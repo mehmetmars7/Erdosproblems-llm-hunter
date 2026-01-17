@@ -144,3 +144,283 @@ Decide whether there exists an infinite increasing sequence $(d_i)$ with $\delta
 If density $1$ is impossible, a minimal obstruction would likely be that any set $D$ missing only $o(M)$ integers in $\{1,\dots,M\}$ forces the presence of some $d_j$ equal to a product of a previous consecutive block, creating an unavoidable collision between a length-$1$ interval and a longer interval. Such a counterexample would manifest as an explicit collision $\prod_{i=u}^v d_i=\prod_{i=u'}^{v'} d_i$ with $u'<u\le v<v'$ or similar nested structure.
 \end{enumerate}
 
+\section*{1) FORMAL RESTATEMENT}
+
+\textbf{Conventions.}
+Let $\mathbb N:=\{1,2,3,\dots\}$.
+
+A \textbf{candidate} is a strictly increasing sequence of positive integers
+\[
+1\le d_1<d_2<\cdots,\qquad d_i\in\mathbb N,
+\]
+and we write $D:=\{d_i:i\in\mathbb N\}\subset\mathbb N$.
+
+Define the \textbf{(natural/asymptotic) density} of $D$, if it exists, by
+\[
+\delta(D):=\lim_{N\to\infty}\frac{|D\cap\{1,2,\dots,N\}|}{N}.
+\]
+For integers $u,v\in\mathbb N$ with $1\le u\le v$, define the \textbf{consecutive block product}
+\[
+P_{u,v}:=\prod_{i=u}^v d_i\in\mathbb N.
+\]
+
+\textbf{Problem (\#421).}
+Does there exist an infinite strictly increasing sequence $(d_i)_{i\ge1}$ such that
+\begin{enumerate}
+\item $\delta(D)=1$, and
+\item (\textbf{distinct interval products}) for all $(u,v)\neq(u',v')$ with $1\le u\le v$ and $1\le u'\le v'$,
+\[
+P_{u,v}\neq P_{u',v'}\, ?
+\]
+\end{enumerate}
+
+\textbf{Stress points / edge cases.}
+\begin{itemize}
+\item The sequence must be infinite (otherwise $\delta(D)=1$ cannot hold).
+\item If any $d_j=1$ and there is a later term, then $P_{j,j+1}=P_{j+1,j+1}$, so any infinite solution must satisfy $d_i\ge2$ for all $i$.
+\item The condition is global: it forbids \emph{all} multiplicative relations among consecutive blocks, including relations that can be \emph{created} by deleting terms.
+\end{itemize}
+
+\section*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+As of 2026-01-17, the Erd\H{o}s Problems database lists \#421 as \textbf{OPEN} and records that Selfridge constructed sequences with the desired ``distinct consecutive block products'' property and density $>1/e-\varepsilon$ for every $\varepsilon>0$, while the density-$1$ case is not marked as resolved there. A recent forum discussion proposes a route via a prefix-stable greedy construction plus determinant-method bounds for integral points on certain separated-variable curves; however, no fully published unconditional resolution was identified in that check.
+
+\section*{3) ATTACK PLAN}
+
+\textbf{Proof-track strategies.}
+\begin{enumerate}
+\item \textbf{Prefix-stable greedy construction.} Scan $n=2,3,4,\dots$ and include $n$ unless it creates a collision among consecutive products in the current sequence, in a way that guarantees later decisions cannot create new collisions among already-accepted terms. Goal: show the rejected set is $o(N)$ up to $N$.
+\item \textbf{Dyadic deletion + local deficiency + Diophantine bounds.} Delete a density-$0$ set scale-by-scale while controlling local deletion counts, so only $X^{o(1)}$ ``gap patterns'' occur at scale $X$; then use determinant-method point counting to show only $o(X)$ collisions per dyadic block.
+\item \textbf{Large prime factor / random deletion hybrid.} Prepare the sequence so each term has a large prime factor, then delete a sparse set randomly to destroy long-block collisions; use Diophantine tools for the $\log$-length bottleneck.
+\end{enumerate}
+
+\textbf{Disproof-track strategies.}
+\begin{enumerate}
+\item \textbf{Forced collision counting.} Attempt to show density $1$ implies too many multiplicative identities among consecutive blocks (pigeonhole/divisor-lattice arguments).
+\item \textbf{Unavoidable product closure.} Attempt to show density $1$ forces inclusion of too many numbers that equal products of short consecutive blocks, making collisions inevitable.
+\end{enumerate}
+
+\textbf{Chosen direction.}
+The strongest available ``hard'' input appears to be determinant-method point counting for plane curves, but a major independent obstacle is that deletion is not monotone: deleting terms can \emph{create} new collisions. Any density-$1$ construction must be \emph{prefix-stable} against that phenomenon.
+
+\section*{4) WORK}
+
+\subsection*{4.1 Basic necessary lemma: no $1$ in an infinite solution}
+
+\textbf{Lemma 4.1.}
+If $(d_i)_{i\ge1}$ is strictly increasing and has the distinct-interval-products property, and it has at least two terms, then $d_i\neq1$ for all $i$. In particular any infinite solution satisfies $d_i\ge2$ for all $i$.
+
+\textbf{Proof.}
+Suppose $d_j=1$ for some $j$ and that $d_{j+1}$ exists. Then
+\[
+P_{j+1,j+1}=d_{j+1},\qquad P_{j,j+1}=d_jd_{j+1}=1\cdot d_{j+1}=d_{j+1},
+\]
+so $P_{j+1,j+1}=P_{j,j+1}$ with $(j+1,j+1)\neq(j,j+1)$, contradicting injectivity. \hfill$\square$
+
+\subsection*{4.2 Normal form for collisions: disjoint separated consecutive blocks}
+
+A collision is an equality
+\[
+P_{u,v}=P_{u',v'}\qquad\text{with }(u,v)\neq(u',v').
+\]
+The key structural fact is that, since all $d_i\ge2$, one interval cannot properly contain the other; after cancellation one obtains an equality of products of two disjoint consecutive blocks.
+
+\textbf{Lemma 4.2 (collision normal form).}
+Assume $d_i\ge2$ for all $i$. If there exist $1\le u\le v$ and $1\le u'\le v'$ with $(u,v)\neq(u',v')$ such that
+\[
+\prod_{i=u}^v d_i=\prod_{i=u'}^{v'} d_i,
+\]
+then there exist integers $M,N,\ell,k$ with $M<N$, $\ell\ge1$, $k\ge0$ such that
+\[
+\boxed{\ \prod_{i=M-\ell+1}^{M} d_i\;=\;\prod_{i=N}^{N+k} d_i\ }\tag{NF}
+\]
+(i.e.\ equality of products of two disjoint consecutive blocks, left block ending at $M$, right block starting at $N$).
+
+\textbf{Proof.}
+Without loss of generality assume $u\le u'$. Consider cases.
+
+\emph{Case 1: Disjoint, $v<u'$.}
+Set $M:=v$, $N:=u'$, $\ell:=v-u+1$, $k:=v'-u'$. Then (NF) is exactly the original equality.
+
+\emph{Case 2: Overlap, $u\le u'\le v$.}
+Then
+\[
+\prod_{i=u}^v d_i=\prod_{i=u'}^{v'} d_i.
+\]
+Cancel the common factor $\prod_{i=u'}^{v} d_i$ (since $u'\le v$) to obtain
+\[
+\prod_{i=u}^{u'-1} d_i=\prod_{i=v+1}^{v'} d_i.\tag{1}
+\]
+Now $u'-1<v+1$, so the two blocks in (1) are disjoint and separated. Define $M:=u'-1$, $N:=v+1$, $\ell:=u'-u$, and $k:=v'-v-1$. Then (1) becomes (NF).
+
+\emph{Case 3: Containment, $u\le u'$ and $v'\le v$.}
+Then $[u',v']\subseteq[u,v]$, and cancellation gives
+\[
+\prod_{i=u}^{u'-1} d_i\cdot \prod_{i=v'+1}^{v} d_i=1.
+\]
+Each factor is $\ge2$, so the left-hand side is $\ge2$ unless both products are empty, i.e.\ unless $u=u'$ and $v=v'$, contradicting $(u,v)\neq(u',v')$. Hence containment cannot occur.
+
+Thus in all possible cases a collision yields (NF). \hfill$\square$
+
+\subsection*{4.3 Deleting numbers can create collisions (non-monotonicity)}
+
+\textbf{Lemma 4.3 (non-monotonicity under deletion).}
+There exists a finite strictly increasing sequence whose interval products are all distinct, but deleting a term from it creates an interval-product collision.
+
+\textbf{Proof (explicit example).}
+Take the set $A=\{2,4,6,12\}$ with enumeration $d_1=2,d_2=4,d_3=6,d_4=12$.
+All interval products are:
+\begin{itemize}
+\item length $1$: $2,4,6,12$;
+\item length $2$: $2\cdot4=8$, $4\cdot6=24$, $6\cdot12=72$;
+\item length $3$: $2\cdot4\cdot6=48$, $4\cdot6\cdot12=288$;
+\item length $4$: $2\cdot4\cdot6\cdot12=576$.
+\end{itemize}
+These $10$ values are pairwise distinct, so $A$ satisfies the distinct-interval-products property.
+
+Now delete $4$ to obtain $A'=\{2,6,12\}$. Then
+\[
+P'_{1,2}=2\cdot 6=12=P'_{3,3},
+\]
+a collision. \hfill$\square$
+
+\textbf{Consequence.}
+Any deletion-based construction must establish a \emph{prefix-stability} invariant; it is not enough to hit collisions present at one stage, because new collisions can be created by the deletion itself.
+
+\subsection*{4.4 Determinant-method input (polylog bounds when degree $\asymp \log B$)}
+
+A standard Diophantine-geometric reduction rewrites a collision in normal form (NF) as an integer point on a separated-variable curve of the shape
+\[
+\prod_{i=0}^{\ell-1}(x-a_i)=\prod_{j=0}^{k}(y+b_j),
+\]
+where $a_0=b_0=0$ and typically $a_i,b_j\in\mathbb Z_{\ge0}$ encode local gaps.
+
+One quantitative determinant-method theorem (Castryck--Cluckers--Dittmann--Nguyen, plane curve case) states:
+
+\textbf{Theorem 4.4 (CCDN, plane curve case).}
+Let $X\subset\mathbb A^2$ be an \emph{integral} affine curve of degree $d\ge2$ defined over $\mathbb Q$.
+Let $N(X,B)$ be the number of integer points $(x,y)\in X(\mathbb Z)$ with $|x|\le B$ and $|y|\le B$.
+Then
+\[
+N(X,B)\ \ll\ (d^3\log B+d^4)\,B^{1/d},
+\]
+with an absolute implied constant.
+
+\textbf{Corollary 4.5.}
+Fix constants $0<c\le C$. If $c\log B\le d\le C\log B$, then
+\[
+N(X,B)\ \ll\ (\log B)^5.
+\]
+
+\textbf{Proof.}
+Since $d\ge c\log B$, we have
+\[
+B^{1/d}=\exp\!\Big(\frac{\log B}{d}\Big)\le \exp(1/c),
+\]
+so Theorem 4.4 yields $N(X,B)\ll (d^3\log B+d^4)\ll (\log B)^5$. \hfill$\square$
+
+\subsection*{4.5 Line-component degeneracy is harmless in the collision region $x<y$, $x,y>0$}
+
+Set
+\[
+f(x):=\prod_{i=0}^{\ell-1}(x-a_i),\qquad g(y):=\prod_{j=0}^{k}(y+b_j),
+\]
+with $a_0=b_0=0$ and $a_i,b_j\in\mathbb Z_{\ge0}$. Assume $\deg f=\deg g=d\ge1$ and both are monic.
+Let
+\[
+F(x,y):=f(x)-g(y)\in\mathbb Z[x,y].
+\]
+
+\textbf{Lemma 4.6 (classification of linear factors).}
+If $F(x,y)=f(x)-g(y)$ has a nonconstant linear factor over $\mathbb Q$, then there exists $t\in\mathbb Q$ such that either
+\[
+f(x)\equiv g(x+t)\quad\text{or}\quad f(x)\equiv g(-x+t)
+\]
+as polynomials in $\mathbb Q[x]$.
+
+\textbf{Proof.}
+Let $L(x,y)=ux+vy+w$ be a linear factor of $F$ with $(u,v)\neq(0,0)$.
+Then $v\neq0$ (otherwise $L$ depends only on $x$, forcing $f$ to be constant).
+Write the line as $y=\alpha x+\beta$ with $\alpha,\beta\in\mathbb Q$.
+Divisibility implies
+\[
+0\equiv F(x,\alpha x+\beta)=f(x)-g(\alpha x+\beta)
+\]
+in $\mathbb Q[x]$, hence $f(x)\equiv g(\alpha x+\beta)$.
+Comparing leading coefficients, since $f$ and $g$ are monic of degree $d$,
+the leading coefficient of $g(\alpha x+\beta)$ is $\alpha^d$, so $\alpha^d=1$ in $\mathbb Q$.
+Thus $\alpha=1$ or $\alpha=-1$. Writing $t:=\beta$ gives the claim. \hfill$\square$
+
+\textbf{Lemma 4.7 (no relevant points from line components).}
+Under the above assumptions, in either of the identities $f(x)\equiv g(x+t)$ or $f(x)\equiv g(-x+t)$ we obtain:
+\begin{itemize}
+\item If $f(x)\equiv g(x+t)$, then necessarily $t\le0$, so the line $y=x+t$ contains no integer point with $x<y$.
+\item If $f(x)\equiv g(-x+t)$, then necessarily $t=0$, so the line $y=-x$ contains no integer point with $x,y>0$.
+\end{itemize}
+
+\textbf{Proof.}
+If $f(x)\equiv g(x+t)$, then the root multisets agree:
+roots of $f$ are $\{a_i\}\subseteq\mathbb Z_{\ge0}$ and include $0=a_0$;
+roots of $g(x+t)$ are $\{-t-b_j\}$ and include $-t$ (since $b_0=0$).
+Thus $-t$ is a root of $f$, so $-t\ge0$, i.e.\ $t\le0$, and $y=x+t\le x$, excluding $x<y$.
+
+If $f(x)\equiv g(-x+t)$, then roots of $g(-x+t)$ are $\{t+b_j\}\subseteq t+\mathbb Z_{\ge0}$ and include $t$.
+Since $0$ is a root of $f$, we need $0=t+b_j$ for some $j$, hence $t\le0$.
+But also $t$ itself is a root of $f$, so $t\ge0$. Therefore $t=0$, and $y=-x$ has no solutions with $x,y>0$. \hfill$\square$
+
+\textbf{Conclusion.}
+Any affine line component of $F(x,y)=0$ yields no points in the collision-relevant region $x<y$ with $x,y>0$.
+
+\subsection*{4.6 Precise point where the full solution breaks}
+
+The determinant-method bounds in \S4.4 are strong enough to bound integer points on \emph{a fixed} integral curve of degree $d$.
+However, turning this into a density-$1$ set $D$ with \emph{all} consecutive block products distinct requires a construction argument that is robust under deletions/rejections. Lemma 4.3 shows naive deletion can create new collisions.
+
+A crisp formulation of the missing step is:
+
+\medskip
+\noindent\textbf{GAP (construction stability problem).}
+Construct (or prove existence of) an infinite set $D\subset\mathbb N$ of density $1$ via an explicit selection/deletion rule such that, for every cutoff $N$, there are no collisions in normal form (NF) whose maximum index/value lies $\le N$, and such that the number of rejected integers $\le N$ is $o(N)$.
+In particular, one must prove a \emph{prefix-stability} invariant that prevents the phenomenon of Lemma 4.3 at all scales.
+\medskip
+
+\section*{5) VERIFICATION}
+
+\begin{itemize}
+\item Lemma 4.1: checked by explicit collision $P_{j,j+1}=P_{j+1,j+1}$ if $d_j=1$ and a later term exists.
+\item Lemma 4.2: all interval-pair configurations split into disjoint, overlap, containment; cancellation is explicit; containment is ruled out using $d_i\ge2$.
+\item Lemma 4.3: explicit finite example verified by listing all interval products; deletion creates a concrete collision.
+\item Lemmas 4.6--4.7: linear factor $\Rightarrow$ affine parametrization $y=\alpha x+\beta$; monicity forces $\alpha\in\{\pm1\}$; root-multiset arguments with $a_i,b_j\ge0$ exclude any collision-region integer points.
+\item No claim of a full construction is made; the stated GAP is genuine and consistent with non-monotonicity under deletion.
+\end{itemize}
+
+\section*{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial result obtained here.}
+\begin{itemize}
+\item Any collision can be reduced to the disjoint-block normal form (NF) (Lemma 4.2).
+\item The ``no-collision'' property is not monotone under deletion (Lemma 4.3).
+\item For the separated-variable curve $f(x)-g(y)=0$ with nonnegative gap roots, any affine line component yields no collision-relevant points with $x<y$, $x,y>0$ (Lemmas 4.6--4.7).
+\item Determinant-method bounds give explicit uniform point counts $N(X,B)\ll(d^3\log B+d^4)B^{1/d}$ for integral plane curves of degree $d$; in particular for $d\asymp\log B$ this is polylogarithmic in $B$ (Theorem 4.4 and Corollary 4.5).
+\end{itemize}
+
+\item[(ii)] \textbf{First gap (single crisp statement).}
+Provide a fully rigorous, prefix-stable construction of a density-$1$ increasing sequence $(d_i)$ with distinct consecutive block products; in particular, prove that the deletion/rejection mechanism cannot create new collisions below already-processed scales (cf.\ Lemma 4.3).
+
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Design and prove a genuinely prefix-stable selection rule (an invariant ``no collisions with maximum $\le n$'' maintained at each step).
+\item Prove a quantitative bound on the number of realized local gap patterns at each dyadic scale under that invariant.
+\item Combine the pattern bound with Theorem 4.4 on each (integral) component and a controlled degeneracy classification to show only $o(X)$ total collision points per dyadic range $[X,2X]$.
+\end{itemize}
+
+\item[(iv)] \textbf{Likely structure of a minimal obstruction (if density $1$ is impossible).}
+A forcing lemma would show that any $D\subset\mathbb N$ with $|[1,N]\setminus D|=o(N)$ must contain a short normal-form collision (NF) with maximum $\le N$, likely involving very short blocks (e.g.\ length $2$ vs length $1$), since those are hardest to eliminate without deleting a positive proportion.
+\end{enumerate}
+
+\section*{7) COMPLETION ESTIMATE}
+
+\noindent COMPLETION: 45\%.
