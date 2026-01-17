@@ -1,0 +1,261 @@
+\section*{Problem \#789 (Erd\H{o}s--Straus admissible subsets)}
+
+\subsection*{1. Formal restatement}
+
+The statement in the prompt is (slightly) ambiguous about whether repeated summands are allowed.
+If repetitions were allowed, the property would be essentially trivial (e.g. a 2-element set
+\(\{x,2x\}\) already violates the condition). In the literature around Erd\H{o}s--Straus and Straus,
+``admissible'' refers to sums of \emph{distinct} elements.
+
+Accordingly, throughout this section we interpret the problem as follows.
+
+\medskip
+\noindent\textbf{Definition (admissible finite set).}
+A finite set \(B\subset\mathbb{Z}\) is \emph{admissible} if for any two (finite) \emph{distinct-element} sums
+\[
+  b_1+\cdots+b_r = b'_1+\cdots+b'_s\qquad (b_i,b'_j\in B,\ b_1<\cdots<b_r,\ b'_1<\cdots<b'_s),
+\]
+we necessarily have \(r=s\).
+Equivalently, if we define for \(r\ge1\)
+\[
+  S_r(B)\;:=\;\Big\{\, b_1+\cdots+b_r : b_1<\cdots<b_r\in B\,\Big\},
+\]
+then \(B\) is admissible if and only if \(S_r(B)\cap S_s(B)=\emptyset\) for all \(r\neq s\).
+
+\medskip
+\noindent\textbf{Definition of \(h(n)\).}
+Let \(h(n)\) be the largest integer such that every set \(A\subset\mathbb{Z}\) with \(|A|=n\)
+contains an admissible subset \(B\subseteq A\) with \(|B|\ge h(n)\).
+
+\medskip
+\noindent\textbf{Problem.} Estimate the growth of \(h(n)\) as \(n\to\infty\).
+
+\subsection*{2. Quick literature/context check (browsing available)}
+
+This is an Erd\H{o}s--Straus extremal problem.
+The Erd\H{o}s Problems website (problem \#789) records:
+
+\begin{itemize}
+\item Erd\H{o}s proved a lower bound \(h(n)\gg n^{1/3}\).
+\item Straus proved an upper bound \(h(n)\ll n^{1/2}\).
+\item Choi improved the lower bound to \(h(n)\gg (n\log n)^{1/3}\).
+\end{itemize}
+
+In this writeup I will reprove a clean \(n^{1/3}\) lower bound and a clean \(\sqrt{n}\) upper bound
+(with an explicit constant), both with complete details, and then record the known improvements.
+
+\subsection*{3. Attack plan}
+
+\begin{enumerate}
+\item Prove a lower bound \(h(n)\gg n^{1/3}\) by a probabilistic ``random rotation'' argument:
+choose \(\alpha\in[0,1]\) and keep those elements of \(A\) whose fractional parts
+\(\{\alpha a\}\) lie in a short interval. This forces the fractional part of any \(r\)-sum
+to sit near \(r\theta\), with disjoint neighborhoods for different \(r\).
+\item Prove an upper bound \(h(n)\ll \sqrt{n}\) by choosing the specific set
+\(A=\{1,2,\dots,n\}\) and bounding the size of any admissible \(B\subseteq A\).
+To do this in a self-contained way, use the Erd\H{o}s--Heilbronn / Dias da Silva--Hamidoune
+restricted sumset inequality \(|S_r(B)|\ge r|B|-r^2+1\), sum over \(r\), and compare with the
+trivial bound that all sums are \(\le |B|\,n\).
+\end{enumerate}
+
+\subsection*{4. Detailed work}
+
+\subsubsection*{4.1 A clean \texorpdfstring{\(n^{1/3}\)}{n^{1/3}} lower bound}
+
+\begin{theorem}
+There is an absolute constant \(c>0\) such that for all \(n\ge1\), every \(A\subset\mathbb{Z}\)
+with \(|A|=n\) contains an admissible subset \(B\subseteq A\) with
+\(\,|B|\ge c\,n^{1/3}\). In particular, \(h(n)\gg n^{1/3}\).
+\end{theorem}
+
+\begin{proof}
+Fix \(A=\{a_1,\dots,a_n\}\subset\mathbb{Z}\) with \(|A|=n\).
+Let
+\[
+  m := \left\lfloor \frac{1}{4}n^{1/3}\right\rfloor\qquad (m\ge1\ \text{for}\ n\ge 64).
+\]
+We will construct an admissible subset of size \(m\), which suffices since \(m\asymp n^{1/3}\).
+
+Choose parameters
+\[
+  \theta := \frac{1}{2m},\qquad \delta := \frac{1}{8m^2},\qquad I := (\theta-\delta,\,\theta+\delta)\subset(0,1).
+\]
+For \(\alpha\in[0,1]\), define
+\[
+  B(\alpha) := \{a\in A : \{\alpha a\}\in I\},
+\]
+where \(\{x\}=x-\lfloor x\rfloor\in[0,1)\) is the fractional part.
+
+\medskip
+\noindent\emph{Step 1: show some \(\alpha\) gives many elements.}
+For fixed \(a\in\mathbb{Z}\setminus\{0\}\), as \(\alpha\) ranges uniformly in \([0,1]\), the quantity
+\(\{\alpha a\}\) is uniformly distributed in \([0,1)\).
+Hence
+\(\mathbb{P}(\{\alpha a\}\in I)=|I|=2\delta=\frac{1}{4m^2}.\)
+For \(a=0\), \(\{\alpha a\}=0\notin I\).
+Therefore
+\[
+  \mathbb{E}_{\alpha\sim U[0,1]}\,|B(\alpha)|
+  \;=\;\sum_{a\in A}\mathbb{P}(\{\alpha a\}\in I)
+  \;\ge\; (n-1)\cdot \frac{1}{4m^2}.
+\]
+For \(n\ge 64\) we have \(m\le \frac14 n^{1/3}\), hence \(m^3\le n/64\), so
+\((n-1)/(4m^2)\ge 16m -1\).
+Thus there exists \(\alpha\) such that \(|B(\alpha)|\ge 16m-1\).
+Fix such an \(\alpha\), and choose any subset \(B\subseteq B(\alpha)\) of size exactly \(m\).
+
+\medskip
+\noindent\emph{Step 2: prove \(B\) is admissible.}
+Let \(r,s\) be integers with \(1\le r<s\le m\).
+Take distinct elements \(b_1<\dots<b_s\in B\), and write
+\(x_i:=\{\alpha b_i\}\in I\).
+Then
+\[
+  x_i \in (\theta-\delta,\theta+\delta)\subset(0,1)
+  \quad\Longrightarrow\quad
+  \sum_{i=1}^t x_i \in (t\theta-t\delta,\ t\theta+t\delta)\ \text{for each}\ t\le m.
+\]
+Moreover, for \(t\le m\) we have
+\[
+  t\theta+t\delta \le m\Big(\frac{1}{2m}+\frac{1}{8m^2}\Big) = \frac12+\frac{1}{8m} < 1.
+\]
+Therefore the sum \(\sum_{i=1}^t x_i\) lies in \((0,1)\), so there is \emph{no wraparound} mod 1, and
+\[
+  \Big\{\alpha\sum_{i=1}^t b_i\Big\}
+  = \Big\{\sum_{i=1}^t \alpha b_i\Big\}
+  = \Big\{\sum_{i=1}^t (\lfloor \alpha b_i\rfloor + x_i)\Big\}
+  = \Big\{\sum_{i=1}^t x_i\Big\}
+  = \sum_{i=1}^t x_i.
+\]
+
+Suppose for contradiction that there are two disjoint subsets
+\(\{c_1<\cdots<c_r\}\) and \(\{d_1<\cdots<d_s\}\) of \(B\) with different sizes \(r\neq s\) such that
+\[
+  c_1+\cdots+c_r\;=\;d_1+\cdots+d_s.
+\]
+Write \(u_i:=\{\alpha c_i\}\in I\) and \(v_j:=\{\alpha d_j\}\in I\).
+As shown above, for any \(t\le m\) we have \(\sum_{i=1}^t u_i\in(0,1)\) and \(\sum_{j=1}^t v_j\in(0,1)\),
+so there is no modular wraparound and
+\[
+  \Big\{\alpha\sum_{i=1}^r c_i\Big\} = \sum_{i=1}^r u_i,
+  \qquad
+  \Big\{\alpha\sum_{j=1}^s d_j\Big\} = \sum_{j=1}^s v_j.
+\]
+Taking fractional parts of the equality of integer sums therefore yields the real equality
+\(\sum_{i=1}^r u_i = \sum_{j=1}^s v_j\).
+But
+\[
+  \sum_{i=1}^r u_i \in (r\theta-r\delta,\ r\theta+r\delta),
+  \qquad
+  \sum_{j=1}^s v_j \in (s\theta-s\delta,\ s\theta+s\delta).
+\]
+Since \(|r-s|\ge 1\), the centers differ by at least \(\theta=1/(2m)\), while the total half-width
+is at most \((r+s)\delta\le 2m\delta = 1/(4m)\).
+Hence these two intervals are disjoint, a contradiction.
+Therefore no such equality with \(r\neq s\) exists, and \(B\) is admissible.
+
+Finally, for \(n<64\) we trivially have \(h(n)\ge1\), so the bound \(h(n)\gg n^{1/3}\) holds for all \(n\)
+after adjusting constants.
+\end{proof}
+
+\subsubsection*{4.2 A clean \texorpdfstring{\(\sqrt{n}\)}{sqrt(n)} upper bound}
+
+We now prove an \(O(\sqrt{n})\) upper bound on \(h(n)\) by exhibiting one set \(A\) of size \(n\)
+for which every admissible subset is \(O(\sqrt{n})\).
+
+\medskip
+\noindent\textbf{Restricted sumset lower bound.}
+For a finite set \(B\subset\mathbb{Z}\) and \(1\le r\le |B|\), let
+\(S_r(B)\) be the set of sums of \(r\) distinct elements.
+A consequence of the Dias da Silva--Hamidoune theorem (Erd\H{o}s--Heilbronn) is that
+\begin{equation}
+  |S_r(B)|\ \ge\ r|B|-r^2+1\ =\ r(|B|-r)+1.
+  \label{eq:EDSH}
+\end{equation}
+(One route to \eqref{eq:EDSH} is: embed \(B\) into a prime cyclic group \(\mathbb{Z}/p\mathbb{Z}\)
+for a prime \(p\) larger than the full range of possible sums so that no modular wrap occurs,
+apply the restricted sumset inequality in \(\mathbb{Z}/p\mathbb{Z}\), and pull back.)
+
+\begin{theorem}
+There is an absolute constant \(C>0\) such that \(h(n)\le C\sqrt{n}\) for all \(n\ge1\).
+In particular, one may take \(C=\sqrt{7}\).
+\end{theorem}
+
+\begin{proof}
+Fix \(n\ge1\) and let \(A:=\{1,2,\dots,n\}\subset\mathbb{N}\).
+Let \(B\subseteq A\) be admissible and put \(m:=|B|\).
+For each \(1\le r\le m\), every element of \(S_r(B)\) is a positive integer and is at most
+\(rn\le mn\). Since \(B\) is admissible, the sets \(S_r(B)\) are pairwise disjoint, hence
+\begin{equation}
+  \sum_{r=1}^m |S_r(B)|\ \le\ mn.
+  \label{eq:sumSrUpper}
+\end{equation}
+On the other hand, applying \eqref{eq:EDSH} and summing gives
+\[
+  \sum_{r=1}^m |S_r(B)|
+  \ \ge\ \sum_{r=1}^m \big(rm-r^2+1\big)
+  \ =\ m\sum_{r=1}^m r - \sum_{r=1}^m r^2 + m.
+\]
+Compute the sums:
+\(\sum_{r=1}^m r = \frac{m(m+1)}{2}\) and
+\(\sum_{r=1}^m r^2 = \frac{m(m+1)(2m+1)}{6}\).
+Therefore
+\[
+  \sum_{r=1}^m |S_r(B)|
+  \ \ge\ \frac{m^2(m+1)}{2} - \frac{m(m+1)(2m+1)}{6} + m
+  \ =\ \frac{m(m+1)(m-1)}{6} + m
+  \ \ge\ \frac{m^3}{7}
+\]
+for all \(m\ge2\) (and is trivially \(\ge1\) when \(m=1\)).
+Combine with \eqref{eq:sumSrUpper} to get \(mn\ge m^3/7\), hence
+\(m^2\le 7n\), i.e.
+\(m\le \sqrt{7n}\).
+
+Since \(A\) was a specific size-\(n\) set, this shows that no universal guarantee \(h(n)\) can exceed
+\(\sqrt{7n}\), i.e. \(h(n)\le \sqrt{7n}\).
+\end{proof}
+
+\subsubsection*{4.3 Summary of bounds}
+
+From the two theorems we obtain the (gapful) exponent window
+\[
+  c\,n^{1/3}\ \le\ h(n)\ \le\ \sqrt{7}\,n^{1/2}\qquad (n\to\infty).
+\]
+The literature records the stronger lower bound \(h(n)\gg (n\log n)^{1/3}\) (Choi) and sharper
+upper bounds for the related finite-interval extremal problem (Deshouillers, Freiman, Erd\H{o}s--Nicolas--S\'ark\"ozy, etc.).
+
+\subsection*{5. Verification (gap check, edge cases)}
+
+\begin{itemize}
+\item \emph{Distinct summands interpretation:} without this, the problem degenerates. The restatement aligns
+with the standard ``admissible'' definition used in related problems (e.g. \#874, \#875).
+\item \emph{Lower bound proof:} the only delicate point is modular wraparound of fractional parts.
+We ensured \(\sum_{i=1}^t x_i<1\) for all \(t\le m\), so fractional parts equal ordinary sums.
+\item \emph{Upper bound proof:} we used the restricted sumset bound \eqref{eq:EDSH}.
+This is a known theorem (Erd\H{o}s--Heilbronn, proved by Dias da Silva--Hamidoune) and the reduction
+from integers to \(\mathbb{Z}/p\mathbb{Z}\) is valid provided \(p\) exceeds the full sum range, which we can arrange.
+\item \emph{Constants:} we did not optimize; the point is the exponents \(1/3\) and \(1/2\).
+\end{itemize}
+
+\subsection*{6. Final}
+
+\textbf{UNRESOLVED.}
+
+\begin{enumerate}[label=(\roman*)]
+\item \emph{Furthest point reached:}
+A complete proof that \(h(n)\gg n^{1/3}\) and \(h(n)\ll n^{1/2}\) (explicitly \(h(n)\le\sqrt{7n}\)).
+\item \emph{Blocking issue:}
+The true asymptotic order of \(h(n)\) (in particular the optimal exponent between \(1/3\) and \(1/2\))
+remains open.
+\item \emph{Most plausible next steps:}
+Tighten the upper bound by sharpening restricted-sumset lower bounds in structured settings and/or
+leveraging the precise structure theorems for near-extremal admissible subsets of \([1,N]\);
+for the lower bound, refine the random-rotation argument using a sieve/large-sieve input to gain the
+\((\log n)^{1/3}\) factor (as in Choi).
+\item \emph{Small experiments/checks:}
+The proofs above are analytic/probabilistic and do not rely on computation.
+A computational check of extremal admissible subsets in \([1,N]\) for small \(N\) might help calibrate constants,
+but is not necessary for the established bounds.
+\end{enumerate}
+
+% ------------------------------------------------------------

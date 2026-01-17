@@ -1,0 +1,183 @@
+\section*{Problem 768}
+
+\subsection*{1. Formal restatement}
+
+\begin{definition}[The set $A$]
+Let $A\subseteq \mathbb{N}$ be the set of integers $n\ge 1$ with the property:
+for every prime $p\mid n$ there exists a divisor $d$ of $n$ such that
+\begin{itemize}[leftmargin=2em]
+\item $d>1$, and
+\item $d\equiv 1\pmod p$.
+\end{itemize}
+Equivalently: for every prime $p\mid n$ there is an integer $a\ge 1$ such that $1+ap\mid n$.
+\end{definition}
+
+For $N\ge 1$ define the counting function
+\[
+A(N)\coloneqq |\{n\le N: n\in A\}|,
+\qquad \delta(N)\coloneqq \frac{A(N)}{N}.
+\]
+
+\paragraph{Question (Erd\H{o}s).}
+Is there a constant $c>0$ such that, as $N\to\infty$,
+\[
+\delta(N)=\exp\bigl(-(c+o(1))\,\sqrt{\log N}\,\log\log N\bigr)?
+\]
+(Here and throughout, $\log$ is the natural logarithm.)
+
+\subsection*{2. Quick literature/context check (web-browsing was available)}
+
+The problem statement and its known bounds are recorded on the ErdosProblems project page for \#768.
+The same set $A$ appears as OEIS \href{https://oeis.org/A352287}{A352287} (``Numbers surviving the Sylow test'') and is discussed in a MathOverflow thread by M.~Su\'arez-\'Alvarez (answer by W.~Sawin) about the density of integers excluded by Sylow congruences for simple group orders.
+
+A quick web search (Jan 2026) did not turn up a published proof of the conjectured sharp asymptotic with an explicit constant $c$.
+
+\subsection*{3. Strategy}
+
+\paragraph{What would prove the conjectured asymptotic.}
+One needs an upper bound matching Erd\H{o}s's lower bound of the shape
+$\delta(N)\le \exp(-(c'+o(1))\sqrt{\log N}\,\log\log N)$
+for some constant $c'>0$ and in fact with $c'=c$.
+Heuristically, the bottleneck is controlling the constraint for the \emph{largest} prime factor $P(n)$, because a divisor $\equiv 1\pmod{P(n)}$ must be of the form $1+aP(n)$, which forces substantial extra structure.
+
+\paragraph{What we can do unconditionally here.}
+We give a clean proof (following the idea in Sawin's MathOverflow answer) that $A$ has natural density $0$.
+This is far from the conjectured stretched-exponential asymptotic, but it is a rigorous ``first barrier'' result.
+We also provide small-$N$ computational data.
+
+\subsection*{4. Work}
+
+\subsubsection*{4.1 A density-$0$ theorem}
+
+\begin{proposition}[The set $A$ has density $0$]
+As $N\to\infty$,
+\[
+\frac{A(N)}{N}\longrightarrow 0.
+\]
+\end{proposition}
+
+\begin{proof}
+Fix a parameter $0<\delta<1/2$ (we will later choose it small).
+For $x\ge 1$ write $P(n)$ for the largest prime factor of $n$ (with $P(1)=1$).
+Split
+\[
+\{n\le x: n\in A\}=S_\mathrm{smooth}(x)\;\cup\;S_\mathrm{rough}(x)
+\]
+where
+\[
+S_\mathrm{smooth}(x)=\{n\le x: n\in A,\ P(n)\le x^{\delta}\},
+\qquad
+S_\mathrm{rough}(x)=\{n\le x: n\in A,\ P(n)>x^{\delta}\}.
+\]
+
+\smallskip
+\noindent\emph{Step 1: the ``smooth'' part can be made arbitrarily small.}
+The set $S_\mathrm{smooth}(x)$ is contained in the set of $x^{\delta}$-smooth numbers.
+By standard estimates for smooth numbers (e.g. de Bruijn--Dickman asymptotics), for each $\varepsilon>0$ there exists a choice of $\delta>0$ such that for all sufficiently large $x$,
+\[
+|S_\mathrm{smooth}(x)|\le \#\{n\le x: P(n)\le x^{\delta}\}\le \varepsilon x.
+\]
+(We will henceforth fix such a $\delta$ corresponding to an arbitrary small $\varepsilon$.)
+
+\smallskip
+\noindent\emph{Step 2: for fixed $\delta$, the ``rough'' part is $o(x)$.}
+Let $n\in S_\mathrm{rough}(x)$ and put $p\coloneqq P(n)>x^{\delta}$.
+Because $n\in A$, applying the defining property to the prime $p\mid n$ yields a divisor $d\mid n$ with $d>1$ and $d\equiv 1\pmod p$.
+Write $d=1+ap$ with $a\ge 1$.
+Note that $p\nmid d$ (since $d\equiv 1\pmod p$), so we may write
+\[
+ n = p\,d\,b
+\]
+for some integer $b\ge 1$ (this absorbs the remaining prime-power factors of $n$, including possible additional factors of $p$).
+In particular,
+\[
+ n \ge p\,d = p(1+ap).
+\]
+
+Now count such $n\le x$ by counting triples $(p,a,b)$.
+For fixed $p$ and $a$, the number of $b$ with $p(1+ap)b\le x$ is at most $x/(p(1+ap))$.
+Therefore
+\[
+|S_\mathrm{rough}(x)|
+\le \sum_{\substack{p>x^{\delta}\\ p\text{ prime}}}\ \sum_{a\ge 1}\ \frac{x}{p(1+ap)}.
+\]
+For each prime $p$ we bound
+\[
+\sum_{a\ge 1}\frac{1}{p(1+ap)}
+\le \frac{1}{p^2}\sum_{a\ge 1}\frac{1}{a}
+\quad\text{with the constraint } 1+ap\le x\ \text{ (else the summand contributes }0\text{).}
+\]
+More cleanly, since $1+ap\le x$ implies $a\le x/p$, we have
+\[
+\sum_{1\le a\le x/p}\frac{1}{p(1+ap)}
+\le \frac{1}{p^2}\sum_{1\le a\le x/p}\frac{1}{a}
+\le \frac{\log x}{p^2}
+\]
+for all large $x$.
+Hence
+\[
+|S_\mathrm{rough}(x)|
+\le x\log x\sum_{p>x^{\delta}}\frac{1}{p^2}.
+\]
+Using the crude bound $\sum_{m>y}m^{-2}\le 1/y$ we obtain
+\[
+\sum_{p>x^{\delta}}\frac{1}{p^2}\le \sum_{m> x^{\delta}}\frac{1}{m^2}\le \frac{1}{x^{\delta}}.
+\]
+Therefore
+\[
+|S_\mathrm{rough}(x)|\le x\log x\cdot x^{-\delta}=x^{1-\delta}\log x=o(x).
+\]
+
+\smallskip
+\noindent\emph{Step 3: conclude density $0$.}
+Given any $\varepsilon>0$ choose $\delta$ as in Step 1.
+Then for sufficiently large $x$,
+\[
+A(x)\le |S_\mathrm{smooth}(x)|+|S_\mathrm{rough}(x)|\le \varepsilon x + o(x).
+\]
+Dividing by $x$ and letting $x\to\infty$ gives $\limsup_{x\to\infty}A(x)/x\le \varepsilon$.
+Since $\varepsilon$ was arbitrary, $A(x)/x\to 0$.
+\end{proof}
+
+\subsubsection*{4.2 Small-$N$ computational data}
+
+A direct computation (trial division via smallest-prime-factor sieve, enumerating divisors of the $p$-free part for each prime $p\mid n$) gives:
+\begin{itemize}[leftmargin=2em]
+\item First few elements of $A$:
+\[
+1,12,24,30,36,48,56,60,72,80,90,96,105,108,112,120,\dots
+\]
+\item Densities:
+\[
+\delta(10^4)=0.057,\qquad \delta(10^5)\approx 0.03276,\qquad \delta(2\cdot 10^5)\approx 0.02757,\qquad \delta(10^6)\approx 0.018462.
+\]
+\item The ratio
+$\displaystyle \frac{-\log\delta(N)}{\sqrt{\log N}\,\log\log N}$
+for these $N$ is about $0.41$ (not remotely in an asymptotic regime, but consistent with a conjectural constant of that scale).
+\end{itemize}
+
+\subsection*{5. Obstacles/checks}
+
+The density-$0$ argument above is extremely lossy: it only uses one prime (the largest prime factor) and counts very crudely by the divisor form $1+ap$.
+To reach a sharp asymptotic of the form $\exp(-(c+o(1))\sqrt{\log N}\,\log\log N)$ one would need:
+\begin{itemize}[leftmargin=2em]
+\item a much finer understanding of the typical size of the largest prime factor $P(n)$ among $n\in A$;
+\item a sieve analysis of how often $n$ can contain, simultaneously for many primes $p\mid n$, a nontrivial divisor $\equiv 1\pmod p$;
+\item matching upper and lower bounds on a stretched-exponential scale.
+\end{itemize}
+
+\subsection*{6. Conclusion}
+
+\textbf{UNRESOLVED.}
+The conjectured sharp asymptotic with constant $c$ remains open (as far as found in the quick literature check).
+What is proved here is that $A$ has density $0$, and we provide small computational data.
+
+\subsection*{7. If UNRESOLVED: what we have and what is missing}
+
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Strongest proved statement here:} $A(N)=o(N)$ (density $0$), with an explicit upper bound of the form $A(x)\ll x^{1-\delta}\log x + \Psi(x,x^{\delta})$ for any fixed small $\delta>0$.
+\item \textbf{First genuine gap toward the conjecture:} proving an upper bound of the correct \emph{stretched-exponential} order $\exp(-c\sqrt{\log N}\,\log\log N)$, rather than just $o(1)$ density.
+\item \textbf{A plausible route:} sharpen the ``largest prime factor'' counting to the regime $p\approx \exp(\sqrt{\log N\log\log N})$ and combine with de Bruijn asymptotics for smooth numbers; then analyze additional constraints from smaller prime factors.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

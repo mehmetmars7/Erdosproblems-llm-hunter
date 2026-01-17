@@ -1,0 +1,121 @@
+\section*{Problem 749: dense sumset with uniformly bounded representation function}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+Let $\epsilon>0$.
+Does there exist a set $A\subseteq \mathbb{N}$ such that
+
+\begin{enumerate}
+\item the lower density of the sumset is large:
+\[
+\underline d(A+A)\ \ge\ 1-\epsilon,
+\]
+and
+\item the additive convolution (ordered representation function) is uniformly bounded:
+\[
+(\mathbf 1_A * \mathbf 1_A)(n)\ \ll_\epsilon\ 1
+\qquad\text{for all }n\in\mathbb{N}?
+\]
+\end{enumerate}
+
+Equivalently: can one make $A+A$ miss only an $\epsilon$-fraction of integers while ensuring that every integer has at most $C(\epsilon)$ representations as a sum of two elements of $A$?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+Web browsing available? YES.
+
+\begin{itemize}
+\item The problem is listed as open on \texttt{erdosproblems.com} (Problem 749).
+\item It is closely related in spirit to the Erd\H{o}s--Tur\'an conjecture on additive bases of order $2$ (which would assert that if $A+A$ is eventually all integers, then $\sup_n (\mathbf 1_A*\mathbf 1_A)(n)=\infty$).
+Here we only ask $A+A$ to have density $1-\epsilon$, so a positive answer would not contradict Erd\H{o}s--Tur\'an.
+\end{itemize}
+
+\subsection*{3) ATTACK PLAN}
+
+\begin{itemize}
+\item \textbf{Necessary conditions:} Derive growth restrictions on $A(x)=|A\cap[1,x]|$ from the uniform bound on $(\mathbf 1_A*\mathbf 1_A)(n)$.
+\item \textbf{Finite-model search:} For small $N$, search for $A\subseteq[0,N]$ with bounded representation counts and with $(A+A)\cap[0,N]$ large, to see what constants might be plausible.
+\item \textbf{Candidate constructions:} Try ``block'' or ``recursive'' constructions that (i) keep each sum represented $O(1)$ times, and (ii) cover most integers by sums coming from the same scale.
+\item \textbf{Disproof attempts:} Look for an information-theoretic obstruction: does bounded representation force a positive-density set of integers to be missing from $A+A$?
+\end{itemize}
+
+\subsection*{4) WORK}
+
+\paragraph{4.1 A basic necessary condition: $A$ must be $\sqrt{x}$-sized.}
+Assume there is a constant $g$ with $(\mathbf 1_A*\mathbf 1_A)(n)\le g$ for all $n$.
+For any $x$,
+\[
+\sum_{n\le x} (\mathbf 1_A*\mathbf 1_A)(n)
+=
+|\{(a,a')\in A^2:\ a+a'\le x\}|.
+\]
+In particular, all pairs with $a,a'\le x/2$ contribute, so
+\[
+|A\cap[1,x/2]|^2 \ \le\  \sum_{n\le x} (\mathbf 1_A*\mathbf 1_A)(n)\ \le\  gx.
+\]
+Hence
+\[
+|A\cap[1,x]| \ \le\ |A\cap[1,x/2]| + |A\cap(x/2,x]|\ \ll\ \sqrt{g x}.
+\]
+So any solution must have density $0$ and must be of ``critical'' size $\asymp \sqrt{x}$.
+
+\paragraph{4.2 Heuristic parameter count.}
+If $A(x)\asymp c\sqrt{x}$ then the number of ordered pairs $(a,a')\in A^2$ with $a+a'\le x$ is $\asymp c^2 x$.
+If in addition each $n$ has at most $g$ representations, then the number of represented $n\le x$ is at most $\asymp c^2 x/g$.
+To cover $(1-\epsilon)x$ integers up to $x$, one needs $c^2/g \gtrsim 1-\epsilon$.
+This is consistent with the necessary bound $A(x)\ll \sqrt{g x}$, and suggests that $g$ should need to grow at least on the order of $\log(1/\epsilon)$ in any probabilistic ``Poisson''-type model.
+
+\paragraph{4.3 Finite computations (evidence, not a proof).}
+I brute-forced small initial segments to see whether one can simultaneously:
+(i) keep $(\mathbf 1_A*\mathbf 1_A)(n)\le g$ for $n\le 2N$ and
+(ii) make $(A+A)\cap[0,N]=[0,N]$ (perfect coverage of the first block).
+
+For $N\le 16$, there exist such sets already with $g=4$. For instance, for $N=16$ one example is
+\[
+A=\{0,1,2,3,5,7,11,15\}\subseteq[0,16],
+\]
+for which all sums $0\le n\le 16$ occur at least once, and no sum $n\le 32$ has more than $4$ ordered representations.
+This suggests that a global construction with bounded representation may be \emph{plausible}.
+
+\paragraph{4.4 Why this still does not solve the infinite problem.}
+Extending a finite configuration to an infinite $A$ is nontrivial:
+adding new large elements creates new sums, but it can also create \emph{new representations} for old sums (through mixing scales) unless
+scales are separated very carefully. Meanwhile, separating scales too much tends to destroy density of $A+A$.
+
+\subsection*{5) VERIFICATION}
+
+\begin{itemize}
+\item The $\sqrt{x}$-growth bound in \S4.1 is rigorous and uses only counting pairs with sum $\le x$.
+\item The finite example in \S4.3 was found by exhaustive search for small $N$; it is suggestive only, not a proof of existence of an infinite $A$.
+\item No step above asserts a full solution; it delineates constraints and provides computational evidence for feasibility at small scales.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\noindent\textbf{UNRESOLVED.}
+
+\begin{itemize}
+\item \textbf{What I have:} A necessary growth constraint $A(x)\ll_{\epsilon}\sqrt{x}$ for any bounded-representation candidate, plus small-$N$ computational evidence that ``cover $[0,N]$ with $g=O(1)$'' is feasible in finite models (e.g.\ $g=4$ works for $N\le 16$).
+\item \textbf{Where it breaks:} Turning finite blocks into an infinite set without letting representations accumulate across blocks.
+\item \textbf{Next moves:}
+  \begin{enumerate}
+  \item Develop a \emph{scale-separated} recursive construction where new blocks are placed so that sums produced by distinct scale-pairs overlap only $O(1)$-fold.
+  \item Prove (or disprove) a ``bounded-overlap interval cover'' lemma: choose intervals $I_k$ so that every large $n$ lies in many $I_k+I_k$ but in only $O(1)$ such sum-intervals, then populate each $I_k$ with a near-optimal $B_2[g]$-type set.
+  \item Attempt a probabilistic construction with an explicit deletion scheme that caps $(\mathbf 1_A*\mathbf 1_A)(n)$ while keeping the uncovered set in $A+A$ of density at most $\epsilon$.
+  \end{enumerate}
+\item \textbf{Minimal lemma that would settle the problem (one plausible route):}
+  Construct for each $\epsilon>0$ a sequence of finite sets $A_k\subseteq[1,N_k]$ with
+  \[
+  \max_{n\le 2N_k} (\mathbf 1_{A_k}*\mathbf 1_{A_k})(n)\le C(\epsilon),
+  \qquad
+  |(A_k+A_k)\cap[1,N_k]|\ge (1-\epsilon)N_k,
+  \]
+  and a \emph{compatibility} condition ensuring that embedding $A_k$ into scale $k$ of a growing union does not increase representation counts of earlier scales.
+\end{itemize}
+
+\subsection*{7) COMPLETION}
+
+COMPLETION: 30\% (necessary condition + computational evidence; full infinite construction remains open).
+
+\hrule
+

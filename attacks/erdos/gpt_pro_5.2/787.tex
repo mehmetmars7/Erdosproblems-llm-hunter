@@ -1,0 +1,110 @@
+\section*{Problem 787}
+\addcontentsline{toc}{section}{Problem 787}
+
+\subsection*{1. Formal restatement}
+For a finite set $A\subset\mathbb{R}$, define $\varphi(A)$ to be the largest integer $m$ such that $A$ contains distinct elements $b_1,\dots,b_m$ with
+\[
+ b_i+b_j\notin A\qquad\text{for all }1\le i<j\le m.
+\]
+Let
+\[
+ g(n)\coloneqq \min\{\varphi(A): A\subset\mathbb{R},\ |A|=n\}.
+\]
+Estimate the growth of $g(n)$.
+
+\subsection*{2. Quick literature/context check}
+The statement records the following (we list them only as context).
+\begin{itemize}[leftmargin=2em]
+\item A greedy algorithm gives $g(n)\gg \log n$.
+\item (Choi) $g(n)\ge \log_2 n$.
+\item (Ruzsa, unpublished) $g(n)>2\log_3 n-1$.
+\item (Sudakov--Szemer\'edi--Vu) $g(n)$ is superlogarithmic.
+\item Best known upper bound (Ruzsa): $g(n)<\exp(\sqrt{\log n})$.
+\item (Sanders) $g(n)\ge (\log n)^{1+c}$ for some $c>0$.
+\item (Beker) the exponent can be taken to be $1+\tfrac{1}{68}$.
+\end{itemize}
+
+\subsection*{3. Attack plan}
+\begin{enumerate}[leftmargin=2em]
+\item Reinterpret the problem as an independent-set problem in a ``sum graph'' on $A$.
+\item Prove at least logarithmic lower bounds by bounding degrees in a suitable induced sum graph (e.g., on the positive elements), then apply a standard independent-set lower bound such as Caro--Wei.
+\item For upper bounds, search for constructions of $A$ with very large additive energy so that many pairwise sums stay inside $A$, shrinking $\varphi(A)$. (This is the hard direction and uses additive-combinatorial machinery in the best known results.)
+\item As a computational reality check for small $n$, brute-force over $A\subset[-M,M]\cap\mathbb{Z}$ and compute $\varphi(A)$ by exhaustive search.
+\end{enumerate}
+
+\subsection*{4. Work}
+\subsubsection*{4.1. A clean $\boldsymbol{\gg\log n}$ lower bound via Caro--Wei}
+The following argument is essentially the one recorded in the Tao--Vu survey on sum-free sets.
+
+\begin{proposition}[Logarithmic lower bound]
+\label{prop:g-log}
+For all $n\ge 2$,
+\[
+ g(n)\ge H_{\lfloor n/2\rfloor},
+\]
+where $H_m=1+\tfrac12+\cdots+\tfrac1m$ is the $m$-th harmonic number. In particular, $g(n)\ge \log(n/2)$ for $n\ge 2$.
+\end{proposition}
+
+\begin{proof}
+By a Freiman-isomorphism argument one may reduce to the case $A\subset\mathbb{Z}$ (this is standard and we do not reprove it).
+Also note that $\varphi(A)=\varphi(-A)$ because $b_i+b_j\in A$ is equivalent to $-(b_i+b_j)\in -A$.
+Hence, replacing $A$ by $-A$ if needed, we may assume $A$ contains at least $m\coloneqq\lfloor n/2\rfloor$ positive elements.
+List $m$ of them in increasing order:
+\[
+0<a_1<a_2<\cdots<a_m.
+\]
+
+Define a graph $G$ on vertex set $\{a_1,\dots,a_m\}$ by joining $a_i$ and $a_j$ ($i<j$) if $a_i+a_j\in A$.
+Any independent set in $G$ is a subset $B\subset A$ of positive elements whose pairwise sums avoid $A$, hence has size at most $\varphi(A)$. Therefore
+\[
+\varphi(A)\ge \alpha(G),
+\]
+where $\alpha(G)$ denotes the independence number.
+
+For each fixed $j$, the neighbors of $a_j$ correspond to those $i\ne j$ for which $a_i+a_j\in A$. Because $a_i,a_j>0$ and distinct, each sum $a_i+a_j$ is a positive integer strictly larger than $a_j$, and different $i$ give different sums. Thus these sums must lie among the positive elements of $A$ that are larger than $a_j$, of which there are at most $m-j$. Hence
+\[
+\deg_G(a_j)\le m-j.
+\]
+
+Now apply the Caro--Wei bound for independent sets:
+\[
+\alpha(G)\ge \sum_{v\in V(G)} \frac{1}{\deg(v)+1}
+\ \ge\ 
+\sum_{j=1}^m \frac{1}{(m-j)+1}
+\ =\ H_m.
+\]
+Since this holds for every $A$ of size $n$, we get $g(n)\ge H_m$.
+\end{proof}
+
+\subsubsection*{4.2. Small computational reality check}
+For small $n$ one can brute-force over $A\subset[-M,M]\cap\mathbb{Z}$ and compute $\varphi(A)$ by checking all subsets $B\subset A$. For $M=10$ this search returns the following minima for $n\le 7$:
+\[
+ g(2)=1,\quad g(3)=1,\quad g(4)=2,\quad g(5)=2,\quad g(6)=2,\quad g(7)=2.
+\]
+(These match the general lower bound $g(n)\ge H_{\lfloor n/2\rfloor}$, which is $\ge 2$ for $n\ge 4$.)
+
+\subsection*{5. Verification}
+\begin{itemize}[leftmargin=2em]
+\item Proposition~\ref{prop:g-log} is self-contained and yields the promised $\gg\log n$ growth.
+\item The computational check is consistent with the theorem for small $n$ (it is not a proof for general $n$).
+\end{itemize}
+
+\subsection*{6. FINAL}
+\textbf{UNRESOLVED.}
+
+\medskip
+\noindent\textbf{Fail-safe (required):}
+\begin{enumerate}[leftmargin=2em,label=(\roman*)]
+\item \textbf{Strongest partial results proved here.}
+A clean logarithmic lower bound $g(n)\ge H_{\lfloor n/2\rfloor}\sim \log n$ (Proposition~\ref{prop:g-log}).
+\item \textbf{First gap that blocks a full solution.}
+We do not prove any superlogarithmic lower bound, nor do we reproduce Ruzsa-type constructions giving subpolynomial upper bounds such as $\exp(\sqrt{\log n})$.
+\item \textbf{What would close the problem.}
+Either (a) a matching upper bound construction showing $g(n)\le (\log n)^{1+o(1)}$ or similar, or (b) a proof that $g(n)$ grows faster than any fixed power of $\log n$ (together with a best-possible rate).
+\item \textbf{Why computations didn't settle it.}
+Brute force only accesses tiny $n$ and cannot detect the asymptotic regime where superlogarithmic behavior appears.
+\end{enumerate}
+
+\subsection*{7. COMPLETION ESTIMATE}
+\textbf{30\%.} A baseline $\log n$ lower bound is proved, but the true growth rate remains open.
+

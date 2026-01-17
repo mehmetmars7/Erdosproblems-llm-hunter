@@ -1,0 +1,212 @@
+\section*{Problem \#783 (Coprime set with bounded harmonic sum covering $[1,n]$)}
+\addcontentsline{toc}{section}{Problem \#783 (Coprime set with bounded harmonic sum covering $[1,n]$)}
+
+\subsection*{1) FORMAL RESTATEMENT}
+\addcontentsline{toc}{subsection}{1) Formal restatement (\#783)}
+
+Fix a constant $C>0$ and let $n$ be large.
+We choose a set $A\subseteq\{2,3,\dots,n\}$ subject to
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+\item $\gcd(a,b)=1$ for all distinct $a,b\in A$ (pairwise coprime);
+\item $\displaystyle \sum_{a\in A} \frac1a \le C$.
+\end{enumerate}
+Define the ``uncovered'' set
+\[
+U(A) := \big\{ m\in\{1,2,\dots,n\}: \forall a\in A,\ a\nmid m\big\}.
+\]
+Equivalently, $U(A)$ are those integers $\le n$ not divisible by any element of $A$.
+
+\medskip
+\noindent\textbf{Goal.}
+Choose $A$ (depending on $n$ and $C$) to minimize $|U(A)|$.
+
+\medskip
+\noindent\textbf{Candidate suggested in the problem.}
+Let $q_1>q_2>\cdots$ be the primes in decreasing order starting at the largest prime $\le n$.
+Let $k$ be maximal such that $\sum_{i=1}^k 1/q_i \le C$, and take $A=\{q_1,\dots,q_k\}$.
+The question asks whether this choice minimizes $|U(A)|$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+\addcontentsline{toc}{subsection}{2) Quick literature/context check (\#783)}
+
+This problem appears as Erd\H{o}s problem \#783 on \texttt{erdosproblems.com}.  I did not find a definitive published solution.
+
+\subsection*{3) ATTACK PLAN}
+\addcontentsline{toc}{subsection}{3) Attack plan (\#783)}
+
+View this as a weighted covering problem.
+Each $a\in A$ ``covers'' the multiples $\{a,2a,\dots,\lfloor n/a\rfloor a\}$.  We want to cover as much of $[1,n]$ as possible under a harmonic-cost budget and a coprimality constraint.
+
+\medskip
+\noindent\textbf{Two guiding principles.}
+\begin{itemize}[leftmargin=2em]
+\item \emph{Upper bound by the budget:} ignoring overlaps, $a$ covers about $n/a$ integers and costs $1/a$, so the naive ``efficiency'' is about $n$ covered per unit cost.  Overlaps between different $a$ are the main source of inefficiency.
+\item \emph{Avoid overlaps by making all $a$ large:} if $a,b>\sqrt{n}$ and $\gcd(a,b)=1$, then $ab>n$ and hence no integer $\le n$ is divisible by both $a$ and $b$.  Thus for such large $A$ the covered sets are disjoint.
+\end{itemize}
+
+\subsection*{4) WORK}
+\addcontentsline{toc}{subsection}{4) Work (\#783)}
+
+\subsubsection*{4.1 A universal lower bound}
+Let
+\[
+B(A):=\{m\le n:\exists a\in A\text{ with }a\mid m\}
+\]
+be the covered set, so $|U(A)| = n-|B(A)|$.
+By a union bound,
+\[
+|B(A)|\le \sum_{a\in A} \left\lfloor\frac{n}{a}\right\rfloor
+\le n\sum_{a\in A} \frac1a \le Cn.
+\]
+Therefore
+\begin{equation}
+\label{eq:lb}
+|U(A)| \ge n - Cn = (1-C)n.
+\end{equation}
+This bound is nontrivial when $C\le 1$.
+
+\subsubsection*{4.2 A regime where the candidate is (asymptotically) optimal}
+A key observation is that when all chosen moduli are $>\sqrt{n}$, there are \emph{no overlaps}.
+
+\begin{lemma}[Disjointness above $\sqrt{n}$]
+\label{lem:disjoint}
+If $a,b>\sqrt{n}$ and $\gcd(a,b)=1$, then no $m\le n$ is divisible by both $a$ and $b$.
+Hence the sets of multiples of elements of $A$ are pairwise disjoint whenever every $a\in A$ satisfies $a>\sqrt{n}$.
+\end{lemma}
+\begin{proof}
+If $a\mid m$ and $b\mid m$ with $\gcd(a,b)=1$, then $ab\mid m$.  But $ab>n$, so $m\ge ab>n$, contradiction.
+\end{proof}
+
+Now consider the candidate choice $A$ consisting of all primes $p$ in an interval $[y,n]$, where $y$ is chosen so that $\sum_{p\in[y,n]}1/p\approx C$.
+
+\begin{theorem}[Asymptotic optimality for $C<\log 2$]
+\label{thm:C<log2}
+Fix $0<C<\log 2$.  For all sufficiently large $n$ there exists a set $A\subseteq\{2,\dots,n\}$ of pairwise coprime integers with $\sum_{a\in A} 1/a\le C$ such that
+\[
+|U(A)| = (1-C)n + o(n).
+\]
+In particular, the lower bound \eqref{eq:lb} is asymptotically tight.
+Moreover, choosing $A$ to be (essentially) all primes $p\in[n^{e^{-C}},n]$ achieves this.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+Let $y:=n^{e^{-C}}$.  Since $C<\log 2$, we have $e^{-C}>1/2$, so $y>\sqrt{n}$.
+
+By Mertens' theorem for primes,
+\[
+\sum_{p\le x} \frac1p = \log\log x + B_1 + o(1),
+\]
+so
+\[
+\sum_{y\le p\le n} \frac1p = \big(\log\log n - \log\log y\big) + o(1)
+= \big(\log\log n - \log(e^{-C}\log n)\big) + o(1) = C + o(1).
+\]
+Thus for $n$ large we can select a subset of primes in $[y,n]$ whose reciprocal sum is $\le C$ but arbitrarily close to $C$.
+Call this set $A$.
+
+Because every $p\in A$ satisfies $p\ge y>\sqrt{n}$, Lemma~\ref{lem:disjoint} gives that the sets of multiples are disjoint. Hence
+\[
+|B(A)| = \sum_{p\in A} \left\lfloor\frac{n}{p}\right\rfloor
+= n\sum_{p\in A} \frac1p + O(|A|).
+\]
+Here $|A|\le \pi(n)=o(n)$, so $O(|A|)=o(n)$.  Since $\sum_{p\in A}1/p = C+o(1)$, we get $|B(A)|=Cn+o(n)$.
+Therefore $|U(A)| = n-|B(A)| = (1-C)n+o(n)$, as claimed.
+\end{proof}
+
+\paragraph{Interpretation.}
+For $C<\log 2$, one can spend the harmonic budget entirely on primes $>\sqrt{n}$, achieving essentially no overlaps and hence the best-possible coverage up to lower-order terms.
+
+\subsubsection*{4.3 What happens for larger $C$ (heuristics)}
+When $C\ge \log 2$, the threshold $y=n^{e^{-C}}$ drops below $\sqrt{n}$, so overlaps among multiples of chosen primes become unavoidable.
+A natural ``all large primes'' choice $A=\{p: p\ge y\}$ covers precisely the integers $m\le n$ having some prime factor $\ge y$.
+Thus the uncovered set becomes the set of $y$--smooth numbers, whose size is traditionally denoted $\psi(n,y)$.
+Heuristically (Dickman--de Bruijn), if $y=n^{1/u}$ then
+\[
+\psi(n,y) \sim n\,\rho(u),
+\]
+where $\rho$ is the Dickman function.
+Here $y=n^{e^{-C}}$ corresponds to $u=e^{C}$, predicting
+\[
+|U(A)| \approx n\,\rho(e^{C}).
+\]
+Proving optimality of this choice (or finding a better one) appears difficult.
+
+\subsubsection*{4.4 Small-$n$ exact optimization as a sanity check}
+For small $n$ one can brute-force the optimization problem and compare to the ``take the largest primes'' candidate.
+For example, for $n=30$ and $C=1.0$:
+\begin{itemize}[leftmargin=2em]
+\item Candidate (largest primes with reciprocal sum $\le 1$): $A=\{29,23,19,17,13,11,7,5\}$, which leaves $|U(A)|=12$ uncovered.
+\item An optimal set (by exact search) achieves $|U(A)|=6$ (one optimal choice is $A=\{2,7,9,17,19,23,25,29\}$ with $\sum 1/a\approx 0.983$).
+\end{itemize}
+This illustrates that the ``largest primes'' rule is not literally optimal for small $n$, but it does not decide the asymptotic question for $n\to\infty$.
+
+\subsection*{5) VERIFICATION}
+\addcontentsline{toc}{subsection}{5) Verification (\#783)}
+
+\begin{itemize}[leftmargin=2em]
+\item Inequality \eqref{eq:lb} is immediate and correct (union bound).
+\item Lemma~\ref{lem:disjoint} is a direct divisibility argument.
+\item Theorem~\ref{thm:C<log2} hinges on two standard facts: Mertens' asymptotic for $\sum_{p\le x}1/p$ and the observation that $C<\log 2$ implies $n^{e^{-C}}>\sqrt{n}$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\addcontentsline{toc}{subsection}{6) Final (\#783)}
+
+\paragraph{LABEL: \textbf{UNRESOLVED}.}
+
+\paragraph{What is proved here.}
+For $0<C<\log 2$, the minimum possible uncovered set size satisfies
+\[
+\min_A |U(A)| = (1-C)n + o(n),
+\]
+and can be achieved by choosing an appropriate set of primes all exceeding $\sqrt{n}$.
+
+\paragraph{What remains open.}
+For general fixed $C\ge \log 2$, overlaps become unavoidable and I do not have a proof that the ``largest primes'' choice is optimal.  The natural heuristic connects $|U(A)|$ to counts of smooth numbers, predicting $\approx n\rho(e^{C})$ uncovered for the ``all primes $\ge n^{e^{-C}}$'' choice, but optimality is not established.
+
+\paragraph{Main obstacle.}
+One needs a sharp upper bound on the size of the union of multiples under only the harmonic budget and coprimality constraints.  Controlling overlaps in a best-possible way is essentially a sieve-optimization problem.
+
+\paragraph{Next concrete steps.}
+\begin{enumerate}[leftmargin=2em]
+\item Formulate the optimization as a constrained sieve and attempt to prove that any $A$ with $\sum 1/a\le C$ leaves at least $\psi(n,n^{e^{-C}})$ numbers uncovered (up to lower-order terms).
+\item Investigate whether allowing prime powers (one per prime) can ever beat the ``large primes'' strategy for $C\ge \log 2$.
+\item Compute the exact optimum for larger $n$ using integer programming with coprimality constraints, to guess the true asymptotic structure.
+\end{enumerate}
+
+\paragraph{COMPLETION: 55\%.}
+
+\hrule
+
+\begin{thebibliography}{99}
+
+\bibitem{MaSp24}
+S.~Malekshahian and G.~Spiro,
+\emph{On a clique-building game of Erd\H{o}s}, arXiv:2410.18304 (2024).
+
+\bibitem{CaPr25}
+S.~Cambie and H.~Provoost,
+\emph{On edge-colouring-games by Erd\H{o}s, and Bensmail and McInerney}, arXiv:2505.03497v2 (2025).
+
+\bibitem{BEF90}
+T.~C.~Brown, P.~Erd\H{o}s, and D.~Z.~Freedman,
+\emph{Quasi-progressions and descending waves},
+J. Combin. Theory Ser. A \textbf{53} (1990), 81--95.
+
+\bibitem{So07}
+J.~Solymosi,
+\emph{Note on sumsets of integers},
+European J. Combin. \textbf{28} (2007), no.~4, 1067--1071.
+
+\bibitem{CiGr07}
+J.~Cilleruelo and A.~Granville,
+\emph{Lattice points on circles, squares in arithmetic progressions and sumsets of squares},
+in \emph{Additive combinatorics}, CRM Proc. Lecture Notes, vol.~43, Amer. Math. Soc., Providence, RI, 2007, pp.~241--262.
+
+\bibitem{DiEl15}
+R.~Dietmann and C.~Elsholtz,
+\emph{Hilbert cubes in arithmetic sets},
+arXiv:1510.05260 (2015).
+
+\end{thebibliography}
+

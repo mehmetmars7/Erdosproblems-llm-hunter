@@ -1,0 +1,116 @@
+\section*{Problem 773: Sidon subsets of the first \(N\) squares}
+
+\subsection*{1) Formal restatement}
+Let \(S_N=\{1^2,2^2,\dots,N^2\}\).
+A set \(A\subseteq\mathbb{Z}\) is \emph{Sidon} (a \(B_2\)-set) if
+\[
+a+b=c+d\ (a,b,c,d\in A)\quad\Longrightarrow\quad \{a,b\}=\{c,d\}.
+\]
+Equivalently, all sums \(a+b\) with \(a<b\) are distinct.
+Define
+\[
+f(N):=\max\{|A|:A\subseteq S_N \text{ is Sidon}\}.
+\]
+The problem asks for the best possible asymptotic bounds on \(f(N)\).
+
+\subsection*{2) Quick literature/context check (no more than 8 lines)}
+\begin{itemize}[leftmargin=*]
+\item Landau's theorem on sums of two squares yields \(f(N)\ll N(\log N)^{-1/4}\).
+\item A graph/hypergraph extraction lemma of Alon--Erd\H{o}s implies \(f(N)\gg_\varepsilon N^{2/3-\varepsilon}\) for every \(\varepsilon>0\).
+\item Lefmann--Thiele improved the lower bound to \(f(N)\gg N^{2/3}\).
+\item The true order of \(f(N)\) remains open: there is still a large gap between exponents \(2/3\) and \(1\) (up to logs).
+\end{itemize}
+
+\subsection*{3) Attack plan}
+\begin{itemize}[leftmargin=*]
+\item Upper bound: count the number of distinct pair-sums \(a+a'\) forced by the Sidon property and compare with Landau's count of integers that are sums of two squares.
+\item Lower bound: prove a general lemma that any \(B(2k)\) sequence of length \(n\) contains a Sidon subsequence of size \(\gg k^{-1/3}n^{2/3}\), then apply to squares using a divisor-function bound on the number of representations \(m=i^2+j^2\).
+\end{itemize}
+
+\subsection*{4) Work}
+
+\paragraph{Upper bound \(\boldsymbol{f(N)\ll N(\log N)^{-1/4}}\).}
+Let \(A\subseteq S_N\) be Sidon and let
+\[
+\Sigma:=\{a+a': a,a'\in A,\ a<a'\}.
+\]
+Sidon implies that each unordered pair \(\{a,a'\}\) gives a distinct sum, so \(|\Sigma|=\binom{|A|}{2}\).
+Each element of \(\Sigma\) is a sum of two squares, and \(\Sigma\subseteq [2,2N^2]\).
+
+Let \(R(X)\) be the number of integers \(m\le X\) representable as a sum of two squares.
+Landau proved \(R(X)\ll X/\sqrt{\log X}\), so
+\[
+\binom{|A|}{2}=|\Sigma|\le R(2N^2)\ll \frac{N^2}{\sqrt{\log N}}.
+\]
+Hence \(|A|^2\ll N^2(\log N)^{-1/2}\), i.e.
+\[
+|A|\ll \frac{N}{(\log N)^{1/4}}.
+\]
+Therefore \(f(N)\ll N(\log N)^{-1/4}\).
+
+\paragraph{A general extraction lemma.}
+\begin{definition}
+A strictly increasing sequence \(a_1<\dots<a_n\) is a \emph{\(B(2k)\)-sequence} if every integer has at most \(k\) representations as \(a_i+a_j\) with \(i<j\).
+\end{definition}
+
+\begin{lemma}\label{lem:B2k-to-Sidon}
+There is an absolute constant \(c>0\) such that every \(B(2k)\)-sequence of length \(n\) contains a Sidon subsequence of size at least \(c\,k^{-1/3}n^{2/3}\).
+\end{lemma}
+
+\begin{proof}
+Given \(a_1<\dots<a_n\), form a 4-uniform hypergraph \(H\) on vertex set \([n]\) whose edges are 4-tuples of distinct indices
+\(\{i,j,u,v\}\) such that \(a_i+a_j=a_u+a_v\) with \(\{i,j\}\ne\{u,v\}\).
+An independent set of vertices in \(H\) corresponds exactly to a Sidon subsequence.
+
+Let \(r_m\) be the number of pairs \(i<j\) with \(a_i+a_j=m\).
+Then \(\sum_m r_m=\binom{n}{2}\) and \(r_m\le k\) for all \(m\).
+Each fiber of size \(r_m\) contributes at most \(\binom{r_m}{2}\) edges, so
+\[
+|E(H)|\le \sum_m \binom{r_m}{2}\le \frac{\binom{n}{2}}{k}\binom{k}{2}\le \frac{(k-1)n^2}{4}.
+\]
+
+Choose each vertex independently with probability \(p=\alpha k^{-1/3}n^{-1/3}\), where \(\alpha\in(0,1)\) is a fixed small constant.
+Then \(\mathbb{E}|X|=pn=\alpha k^{-1/3}n^{2/3}\).
+Also \(\mathbb{E}|E(H[X])|=p^4|E(H)|\ll \alpha^4 k^{-1/3}n^{2/3}\).
+Deleting one vertex from each edge of \(H[X]\) yields an independent set \(I\) with
+\(\mathbb{E}|I|\ge \mathbb{E}|X|-\mathbb{E}|E(H[X])|\ge (\alpha-C\alpha^4)k^{-1/3}n^{2/3}\).
+Choosing \(\alpha\) small so that \(\alpha-C\alpha^4>0\) gives \(|I|\ge c k^{-1/3}n^{2/3}\) for some absolute \(c>0\).
+\end{proof}
+
+\paragraph{Lower bound for squares.}
+Apply Lemma~\ref{lem:B2k-to-Sidon} to \(a_i=i^2\) for \(i=1,\dots,N\) (so \(n=N\)).
+We need an upper bound on the number of representations of \(m\le 2N^2\) as \(m=i^2+j^2\) with \(1\le i<j\le N\).
+
+Let \(r_2(m)\) denote the number of integer solutions \((x,y)\in\mathbb{Z}^2\) to \(x^2+y^2=m\).
+A classical formula implies \(r_2(m)\le 4d(m)\), where \(d(m)\) is the divisor function.
+Hence the number of pairs \((i,j)\) with \(1\le i<j\le N\) and \(i^2+j^2=m\) is \(O(d(m))\).
+
+Fix \(\varepsilon>0\).
+It is standard that \(d(m)\le m^{\varepsilon}\) for all sufficiently large \(m\).
+Since \(m\le 2N^2\), for \(N\) large we have \(d(m)\ll_\varepsilon N^{2\varepsilon}\), and thus
+\[
+\#\{(i,j): i^2+j^2=m,\ 1\le i<j\le N\}\le N^{3\varepsilon}
+\]
+after increasing \(N\) if needed (absorbing constants).
+Therefore \(\{1^2,\dots,N^2\}\) is a \(B(2k)\)-sequence with \(k=N^{3\varepsilon}\), and Lemma~\ref{lem:B2k-to-Sidon} gives a Sidon subset of size
+\[
+\gg k^{-1/3}N^{2/3} = N^{2/3-\varepsilon}.
+\]
+So \(f(N)\gg_\varepsilon N^{2/3-\varepsilon}\) for every \(\varepsilon>0\).
+(A stronger bound \(f(N)\gg N^{2/3}\) is known by Lefmann--Thiele.)
+
+\subsection*{5) Verification}
+\begin{itemize}[leftmargin=*]
+\item Upper bound: \(|\Sigma|=\binom{|A|}{2}\) is exact for Sidon; Landau's bound applies to all sums \(a+a'\le 2N^2\).
+\item Lemma~\ref{lem:B2k-to-Sidon}: the hypergraph edge count \(\sum_m\binom{r_m}{2}\) is maximized by packing fibers to size \(k\), giving \(|E(H)|\le (k-1)n^2/4\).
+\item Divisor bound step: only needs the qualitative fact \(d(m)\le m^\varepsilon\) for large \(m\), hence \(k=N^{O(\varepsilon)}\).
+\end{itemize}
+
+\subsection*{6) Final (exactly one label and one sub-label)}
+\noindent\textbf{LABEL: UNRESOLVED.}\\
+\textbf{SUBLABEL: Proved the Landau upper bound and an \(N^{2/3-\varepsilon}\) lower bound (with known improvement to \(N^{2/3}\)); the true order of \(f(N)\) is open.}
+
+\subsection*{7) Completion estimate}
+To resolve Problem~773 completely would require either substantially improving the upper bound (beyond Landau) or giving a near-linear lower bound; presently the best-known exponents remain \(2/3\) (lower) and \(1\) (upper, with a log saving).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

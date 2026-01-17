@@ -1,0 +1,218 @@
+\section*{Problem 770}
+
+\subsection*{1. Formal restatement (including an ambiguity fix)}
+
+The phrase ``$2^n-1,3^n-1,\dots,h(n)^n-1$ are mutually coprime'' is ambiguous: it can mean
+\begin{itemize}[leftmargin=2em]
+\item \emph{pairwise} coprime (every pair has gcd $1$), or
+\item \emph{collectively} coprime (their \emph{common} gcd is $1$).
+\end{itemize}
+If interpreted pairwise, the definition would be degenerate (already a single number is vacuously pairwise coprime), and the stated fact ``$h(n)=n+1$ iff $n+1$ is prime'' would fail.
+The only interpretation consistent with the rest of the prompt is the \emph{collective} one.
+
+\begin{definition}[$h(n)$]
+For $n\ge 1$, let $h(n)$ be the smallest integer $m\ge 2$ such that
+\[
+\gcd\bigl(2^n-1,3^n-1,\dots,m^n-1\bigr)=1.
+\]
+(Equivalently: the integers $2^n-1,\dots,m^n-1$ have no common prime divisor.)
+\end{definition}
+
+\paragraph{Questions (Erd\H{o}s).}
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em]
+\item For each prime $p$, does the natural density $\delta_p$ of integers $n$ with $h(n)=p$ exist?
+\item Is $\liminf_{n\to\infty} h(n)=\infty$?
+\item If $p$ is the greatest prime such that $p-1\mid n$ and $p>n^{\varepsilon}$, must $h(n)=p$?
+\end{enumerate}
+
+\subsection*{2. Quick literature/context check (web-browsing was available)}
+
+The ErdosProblems project page for \#770 and its discussion thread include computational data and mention connections to gcd-problems such as the Ailon--Rudnick conjecture about $\gcd(2^n-1,3^n-1)$.
+No complete resolution of the density questions was found in the quick check.
+
+\subsection*{3. Strategy}
+
+The function $h(n)$ is controlled by common prime divisors of the form
+\[
+q\mid a^n-1\ \text{ for all } a\in\{2,\dots,m\}.
+\]
+Such a prime $q$ forces all these residues to lie in the subgroup of $n$-th roots of unity in $(\mathbb{Z}/q\mathbb{Z})^*$.
+This connects $h(n)$ to:
+\begin{itemize}[leftmargin=2em]
+\item congruence conditions $q\equiv 1\pmod d$ (so that the group has an element of order $d$),
+\item and (for odd $n$) quadratic residue constraints via Euler's criterion.
+\end{itemize}
+
+We prove two unconditional statements mentioned in the prompt:
+\begin{itemize}[leftmargin=2em]
+\item $h(n)=n+1$ iff $n+1$ is prime;
+\item $h(n)$ is unbounded along odd $n$.
+\end{itemize}
+The density questions and the ``largest prime with $p-1\mid n$'' conjecture remain open.
+
+\subsection*{4. Work}
+
+\subsubsection*{4.1 A basic lemma when $p-1\mid n$}
+
+\begin{lemma}[A Sylow-type divisibility]
+Let $p$ be prime and $n\ge 1$.
+If $p-1\mid n$, then for every integer $a$ with $p\nmid a$ we have
+\[
+ a^n\equiv 1\pmod p,
+\quad\text{hence}\quad
+ p\mid (a^n-1).
+\]
+In particular, $p\mid (a^n-1)$ for all integers $2\le a\le p-1$.
+\end{lemma}
+
+\begin{proof}
+If $p\nmid a$, Fermat's little theorem gives $a^{p-1}\equiv 1\pmod p$.
+Write $n=(p-1)t$.
+Then $a^n=(a^{p-1})^t\equiv 1^t\equiv 1\pmod p$.
+\end{proof}
+
+\subsubsection*{4.2 The characterization $h(n)=n+1 \iff n+1$ prime}
+
+\begin{theorem}\label{thm:hn-nplus1}
+For every $n\ge 1$,
+\[
+ h(n)=n+1\ \Longleftrightarrow\ \text{$n+1$ is prime}.
+\]
+\end{theorem}
+
+\begin{proof}
+Let $m=n+1$.
+
+\smallskip
+\noindent\emph{($\Rightarrow$) Assume $h(n)=m$; we prove $m$ is prime.}
+By definition, the gcd
+\[
+G\coloneqq \gcd(2^n-1,3^n-1,\dots,n^n-1)
+\]
+is $>1$, while
+\[
+\gcd(G, m^n-1)=1.
+\]
+Choose a prime $p\mid G$.
+Then $p\mid (a^n-1)$ for every $a\in\{2,3,\dots,n\}$.
+First note that $p>n$: if $p\le n$, taking $a=p$ gives $p^n-1\equiv -1\pmod p$, contradiction.
+Thus the residues $1,2,\dots,n$ are distinct modulo $p$.
+
+Since $p\mid (a^n-1)$ for $a=1,2,\dots,n$, each of $1,2,\dots,n$ is a root in $\mathbb{F}_p$ of the polynomial $X^n-1$.
+Because $\deg(X^n-1)=n$, it has at most $n$ roots in a field, hence
+\begin{equation}
+\{x\in\mathbb{F}_p^*: x^n=1\}=\{1,2,\dots,n\}. \tag{$\ast$}
+\end{equation}
+The left-hand set is a (multiplicative) subgroup of $\mathbb{F}_p^*$ of size $n$.
+In any finite field, the sum of the elements of a nontrivial multiplicative subgroup is $0$:
+indeed, if $H=\langle \zeta\rangle$ has order $n>1$, then
+$\sum_{h\in H}h=\sum_{k=0}^{n-1}\zeta^k=(\zeta^n-1)/(\zeta-1)=0$.
+Applying this to the subgroup in ($\ast$) gives
+\[
+1+2+\cdots+n\equiv 0\pmod p.
+\]
+But $1+2+\cdots+n=n(n+1)/2 = n m/2$.
+Since $p>n\ge 1$, we have $p\nmid n$.
+Also $p\ne 2$ because $p>n\ge 1$ and if $n=1$ the statement is immediate.
+Hence $p\nmid 2$, so $p\mid m$.
+Because $m=n+1<p$ would contradict $p\mid m$, we must have $p=m$.
+Therefore $m$ is prime.
+
+\smallskip
+\noindent\emph{($\Leftarrow$) Assume $m=n+1$ is prime; we prove $h(n)=m$.}
+Let $p\coloneqq m$ (prime), so $n=p-1$.
+By the lemma above, $p\mid (a^{p-1}-1)$ for every $2\le a\le p-1$.
+So the gcd
+\[
+G_0\coloneqq \gcd(2^{p-1}-1,3^{p-1}-1,\dots,(p-1)^{p-1}-1)
+\]
+is divisible by $p$.
+We claim $G_0=p$.
+Let $q$ be any prime divisor of $G_0$.
+If $q<p$, then taking $a=q$ (which lies in $\{2,\dots,p-1\}$) gives
+$a^{p-1}-1\equiv -1\pmod q$, contradiction.
+So $q\ge p$.
+If $q>p$, then in $\mathbb{F}_q$ the polynomial $X^{p-1}-1$ has the distinct roots $1,2,\dots,p-1$; hence it has at least $p-1$ roots, so it has exactly $p-1$ roots.
+But the set of roots of $X^{p-1}-1$ in $\mathbb{F}_q^*$ is a subgroup, and since $p-1$ is even (for $p>2$) it contains $-1\equiv q-1$.
+This contradicts the fact that the only roots are $1,2,\dots,p-1$ (all strictly smaller than $q-1$).
+Hence no prime $q>p$ divides $G_0$, so indeed $G_0=p$.
+
+Finally, $p\nmid (p^{p-1}-1)$ because $p^{p-1}-1\equiv -1\pmod p$.
+Therefore
+\[
+\gcd\bigl(G_0,\,p^{p-1}-1\bigr)=1,
+\]
+so
+$\gcd(2^{p-1}-1,\dots,p^{p-1}-1)=1$.
+Since the gcd up to $p-1$ was $>1$, the minimal $m$ making the gcd equal to $1$ is $m=p=n+1$.
+Thus $h(n)=n+1$.
+\end{proof}
+
+\subsubsection*{4.3 Unboundedness along odd $n$}
+
+\begin{theorem}\label{thm:odd-unbounded}
+The values $h(n)$ are unbounded on the odd integers $n$.
+More precisely: for every $M\ge 2$ there exists an odd $n$ such that $h(n)>M$.
+\end{theorem}
+
+\begin{proof}
+Fix $M\ge 2$.
+Let $K\coloneqq \mathbb{Q}(\sqrt{2},\sqrt{3},\dots,\sqrt{M})$, a finite Galois extension of $\mathbb{Q}$.
+By the Chebotarev density theorem, there exist infinitely many rational primes $q$ that split completely in $K$.
+Among these primes, we may choose one with $q\equiv 3\pmod 4$ (intersecting with a congruence class still yields infinitely many primes).
+Fix such a prime $q$.
+
+For a prime $q$ splitting completely in $\mathbb{Q}(\sqrt{a})$, every integer $a\in\{2,3,\dots,M\}$ is a quadratic residue mod $q$.
+Equivalently, for each $a\in\{2,\dots,M\}$,
+\[
+ a^{(q-1)/2}\equiv 1\pmod q
+\]
+(Euler's criterion).
+Set $n\coloneqq (q-1)/2$.
+Because $q\equiv 3\pmod 4$, the integer $n$ is odd.
+Then for every $2\le a\le M$ we have $q\mid (a^n-1)$, so
+\[
+\gcd(2^n-1,3^n-1,\dots,M^n-1)\ge q>1.
+\]
+Hence by definition of $h(n)$, we must have $h(n)>M$.
+Since $M$ was arbitrary, $h(n)$ is unbounded on odd $n$.
+\end{proof}
+
+\subsubsection*{4.4 Small-$n$ computations and connection to $\gcd(2^n-1,3^n-1)$}
+
+By definition, $h(n)=3$ if and only if $\gcd(2^n-1,3^n-1)=1$.
+This is a special case of the Ailon--Rudnick conjecture (for integers $2$ and $3$), which predicts that this happens for infinitely many $n$.
+In that scenario, $\liminf h(n)=3$.
+On the other hand, Theorem~\ref{thm:odd-unbounded} shows that $\limsup h(n)=\infty$ even restricting to odd $n$.
+
+A brute-force computation for $1\le n\le 50$ gives
+\[
+(h(n))_{n=1}^{50}=
+2,3,3,5,3,7,3,5,3,11,5,13,3,3,3,17,3,19,3,11,3,23,5,13,3,3,3,29,3,31,3,17,5,3,7,37,3,3,3,41,3,43,5,23,3,47,3,17,3,11.
+\]
+(For instance, $h(11)=5$ because $\gcd(2^{11}-1,3^{11}-1)=23$.)
+
+\subsection*{5. Obstacles/checks}
+
+Theorem~\ref{thm:hn-nplus1} shows that the special values $h(n)=n+1$ are completely controlled.
+The hard part is understanding the typical size of $h(n)$ and the distribution of primes dividing the gcds.
+Questions (a)--(c) involve subtle global information about common divisors of many exponential sequences.
+
+\subsection*{6. Conclusion}
+
+\textbf{UNRESOLVED (for the main distribution questions).}
+We proved two unconditional structural facts:
+\begin{itemize}[leftmargin=2em]
+\item $h(n)=n+1$ if and only if $n+1$ is prime;
+\item $h(n)$ is unbounded on odd $n$.
+\end{itemize}
+The density questions and the ``largest prime with $p-1\mid n$'' criterion remain open.
+
+\subsection*{7. If UNRESOLVED: what we have and what is missing}
+
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Strongest proved statements here:} Theorems~\ref{thm:hn-nplus1} and \ref{thm:odd-unbounded}.
+\item \textbf{First genuine gap toward (a) and (b):} even proving that $h(n)=3$ infinitely often (equivalently $\gcd(2^n-1,3^n-1)=1$ infinitely often) is open; without this, $\liminf h(n)$ is inaccessible.
+\item \textbf{Toward (c):} one needs to understand whether, after ``removing'' the large prime $p$ with $p-1\mid n$, any other prime can divide all of $2^n-1,\dots,p^n-1$; this seems to require strong control of multiplicative orders simultaneously for many bases.
+\end{itemize}
+

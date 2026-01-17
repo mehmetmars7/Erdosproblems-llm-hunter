@@ -1,0 +1,156 @@
+\section*{Problem 786}
+\addcontentsline{toc}{section}{Problem 786}
+
+\subsection*{1. Formal restatement}
+Let $A\subset \mathbb{N}$. We say that $A$ has the \emph{length-rigidity} property if for all integers $r,s\ge 1$ and all (not necessarily distinct) choices $a_1,\dots,a_r\in A$ and $b_1,\dots,b_s\in A$, the equality
+\[
+ a_1\cdots a_r=b_1\cdots b_s
+\]
+forces $r=s$.
+
+\medskip
+\noindent\textbf{(a) Infinite version.} Does there exist, for every $\varepsilon>0$, a set $A\subset\mathbb{N}$ with this property and natural density $d(A)>1-\varepsilon$?
+
+\medskip
+\noindent\textbf{(b) Finite version.} Let $A\subset\{1,2,\dots,N\}$ have the length-rigidity property. Must there be an absolute $c>0$ such that $|A|\le (1-c)N$ for all $N$?
+
+\subsection*{2. Quick literature/context check}
+The problem statement records the following constructions/bounds.
+\begin{itemize}[leftmargin=2em]
+\item The residue class $A=\{n\in\mathbb{N}: n\equiv 2\pmod 4\}$ has density $1/4$ and is length-rigid.
+\item (Selfridge) There exist length-rigid sets of density $1/e-\varepsilon$ for any $\varepsilon>0$.
+\item In the finite setting, if $A$ is the set of $n\le N$ having a prime factor $>\sqrt{N}$, then $|A|=(\log 2+o(1))N$ and $A$ is length-rigid.
+\item (Ruzsa, unpublished as quoted in the statement) In the finite setting one should have $|A|\le (1-c)N$ for some absolute $c>0$.
+\end{itemize}
+
+One can further note (from later discussion in the literature) that taking $A$ to be integers $n\le N$ with \emph{exactly one} prime factor exceeding a suitably chosen threshold gives a larger constant-density construction; the best constant of this form is related to the Hall--Montgomery constant. (No attempt is made here to rederive that constant from first principles.)
+
+\subsection*{3. Attack plan}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Structural step.} Reinterpret length-rigidity as the existence of a completely additive ``length'' functional on prime-exponent vectors. This converts the multiplicative condition into linear algebra over $\mathbb{Q}$.
+\item \textbf{Finite optimization heuristic.} For $A\subset[1,N]$, natural candidates are level sets of the form
+\[
+F(n)=\sum_{p\le N} \alpha_p v_p(n)\equiv 1,
+\]
+where $v_p$ is the $p$-adic valuation and only primes in a certain range have nonzero weight. One then tries to maximize $|\{n\le N: F(n)=1\}|$ using sieve/asymptotic estimates.
+\item \textbf{Upper bounds.} If one could show that any such level set has density bounded away from $1$ (uniformly in the weights), that would settle (a) negatively and imply the existence of $c>0$ in (b). A possible route is to combine the structural lemma with distribution results for additive functions (or with ``large prime factor'' decompositions).
+\item \textbf{Computational experiments.} For small $N$, brute-force search can be done using the structural lemma (solve a rational linear system) instead of enumerating all multiplicative relations.
+\end{enumerate}
+
+\subsection*{4. Work}
+\subsubsection*{4.1. A linear-algebra characterization (finite sets)}
+For an integer $n$ and a prime $p$ write $v_p(n)$ for the exponent of $p$ in the prime factorization of $n$.
+
+\begin{lemma}[Additive functional criterion]
+\label{lem:additive-functional}
+Let $A\subset\mathbb{N}$ be finite, and let $P$ be the finite set of primes dividing at least one element of $A$. For $a\in A$ write its exponent vector
+\[
+\mathbf v(a)\coloneqq (v_p(a))_{p\in P}\in \mathbb{Z}_{\ge 0}^{P}.
+\]
+Then $A$ is length-rigid if and only if there exist rational numbers $(\alpha_p)_{p\in P}\in\mathbb{Q}^{P}$ such that
+\begin{equation}
+\label{eq:alpha-eq}
+\sum_{p\in P} \alpha_p\, v_p(a)=1\qquad\text{for every }a\in A.
+\end{equation}
+Equivalently, there exists a completely additive function $F:\mathbb{N}\to\mathbb{Q}$ of the form
+\[
+F(n)=\sum_{p\in P} \alpha_p v_p(n)
+\]
+for which $F(a)=1$ for all $a\in A$.
+\end{lemma}
+
+\begin{proof}
+First assume \eqref{eq:alpha-eq} holds. If $a_1\cdots a_r=b_1\cdots b_s$ with all $a_i,b_j\in A$, then comparing prime exponents gives
+\[
+\sum_{i=1}^r v_p(a_i)=\sum_{j=1}^s v_p(b_j)\qquad\text{for all }p\in P.
+\]
+Multiplying by $\alpha_p$ and summing over $p\in P$ yields
+\[
+\sum_{i=1}^r \sum_{p\in P} \alpha_p v_p(a_i)
+=
+\sum_{j=1}^s \sum_{p\in P} \alpha_p v_p(b_j).
+\]
+By \eqref{eq:alpha-eq} each inner sum equals $1$, so the left side is $r$ and the right side is $s$, hence $r=s$.
+
+\medskip
+Conversely, assume $A$ is length-rigid. Consider any rational linear relation among exponent vectors
+\begin{equation}
+\label{eq:relation}
+\sum_{a\in A} c_a\,\mathbf v(a)=\mathbf 0,
+\end{equation}
+where $c_a\in\mathbb{Q}$. Let $D$ be a common denominator of the $c_a$ and set $m_a\coloneqq Dc_a\in\mathbb{Z}$. Then
+$\sum_a m_a\mathbf v(a)=\mathbf 0$. Write $m_a=m_a^+-m_a^-$ with $m_a^+,m_a^-\in\mathbb{Z}_{\ge0}$.
+The vector identity $\sum_a m_a\mathbf v(a)=\mathbf 0$ is equivalent to
+\[
+\prod_{a\in A} a^{m_a^+}=\prod_{a\in A} a^{m_a^-}.
+\]
+Both sides are products of elements of $A$ (allowing repetition). By length-rigidity the total number of factors on each side is equal:
+\[
+\sum_{a\in A} m_a^+=\sum_{a\in A} m_a^-.
+\]
+Hence $\sum_{a\in A} m_a=0$, and dividing by $D$ gives $\sum_{a\in A} c_a=0$.
+
+Thus, any rational relation \eqref{eq:relation} forces $\sum_a c_a=0$, meaning that the assignment $\mathbf v(a)\mapsto 1$ is well-defined as a linear functional on the $\mathbb{Q}$-span of the vectors $\{\mathbf v(a):a\in A\}$. Therefore there exists a linear functional $L$ on $\mathbb{Q}^P$ with $L(\mathbf v(a))=1$ for all $a\in A$. Writing $L$ in coordinates gives coefficients $(\alpha_p)_{p\in P}$ satisfying \eqref{eq:alpha-eq}.
+\end{proof}
+
+\subsubsection*{4.2. Two concrete constructions (finite $[1,N]$)}
+The lemma explains why ``one distinguished prime factor'' constructions work: one chooses weights $\alpha_p\in\{0,1\}$ and forces each $n\in A$ to have total weighted valuation $1$.
+
+\begin{proposition}[Classical $\sqrt N$ threshold]
+Fix $N\ge 1$ and set
+\[
+A_N\coloneqq\{n\in\{1,\dots,N\}: \text{$n$ has a prime factor $p>\sqrt N$}\}.
+\]
+Then $A_N$ is length-rigid.
+\end{proposition}
+
+\begin{proof}
+If $p>\sqrt N$ divides some $n\le N$, then $p$ divides $n$ to exponent exactly $1$ and no other prime $>\sqrt N$ can divide $n$ (since two such primes would multiply to $>N$). Thus every $n\in A_N$ has
+\[
+\sum_{p>\sqrt N} v_p(n)=1.
+\]
+Apply Lemma~\ref{lem:additive-functional} with weights $\alpha_p=1$ for $p>\sqrt N$ and $\alpha_p=0$ otherwise.
+\end{proof}
+
+The size asymptotic $|A_N|=(\log 2+o(1))N$ comes from the classical estimate that the proportion of $\sqrt N$-smooth numbers up to $N$ tends to $1-\log 2$ (Dickman--de Bruijn theory); we do not reprove this here.
+
+\subsubsection*{4.3. Small computational experiment (finite $[1,N]$)}
+Using Lemma~\ref{lem:additive-functional}, one can test length-rigidity of a candidate $A\subset\{1,\dots,N\}$ by solving a rational linear system $\sum_p \alpha_p v_p(a)=1$ for all $a\in A$.
+
+A brute-force search over all subsets for $N\le 12$ (implemented via exact rational Gaussian elimination) finds the following maximum sizes:
+\[
+\begin{array}{c|ccccccccccc}
+N&2&3&4&5&6&7&8&9&10&11&12\\\hline
+\max|A|&1&2&2&3&3&4&4&5&5&6&7
+\end{array}
+\]
+For $N=12$ one extremal example is $A=\{3,5,6,7,10,11,12\}$; it is certified by the weights
+$\alpha_3=\alpha_5=\alpha_7=\alpha_{11}=1$ and all other $\alpha_p=0$, i.e.
+$F(n)=v_3(n)+v_5(n)+v_7(n)+v_{11}(n)$.
+
+\subsection*{5. Verification}
+\begin{itemize}[leftmargin=2em]
+\item Lemma~\ref{lem:additive-functional} is internally consistent: it correctly rules out sets containing $1$ or simultaneously containing $p$ and $p^2$.
+\item The construction $A_N$ is verified by the fact that each $n\in A_N$ has a unique prime factor $>\sqrt N$.
+\item The small-$N$ brute force uses the lemma as a certificate, so any reported $A$ indeed satisfies the defining implication.
+\end{itemize}
+
+\subsection*{6. FINAL}
+\textbf{UNRESOLVED.}
+
+\medskip
+\noindent\textbf{Fail-safe (required):}
+\begin{enumerate}[leftmargin=2em,label=(\roman*)]
+\item \textbf{Strongest partial results proved here.}
+Lemma~\ref{lem:additive-functional} gives a clean equivalence between length-rigidity and the existence of a rational completely additive ``length'' functional constant on $A$. This gives a simple proof of the $\sqrt N$-threshold construction in the finite problem and supports systematic search.
+\item \textbf{First gap that blocks a full solution.}
+Even with the additive-functional characterization, we do not have a general theorem bounding the density of a level set $\{n: F(n)=1\}$ of a (possibly infinitely-supported) additive function $F(n)=\sum_p \alpha_p v_p(n)$.
+\item \textbf{What would likely close the problem.}
+A uniform upper bound of the form $d(\{n: F(n)=1\})\le 1-c$ for all nontrivial additive $F$ with rational values would settle (a) negatively and imply (b). Alternatively, an explicit construction achieving densities $1-\varepsilon$ would settle (a) positively.
+\item \textbf{Why computations didn't settle it.}
+The brute force only explores very small $N$ and cannot distinguish between densities such as $0.83$ vs $1$; it is useful mainly as a sanity check and for pattern-spotting.
+\end{enumerate}
+
+\subsection*{7. COMPLETION ESTIMATE}
+\textbf{35\%.} A structural equivalence and supporting computations are provided, but the main density questions remain open.
+
