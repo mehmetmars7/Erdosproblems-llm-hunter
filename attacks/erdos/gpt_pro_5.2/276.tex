@@ -177,3 +177,232 @@ An explicit example is $(x_0,x_1)=(106276436867,35256392432)$, and the proof abo
 
 \subsection*{COMPLETION ESTIMATE (honest)}
 The literal existence question is complete.  The additional informal question about ``no underlying covering congruences responsible'' would require a precise formal definition of that phrase; different formalizations lead to different problems, and some such variants remain open in the literature.
+
+\section*{Problem \#276}
+
+\subsection*{FORMAL RESTATEMENT}
+Let $\mathbb N_0:=\{0,1,2,\dots\}$. A \emph{(Fibonacci-like) Lucas sequence} means an integer sequence $(a_n)_{n\ge 0}$ determined by integers $a_0,a_1$ and the recurrence
+\[
+a_{n+2}=a_{n+1}+a_n \qquad (n\in\mathbb N_0).
+\]
+A \emph{composite} integer means an integer $>1$ that is not prime.
+
+The Erd\H{o}s Problems site states the following (``strong'') question:
+\begin{quote}
+Do there exist $a_0,a_1\in\mathbb Z_{>0}$ such that
+\begin{enumerate}
+\item[(i)] $\forall n\in\mathbb N_0$, the term $a_n$ is composite, and
+\item[(ii)] $\forall m\in\mathbb Z$ with $m>1$, there exists $n\in\mathbb N_0$ such that $\gcd(m,a_n)=1$?
+\end{enumerate}
+\end{quote}
+Equivalently, (ii) is
+\[
+\neg\exists m\in\mathbb Z,\ m>1 \text{ such that } \forall n\in\mathbb N_0,\ \gcd(m,a_n)>1.
+\]
+
+\medskip
+\noindent\textbf{Ambiguity/misstatement in the provided ``solution''.}
+Many writeups (including the one quoted by the user) replace (ii) by the strictly weaker clause
+\[
+\neg\exists d\in\mathbb Z,\ d>1 \text{ such that } \forall n\in\mathbb N_0,\ d\mid a_n,
+\]
+i.e.\ ``no integer $d>1$ divides every term''. This weaker clause is equivalent to $\gcd(a_0,a_1)=1$ (since $\gcd(a_n,a_{n+1})$ is constant), but it is \emph{not} equivalent to (ii), which concerns sharing \emph{some} nontrivial gcd with each term, not necessarily dividing all terms. Hence there are two distinct statements:
+\begin{itemize}
+\item \textbf{(W) Weak:} $\exists a_0,a_1\in\mathbb Z_{>0}$ with $\gcd(a_0,a_1)=1$ such that $\forall n$, $a_n$ is composite.
+\item \textbf{(S) Strong:} $\exists a_0,a_1\in\mathbb Z_{>0}$ such that $\forall n$, $a_n$ is composite and $\forall m>1\ \exists n:\gcd(m,a_n)=1$.
+\end{itemize}
+A covering-congruences construction (Graham/Knuth/Wilf/Nicol/Vsemirnov) proves (W) but \emph{cannot} prove (S).
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+\begin{itemize}
+\item The Erd\H{o}s Problems page \#276 states the strong version (S) and marks it \emph{open}, while noting that the existence of a primefree Fibonacci-like sequence (W) was settled by Graham via covering systems.
+\item Graham (1964) gave the first example solving (W) via covering congruences.
+\item Vsemirnov (2004) produced a record-small known initial pair
+\[
+(a_0,a_1)=(106276436867,\ 35256392432),
+\]
+giving a Lucas sequence with no prime terms (solving (W)).
+\item Is\u{a}mailescu--Son (2014) construct a different all-composite Fibonacci-like sequence, where odd-indexed terms factor for structural reasons and even-indexed terms are forced composite via a finite set of primes; they do not prove the strong ``no common factor with every term'' condition (ii) for the odd terms, which is why this is described as only conjecturally addressing (S).
+\end{itemize}
+
+\subsection*{ATTACK PLAN}
+\begin{enumerate}
+\item \textbf{Proof track for (W):} present the standard Fibonacci representation, then the covering-congruences $+$ CRT argument (Vsemirnov) to force a prime divisor for every index, ensuring compositeness and $\gcd(a_0,a_1)=1$.
+\item \textbf{Disproof track for ``(W) solves (S)'':} show that any covering-congruences construction yields an integer $M$ (product of finitely many covering primes) with $\gcd(M,a_n)>1$ for all $n$, violating (ii).
+\item \textbf{For (S):} reduce (ii) to unbounded least prime factor; identify the first gap in known candidate constructions.
+\end{enumerate}
+
+\subsection*{WORK}
+
+\paragraph{PHASE 1: Fast reality check (tiny cases).}
+Small $(a_0,a_1)$ typically yield primes eventually; this supports that (S) is nontrivial and that (W) requires structured constructions.
+
+\paragraph{Part A: Full proof of the weak statement (W) (Vsemirnov).}
+
+\begin{lemma}[Fibonacci linear-combination formula]\label{lem:lincombo}
+Let $(F_n)_{n\ge 0}$ be Fibonacci numbers: $F_0=0$, $F_1=1$, $F_{n+2}=F_{n+1}+F_n$.
+If $(a_n)$ satisfies $a_{n+2}=a_{n+1}+a_n$ with given $a_0,a_1$, then for all integers $n\ge 1$,
+\[
+a_n=a_0F_{n-1}+a_1F_n.
+\]
+\end{lemma}
+\begin{proof}
+Define $b_n:=a_0F_{n-1}+a_1F_n$ for $n\ge 1$, and set $b_0:=a_0$.
+Then $b_0=a_0$, $b_1=a_1$ (since $F_0=0,F_1=1$), and
+\[
+b_{n+2}=a_0F_{n+1}+a_1F_{n+2}
+=a_0(F_n+F_{n-1})+a_1(F_{n+1}+F_n)
+=b_{n+1}+b_n.
+\]
+Thus $(b_n)$ and $(a_n)$ satisfy the same recurrence and share the same initial values, hence $a_n=b_n$ for all $n$.
+\end{proof}
+
+\begin{lemma}[Fibonacci addition formula]\label{lem:add}
+For integers $u\ge 1$ and $v\ge 0$,
+\[
+F_{u+v}=F_uF_{v+1}+F_{u-1}F_v.
+\]
+\end{lemma}
+\begin{proof}
+Fix $u\ge 1$ and define $G_v:=F_uF_{v+1}+F_{u-1}F_v$.
+Then $G_0=F_u=F_{u+0}$ and $G_1=F_uF_2+F_{u-1}F_1=F_u+F_{u-1}=F_{u+1}$.
+Also,
+\[
+G_{v+2}=F_uF_{v+3}+F_{u-1}F_{v+2}
+=F_u(F_{v+2}+F_{v+1})+F_{u-1}(F_{v+1}+F_v)
+=G_{v+1}+G_v.
+\]
+So $(G_v)$ satisfies the Fibonacci recurrence with the same initial values as $(F_{u+v})$, hence $G_v=F_{u+v}$ for all $v$.
+\end{proof}
+
+\begin{lemma}[Divisibility along multiples]\label{lem:divmult}
+If $m\ge 1$ and $t\ge 1$, then $F_m\mid F_{tm}$.
+\end{lemma}
+\begin{proof}
+Induct on $t$. The case $t=1$ is trivial. Assume $F_m\mid F_{(t-1)m}$.
+By Lemma~\ref{lem:add} with $u=m$ and $v=(t-1)m$,
+\[
+F_{tm}=F_{m+(t-1)m}=F_mF_{(t-1)m+1}+F_{m-1}F_{(t-1)m}.
+\]
+The first term is divisible by $F_m$, and the second term is divisible by $F_m$ by the induction hypothesis; hence $F_m\mid F_{tm}$.
+\end{proof}
+
+\paragraph{Vsemirnov's covering data.}
+Consider the following $17$ quadruples $(p_i,m_i,r_i,c_i)$:
+\[
+\begin{aligned}
+&(3,4,3,2),\ (2,3,1,1),\ (5,5,4,2),\ (7,8,5,3),\ (17,9,2,5),\\
+&(11,10,6,6),\ (47,16,9,34),\ (19,18,14,14),\ (61,15,12,29),\\
+&(23,24,17,6),\ (107,36,8,19),\ (31,30,0,21),\ (1103,48,33,9),\\
+&(181,90,80,58),\ (41,20,18,11),\ (541,90,62,185),\ (2521,60,48,306).
+\end{aligned}
+\]
+They satisfy:
+\begin{enumerate}
+\item[(1)] Each $p_i$ is prime and $p_i\mid F_{m_i}$.
+\item[(2)] The congruences $n\equiv r_i\pmod{m_i}$ cover all integers $n\ge 0$ (equivalently, all residues mod $\mathrm{lcm}(m_1,\dots,m_{17})=720$).
+\end{enumerate}
+
+Define $(a_0,a_1)$ by the simultaneous congruences
+\begin{equation}\label{eq:CRT}
+a_0 \equiv c_iF_{m_i-r_i}\pmod{p_i},
+\qquad
+a_1 \equiv c_iF_{m_i-r_i+1}\pmod{p_i}
+\qquad (1\le i\le 17).
+\end{equation}
+Since the primes $p_i$ are pairwise coprime, the Chinese remainder theorem yields solutions $(a_0,a_1)$.
+
+One explicit solution (Vsemirnov) is
+\[
+a_0=106276436867,\qquad a_1=35256392432,
+\]
+with $\gcd(a_0,a_1)=1$.
+
+\begin{lemma}[Key congruence]\label{lem:keycong}
+Fix $i$. For all $n\ge 1$,
+\[
+a_n \equiv c_i\,F_{n+m_i-r_i}\pmod{p_i}.
+\]
+\end{lemma}
+\begin{proof}
+By Lemma~\ref{lem:lincombo} and \eqref{eq:CRT},
+\[
+a_n=a_0F_{n-1}+a_1F_n
+\equiv c_iF_{m_i-r_i}F_{n-1}+c_iF_{m_i-r_i+1}F_n
+=c_i\bigl(F_{m_i-r_i}F_{n-1}+F_{m_i-r_i+1}F_n\bigr)\pmod{p_i}.
+\]
+By Lemma~\ref{lem:add} with $u=m_i-r_i+1$ and $v=n-1$,
+\[
+F_{n+m_i-r_i}=F_{m_i-r_i+1}F_n+F_{m_i-r_i}F_{n-1},
+\]
+hence the desired congruence.
+\end{proof}
+
+\begin{lemma}[Each term has a covering prime divisor]\label{lem:primehit}
+For every $n\in\mathbb N_0$ there exists $i$ such that $p_i\mid a_n$.
+\end{lemma}
+\begin{proof}
+For $n=0$, use the covering class with $r_i\equiv 0\pmod{m_i}$; in the list, $(p,m,r,c)=(31,30,0,21)$ works. Since $31\mid F_{30}$, \eqref{eq:CRT} gives $31\mid a_0$.
+
+Now let $n\ge 1$. Choose $i$ with $n\equiv r_i\pmod{m_i}$. Then $n+m_i-r_i$ is a positive multiple of $m_i$; by Lemma~\ref{lem:divmult}, $F_{m_i}\mid F_{n+m_i-r_i}$. Since $p_i\mid F_{m_i}$, we have $p_i\mid F_{n+m_i-r_i}$, and Lemma~\ref{lem:keycong} yields $a_n\equiv 0\pmod{p_i}$.
+\end{proof}
+
+\begin{lemma}[Growth]\label{lem:growth}
+If $a_0,a_1>0$, then $a_n>0$ for all $n$, and $a_n$ is strictly increasing for all $n\ge 1$.
+\end{lemma}
+\begin{proof}
+Positivity follows by induction from the recurrence. For $n\ge 1$, $a_{n+1}=a_n+a_{n-1}>a_n$ since $a_{n-1}>0$.
+\end{proof}
+
+\paragraph{Compositeness and coprimality.}
+All primes in the covering list satisfy $p_i\le 2521$, while $a_0>2521$ and $a_1>2521$, hence by Lemma~\ref{lem:growth} we have $a_n>2521$ for all $n$. By Lemma~\ref{lem:primehit}, each $a_n$ is divisible by some $p_i$ with $1<p_i<a_n$, so $a_n$ is composite for every $n\in\mathbb N_0$.
+
+Finally, Vsemirnov's explicit pair satisfies $\gcd(a_0,a_1)=1$, hence it witnesses the weak statement (W).
+
+\paragraph{Part B: Why (W) does \emph{not} solve the strong Erd\H{o}s--Graham condition (S).}
+Let $P:=\prod_{i=1}^{17} p_i$. For each $n$, Lemma~\ref{lem:primehit} gives some $i$ with $p_i\mid a_n$, hence
+\[
+\gcd(P,a_n)\ \ge\ p_i\ >1 \qquad \text{for all } n\in\mathbb N_0.
+\]
+Therefore the integer $P>1$ has a common factor with \emph{every} term of the sequence, so condition (ii) in the strong problem (S) fails. In particular, any finite covering-congruences method necessarily produces such a $P$ and thus cannot solve (S).
+
+\paragraph{Part C: Reduction of the strong condition (S) to unbounded least prime factor.}
+Let $\operatorname{lpf}(N)$ denote the least prime factor of an integer $N>1$.
+
+\begin{lemma}[Equivalence]\label{lem:lpf_equiv}
+Assume $a_n>1$ for all $n$. Then the following are equivalent:
+\begin{enumerate}
+\item[(i)] $\forall m>1\ \exists n:\gcd(m,a_n)=1$.
+\item[(ii)] For every integer $B\ge 2$ there exists $n$ such that no prime $\le B$ divides $a_n$ (equivalently, $\operatorname{lpf}(a_n)$ is unbounded).
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(i)$\Rightarrow$(ii): Fix $B\ge 2$ and let $m:=\prod_{p\le B} p$ (product of all primes $\le B$). By (i) choose $n$ with $\gcd(m,a_n)=1$. Then no prime $p\le B$ divides $a_n$.
+
+(ii)$\Rightarrow$(i): Fix $m>1$ and let $B$ be the largest prime divisor of $m$. By (ii) pick $n$ with $\operatorname{lpf}(a_n)>B$. Then $a_n$ has no prime divisor in common with $m$, hence $\gcd(m,a_n)=1$.
+\end{proof}
+
+Thus, solving the strong Erd\H{o}s--Graham problem (S) is equivalent to constructing an all-composite Lucas sequence with unbounded least prime factor.
+
+\paragraph{Part D: Status of the strong problem.}
+Known covering-system constructions (Graham/Knuth/Wilf/Nicol/Vsemirnov) solve (W) but fail (S) by the argument in Part B. Constructions of Is\u{a}mailescu--Son provide an all-composite sequence by mixing a covering mechanism on even indices with a structural factorization on odd indices, but (as discussed on the Erd\H{o}s Problems page) the nonexistence of a single $m>1$ sharing a factor with \emph{all} odd-indexed terms is not proved there; hence (S) remains open in that sense.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemmas~\ref{lem:lincombo}, \ref{lem:add}, \ref{lem:divmult}, \ref{lem:keycong}, \ref{lem:primehit}, \ref{lem:growth}, \ref{lem:lpf_equiv} were proved with all quantifiers and boundary cases stated.
+\item The covering data reduce to finite checks:
+  \begin{itemize}
+  \item $p_i\mid F_{m_i}$ for each $i$;
+  \item the congruences $n\equiv r_i\pmod{m_i}$ cover all residues mod $720$;
+  \item the explicit $(a_0,a_1)$ satisfies \eqref{eq:CRT};
+  \item $\gcd(a_0,a_1)=1$ by Euclidean algorithm.
+  \end{itemize}
+\item The argument that covering methods fail the strong condition (S) is exact: $P=\prod p_i$ satisfies $\gcd(P,a_n)>1$ for all $n$.
+\item Lemma~\ref{lem:lpf_equiv} gives a precise reformulation of the strong condition as unbounded least prime factor.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.} The weak existence statement (W) is fully solved (e.g.\ by Vsemirnov's explicit pair), but it does \emph{not} answer the Erd\H{o}s--Graham strong condition (S). Any finite covering-congruences construction necessarily violates (S) because the product of the covering primes shares a factor with every term. The strong condition (S) is equivalent to requiring unbounded least prime factor along an all-composite Lucas sequence (Lemma~\ref{lem:lpf_equiv}); this is the first unresolved gap in current constructions.
+
+\subsection*{COMPLETION ESTIMATE}
+COMPLETION: 65\%.
