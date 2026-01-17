@@ -3,10 +3,10 @@ var siteStats = {
     "total_problems": 675,
     "with_attacks": 563,
     "models": [
-      "gpt 5.2",
       "claude opus 4.5",
+      "gpt pro 5.2",
       "codex 5.2 extra high",
-      "gpt pro 5.2"
+      "gpt 5.2"
     ]
   },
   "mo": {
