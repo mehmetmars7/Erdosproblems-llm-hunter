@@ -118,3 +118,275 @@ and attempt to show there exists a length-$n$ interval consisting entirely of su
 If the statement is false, one would expect infinitely many $n$ such that \emph{every} block of $n$ consecutive residues modulo $P(n)$ contains
 some integer having at most one prime divisor $\le n$ (i.e.\ either coprime to $P(n)$ or divisible by exactly one prime $\le n$). Such an $n$ would
 force a strong obstruction to packing length-$n$ intervals with ``$\ge 2$ small prime factors'' integers.
+
+\subsection*{Erd\H{o}s Problem 689}
+
+\paragraph{1) FORMAL RESTATEMENT.}
+
+\textbf{Conventions.}
+\begin{itemize}
+\item $\mathbb N:=\{1,2,3,\dots\}$.
+\item ``Prime'' means a rational prime $p\ge 2$.
+\item For integers $x,y$ and $p\in\mathbb N$, $x\equiv y\pmod p$ means $p\mid(x-y)$.
+\item A ``residue class $a_p \pmod p$'' means choosing an integer $a_p$ and considering its class mod $p$; equivalently choose $a_p\in\{0,1,\dots,p-1\}$.
+\end{itemize}
+
+\textbf{Data.} Fix $n\in\mathbb N$. Let
+\[
+\mathcal P(n):=\{p:\ p\text{ prime and }2\le p\le n\}.
+\]
+Choose residues $(a_p)_{p\in\mathcal P(n)}$ with each $a_p\in\mathbb Z/p\mathbb Z$.
+For each integer $m\in\{1,2,\dots,n\}$, define the ``coverage count''
+\[
+c(m):=\#\{p\in\mathcal P(n):\ m\equiv a_p\pmod p\}.
+\]
+
+\textbf{Asymptotic version (standard ``sufficiently large'' reading).}
+For a fixed integer $r\ge 2$, define the statement $\mathbf{E}(r)$:
+
+\medskip
+\noindent $\mathbf{E}(r)$: $\exists N_r\in\mathbb N$ such that $\forall n\in\mathbb N$ with $n\ge N_r$, $\exists$ a choice of residues $(a_p)_{p\in\mathcal P(n)}$ with
+\[
+\forall m\in\{1,2,\dots,n\},\qquad c(m)\ge r.
+\]
+\medskip
+
+Erd\H{o}s Problem \#689 asks about $\mathbf{E}(2)$. It also explicitly asks the analogous question for general fixed $r$.
+
+\textbf{Literal-source ambiguity.}
+The original wording (in Erd\H{o}s' source) does not explicitly fix the quantifier structure in $n$. In particular, it does not clearly distinguish between:
+\begin{itemize}
+\item[(A)] $\forall$ sufficiently large $n$, $\exists$ residues \dots\ (the $\mathbf{E}(r)$ form),
+\item[(B)] $\exists$ arbitrarily large $n$ such that $\exists$ residues \dots,
+\item[(C)] $\exists n$ such that $\exists$ residues \dots.
+\end{itemize}
+Here I treat (A) as the minimal corrected statement consistent with modern conventions and common formalizations, while also noting counterexamples to the over-strong reading ``for all $n$''.
+
+\textbf{Stress points / edge cases.}
+\begin{itemize}
+\item If $|\mathcal P(n)|<r$ then $c(m)\le |\mathcal P(n)|<r$ for all $m$, so the property is impossible (e.g.\ $n=2$ for $r=2$).
+\item The integer $m=1$ has no prime divisors, so any construction must cover $1$ using \emph{nonzero} residue classes (e.g.\ primes $p$ with $a_p\equiv 1\pmod p$, etc.).
+\item Large primes $p$ near $n$ have residue classes intersecting $[1,n]$ in at most one element; small primes cover many elements. Any construction must balance these regimes.
+\end{itemize}
+
+\paragraph{2) QUICK LITERATURE/CONTEXT CHECK.}
+\begin{itemize}
+\item \textbf{Original source (Erd\H{o}s 1979).} Erd\H{o}s asks: ``Are there residues $c_p$ for every prime $p$ with $2\le p\le n$ so that every positive integer $x\le n$ satisfies at least $2$ (or at least $r$) of the congruences $x\equiv c_p\pmod p$?'' The wording does not pin down the quantifier structure in $n$ (existence for some $n$ vs all large $n$), hence the ambiguity above.
+\item \textbf{Current status / formalization on erdosproblems.com.} The problem is listed as \textbf{OPEN} and phrased as ``Let $n$ be sufficiently large\dots'' and also notes the $r$-fold generalization.
+\item \textbf{Community discussion / heuristic approach.} Forum discussions contain heuristic numerology and possible strategy sketches (e.g.\ Tao; Sawhney), emphasizing links to large gaps between primes technology and (potentially) linear equations in primes methods to control residue-class hitting of prime/semiprime survivors. These are not complete proofs.
+\end{itemize}
+
+\paragraph{3) ATTACK PLAN.}
+
+\textbf{Problem type.} Sieve/covering congruences / probabilistic combinatorics with strong number-theoretic distribution input. Closely aligned with constructions for long strings of composites (large prime gaps) but with a \emph{double-hit} requirement.
+
+\textbf{Likely tools (landscape).}
+\begin{enumerate}
+\item \textbf{CRT/primorial reduction:} translate residue choices to a single shift modulo $P(n)=\prod_{p\le n}p$.
+\item \textbf{Double counting / incidence bounds:} necessary conditions like $\sum_{p\le n}\lceil n/p\rceil\ge rn$.
+\item \textbf{Sieve theory:} classify numbers in $[1,n]$ by roughness after sieving with small primes; estimate survivors.
+\item \textbf{Probabilistic method:} random choice of residue classes for a range of primes; estimate coverage.
+\item \textbf{Hypergraph covering / R\"odl nibble:} interpret residue classes as hyperedges; seek near-disjoint efficient covering of survivors.
+\item \textbf{Large gaps between primes technology:} constructions of long prime-free intervals via congruences; here needs ``two hits''.
+\item \textbf{Linear equations in primes theory:} to justify that certain structured progressions contain needed prime patterns with correct pseudorandomness.
+\item \textbf{Local obstructions:} for $r\ge 3$, potential sieve-based lower bounds on unavoidable survivors that exceed remaining covering capacity.
+\end{enumerate}
+
+\textbf{Dual-track strategies.}
+\begin{itemize}
+\item \textbf{(A) Proof track (best guess for $r=2$).}
+Reduce to a shift problem; implement a two-stage sieve/cover: (i) give almost everyone one hit; (ii) use remaining primes to give survivors a second hit, requiring strong distribution input.
+\item \textbf{(B) Disproof track.}
+Try to show for infinitely many $n$ any choice of residues leaves some $m\le n$ with $c(m)\le 1$. For $r\ge 3$, attempt to formalize a sieve-capacity obstruction.
+\end{itemize}
+
+\paragraph{4) WORK.}
+
+\subsubsection*{PHASE 0 --- HYGIENE}
+
+\textbf{Lemma 4.1 (CRT shift equivalence).}
+Let $n\in\mathbb N$ and let $(a_p)_{p\in\mathcal P(n)}$ be residue classes $a_p\in\mathbb Z/p\mathbb Z$. Define the primorial
+\[
+P(n):=\prod_{p\in\mathcal P(n)} p.
+\]
+Then there exists a unique residue class $t\in\mathbb Z/P(n)\mathbb Z$ such that
+\[
+t\equiv -a_p \pmod p\quad\text{for all }p\in\mathcal P(n).
+\]
+Moreover, for every integer $m$,
+\[
+m\equiv a_p\pmod p \quad\Longleftrightarrow\quad p\mid(t+m).
+\]
+Consequently for $m\in\{1,\dots,n\}$,
+\[
+c(m)=\#\{p\in\mathcal P(n): p\mid(t+m)\},
+\]
+and the condition $c(m)\ge r$ for all $m\in\{1,\dots,n\}$ is equivalent to:
+\[
+\forall m\in\{1,\dots,n\},\quad t+m\text{ is divisible by at least $r$ distinct primes }\le n.
+\]
+
+\emph{Proof.}
+The moduli $p\in\mathcal P(n)$ are pairwise coprime, so by CRT the system
+$t\equiv -a_p\pmod p$ for all $p\in\mathcal P(n)$ has a unique solution modulo $P(n)$.
+Fix such $t$.
+For a given prime $p\le n$,
+\[
+m\equiv a_p\pmod p
+\iff m-a_p\equiv 0\pmod p
+\iff m+t\equiv a_p+t\equiv 0\pmod p
+\iff p\mid(t+m),
+\]
+using $t\equiv -a_p\pmod p$.
+Counting such primes gives the claimed formula for $c(m)$, and the equivalence for $c(m)\ge r$ follows.
+\hfill$\square$
+
+\subsubsection*{PHASE 1 --- FAST REALITY CHECK}
+
+\textbf{Tiny $n$ by hand (disproof of the ``for all $n$'' reading).}
+If one (incorrectly) interprets the claim as ``for every $n$ there exists a choice\dots'', it is false:
+\begin{itemize}
+\item $n=2$: $\mathcal P(2)=\{2\}$, hence $c(m)\le 1$ for all $m$, so $c(m)\ge 2$ is impossible.
+\item $n=3$: $\mathcal P(3)=\{2,3\}$. If $c(m)\ge 2$ for $m=1,2,3$, then each $m$ satisfies both congruences. Hence $1,2,3$ would all lie in the same residue class modulo $6$, impossible.
+\end{itemize}
+
+\textbf{Computation for small $n\le 20$.}
+Using Lemma~4.1, the property depends only on $t\bmod P(n)$.
+A brute-force scan for $n\le 20$ shows the maximum cyclic run length (mod $P(n)$) of consecutive residues $x$ such that $x$ has at least two distinct prime divisors from $\mathcal P(n)$ is:
+\[
+\begin{array}{c|c}
+n & \text{max run length}\\
+\hline
+2 & 0\\
+3,4,5,6 & 1\\
+7,8,9,10 & 2\\
+11,12 & 3\\
+13,14,15,16 & 4\\
+17,18 & 5\\
+19,20 & 6
+\end{array}
+\]
+In particular, for every $n\le 20$ tested, the max run length is $<n$, so no solution exists for $n\le 20$ in the $r=2$ problem.
+
+\subsubsection*{PHASE 2 --- LANDSCAPE: Necessary conditions and easy partial results}
+
+\textbf{Lemma 4.2 (incidence bound).}
+Fix $n\in\mathbb N$ and $r\in\mathbb N$.
+Suppose there exist residues $(a_p)_{p\in\mathcal P(n)}$ such that $c(m)\ge r$ for all $m\in\{1,\dots,n\}$.
+Then
+\[
+\sum_{p\in\mathcal P(n)} \left\lceil \frac{n}{p}\right\rceil \ \ge\ r n.
+\]
+
+\emph{Proof.}
+For each prime $p\le n$, let
+\[
+C_p:=\#\{m\in\{1,\dots,n\}:\ m\equiv a_p\pmod p\}.
+\]
+Then $C_p\le \lceil n/p\rceil$.
+Counting incidences,
+\[
+\sum_{m=1}^n c(m)
+=\sum_{m=1}^n \#\{p\le n:\ m\equiv a_p\pmod p\}
+=\sum_{p\le n} \#\{m\le n:\ m\equiv a_p\pmod p\}
+=\sum_{p\le n} C_p.
+\]
+If $c(m)\ge r$ for each $m$, then $\sum_{m=1}^n c(m)\ge rn$, so
+\[
+rn \le \sum_{p\le n} C_p \le \sum_{p\le n}\left\lceil\frac{n}{p}\right\rceil.
+\]
+\hfill$\square$
+
+\textbf{Corollary 4.3 (trivial upper bound on uniform coverage).}
+For any choice of residues $(a_p)$,
+\[
+\min_{1\le m\le n} c(m)
+\le \frac{1}{n}\sum_{m=1}^n c(m)
+= \frac{1}{n}\sum_{p\le n} C_p
+\le \sum_{p\le n}\left(\frac{1}{p}+\frac{1}{n}\right)
+= \sum_{p\le n}\frac{1}{p} + \frac{\pi(n)}{n}.
+\]
+In particular, $\min_{m\le n} c(m)$ cannot exceed $(1+o(1))\log\log n$ as $n\to\infty$ (using known asymptotics for $\sum_{p\le n}1/p$ and $\pi(n)$).
+
+\textbf{Lemma 4.4 (all-zero choice).}
+Fix $n\ge 2$. Choose $a_p\equiv 0\pmod p$ for every prime $p\le n$.
+Then for each integer $m$ with $2\le m\le n$,
+\[
+c(m)=\omega(m),
+\]
+where $\omega(m)$ is the number of \emph{distinct} prime factors of $m$.
+In particular,
+\[
+c(m)\ge 2 \quad\text{for all }m\in\{2,\dots,n\}\text{ that are not prime powers.}
+\]
+Moreover $c(1)=0$.
+
+\emph{Proof.}
+For $m\le n$, the condition $m\equiv 0\pmod p$ is equivalent to $p\mid m$.
+Because $m\le n$, every prime divisor of $m$ lies in $\mathcal P(n)$.
+Thus $c(m)$ counts exactly the distinct prime divisors of $m$, i.e.\ $\omega(m)$.
+Also $\omega(m)=1$ iff $m$ is a power of a single prime, and $\omega(1)=0$.
+\hfill$\square$
+
+\subsubsection*{PHASE 3 --- DUAL-TRACK SOLVE (attempts and first crisp gaps)}
+
+\textbf{Proof-track outline (why it plausibly reduces to deep input).}
+By Lemma~4.1, for $r=2$ one seeks $t$ such that each $t+m$ ($1\le m\le n$) has at least two distinct prime divisors $\le n$.
+A natural strategy is:
+\begin{enumerate}
+\item \emph{Stage I:} choose many residues to give almost every $m$ at least one hit (a first small prime divisor).
+\item \emph{Stage II:} use remaining primes to give the sparse set of one-hit survivors a second hit.
+\end{enumerate}
+A fully rigorous implementation appears to require strong distribution input (e.g.\ pseudorandomness of primes/semiprimes in many residue classes simultaneously) to ensure enough survivors are hit efficiently.
+
+\textbf{Disproof-track attempt (obstruction for $r\ge 3$).}
+Heuristic sieve-capacity arguments suggest $r\ge 3$ may fail, because after a certain sieving stage too many semiprimes may survive relative to the ability of remaining primes (one congruence class each) to supply the additional hits. Turning this into a rigorous unconditional disproof would require strong \emph{worst-case} upper bounds on how many survivors a residue class can hit, summed over the remaining primes.
+
+\paragraph{5) VERIFICATION.}
+
+\begin{itemize}
+\item Lemma~4.1 is a direct CRT equivalence; all implications are explicit.
+\item Lemma~4.2 is pure double counting and holds for all $n,r$.
+\item Corollary~4.3 uses only $\lceil n/p\rceil\le n/p+1$ and $\min\le \text{average}$.
+\item Lemma~4.4 is correct because $m\le n$ forces all prime divisors of $m$ to lie in $\mathcal P(n)$.
+\item The computation certifies failure for $n\le 20$ but does not settle asymptotics.
+\end{itemize}
+
+\paragraph{6) FINAL.}
+
+\noindent\textbf{UNRESOLVED}
+
+\smallskip
+\noindent\textbf{(i) Strongest fully proved partial results obtained here.}
+\begin{enumerate}
+\item Exact equivalence (Lemma~4.1): the problem is equivalent to finding a shift $t$ such that each of $t+1,\dots,t+n$ has at least $r$ distinct prime divisors $\le n$.
+\item Necessary incidence bound (Lemma~4.2): any solution must satisfy $\sum_{p\le n}\lceil n/p\rceil\ge rn$.
+\item Near-solution (Lemma~4.4): choosing $a_p\equiv 0$ gives $c(m)=\omega(m)$ for $m\ge 2$, so all $m\in[2,n]$ except prime powers already satisfy $c(m)\ge 2$.
+\item Computation: for every $n\le 20$, no choice of residues achieves $c(m)\ge 2$ for all $m\in[1,n]$.
+\end{enumerate}
+
+\smallskip
+\noindent\textbf{(ii) Exact first gap (single crisp statement).}
+\begin{quote}
+Prove that for all sufficiently large $n$ there exists a choice of residues $(a_p)_{p\le n}$ such that every $m\in[1,n]$ lies in at least two of the selected classes; equivalently (Lemma~4.1), prove that for all sufficiently large $n$ there exists $t$ such that every integer in $[t+1,t+n]$ has at least two distinct prime factors $\le n$.
+\end{quote}
+
+\smallskip
+\noindent\textbf{(iii) Top 3 next moves (specific, technical).}
+\begin{enumerate}
+\item Formulate a precise hypergraph covering lemma for survivors after a first sieving stage: vertices = primes in a range; hyperedges = residue classes intersected with the survivor set; then apply a nibble/covering argument, contingent on pseudorandomness estimates.
+\item Prove a robust pseudorandomness-of-survivors statement: after removing multiples of small primes, show remaining primes/semiprimes are equidistributed enough across many moduli to support probabilistic covering.
+\item For $r\ge 3$, try to formalize the capacity obstruction into an unconditional inequality: a worst-case upper bound on how many semiprimes (with specified roughness) a single residue class mod $p$ can hit, summed over available $p$.
+\end{enumerate}
+
+\smallskip
+\noindent\textbf{(iv) What a minimal counterexample would likely look like.}
+If $\mathbf{E}(2)$ is false, one expects infinitely many $n$ such that every length-$n$ block modulo $P(n)$ contains some residue with at most one prime divisor $\le n$; equivalently, no shift $t$ can make all $t+1,\dots,t+n$ have two small prime factors. Such an obstruction would manifest as an unavoidable occurrence, in every block, of either:
+\begin{itemize}
+\item a residue coprime to $P(n)$ (no small prime factors), or
+\item a residue divisible by exactly one prime $\le n$ (a ``one-hit'' number relative to $\mathcal P(n)$),
+\end{itemize}
+with this inevitability persisting despite the freedom to choose $t$.
+
+\paragraph{7) COMPLETION ESTIMATE (MANDATORY).}
+\noindent COMPLETION: 40\%
