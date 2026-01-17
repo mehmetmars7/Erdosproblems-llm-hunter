@@ -12,7 +12,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Problem - Problem Hunting with LLMs (beta)</title>
+    <title>Problem - Erdos Problems LLM Hunter (beta)</title>
     <link rel="stylesheet" href="styles.css">
     <script>
         window.MathJax = {
@@ -152,14 +152,14 @@
             // Update page title
             if (type === 'erdos') {
                 document.getElementById('page-title').textContent = `Erdos Problem #${id}`;
-                document.title = `Erdos Problem #${id} - Problem Hunting with LLMs`;
+                document.title = `Erdos Problem #${id} - Erdos Problems LLM Hunter`;
             } else {
                 // Decode HTML entities in title
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = problem.title || `MO Question ${id}`;
                 const decodedTitle = tempDiv.textContent || tempDiv.innerText || `MO Question ${id}`;
                 document.getElementById('page-title').textContent = decodedTitle;
-                document.title = `${decodedTitle} - Problem Hunting with LLMs`;
+                document.title = `${decodedTitle} - Erdos Problems LLM Hunter`;
             }
 
             // Problem meta
@@ -361,6 +361,16 @@
                             continue;
                         }
                     }
+                    if (input[i] === '$' && (i === 0 || input[i - 1] !== '\\')) {
+                        const isDisplay = input[i + 1] === '$';
+                        const delim = isDisplay ? '$$' : '$';
+                        const endIdx = input.indexOf(delim, i + delim.length);
+                        if (endIdx !== -1) {
+                            out += input.slice(i, endIdx + delim.length);
+                            i = endIdx + delim.length;
+                            continue;
+                        }
+                    }
 
                     const ch = input[i];
                     if (ch === '(' && (i === 0 || input[i - 1] !== '\\')) {
@@ -449,6 +459,18 @@
             text = text.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
             // \textit{...} → <em>...</em>
             text = text.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
+            // \underline{...} → <u>...</u>
+            text = text.replace(/\\underline\{([^}]+)\}/g, '<u>$1</u>');
+            // Markdown-style emphasis
+            text = text.replace(/\\qedhere\b/g, '\\(\\square\\)');
+            text = text.replace(/\\qed\b/g, '\\(\\square\\)');
+            text = text.replace(/\*\*([^\n*]+)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*([A-Za-z0-9][^*\n]*?)\*/g, '<em>$1</em>');
+            // Markdown headings (##, ###, ####, ...)
+            text = text.replace(/^\s*(#{2,6})\s+(.+)$/gm, function(match, hashes, heading) {
+                const level = Math.min(6, hashes.length);
+                return `<h${level}>${heading.trim()}</h${level}>`;
+            });
             
             // Remove LaTeX reference commands
             text = text.replace(/\\label\{[^}]+\}/g, '');
@@ -460,6 +482,7 @@
             text = text.replace(/\\noindent/g, '');
             text = text.replace(/\\bigskip/g, '');
             text = text.replace(/\\smallskip/g, '');
+            text = text.replace(/\\hfill/g, '');
             
             // Replace delimiter sizing commands with \left and \right equivalents
             // These work better in MathJax than the explicit sizing commands
@@ -559,15 +582,24 @@
                 .replace(/&lt;\/strong&gt;/g, '</strong>')
                 .replace(/&lt;em&gt;/g, '<em>')
                 .replace(/&lt;\/em&gt;/g, '</em>')
+                .replace(/&lt;u&gt;/g, '<u>')
+                .replace(/&lt;\/u&gt;/g, '</u>')
                 .replace(/&lt;a href="/g, '<a href="')
                 .replace(/&lt;\/a&gt;/g, '</a>')
                 .replace(/" target="_blank"&gt;/g, '" target="_blank">');
 
-            // Convert line breaks to HTML
-            formatted = formatted.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
-
-            // Wrap in paragraphs
-            formatted = '<p>' + formatted + '</p>';
+            // Convert line breaks to paragraphs, avoid inserting <br> inside math
+            formatted = formatted
+                .split(/\n{2,}/)
+                .map(para => para.replace(/\n/g, ' ').trim())
+                .filter(para => para.length > 0)
+                .map(para => {
+                    if (/^<(h[1-6]|ul|ol|div|blockquote|pre|hr)\b/i.test(para)) {
+                        return para;
+                    }
+                    return '<p>' + para + '</p>';
+                })
+                .join('');
 
             return formatted;
         }
