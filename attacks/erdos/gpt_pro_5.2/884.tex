@@ -138,3 +138,381 @@ prove or disprove that there exists absolute $C$ with
 A counterexample sequence would require integers $n$ whose divisor set contains a large “cluster” of divisors with roughly uniform small additive spacing (so that $\sum_{i<j}1/(d_j-d_i)$ gains a logarithmic factor) while the consecutive-gap reciprocal sum remains comparatively small. Such clustering is most plausible near $\sqrt n$.
 
 
+\section*{1. Formal restatement}
+
+Let \(n\in \mathbb{Z}_{\ge 1}\). Let \(1=d_1<d_2<\dots<d_t=n\) be the complete increasing list of \emph{positive} divisors of \(n\) (so \(t=\tau(n)\)). Define
+\[
+S_{\mathrm{all}}(n):=\sum_{1\le i<j\le t}\frac{1}{d_j-d_i},
+\qquad
+S_{\mathrm{gap}}(n):=\sum_{1\le i<t}\frac{1}{d_{i+1}-d_i}.
+\]
+Question: does there exist an \emph{absolute} constant \(C>0\) such that
+\[
+\forall n\ge 1,\qquad S_{\mathrm{all}}(n)\le C\bigl(1+S_{\mathrm{gap}}(n)\bigr)\,?
+\]
+Edge case: if \(n=1\), then \(t=1\) and \(S_{\mathrm{all}}(1)=S_{\mathrm{gap}}(1)=0\), so the inequality holds for any \(C\ge 0\).
+
+\section*{2. Quick literature/context check (browsing available)}
+
+As of Jan 17, 2026, the Erd\H{o}s Problems page for Problem \#884 contains the following relevant context.
+
+\begin{itemize}
+\item Terence Tao states (Sep 10, 2025) that he can \emph{disprove} the conjectured absolute-constant inequality \emph{assuming} the qualitative Hardy--Littlewood prime tuples conjecture. The construction uses
+\[
+n=\prod_{m=1}^K (t-h_m)
+\]
+for an admissible tuple \(h_1,\dots,h_K\) of diameter \(\asymp K^2\) with consecutive elements \(\gg K\)-separated, and chooses \(t\) so that all \(t-h_m\) are prime (the conditional step).
+\item Tao also wrote a note titled \emph{On the sum of reciprocals of gaps between divisors} (2025) giving a conditional theorem that, under such a prime tuples conjecture, there exist integers \(n\) for which
+\[
+\sum_{i<j}\frac1{d_j-d_i}\gg \log K
+\qquad\text{while}\qquad
+\sum_i\frac1{d_{i+1}-d_i}\ll 1,
+\]
+forcing the ratio \(S_{\mathrm{all}}(n)/(1+S_{\mathrm{gap}}(n))\) to be unbounded and hence contradicting the desired inequality with any absolute \(C\).
+\item The same thread includes computationally observed record values of \(S_{\mathrm{all}}(n)/(1+S_{\mathrm{gap}}(n))\) for various \(n\), suggesting very slow growth and a likely divergence, but this is not an unconditional proof.
+\end{itemize}
+
+Thus: \emph{conditionally} (prime tuples), the statement is false; \emph{unconditionally} it appears open.
+
+\section*{3. Attack plan}
+
+\paragraph{Classification.}
+This is a problem about an ``energy'' sum \(\sum_{i<j}1/(d_j-d_i)\) for a highly structured increasing set (divisors of \(n\)), compared to the nearest-neighbor ``energy'' \(\sum_i 1/(d_{i+1}-d_i)\).
+
+\paragraph{Proof-track ideas.}
+\begin{enumerate}
+\item Prove general inequalities bounding \(\sum_{i<j}1/(x_j-x_i)\) by \((\log t)\sum_i 1/(x_{i+1}-x_i)\) for arbitrary increasing sequences \((x_i)\); then attempt to remove the \(\log t\) using divisor-specific structure.
+\item Prove the conjectured inequality for special families (e.g.\ prime powers) to test plausibility of an absolute constant.
+\item Analyze divisor clustering near \(\sqrt{n}\) and attempt to show that any clustering strong enough to make \(S_{\mathrm{all}}\) large must also force \(S_{\mathrm{gap}}\) large.
+\end{enumerate}
+
+\paragraph{Disproof-track ideas.}
+\begin{enumerate}
+\item Attempt to construct \(n\) whose divisor set contains a dense block behaving like an arithmetic progression (which would create a \(\log\)-gain in \(\sum_{i<j}1/(d_j-d_i)\)) while keeping \(\sum_i 1/(d_{i+1}-d_i)\) bounded.
+\item Follow Tao's conditional construction using primes in a short interval; this yields a conditional counterexample family under prime tuples.
+\end{enumerate}
+
+\paragraph{Chosen path.}
+Execute both tracks. The strongest rigorous global outcome currently available is a \emph{conditional disproof} under the prime tuples conjecture plus unconditional partial bounds.
+
+\section*{4. Work}
+
+\subsection*{4.1. Universal \(\log t\)-loss bound (arbitrary sequences)}
+
+\paragraph{Lemma 1.}
+Let \(x_1<\dots<x_t\) be strictly increasing reals and let \(g_i:=x_{i+1}-x_i>0\). Then
+\[
+\sum_{1\le i<j\le t}\frac{1}{x_j-x_i}\ \le\ H_{t-1}\sum_{i=1}^{t-1}\frac{1}{g_i},
+\qquad
+H_{t-1}:=\sum_{m=1}^{t-1}\frac1m.
+\]
+
+\emph{Proof.}
+Fix \(1\le i<j\le t\). Then
+\[
+x_j-x_i=g_i+g_{i+1}+\dots+g_{j-1}=\sum_{k=i}^{j-1}g_k.
+\]
+By Cauchy--Schwarz,
+\[
+\Big(\sum_{k=i}^{j-1}g_k\Big)\Big(\sum_{k=i}^{j-1}\frac{1}{g_k}\Big)\ge (j-i)^2.
+\]
+Rearranging gives
+\[
+\frac{1}{x_j-x_i}=\frac{1}{\sum_{k=i}^{j-1}g_k}\le \frac{1}{(j-i)^2}\sum_{k=i}^{j-1}\frac{1}{g_k}.
+\]
+Summing over \(i<j\) yields
+\[
+\sum_{i<j}\frac1{x_j-x_i}\le \sum_{i<j}\frac{1}{(j-i)^2}\sum_{k=i}^{j-1}\frac{1}{g_k}.
+\]
+Swap summations: for fixed \(k\in\{1,\dots,t-1\}\), the coefficient of \(1/g_k\) is
+\[
+c_k:=\sum_{\substack{i\le k<j}}\frac{1}{(j-i)^2}.
+\]
+Group by \(m:=j-i\ge 1\). For fixed \(m\), the condition \(i\le k<i+m\) is equivalent to \(k-m+1\le i\le k\), giving at most \(m\) possible \(i\). Hence
+\[
+c_k\le \sum_{m=1}^{t-1}\frac{m}{m^2}=\sum_{m=1}^{t-1}\frac1m=H_{t-1}.
+\]
+Therefore
+\[
+\sum_{i<j}\frac1{x_j-x_i}\le \sum_{k=1}^{t-1}\frac1{g_k}\,H_{t-1}
+=H_{t-1}\sum_{k=1}^{t-1}\frac{1}{g_k}.
+\qquad \Box
+\]
+
+\paragraph{Corollary 1.}
+For every \(n\ge 1\),
+\[
+S_{\mathrm{all}}(n)\le H_{\tau(n)-1}\,S_{\mathrm{gap}}(n),
+\]
+which is weaker than the conjectured inequality by a factor \(\asymp \log \tau(n)\).
+
+\subsection*{4.2. Prime powers satisfy the desired form}
+
+\paragraph{Lemma 2.}
+If \(n=p^m\) with \(p\) prime and \(m\ge 1\), then
+\[
+S_{\mathrm{all}}(n)\le 2\,S_{\mathrm{gap}}(n)\le 2\bigl(1+S_{\mathrm{gap}}(n)\bigr).
+\]
+
+\emph{Proof.}
+The divisors are \(d_i=p^{i-1}\) for \(i=1,\dots,m+1\).
+Consecutive gaps are
+\[
+d_{i+1}-d_i=p^i-p^{i-1}=p^{i-1}(p-1)\qquad (i=1,\dots,m),
+\]
+hence
+\[
+S_{\mathrm{gap}}(n)=\sum_{i=1}^{m}\frac{1}{p^{i-1}(p-1)}=\frac{1}{p-1}\sum_{r=0}^{m-1}p^{-r}.
+\]
+For \(i<j\), write \(r=j-i\ge 1\). Then
+\[
+d_j-d_i=p^{j-1}-p^{i-1}=p^{i-1}(p^r-1)\ge p^{i-1}\,p^{r-1}(p-1)=p^{j-2}(p-1).
+\]
+Thus
+\[
+\frac{1}{d_j-d_i}\le \frac{1}{p^{j-2}(p-1)}=\frac{p}{p-1}\cdot \frac{1}{p^{j-1}}.
+\]
+For fixed \(j\),
+\[
+\sum_{i=1}^{j-1}\frac{1}{d_j-d_i}\le (j-1)\frac{p}{p-1}\cdot p^{-(j-1)}.
+\]
+Therefore
+\[
+S_{\mathrm{all}}(n)\le \frac{p}{p-1}\sum_{j=2}^{m+1}(j-1)p^{-(j-1)}.
+\]
+Using \(\sum_{u=1}^\infty u p^{-u}=\frac{p}{(p-1)^2}\), we have the partial-sum bound
+\[
+\sum_{j=2}^{m+1}(j-1)p^{-(j-1)}\le \sum_{u=1}^\infty u p^{-u}=\frac{p}{(p-1)^2}.
+\]
+Combining gives
+\[
+S_{\mathrm{all}}(n)\le \frac{p}{p-1}\cdot \frac{p}{(p-1)^2}
+\le \frac{p}{p-1}\cdot \frac{1}{p-1}\sum_{r=0}^{m-1}p^{-r}
+=\frac{p}{p-1}\,S_{\mathrm{gap}}(n)\le 2\,S_{\mathrm{gap}}(n),
+\]
+since \(\frac{p}{p-1}\le 2\) for all primes \(p\).
+\(\Box\)
+
+\subsection*{4.3. A general lower bound for reciprocal-distance energy in an interval}
+
+\paragraph{Lemma 3 (Energy lower bound in an interval).}
+Let \(I\subset \mathbb{R}\) be an interval of length \(L>0\). Let \(x_1<\dots<x_k\) be \(k\ge 2\) points in \(I\). Then
+\[
+\sum_{1\le i<j\le k}\frac{1}{x_j-x_i}\ \ge\ c\,\frac{k^2\log k}{L}
+\]
+for some absolute constant \(c>0\) (for instance \(c=\frac{1}{32}\) works for all \(k\ge 2\)).
+
+\emph{Proof.}
+Translate and scale so \(I=[0,L]\). For \(m\ge 0\) set \(s_m:=L/2^m\), and let \(N_m\) denote the number of pairs \((i,j)\) with \(1\le i<j\le k\) such that \(|x_j-x_i|\le s_m\).
+
+\emph{Step 1: lower bound on \(N_m\).}
+Partition \([0,L]\) into \(2^m\) subintervals of length \(s_m\), and let \(a_{m,r}\) be the number of points in the \(r\)-th subinterval. Then \(\sum_r a_{m,r}=k\), and every pair of points within the same subinterval has distance \(\le s_m\), so
+\[
+N_m\ge \sum_{r=1}^{2^m}\binom{a_{m,r}}{2}
+= \frac12\sum_r (a_{m,r}^2-a_{m,r})
+= \frac12\Big(\sum_r a_{m,r}^2-k\Big).
+\]
+By Cauchy--Schwarz,
+\[
+\sum_{r=1}^{2^m} a_{m,r}^2\ge \frac{(\sum_r a_{m,r})^2}{2^m}=\frac{k^2}{2^m}.
+\]
+Hence
+\[
+N_m\ge \frac12\Big(\frac{k^2}{2^m}-k\Big).
+\]
+In particular, if \(2^m\le k/2\) (i.e.\ \(m\le \lfloor \log_2(k/2)\rfloor\)), then \(\frac{k^2}{2^m}\ge 2k\), so
+\[
+N_m\ge \frac{k^2}{4\cdot 2^m}.
+\tag{\(\star\)}
+\]
+
+\emph{Step 2: relate \(N_m\) to energy.}
+Let
+\[
+E:=\sum_{1\le i<j\le k}\frac{1}{x_j-x_i}.
+\]
+Fix a pair at distance \(d:=x_j-x_i\in (0,L]\). Then
+\[
+\sum_{m:\ s_m\ge d}\frac{1}{s_m}
+=\sum_{m=0}^{M(d)}\frac{2^m}{L}
+=\frac{2^{M(d)+1}-1}{L}
+<\frac{2^{M(d)+1}}{L}
+=\frac{2}{s_{M(d)}}
+\le \frac{2}{d},
+\]
+where \(M(d)\) is the largest integer with \(s_{M(d)}\ge d\), so \(s_{M(d)}\ge d\).
+Summing this bound over all pairs gives
+\[
+\sum_{m\ge 0}\frac{N_m}{s_m}
+=\sum_{i<j}\sum_{m:\ s_m\ge (x_j-x_i)}\frac1{s_m}
+\le \sum_{i<j}\frac{2}{x_j-x_i}
+=2E,
+\]
+hence
+\[
+E\ge \frac12\sum_{m\ge 0}\frac{N_m}{s_m}.
+\tag{\(\dagger\)}
+\]
+
+\emph{Step 3: conclude.}
+Let \(M:=\lfloor \log_2(k/2)\rfloor\). Using \((\star)\) in \((\dagger)\),
+\[
+E\ge \frac12\sum_{m=0}^{M}\frac{N_m}{s_m}
+\ge \frac12\sum_{m=0}^{M}\frac{\frac{k^2}{4\cdot 2^m}}{L/2^m}
+=\frac12\sum_{m=0}^{M}\frac{k^2}{4L}
+=\frac{k^2}{8L}(M+1).
+\]
+Since \(M+1\ge \log_2(k/2)\ge \frac12\log_2 k\) for \(k\ge 2\), we obtain
+\[
+E\ge \frac{k^2}{16L}\log_2 k
+=\frac{1}{16\log 2}\,\frac{k^2\log k}{L}
+\ge \frac{1}{32}\,\frac{k^2\log k}{L}.
+\qquad \Box
+\]
+
+\subsection*{4.4. Conditional disproof under prime tuples (Tao)}
+
+\paragraph{Prime tuples conjecture (qualitative).}
+For every admissible tuple \((h_1,\dots,h_K)\) (i.e.\ for every prime \(p\), the residues \(h_1,\dots,h_K\pmod p\) do not cover all residue classes mod \(p\)), there exist infinitely many integers \(t\) such that \(t-h_1,\dots,t-h_K\) are all prime.
+
+\paragraph{Theorem 4 (Conditional disproof).}
+Assuming the prime tuples conjecture, there is no absolute constant \(C\) such that
+\[
+S_{\mathrm{all}}(n)\le C\bigl(1+S_{\mathrm{gap}}(n)\bigr)
+\quad\text{for all }n\ge 1.
+\]
+In fact, for arbitrarily large \(K\) there exists \(n\) with
+\[
+\frac{S_{\mathrm{all}}(n)}{1+S_{\mathrm{gap}}(n)}\gg \log K.
+\]
+
+\emph{Proof (conditional on prime tuples).}
+Fix a large integer \(K\). By a sieve construction (as in Tao's note), one can choose an admissible tuple \(h_1<\dots<h_K\) with diameter \(O(K^2)\) and with separations \(|h_i-h_j|\gg K\) for \(i\neq j\). (This part is unconditional in Tao's argument.)
+
+By the prime tuples conjecture, choose \(t\) such that all \(t-h_1,\dots,t-h_K\) are prime, and set
+\[
+n:=\prod_{m=1}^K (t-h_m).
+\]
+Then \(n\) is squarefree with exactly \(K\) prime factors, so \(\tau(n)=2^K\). The numbers \(t-h_1,\dots,t-h_K\) are divisors of \(n\), and they lie in an interval of length \(O(K^2)\). Applying Lemma~3 to these \(K\) divisors yields
+\[
+S_{\mathrm{all}}(n)\ \ge\ \sum_{1\le i<j\le K}\frac{1}{(t-h_j)-(t-h_i)}
+=\sum_{1\le i<j\le K}\frac{1}{h_j-h_i}
+\gg \log K.
+\tag{1}
+\]
+
+It remains to control \(S_{\mathrm{gap}}(n)\). Observe that any gap \(d_{i+1}-d_i>2^K\) contributes at most \(1/2^K\), so the total contribution of all such gaps is at most \((2^K-1)\cdot (1/2^K)<1\). Hence it suffices to bound the contribution from gaps \(\le 2^K\).
+
+Every divisor of \(n\) has the form
+\[
+P_{a_1,\dots,a_k}(t):=\prod_{r=1}^k (t-a_r)
+\quad\text{with}\quad \{a_1,\dots,a_k\}\subset \{h_1,\dots,h_K\}.
+\]
+For \(t\) sufficiently large (depending on \(K\)), if two such divisor-polynomials differ by at most \(2^K\) at the point \(t\), then their difference must be a \emph{constant} polynomial (because any nonconstant polynomial with integer coefficients and coefficients bounded in terms of \(K\) grows beyond \(2^K\) for large \(t\)). In particular, close divisor pairs must come from polynomials of the same degree \(k\).
+
+The degree-\(1\) divisors are exactly \(t-h_1,\dots,t-h_K\); their pairwise differences are \(\gg K\) by separation, and their total contribution to \(\sum 1/(d_{i+1}-d_i)\) is \(O(1)\).
+For degrees \(k\ge 2\), one reduces to bounding a sum over constant differences between distinct polynomials:
+\[
+P_{a_1,\dots,a_k}(t)-P_{b_1,\dots,b_k}(t)=\ell\in \{1,2,\dots,2^K\},
+\]
+counted in a manner that ensures each close consecutive divisor gap is charged at most once. The key lower bound is:
+
+\medskip
+\noindent\textbf{Lemma 5 (Lower bound on constant differences).}
+If \(a_1<\dots<a_k\), \(b_1<\dots<b_k\), and
+\[
+P_{a_1,\dots,a_k}(t)-P_{b_1,\dots,b_k}(t)=\ell
+\]
+is constant with \(\ell>0\), then \(b_k>a_k\) and
+\[
+\ell\ \ge\ \frac{b_k-a_k}{k}\prod_{i=1}^{k-1}(a_k-a_i).
+\]
+
+\emph{Proof.}
+The polynomial \(P_{a_1,\dots,a_k}\) has \(k\) simple real roots, hence for \(t\ge a_k\) it is increasing and convex. Since \(\ell>0\), evaluating at \(t=b_k\) forces \(b_k>a_k\). By convexity and the mean value theorem,
+\[
+\ell=P_{a_1,\dots,a_k}(b_k)-P_{a_1,\dots,a_k}(a_k)\ge (b_k-a_k)\,P'_{a_1,\dots,a_k}(a_k).
+\]
+A direct Leibniz-rule computation gives
+\[
+P'_{a_1,\dots,a_k}(a_k)=\prod_{i=1}^{k-1}(a_k-a_i),
+\]
+so in fact \(\ell\ge (b_k-a_k)\prod_{i=1}^{k-1}(a_k-a_i)\), which implies the displayed bound with the additional factor \(1/k\).
+\(\Box\)
+\medskip
+
+Applying this lemma with \(a_i=h_{j_i}\), \(b_i=h_{\tilde j_i}\), and using the separation \(|h_u-h_v|\gg K\), one obtains
+\[
+\ell \gg \frac{K}{k}\prod_{i=1}^{k-1}(h_{j_k}-h_{j_i}).
+\tag{2}
+\]
+Now dyadically pigeonhole the differences \(h_{j_k}-h_{j_i}\) into dyadic ranges \([A_i,2A_i]\) with \(K\ll A_i\ll K^2\). For fixed \(k\) and fixed dyadic choices \((A_1,\dots,A_{k-1})\), the number of \(k\)-tuples \((j_1,\dots,j_k)\) meeting these constraints is bounded by
+\[
+\ll K\prod_{i=1}^{k-1}\frac{A_i}{K},
+\tag{3}
+\]
+because there are \(O(K)\) choices for \(j_k\), and for each \(i<k\) the \(\gg K\)-separation implies \(O(A_i/K)\) choices for \(j_i\) in an interval of length \(O(A_i)\).
+
+For each such tuple, the corresponding \(\ell\) (minimal constant difference, if it exists) is uniquely determined. Using \((2)\), we have \(1/\ell \ll \frac{k}{K\prod_i A_i}\). Multiplying by the count \((3)\) shows that the total contribution to \(\sum 1/\ell\) from fixed \((k;A_1,\dots,A_{k-1})\) is
+\[
+\ll \Big(\frac{1}{K}\Big)^{k-1}
+\]
+up to absolute constants. Summing over the \(O((\log K)^{k-1})\) dyadic choices yields a bound
+\[
+\ll \Big(\frac{C\log K}{K}\Big)^{k-1}.
+\]
+Summing this geometric series over \(k\ge 2\) gives an absolute bound \(S_{\mathrm{gap}}(n)\ll 1\) for \(K\) large. Combining with \((1)\) yields
+\[
+\frac{S_{\mathrm{all}}(n)}{1+S_{\mathrm{gap}}(n)}\gg \log K\to\infty,
+\]
+so no absolute \(C\) can satisfy the inequality for all \(n\).
+\(\Box\)
+
+\section*{5. Verification (adversarial checks)}
+
+\begin{itemize}
+\item \textbf{Lemma 1:} The only subtlety is counting, for fixed \(k\) and fixed \(m=j-i\), the number of \(i\) such that \(i\le k< i+m\); this is at most \(m\). Hence \(c_k\le \sum_{m=1}^{t-1}1/m\), as claimed.
+\item \textbf{Lemma 2:} The inequality \(p^r-1\ge p^{r-1}(p-1)\) is exact; the factor \(p/(p-1)\le 2\) holds for all primes \(p\). No hidden dependence on \(m\).
+\item \textbf{Lemma 3:} The dyadic summation inequality \(\sum_{m:\ s_m\ge d}1/s_m\le 2/d\) is a direct geometric-series bound and is correct.
+\item \textbf{Lemma 5 / constant-difference bound:} A direct derivative computation gives \(P'(a_k)=\prod_{i<k}(a_k-a_i)\). This yields an even \emph{stronger} lower bound on \(\ell\) than the weaker \(\frac{1}{k}\)-version used above, so the subsequent estimates remain valid.
+\item \textbf{Conditional step:} The only genuinely conditional input is producing \(t\) with all \(t-h_i\) prime for large \(K\). Without this, the disproof argument does not go through unconditionally.
+\end{itemize}
+
+\section*{6. FINAL}
+
+\paragraph{\textbf{UNRESOLVED (unconditionally).}}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial results.}
+\begin{itemize}
+\item For every \(n\), one has the universal bound
+\[
+S_{\mathrm{all}}(n)\le H_{\tau(n)-1}\,S_{\mathrm{gap}}(n)\ll (\log \tau(n))\,S_{\mathrm{gap}}(n).
+\]
+\item For prime powers \(n=p^m\), the conjectured inequality holds with absolute constant \(2\):
+\[
+S_{\mathrm{all}}(n)\le 2\bigl(1+S_{\mathrm{gap}}(n)\bigr).
+\]
+\item Assuming the qualitative prime tuples conjecture, the conjecture is \emph{false}: there exist \(n\) with
+\[
+\frac{S_{\mathrm{all}}(n)}{1+S_{\mathrm{gap}}(n)}\to\infty.
+\]
+\end{itemize}
+
+\item[(ii)] \textbf{Exact first gap.}
+To resolve the original question unconditionally, one must either (a) prove an absolute bound \(S_{\mathrm{all}}(n)\le C(1+S_{\mathrm{gap}}(n))\) for all \(n\), or (b) construct an unconditional infinite family \(n\) with unbounded ratio. The strongest available disproof strategy requires producing many primes \(t-h_1,\dots,t-h_K\) in a short interval with controlled spacing; this is precisely where prime tuples is used.
+
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Find an unconditional substitute for prime tuples in Tao's construction (e.g.\ controlled almost-prime constellations) together with an anti-collision argument that still forces \(S_{\mathrm{gap}}(n)\ll 1\).
+\item Prove a rigorous unbounded lower bound for \(R(n)\) along an explicit family (e.g.\ \(n=k!\) or \(n=\mathrm{lcm}(1,\dots,k)\)), or show such families cannot work.
+\item Develop a divisor-cluster structural theorem showing that a large block contributing \(\gg \log\)-energy must force comparably large \(S_{\mathrm{gap}}\), or else exhibit the obstruction explicitly.
+\end{enumerate}
+
+\item[(iv)] \textbf{Likely minimal counterexample structure.}
+A counterexample family would likely have a dense block of divisors inside a short interval (producing \(\gg \log\) contribution to \(S_{\mathrm{all}}\)), while the full divisor set avoids creating too many additional small consecutive gaps (keeping \(S_{\mathrm{gap}}\) bounded). Tao's conditional construction produces precisely this behavior using primes in a short interval with controlled spacing.
+\end{enumerate}
+
+\section*{7. Completion estimate}
+
+\noindent \textbf{COMPLETION: \(70\%\).}
