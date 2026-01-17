@@ -30,6 +30,17 @@
                     'Z': '{\\mathbb{Z}}',
                     'Q': '{\\mathbb{Q}}',
                     'F': '{\\mathbb{F}}',
+                    'RR': '{\\mathbb{R}}',
+                    'CC': '{\\mathbb{C}}',
+                    'NN': '{\\mathbb{N}}',
+                    'ZZ': '{\\mathbb{Z}}',
+                    'QQ': '{\\mathbb{Q}}',
+                    'FF': '{\\mathbb{F}}',
+                    'PP': '{\\mathbb{P}}',
+                    'HH': '{\\mathbb{H}}',
+                    'Qbar': '{\\overline{\\mathbb{Q}}}',
+                    'GQ': '{\\mathrm{Gal}(\\Qbar/\\mathbb{Q})}',
+                    'Mgn': ['{\\mathcal{M}_{#1,#2}}', 2],
                     'Bbb': ['{\\mathbb{#1}}', 1],
                     'normp': ['{\\|#1\\|_{#2}}', 2],
                     'norm': ['{\\|#1\\|}', 1],
@@ -411,6 +422,19 @@
 
             text = convertInlineMath(text);
             
+            // Handle LaTeX comments (lines starting with %) only in the first ~10 lines
+            const lines = text.split('\n');
+            const headerLineCount = Math.min(10, lines.length);
+            for (let i = 0; i < headerLineCount; i++) {
+                if (lines[i].match(/^\s*%/)) {
+                    lines[i] = lines[i].replace(/^(\s*)%(.*)$/, '$1<span class="latex-comment">%$2</span>');
+                } else if (!lines[i].trim().startsWith('<span class="latex-comment">') && lines[i].trim().length > 0) {
+                    // Stop processing comments once we hit a non-comment, non-empty line
+                    break;
+                }
+            }
+            text = lines.join('\n');
+            
             // Convert LaTeX environments to HTML before escaping
             // This must happen before HTML escaping
             
@@ -453,14 +477,56 @@
             text = text.replace(/\\end\{psmallmatrix\}/g, '\\end{pmatrix}');
             
             // Handle LaTeX text formatting commands BEFORE HTML escaping
-            // \emph{...} → <em>...</em>
-            text = text.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
-            // \textbf{...} → <strong>...</strong>
-            text = text.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
-            // \textit{...} → <em>...</em>
-            text = text.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
-            // \underline{...} → <u>...</u>
-            text = text.replace(/\\underline\{([^}]+)\}/g, '<u>$1</u>');
+            function replaceLatexCommand(input, command, openTag, closeTag) {
+                const needle = '\\\\' + command + '{';
+                let out = '';
+                let i = 0;
+
+                while (i < input.length) {
+                    const idx = input.indexOf(needle, i);
+                    if (idx === -1) {
+                        out += input.slice(i);
+                        break;
+                    }
+                    out += input.slice(i, idx);
+
+                    let j = idx + needle.length;
+                    let depth = 1;
+
+                    while (j < input.length && depth > 0) {
+                        const ch = input[j];
+                        if (ch === '\\\\') {
+                            j += 2;
+                            continue;
+                        }
+                        if (ch === '{') {
+                            depth += 1;
+                        } else if (ch === '}') {
+                            depth -= 1;
+                            if (depth === 0) {
+                                break;
+                            }
+                        }
+                        j += 1;
+                    }
+
+                    if (depth !== 0) {
+                        out += input.slice(idx);
+                        return out;
+                    }
+
+                    const content = input.slice(idx + needle.length, j);
+                    out += openTag + content + closeTag;
+                    i = j + 1;
+                }
+
+                return out;
+            }
+
+            text = replaceLatexCommand(text, 'emph', '<em>', '</em>');
+            text = replaceLatexCommand(text, 'textbf', '<strong>', '</strong>');
+            text = replaceLatexCommand(text, 'textit', '<em>', '</em>');
+            text = replaceLatexCommand(text, 'underline', '<u>', '</u>');
             // Markdown-style emphasis
             text = text.replace(/\\qedhere\b/g, '\\(\\square\\)');
             text = text.replace(/\\qed\b/g, '\\(\\square\\)');
@@ -501,6 +567,9 @@
 
             // Handle \href{url}{text}
             text = text.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1" target="_blank">$2</a>');
+
+            // Convert plain URLs to clickable links (but not if already in an <a> tag)
+            text = text.replace(/(?<!href=")(https?:\/\/[^\s<>"{}|\\^\[\]`]+)/g, '<a href="$1" target="_blank">$1</a>');
 
             // Replace LaTeX quotes with proper HTML entities
             text = text.replace(/``/g, '"');
@@ -558,6 +627,8 @@
                 .replace(/&lt;\/ol&gt;/g, '</ol>')
                 .replace(/&lt;li&gt;/g, '<li>')
                 .replace(/&lt;\/li&gt;/g, '</li>')
+                .replace(/&lt;span class="latex-comment"&gt;/g, '<span class="latex-comment">')
+                .replace(/&lt;\/span&gt;/g, '</span>')
                 .replace(/&lt;blockquote&gt;/g, '<blockquote>')
                 .replace(/&lt;\/blockquote&gt;/g, '</blockquote>')
                 .replace(/&lt;pre&gt;/g, '<pre>')
@@ -594,6 +665,10 @@
                 .map(para => para.replace(/\n/g, ' ').trim())
                 .filter(para => para.length > 0)
                 .map(para => {
+                    // Preserve line breaks in spans (like latex-comment)
+                    if (para.includes('<span class="latex-comment">')) {
+                        para = para.replace(/<\/span> <span class="latex-comment">/g, '</span><br><span class="latex-comment">');
+                    }
                     if (/^<(h[1-6]|ul|ol|div|blockquote|pre|hr)\b/i.test(para)) {
                         return para;
                     }
