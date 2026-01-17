@@ -1,0 +1,164 @@
+% Erdos problem #566
+%
+FORMAL RESTATEMENT
+
+Let $G$ be a fixed (simple) graph such that every subgraph $G'\subseteq G$ on $k$ vertices has at most $2k-3$ edges.
+(Equivalently, every induced subgraph on $k$ vertices has at most $2k-3$ edges, since deleting edges only decreases the edge count.)
+The question asks whether $G$ is Ramsey size linear:
+does there exist a constant $C_G>0$ such that for every graph $H$ with $m$ edges and no isolated vertices,
+\[
+R(G,H) \le C_G m ?
+\]
+Here $R(G,H)$ is the usual graph Ramsey number: the least $N$ such that every red/blue colouring of $E(K_N)$ contains a red copy of $G$ or a blue copy of $H$.
+
+QUICK LITERATURE/CONTEXT CHECK
+
+The file states:
+(i) the statement fails if $G$ has $n$ vertices and $2n-2$ edges (e.g. with $H=K_n$);
+(ii) Erd\H{o}s--Faudree--Rousseau--Schelp (1993) proved that any graph with $n$ vertices and at most $n+1$ edges is Ramsey size linear.
+No other results are used here.
+
+ATTACK PLAN
+
+Proof track:
+Try to exploit the sparsity condition (edge bound $2k-3$ for all $k$) to derive structural constraints (degeneracy/arboricity/treewidth) and then attempt to embed $G$ into a large monochromatic subgraph with bounded average degree.
+
+Disproof track:
+Try to construct a sparse $G$ (satisfying the condition) for which $R(G,K_t)$ grows superlinearly in $|E(K_t)|\asymp t^2$, or choose a family of $H$ with $m$ edges and see if $R(G,H)$ must grow faster than $m$.
+No such construction is obtained below.
+
+WORK
+
+Lemma 566.1 (degeneracy consequence of the $2k-3$ condition).
+If every $k$-vertex subgraph of $G$ has at most $2k-3$ edges, then $G$ is $3$-degenerate: every nonempty subgraph of $G$ has a vertex of degree at most $3$.
+
+Proof.
+Let $G'$ be a nonempty subgraph of $G$ on $k\ge 1$ vertices and $e$ edges.
+If $k=1$ then the unique vertex has degree $0$.
+If $k\ge 2$, the hypothesis gives $e\le 2k-3$, so the average degree of $G'$ is
+$\bar d = 2e/k \le 2(2k-3)/k = 4 - 6/k < 4$.
+In a finite graph, if all vertices had degree at least $4$ then the average degree would be at least $4$.
+Thus $G'$ contains a vertex of degree at most $3$.
+Since $G'$ was an arbitrary nonempty subgraph, $G$ is $3$-degenerate. \hfill$\square$
+
+Lemma 566.2 (no isolated vertices implies $v(H)\le 2m$).
+If $H$ has $m$ edges and no isolated vertices, then the number of vertices $v(H)$ satisfies $v(H)\le 2m$.
+
+Proof.
+Let the vertex degrees be $d_1,\dots,d_{v(H)}$.
+Since $H$ has no isolated vertices, each $d_i\ge 1$.
+By the handshaking lemma, $\sum_i d_i = 2m$.
+Thus $v(H)\le\sum_i d_i = 2m$. \hfill$\square$
+
+Lemma 566.3 (general polynomial bound in terms of $m$ for fixed $G$).
+Let $G$ be any fixed graph on $s$ vertices and let $H$ be any graph with $m$ edges and no isolated vertices.
+Then
+\[
+R(G,H) \le O_s(m^{s-1}).
+\]
+More explicitly,
+\[
+R(G,H) \le R(K_s, K_{v(H)}) \le \binom{s+v(H)-2}{s-1} \le \binom{s+2m-2}{s-1}.
+\]
+
+Proof.
+Monotonicity of Ramsey numbers gives $R(G,H)\le R(K_s,K_{v(H)})$ because any blue $K_{v(H)}$ contains $H$ as a subgraph on the same vertex set.
+It remains to upper bound $R(K_s,K_t)$ for $t=v(H)$.
+Let $R(s,t):=R(K_s,K_t)$.
+Pick a vertex $v$ in a red/blue colouring of $K_N$.
+Let $A$ be the set of red neighbours of $v$ and $B$ the blue neighbours.
+If $|A|\ge R(s-1,t)$ then the induced colouring on $A$ contains either a red $K_{s-1}$ (which together with $v$ forms a red $K_s$) or a blue $K_t$.
+If $|A|<R(s-1,t)$ then $|B|\ge N-1-(R(s-1,t)-1)$; if in addition $N\ge R(s-1,t)+R(s,t-1)$ then $|B|\ge R(s,t-1)$ and similarly we get a red $K_s$ or blue $K_t$.
+Thus the recursion
+\[
+R(s,t) \le R(s-1,t)+R(s,t-1)
+\]
+holds for all $s,t\ge 2$, with $R(1,t)=R(s,1)=1$.
+A standard induction on $s+t$ yields the closed-form upper bound
+\[
+R(s,t) \le \binom{s+t-2}{s-1}.
+\]
+Finally apply Lemma 566.2 to bound $t=v(H)\le 2m$, and use $\binom{s+2m-2}{s-1}=O_s(m^{s-1})$. \hfill$\square$
+
+Lemma 566.4 (linear bound when $G$ is a tree).
+Let $T$ be a tree on $t\ge 1$ vertices and let $H$ be a graph with $m$ edges and no isolated vertices.
+Then
+\[
+R(T,H) \le (t-1)(2m-1)+1.
+\]
+
+Proof.
+Let $q=v(H)\le 2m$ by Lemma 566.2.
+Since a blue $K_q$ contains $H$, we have $R(T,H)\le R(T,K_q)$.
+We prove by induction on $t+q$ the bound
+\[
+R(T,K_q) \le (t-1)(q-1)+1. \tag{$**$}
+\]
+This is enough because $(t-1)(q-1)+1\le (t-1)(2m-1)+1$.
+
+Base cases: if $t=1$ then $T$ is a single vertex and $R(T,K_q)=1$, matching ($**$).
+If $q=1$ then $K_1$ is a single vertex and $R(T,K_1)=1$, also matching ($**$).
+
+Inductive step: assume $t,q\ge 2$.
+Let $u$ be a leaf of $T$ and let $T':=T\setminus\{u\}$ (a tree on $t-1$ vertices).
+We claim the recursion
+\[
+R(T,K_q) \le R(T',K_q)+R(T,K_{q-1}). \tag{$***$}
+\]
+To prove ($***$), let $N = R(T',K_q)+R(T,K_{q-1})$ and consider any red/blue colouring of $K_N$.
+Pick a vertex $v$.
+Let $A$ be the set of red neighbours of $v$ and $B$ the set of blue neighbours.
+If $|A|\ge R(T',K_q)$, then in the induced colouring on $A$ there is either a blue $K_q$ (done) or a red copy of $T'$.
+In the latter case, since $v$ is red-adjacent to every vertex of $A$, we can map the deleted leaf $u$ to $v$ and keep the copy of $T'$ on $A$, obtaining a red copy of $T$.
+If $|A|<R(T',K_q)$ then $|B|\ge N-1-(R(T',K_q)-1)=R(T,K_{q-1})$.
+Applying the definition of $R(T,K_{q-1})$ to the induced colouring on $B$ yields either a red $T$ (done) or a blue $K_{q-1}$, which together with $v$ forms a blue $K_q$.
+This proves ($***$).
+
+Now apply the induction hypothesis to $R(T',K_q)$ and $R(T,K_{q-1})$:
+\[
+R(T',K_q) \le (t-2)(q-1)+1,
+\qquad
+R(T,K_{q-1}) \le (t-1)(q-2)+1.
+\]
+Summing and using ($***$) gives
+\[
+R(T,K_q) \le [(t-2)(q-1)+1] + [(t-1)(q-2)+1] = (t-1)(q-1)+1,
+\]
+which is exactly ($**$) and completes the induction.
+Therefore $R(T,H)\le (t-1)(2m-1)+1$. \hfill$\square$
+
+VERIFICATION
+
+(1) Lemma 566.1 correctly uses the hypothesis for all subgraphs, not just induced.
+Since maximum average degree $<4$ in every subgraph, degeneracy $\le 3$ follows.
+
+(2) Lemma 566.4 is checked carefully: the recursion ($***$) uses the fact that a red copy of $T'$ in $A$ can be extended by mapping the missing leaf to $v$.
+This is valid because the leaf has exactly one neighbour in $T$ and $v$ is red-adjacent to the entire copy of $T'$; in particular it is red-adjacent to the image of the neighbour of $u$.
+
+(3) Fast reality check: if $H$ has $m$ edges and no isolates then indeed $v(H)\le 2m$ is tight for a matching.
+For a tree $T$ on $t$ vertices, the bound $R(T,H)\le (t-1)(2m-1)+1$ is linear in $m$ as claimed.
+
+FINAL
+
+UNRESOLVED
+
+(i) Strongest proved partial result here:
+- The sparsity hypothesis forces $G$ to be $3$-degenerate (Lemma 566.1).
+- For any fixed $G$ on $s$ vertices and any $H$ with $m$ edges and no isolates, one always has the polynomial bound $R(G,H)=O_s(m^{s-1})$ (Lemma 566.3).
+- If $G$ is a tree then $G$ is Ramsey size linear (Lemma 566.4), with the explicit bound $R(G,H)\le (t-1)(2m-1)+1$.
+
+(ii) First gap (crisp): prove (or disprove) that every $3$-degenerate graph $G$ satisfying the stronger hereditary edge bound $e(G')\le 2v(G')-3$ has
+\[
+R(G,H) = O_G(|E(H)|)
+\]
+for all $H$ with no isolated vertices.
+
+(iii) Top 3 next moves:
+(1) Identify a structural characterization of graphs with $e(G')\le 2v(G')-3$ for all subgraphs $G'$ (e.g. bounded treewidth/series-parallel) and try to prove linear Ramsey size for that entire class.
+(2) Try to extend the tree argument (Lemma 566.4) to graphs obtained by adding one extra edge to a tree (unicyclic) and then to the full class.
+(3) Attempt to construct counterexamples by choosing candidate $G$ in this class and testing $R(G,K_t)$ experimentally for moderate $t$ against linear-in-$m=\binom{t}{2}$ growth.
+
+(iv) Minimal counterexample structure: a counterexample would be a fixed graph $G$ with the hereditary bound $e(G')\le 2v(G')-3$ and a family $H_m$ with $m$ edges/no isolates such that $R(G,H_m)/m\to\infty$.
+Since $v(H_m)\le 2m$, any such family must force growth beyond the trivial $O(m^{v(G)-1})$ bound, likely via $H_m$ being relatively dense (e.g. cliques) while $G$ encodes a difficult sparse obstruction.
+
+

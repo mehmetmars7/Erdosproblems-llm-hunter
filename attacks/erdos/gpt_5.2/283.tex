@@ -1,0 +1,88 @@
+% Attempt for Erdos Problem #283
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used only to verify the example
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $p\in\mathbb{Z}[x]$ be a polynomial with positive leading coefficient and with no fixed divisor on $\{1,2,3,\dots\}$:
+there is no integer $d\ge 2$ such that $d\mid p(n)$ for every $n\ge 1$.
+
+Question: Is it true that there exists $M_0$ (depending on $p$) such that for every integer $m\ge M_0$
+there exist integers $k\ge 1$ and $1\le n_1<\cdots<n_k$ with
+\[1=\sum_{i=1}^k \frac1{n_i}\qquad\text{and}\qquad m=\sum_{i=1}^k p(n_i)?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement contains several claimed results for special $p$ and a verified example for $p(x)=x^2$ and $m=200$. I only use the example as a sanity check and do not rely on the other literature claims.
+
+3) ATTACK PLAN
+Proof track:
+1. Build flexible families of Egyptian fraction decompositions of $1$ with distinct denominators.
+2. Track how $\sum p(n_i)$ changes under local “splitting” moves that preserve $\sum 1/n_i$.
+3. Try to obtain an “additive basis” property for achievable $m$ values via many small adjustable moves.
+
+Disproof track:
+1. Look for congruence obstructions on $m=\sum p(n_i)$ induced by the constraint $\sum 1/n_i=1$.
+2. Try small-degree polynomials $p$ and search computationally for missing residue classes of achievable $m$.
+
+Chosen path: prove that achievable $m$ are unbounded for every such $p$ (but not that all large $m$ occur).
+
+4) WORK
+Lemma 1 (Infinitely many Egyptian fraction decompositions of $1$ with distinct denominators).
+Starting from $1=\frac12+\frac13+\frac16$, one can generate infinitely many identities
+\[1=\sum_{i=1}^k \frac1{n_i}\]
+with strictly increasing $n_1<\cdots<n_k$ by repeatedly applying the splitting identity
+\[\frac1{n}=\frac1{n+1}+\frac1{n(n+1)}.\]
+
+Proof.
+The splitting identity is verified by bringing to a common denominator:
+\[\frac1{n+1}+\frac1{n(n+1)}=\frac{n}{n(n+1)}+\frac1{n(n+1)}=\frac{n+1}{n(n+1)}=\frac1n.\]
+Starting from the 3-term decomposition $1=\frac12+\frac13+\frac16$, pick the largest denominator $n$ in the current decomposition and replace $1/n$ by $1/(n+1)+1/(n(n+1))$.
+Both new denominators exceed $n$, hence exceed all previous denominators; thus denominators remain distinct and increasing.
+This increases the number of terms by $1$ and preserves the sum $1$.
+Iterating yields infinitely many distinct decompositions. \qed
+
+Lemma 2 (Achievable $m$ are unbounded for every $p$ with positive leading coefficient).
+Let $p\in\mathbb{Z}[x]$ have positive leading coefficient. Then there exist solutions to the reciprocal equation
+\[1=\sum_{i=1}^k \frac1{n_i}\]
+with distinct $n_i$ for which the corresponding value $m=\sum_i p(n_i)$ is arbitrarily large.
+
+Proof.
+By Lemma 1 there are infinitely many decompositions of $1$ with distinct denominators, obtained by repeatedly splitting the current largest denominator.
+Consider one splitting step applied to a term $1/n$, replacing it by $1/(n+1)+1/(n(n+1))$.
+This changes the $p$-sum by
+\[\Delta(n)=p(n+1)+p(n(n+1)) - p(n).\]
+Since $p$ has positive leading coefficient, $p(t)\to +\infty$ as $t\to+\infty$, and in particular $p(n(n+1))\to+\infty$ as $n\to\infty$.
+Therefore $\Delta(n)\to+\infty$ as $n\to\infty$, so for all sufficiently large $n$ we have $\Delta(n)>0$.
+Along the iterative splitting process, the largest denominator tends to infinity, so eventually we apply a split at some $n$ with $\Delta(n)>0$, strictly increasing $m$.
+Repeating thereafter produces decompositions with $m$ growing without bound. \qed
+
+FAST REALITY CHECK (given example).
+For $n_i\in\{2,4,6,12\}$,
+\[\frac12+\frac14+\frac16+\frac1{12}=1\quad\text{and}\quad 2^2+4^2+6^2+12^2=200.\]
+I verified both equalities exactly by computation.
+
+5) VERIFICATION
+- Lemma 1’s splitting operation preserves the reciprocal sum and strictly increases denominators, so it never creates repeats.
+- Lemma 2 uses only that $p(n(n+1))$ dominates and tends to $+\infty$; thus it shows unboundedness of achievable $m$ but not coverage of all large $m$.
+- The example check is arithmetic only.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+For any integer polynomial $p$ with positive leading coefficient, there exist solutions with $m=\sum_i p(n_i)$ arbitrarily large (Lemma 2). In particular the set of achievable $m$ is infinite and unbounded.
+
+(ii) First gap:
+Upgrade “infinitely many (unbounded) achievable $m$” to “all sufficiently large $m$ are achievable”; concretely, show that for some $M_0$ every $m\ge M_0$ can be hit by choosing an Egyptian fraction decomposition of $1$ whose $p$-sum equals $m$.
+
+(iii) Top 3 next moves:
+1. Develop local moves on decompositions of $1$ that change $\sum p(n_i)$ by controlled \emph{small} increments (e.g. a finite generating set of $\Delta$-values with gcd $1$).
+2. For specific $p$ (say $p(x)=x^2$), compute achievable $m$ up to a moderate bound and look for modular obstructions or a stabilization phenomenon.
+3. Combine “many degrees of freedom” in Egyptian fraction expansions with additive number theory to represent every large $m$ (e.g. show the set of achievable $\sum p(n_i)$ contains a long interval).
+
+(iv) Minimal counterexample structure (if the conjecture were false):
+A polynomial $p$ as above and an infinite sequence of integers $m_j\to\infty$ such that no Egyptian fraction decomposition of $1$ with distinct denominators yields $\sum p(n_i)=m_j$; such a failure would likely come from a hidden congruence obstruction linking $\sum 1/n_i=1$ to $\sum p(n_i)$.
+

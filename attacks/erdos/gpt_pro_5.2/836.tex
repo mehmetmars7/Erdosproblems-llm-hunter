@@ -1,0 +1,206 @@
+% Solutions file generated from 836-840.tex
+% Following PROMPT_STRATEGY.MD output format for each problem.
+
+% Erdos Problem #836
+% URL: https://www.erdosproblems.com/836
+
+Let $r\geq 2$ and $G$ be a $r$-uniform hypergraph with chromatic number $3$ (that is, there is a $3$-colouring of the vertices of $G$ such that no edge is monochromatic). Suppose any two edges of $G$ have a non-empty intersection. Must $G$ contain $O(r^2)$ many vertices? Must there be two edges which meet in $\gg r$ many vertices? A problem of Erd\H{o}s and Shelah. The Fano geometry gives an example where there are no two edges which meet in $r-1$ vertices. Are there any other examples? Erd\H{o}s and Lov\'{a}sz \cite{ErLo75} proved that there must be two edges which meet in $\gg \frac{r}{\log r}$ many vertices. Alon has provided the following counterexample to the first question: as vertices take two sets $X$ and $Y$ of sizes $2r-2$ and $\frac{1}{2}\binom{2r-2}{r-1}$ respectively, where $Y$ corresponds to all partitions of $X$ into two equal parts. The edges are all subsets of $X$ of size $r$, and also all sets consisting of a subset of $X$ of size $r-1$ together with the unique element of $Y$ corresponding to the induced partition of $X$. This hypergraph is intersecting, its chromatic number is $3$, and it has $\asymp 4^r/\sqrt{r}$ many vertices. References [ErLo75] Erd\H{o}s, P. and Lov\'{a}sz, L., Problems and results on {$3$}-chromatic hypergraphs and some related questions . (1975), 609--627.
+
+\medskip
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+We have an $r$-uniform hypergraph $G=(V,E)$, meaning each edge $e\in E$ satisfies $|e|=r$.
+
+The hypothesis ``any two edges have a non-empty intersection'' means $G$ is \emph{intersecting}:
+\[
+\forall e,f\in E,\ e\neq f \implies e\cap f\neq \emptyset.
+\]
+
+\textbf{Ambiguity.} The text says ``chromatic number $3$'' but then parenthetically defines only the existence of a proper $3$-colouring (i.e. $\chi(G)\le 3$). Standard convention for ``chromatic number $3$'' is $\chi(G)=3$ (3-colourable but not 2-colourable).
+
+\textbf{Minimal corrected interpretation.} I will interpret the intended condition as
+\[
+\chi(G)=3.
+\]
+I will also track what is true under the literal weaker assumption $\chi(G)\le 3$.
+
+The problem asks:
+
+(Q1) Is it true that every intersecting $r$-uniform hypergraph $G$ with $\chi(G)=3$ must satisfy $|V|=O(r^2)$?
+
+(Q2) Is it true that there exists an absolute constant $c>0$ such that every such $G$ has two edges $e,f$ with $|e\cap f|\ge c r$?
+
+(Q3) Besides the Fano plane example at $r=3$, are there intersecting $r$-uniform $\chi=3$ hypergraphs with \emph{no} pair of edges meeting in $r-1$ vertices?
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+I will not invoke any external results beyond what is stated in the problem text.
+The statement itself records:
+
+\begin{itemize}
+\item Erd\H{o}s--Lov\'{a}sz proved (for this setup) that there exist two edges with intersection size $\gg r/\log r$.
+\item Alon gave an explicit construction disproving (Q1), with $|V|\asymp 4^r/\sqrt r$.
+\item The Fano plane ($r=3$) is an intersecting example with no pair of edges meeting in $r-1$ vertices.
+\end{itemize}
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN}
+
+\begin{itemize}
+\item For (Q1): fully formalize Alon's construction and verify: (i) $r$-uniform, (ii) intersecting, (iii) $\chi(G)=3$, and (iv) $|V|$ grows super-polynomially in $r$.
+\item For (Q2)/(Q3): do small-$r$ sanity checks; extract structural constraints from intersecting+$\chi=3$; attempt a simple lower bound on a large intersection pair (likely far weaker than $r/\log r$).
+\end{itemize}
+
+\medskip
+\noindent\textbf{4) WORK}
+
+\textbf{Fast reality check (small $r$ via brute force).}
+For the explicit Alon construction below, a brute-force verification (Python) gives:
+\begin{itemize}
+\item $r=2$: $|V|=3$, $|E|=3$, intersecting, and chromatic number $3$.
+\item $r=3$: $|V|=7$, $|E|=10$, intersecting, and chromatic number $3$.
+\item $r=4$: $|V|=16$, $|E|=35$, intersecting, and not 2-colourable.
+\end{itemize}
+(Details: vertices and edges were generated exactly from the definition; all colourings were checked exhaustively for $r\le 3$.)
+
+\medskip
+\noindent\textbf{Alon's construction (as in the problem statement).}
+Fix $r\ge 2$.
+
+Let $X$ be a set with $|X|=2r-2$.
+Let $\mathcal P$ be the set of unordered partitions of $X$ into two equal parts, i.e.
+\[
+\mathcal P:=\big\{\{S, X\setminus S\}: S\subseteq X,\ |S|=r-1\big\}.
+\]
+Then $|\mathcal P|=\frac12\binom{2r-2}{r-1}$.
+Let $Y$ be a set in bijection with $\mathcal P$; write $y_{\{S,X\setminus S\}}\in Y$ for the element corresponding to the partition $\{S,X\setminus S\}$.
+
+Define a vertex set $V:=X\sqcup Y$.
+Define an $r$-uniform hypergraph $G_r=(V,E)$ whose edges are of two types:
+\begin{itemize}
+\item (Type I) every $r$-subset $A\subseteq X$ is an edge.
+\item (Type II) for every $(r-1)$-subset $S\subseteq X$, the set
+\[
+S\cup\{y_{\{S,X\setminus S\}}\}
+\]
+is an edge.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Lemma 1 (Intersecting).}
+Every two edges of $G_r$ have non-empty intersection.
+
+\noindent\emph{Proof.}
+Let $e,f\in E$.
+
+\emph{Case 1: both $e,f$ are Type I.}
+Then $e,f$ are $r$-subsets of $X$ where $|X|=2r-2$.
+If $e\cap f=\emptyset$, then $|e\cup f|=|e|+|f|=2r$, contradicting $|e\cup f|\le |X|=2r-2$.
+So $e\cap f\neq\emptyset$.
+
+\emph{Case 2: $e$ Type I and $f$ Type II.}
+Write $e=A$ where $A\subseteq X$ and $|A|=r$, and write $f=S\cup\{y\}$ where $S\subseteq X$, $|S|=r-1$, and $y\in Y$.
+If $A\cap S=\emptyset$ then $A\subseteq X\setminus S$, but $|X\setminus S|=(2r-2)-(r-1)=r-1$, contradicting $|A|=r$.
+Hence $A\cap S\neq\emptyset$, so $e\cap f\neq\emptyset$.
+
+\emph{Case 3: both $e,f$ are Type II.}
+Write $e=S_1\cup\{y_1\}$ and $f=S_2\cup\{y_2\}$ with $|S_1|=|S_2|=r-1$.
+If $y_1=y_2$ then $e\cap f$ contains $y_1$.
+Assume $y_1\neq y_2$.
+If $S_1\cap S_2=\emptyset$ then (since $|S_1|=|S_2|=r-1$ and $|X|=2r-2$) we must have $S_2=X\setminus S_1$, so $\{S_1,X\setminus S_1\}=\{S_2,X\setminus S_2\}$, implying $y_1=y_2$, contradicting the assumption.
+Therefore $S_1\cap S_2\neq\emptyset$, hence $e\cap f\neq\emptyset$.
+
+All cases yield $e\cap f\neq\emptyset$, proving the lemma. \hfill$\Box$
+
+\medskip
+\noindent\textbf{Lemma 2 ($\chi(G_r)=3$).}
+The hypergraph $G_r$ is 3-colourable but not 2-colourable.
+
+\noindent\emph{Proof.}
+\emph{(3-colourable).}
+Partition $X$ into two sets $X=R\sqcup B$ with $|R|=|B|=r-1$.
+Define a 3-colouring of $V$ by colouring vertices of $R$ red, vertices of $B$ blue, and every vertex of $Y$ green.
+
+Type I edges are all $r$-subsets of $X$.
+No Type I edge can be monochromatic red because $R$ has size $r-1$; similarly none can be monochromatic blue.
+So every Type I edge contains at least one red and at least one blue vertex.
+
+Every Type II edge has the form $S\cup\{y\}$ with $y\in Y$ green, so it contains a green vertex and hence cannot be monochromatic.
+Thus this 3-colouring is proper, so $\chi(G_r)\le 3$.
+
+\emph{(Not 2-colourable).}
+Assume for contradiction that there is a proper 2-colouring of $V$ with colours, say, red/blue.
+Consider the restriction to $X$.
+Since every $r$-subset of $X$ is an edge (Type I), neither colour class inside $X$ can have size $\ge r$; otherwise those $r$ vertices form a monochromatic Type I edge.
+Thus each colour class in $X$ has size at most $r-1$.
+Because $|X|=2r-2$, we must have exactly $r-1$ red vertices and $r-1$ blue vertices in $X$.
+Let $R\subseteq X$ be the red vertices and $B=X\setminus R$ the blue vertices.
+Then $|R|=|B|=r-1$, so $\{R,B\}\in\mathcal P$ and hence there is a vertex $y\in Y$ corresponding to this partition.
+By construction, both $R\cup\{y\}$ and $B\cup\{y\}$ are Type II edges.
+If $y$ is coloured red, then $R\cup\{y\}$ is monochromatic red, contradiction.
+If $y$ is coloured blue, then $B\cup\{y\}$ is monochromatic blue, contradiction.
+So no 2-colouring exists and $\chi(G_r)\ge 3$.
+
+Combining, $\chi(G_r)=3$. \hfill$\Box$
+
+\medskip
+\noindent\textbf{Lemma 3 (Vertex count is super-polynomial).}
+The number of vertices of $G_r$ is
+\[
+|V(G_r)|=(2r-2)+\frac12\binom{2r-2}{r-1}.
+\]
+In particular $|V(G_r)|$ is not $O(r^2)$.
+
+\noindent\emph{Proof.}
+By definition $V=X\sqcup Y$ with $|X|=2r-2$ and $|Y|=|\mathcal P|=\frac12\binom{2r-2}{r-1}$.
+Thus the displayed formula holds.
+
+To see this is not $O(r^2)$, use the elementary lower bound
+\[
+\binom{2m}{m}\ge \frac{4^m}{2m+1}\qquad(m\ge 1),
+\]
+which follows from $\binom{2m}{m}=(2m+1)\,C_m$ where $C_m=\frac{1}{m+1}\binom{2m}{m}$ is the $m$th Catalan number and $C_m\ge 1$.
+With $m=r-1$ this yields
+\[
+|V(G_r)|\ge \frac12\binom{2r-2}{r-1}\ge \frac12\cdot \frac{4^{r-1}}{2r-1}=\frac{4^{r-1}}{4r-2},
+\]
+which grows exponentially in $r$ and hence is not $O(r^2)$. \hfill$\Box$
+
+\medskip
+\noindent\textbf{Conclusion for (Q1).}
+The universal claim ``every such $G$ has $O(r^2)$ vertices'' is false (under either $\chi(G)\le 3$ or $\chi(G)=3$), because the explicit family $G_r$ above has $\chi(G_r)=3$, is intersecting, and satisfies $|V(G_r)|\ge 4^{r-1}/(4r-2)$.
+
+\medskip
+\noindent\textbf{(Q2)/(Q3) sanity checks on Alon's example.}
+This example does \emph{not} address (Q3) because among the Type I edges (all $r$-subsets of $X$) there are pairs with intersection size $r-1$ (choose two $r$-subsets differing by one vertex).
+
+\medskip
+\noindent\textbf{5) VERIFICATION}
+
+\begin{itemize}
+\item \emph{Edge cases $r=2$.} Then $|X|=2$, $Y$ has one partition, and the above proofs still work. The 2-colouring obstruction in Lemma 2 is exactly the same: the unique $y\in Y$ forces a third colour.
+\item \emph{Uniformity check.} Type I edges have size $r$; Type II edges have $(r-1)+1=r$.
+\item \emph{Intersecting check.} Lemma 1 covered all combinations; the only subtle point is that two disjoint $(r-1)$-subsets of $X$ must be complementary, hence correspond to the same $y\in Y$.
+\item \emph{Chromatic number check.} The non-2-colourability proof uses only that Type I includes all $r$-subsets of $X$ and Type II includes both $R\cup\{y\}$ and $B\cup\{y\}$ for the partition induced by the 2-colouring on $X$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL}
+
+\textbf{**UNRESOLVED**}
+
+(i) \emph{Strongest proved partial result.} (Q1) is false: the explicit family $G_r$ above is intersecting, satisfies $\chi(G_r)=3$, and has $|V(G_r)|=(2r-2)+\frac12\binom{2r-2}{r-1}\ge 4^{r-1}/(4r-2)$.
+
+(ii) \emph{First gap (crisp).} Decide whether there exists an absolute $c>0$ such that every intersecting $r$-uniform hypergraph with $\chi(G)=3$ contains two edges $e,f$ with $|e\cap f|\ge c r$.
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Prove (or disprove) a linear-intersection bound in the special case that $G$ is \emph{linear} (pairwise intersections of size exactly 1) or has bounded codegrees; understand how the $\chi(G)=3$ constraint interacts with linearity.
+\item Attempt to upgrade the recorded $\gg r/\log r$ intersection bound toward $\gg r$ using any structural decomposition of intersecting families (e.g., via large stars/covers) that is forced by 3-chromaticity.
+\item Search for (Q3) examples by imposing the constraint ``no $(r-1)$-intersection pair'' and performing a small-$r$ computer search for $r=4,5$ to see what extremal objects exist.
+\end{enumerate}
+
+(iv) \emph{What a minimal counterexample to (Q2) would likely look like.} It would be an intersecting $r$-graph with $\chi=3$ in which \emph{all} pairwise intersections are $o(r)$ (in particular, it cannot contain an ``almost-equal'' pair of edges). Such a structure would likely be close to a highly symmetric design-like object (generalizing the Fano plane behaviour) with small codegrees and no dominant star.
+
+

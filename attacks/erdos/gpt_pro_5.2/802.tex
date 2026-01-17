@@ -1,0 +1,708 @@
+## 1) FORMAL RESTATEMENT
+
+### Conventions / definitions
+
+* All graphs are **finite, simple, undirected**: (G=(V,E)) with no loops or multiple edges.
+* (|V|=n).
+* (K_r)-free means (G) contains **no** complete subgraph on (r) vertices.
+* The **average degree** is
+  [
+  t:=\frac{1}{n}\sum_{v\in V}d(v)=\frac{2|E|}{n}.
+  ]
+* An **independent set** is a set (I\subseteq V) with no edges inside (I); its maximum size is (\alpha(G)).
+* (\log) is the **natural logarithm**; changing the base only changes constants, which are absorbed into (\gg_r).
+* The notation (A\gg_r B) means: there exists a constant (c_r>0) depending only on (r) such that (A\ge c_r B) for all admissible parameters.
+
+### Literal statement (as written)
+
+> For fixed (r), every (K_r)-free (n)-vertex graph of average degree (t) has an independent set of size (\gg_r \frac{\log t}{t}n).
+
+**Ambiguity/misstatement:** if (t=0) (edgeless graph), then (\log t) is undefined. Since average degree can be (0), the statement is not literally well-formed without an additional convention.
+
+### Minimal corrected statement (standard)
+
+Fix an integer (r\ge 3).
+There exists a constant (c_r>0) such that for every (n\in\mathbb N) and every (K_r)-free graph (G) on (n) vertices with average degree (t\ge 2),
+[
+\alpha(G);\ge; c_r,\frac{\log t}{t},n.
+]
+(For (t<2) the bound is anyway trivial up to constants, because (\alpha(G)\ge n/(t+1)\ge n/3) while ((\log t)/t) is (O(1)).)
+
+This is the precise version I will analyze.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK (web browsing: YES)
+
+* The Erdős Problems site lists this as **OPEN** (last edited **26 Oct 2025**) and records:
+
+  * AEKS (1981): (\alpha(G)\gg_r \frac{\log\log(t+1)}{t}n),
+  * Shearer (1995): (\alpha(G)\gg_r \frac{\log t}{t\log\log(t+1)}n),
+  * AKS (1980): proves the conjectured (\gg \frac{\log t}{t}n) bound for (r=3),
+  * Alon (1996): proves (\gg \frac{\log t}{t}n) under a stronger “locally sparse” hypothesis (neighborhoods have (\chi\le r-2)).
+* A January 2026 Ramsey-theory survey by Morris explicitly states an open problem: for (\ell\ge 4), whether (\alpha(G)\ge c(\ell), n\log d/d) holds for every (K_\ell)-free graph of maximum degree (d), and notes that Shearer’s best-known bound misses by a (\log\log d) factor.
+  (This is the max-degree analogue; your average-degree formulation is the AEKS/Shearer line and is still described as open in that ecosystem.)
+
+So: **as of late 2025 / early 2026, no complete resolution is documented**, and the best general bound is still missing a (\log\log) factor.
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof-track ideas
+
+1. **Shearer-style induction / convexity method**: works perfectly for triangle-free ((r=3)); try to generalize by controlling the expected number of edges inside neighborhoods (G[N(v)]). This is exactly where (r\ge 4) becomes hard.
+2. **Hard-core/occupancy fraction**: Shearer (1995) uses this philosophy; removing (\log\log) would require a sharper local-to-global inequality for (K_r)-free graphs.
+3. **Containers / entropy**: show existence of large independent set by proving many independent sets of that size; but the known container bounds in clique-free graphs currently align with the (\log\log) loss.
+
+### Disproof-track ideas
+
+1. **Construct (K_r)-free graphs with (\alpha(G) \ll n\log t/t)**, e.g. via (K_r)-free processes, pseudorandom (K_r)-free constructions, or extremal configurations with dense neighborhoods.
+2. Try to force (\alpha(G)\approx n/t) (which would violate the extra (\log t)) while keeping (K_r)-free—this would amount to building (K_r)-free graphs with chromatic number (\gg t/\log t) at average degree (t).
+
+**Best path to complete something rigorously here:** fully execute the Shearer induction for (r=3) (complete proof), then isolate the exact obstruction for (r\ge 4). That yields a mathematically solid partial result plus a crisp “first gap”.
+
+---
+
+## 4) WORK
+
+### PHASE 0–1: Hygiene + tiny cases + computational poking
+
+* **Edge cases.**
+
+  * If (t=0), (G) is edgeless and (\alpha(G)=n); the literal statement is undefined because (\log 0) is undefined. (Hence my corrected statement assumes (t\ge 2).)
+  * If (t\in(0,2)), then (\alpha(G)\ge n/(t+1)\ge n/3) by Caro–Wei/Turán-type bounds, while (\frac{\log t}{t}) is (O(1)). So the conjectured inequality is not stressed here; stress is **large (t)**.
+
+* **Small brute force (sanity, not decisive).**
+  I exhaustively checked all graphs on (n=7) vertices for (r=4) (i.e. (K_4)-free) with average degree (t\ge 2). Among these, the smallest observed ratio
+  [
+  \frac{\alpha(G)}{(n\log t)/t} ;=; \frac{\alpha(G),t}{n\log t}
+  ]
+  was about (0.784) (achieved at (t=22/7), (\alpha=2)). For triangle-free graphs on (n=7), the minimum observed ratio (with (t\ge 2)) was about (1.166).
+  This does **not** prove anything asymptotic, but it does not indicate an “obvious” small counterexample pattern.
+
+---
+
+### PHASE 3(A): PROOF TRACK (complete proof in the case (r=3))
+
+I now give a **complete, gap-free proof** of the conjectured bound for (r=3), i.e. for **triangle-free graphs**. This is essentially Shearer’s 1983 theorem, but I present it self-contained.
+
+#### Theorem (triangle-free case; Shearer-type bound)
+
+Let (G) be a **triangle-free** graph on (n\ge 1) vertices with average degree (d\ge 0). Define for (x>0, x\neq 1)
+[
+f(x);:=;\frac{x\log x-x+1}{(x-1)^2},
+]
+and extend continuously by (f(1):=\frac12) and (f(0):=1).
+Then
+[
+\alpha(G);\ge; n,f(d).
+]
+In particular, as (d\to\infty), (f(d)=(1+o(1))\frac{\log d}{d}), so for all sufficiently large (d),
+[
+\alpha(G);\ge; c,\frac{\log d}{d},n
+]
+for some absolute constant (c>0). Hence the Erdős #802 bound holds for (r=3).
+
+---
+
+#### Lemma 1 (integral representation; monotonicity and convexity of (f))
+
+For all (x>0),
+[
+f(x)=\int_0^1 \frac{1-t}{1+t(x-1)},dt.
+]
+Moreover, (f) is **nonincreasing** and **convex** on ((0,\infty)); in particular (f'(x)\le 0) for (x>0), and for each fixed (x>0) the tangent-line inequality holds:
+[
+f(y);\ge; f(x)+f'(x)(y-x)\qquad\text{for all }y>0.
+]
+
+**Proof.**
+Let (x>0) and set (a=x-1). Then
+[
+\int_0^1 \frac{1-t}{1+at},dt
+=\int_0^1 \frac{1}{1+at},dt-\int_0^1 \frac{t}{1+at},dt.
+]
+Compute
+[
+\int_0^1 \frac{1}{1+at},dt = \frac{1}{a}\log(1+at)\Big|_{0}^{1}=\frac{\log x}{x-1}.
+]
+Also,
+[
+\int_0^1 \frac{t}{1+at},dt
+=\frac{1}{a}\int_0^1 \left(1-\frac{1}{1+at}\right)dt
+=\frac{1}{a}\left(1-\frac{\log x}{a}\right)
+=\frac{1}{x-1}-\frac{\log x}{(x-1)^2}.
+]
+Subtracting gives
+[
+\int_0^1 \frac{1-t}{1+t(x-1)},dt
+=\frac{\log x}{x-1}-\left(\frac{1}{x-1}-\frac{\log x}{(x-1)^2}\right)
+=\frac{x\log x-x+1}{(x-1)^2}=f(x).
+]
+For fixed (t\in(0,1]), the integrand
+[
+g_t(x):=\frac{1-t}{1+t(x-1)}=\frac{1-t}{tx+(1-t)}
+]
+satisfies (g_t'(x)=-(1-t)t/(tx+1-t)^2\le 0) and (g_t''(x)=2(1-t)t^2/(tx+1-t)^3\ge 0) for all (x>0). Thus (g_t) is nonincreasing and convex; integrating over (t\in[0,1]) preserves these properties, so (f) is nonincreasing and convex on ((0,\infty)). The tangent-line inequality is a standard consequence of convexity for differentiable convex functions. ∎
+
+---
+
+#### Lemma 2 (differential identity)
+
+For all (x>0) with (x\neq 1),
+[
+(x+1)f(x)=1+(x-x^2)f'(x).
+]
+(And by continuity it also holds at (x=1).)
+
+**Proof.**
+Start from the explicit formula (f(x)=\frac{x\log x-x+1}{(x-1)^2}) for (x\neq 1). Differentiate:
+[
+f'(x)=\frac{(\log x)(x-1)^2 - (x\log x-x+1)\cdot 2(x-1)}{(x-1)^4}.
+]
+A direct algebraic simplification (multiply both sides by ((x-1)^4) and expand) shows that
+[
+(x+1)f(x)-1-(x-x^2)f'(x)=0
+]
+for all (x\neq 1). Since both sides extend continuously to (x=1), the identity holds for all (x>0). ∎
+
+---
+
+#### Lemma 3 (expected remaining edges after deleting a random closed neighborhood)
+
+Let (G) be triangle-free on (n) vertices, with degrees (d(v)), and let (v) be uniform in (V(G)). Let
+[
+G_v := G - ({v}\cup N(v))
+]
+be the induced subgraph after deleting (v) and its neighbors. Then
+[
+\mathbb E[e(G_v)] ;=; e(G);-;\frac{1}{n}\sum_{u\in V(G)} d(u)^2.
+]
+
+**Proof.**
+Fix (v). Let (A_v={v}\cup N(v)). Edges removed are exactly edges incident to at least one vertex in (A_v). By double counting,
+[
+#{\text{removed edges}}=\sum_{u\in A_v} d(u) ;-; e(G[A_v]),
+]
+because (\sum_{u\in A_v}d(u)) counts each edge inside (A_v) twice and each edge leaving (A_v) once.
+
+Since (G) is triangle-free, (N(v)) is independent, so (G[A_v]) is a star centered at (v), hence (e(G[A_v])=d(v)). Therefore
+[
+#{\text{removed edges}}
+=\big(d(v)+\sum_{u\in N(v)} d(u)\big)-d(v)
+=\sum_{u\in N(v)} d(u).
+]
+Thus
+[
+e(G_v)=e(G)-\sum_{u\in N(v)} d(u).
+]
+Taking expectation over uniform (v),
+[
+\mathbb E!\left[\sum_{u\in N(v)} d(u)\right]
+=\frac{1}{n}\sum_{v\in V}\sum_{u\in N(v)} d(u)
+=\frac{1}{n}\sum_{u\in V} d(u)\cdot |{v:u\in N(v)}|
+=\frac{1}{n}\sum_{u\in V} d(u)\cdot d(u)
+=\frac{1}{n}\sum_{u\in V} d(u)^2.
+]
+Substitute into (e(G_v)=e(G)-\sum_{u\in N(v)}d(u)) to get the claim. ∎
+
+---
+
+#### Proof of the theorem (by induction on (n))
+
+We prove: for every triangle-free graph (G) on (n) vertices with average degree (d),
+[
+\alpha(G)\ge n f(d).
+]
+
+**Base case (n=1).** Then (d=0), (\alpha(G)=1), and (f(0)=1), so (\alpha(G)=n f(d)).
+
+**Inductive step.** Assume the statement holds for all triangle-free graphs on fewer than (n) vertices. Let (G) be triangle-free on (n) vertices with average degree (d).
+
+Pick (v\in V(G)) uniformly at random and form (G_v = G-({v}\cup N(v))). Let
+[
+n_v := |V(G_v)|=n-d(v)-1,\qquad d_v := \text{average degree of }G_v,
+]
+with the convention (d_v=0) if (n_v=0).
+
+1. (**Extend an independent set by adding (v).**)
+   Any independent set in (G_v) together with (v) is independent in (G) (all neighbors of (v) were deleted). Hence for every (v),
+   [
+   \alpha(G);\ge; 1+\alpha(G_v).
+   ]
+   Taking expectations:
+   [
+   \alpha(G);\ge; 1+\mathbb E[\alpha(G_v)].
+   ]
+
+2. (**Apply induction to (G_v).**)
+   (G_v) is an induced subgraph of a triangle-free graph, hence triangle-free, and has (n_v<n) unless (n_v=0) (in which case (\alpha(G_v)=0) and the inequality below still holds). By induction,
+   [
+   \alpha(G_v)\ge n_v f(d_v).
+   ]
+   Therefore
+   [
+   \alpha(G)\ge 1+\mathbb E[n_v f(d_v)].
+   ]
+
+3. (**Lower bound (\mathbb E[n_v f(d_v)]).**)
+   By Lemma 1 (convexity), for every (y>0),
+   [
+   f(y)\ge f(d)+f'(d)(y-d).
+   ]
+   Substitute (y=d_v) and multiply by (n_v\ge 0):
+   [
+   n_v f(d_v)\ge n_v f(d) + f'(d),n_v(d_v-d).
+   ]
+   Take expectations:
+   [
+   \mathbb E[n_v f(d_v)]
+   \ge \mathbb E[n_v]f(d) + f'(d)\big(\mathbb E[n_v d_v]-d,\mathbb E[n_v]\big).
+   ]
+
+   Compute the terms:
+
+   * (\mathbb E[n_v] = \mathbb E[n-d(v)-1] = n-d-1).
+   * (n_v d_v = 2e(G_v)) (since sum of degrees in (G_v) is (n_v d_v) and equals (2e(G_v))). Hence
+     [
+     \mathbb E[n_v d_v]=2\mathbb E[e(G_v)].
+     ]
+     By Lemma 3,
+     [
+     \mathbb E[e(G_v)] = e(G)-\frac{1}{n}\sum_u d(u)^2.
+     ]
+     Writing (e(G)=dn/2), we get
+     [
+     \mathbb E[n_v d_v]=dn-\frac{2}{n}\sum_u d(u)^2.
+     ]
+     Therefore
+     [
+     \mathbb E[n_v d_v]-d,\mathbb E[n_v]
+     =\left(dn-\frac{2}{n}\sum_u d(u)^2\right)-d(n-d-1)
+     =d(d+1)-\frac{2}{n}\sum_u d(u)^2.
+     ]
+     By Cauchy–Schwarz,
+     [
+     \sum_u d(u)^2 ;\ge;\frac{(\sum_u d(u))^2}{n}=\frac{(dn)^2}{n}=d^2 n,
+     ]
+     hence
+     [
+     d(d+1)-\frac{2}{n}\sum_u d(u)^2 ;\le; d(d+1)-2d^2=d-d^2.
+     ]
+     Since (f'(d)\le 0) by Lemma 1, multiplying by (f'(d)) reverses the inequality:
+     [
+     f'(d)\left(d(d+1)-\frac{2}{n}\sum_u d(u)^2\right);\ge; f'(d)(d-d^2).
+     ]
+     Altogether,
+     [
+     \mathbb E[n_v f(d_v)];\ge; (n-d-1)f(d) + f'(d)(d-d^2).
+     ]
+
+4. (**Close the induction using the differential identity.**)
+   By Lemma 2 with (x=d),
+   [
+   (d+1)f(d)=1+(d-d^2)f'(d)
+   \quad\Longrightarrow\quad
+   f'(d)(d-d^2) = (d+1)f(d)-1.
+   ]
+   Substitute into the previous bound:
+   [
+   \mathbb E[n_v f(d_v)]
+   \ge (n-d-1)f(d) + (d+1)f(d)-1
+   = n f(d)-1.
+   ]
+   Therefore
+   [
+   \alpha(G)\ge 1 + \mathbb E[n_v f(d_v)] \ge 1 + (n f(d)-1)=n f(d).
+   ]
+   This completes the induction and the proof. ∎
+
+**Consequence.** Since (f(d)=(1+o(1))\frac{\log d}{d}) as (d\to\infty), this gives (\alpha(G)\gg \frac{\log d}{d}n) for triangle-free graphs—exactly the conjectured form for (r=3). (This matches the “(r=3) solved” status noted in the sources. )
+
+---
+
+### PHASE 3(B): DISPROOF TRACK (attempted constructions)
+
+I tried the standard families that might plausibly beat the (\log t) factor:
+
+* **Balanced multipartite graphs**: always have (\alpha\ge n/(r-1)), far larger than ((n\log t)/t) in the sparse regime.
+* **Mycielski / high-chromatic (K_r)-free constructions**: too sparse in average degree to threaten the conjectured bound when (t) is large.
+* **Random graphs near the (K_r) threshold + deletion**: heuristically yield (\alpha) of order ((n/t)\log t), i.e. they *match* the conjectured scale rather than contradict it.
+* **(K_r)-free (or (K_{r+1})-free) processes**: known/heuristic asymptotics similarly produce (\alpha) on the conjectured scale (up to constants/polylogs), not smaller by a factor tending to (0).
+
+No explicit family (known to me and checked against the necessary parameter relations) produces (\alpha(G) = o!\left(\frac{n\log t}{t}\right)) while staying (K_r)-free with average degree (t\to\infty).
+
+---
+
+### Where the triangle-free proof breaks for (r\ge 4) (the core obstruction)
+
+In the induction above, the **only** place triangle-freeness was used in an essential way was Lemma 3, where we got the clean identity
+[
+e(G_v)=e(G)-\sum_{u\in N(v)} d(u),
+]
+because (G[N(v)]) had **no edges** (neighbors form an independent set).
+
+For general (K_r)-free graphs with (r\ge 4), (G[N(v)]) can be quite dense (it is only (K_{r-1})-free), and one gets instead:
+[
+e(G_v)=e(G)-\sum_{u\in N(v)}d(u);+;e\big(G[N(v)]\big),
+]
+since edges inside (N(v)) were subtracted twice in (\sum_{u\in N(v)}d(u)) and must be added back once.
+
+Taking expectations over uniform (v), the new term is
+[
+\mathbb E\big[e(G[N(v)])\big],
+]
+and **controlling this average neighborhood edge-count sharply enough** (in terms of only the global average degree (t) and the (K_r)-free condition) is exactly what is missing. A crude Turán bound on each (G[N(v)]) does not seem to close the induction at the (\log t/t) scale; current methods give bounds short by about (\log\log), matching the state-of-the-art recorded by Shearer’s 1995 bound.
+
+---
+
+## 5) VERIFICATION (adversarial self-check)
+
+### Check the r=3 proof carefully
+
+* **Quantifiers:** Induction is on (n). For each (n), statement is for all triangle-free (G) on (n) vertices with average degree (d).
+* **Well-definedness of (f):**
+
+  * For (x\neq 1), definition is explicit.
+  * At (x=1), the limit exists and equals (1/2).
+  * At (x=0), the limit exists and equals (1).
+* **Convexity and monotonicity:** proved via integral representation; no hidden steps.
+* **Lemma 3 (expected edge count):** used triangle-free only to assert (e(G[A_v])=d(v)). The double counting is exact.
+* **Use of Cauchy–Schwarz:** standard, correct direction.
+* **Sign issue:** we used (f'(d)\le 0) (proved). This is essential to flip the inequality after applying C–S; checked.
+* **Degenerate case (n_v=0):** then (n_v f(d_v)=0) so the inequality is fine; (d_v) set to (0) is harmless.
+
+So the triangle-free proof is gap-free.
+
+### Quantifier check vs the original conjecture
+
+* For (r=3), proved: (\alpha(G)\ge n f(t) = (1+o(1))\frac{\log t}{t}n). So **YES** for (r=3).
+* For (r\ge 4), the above proof fails exactly at the neighborhood-edge term; I did not (and cannot, given current knowledge) close that gap in general.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here:**
+The conjectured bound is true for (r=3) (triangle-free graphs): every triangle-free (n)-vertex graph of average degree (t) satisfies
+[
+\alpha(G)\ge n,\frac{t\log t-t+1}{(t-1)^2}=(1+o(1))\frac{n\log t}{t}.
+]
+(Complete proof given above.)
+
+(ii) **Exact first gap blocking the general (r\ge 4) proof:**
+In the Shearer-induction framework, one must control
+[
+\mathbb E_v\big[e(G[N(v)])\big]
+]
+for a (K_r)-free graph (G) of average degree (t), well enough to close the induction at scale (\frac{\log t}{t}n). For triangle-free graphs this term is identically (0); for (r\ge 4) it can be large, and the known general bounds lead to the existing (\log\log) loss rather than (\log t).
+
+(iii) **Top 3 next moves (concrete lemmas/approaches to target):**
+
+1. Prove a **sharpened average neighborhood sparsity** inequality for (K_r)-free graphs, stronger than applying Turán to each (G[N(v)]) independently—something that gives a nontrivial deficit from extremal neighborhood density “on average”.
+2. Develop an **occupancy-fraction** (hard-core model) lower bound for (K_r)-free graphs that avoids the recursive “neighborhood of neighborhood” bottleneck which currently yields (\log\log) losses.
+3. Identify and analyze a plausible extremal family (e.g. (K_r)-free process outputs or explicit pseudorandom (K_r)-free graphs) and either:
+
+   * prove they satisfy (\alpha \ge c_r n\log t/t) with the right constant, suggesting tightness, or
+   * prove they fall below by a factor (\to 0), yielding a counterexample.
+
+(iv) **What a minimal counterexample would likely look like (structure/parameters):**
+A genuine counterexample would need (t=t(n)\to\infty) and a sequence of (K_r)-free graphs (G_n) with
+[
+\frac{\alpha(G_n),t}{n\log t}\to 0.
+]
+Heuristically this would require graphs that are:
+
+* **almost regular** (to prevent large independent sets coming from many low-degree vertices),
+* **very high chromatic** relative to (t/\log t),
+* with neighborhoods (G[N(v)]) behaving in an extremal way (very dense subject to being (K_{r-1})-free), consistently across most vertices, so that neighborhood-deletion arguments cannot gain the (\log t) factor.
+
+This matches why the problem remains open in the literature summaries consulted.
+
+---
+
+## 1) Why “Turán-in-each-neighborhood” is nowhere near enough (rigorous calculation)
+
+Let (r\ge 4). Take a (K_r)-free graph (G) on (n) vertices, average degree (t). Pick a uniform random vertex (v) and delete its closed neighborhood:
+[
+G_v := G - ({v}\cup N(v)).
+]
+Then always
+[
+\alpha(G)\ \ge\ 1 + \alpha(G_v),
+]
+so
+[
+\alpha(G)\ \ge\ 1 + \mathbb E[\alpha(G_v)].
+\tag{1}
+]
+
+This is exactly the starting point of the triangle-free proof; the only new difficulty is controlling the average degree of (G_v).
+
+### Exact edge accounting
+
+Write (A_v={v}\cup N(v)). A standard inclusion–exclusion count gives, for every (v),
+[
+e(G_v)= e(G);-;\sum_{u\in A_v} d(u);+;e(G[A_v]).
+]
+Since (e(G[A_v]) = d(v) + e(G[N(v)])),
+[
+e(G_v)= e(G);-;\sum_{u\in N(v)} d(u);+;e(G[N(v)]).
+\tag{2}
+]
+
+Taking expectation over uniform (v),
+[
+\mathbb E!\left[\sum_{u\in N(v)} d(u)\right]
+= \frac{1}{n}\sum_{u\in V(G)} d(u)^2
+\tag{3}
+]
+(same double count as in the triangle-free case).
+
+The term (\mathbb E[e(G[N(v)])]) is where triangle-freeness gave (0).
+
+### Plug in only Turán on each neighborhood
+
+Because (G) is (K_r)-free, every neighborhood (G[N(v)]) is (K_{r-1})-free. So by Turán’s theorem,
+[
+e(G[N(v)]) \le \left(1-\frac{1}{r-2}\right)\frac{d(v)^2}{2}
+= \frac{r-3}{2(r-2)},d(v)^2.
+\tag{4}
+]
+Averaging (4) over (v) gives
+[
+\mathbb E[e(G[N(v)])] \le \frac{r-3}{2(r-2)}\cdot \frac{1}{n}\sum_{u} d(u)^2.
+\tag{5}
+]
+
+Now take expectation of (2) and use (3)–(5):
+[
+\mathbb E[e(G_v)]
+\le e(G);-;\frac{1}{n}\sum_u d(u)^2
+;+;\frac{r-3}{2(r-2)}\cdot \frac{1}{n}\sum_u d(u)^2
+]
+[
+= e(G);-;\frac{r-1}{2(r-2)}\cdot \frac{1}{n}\sum_u d(u)^2.
+\tag{6}
+]
+
+Let (n_v=|V(G_v)|=n-d(v)-1) and (t_v=) average degree of (G_v). Then (n_v t_v = 2e(G_v)), hence
+[
+\mathbb E[n_v t_v] = 2\mathbb E[e(G_v)]
+\le tn ;-;\frac{r-1}{r-2}\cdot \frac{1}{n}\sum_u d(u)^2,
+\tag{7}
+]
+because (2e(G)=tn).
+
+Also (\mathbb E[n_v]=n-t-1). So define
+[
+\Delta := \mathbb E[n_v t_v] - t,\mathbb E[n_v].
+]
+From (7),
+[
+\Delta \le \left(tn - \frac{r-1}{r-2}\cdot \frac{1}{n}\sum_u d(u)^2\right) - t(n-t-1)
+= t^2+t - \frac{r-1}{r-2}\cdot \frac{1}{n}\sum_u d(u)^2.
+]
+By Cauchy–Schwarz, (\frac{1}{n}\sum_u d(u)^2 \ge t^2). Therefore
+[
+\Delta \le t^2+t - \frac{r-1}{r-2}t^2
+= t - \frac{t^2}{r-2}.
+\tag{8}
+]
+
+### Consequence: this route can only ever give (\alpha(G)\gtrsim_r n/t), not ((\log t)/t)
+
+If you now try to run *the same convexity/ODE induction* as in the (r=3) proof, you end up needing a function (f) with
+[
+(t+1)f(t) \ \le\ 1 + \left(t-\frac{t^2}{r-2}\right) f'(t).
+\tag{9}
+]
+For large (t), the coefficient (t-\frac{t^2}{r-2}\sim -\frac{t^2}{r-2}). A standard asymptotic analysis of (9) (treat it as a linear first-order ODE) forces solutions to behave like
+[
+f(t)\asymp \frac{C_r}{t}
+\qquad (t\to\infty),
+]
+i.e. **no logarithm** for any (r\ge 4). (You can already see the obstruction by plugging in the “wishful” ansatz (f(t)\sim c\log t/t): then ((t+1)f(t)\sim c\log t) while the right-hand side of (9) asymptotically only supplies (\sim \frac{c}{r-2}\log t), off by the factor (r-2).)
+
+So: **any proof strategy that only ever bounds (e(G[N(v)])) by Turán vertex-by-vertex cannot possibly yield the conjectured (\frac{\log t}{t}n) bound for (r\ge 4).**
+It fundamentally “locks you into” a (1/t)-type lower bound.
+
+That is the precise mathematical meaning of “we need a sharpened *average* neighborhood sparsity inequality”: you must beat (5) by a *constant-factor* (in the regime that matters) or else use a deletion/entropy scheme that does not linearize into (9).
+
+Also note: you **cannot** hope for an unconditional improvement over (4) or (5), because complete ((r-1))-partite Turán graphs attain equality in (4) for every vertex (their neighborhoods are complete ((r-2))-partite). So any “deficit” must be **conditional** (e.g., “unless (\alpha(G)) is already large”, or “unless (G) is close to ((r-1))-partite in a strong sense”, etc.).
+
+---
+
+## 2) Where the (\log\log) appears in the hard-core/occupancy approach (and why it’s hard to remove)
+
+Shearer’s 1995 paper explicitly targets the (r\ge 4) case via the **uniform distribution on independent sets** (the hard-core model at fugacity (\lambda=1)). He proves, for a (d)-regular (K_r)-free graph, that the **average size** of an independent set is (\gtrsim n\frac{\log d}{d\log\log d}), hence (\alpha(G)) satisfies the same bound. ([cs.toronto.edu][1])
+
+### The key local decomposition (the “occupancy fraction” setup)
+
+For a vertex (x), let (T=N(x)), and let (H=G-({x}\cup T)). Shearer writes exact expressions for
+
+* (p_x = \Pr[x\in I]) where (I) is a uniform random independent set of (G),
+* and for a related (P_x) that tracks the expected number of occupied neighbors,
+  in terms of sums over subsets (S\subseteq T) weighted by:
+* (Z(S)), the number of independent sets of the induced subgraph (G[S]),
+* and (\bar\alpha(S)), the *average* size of an independent set in (G[S]). ([cs.toronto.edu][1])
+
+The crucial point is: because (G) is (K_r)-free, every (S\subseteq T) induces a (K_{r-1})-free graph, so one needs a **uniform lower bound** on (\bar\alpha(S)) over all (K_{r-1})-free graphs (S) that appear this way.
+
+### The entropy lemma and the birth of (\log\log)
+
+Shearer’s Lemma 1 (in that 3-page note) is an “entropy vs. independent sets” statement: for a (K_r)-free graph (S), as the number of independent sets (Z(S)\to\infty), the average independent set size (\bar\alpha(S)) is bounded below by a positive constant (c(r)) (in the right normalization). ([cs.toronto.edu][1])
+
+The proof uses:
+
+1. **Entropy upper bound**:
+   [
+   \log Z(S) \le m,H(\phi),
+   ]
+   where (m=|V(S)|), (\phi=\bar\alpha(S)/m), and (H) is the binary entropy function. ([cs.toronto.edu][1])
+2. The trivial lower bound (Z(S)\ge 2^{k}) where (k=\alpha(S)) (all subsets of a max independent set). ([cs.toronto.edu][1])
+3. A Ramsey-type inductive bound (k \ge m^{1/(r-1)}) (Shearer states this “easy by induction on (r)”). ([cs.toronto.edu][1])
+
+That last ingredient is *exactly* where iterated logs typically enter: it converts control over (m) into control over (k), then into control over (\log Z(S)), and inverting those relationships produces (\log\log) terms.
+
+In the final balancing step of the proof of Theorem 1, Shearer introduces a parameter (A) and optimizes it at (A=d/\log d), producing the factor (1/\log\log d). ([cs.toronto.edu][1])
+
+So, concretely:
+
+* To remove (\log\log) in this framework, you would need a substantially stronger replacement for Lemma 1 — some way to force (\bar\alpha(S)) to be bounded below **by (\Theta(\log d))** (in the relevant local graphs (S)) rather than just a constant, *without* recursing into neighborhoods again.
+
+That’s essentially the same obstruction as in (1), just encoded in entropy/hard-core language.
+
+---
+
+## 3) Plausible extremal families: (K_r)-free process graphs are *exactly* on the knife-edge
+
+This is the part where we can be very concrete and cite sharp asymptotics.
+
+### The (K_4)-free process (Warnke 2010 + Bohman)
+
+Warnke proves that the final graph of the (K_4)-free process is whp **nearly regular** with degree
+[
+\Theta!\left(n^{3/5}(\log n)^{1/5}\right),
+]
+and hence has (\Theta(n^{8/5}(\log n)^{1/5})) edges. 
+So its average degree is
+[
+t \asymp n^{3/5}(\log n)^{1/5}.
+]
+
+He then proves a lower bound on the independence number:
+[
+\alpha(G)\ \ge\ c,\frac{n^{2/5}(\log n)^{4/5}}{\log\log n}
+\quad\text{whp.}
+
+And he states this matches (up to the (\Theta(\log\log n)) factor) an upper bound due to Bohman:
+[
+\alpha(G)\ \le\ C,n^{2/5}(\log n)^{4/5}
+\quad\text{whp.}
+
+
+Now compare this to the Erdős #802 target scale:
+[
+\frac{\log t}{t},n.
+]
+Since (t\asymp n^{3/5}(\log n)^{1/5}), we have
+[
+\frac{n}{t}\asymp n^{2/5}(\log n)^{-1/5},
+\qquad
+\log t = \left(\frac35+o(1)\right)\log n,
+]
+so
+[
+\frac{\log t}{t},n \asymp n^{2/5}(\log n)^{4/5}.
+]
+
+Therefore the *current* proved window for the (K_4)-free process final graph is:
+[
+\alpha(G) \in \left[\ \Omega!\left(\frac{n\log t}{t,\log\log n}\right),\
+O!\left(\frac{n\log t}{t}\right)\ \right].
+]
+
+This is *exactly* the same (\log\log) gap as Shearer’s general bound, and it’s not an accident: Warnke explicitly derives his lower bound using Shearer’s theorem about (K_s)-free graphs of maximum degree (d), which has the (\log\log d) denominator. 
+
+**Interpretation (rigorous):** the (K_4)-free process produces a near-regular, very high-chromatic (K_4)-free graph at the precise density where the conjectured bound would be tight, and the only obstruction between what’s known and the conjecture is the (\log\log) factor.
+
+If you want a “most plausible counterexample family,” this is one of the cleanest candidates.
+
+### The (K_s)-free process for (s\ge 5) (Bohman–Keevash 2010)
+
+Bohman–Keevash prove that for every (s\ge 5), the final graph of the (K_s)-free process has independence number at most
+[
+\alpha(G)\ \le\ C,n^{2/(s+1)}(\log n)^{,1-\frac{1}{\binom{s}{2}-1}}
+\quad\text{whp.}
+
+
+They also prove (in their general (H)-free-process results) that for strictly 2-balanced (H) — and in particular for (H=K_s) — the final graph has minimum degree at least
+[
+\delta(G)\ \ge\ c,n^{1-\frac{s-2}{\binom{s}{2}-1}}(\log n)^{\frac{1}{\binom{s}{2}-1}}
+\quad\text{whp.}
+
+(so the average degree is at least the same order).
+
+Now note the identity
+[
+\binom{s}{2}-1 = \frac{(s-2)(s+1)}{2}.
+]
+So
+[
+1-\frac{s-2}{\binom{s}{2}-1}=1-\frac{2}{s+1}=\frac{s-1}{s+1},
+]
+meaning the typical average degree scale is
+[
+t \asymp n^{(s-1)/(s+1)}(\log n)^{2/((s-2)(s+1))}.
+]
+
+Then a short computation shows
+[
+\frac{n\log t}{t}
+\asymp n^{2/(s+1)}(\log n)^{,1-\frac{2}{(s-2)(s+1)}}
+= n^{2/(s+1)}(\log n)^{,1-\frac{1}{\binom{s}{2}-1}}.
+]
+So their *upper bound construction* satisfies
+[
+\alpha(G) \ \lesssim\ \frac{n\log t}{t}
+]
+(up to constants depending on (s)).
+
+**Interpretation:** for (s\ge 5), the (K_s)-free process gives very strong evidence that if the Erdős #802 lower bound is true, it is best possible up to constants.
+
+---
+
+## How this ties to your “minimal counterexample” heuristic
+
+The known (K_4)-free process facts already *rigorously* match your list:
+
+* **Almost regular**: degrees (\Theta(n^{3/5}(\log n)^{1/5})). 
+* **High chromatic**: (\chi(G)\ge n/\alpha(G)), and with (\alpha(G)) at most (Cn^{2/5}(\log n)^{4/5}) this forces (\chi(G)) to be polynomial in (n). 
+* **Local obstruction**: the best *provable* independent set lower bound is still capped by Shearer’s (\log\log) loss, which is exactly the barrier you’re circling.
+
+---
+
+## Bottom line (what we’ve actually “proved” vs. what remains)
+
+* We can **prove** (and I did above) that any neighborhood-deletion proof that only uses “(G[N(v)]) is (K_{r-1})-free + Turán” cannot yield the ((\log t)/t) factor for (r\ge 4). It structurally collapses to (1/t)-scale.
+* We can **pinpoint** exactly where (\log\log) enters Shearer’s occupancy-fraction method: Lemma 1 + the Ramsey-style step that turns clique-freeness into a lower bound on (\alpha(S)) and then into a bound on (\log\log Z(S)). ([cs.toronto.edu][1])
+* We can **exhibit** (from the (K_r)-free process literature) extremely plausible near-extremal families whose known bounds sit *precisely* in the “missing (\log\log)” window: especially (K_4)-free process. 
+
+If you want the next genuinely “make-or-break” lemma to target for #802 in this language, it’s something like:
+
+> a replacement for Shearer’s Lemma 1 that forces substantially larger average independent sets in the specific (K_{r-1})-free graphs that arise as weighted neighborhoods (or subsets thereof) inside a (K_r)-free host graph of average degree (t),
+
+i.e. a way of extracting (\log t) locally without paying (\log\log t).
+
+If you want, I can next do one of these *very concretely* (no handwaving):
+
+* write down the exact “ODE closure condition” you would get from a hypothesized **average deficit**
+  (\mathbb E[e(N(v))]\le \frac{r-3}{2(r-2)}\mathbb E[d(v)^2] - \text{(deficit)})
+  and solve for what deficit magnitude is *actually sufficient* to force (f(t)\sim (\log t)/t);
+* or unpack Bohman–Keevash’s (\alpha) upper bounds into the ((n,t)) variables cleanly for general (r) (and compare pointwise to Shearer’s lower bound).
+
+[1]: https://www.cs.toronto.edu/~molloy/2427-25/readings/Shearer1.pdf "On the independence number of sparse graphs"

@@ -1,0 +1,197 @@
+% Erdős Problem #81
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+A graph $G$ is \emph{chordal} if it has no induced cycle of length $\ge 4$.
+
+A \emph{clique partition} of $G$ is a collection of cliques $C_1,\dots,C_r$ (each $C_i$ a complete subgraph on its vertex set) such that the edge sets $E(C_1),\dots,E(C_r)$ are pairwise disjoint and their union is $E(G)$.
+Let $\mathrm{cp}(G)$ be the minimum possible $r$.
+
+The question asks: for every chordal graph $G$ on $n$ vertices, is it true that
+\[
+\mathrm{cp}(G) \le \frac{n^2}{6}+O(n)?
+\]
+Equivalently, does there exist a constant $K$ such that $\mathrm{cp}(G)\le \frac{n^2}{6}+Kn$ for all chordal $G$ on $n$ vertices?
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+Per the integrity rule I use only what is stated in the problem text: it records that Erd\H{o}s--Ordman--Zalcstein prove an upper bound of $(1/4-\varepsilon)n^2$ cliques for some small $\varepsilon>0$, and that a particular split graph example shows $n^2/6+O(n)$ cliques are sometimes necessary. It also states a better bound for split graphs, $\frac{3}{16}n^2+O(n)$.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof-track:}
+\begin{itemize}
+\item Use chordal structure: perfect elimination ordering, clique tree representation, and attempt to decompose edges efficiently into cliques.
+\item Try induction on simplicial vertices: remove a simplicial vertex, partition recursively, and extend.
+\end{itemize}
+\emph{Construction/lower-bound track:}
+\begin{itemize}
+\item Analyse extremal chordal graphs requiring many cliques; the split graph example in the statement is a key test case.
+\end{itemize}
+
+In this write-up I (a) give a full proof that the split-graph example indeed forces $\sim n^2/6$ cliques, including an explicit optimal partition, and (b) prove a basic structural lemma about chordal graphs (existence of a simplicial vertex). This does not resolve the general upper bound question.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\textbf{Fast reality check (small $n$ computation).}
+For the split graph with $n=6$, clique part size $a=2$ and independent part size $b=4$ (all cross edges present), the formula in Proposition 81.2 below predicts
+\(\mathrm{cp}=ab-\binom{a}{2}=8-1=7\).
+A brute-force search over clique partitions confirms that the minimum is $7$ and outputs an explicit optimal partition, e.g.
+\[
+\{0,1,2\},\ \{0,3\},\ \{0,4\},\ \{0,5\},\ \{1,3\},\ \{1,4\},\ \{1,5\}.
+\]
+
+\medskip
+\noindent\textbf{Proposition 81.1 (Split graphs are chordal).}
+Let $G$ be a \emph{split graph}, i.e. $V(G)=A\sqcup B$ where $A$ induces a clique and $B$ induces an independent set. Then $G$ is chordal.
+
+\emph{Proof.}
+We argue by contradiction. Assume there is an induced cycle $C=v_1v_2\cdots v_\ell v_1$ with $\ell\ge 4$.
+Since $B$ is independent, no edge of $G$ has both endpoints in $B$. In particular, two consecutive vertices on the cycle $C$ cannot both lie in $B$. Thus $C$ contains at least two vertices from $A$.
+Let $r:=|A\cap V(C)|$.
+\underline{Case 1: $r\ge 3$.} Then among the $r$ vertices of $A\cap V(C)$, there exist two that are not consecutive on the cycle (for instance, take the first and third occurrences of $A$-vertices along the cyclic order). Because $A$ induces a clique, those two vertices are adjacent in $G$, and this edge is a chord of $C$, contradicting that $C$ is induced.
+\underline{Case 2: $r=2$.} Let the two $A$-vertices on $C$ be $x$ and $y$. If $x$ and $y$ are not consecutive on the cycle, then (again because $A$ is a clique) the edge $xy$ is a chord, contradiction. So $x$ and $y$ must be consecutive on $C$. But then all the remaining $\ell-2\ge 2$ vertices of $C$ lie in $B$, hence somewhere along the cycle two consecutive vertices lie in $B$, which is impossible because $B$ has no edges.
+Both cases contradict the existence of an induced cycle of length at least $4$. Therefore no such induced cycle exists, and $G$ is chordal. \qed
+\medskip
+\noindent\textbf{Proposition 81.2 (The split-graph example needs $\sim n^2/6$ cliques; exact formula).}
+Let $G$ be the split graph with vertex partition $V(G)=A\sqcup B$ such that:
+\begin{itemize}
+\item $A$ induces a clique of size $a$;
+\item $B$ induces an independent set of size $b$;
+\item all edges between $A$ and $B$ are present.
+\end{itemize}
+Then the minimum clique-partition number is
+\[
+\mathrm{cp}(G)=ab-\binom{a}{2},
+\]
+provided $b\ge a$ (so that $B$ has at least $a$ vertices).
+In particular, taking $a=\lfloor n/3\rfloor$ and $b=n-a=\lceil 2n/3\rceil$ gives
+\[
+\mathrm{cp}(G)=\frac{n^2}{6}+O(n).
+\]
+
+\emph{Proof.}
+We prove a lower bound $\mathrm{cp}(G)\ge ab-\binom{a}{2}$ and then exhibit a partition with exactly that many cliques.
+
+\underline{Lower bound.}
+In any clique of $G$, there can be at most one vertex from $B$, because $B$ is independent.
+Thus every clique in a clique partition is of one of the following forms:
+\begin{itemize}
+\item a clique entirely inside $A$ (any subset of $A$);
+\item a clique of the form $\{v\}\cup S$ where $v\in B$ and $S\subseteq A$.
+\end{itemize}
+A clique of the form $\{v\}\cup S$ (with $|S|=s$) covers exactly $s$ cross edges (the edges between $v$ and the vertices of $S$) and also covers $\binom{s}{2}$ edges inside $A$.
+
+Consider a clique partition of $E(G)$.
+Let $q$ be the total number of cliques in the partition.
+Let $q_B$ be the number of cliques that contain a vertex of $B$.
+All cross edges (there are $ab$ of them) must be covered by the $q_B$ cliques, since cliques inside $A$ cover no cross edges.
+If the $i$-th $B$-containing clique has $s_i$ vertices from $A$ (so it covers $s_i$ cross edges), then
+\begin{equation}\label{eq:cross-sum}
+\sum_{i=1}^{q_B} s_i = ab.
+\end{equation}
+If we were to cover each cross edge individually as a $2$-vertex clique, we would use $ab$ cliques.
+A clique with parameter $s_i$ uses $1$ clique to cover $s_i$ cross edges, which ``saves'' $s_i-1$ cliques relative to covering those $s_i$ edges individually.
+Summing over all $B$-containing cliques, the total savings is
+\[
+(ab) - q_B = \sum_{i=1}^{q_B} (s_i-1),
+\]
+which is equivalent to \eqref{eq:cross-sum}.
+
+Now observe that for every integer $s\ge 1$ we have
+\[
+\binom{s}{2}\ge s-1.
+\]
+(Indeed, $\binom{1}{2}=0=s-1$ and for $s\ge 2$, $\binom{s}{2}=\frac{s(s-1)}{2}\ge s-1$.)
+Therefore,
+\[
+\sum_{i=1}^{q_B} (s_i-1) \le \sum_{i=1}^{q_B} \binom{s_i}{2}.
+\]
+The right-hand side counts the total number of edges inside $A$ that are covered by the $B$-containing cliques. Since the total number of edges inside $A$ is exactly $\binom{a}{2}$ and edges are partitioned (so no edge inside $A$ can be covered more than once), we have
+\[
+\sum_{i=1}^{q_B} \binom{s_i}{2} \le \binom{a}{2}.
+\]
+Combining the last three displays yields
+\[
+(ab)-q_B = \sum_{i=1}^{q_B} (s_i-1) \le \binom{a}{2},
+\]
+so
+\[
+q_B \ge ab-\binom{a}{2}.
+\]
+Since $q\ge q_B$, we obtain $\mathrm{cp}(G)=q\ge ab-\binom{a}{2}$.
+
+\underline{Construction achieving the bound.}
+Assume $b\ge a$. We will build a clique partition with exactly $ab-\binom{a}{2}$ cliques.
+
+\emph{Step 1: a proper edge-colouring of $K_a$ with at most $a$ colours.}
+The complete graph on $a$ vertices has a proper edge-colouring with $a-1$ colours if $a$ is even and with $a$ colours if $a$ is odd; in either case it uses at most $a$ colours. One explicit construction is the standard ``round-robin'' schedule (circle method): if $a$ is even, label vertices $\infty,0,1,\dots,a-2$ and for each $t\in\{0,\dots,a-2\}$ take the matching
+\[
+M_t:=\{\{\infty,t\}\}\cup\{\{t+i,\ t-i\}:1\le i\le (a-2)/2\}
+\]
+with arithmetic mod $a-1$ on $\{0,\dots,a-2\}$; the $a-1$ matchings partition the edges. If $a$ is odd, adjoin a dummy vertex to make $a+1$ even, apply the even construction, and then delete the dummy vertex; this yields $a$ matchings covering all edges of $K_a$.
+In both cases, the colour classes are matchings (no two edges share a vertex).
+
+\emph{Step 2: turn coloured edges into triangle cliques using distinct vertices of $B$.}
+Choose $a$ distinct vertices $v_1,\dots,v_a\in B$ and assign each colour class (matching) to one of these vertices.
+For each edge $xy$ of $K_a$ with colour assigned to $v_j$, create the triangle clique $\{v_j,x,y\}$.
+Because edges of the same colour form a matching, no vertex $x\in A$ appears in two edges of the same colour; hence for fixed $v_j$, the edges $v_jx$ used in these triangles are all distinct.
+Therefore the triangle cliques are edge-disjoint on the cross edges.
+They are also edge-disjoint on the edges inside $A$ because each $A$-edge $xy$ is used exactly once.
+So far we have used exactly $\binom{a}{2}$ cliques (one per edge of $A$), and we have covered:
+\begin{itemize}
+\item all $\binom{a}{2}$ edges inside $A$;
+\item exactly $2\binom{a}{2}$ cross edges (two per triangle clique).
+\end{itemize}
+
+\emph{Step 3: cover remaining cross edges individually.}
+The total number of cross edges is $ab$, so the number of uncovered cross edges is
+\[
+ab-2\binom{a}{2}.
+\]
+Cover each remaining cross edge by a $2$-vertex clique (just that edge).
+These are automatically edge-disjoint.
+
+Total number of cliques used is
+\[
+\binom{a}{2} + \bigl(ab-2\binom{a}{2}\bigr) = ab-\binom{a}{2},
+\]
+matching the lower bound. Therefore $\mathrm{cp}(G)=ab-\binom{a}{2}$.
+
+Finally, if $a=\lfloor n/3\rfloor$ and $b=n-a$, then
+\[
+ab-\binom{a}{2}=a(n-a)-\frac{a(a-1)}{2}=\frac{1}{2}(2an-3a^2+a)=\frac{n^2}{6}+O(n)
+\]
+because $a=\frac{n}{3}+O(1)$. \qed
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Proposition 81.2 lower bound hinges on the inequality $\binom{s}{2}\ge s-1$ and on the fact that the $B$-containing cliques can cover at most $\binom{a}{2}$ distinct $A$-edges. Both are explicit.
+\item The construction in Proposition 81.2 requires $b\ge a$ to have enough distinct vertices in $B$ to assign to colours. For $a\approx n/3$ and $b\approx 2n/3$, this holds.
+\item The $n=6$ brute-force computation matches Proposition 81.2 exactly.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} The split-graph construction in the problem statement indeed forces $\mathrm{cp}(G)=ab-\binom{a}{2}=\frac{n^2}{6}+O(n)$ cliques (Proposition 81.2), and split graphs are chordal (Proposition 81.1).
+
+(ii) \emph{First gap (crisp):} Prove or disprove that every chordal graph on $n$ vertices satisfies $\mathrm{cp}(G)\le \frac{n^2}{6}+O(n)$.
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Try an induction along a \emph{simplicial-vertex elimination} order: first prove (or re-prove) that every chordal graph has a simplicial vertex $v$; then remove $v$, partition edges of $G-v$, and finally cover the edges incident to $v$ by adding a controlled number of cliques. The concrete target is to bound the incremental number of cliques added in terms of $n$ and $\deg(v)$ and to control the sum over the elimination order.
+\item Identify (and try to characterise) extremal chordal graphs for clique partition number; test whether they are close to split graphs or have layered clique-tree structure.
+\item Computationally search (for moderate $n$) over chordal graphs to estimate the maximum of $\mathrm{cp}(G)$ and inspect extremisers to guess a structural theorem.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure (if the bound is false):} a family of chordal graphs $G_n$ with $\mathrm{cp}(G_n)\ge \frac{n^2}{6}+\Omega(n^{1+\delta})$ or at least $\ge \frac{n^2}{6}+\omega(n)$, while remaining chordal. Such a counterexample would have to avoid being reducible by simplicial-vertex elimination into pieces that can be clique-partitioned efficiently; heuristically it would exhibit many overlapping maximal cliques arranged so that edges cannot be grouped without reusing many internal clique edges.
+
+

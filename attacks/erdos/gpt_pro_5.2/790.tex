@@ -1,0 +1,143 @@
+% Erdos Problem #790
+
+\subsection*{FORMAL RESTATEMENT}
+For $n\ge 1$, let $\ell(n)$ be the largest integer with the following property:
+for every set $A\subset \mathbb Z$ with $|A|=n$, there exists a subset $B\subset A$ with
+$|B|\ge \ell(n)$ such that there is \emph{no} solution
+\[
+ a_1 = a_2 + a_3 + \cdots + a_r
+\]
+with $r\ge 2$ and all $a_1,\dots,a_r$ \emph{distinct} elements of $B$.
+Equivalently, no element of $B$ is the sum of distinct other elements of $B$.
+
+The problem asks to estimate $\ell(n)$ and, in particular, whether
+\[\ell(n)/\sqrt n \to \infty\quad\text{as }n\to\infty\]
+and whether $\ell(n)< n^{1-c}$ for some absolute $c>0$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+From the problem statement: Erd\H{o}s observed $\ell(n)\ge (n/2)^{1/2}$, and later works improve lower bounds above $(1+c)\sqrt n$ and as far as $\ell(n)\ge \sqrt{(\log n/\log\log n)\,n}$. The best upper bounds quoted are of the form $\ell(n)<n^{2/3+o(1)}$.
+
+In what follows I only prove a very elementary order-$\sqrt n$ lower bound (with a weaker constant) and give small sanity checks.
+
+\subsection*{ATTACK PLAN}
+1) Give an explicit, fully self-contained sufficient condition on $B$ (a ``superincreasing'' condition in absolute value) that guarantees the required sum-freeness.
+
+2) Use a dyadic decomposition by absolute value to show every $A$ of size $n$ contains such a $B$ of size $\gg \sqrt n$.
+
+3) Reality check: brute-force the definition for very small $n$ inside a bounded window to ensure no contradictions.
+
+\subsection*{WORK}
+\textbf{Lemma 790.1 (Superincreasing in absolute value $\Rightarrow$ no one-term subset-sum).}
+Let $B\subset\mathbb Z$ be finite. Suppose there is an ordering $B=\{b_1,\dots,b_k\}$ such that
+\[
+|b_1|\ge 1,\qquad |b_{i}| > \sum_{j=1}^{i-1} |b_j|\quad\text{for every }i=2,\dots,k.
+\]
+Then $B$ has no solution $a_1=a_2+\cdots+a_r$ with $r\ge 2$ and all $a_i$ distinct elements of $B$.
+
+\emph{Proof.}
+Assume for contradiction that such a solution exists. Move all terms to one side:
+\[
+ a_1 - a_2 - \cdots - a_r = 0.
+\]
+This is a nontrivial linear combination of elements of $B$ with coefficients in $\{-1,0,1\}$. Choose $a_t$ among $\{a_1,\dots,a_r\}$ with maximal absolute value.
+Because all $a_i$ are distinct elements of $B$, in the chosen ordering $a_t=b_i$ for some $i$, and every other $a_s$ has absolute value at most $\sum_{j<i}|b_j|$.
+More precisely, since $|b_i|>\sum_{j<i}|b_j|$ and every other term in the combination is one of $\{b_1,\dots,b_{i-1}\}$,
+\[
+\Bigl|\pm b_i\Bigr| = |b_i| > \sum_{j<i}|b_j| \ge \sum_{\substack{s\ne t}} |a_s| \ge \Bigl|\sum_{\substack{s\ne t}} \pm a_s\Bigr|.
+\]
+Hence the term $\pm b_i$ cannot be canceled by the sum of the remaining terms, so the total cannot be $0$, contradicting the assumed equality. \hfill$\square$
+
+\medskip
+\textbf{Lemma 790.2 (Dyadic shell argument gives $\ell(n)\ge \lfloor \tfrac12\sqrt n\rfloor$).}
+For every $n\ge 1$ and every $A\subset\mathbb Z$ with $|A|=n$, there exists $B\subset A$ with
+\[
+|B|\ge \left\lfloor \frac{\sqrt n}{2}\right\rfloor
+\]
+and with no solution $a_1=a_2+\cdots+a_r$ on distinct elements of $B$.
+
+\emph{Proof.}
+If $n\le 3$ the claim is immediate (any $B$ of size $1$ works), so assume $n\ge 4$.
+Partition $A\setminus\{0\}$ into dyadic shells by absolute value:
+\[
+S_t := \{a\in A\setminus\{0\}: 2^{t-1} < |a| \le 2^t\},\qquad t\in\mathbb Z.
+\]
+Only finitely many $S_t$ are nonempty.
+
+Set $m:=\left\lfloor \tfrac12\sqrt n\right\rfloor$.
+
+\emph{Case 1:} There exists a shell $S_t$ with $|S_t|\ge 2m$.
+Then either $S_t$ contains at least $m$ positive elements or at least $m$ negative elements (pigeonhole on sign).
+Let $B$ be any $m$ elements of that sign inside $S_t$.
+All elements of $B$ have the same sign and satisfy $2^{t-1}<|b|\le 2^t$.
+If $r\ge 2$ and $b_2,\dots,b_r\in B$ are distinct, then
+\[
+|b_2+\cdots+b_r| = |b_2|+\cdots+|b_r| > 2\cdot 2^{t-1} = 2^t \ge |b_1|
+\]
+for every $b_1\in B$. Thus $b_1\ne b_2+\cdots+b_r$ for all distinct choices, so $B$ is valid.
+
+\emph{Case 2:} Every shell satisfies $|S_t|\le 2m-1$.
+Let $L$ be the number of nonempty shells. Then
+\[
+ n-1 \le \sum_t |S_t| \le L(2m-1),
+\]
+so $L\ge (n-1)/(2m-1)$. For $n\ge 4$ and $m=\lfloor \sqrt n/2\rfloor$ one checks $L\ge 2m$.
+Now split the indices $t$ of nonempty shells into even and odd. One of these parities contains at least $m$ nonempty shells.
+Choose one element from each of these $m$ shells, and order the chosen elements by increasing $|\cdot|$ to obtain $b_1,\dots,b_m$.
+Because consecutive chosen shells differ by at least $2$ in index, we have
+\[
+|b_{i+1}| > 2^{t_i+1} \ge 2\cdot 2^{t_i} \ge 2|b_i|\quad\text{for all }i,
+\]
+so in particular
+\[
+|b_{i+1}| > \sum_{j\le i} |b_j|\qquad(\text{geometric series bound}).
+\]
+Thus the chosen $B=\{b_1,\dots,b_m\}$ satisfies the hypothesis of Lemma~790.1, hence is sum-free in the required sense.
+
+In both cases we produced $B$ of size $m=\lfloor \sqrt n/2\rfloor$. \hfill$\square$
+
+\medskip
+\textbf{Fast reality check (small brute force in a bounded window).}
+I brute-forced, for each $n\le 6$, the quantity
+\[
+\min_{A\subset[-6,6],\ |A|=n}\ \max\{|B|: B\subset A\text{ and }B\text{ has no }a_1=\sum_{i\ge 2}a_i\text{ on distinct elements}\}.
+\]
+The exact minima found in this restricted search were:
+\begin{center}
+\begin{tabular}{c|cccccc}
+$n$ & 1 & 2 & 3 & 4 & 5 & 6\\\hline
+min max-size in $[-6,6]$ & 1 & 2 & 2 & 3 & 3 & 3
+\end{tabular}
+\end{center}
+(These are only sanity checks: restricting $A$ to $[-6,6]$ can only make the minimum \emph{larger} than the true $\ell(n)$.)
+
+\subsection*{VERIFICATION}
+-- Lemma 790.1 was checked by a standard ``largest absolute value dominates'' argument; it rules out 
+$a_1=a_2+\cdots+a_r$ even when cancellations could occur.
+
+-- In Case 1 of Lemma 790.2 the strict inequality $|b_2|+|b_3|>2^t$ is crucial; it uses $|b_i|>2^{t-1}$.
+
+-- In Case 2, choosing shells of one parity ensures index gaps of at least $2$, giving a factor-$>2$ growth, hence the superincreasing condition.
+
+\subsection*{FINAL}
+UNRESOLVED
+
+(i) \textbf{Strongest proved partial result here:} Every $A\subset\mathbb Z$ with $|A|=n$ contains a subset $B$ with no solution $a_1=a_2+\cdots+a_r$ on distinct elements and
+\[|B|\ge \left\lfloor \frac{\sqrt n}{2}\right\rfloor.
+\]
+(The problem statement quotes the stronger bound $\ell(n)\ge (n/2)^{1/2}$ and much stronger later improvements.)
+
+(ii) \textbf{First gap (crisp):} Prove any super-$\sqrt n$ lower bound on $\ell(n)$, e.g.
+\[\ell(n)\ge \sqrt n\,\omega(1)\quad\text{or even}\quad \ell(n)\ge n^{1/2+\varepsilon}\text{ for some fixed }\varepsilon>0.
+\]
+
+(iii) \textbf{Top 3 next moves:}
+\begin{enumerate}
+\item Try to refine the dyadic-shell method by allowing multiple elements per shell but controlling cancellations via congruence classes (e.g., mod a large odd modulus) to improve the constant and perhaps the order.
+\item Computationally: for $n\le 12$ (where exhaustive search over all $A\subset[-M,M]$ is feasible for moderate $M$), search for candidate extremal $A$ that force small maximal sum-free $B$, to guess extremal structure.
+\item Structural: prove a ``container''-type lemma showing that if $B\subset\mathbb Z$ has many additive relations $x=\sum y_i$, then $B$ must concentrate in a short interval or a low-rank generalized arithmetic progression; then show such structured $A$ still contain large relation-free subsets.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure to watch for:} A worst-case $A$ for large $n$ would likely be highly structured and highly additive (many subset-sum coincidences), e.g. a dense chunk of an arithmetic progression together with carefully placed negatives to enable cancellations. Any improvement must rule out such ``many-cancellation'' configurations.
+
+\bigskip
+

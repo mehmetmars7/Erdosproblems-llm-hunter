@@ -1,0 +1,121 @@
+% Erdos Problem #854
+
+\subsection*{FORMAL RESTATEMENT}
+Let $n_k := \prod_{i=1}^k p_i$ be the $k$th primorial (product of the first $k$ primes). Let
+\[
+  1=a_1<a_2<\cdots<a_{\varphi(n_k)}=n_k-1
+\]
+be the increasing list of integers in $\{1,2,\dots,n_k-1\}$ that are coprime to $n_k$.
+Define the consecutive differences
+\[
+  g_i := a_{i+1}-a_i \qquad (1\le i\le \varphi(n_k)-1).
+\]
+The first question asks to estimate
+\[
+  m(k):=\min\{\text{even }t\ge 2: t\notin\{g_1,\dots,g_{\varphi(n_k)-1}\}\},
+\]
+i.e. the smallest even integer not equal to any consecutive coprime gap.
+
+The second question asks whether the set of even values attained by the $g_i$ is large, e.g. whether
+\[
+  \#\{t\in 2\mathbb{N}: t=g_i\ \text{for some }i\}\ \gg\ \max_i g_i.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I do not import external results beyond what is explicitly stated in the problem file. The statement reports computations (Lacampagne--Selfridge, as relayed by Erd\H{o}s) indicating that the naive conjecture ``all even $t\le \max_i g_i$ occur'' fails for $n_k=2\cdot 3\cdot 5\cdot 7\cdot 11\cdot 13$.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Structural lemmas:} Relate $g_i$ to runs of consecutive integers all sharing a nontrivial gcd with $n_k$.
+\item \textbf{Lower bounds / explicit gaps:} Identify guaranteed gap values (e.g. the first gap $a_2-a_1$).
+\item \textbf{Computation:} For moderate $k$ compute the full gap-set and identify the smallest missing even and the maximum gap.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 854.1 (The first coprime after 1 is the next prime).}
+Assume $k\ge 2$. Then $a_2=p_{k+1}$ and hence
+\[
+  g_1=a_2-a_1=p_{k+1}-1.
+\]
+
+\textbf{Proof.}
+Every integer $m$ with $2\le m < p_{k+1}$ has a prime factor $q\le m < p_{k+1}$. By definition of $p_{k+1}$, every prime $q<p_{k+1}$ is among $p_1,\dots,p_k$, hence divides $n_k$. Therefore $\gcd(m,n_k)\ge q>1$, so $m$ is \emph{not} coprime to $n_k$.
+
+On the other hand, $p_{k+1}$ is prime and does not divide $n_k$ (since $n_k$ only contains the first $k$ primes), so $\gcd(p_{k+1},n_k)=1$. Thus $p_{k+1}$ is the smallest integer $>1$ coprime to $n_k$, i.e. $a_2=p_{k+1}$. Because $a_1=1$, we get $g_1=p_{k+1}-1$.\ $\square$
+
+\medskip
+\textbf{Lemma 854.2 (All gaps are even).}
+For every $k\ge 1$ and every $i$, the difference $g_i=a_{i+1}-a_i$ is even.
+
+\textbf{Proof.}
+Since $2\mid n_k$ for $k\ge 1$, any integer coprime to $n_k$ must be odd. Thus each $a_i$ is odd, and the difference of two odd integers is even.\ $\square$
+
+\medskip
+\textbf{Lemma 854.3 (Gaps and runs of non-coprimes).}
+Fix $k\ge 1$ and an index $i\in\{1,\dots,\varphi(n_k)-1\}$. Let $t=g_i=a_{i+1}-a_i$. Then:
+\begin{itemize}
+\item $\gcd(a_i,n_k)=\gcd(a_{i+1},n_k)=1$;
+\item for every integer $j$ with $1\le j\le t-1$, we have $\gcd(a_i+j,n_k)>1$.
+\end{itemize}
+Conversely, if $m$ and $m+t$ are coprime to $n_k$ and every integer strictly between them has gcd $>1$ with $n_k$, then $t$ occurs as some gap $g_i$.
+
+\textbf{Proof.}
+The forward direction is immediate from the definition of the $a_i$ as consecutive coprime integers: there are no coprime integers between $a_i$ and $a_{i+1}$.
+
+For the converse, assume $m$ and $m+t$ are coprime to $n_k$ and all intermediate integers are not. In the increasing list of integers coprime to $n_k$, $m$ and $m+t$ appear as some consecutive entries (no other coprime lies between them), so their difference $t$ equals $g_i$ for the appropriate $i$.\ $\square$
+
+\medskip
+\textbf{Proposition 854.4 (A trivial bound on the smallest missing even).}
+Let $G_k := \max_i g_i$ (maximum gap). Then the smallest missing even $m(k)$ satisfies
+\[
+  m(k) \le G_k+2.
+\]
+Moreover, $m(k)=G_k+2$ holds if and only if every even $t\in\{2,4,\dots,G_k\}$ occurs among the $g_i$.
+
+\textbf{Proof.}
+Every even $t>G_k$ is absent from $\{g_i\}$ by definition of $G_k$, and the smallest even integer strictly larger than $G_k$ is $G_k+2$. Hence the smallest missing even is at most $G_k+2$.
+
+The ``if and only if'' statement is just unpacking the definition of ``smallest missing'': if all even $\le G_k$ occur, the first missing even is $G_k+2$, whereas if some even $\le G_k$ is missing, then $m(k)\le G_k$.\ $\square$
+
+\medskip
+\textbf{FAST REALITY CHECK (explicit computations for small $k$).}
+For each $k$ I enumerated all $a\in\{1,\dots,n_k-1\}$ with $\gcd(a,n_k)=1$, sorted them, computed $g_i=a_{i+1}-a_i$, and extracted $G_k$ and $m(k)$.
+
+Summary (non-cyclic gaps as in the statement):
+\begin{verbatim}
+k=2: n_k=6       max gap G_k=4   smallest missing even m(k)=2
+k=3: n_k=30      max gap G_k=6   smallest missing even m(k)=8
+k=4: n_k=210     max gap G_k=10  smallest missing even m(k)=12
+k=5: n_k=2310    max gap G_k=14  smallest missing even m(k)=16
+k=6: n_k=30030   max gap G_k=22  smallest missing even m(k)=20
+k=7: n_k=510510  max gap G_k=26  smallest missing even m(k)=28
+k=8: n_k=9699690 max gap G_k=34  smallest missing even m(k)=32
+
+detail for k=6 (n_k=30030):
+ distinct gap values: [2,4,6,8,10,12,14,16,18,22]
+ missing even values up to G_k=22: [20]
+ max gap 22 occurs between consecutive coprimes 9439 and 9461.
+\end{verbatim}
+This reproduces the reported failure of the ``all even $t\le G_k$ occur'' conjecture at $k=6$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item \textbf{Lemma 854.1:} The key point is that if $m<p_{k+1}$ then every prime factor of $m$ is $<p_{k+1}$ and hence divides $n_k$.
+\item \textbf{Lemma 854.3:} Forward direction uses the fact that $a_i$ are consecutive among coprimes to $n_k$; converse uses the same ordering.
+\item \textbf{Computation:} For each $k\le 8$ the search is exhaustive over a finite set of size $n_k-1$. In particular, for $k=6$ the claim ``20 never occurs'' is verified by directly checking every one of the $\varphi(30030)-1=5759$ differences.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.} (a) The first gap is always $p_{k+1}-1$ (Lemma~854.1). (b) All gaps are even (Lemma~854.2). (c) The smallest missing even satisfies $m(k)\le G_k+2$ (Proposition~854.4).
+\item[(ii)] \textbf{First gap (crisp).} Determine the asymptotic size of $m(k)$ (or even of $G_k$) as $k\to\infty$, and decide whether $\#\{\text{distinct even gaps}\}\gg G_k$ holds for all large $k$.
+\item[(iii)] \textbf{Top 3 next moves.}
+  \begin{enumerate}
+  \item Compute $(m(k),G_k)$ for substantially larger $k$ (e.g. $k\ge 12$) and record the full set of missing even values up to $G_k$.
+  \item Prove nontrivial upper/lower bounds on $G_k$ by studying the maximum length of a run of consecutive integers each divisible by some prime $\le p_k$ (a Jacobsthal-type question for $n_k$).
+  \item Try to prove existence of many distinct gap sizes by constructing (via CRT) many disjoint ``patterns'' where two consecutive coprimes are separated by a prescribed even $t$.
+  \end{enumerate}
+\item[(iv)] \textbf{Minimal counterexample structure.} A negative answer to ``many distinct gaps'' would manifest as infinitely many $k$ for which the set of attained even gaps has size $o(G_k)$; concretely, many even $t\le G_k$ would be missing from $\{g_i\}$.
+\end{enumerate}
+

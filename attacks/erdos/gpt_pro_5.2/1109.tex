@@ -1,0 +1,123 @@
+% Erdos Problem #1109
+% URL: https://www.erdosproblems.com/1109
+
+\subsection*{FORMAL RESTATEMENT}
+For a positive integer $N$, let $f(N)$ be the maximum size of a set $A\subseteq\{1,2,\dots,N\}$ such that every element of the sumset
+\[A+A := \{a+b : a,b\in A\}\]
+is \emph{squarefree} (i.e. not divisible by $p^2$ for any prime $p$).
+The problem asks for estimates on $f(N)$ as $N\to\infty$, and in particular whether one has
+\[f(N)\le N^{o(1)}\quad\text{or even}\quad f(N)\le (\log N)^{O(1)}.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file states known bounds from the literature:
+\[\log N \ll f(N) \ll N^{3/4}\log N\]
+(Erd\H{o}s--S\'ark\"ozy), and an improved upper bound $f(N)\ll N^{11/15+o(1)}$ with a lower bound $\log\log N (\log N)^2\ll f(N)$ (Konyagin).
+I do not use any results not explicitly stated in the problem file.
+
+\subsection*{ATTACK PLAN}
+\emph{Proof-track strategies.}
+\begin{itemize}
+\item Derive strong modular restrictions: for each prime $p$, $A+A$ must avoid $0\bmod p^2$, so $A\bmod p^2$ must avoid pairs summing to $0$. Combine these constraints over many primes via a sieve/large-sieve style argument.
+\item Use additive combinatorics: if $|A|$ is large then $|A+A|$ is typically large; compare with the density of squarefree numbers and the distribution of squarefree numbers in residue classes.
+\item For lower bounds, attempt constructive sets using the Chinese remainder theorem to force $a+b$ away from $0\bmod p^2$ for many small primes simultaneously.
+\end{itemize}
+
+\emph{Disproof-track strategy.}
+Try to build $A$ of size $N^{\delta}$ for some fixed $\delta>0$ by a structured choice of residues mod $\prod_{p\le y} p^2$, and test whether accidental divisibility by larger prime squares can be controlled.
+
+\subsection*{WORK}
+\paragraph{FAST REALITY CHECK (computation).}
+I computed the exact value of $f(N)$ for $N\le 40$ by backtracking, using the necessary condition that every $2a\in A+A$ must be squarefree.
+The values for $N\le 40$ are:
+
+\begin{center}
+\begin{tabular}{r|rrrrrrrrrrrrrrrrrrrr}
+$N$ &1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19&20\\\hline
+$f(N)$&1&1&1&1&2&2&2&2&2&2&2&2&2&2&2&2&2&2&3&3
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{r|rrrrrrrrrrrrrrrrrrrr}
+$N$ &21&22&23&24&25&26&27&28&29&30&31&32&33&34&35&36&37&38&39&40\\\hline
+$f(N)$&3&3&4&4&4&4&4&4&4&4&4&4&4&4&4&4&5&5&5&5
+\end{tabular}
+\end{center}
+
+Example maximizing sets found by the search include:
+\begin{itemize}
+\item $N=20$: $A=\{3,7,19\}$ (size $3$).
+\item $N=30$: $A=\{3,7,19,23\}$ (size $4$).
+\item $N=40$: $A=\{1,5,29,33,37\}$ (size $5$).
+\end{itemize}
+For some larger sample points the same code gave:
+\begin{itemize}
+\item $f(50)=6$ with example $A=\{1,5,29,33,37,41\}$.
+\item $f(60)=7$ with example $A=\{7,15,19,23,51,55,59\}$.
+\item $f(80)=7$ with example $A=\{1,5,21,37,41,65,73\}$.
+\item $f(100)=8$ with example $A=\{5,17,29,41,53,65,77,89\}$.
+\end{itemize}
+These values are small-$N$ data only and do not address the asymptotic questions.
+
+\paragraph{Lemma 1109.1 (every element of $A$ is odd and squarefree).}
+Let $A\subseteq\{1,\dots,N\}$ satisfy that every element of $A+A$ is squarefree.
+Then every $a\in A$ is odd and squarefree.
+
+\paragraph{Proof.}
+Fix $a\in A$. Since $a+a=2a\in A+A$, the integer $2a$ is squarefree by hypothesis.
+
+If $a$ were even, then $2a$ would be divisible by $4=2^2$, contradicting squarefreeness. Hence $a$ is odd.
+
+If $a$ were not squarefree, then there exists a prime $p$ such that $p^2\mid a$.
+Then $p^2\mid 2a$, so $2a$ would not be squarefree, again contradicting the hypothesis.
+Therefore $a$ is squarefree. \hfill $\square$
+
+\paragraph{Lemma 1109.2 (residue-class restriction modulo $p^2$).}
+Let $A\subseteq\{1,\dots,N\}$ satisfy that every element of $A+A$ is squarefree.
+Fix a prime $p$.
+Then:
+\begin{itemize}
+\item No element of $A$ is $0\bmod p^2$.
+\item For any residue class $x\bmod p^2$, $A$ cannot contain simultaneously an element congruent to $x$ and an element congruent to $-x$ modulo $p^2$.
+\end{itemize}
+In particular, if $r$ is the number of residue classes modulo $p^2$ that $A$ meets, then $r\le (p^2-1)/2$, and hence
+\[|A|\le \frac{p^2-1}{2}\,\left\lceil \frac{N}{p^2}\right\rceil.
+\]
+
+\paragraph{Proof.}
+If $a\in A$ satisfies $a\equiv 0\pmod{p^2}$, then $a+a=2a\equiv 0\pmod{p^2}$, so $2a$ is divisible by $p^2$ and therefore not squarefree, contradicting the hypothesis. This proves the first bullet.
+
+For the second bullet, suppose $a,b\in A$ satisfy $a\equiv x\pmod{p^2}$ and $b\equiv -x\pmod{p^2}$. Then $a+b\equiv 0\pmod{p^2}$, so $p^2\mid (a+b)$, implying $a+b$ is not squarefree. But $a+b\in A+A$, contradiction.
+
+Thus among the nonzero residue classes modulo $p^2$, $A$ can use at most one of each pair $\{x,-x\}$.
+There are $p^2-1$ nonzero classes, giving at most $(p^2-1)/2$ usable classes.
+Each residue class contributes at most $\lceil N/p^2\rceil$ elements from $\{1,\dots,N\}$, yielding the stated upper bound on $|A|$. \hfill $\square$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 1109.1 uses only the necessary condition that $2a\in A+A$ is squarefree, so it is robust.
+\item Lemma 1109.2 correctly treats the diagonal case $a=b$: the first bullet excludes $a\equiv 0\pmod{p^2}$, which is exactly the condition needed to prevent $2a$ from being divisible by $p^2$ for odd $p$.
+\item The brute-force computations restricted candidates to odd squarefree numbers using Lemma 1109.1; this does not discard any feasible maximizing set.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+Lemma 1109.1 shows every feasible set $A$ consists of odd squarefree integers.
+Lemma 1109.2 gives a sharp modular restriction: for each prime $p$, $A\bmod p^2$ avoids pairs $x,-x$ and avoids $0$, yielding the explicit bound
+$|A|\le \frac{p^2-1}{2}\lceil N/p^2\rceil$.
+
+(ii) \textbf{First gap.}
+Prove an asymptotic upper bound of the form $f(N)\le N^{o(1)}$ (or $f(N)\le (\log N)^{O(1)}$), or else construct sets $A$ of size $N^{\delta}$ for some fixed $\delta>0$.
+
+(iii) \textbf{Top 3 next moves.}
+1. Combine the constraints of Lemma 1109.2 over many primes $p\le y$ using a sieve/large-sieve framework to force $|A|$ to be small.
+2. Study the distribution of $A+A$ and use lower bounds on $|A+A|$ (via additive energy or sumset growth) together with upper bounds on how many squarefree numbers can lie in a structured set.
+3. Computationally search for extremal sets for larger $N$ (say $N\le 500$) to guess the true growth rate and to detect residue-class patterns mod $p^2$ that good constructions exploit.
+
+(iv) \textbf{What a minimal counterexample would likely look like.}
+To contradict a polylogarithmic upper bound, a minimal counterexample would be a set $A$ of size $\gg N^{\delta}$ whose residues modulo many small $p^2$ occupy close to $(p^2-1)/2$ allowable classes (from Lemma 1109.2) while still avoiding accidental divisibility by squares of larger primes in all pairwise sums. Such a set would likely have a strong Chinese-remainder structure.
+
+

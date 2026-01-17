@@ -1,0 +1,87 @@
+% Attempt for Erdos Problem #282
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $A\subseteq\mathbb{N}$ be infinite and let $x_0=x\in(0,1)\cap\mathbb{Q}$.
+Define inductively: given $x_j>0$, choose the \emph{minimal} $n_j\in A$ with $n_j\ge 1/x_j$ (equivalently $1/n_j\le x_j$),
+and set
+\[x_{j+1}=x_j-\frac1{n_j}.\]
+If some $x_J=0$, the process terminates and yields an Egyptian fraction expansion
+\[x=\sum_{j=0}^{J-1}\frac1{n_j}\]
+with distinct denominators (since $n_j$ is nondecreasing and $x_j$ strictly decreases, $n_j$ is strictly increasing in practice).
+
+Main question (Stein): for $A=\{\text{odd positive integers}\}$ and rational $x=m/n$ with $n$ odd (in lowest terms),
+does the greedy algorithm always terminate?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement itself says: for $A=\mathbb{N}$ termination is classical; there are characterizations of \emph{existence} of representations with denominators in arithmetic progressions or squares, but termination of the greedy algorithm in those cases is unclear and likely false for squares.
+
+3) ATTACK PLAN
+Proof track:
+1. Identify invariants for the odd-denominator/odd-$A$ case (parity, denominator structure).
+2. Prove quantitative decay bounds on $x_j$ and growth bounds on $n_j$.
+3. Attempt to show the process cannot continue indefinitely for rational $x$ (e.g. by bounding denominator growth vs numerator decrease).
+
+Disproof track:
+1. Search computationally for rational $x$ with odd denominator where the greedy odd algorithm exhibits very long expansions or apparent nontermination.
+2. For other sets $A$ (e.g. squares), look for explicit $x$ whose greedy expansion provably does not terminate.
+
+Chosen path: establish invariants/inequalities and do a systematic small-denominator computation for the odd case.
+
+4) WORK
+Lemma 1 (Odd denominator is preserved for $A=\{\text{odd}\}$).
+Let $A$ be the odd positive integers. Suppose $x=m/n\in(0,1)$ is in lowest terms with $n$ odd.
+At each greedy step, the chosen denominator $n_j$ is odd, and the new remainder $x_{j+1}$ is a rational number with odd denominator (in lowest terms).
+
+Proof.
+The greedy rule chooses the minimal element of $A$ above $1/x_j$, hence $n_j$ is odd.
+Write $x_j=m_j/n_j'$ in lowest terms with $n_j'$ odd. Then
+\[x_{j+1}=x_j-\frac1{n_j}=\frac{m_j n_j - n_j'}{n_j' n_j}.\]
+The denominator $n_j'n_j$ is a product of odd integers, hence odd; reducing the fraction cannot introduce a factor $2$.
+Therefore $x_{j+1}$ has odd denominator in lowest terms. \qed
+
+Lemma 2 (A quantitative one-step decay bound).
+Let $A$ be the odd positive integers and $x\in(0,1)$.
+Let $n$ be the minimal odd integer with $n\ge 1/x$ (the greedy choice). Then
+\[0\le x-\frac1n < \frac{2x^2}{1+2x} < 2x^2.\]
+
+Proof.
+By minimality of $n$ among odd integers $\ge 1/x$, we have
+\[\frac1x\le n < \frac1x+2.\]
+In particular $1/n \ge 1/(1/x+2)=x/(1+2x)$.
+Therefore
+\[x-\frac1n \le x-\frac{x}{1+2x}=\frac{2x^2}{1+2x}.\]
+The remainder is nonnegative by construction ($1/n\le x$), and since $1+2x>1$ the last expression is $<2x^2$. \qed
+
+FAST REALITY CHECK (computation).
+I implemented the greedy algorithm with $A=\{\text{odd}\}$ and tested all reduced fractions $x\in(0,1)$ with odd denominator $\le 199$.
+Result: every such $x$ terminated within $19$ steps; the maximum length in this range occurred at $x=5/139$.
+(For denominators $\le 99$, the maximum length was $13$ at $x=35/71$.) Denominators in the expansion can grow extremely quickly.
+
+5) VERIFICATION
+- Lemma 1 is a strict parity argument: odd/odd remains odd under subtraction of $1/(\text{odd})$.
+- Lemma 2’s key bound is $n<1/x+2$ for the minimal odd integer above $1/x$; the inequality chain is explicit.
+- The computation is only finite evidence; it cannot rule out an odd-denominator rational with a nonterminating greedy expansion.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+In the odd-denominator/odd-$A$ setting, the greedy algorithm preserves “odd denominator” at every step (Lemma 1) and shrinks the remainder at least quadratically in $x$ up to a factor $<2$ (Lemma 2). Exhaustive computation for all reduced $x$ with odd denominator $\le 199$ shows termination in $\le 19$ steps.
+
+(ii) First gap:
+Prove that the decreasing sequence of remainders $x_j$ must hit $0$ in finitely many steps for every rational $x$ with odd denominator (equivalently, rule out an infinite strictly decreasing sequence of positive rationals produced by the greedy odd algorithm).
+
+(iii) Top 3 next moves:
+1. Search for structural invariants stronger than “odd denominator” (e.g. congruence restrictions on numerators/denominators) that force termination.
+2. Push computation much further (larger odd denominators, or adversarial search for maximal-length expansions) to look for anomalous behavior.
+3. Analyze the process in terms of continued fractions/Engel expansions adapted to the “odd denominators only” constraint, to see whether nontermination is possible.
+
+(iv) Minimal counterexample structure (if termination fails):
+A rational $x=m/n$ with $n$ odd whose greedy odd expansion yields an infinite strictly increasing odd sequence $(n_j)$ and remainders $(x_j)$ with $x_j>0$ for all $j$, never reaching $0$ despite $x_j\to 0$ rapidly.
+

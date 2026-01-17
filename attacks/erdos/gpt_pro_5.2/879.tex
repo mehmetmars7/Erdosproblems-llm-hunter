@@ -1,0 +1,145 @@
+% Erdos Problem #879
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Fix $n\ge 1$.
+A set $S\subseteq\{1,2,\dots,n\}$ is \emph{admissible} if
+\[
+\forall a\ne b\in S,\qquad \gcd(a,b)=1.
+\]
+Define
+\[
+G(n)=\max_{\substack{S\subseteq\{1,\dots,n\}\\ S\text{ admissible}}}\ \sum_{a\in S} a.
+\]
+Define
+\[
+H(n)=\sum_{\substack{p\text{ prime}\\ p<n}} p\ +\ n\,\pi(\sqrt{n}),
+\]
+where $\pi(x)=\#\{p\le x: p\text{ prime}\}$.
+
+Questions in the problem text:
+\begin{itemize}
+\item Is it true that $G(n)>H(n)-n^{1+o(1)}$?
+\item Is it true that for every fixed $k\ge 2$, for all sufficiently large $n$, an admissible set achieving $G(n)$ contains an integer with at least $k$ prime factors? (The problem text does not specify whether ``prime factors'' means with multiplicity $\Omega(\cdot)$ or distinct prime factors $\omega(\cdot)$.)
+\end{itemize}
+
+The problem text states that Erd\H{o}s and van Lint proved bounds
+\[
+H(n)-n^{3/2-o(1)}<G(n)<H(n)
+\quad\text{and}\quad
+\frac{H(n)-G(n)}{n}\to\infty,
+\]
+and proved the second claim for $k=2$.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+I only use the statements explicitly given in the problem text (quoted above) as context.
+The proofs below are elementary and self-contained.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{enumerate}
+\item Prove an elementary upper bound of the shape $G(n)\le H(n)+O(1)$ by decomposing admissible sets into primes and composites and using that every composite has a small prime factor.
+\item Identify forced elements that must appear in any maximizing set (e.g. primes in $(n/2,n]$).
+\item Compute exact values for small $n$ via dynamic programming on prime-factor supports.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 1 (elementary $H$-type upper bound).}
+For every $n\ge 4$ and every admissible $S\subseteq\{1,\dots,n\}$,
+\[
+\sum_{a\in S} a \le \sum_{p<n} p\ +\ n\,\pi(\sqrt{n})\ +\ 1.
+\]
+In particular, $G(n)\le H(n)+1$ for all $n\ge 4$.
+
+\noindent\emph{Proof.}
+Write $S=\{1\}\cup S'$ if $1\in S$, otherwise $S=S'$.
+Let
+\[
+S_{\le \sqrt n}:=\{a\in S':\ a\text{ is divisible by some prime }p\le \sqrt n\},
+\]
+and let $S_{>\sqrt n}:=S'\setminus S_{\le\sqrt n}$.
+
+\emph{Step 1: bound $S_{\le \sqrt n}$.}
+For each $a\in S_{\le\sqrt n}$, let $p(a)$ be the smallest prime divisor of $a$. Then $p(a)\le \sqrt a\le \sqrt n$.
+If $a\ne b$ are distinct elements of $S_{\le\sqrt n}$, then $\gcd(a,b)=1$, so they cannot share any prime divisor. In particular $p(a)\ne p(b)$.
+Hence the map $a\mapsto p(a)$ is injective from $S_{\le\sqrt n}$ into the set of primes $\le \sqrt n$.
+Therefore
+\[
+|S_{\le\sqrt n}|\le \pi(\sqrt n).
+\]
+Since every element of $S_{\le\sqrt n}$ is at most $n$, we get
+\[
+\sum_{a\in S_{\le\sqrt n}} a \le n\,\pi(\sqrt n).
+\]
+
+\emph{Step 2: identify $S_{>\sqrt n}$.}
+Any integer $a\le n$ that has no prime factor $\le \sqrt n$ is either $1$ or a prime $>\sqrt n$.
+Indeed, if $a$ were composite with all prime factors $>\sqrt n$, it would have at least two such prime factors and hence exceed $n$.
+Thus $S_{>\sqrt n}$ consists only of primes in $(\sqrt n,n]$.
+Consequently,
+\[
+\sum_{a\in S_{>\sqrt n}} a \le \sum_{\substack{p\text{ prime}\\ p<n}} p,
+\]
+since the right-hand side sums \emph{all} primes $<n$, which certainly dominates the sum over the subset $S_{>\sqrt n}$.
+
+Combining Step 1 and Step 2, and adding back a possible $1\in S$, we obtain
+\[
+\sum_{a\in S} a \le \Big(\sum_{p<n} p\Big) + n\pi(\sqrt n) + 1.
+\]
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (primes in $(n/2,n]$ are forced in any maximizing set).}
+Let $n\ge 2$ and let $S\subseteq\{1,\dots,n\}$ be admissible with $\sum_{a\in S}a=G(n)$.
+Then every prime $p$ with $n/2<p\le n$ must belong to $S$.
+
+\noindent\emph{Proof.}
+Fix a prime $p$ with $n/2<p\le n$. Then $2p>n$, so the only multiple of $p$ in $\{1,\dots,n\}$ is $p$ itself.
+Therefore no element of $\{1,\dots,n\}\setminus\{p\}$ is divisible by $p$.
+Hence $\gcd(p,a)=1$ for every $a\in\{1,\dots,n\}\setminus\{p\}$.
+
+If $p\notin S$, then $S\cup\{p\}$ is still admissible and has strictly larger sum, contradicting maximality of $S$.
+Thus $p\in S$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{VERIFICATION (FAST REALITY CHECK).}
+For small $n$ I computed $G(n)$ exactly by dynamic programming over prime-support masks (weighted set packing).
+Below are values of $G(n)$ and $H(n)$ (as defined in the problem), together with one maximizing admissible set $S$ found by reconstruction.
+\begin{verbatim}
+ n   G(n)   H(n)  H(n)-G(n)   example maximizing S
+10    30     37       7       {5,7,8,9}
+15    55     71      16       {7,8,11,13,15}
+20    99    117      18       {7,11,13,15,16,17,19}
+30   193    219      26       {11,13,17,19,23,25,27,28,29}
+40   275    317      42       {11,13,17,19,23,27,29,31,32,35,37}
+50   446    528      82       {13,17,19,23,25,27,29,31,37,41,43,44,47,49}
+\end{verbatim}
+(These sets are admissible: all pairs have gcd $1$.)
+The difference $(H(n)-G(n))/n$ increases over this range (e.g. $0.7$ at $n=10$ and $1.64$ at $n=50$), consistent with the statement in the problem text that $(H(n)-G(n))/n\to\infty$.
+
+For the ``$k$ prime factors'' question: in these examples the maximum number of \emph{distinct} prime factors among selected elements is $2$ (e.g. $15=3\cdot 5$), while the maximum number of prime factors \emph{counted with multiplicity} can be larger (e.g. $16=2^4$).
+
+\medskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}.
+
+\noindent(i) \emph{Strongest proved partial result here.}
+Lemma~1: a completely elementary $H$-type upper bound $G(n)\le H(n)+1$ (for $n\ge 4$).
+Lemma~2: any maximizing set must contain all primes in $(n/2,n]$.
+
+\noindent(ii) \emph{First gap (crisp).}
+Prove (unconditionally) a lower bound of the form $G(n)\ge H(n)-n^{1+o(1)}$ or disprove it by constructing $n$ with $H(n)-G(n)$ larger than $n^{1+o(1)}$.
+
+\noindent(iii) \emph{Top 3 next moves (concrete).}
+\begin{enumerate}
+\item Improve Lemma~1 from $H(n)+1$ toward $H(n)$ by sharpening the treatment of primes and composites (the crude upper bound counts \emph{all} primes $<n$ regardless of whether they can coexist with the chosen composites).
+\item Explore explicit constructions for large admissible sets that use many near-$n$ composites with carefully chosen disjoint prime supports, and quantify how close their sums get to $H(n)$.
+\item For the ``$k$ prime factors'' problem, search computationally for maximizing sets for larger $n$ using heuristic/ILP methods and track the maximum of $\omega(a)$ or $\Omega(a)$ among chosen elements.
+\end{enumerate}
+
+\noindent(iv) \emph{Minimal counterexample structure.}
+A counterexample to $G(n)>H(n)-n^{1+o(1)}$ would be an infinite sequence $n_j$ where every admissible set has sum at most $H(n_j)-n_j^{1+\delta}$ for some fixed $\delta>0$.
+Such an $n_j$ would force a strong incompatibility between taking many large primes and simultaneously taking $\pi(\sqrt{n_j})$ large composite ``almost-$n_j$'' numbers with disjoint prime supports.
+

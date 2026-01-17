@@ -1,0 +1,103 @@
+% Erdos Problem #979
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 2$. For each integer $n\ge 1$, let $f_k(n)$ be the number of ordered $k$-tuples
+of primes $(p_1,\dots,p_k)$ such that
+\[
+n=p_1^k+\cdots+p_k^k.
+\]
+(If one instead counts unordered tuples, the numerical values differ by at most a factor of $k!$; here I follow the most literal reading ``number of solutions'' $=(p_1,\dots,p_k)$.)
+The question is: is it true that
+\[
+\limsup_{n\to\infty} f_k(n)=\infty?
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided problem statement says Erd\H{o}s proved this for $k=2$ and also for $k=3$ (with the $k=3$ proof apparently unpublished).
+A quick web search (2026-01-16) did not surface an explicit resolution for general $k$ beyond what is stated there, so I treat the general question as open here.
+
+3) ATTACK PLAN
+
+Proof track: one expects methods from analytic number theory (circle method / sieve) to give asymptotics for representation functions of sums of prime powers, and then deduce unboundedness.
+Disproof track: seek congruence obstructions forcing $f_k(n)$ to be bounded, but unboundedness asks only for a subsequence of $n$.
+
+In this write-up I record elementary bounds/congruence constraints and a computational sanity check.
+
+4) WORK
+
+FAST REALITY CHECK (exact computations; ordered tuples)
+
+For each $k\in\{2,3,4\}$ and each cutoff $N$, I computed $\max_{n\le N} f_k(n)$ and exhibited an $n$ attaining it.
+\[
+\begin{array}{c|c|c|c}
+(k,N) & \max_{n\le N} f_k(n) & \text{example }n\text{ attaining max} & \text{notes}\\\hline
+(2,10^4) & 6 & 2210 & \\
+(2,10^5) & 16 & 81770 & \\
+(2,10^7) & 26 & 9549410 & \\
+(3,10^4) & 6 & 160 & \\
+(3,10^6) & 12 & 185527 & \\
+(3,10^7) & 18 & 8627527 & \\
+(4,10^5) & 24 & 3123 & \\
+(4,10^7) & 48 & 6539044 &
+\end{array}
+\]
+These computations show growth of the observed maxima with $N$ in these ranges, but of course do not prove $\limsup f_k(n)=\infty$.
+
+Lemma 4.1 (trivial finiteness and a crude upper bound).
+For every $n\ge 1$,
+\[
+0\le f_k(n)\le \pi\bigl(n^{1/k}\bigr)^k,
+\]
+where $\pi(x)$ is the number of primes $\le x$.
+
+Proof.
+If $p_1^k+\cdots+p_k^k=n$ with $p_i$ prime, then each $p_i^k\le n$, hence $p_i\le n^{1/k}$.
+Thus each $p_i$ must lie in the finite set of primes $\le n^{1/k}$, which has size $\pi(n^{1/k})$.
+Counting ordered $k$-tuples from this set gives at most $\pi(n^{1/k})^k$ possibilities. \qed
+
+Lemma 4.2 (a simple congruence restriction mod $8$ for even $k$).
+Assume $k$ is even and $k\ge 2$. If all $p_i$ in a representation are odd primes, then
+\[
+n\equiv k\pmod 8.
+\]
+More generally, if exactly $t$ of the primes $p_i$ equal $2$, then
+\[
+n\equiv k-t\pmod 8\quad\text{for }k\ge 4.
+\]
+
+Proof.
+For any odd integer $p$, one has $p^2\equiv 1\pmod 8$, hence for even $k$,
+$p^k=(p^2)^{k/2}\equiv 1\pmod 8$.
+If all $p_i$ are odd, then $n=\sum_{i=1}^k p_i^k\equiv k\pmod 8$.
+If exactly $t$ of the primes equal $2$, then for $k\ge 4$ we have $2^k\equiv 0\pmod 8$ and the other $k-t$ terms are $\equiv 1\pmod 8$, giving $n\equiv k-t\pmod 8$. \qed
+
+Lemma 4.3 (parity constraint for odd $k$).
+If $k$ is odd, then in any representation $n=p_1^k+\cdots+p_k^k$,
+\[
+n\equiv t\pmod 2,
+\]
+where $t$ is the number of indices $i$ with $p_i=2$.
+
+Proof.
+For odd $k$, an odd prime power is odd and $2^k$ is even. Thus $n$ has the same parity as the number of odd summands, which is $k-t$, i.e. $n\equiv k-t\equiv t\pmod 2$ since $k$ is odd. \qed
+
+5) VERIFICATION
+
+- Lemma 4.1 only uses the implication $p_i^k\le n\Rightarrow p_i\le n^{1/k}$.
+- Lemma 4.2 uses $p^2\equiv 1\pmod 8$ for odd $p$ and needs $k\ge 4$ to ensure $2^k\equiv 0\pmod 8$.
+- The computational table counts ordered tuples.
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest proved partial result: elementary congruence constraints (Lemmas 4.2--4.3) and the trivial finiteness/upper bound $f_k(n)\le \pi(n^{1/k})^k$ (Lemma 4.1). Exact computations up to $N=10^7$ for $k=2,3,4$ show that $\max_{n\le N} f_k(n)$ increases with $N$ in these ranges.
+(ii) First gap (crisp): prove that for each fixed $k\ge 2$ there exist integers $n$ for which the number of prime-$k$th-power representations $f_k(n)$ exceeds an arbitrarily large prescribed threshold $T$.
+(iii) Top 3 next moves:
+  1. Establish a usable asymptotic (or at least a lower bound) for the mean square $\sum_{n\le N} f_k(n)^2$ together with the mean $\sum_{n\le N} f_k(n)$, then deduce a lower bound on $\max_{n\le N} f_k(n)$ via Cauchy--Schwarz.
+  2. For specific $k$ (say $k=3,4$), attempt a circle-method major/minor arc decomposition tailored to sums of prime $k$th powers with exactly $k$ variables.
+  3. Computation: push the search for $\max_{n\le N} f_k(n)$ to larger $N$ for several $k$ to guess growth rates and identify candidate families of $n$ with many representations.
+(iv) Minimal counterexample structure: if $\limsup f_k(n)$ were finite, then there would exist $M$ such that every $n$ has at most $M$ ordered representations as a sum of $k$ prime $k$th powers; such a bound would have to persist despite the increasing combinatorial complexity of prime power sums, and would likely require strong uniform cancellation in the representation function that is not explained by the simple congruence obstructions above.
+
+

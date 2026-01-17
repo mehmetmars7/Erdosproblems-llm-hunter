@@ -1,0 +1,285 @@
+## 1) FORMAL RESTATEMENT
+
+**Conventions.**
+All graphs are **finite, simple, undirected** graphs on a **labelled** vertex set (V(G)={1,\dots,n}).
+A **cycle** means a **simple cycle** (no repeated vertices) of length (\ell\ge 3).
+
+**Cycle set.** For a graph (G) on (n) vertices define
+[
+S(G);:=;{\ell\in{3,4,\dots,n}:\text{ (G) contains a cycle of length (\ell)}}.
+]
+A set (A\subseteq{3,\dots,n}) is called a **cycle set on (n) vertices** if there exists an (n)-vertex graph (G) with (S(G)=A).
+
+**Counting function.** Let
+[
+f(n);:=;\bigl|{S(G):; G \text{ is a graph on }n\text{ vertices}}\bigr|
+]
+(the number of distinct cycle sets realized by (n)-vertex graphs).
+
+**Claims to prove.**
+
+1. (f(n)=o(2^n)) as (n\to\infty), i.e.
+   [
+   \lim_{n\to\infty}\frac{f(n)}{2^n}=0.
+   ]
+2. (\displaystyle \lim_{n\to\infty}\frac{f(n)}{2^{n/2}}=\infty), i.e.
+   [
+   \forall M>0;\exists N;\forall n\ge N:\quad f(n)>M\cdot 2^{n/2}.
+   ]
+
+**Edge cases.** For (n\le 2), ({3,\dots,n}=\emptyset), so the only cycle set is (\emptyset) and (f(1)=f(2)=1). For asymptotics we only care about (n\to\infty).
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+Web check confirms the current landscape is as stated in the prompt:
+
+* Verstraëte (2004) proved the Erdős–Faudree “vanishing fraction” conjecture (f(n)=o(2^n)) with an explicit upper bound (f(n)\le 2^{,n-n^{1/10}}). ([arXiv][1])
+* Nenadov (arXiv v2, Sept 22, 2025) improved this to
+  [
+  f(n)\le 2^{,n-\Omega!\Bigl(\frac{\sqrt n}{\log^{3/2}n}\Bigr)},
+  ]
+  which is of the advertised form (2^{n-n^{1/2-o(1)}}). ([arXiv][1])
+* The best general lower bound remains the Faudree construction giving (f(n)\ge 2^{n/2}) for even (n), via (S(G)\cap{n/2+1,\dots,n}=A). ([arXiv][1])
+* Nenadov explicitly notes that improving (2^{n/2}) even to (2^{(1+c)n/2}) for any constant (c>0) “would already be interesting,” i.e., the lower-bound strengthening is open. ([arXiv][1])
+
+So: **Claim (1)** is settled in the literature; **claim (2)** is (still) a conjectural strengthening.
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof track for (1): (f(n)=o(2^n))
+
+Use Nenadov’s explicit upper bound
+[
+f(n)\le 2^{,n-\Omega(\sqrt n/\log^{3/2}n)}.
+]
+Then divide by (2^n) and show the exponent (\Omega(\sqrt n/\log^{3/2}n)\to\infty), forcing the ratio to (0).
+
+### Proof track for (2): (f(n)/2^{n/2}\to\infty)
+
+Try to build (\omega(1)) *many disjoint families* of size (2^{n/2}) each (or one family of size (2^{n/2+\omega(1)})) by:
+
+* combining independent gadgets whose cycle lengths lie in disjoint length ranges, or
+* constructing a parametric family where the cycle set allows decoding (n/2) “bits” plus an additional (\omega(1)) parameter.
+
+I attempted several such gadget/gluing ideas (disjoint unions with disjoint length spectra; parity separation; “shift” gadgets), but each ran into the same obstruction: cycle lengths in different components inevitably overlap in ({3,\dots,n}), and ensuring overlap-free decoding seems to require **high girth** in the bit-encoding component, which collapses the entropy.
+
+### Disproof track for (2)
+
+A disproof would require an upper bound (f(n)\le C\cdot 2^{n/2}) along infinitely many (n) (or bounded limsup of the ratio). Nothing in the current literature suggests such a strong upper bound, and Nenadov’s work improves only the (o(2^n)) direction.
+
+**Conclusion of plan:** I can give a fully rigorous proof of (1) and the standard (2^{n/2}) lower bound; for (2) I can’t complete a gap-free argument (it appears open).
+
+---
+
+## 4) WORK
+
+### Phase 1: small-(n) reality check (computed by brute force)
+
+By exhaustive enumeration of all labelled graphs for (n\le 6), the values are:
+[
+f(1)=1,; f(2)=1,; f(3)=2,; f(4)=4,; f(5)=6,; f(6)=11.
+]
+This is consistent with (f(n)) growing much more slowly than (2^n) but faster than (2^{n/2}) at these tiny (n) (not asymptotically meaningful).
+
+---
+
+### Theorem 4.1: (f(n)=o(2^n))
+
+**Theorem (Nenadov 2025, quoted precisely).**
+There exists an absolute constant (c>0) such that for all sufficiently large (n),
+[
+f(n);\le;2^{,n-c,\frac{\sqrt n}{\log^{3/2}n}}.
+]
+Equivalently, (f(n)\le 2^{n-\Omega(\sqrt n/\log^{3/2}n)}). ([arXiv][1])
+
+**Proposition 4.2.** The above bound implies (f(n)=o(2^n)).
+
+**Proof.** For sufficiently large (n), by Nenadov’s theorem,
+[
+\frac{f(n)}{2^n};\le;\frac{2^{,n-c\frac{\sqrt n}{\log^{3/2}n}}}{2^n}
+;=;2^{-c\frac{\sqrt n}{\log^{3/2}n}}.
+]
+Let (g(n)=c\frac{\sqrt n}{\log^{3/2}n}). Since (\sqrt n\to\infty) and (\log^{3/2}n=o(\sqrt n)), we have (g(n)\to\infty). Therefore (2^{-g(n)}\to 0), hence
+[
+\lim_{n\to\infty}\frac{f(n)}{2^n}=0,
+]
+which is exactly (f(n)=o(2^n)). ∎
+
+This completes claim (1).
+
+---
+
+### Lemma 4.3 (Faudree lower bound): (f(n)\ge 2^{\lfloor n/2\rfloor})
+
+I now give a **complete** proof of the standard construction (also described in Nenadov’s introduction). ([arXiv][1])
+
+#### Construction (even (n))
+
+Let (n=2m) be even. For each subset
+[
+A\subseteq {m+1,m+2,\dots,2m},
+]
+define a graph (G_A) on vertex set ({1,2,\dots,2m}) with edge set
+[
+E(G_A)={{i,i+1}:;1\le i\le 2m-1};\cup;{{1,a}:;a\in A}.
+]
+So (G_A) consists of the Hamilton path (1-2-\cdots-2m) plus chords from vertex (1) to the vertices in (A).
+
+#### Claim 4.4: Every cycle in (G_A) contains vertex (1).
+
+**Proof.** Remove vertex (1) from (G_A). The remaining graph is the path
+[
+2-3-\cdots-2m,
+]
+which is a tree and hence contains no cycle. Therefore any cycle of (G_A) must use vertex (1). ∎
+
+#### Claim 4.5: Every cycle length in (G_A) is either
+
+* (Type I) (a) for some (a\in A), or
+* (Type II) (b-a+2) for some distinct (a,b\in A) with (a<b).
+
+**Proof.** By Claim 4.4, any cycle (C) contains vertex (1). Since (C) is a simple cycle, vertex (1) has degree exactly (2) in (C), so (C) uses exactly two edges incident to (1). The only neighbors of (1) in (G_A) are vertex (2) (from the Hamilton path) and the vertices (a\in A) (from the added chords).
+
+* If (C) uses edges ({1,2}) and ({1,a}) with (a\in A), then the rest of (C) must be the unique path in the Hamilton path from (2) to (a), namely (2-3-\cdots-a). Hence (C) is
+  [
+  1-2-3-\cdots-a-1
+  ]
+  and has length (a) (Type I).
+* If (C) uses edges ({1,a}) and ({1,b}) with (a,b\in A), (a<b), then the rest of (C) must be the unique Hamilton-path segment from (a) to (b), namely (a-(a+1)-\cdots-b). Thus
+  [
+  C:\quad 1-a-(a+1)-\cdots-b-1
+  ]
+  and its length is ((b-a+1)+1=b-a+2) (Type II).
+
+No other choices of the two edges at vertex (1) are possible, so the classification is complete. ∎
+
+#### Claim 4.6: For all (A\subseteq{m+1,\dots,2m}),
+
+[
+S(G_A)\cap{m+1,m+2,\dots,2m};=;A.
+]
+
+**Proof.**
+
+* **((\supseteq))** Let (a\in A). By Claim 4.5 (Type I), (G_A) contains the cycle (1-2-\cdots-a-1) of length (a). Since (a\in{m+1,\dots,2m}), we have (a\in S(G_A)\cap{m+1,\dots,2m}). Hence (A\subseteq S(G_A)\cap{m+1,\dots,2m}).
+
+* **((\subseteq))** Let (\ell\in S(G_A)\cap{m+1,\dots,2m}). Then (G_A) has a cycle of length (\ell). By Claim 4.5, either:
+
+  * (\ell=a) for some (a\in A), in which case (\ell\in A); or
+  * (\ell=b-a+2) for some (a<b) in (A).
+
+  In the second case, since (a\ge m+1) and (b\le 2m),
+  [
+  \ell=b-a+2;\le;2m-(m+1)+2;=;m+1.
+  ]
+  So a Type II cycle has length **at most (m+1)**. Because (\ell\ge m+1) (by assumption (\ell\in{m+1,\dots,2m})), the only way the Type II case can occur is (\ell=m+1).
+
+  If (\ell=m+1) is realized as Type II, then (b-a+2=m+1), i.e. (b-a=m-1). With (a,b\in{m+1,\dots,2m}), the maximum possible difference is (2m-(m+1)=m-1), achieved **only** by ((a,b)=(m+1,2m)). In particular, this forces (a=m+1\in A). Hence (\ell=m+1\in A) also in this subcase.
+
+  Therefore in all cases (\ell\in A), proving (S(G_A)\cap{m+1,\dots,2m}\subseteq A).
+
+Combining the two inclusions gives the desired equality. ∎
+
+#### Consequence 4.7: injectivity and counting
+
+If (A\neq A'), then
+[
+S(G_A)\cap{m+1,\dots,2m}=A\neq A'=S(G_{A'})\cap{m+1,\dots,2m},
+]
+so (S(G_A)\neq S(G_{A'})). Hence the map (A\mapsto S(G_A)) is injective, and
+[
+f(2m);\ge;2^{m};=;2^{n/2}.
+]
+
+#### Odd (n)
+
+For (n=2m+1), take the above (G_A) on vertices ({1,\dots,2m}) and add an isolated vertex (2m+1). This does not create any new cycles, so the cycle set remains (S(G_A)). Thus (f(2m+1)\ge 2^m=2^{\lfloor n/2\rfloor}).
+
+So for all (n),
+[
+f(n);\ge;2^{\lfloor n/2\rfloor}.
+]
+
+This is the standard lower bound. ([arXiv][1])
+
+---
+
+### Status of claim (2)
+
+The above only gives
+[
+\frac{f(n)}{2^{n/2}};\ge;\frac{2^{\lfloor n/2\rfloor}}{2^{n/2}}
+;=;\begin{cases}
+1,&n\text{ even},[2pt]
+2^{-1/2},&n\text{ odd},
+\end{cases}
+]
+which is bounded and **does not** imply divergence to (\infty).
+
+Moreover, Nenadov explicitly indicates that even improving the lower bound beyond (2^{n/2}) by a fixed exponential factor is open. ([arXiv][1])
+I do not currently have a gap-free construction proving (\frac{f(n)}{2^{n/2}}\to\infty).
+
+---
+
+## 5) VERIFICATION
+
+### Check of claim (1)
+
+* Quantifiers: Nenadov provides an inequality for all sufficiently large (n), which is enough for the limit definition of (o(2^n)).
+* The decay exponent (c\sqrt n/\log^{3/2}n\to\infty) is correct since (\log^{3/2}n=o(\sqrt n)).
+* No hidden assumptions: only uses the quoted bound. ([arXiv][1])
+
+### Check of Faudree construction
+
+* Removing vertex (1) leaves a path, so cycles must include (1): correct.
+* In a simple cycle, the degree of vertex (1) inside the cycle is (2), so exactly two incident edges at (1) are used: correct.
+* Enumerated possibilities for those two edges exhaust all: neighbors of (1) are exactly (2) and (A).
+* Computation of Type II max length: (b-a+2\le 2m-(m+1)+2=m+1): correct.
+* Uniqueness of achieving length (m+1) as Type II: difference (m-1) forces ((a,b)=(m+1,2m)): correct.
+* Injectivity via intersection with ({m+1,\dots,2m}): correct.
+
+### Boundary cases
+
+* For (n=2m) with (m=1) (i.e. (n=2)), the construction is vacuous; but the asymptotic claims begin at large (n). For (n=4) ((m=2)), the construction still works and yields (2^2=4) distinct intersections, consistent with brute force (f(4)=4).
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* Using Nenadov’s Theorem 1.1, we have a complete deduction that
+  [
+  f(n)\le 2^{,n-\Omega(\sqrt n/\log^{3/2}n)}\quad\Longrightarrow\quad f(n)=o(2^n).
+  ]
+  ([arXiv][1])
+* The Faudree construction is proved in full detail, yielding
+  [
+  f(n)\ge 2^{\lfloor n/2\rfloor}\quad\text{for all }n.
+  ]
+  ([arXiv][1])
+
+(ii) **Exact first gap.**
+To prove (\displaystyle \frac{f(n)}{2^{n/2}}\to\infty), it suffices to show **any** explicit function (\omega(n)\to\infty) such that
+[
+f(n);\ge;2^{n/2},\omega(n)
+\quad\text{for all sufficiently large }n.
+]
+Equivalently, one needs a construction producing at least (2^{n/2+\log_2\omega(n)}) **distinct** cycle sets on (n) vertices. I do not have a rigorous injection/construction achieving (\omega(n)\to\infty).
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. **Disjoint-length-range gluing lemma:** Find a family (\mathcal G) of graphs on (n_1) vertices with many distinct cycle sets and with **forbidden short lengths** (girth (>k)), so that disjoint union with a (k)-vertex gadget yields a product lower bound (f(n_1+k)\gtrsim f(n_1)\cdot f(k)). The hard part is maintaining (f(n_1)\approx 2^{n_1/2}) while enforcing girth (>k).
+2. **Cycle-length “translation” gadget:** Build a graph operation on a fixed (n) vertices that maps a base cycle-set encoding (A) to a family (A\mapsto S_{A,t}) with an extra parameter (t\in{1,\dots,\omega(n)}) and prove ((A,t)\mapsto S_{A,t}) injective.
+3. **Probabilistic lower bound on distinct cycle sets:** Define a random sparse family of graphs with (\exp(\Theta(n))) possible edge choices but prove the induced distribution on cycle sets has entropy (>n/2+\omega(1)), implying at least (2^{n/2+\omega(1)}) distinct realized cycle sets.
+
+(iv) **What a minimal counterexample to the divergence claim would look like.**
+If (\frac{f(n)}{2^{n/2}}\not\to\infty), then there exists (M<\infty) and infinitely many (n) with (f(n)\le M\cdot 2^{n/2}). Any structural proof of such a bound would have to show that every realizable cycle set (A\subseteq{3,\dots,n}) is determined by only (\le n/2+O(1)) bits of information (strong global constraints among possible cycle lengths). No such constraint is currently known; indeed the literature still treats even improving the (2^{n/2}) lower bound as open. ([arXiv][1])
+
+[1]: https://arxiv.org/pdf/2501.09904 "Improved bound on the number of cycle sets"

@@ -1,0 +1,111 @@
+% Erdos Problem #1059
+
+\subsection*{FORMAL RESTATEMENT}
+Let $p$ be a prime. Define
+\[
+\mathcal F(p)=\{k! : k\in\mathbb Z_{\ge 1},\ k!<p\}.
+\]
+We ask whether there exist infinitely many primes $p$ such that
+\[
+\forall m\in\mathcal F(p),\quad p-m\ \text{is composite}.
+\]
+Throughout, ``composite'' means an integer $>1$ that is not prime, so the condition excludes $p-m=1$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem statement (from Guy's collection) gives examples $p=101,211$ and suggests an easier related variant about general integers $n$ in a factorial interval. I do not use or claim any results beyond what is explicitly in the problem statement.
+
+\subsection*{ATTACK PLAN}
+Proof-track idea: try to force each difference $p-k!$ to be composite by congruences $p\equiv k!\pmod{q_k}$ so that $q_k\mid (p-k!)$, and then appeal to infinitude of primes in an arithmetic progression. The obstruction is that the set of factorials to control grows with $p$.
+Disproof-track idea: search small primes for a counter-pattern (e.g. show only finitely many). Computations suggest the property is not rare among primes up to $10^6$, so disproof by small counterexample seems unlikely.
+
+\subsection*{WORK}
+\textbf{FAST REALITY CHECK.}
+For $p\in\{2,3,5,7,11\}$ the property fails:
+\begin{itemize}
+\item $p=2$: $1!<2$ and $2-1!=1$ (not composite).
+\item $p=3$: $2!<3$ and $3-1!=2$ (prime), $3-2!=1$ (not composite).
+\item $p=5$: $2!<5$ and $5-2!=3$ (prime).
+\item $p=7$: $2!<7$ and $7-2!=5$ (prime).
+\item $p=11$: $3!=6<11$ and $11-3!=5$ (prime).
+\end{itemize}
+A minimal local search over primes up to $10^6$ found many examples. Exact output:
+\begin{verbatim}
+primes p <= 1,000,000 with property: 7874
+first 30 examples:
+[101, 211, 367, 409, 419, 461, 557, 673, 709, 769,
+ 937, 967, 1009, 1201, 1259, 1709, 1831, 1889, 2141, 2221,
+ 2309, 2351, 2411, 2437, 2539, 2647, 2837, 2879, 3011, 3019]
+
+distribution by m(p)=max{k: k!<p} among these primes p<=1,000,000:
+ m=4: 1
+ m=5: 8
+ m=6: 48
+ m=7: 383
+ m=8: 3000
+ m=9: 4434
+\end{verbatim}
+(These numbers were produced by a direct sieve-and-check script.)
+
+\medskip
+\textbf{Lemma 1059.1 (interval reduction).}
+Let $p$ be a prime satisfying the property, and let
+\[
+m:=m(p):=\max\{k\in\mathbb Z_{\ge 1}:\ k!<p\}.
+\]
+Then $m!<p<(m+1)!$, the condition to check is exactly the finite set $k=1,2,\dots,m$, and moreover $p\neq m!+1$ and $p-m!$ is a composite integer in the range $2\le p-m!\le m\cdot m!$.
+
+\emph{Proof.}
+By definition of $m$, we have $m!<p$ and $(m+1)!\ge p$, hence $m!<p\le (m+1)!-1$; in particular $p<(m+1)!$.
+The set of factorials $k!$ less than $p$ is exactly $\{1!,2!,\dots,m!\}$, so the property is precisely that $p-k!$ is composite for all $1\le k\le m$.
+For $k=m$, the condition says $p-m!$ is composite. Composite integers are $\ge 4$ except for $4,6,8,9,\dots$, but in any case composite means $>1$, so $p-m!\ge 2$. In particular $p\neq m!+1$.
+Finally, since $p<(m+1)!=(m+1)m!$, we have $p-m!<m\cdot m!$, hence $p-m!\le m\cdot m!$ because it is integral. \hfill$\square$
+
+\medskip
+\textbf{Proposition 1059.2 (finite-factorial forcing).}
+Fix an integer $L\ge 1$. There exist infinitely many primes $p$ such that for every $k\in\{1,2,\dots,L\}$ the integer $p-k!$ is composite.
+
+\emph{Proof.}
+Choose pairwise distinct primes $q_1,q_2,\dots,q_L$ such that $q_k>k$ for each $k$. Then $q_k\nmid k!$ because every prime factor of $k!$ is $\le k$.
+For each $k$, impose the congruence
+\[
+p\equiv k!\pmod{q_k}.
+\]
+By the Chinese remainder theorem (CRT), there exists an integer $r$ modulo
+\[
+Q:=\prod_{k=1}^L q_k
+\]
+such that $r\equiv k!\pmod{q_k}$ for all $k$.
+Because $q_k\nmid k!$, we have $r\not\equiv 0\pmod{q_k}$ for each $k$, hence $\gcd(r,Q)=1$.
+By Dirichlet's theorem on primes in arithmetic progressions, there are infinitely many primes $p$ with
+\[
+p\equiv r\pmod{Q}.
+\]
+Fix such a prime $p$. For each $k\le L$, we have $p\equiv k!\pmod{q_k}$, hence $q_k\mid (p-k!)$.
+Since there are infinitely many such primes, we may further restrict to those with
+\[
+p>\max_{1\le k\le L}(k!+q_k).
+\]
+For these primes, $p-k!>q_k\ge 2$, so $p-k!$ has a nontrivial proper divisor $q_k$ and is therefore composite.
+This holds simultaneously for all $k=1,2,\dots,L$. \hfill$\square$
+
+\subsection*{VERIFICATION}
+I checked the edge cases $p=2,3,5,7,11$ by direct evaluation of the defining condition. In Proposition 1059.2, the only number-theoretic input beyond CRT is Dirichlet's theorem; the coprimality hypothesis $\gcd(r,Q)=1$ is verified by choosing $q_k>k$ so that $q_k\nmid k!$.
+For the ``composite'' requirement, I explicitly ensured $p-k!>q_k$ by restricting to primes beyond $\max(k!+q_k)$.
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.}
+For every fixed $L$ there are infinitely many primes $p$ for which $p-k!$ is composite for all $1\le k\le L$ (Proposition 1059.2). Computations show $7874$ such primes $p\le 10^6$.
+\item[(ii)] \textbf{First gap (crisp).}
+Upgrade Proposition 1059.2 to handle the \emph{moving target} $L=m(p)=\max\{k:k!<p\}$, i.e. find infinitely many primes $p$ such that $p-k!$ is composite for \emph{all} $k\le m(p)$.
+Equivalently: for infinitely many $m$ find a prime $p$ with $m!<p<(m+1)!$ such that $p-k!$ is composite for every $1\le k\le m$.
+\item[(iii)] \textbf{Top 3 next moves.}
+(1) Computationally: for each $m$ search primes $p\in(m!, (m+1)!)$ satisfying the full condition for $k\le m$, to see whether examples persist for larger $m$.
+(2) Try to combine the CRT forcing with an upper bound for the least prime in an arithmetic progression (a ``least prime in AP'' theorem) strong enough to guarantee a prime $p\equiv r\pmod Q$ below $(m+1)!$ when $Q$ is built from the needed congruences for $k\le m$.
+(3) Attempt a different forcing that reuses moduli across many factorials (e.g. a structured covering by small primes) so that the modulus grows more slowly with $m$.
+\item[(iv)] \textbf{Minimal counterexample structure.}
+A disproof would require that beyond some threshold, every prime $p$ admits some $k$ with $1\le k!<p$ for which $p-k!$ is either prime or $1$. Such a counterexample would likely exploit that $k!$ quickly becomes very large, so only $k\ll \log p/\log\log p$ are relevant.
+\end{enumerate}
+
+

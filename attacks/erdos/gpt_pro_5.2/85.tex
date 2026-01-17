@@ -1,0 +1,116 @@
+% Solutions for a subset of problems from erdosproblems.com
+% Generated: 2026-01-16
+
+% Erdős Problem #85
+% URL: https://www.erdosproblems.com/85
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Let $n\ge 4$ be an integer. For a (simple, undirected) graph $G=(V,E)$ write $|V|=n$ and $\delta(G)$ for its minimum degree. Let $C_4$ denote the (not necessarily induced) 4-cycle.
+Define
+\[
+ f(n) := \min\big\{ d\in\{0,1,\dots,n-1\} : \text{every graph }G\text{ on }n\text{ vertices with }\delta(G)\ge d\text{ contains a }C_4\big\}.
+\]
+Question: is it true that there exists $n_0$ such that $f(n+1)\ge f(n)$ for all $n\ge n_0$?
+(Equivalently, letting $\Delta(n):=\max\{\delta(G): |V(G)|=n,\ G\text{ is }C_4\text{-free}\}$, we have $f(n)=\Delta(n)+1$, and the question asks whether $\Delta(n)$ is eventually nondecreasing.)
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem statement notes (from a cited source) that $f(n)<\sqrt n+1$ and $f(n)=(1+o(1))\sqrt n$, and relates $f$ to the Ramsey number $R(C_4,K_{1,n})$. In what follows I do \emph{not} use any external results beyond basic graph counting.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item \emph{Proof track:} try to relate $C_4$-free graphs with large minimum degree across successive $n$ (extension/reduction arguments), or show $\Delta(n+1)\ge \Delta(n)$ for $n$ beyond some range.
+\item \emph{Disproof track:} search for a counterexample $n$ with $f(n+1)<f(n)$, starting with small $n$ via exhaustive computation.
+\end{itemize}
+The disproof track found no counterexample up to $n=10$ (see reality check in WORK). The proof track stalls at the step of extending $C_4$-free graphs while controlling minimum degree.
+
+\medskip
+\noindent\textbf{WORK.}
+
+\smallskip
+\noindent\textbf{Lemma 85.1 (one-step upper Lipschitz).}
+For every $n\ge 4$ we have
+\[
+ f(n+1)\le f(n)+1.
+\]
+\textit{Proof.}
+Let $d=f(n)+1$ and let $G$ be any graph on $n+1$ vertices with $\delta(G)\ge d$.
+Pick any vertex $v\in V(G)$ and consider the induced subgraph $H:=G-v$ on $n$ vertices. Every vertex of $H$ loses at most one neighbor when $v$ is deleted, hence
+\[
+\delta(H)\ge \delta(G)-1\ge d-1 = f(n).
+\]
+By definition of $f(n)$, $H$ contains a $C_4$, and then the same 4-cycle is also a subgraph of $G$. Thus every $(n+1)$-vertex graph with minimum degree at least $f(n)+1$ contains a $C_4$, so $f(n+1)\le f(n)+1$.\hfill $\square$
+
+\smallskip
+\noindent\textbf{Lemma 85.2 (pair--common-neighbor bound for $C_4$-free graphs).}
+Let $G$ be a $C_4$-free graph on $n$ vertices with minimum degree $\delta(G)=\delta$. Then
+\[
+\delta(\delta-1)\le n-1.
+\]
+In particular,
+\[
+ f(n)\le \Big\lfloor \frac{1+\sqrt{4n-3}}{2}\Big\rfloor+1.
+\]
+\textit{Proof.}
+In a $C_4$-free graph, any two distinct vertices $x\ne y$ have \emph{at most one} common neighbor: if they had two distinct common neighbors $u\ne v$, then $x-u-y-v-x$ is a 4-cycle.
+
+For each vertex $w\in V(G)$, the unordered pairs of neighbors of $w$ contribute $\binom{\deg(w)}{2}$ pairs $\{x,y\}\subseteq N(w)$. By the observation above, any unordered pair $\{x,y\}$ of vertices can be counted for \emph{at most one} vertex $w$ (as a common neighbor), hence
+\[
+\sum_{w\in V(G)} \binom{\deg(w)}{2} \le \binom{n}{2}.
+\]
+Using $\deg(w)\ge \delta$ for all $w$ gives
+\[
+ n\binom{\delta}{2} \le \binom{n}{2}
+ \quad\Rightarrow\quad
+ n\,\frac{\delta(\delta-1)}{2} \le \frac{n(n-1)}{2}
+ \quad\Rightarrow\quad
+ \delta(\delta-1)\le n-1.
+\]
+Now if a graph on $n$ vertices has $\delta(G)\ge d$ where $d$ is any integer with $d(d-1)>n-1$, then it cannot be $C_4$-free by the inequality just proved, so it must contain a $C_4$. Therefore $f(n)$ is at most the smallest integer $d$ with $d(d-1)>n-1$, which equals $\lfloor(1+\sqrt{4n-3})/2\rfloor+1$.\hfill $\square$
+
+\smallskip
+\noindent\textbf{FAST REALITY CHECK (small $n$ via exhaustive search).}
+For $4\le n\le 10$ I exhaustively searched all $C_4$-free graphs (via backtracking with an incremental ``common neighbor'' constraint) to compute
+\[
+\Delta(n)=\max\{\delta(G): |V(G)|=n,\ G\text{ is }C_4\text{-free}\},\qquad f(n)=\Delta(n)+1.
+\]
+The script output was:
+\begin{verbatim}
+n=4  Delta(n)=1  f(n)=2
+n=5  Delta(n)=2  f(n)=3
+n=6  Delta(n)=2  f(n)=3
+n=7  Delta(n)=2  f(n)=3
+n=8  Delta(n)=2  f(n)=3
+n=9  Delta(n)=2  f(n)=3
+n=10 Delta(n)=3  f(n)=4
+\end{verbatim}
+So $f(n)$ is nondecreasing for $4\le n\le 10$.
+
+\medskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item \emph{Quantifiers / definitions:} $C_4$ means a 4-cycle as a (not necessarily induced) subgraph; the ``two common neighbors'' criterion is exactly equivalent to the presence of a $C_4$.
+\item \emph{Lemma 85.1 edge case:} removing a vertex can only drop minimum degree by 1, so the deduction $\delta(H)\ge f(n)$ is valid.
+\item \emph{Lemma 85.2:} checked that the counting does not assume triangle-freeness; it uses only that pairs have at most one common neighbor, which is forced by $C_4$-freeness.
+\item \emph{Computation:} the backtracking search enforced ``no pair has two common neighbors'' incrementally, which is equivalent to $C_4$-freeness; results are consistent with $f(4)=2$ given in the problem statement.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.}
+The function satisfies $f(n+1)\le f(n)+1$ for all $n\ge 4$ (Lemma 85.1), and any $C_4$-free $n$-vertex graph satisfies $\delta(\delta-1)\le n-1$ (Lemma 85.2), giving $f(n)\le \lfloor(1+\sqrt{4n-3})/2\rfloor+1$. Exhaustive search gives $f(4)=2$, $f(5)=\cdots=f(9)=3$, $f(10)=4$.
+\item[(ii)] \textbf{First gap (crisp).}
+Show that there exists $n_0$ such that for all $n\ge n_0$ one has $f(n+1)\ge f(n)$ (equivalently, $\Delta(n+1)\ge \Delta(n)$), or else exhibit an explicit $n$ and explicit $C_4$-free graphs witnessing $f(n+1)<f(n)$.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Prove an \emph{extension lemma}: given a $C_4$-free $n$-vertex graph with $\delta=d$, adjoin one vertex and connect it to $\ge d$ (or $\ge d-c$) vertices while preserving $C_4$-freeness.
+\item Computationally push $\Delta(n)$ to larger $n$ using SAT/ILP or stronger pruning (e.g., symmetry breaking + branching on degree sequences) to look for the first potential drop.
+\item Study extremal $C_4$-free graphs near the Moore-type bounds (e.g., those achieving $\delta\approx\sqrt n$) and test whether they can be ``padded'' without decreasing minimum degree.
+\end{itemize}
+\item[(iv)] \textbf{Likely structure of a minimal counterexample.}
+A minimal counterexample would be an $n$ such that there exists a $C_4$-free graph on $n$ vertices with minimum degree $d$ but \emph{no} $C_4$-free graph on $n+1$ vertices with minimum degree $\ge d$. Heuristically this would occur at $n$ where known high-minimum-degree constructions exist only at special sizes (near ``square''-type parameters), so the drop would likely be by $1$ and happen near a threshold where $d(d-1)\approx n$.
+\end{enumerate}
+
+

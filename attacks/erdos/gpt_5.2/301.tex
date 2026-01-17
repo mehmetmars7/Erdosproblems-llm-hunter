@@ -1,0 +1,143 @@
+% Attempt for Erdos Problem #301
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+There is an apparent typo/ambiguity: the condition “no solutions to $1/a\neq 1/b_1+\cdots+1/b_k$ with distinct $a,b_i\in A$”
+would force $|A|\le 1$, contradicting the stated lower bound $f(N)\ge N/2$.
+
+Minimal corrected statement consistent with the rest of the paragraph:
+define $f(N)$ to be the maximum size of a set $A\subseteq\{1,\dots,N\}$ such that there do not exist an integer $k\ge 2$ and
+distinct elements $a,b_1,\dots,b_k\in A$ with
+\[\frac1a=\frac1{b_1}+\cdots+\frac1{b_k}.\tag{$\dagger$}\]
+(The case $k=1$ is impossible with distinctness.)
+
+Question: estimate $f(N)$; in particular, is $f(N)=(\tfrac12+o(1))N$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only use what is explicitly in the statement: the lower bound $f(N)\ge N/2$ from $A\subset (N/2,N]$,
+and a sketched disjoint-set argument yielding $f(N)\le (25/28+o(1))N$. I rederive that bound below from the described construction.
+
+3) ATTACK PLAN
+Proof track:
+1. Use explicit Egyptian-fraction identities among $\{2a,3a,4a,6a,12a\}$ to force omissions from many disjoint local configurations.
+2. Prove the disjointness of the family $\{S_a\}$ by encoding the $(2,3)$-adic structure of integers.
+3. Count how many such $a$ occur up to $N/6$ and $N/12$ to turn forced omissions into a global density upper bound.
+
+Disproof track:
+1. Try to build larger-than-$N/2$ solution-free sets by mixing “large interval” elements with carefully chosen small elements and testing for forbidden identities computationally for small $N$.
+
+Chosen path: execute the explicit disjoint-configuration upper-bound method from the statement.
+
+4) WORK
+Lemma 1 (Three explicit forbidden identities).
+For every integer $a\ge 1$ the following hold:
+\[\frac1{2a}=\frac1{3a}+\frac1{6a},\qquad \frac1{3a}=\frac1{4a}+\frac1{12a},\qquad \frac1{4a}=\frac1{6a}+\frac1{12a}.\]
+
+Proof.
+These are direct common-denominator calculations:
+\[\frac1{3a}+\frac1{6a}=\frac{2+1}{6a}=\frac1{2a},\quad
+\frac1{4a}+\frac1{12a}=\frac{3+1}{12a}=\frac1{3a},\quad
+\frac1{6a}+\frac1{12a}=\frac{2+1}{12a}=\frac1{4a}.\qed\]
+
+Lemma 2 (Forced omissions inside $S_a$).
+Fix $N$ and let $A\subseteq\{1,\dots,N\}$ contain no solution to $(\dagger)$.
+Let $a$ be such that $12a\le N$, so $S_a=\{2a,3a,4a,6a,12a\}\subseteq\{1,\dots,N\}$.
+Then $|A\cap S_a|\le 3$ (equivalently, $A$ omits at least two elements of $S_a$).
+
+If instead $6a\le N<12a$ so $S_a\cap[1,N]=\{2a,3a,4a,6a\}$, then $|A\cap S_a|\le 3$ (i.e. $A$ omits at least one element of this 4-set).
+
+Proof.
+First case ($12a\le N$): by Lemma 1, each of the triples
+\[\{2a,3a,6a\},\ \{3a,4a,12a\},\ \{4a,6a,12a\}\]
+supports a forbidden equality of the form $1/x=1/y+1/z$ with distinct elements.
+Thus $A$ cannot contain any of these triples.
+We check that every 4-subset of $S_a$ contains at least one of the listed triples:
+removing $12a$ leaves $\{2a,3a,4a,6a\}\supset\{2a,3a,6a\}$;
+removing $6a$ leaves $\{2a,3a,4a,12a\}\supset\{3a,4a,12a\}$;
+removing $4a$ leaves $\{2a,3a,6a,12a\}\supset\{2a,3a,6a\}$;
+removing $3a$ leaves $\{2a,4a,6a,12a\}\supset\{4a,6a,12a\}$;
+removing $2a$ leaves $\{3a,4a,6a,12a\}\supset\{3a,4a,12a\}$.
+Hence $A$ cannot contain 4 elements of $S_a$, so $|A\cap S_a|\le 3$.
+
+Second case ($6a\le N<12a$): the available triple $\{2a,3a,6a\}$ is still contained in $S_a\cap[1,N]$ and again gives a forbidden equality by Lemma 1.
+Therefore $A$ cannot contain all of $\{2a,3a,6a\}$, so among the four elements $\{2a,3a,4a,6a\}$ it must omit at least one. \qed
+
+Lemma 3 (Disjointness of the family $S_a$ for special $a$).
+Let $\mathcal{A}$ be the set of integers of the form $a=8^b9^cd$ with $b,c\ge 0$ and $(d,6)=1$.
+For $a\in\mathcal{A}$ define
+\[S_a=\{2a,3a,4a,6a,12a\}.\]
+Then the sets $\{S_a:a\in\mathcal{A}\}$ are pairwise disjoint.
+
+Proof.
+Write any integer $n\ge 1$ uniquely as $n=2^{u}3^{v}d$ with $u,v\ge 0$ and $(d,6)=1$.
+If $n\in S_a$ for some $a\in\mathcal{A}$, then $n=t a$ where $t\in\{2,3,4,6,12\}$ and $t=2^{\alpha}3^{\beta}$ with $(\alpha,\beta)\in\{(1,0),(0,1),(2,0),(1,1),(2,1)\}$.
+Since $a$ has $v_2(a)\equiv 0\pmod 3$ and $v_3(a)\equiv 0\pmod 2$, we have
+\[u\equiv \alpha\pmod 3,\qquad v\equiv \beta\pmod 2.\]
+The five pairs $(\alpha\bmod 3,\beta\bmod 2)$ listed above are all distinct, so $(u\bmod 3,v\bmod 2)$ determines $t$ uniquely.
+Then $a=n/t$ is uniquely determined.
+Therefore no integer $n$ can belong to two distinct $S_a$, proving disjointness. \qed
+
+Lemma 4 (Counting the special $a$: density $3/7$).
+Let $\mathcal{A}$ be as in Lemma 3. Then
+\[\#\{a\le X:\ a\in\mathcal{A}\}=\Bigl(\frac{3}{7}+o(1)\Bigr)X\qquad (X\to\infty).\]
+
+Proof.
+An integer $a$ lies in $\mathcal{A}$ iff $v_2(a)\equiv 0\pmod 3$ and $v_3(a)\equiv 0\pmod 2$.
+For fixed $k,\ell\ge 0$, the set of $a$ with $v_2(a)=3k$ and $v_3(a)=2\ell$ has natural density
+\[\Bigl(\frac{1}{2^{3k}}-\frac{1}{2^{3k+1}}\Bigr)\Bigl(\frac{1}{3^{2\ell}}-\frac{1}{3^{2\ell+1}}\Bigr)=\frac{1}{2^{3k+1}}\cdot \frac{2}{3^{2\ell+1}}.\]
+Summing over $k,\ell$ gives total density
+\[\sum_{k\ge 0}\frac{1}{2^{3k+1}}\sum_{\ell\ge 0}\frac{2}{3^{2\ell+1}}
+=\Bigl(\frac12\cdot\frac{1}{1-1/8}\Bigr)\Bigl(\frac{2}{3}\cdot\frac{1}{1-1/9}\Bigr)
+=\frac{4}{7}\cdot\frac{3}{4}=\frac{3}{7}.\]
+Standard truncation of the absolutely convergent series implies the counting function is $(3/7+o(1))X$. \qed
+
+Proposition 5 (Upper bound $f(N)\le (25/28+o(1))N$ via the disjoint configuration method).
+Let $A\subseteq\{1,\dots,N\}$ contain no solution to $(\dagger)$.
+Then
+\[|A|\le \Bigl(\frac{25}{28}+o(1)\Bigr)N.\]
+
+Proof.
+Let $\mathcal{A}$ be as above and consider all $a\in\mathcal{A}$ with $a\le N/6$.
+By Lemma 3 the corresponding sets $S_a\cap[1,N]$ are disjoint.
+By Lemma 2, for $a\le N/12$ we have $|A\cap S_a|\le 3$ while $|S_a|=5$; for $N/12<a\le N/6$ we have $|A\cap S_a|\le 3$ while $|S_a\cap[1,N]|=4$.
+Hence the number of elements of $\bigcup_{a\le N/6} (S_a\cap[1,N])$ that $A$ must omit is at least
+\[\#\{a\le N/12:\ a\in\mathcal{A}\} + \#\{N/12<a\le N/6:\ a\in\mathcal{A}\} = \#\{a\le N/6:\ a\in\mathcal{A}\}+\#\{a\le N/12:\ a\in\mathcal{A}\}.\]
+Therefore
+\[|A|\le N-\#\{a\le N/6:\ a\in\mathcal{A}\}-\#\{a\le N/12:\ a\in\mathcal{A}\}.\]
+Applying Lemma 4 with $X=N/6$ and $X=N/12$ gives
+\[|A|\le N-\Bigl(\frac{3}{7}+o(1)\Bigr)\frac{N}{6}-\Bigl(\frac{3}{7}+o(1)\Bigr)\frac{N}{12}
+=\Bigl(1-\frac{1}{14}-\frac{1}{28}+o(1)\Bigr)N=\Bigl(\frac{25}{28}+o(1)\Bigr)N.\qed\]
+
+FAST REALITY CHECK (computation, corrected statement).
+For the corrected “no solutions to $(\dagger)$” definition, exhaustive search gives:
+\[f(N)=N\ (2\le N\le 5);\ f(6)=5;\ f(7)=6;\ f(8)=7;\ f(9)=8;\ f(10)=9;\ f(11)=10;\ f(12)=10.\]
+(One maximum set for $N=12$ is $\{1,2,3,4,5,7,8,9,10,11\}$.)
+
+5) VERIFICATION
+- The corrected statement is forced by the contradiction between the literal “$\neq$” reading and the explicit lower bound $f(N)\ge N/2$.
+- Lemma 2 checks all 4-subsets of $S_a$ by a finite case split (removing each element).
+- Lemma 3 uses $(v_2 \bmod 3, v_3 \bmod 2)$ as an injective label for the multiplier $t\in\{2,3,4,6,12\}$.
+- Lemma 4 computes a true natural density by an absolutely convergent sum; the $o(1)$ error is from truncation.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Under the corrected interpretation, the disjoint-configuration method yields $f(N)\le (25/28+o(1))N$ (Proposition 5), while the interval example gives $f(N)\ge N/2$.
+
+(ii) First gap:
+Improve the upper bound toward $(1/2+o(1))N$ (or construct a counterexample), i.e. determine whether $f(N)=(1/2+o(1))N$.
+
+(iii) Top 3 next moves:
+1. Find additional large families of disjoint forbidden configurations beyond $\{2a,3a,4a,6a,12a\}$ to force more omissions.
+2. Search computationally for large $N$ (say up to a few hundred) for the true extremal sets to guess structure and density.
+3. Prove a stability statement: any solution-free $A$ with density $>1/2+\epsilon$ must have many multiplicative relations that force an Egyptian-fraction identity.
+
+(iv) Minimal counterexample structure (if $(1/2+o(1))N$ were false):
+A family of sets $A_N\subseteq[1,N]$ with $|A_N|\ge (1/2+\epsilon)N$ for some fixed $\epsilon>0$ and yet avoiding all identities $(\dagger)$; such a family would have to avoid many short identities like those in Lemma 1 across many scales.
+

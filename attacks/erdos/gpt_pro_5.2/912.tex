@@ -1,0 +1,115 @@
+% Erdos Problem #912
+
+\noindent\textbf{FORMAL RESTATEMENT.}\\
+Write the prime factorisation of $n!$ as
+\[
+ n! = \prod_{p\le n} p^{k_p(n)}
+\]
+where the product is over primes $p$ and $k_p(n)=v_p(n!)\in\mathbb{N}$ is the exponent of $p$ in $n!$. Let
+\[
+ h(n):=\big|\{k_p(n): p\le n\text{ prime}\}\big|
+\]
+be the number of \emph{distinct} exponent values appearing in this factorisation. The conjecture asks to prove that there exists a constant $c>0$ such that
+\[
+ h(n) \sim c\,\Big(\frac{n}{\log n}\Big)^{1/2}\qquad (n\to\infty),
+\]
+where $\log$ is the natural logarithm.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}\\
+The problem text states (without proof here) that Erd\H{o}s--Selfridge proved the order of magnitude $h(n)\asymp (n/\log n)^{1/2}$. It also reports a heuristic constant $c=\sqrt{2\pi}$. I will not assume any of those results; I will only derive basic identities and provide computational sanity checks.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}\\
+\emph{Proof track.} Express $k_p(n)$ explicitly (Legendre formula), then analyze how many distinct integers occur among $\{k_p(n)\}$ as $p$ ranges over primes $\le n$.
+
+\smallskip
+\noindent\emph{Reality-check track.} Compute $h(n)$ for moderate $n$ and compare to $\sqrt{n/\log n}$.
+
+\medskip
+\noindent\textbf{WORK.}\\
+\emph{Phase 1: fast reality check (computation).}  Using Legendre's formula (Lemma~912.1) I computed $h(n)$ exactly for several $n$.
+
+\begin{center}
+\begin{tabular}{r|r|r}
+$n$ & $h(n)$ & $h(n)/\sqrt{n/\log n}$\\\hline
+$10$ & $4$ & $1.9194103649$\\
+$20$ & $5$ & $1.9351137801$\\
+$50$ & $8$ & $2.2377196980$\\
+$100$ & $11$ & $2.3605626289$\\
+$200$ & $15$ & $2.4414354461$\\
+$500$ & $24$ & $2.6756734721$\\
+$1000$ & $31$ & $2.5765001112$\\
+$2000$ & $43$ & $2.6508553947$\\
+$5000$ & $65$ & $2.6827277623$\\
+$10^4$ & $87$ & $2.6403232051$\\
+$10^5$ & $252$ & $2.7039171931$\\
+$10^6$ & $723$ & $2.6873347425$\\
+$10^7$ & $2087$ & $2.6495938888$\\
+$3\cdot 10^7$ & $3503$ & $2.6537167525$\\
+\end{tabular}
+\end{center}
+
+\noindent (These values were computed by a direct prime loop and Legendre summation; for example, $h(10^7)=2087$ and $h(3\cdot 10^7)=3503$.)
+
+\medskip
+\noindent\textbf{Lemma 912.1 (Legendre formula).}  \emph{For every prime $p\le n$,}
+\[
+ k_p(n)=v_p(n!)=\sum_{j\ge 1} \Big\lfloor \frac{n}{p^j}\Big\rfloor.
+\]
+
+\noindent\textbf{Proof.} Among the integers $1,2,\dots,n$, the number divisible by $p$ is $\lfloor n/p\rfloor$, each contributing at least one factor $p$ to the product $n!$. The number divisible by $p^2$ is $\lfloor n/p^2\rfloor$, contributing \emph{an additional} factor $p$ beyond the first, and so on. Summing the contributions over all powers $p^j$ counts exactly the total exponent of $p$ in $n!$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 912.2 (large primes have single-term exponents).}  \emph{If $p$ is prime and $p>\sqrt{n}$, then}
+\[
+ k_p(n)=v_p(n!) = \Big\lfloor \frac{n}{p}\Big\rfloor.
+\]
+
+\noindent\textbf{Proof.} By Lemma~912.1,
+\[
+ v_p(n!)=\Big\lfloor \frac{n}{p}\Big\rfloor + \Big\lfloor \frac{n}{p^2}\Big\rfloor+\Big\lfloor \frac{n}{p^3}\Big\rfloor+\cdots.
+\]
+If $p>\sqrt{n}$ then $p^2>n$, hence $\lfloor n/p^j\rfloor=0$ for every $j\ge 2$. Only the $j=1$ term remains. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 912.3 (a crude $O(\sqrt n)$ upper bound on $h(n)$).}  \emph{For every $n\ge 2$,}
+\[
+ h(n) \le \lfloor \sqrt{n}\rfloor + \pi(\sqrt{n}),
+\]
+\emph{where $\pi(x)$ is the number of primes $\le x$. In particular $h(n)=O(\sqrt{n})$.}
+
+\noindent\textbf{Proof.} Split primes into two ranges.
+
+\emph{(1) Primes $p>\sqrt{n}$.} By Lemma~912.2, $k_p(n)=\lfloor n/p\rfloor$. As $p$ ranges over $\{\text{primes}:\sqrt{n}<p\le n\}$, the integer $\lfloor n/p\rfloor$ lies in $\{1,2,\dots,\lfloor\sqrt{n}\rfloor\}$. Hence the set of exponents contributed by these primes has size at most $\lfloor\sqrt{n}\rfloor$.
+
+\emph{(2) Primes $p\le \sqrt{n}$.} There are exactly $\pi(\sqrt{n})$ such primes, hence they contribute at most $\pi(\sqrt{n})$ distinct exponent values.
+
+Taking the union of the two exponent sets proves the displayed inequality. \hfill$\square$
+
+\medskip
+\noindent\textbf{VERIFICATION.}\\
+\begin{itemize}
+\item Lemma~912.1 is the standard valuation counting argument and does not use any unproved prime distribution input.
+\item Lemma~912.2 correctly uses $p^2>n$ to kill higher terms.
+\item The computation table is consistent across multiple $n$ and shows $h(n)$ growing roughly like a constant times $\sqrt{n/\log n}$, but does not constitute a proof.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL.}\\
+\textbf{UNRESOLVED.}
+
+(i) Strongest proved partial result: exact formulae for the exponents $k_p(n)$ (Lemma~912.1) and their simplification for $p>\sqrt{n}$ (Lemma~912.2), plus the crude bound $h(n)\le \lfloor\sqrt n\rfloor+\pi(\sqrt n)$ (Lemma~912.3). Computations up to $n=3\cdot 10^7$ give, e.g., $h(10^7)=2087$ and $h(3\cdot 10^7)=3503$, with ratios $h(n)/\sqrt{n/\log n}$ around $2.65$.
+
+(ii) First gap (crisp): Prove the asymptotic $h(n)\sim c\sqrt{n/\log n}$ for some constant $c>0$, or even prove the existence of the limit $\lim_{n\to\infty} h(n)/\sqrt{n/\log n}$.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item Analyze the map $p\mapsto v_p(n!)$ more sharply: show that for most primes $p$ in a suitable range, $v_p(n!)$ is close to $n/(p-1)$ with controllable error, and convert distinct-value counting into a question about spacing of the values $n/(p-1)$.
+\item Reduce to primes in a ``main range'' $p\asymp \sqrt{n\log n}$ where one expects the spacing between consecutive $v_p(n!)$ to be about $1$; then show that sufficiently many integers are hit as $p$ varies.
+\item Use computation to probe the constant: compute $h(n)$ for larger $n$ (say $10^8$ or beyond) and track $h(n)/\sqrt{n/\log n}$ to see whether it drifts toward a stable value.
+\end{enumerate}
+
+(iv) Minimal counterexample structure (if the asymptotic were false): a mechanism causing long-range ``collisions'' $v_p(n!)=v_q(n!)$ for many distinct primes $p\ne q$ in the main range, or conversely large gaps of missing integers among the set $\{v_p(n!):p\le n\}$; such a mechanism would likely be tied to irregular distribution of primes in short intervals.
+
+

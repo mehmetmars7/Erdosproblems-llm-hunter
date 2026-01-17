@@ -1,0 +1,126 @@
+% Erdos Problem #825
+
+\subsection*{FORMAL RESTATEMENT}
+Write $\sigma(n)=\sum_{d\mid n} d$ and call an integer $n$ \emph{semiperfect} if $n$ is a sum of distinct proper divisors of $n$ (i.e. a sum of a subset of $\{d: d\mid n,\ d<n\}$). Call $n$ \emph{weird} if $\sigma(n)>2n$ (abundant) but $n$ is not semiperfect.
+
+The question is:
+\medskip
+\noindent\textbf{Problem.} Does there exist an absolute constant $C>0$ such that every integer $n$ with $\sigma(n)>Cn$ is semiperfect?
+
+Equivalently: is there an absolute upper bound on the abundancy index
+\[
+\ell(n):=\frac{\sigma(n)}{n}
+\]
+among all weird numbers?
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+From the problem statement: it is suggested the statement might hold with $C=3$; necessarily $C>2$ since $\sigma(70)=144$ but $70$ is not semiperfect. The statement also records an observation attributed to Weisenberg: if a weird number has abundancy index $\ge 4$, then it is divisible by an odd weird number; thus if there are no odd weird numbers then every weird number has abundancy index $<4$.
+
+I only use the definitions and the elementary multiplicativity facts that I prove below.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof track:} Try to show that very abundant numbers must be semiperfect by a subset-sum covering argument using many small divisors (a knapsack/greedy density idea). This seems hard without deep structure theorems.
+\item \textbf{Disproof track:} Try to build weird numbers with arbitrarily large abundancy index, e.g. by multiplicative constructions that keep non-semiperfectness while increasing $\sigma(n)/n$. This also seems hard; known weird numbers in computations have abundancy only slightly above $2$.
+\item \textbf{What I will do here:} Prove two problem-specific lemmas (multiplicativity of abundancy and the "odd weird divisor" implication), and run an exact small search for weird numbers up to $10^5$ to sanity-check abundancy sizes.
+\end{itemize}
+
+\subsection*{WORK}
+\paragraph{FAST REALITY CHECK (exact search for small weird numbers).}
+I searched exactly for weird numbers $n\le 100{,}000$ by checking abundance ($\sigma(n)>2n$) and semiperfectness (subset-sum over proper divisors via a bitset DP).
+\begin{itemize}
+\item There are $204$ weird numbers $\le 100{,}000$.
+\item The first few are $70, 836, 4030, 5830, 7192, 7912, \dots$.
+\item The maximum abundancy index among weird $n\le 100{,}000$ is attained at $n=10430$ and equals
+\[\ell(10430)=\frac{\sigma(10430)}{10430}=\frac{2160}{1043}\approx 2.070949\dots\,.
+\]
+\end{itemize}
+In particular, in this range there are no weird numbers with abundancy index anywhere near $3$ or $4$.
+
+\noindent\textbf{Lemma (Abundancy index is multiplicative on coprime inputs).}
+If $\gcd(a,b)=1$, then
+\[
+\ell(ab)=\ell(a)\ell(b).
+\]
+
+\noindent\textbf{Proof.}
+By the lemma from Problem \#824 that $\sigma$ is multiplicative on coprime inputs, $\sigma(ab)=\sigma(a)\sigma(b)$ when $\gcd(a,b)=1$. Divide both sides by $ab$:
+\[
+\ell(ab)=\frac{\sigma(ab)}{ab}=\frac{\sigma(a)}{a}\cdot \frac{\sigma(b)}{b}=\ell(a)\ell(b).
+\]
+\hfill$\square$
+
+
+\noindent\textbf{Lemma (Explicit abundancy for powers of $2$).}
+For every integer $k\ge 0$,
+\[
+\ell(2^k)=\frac{\sigma(2^k)}{2^k}=2-2^{-k} < 2.
+\]
+
+\noindent\textbf{Proof.}
+The divisors of $2^k$ are $1,2,2^2,\dots,2^k$, so
+\[
+\sigma(2^k)=1+2+2^2+\cdots+2^k = 2^{k+1}-1.
+\]
+Therefore
+\[
+\ell(2^k)=\frac{2^{k+1}-1}{2^k}=2-2^{-k},
+\]
+which is strictly less than $2$.
+\hfill$\square$
+
+
+\noindent\textbf{Lemma (Odd weird divisor if $\ell(n)\ge 4$).}
+Let $n$ be weird and write $n=2^k m$ with $m$ odd. If $\ell(n)\ge 4$, then $m$ is an odd weird number. In particular, if no odd weird numbers exist, then every weird number satisfies $\ell(n)<4$.
+
+\noindent\textbf{Proof.}
+Assume $n$ is weird and $n=2^k m$ with $m$ odd.
+
+First, $\gcd(2^k,m)=1$, so the multiplicativity of $\ell$ on coprime inputs gives
+\[
+\ell(n)=\ell(2^k)\ell(m).
+\]
+By the explicit formula for $\ell(2^k)$, $\ell(2^k)<2$. If $\ell(n)\ge 4$, then
+\[
+\ell(m)=\frac{\ell(n)}{\ell(2^k)} > \frac{4}{2}=2,
+\]
+so $\sigma(m)>2m$ and $m$ is abundant.
+
+It remains to show that $m$ is not semiperfect. Suppose, for contradiction, that $m$ is semiperfect. Then there exist distinct proper divisors $d_1,\dots,d_t$ of $m$ such that
+\[
+m=d_1+\cdots+d_t.
+\]
+Multiplying by $2^k$ gives
+\[
+2^k m = 2^k d_1+\cdots+2^k d_t.
+\]
+Each $2^k d_i$ is a divisor of $n=2^k m$, and it is proper because $d_i<m$ implies $2^k d_i < 2^k m=n$. The terms are distinct because the $d_i$ are distinct. Hence this expresses $n$ as a sum of distinct proper divisors of $n$, i.e. shows $n$ is semiperfect.
+
+This contradicts that $n$ is weird. Therefore $m$ is not semiperfect. Since we already proved $m$ is abundant, $m$ is weird. Finally, $m$ is odd by construction.
+
+The last sentence follows immediately: if no odd weird numbers exist, then the conclusion "if $\ell(n)\ge 4$ then $m$ is an odd weird number" forces that no weird $n$ can have $\ell(n)\ge 4$.
+\hfill$\square$
+
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma (Odd weird divisor if $\ell(n)\ge 4$) uses only (a) multiplicativity of $\ell$ on coprime parts, (b) the exact inequality $\ell(2^k)<2$, and (c) the fact that semiperfectness of the odd part would imply semiperfectness of $2^k$ times the odd part by scaling the subset-sum.
+\item The semiperfect scaling step: if $m=\sum d_i$ with $d_i\mid m$ and $d_i<m$, then $2^k d_i \mid 2^k m$ and $2^k d_i <2^k m$; no hidden assumption is used.
+\item Computation: the DP bitset check is exact (no floating tolerance). The reported maximum $\ell(10430)=2160/1043$ was obtained by exact integer arithmetic ($\sigma(10430)=21600$).
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.} If a weird number $n$ satisfies $\ell(n)\ge 4$, then its odd part is an odd weird number (by the odd-weird-divisor lemma). Hence, assuming there are no odd weird numbers, every weird number has $\ell(n)<4$.
+\item[(ii)] \textbf{First gap.} Either construct a sequence of weird numbers with $\ell(n)\to\infty$ (to disprove existence of a universal $C$), or prove an absolute upper bound on $\ell(n)$ for weird numbers (which would imply a positive answer).
+\item[(iii)] \textbf{Top 3 next moves.}
+  \begin{enumerate}
+  \item Attempt to prove that for sufficiently large abundancy index, the set of proper divisors below (say) $\varepsilon n$ has total sum $>n$ and has enough granularity to realize $n$ via a subset-sum (a quantitative semiperfectness criterion).
+  \item Search computationally for weird numbers with unusually large abundancy index, focusing on numbers with many small prime factors but constrained subset-sum structure, and record the current computational maximum of $\ell(n)$.
+  \item Prove structural closure properties: e.g. characterize when multiplying a weird number by a prime power preserves weirdness and increases $\ell$; any such closure could generate large-index examples.
+  \end{enumerate}
+\item[(iv)] \textbf{Minimal counterexample structure (if the statement were false).} One would need a sequence of weird numbers $n_j$ with $\ell(n_j)\to\infty$. By the odd-weird-divisor lemma, unless odd weird numbers exist, such a sequence would be impossible once $\ell(n_j)\ge 4$; therefore any counterexample to a universal $C$ likely forces existence of odd weird numbers and then an infinite mechanism to boost $\ell$.
+\end{enumerate}
+
+

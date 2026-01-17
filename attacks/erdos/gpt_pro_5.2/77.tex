@@ -1,0 +1,163 @@
+% Solutions for Erd\H{o}s Problems #77, #78, #80, #81, #82
+% Generated from 77-82.tex, following PROMPT_STRATEGY.MD (sectioned format).
+% Integrity note: results not explicitly contained in the problem statements are proved here or flagged as assumptions.
+
+% Erdős Problem #77
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+Let $k\in\mathbb{N}$ with $k\ge 1$. Let $R(k)$ denote the diagonal Ramsey number for $K_k$, i.e.
+\[
+R(k)=\min\{n\in\mathbb{N}:\ \text{every red/blue colouring of }E(K_n)\text{ contains a monochromatic }K_k\}.
+\]
+Equivalently, $R(k)$ is the least $n$ such that every graph on $n$ vertices contains either a clique of size $k$ or an independent set of size $k$.
+
+The task is to determine the value of
+\[
+\lim_{k\to\infty} R(k)^{1/k},
+\]
+and in particular to prove that this limit exists (or to disprove existence by exhibiting nonconvergence).
+
+Edge cases/conventions: $K_n$ is the complete simple graph on $n$ vertices; colourings are arbitrary functions $E(K_n)\to\{\text{red},\text{blue}\}$. The expression $R(k)^{1/k}$ is well-defined for $R(k)\ge 1$.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+Web browsing is available, but per the integrity rule I will only use results explicitly stated in the problem text. The problem text records Erd\H{o}s' bounds
+\(\sqrt2\le \liminf_{k\to\infty}R(k)^{1/k}\le \limsup_{k\to\infty}R(k)^{1/k}\le 4\), and notes that the upper bound $4$ has been improved (with specific numerical values and references given there). I do not reproduce those improved bounds here.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof-track ideas (existence/value):}
+\begin{itemize}
+\item Try to show (approximate) submultiplicativity or subadditivity of $\log R(k)$ to apply Fekete-type arguments and deduce existence of $\lim \frac1k\log R(k)$, hence existence of $\lim R(k)^{1/k}$.
+\item Improve asymptotic upper/lower bounds to squeeze the limit.
+\end{itemize}
+\emph{Disproof-track ideas (nonexistence):}
+\begin{itemize}
+\item Seek plausible oscillations by comparing $R(k)$ along different subsequences, e.g. even/odd, or around extremal constructions.
+\end{itemize}
+
+In this write-up I only establish the classical bounds $\limsup\le 4$ and $\liminf\ge \sqrt2$ with full proofs, and verify tiny cases computationally.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\textbf{Fast reality check (tiny $k$).}
+A brute-force check over all $2$-colourings of $K_n$ for $n\le 6$ shows that $n=6$ is the least $n$ for which every colouring forces a monochromatic triangle, i.e. $R(3)=6$. Concretely, for $n=5$ the script found a colouring with red edges
+\[(0,3),(0,4),(1,2),(1,4),(2,3),\]
+which contains no monochromatic triangle, while for $n=6$ no such colouring exists.
+(Computation: exhaustive enumeration of all $2^{\binom{n}{2}}$ colourings for $n\le 6$.)
+
+\medskip
+\noindent\textbf{Lemma 77.1 (Binomial/$(4^{k})$ upper bound).}
+For all integers $s,t\ge 1$,
+\[
+R(s,t)\le \binom{s+t-2}{s-1},
+\]
+where $R(s,t)$ is the least $n$ such that every red/blue colouring of $E(K_n)$ contains a red $K_s$ or a blue $K_t$. In particular,
+\[
+R(k)=R(k,k)\le \binom{2k-2}{k-1}\le 4^{k-1}\qquad (k\ge 1).
+\]
+
+\emph{Proof.}
+We first prove the standard recursion
+\begin{equation}\label{eq:ramsey-rec}
+R(s,t)\le R(s-1,t)+R(s,t-1)\qquad (s,t\ge 2).
+\end{equation}
+Let $n:=R(s-1,t)+R(s,t-1)$. Consider any red/blue colouring of $E(K_n)$. Fix a vertex $v$. Let $A$ be the set of vertices joined to $v$ by a red edge, and $B$ those joined to $v$ by a blue edge. Then $|A|+|B|=n-1$.
+
+If $|A|\ge R(s-1,t)$, consider the induced complete graph on $A$ with the inherited colouring. By definition of $R(s-1,t)$, it contains either a red $K_{s-1}$ or a blue $K_t$. In the first case, adding $v$ gives a red $K_s$ (because all edges from $v$ to $A$ are red). In the second case we already have a blue $K_t$.
+
+If $|A|<R(s-1,t)$, then
+\[
+|B|=n-1-|A|\ge (R(s-1,t)+R(s,t-1))-1-(R(s-1,t)-1)=R(s,t-1).
+\]
+Apply the same argument on $B$: the colouring on $K_B$ contains either a red $K_s$ or a blue $K_{t-1}$; in the latter case, adding $v$ produces a blue $K_t$.
+
+Thus every colouring of $K_n$ contains a red $K_s$ or a blue $K_t$, proving \eqref{eq:ramsey-rec}.
+
+Now we prove by induction on $s+t$ that $R(s,t)\le \binom{s+t-2}{s-1}$ for all $s,t\ge 1$.
+Base cases: If $s=1$ or $t=1$ then $R(1,t)=R(s,1)=1$, while $\binom{s+t-2}{s-1}=\binom{t-1}{0}=1$ or $\binom{s-1}{s-1}=1$.
+
+Induction step: assume $s,t\ge 2$ and the claim holds for all pairs $(s',t')$ with $s'+t'<s+t$. Then by \eqref{eq:ramsey-rec} and the induction hypothesis,
+\[
+R(s,t)\le R(s-1,t)+R(s,t-1)\le \binom{s+t-3}{s-2}+\binom{s+t-3}{s-1}=\binom{s+t-2}{s-1},
+\]
+using Pascal's identity.
+
+Setting $s=t=k$ yields $R(k)\le \binom{2k-2}{k-1}$. Finally, since
+\[
+2^{2k-2}=(1+1)^{2k-2}=\sum_{i=0}^{2k-2}\binom{2k-2}{i}\ge \binom{2k-2}{k-1},
+\]
+we have $\binom{2k-2}{k-1}\le 2^{2k-2}=4^{k-1}$. \qed
+
+\medskip
+\noindent\textbf{Lemma 77.2 (Probabilistic lower bound giving $\liminf\ge\sqrt2$).}
+There exists $k_0\in\mathbb{N}$ (for instance $k_0=9$) such that for all $k\ge k_0$,
+\[
+R(k) > 2^{k/2}.
+\]
+Consequently $\liminf_{k\to\infty} R(k)^{1/k} \ge \sqrt2$.
+
+\emph{Proof.}
+Fix $k\ge 9$ and let $n:=\lfloor 2^{k/2}\rfloor$. Consider a random red/blue colouring of $E(K_n)$ in which each edge is coloured red with probability $1/2$ and blue with probability $1/2$, independently.
+
+For a fixed $k$-subset $S\subseteq [n]$, the induced $K_k$ on $S$ is monochromatic iff all $\binom{k}{2}$ edges are red or all are blue. Hence
+\[
+\mathbb{P}(\text{$S$ spans a monochromatic }K_k)=2\cdot 2^{-\binom{k}{2}}=2^{1-\binom{k}{2}}.
+\]
+Let $X$ be the number of monochromatic $K_k$ subgraphs. By linearity of expectation,
+\[
+\mathbb{E}X \le \binom{n}{k} \cdot 2^{1-\binom{k}{2}}.
+\]
+We use the standard bound $\binom{n}{k}\le (en/k)^k$ (which follows from $k!\ge (k/e)^k$). Thus
+\[
+\mathbb{E}X \le 2\Big(\frac{en}{k}\Big)^k 2^{-\binom{k}{2}}.
+\]
+Since $n\le 2^{k/2}$, we have
+\[
+\mathbb{E}X \le 2\Big(\frac{e 2^{k/2}}{k}\Big)^k 2^{-k(k-1)/2}
+=2\Big(\frac{e}{k}\Big)^k 2^{k/2}.
+\]
+For $k\ge 9$ we have $e/k\le 1/3$, so
+\[
+\mathbb{E}X \le 2\Big(\frac{1}{3}\Big)^k 2^{k/2} = 2\Big(\frac{\sqrt2}{3}\Big)^k.
+\]
+Now $\sqrt2/3<1$, and already for $k=3$ we have $2(\sqrt2/3)^3<1$; therefore for all $k\ge 9$ the right-hand side is $<1$. Hence $\mathbb{E}X<1$, which implies there exists at least one colouring with $X=0$, i.e. with no monochromatic $K_k$. This means $R(k)>n$. Since $R(k)$ is an integer, $R(k)\ge n+1>2^{k/2}$.
+
+Taking $k$-th roots and $\liminf$ gives $\liminf_{k\to\infty} R(k)^{1/k}\ge \sqrt2$. \qed
+
+\medskip
+\noindent\textbf{Consequence (proved bounds).}
+By Lemma 77.1, $\limsup_{k\to\infty}R(k)^{1/k}\le 4$. By Lemma 77.2, $\liminf_{k\to\infty}R(k)^{1/k}\ge \sqrt2$.
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Quantifiers: Lemma 77.1 holds for all $s,t\ge 1$; diagonal case yields all $k\ge 1$.
+\item Union-size bound in Lemma 77.2: the probability calculation uses only independence of edge colours; the binomial bound and $e/k\le 1/3$ for $k\ge 9$ are explicit.
+\item Small cases: computationally verified $R(3)=6$ by exhaustive enumeration; Lemma 77.2 does not claim anything for $k<9$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} $\sqrt2\le \liminf_{k\to\infty}R(k)^{1/k}$ (Lemma 77.2) and $\limsup_{k\to\infty}R(k)^{1/k}\le 4$ (Lemma 77.1). Also a brute-force computation confirms $R(3)=6$.
+
+(ii) \emph{First gap (crisp):} Prove that the limit $\lim_{k\to\infty}R(k)^{1/k}$ exists (equivalently, prove $\liminf=\limsup$), or produce a rigorous construction showing nonconvergence.
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Prove an inequality of the form $R(k+\ell)\le R(k)\,R(\ell)\,\poly(k,\ell)$ (or a comparable ``almost submultiplicativity'' for $\log R(k)$), then apply a Fekete-type lemma to deduce existence of $\lim \frac1k\log R(k)$.
+\item Prove a complementary ``almost supermultiplicativity'' lower bound along some structured subsequence to control oscillations.
+\item Computational/experimental: for small $k$ (e.g. $k\le 6$) compute best-known bounds on $R(k)$ and inspect $R(k)^{1/k}$ numerically to look for monotonicity or oscillation patterns; then try to reflect those patterns in theoretical inequalities.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure (if the limit fails):} there must exist two subsequences $k_i\to\infty$ and $\ell_i\to\infty$ with $\lim R(k_i)^{1/k_i}<\lim R(\ell_i)^{1/\ell_i}$, i.e. persistent exponential-rate oscillation. Any mechanism would likely require (a) different extremal constructions in different ranges of $k$, and (b) the absence of any near-submultiplicative control strong enough to force convergence.
+
+

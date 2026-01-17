@@ -1,0 +1,77 @@
+% Attempt for Erdos Problem #312
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used (tiny examples only)
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Does there exist an absolute constant $c>0$ such that for every real $K>1$ there exists an integer $N_0(K)$ with the following property?
+
+For every finite multiset $A$ of positive integers with $|A|\ge N_0(K)$ and
+\[\sum_{n\in A}\frac1n > K,\]
+there exists a (multi-)submultiset $S\subseteq A$ such that
+\[1-e^{-cK}<\sum_{n\in S}\frac1n\le 1.\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement says Erd\H{o}s and Graham had a version with $e^{-cK}$ replaced by $c/K^2$. I do not reprove that here.
+
+3) ATTACK PLAN
+Proof track:
+1. Identify easy “degenerate” mechanisms that force a subset sum exactly $1$ (which trivially satisfies the inequality).
+2. Prove a greedy approximation lemma: if all reciprocals are sufficiently small, one can approximate $1$ from below within the size of the largest reciprocal.
+3. Reduce the problem to showing that large total reciprocal mass forces either many repeats (giving exact $1$) or sufficiently small terms (giving a strong approximation).
+
+Disproof track:
+1. Try to build multisets with huge $\sum 1/n$ but with all subset sums that are $\le 1$ staying bounded away from $1$ (an “anti-approximation” construction).
+
+Chosen path: prove two clean structural lemmas and isolate the missing quantitative step.
+
+4) WORK
+Lemma 1 (Many repeats give an exact $1$).
+If a multiset $A$ contains at least $m$ copies of the integer $m$, then there is a submultiset $S\subseteq A$ with
+\[\sum_{n\in S}\frac1n=1.\]
+
+Proof.
+Choose $S$ to be exactly $m$ copies of $m$. Then $\sum_{n\in S}1/n = m\cdot (1/m)=1$. \qed
+
+Lemma 2 (Greedy approximation when all terms are small).
+Let $A$ be a finite multiset of positive integers and suppose every element $n\in A$ satisfies $1/n\le \varepsilon$.
+If $\sum_{n\in A}1/n>1$, then there exists a submultiset $S\subseteq A$ such that
+\[1-\varepsilon < \sum_{n\in S}\frac1n \le 1.\]
+
+Proof.
+Consider any ordering of the elements of $A$ and build $S$ greedily by scanning the list and including an element whenever it does not make the running sum exceed $1$.
+Let $s=\sum_{n\in S}1/n\le 1$ be the final sum and let $r=1-s$ be the remainder.
+Since the total sum of all elements exceeds $1$, not all elements were included (otherwise $s>1$), so there exists at least one unused element $n\in A\setminus S$.
+By maximality of the greedy construction, for every unused element we have $1/n>r$ (otherwise we could add it).
+In particular, since every $1/n\le \varepsilon$, we get $r<\varepsilon$, i.e. $s>1-\varepsilon$.
+Thus $S$ satisfies $1-\varepsilon < s\le 1$. \qed
+
+FAST REALITY CHECK (tiny examples).
+- If $A$ contains $2K+1$ copies of $2$, then $\sum_{n\in A}1/n=K+1/2>K$ and Lemma 1 gives a submultiset summing exactly to $1$ (two copies of $2$).
+- If $A$ is $1000$ copies of $100$, then $\sum 1/n=10>1$ and Lemma 2 with $\varepsilon=1/100$ gives a subset sum in $(0.99,1]$; indeed choosing exactly $100$ copies sums to $1$.
+
+5) VERIFICATION
+- Lemma 1 is immediate and uses the multiset (repetitions) aspect crucially.
+- Lemma 2 is a standard maximality argument for greedy packing and gives an explicit approximation quality equal to the largest term size.
+- Neither lemma connects $\varepsilon$ quantitatively to $K$ without additional information about the distribution of denominators in $A$; that is exactly the hard step toward $e^{-cK}$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+If $A$ has many repeats of some value, one can force a subset sum exactly $1$ (Lemma 1). More generally, if all reciprocals are $\le\varepsilon$ and the total sum is $>1$, one can force a subset sum in $(1-\varepsilon,1]$ (Lemma 2).
+
+(ii) First gap:
+From the sole assumptions “$|A|$ sufficiently large” and $\sum_{n\in A}1/n>K$, deduce the existence of a subset sum within $e^{-cK}$ of $1$ from below for some absolute $c>0$ (i.e. force $\varepsilon \le e^{-cK}$ in Lemma 2 or an equivalent mechanism).
+
+(iii) Top 3 next moves:
+1. Prove a dichotomy: either $A$ has many repeats (trigger Lemma 1) or $A$ has a large submultiset with all terms $\le e^{-cK}$ (trigger Lemma 2).
+2. Attempt a probabilistic subset selection argument (choosing each element with some probability) to show concentration of achievable subset sums near $1$ when the total mass is $K$.
+3. Search computationally for adversarial constructions maximizing the “gap below 1” among achievable subset sums, to guess the right dependence on $K$.
+
+(iv) Minimal counterexample structure (if the statement were false):
+For every $c>0$ there would exist $K$ and arbitrarily large multisets $A$ with total reciprocal sum $>K$ such that every subset sum $\le 1$ is at most $1-e^{-cK}$, meaning the subset-sum set has a macroscopic forbidden interval just below $1$ despite very large total mass.
+

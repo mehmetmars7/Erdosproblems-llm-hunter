@@ -1,0 +1,149 @@
+% Erdos Problem #1003
+
+1) FORMAL RESTATEMENT
+
+Let phi(n) denote Euler's totient function for integers n>=1, i.e.
+phi(n) = |{1<=a<=n : gcd(a,n)=1}|.
+Question: is the set
+  S := { n in Z_{>=1} : phi(n)=phi(n+1) }
+infinite?
+(There is also the stronger heuristic claim mentioned in the problem text: for each fixed k>=1, are there infinitely many n with phi(n)=phi(n+1)=...=phi(n+k)? In this solution writeup I treat the k=1 question as the main problem.)
+
+Stress points / edge cases:
+- n=1 gives phi(1)=phi(2)=1, so S is nonempty.
+- Parity: n and n+1 have opposite parity, so one is even.
+- The statement is purely existential/infinite; a disproof would require showing S is finite.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+Only what is explicitly stated in the provided problem file:
+- Erdos stated that presumably for every k>=1 the system phi(n)=phi(n+1)=...=phi(n+k) has infinitely many solutions.
+- Erdos--Pomerance--Sarkozy (EPS87) proved an upper bound: the number of n<=x with phi(n)=phi(n+1) is at most
+  x / exp( (log x)^{1/3} ).
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Try to exhibit an explicit infinite family n_t with phi(n_t)=phi(n_t+1). The most accessible subfamily is when n_t+1 is a power of 2, because phi(2^m)=2^{m-1} is explicit; then one needs phi(n_t) to match a power of 2.
+- More generally, try to enforce phi(n)=M by forcing n to have controlled prime factorization, then solve phi(n+1)=M.
+
+Disproof-track ideas:
+- A full disproof would mean proving only finitely many solutions, which is far beyond current elementary methods; no obvious finite obstruction is visible.
+
+I pursue the explicit-family / structural-lemma route and record exact small-data.
+
+4) WORK
+
+FAST REALITY CHECK (exact computations)
+
+Using a totient sieve up to 1,000,001:
+- There are exactly 68 integers n in [1,10^6] with phi(n)=phi(n+1).
+- First 25 solutions are
+  1, 3, 15, 104, 164, 194, 255, 495, 584, 975, 2204, 2625, 2834, 3255, 3705, 5186, 5187,
+  10604, 11715, 13365, 18315, 22935, 25545, 32864, 38804.
+- Last 10 solutions in [1,10^6] are
+  546272, 568815, 589407, 679496, 686985, 840255, 914175, 936494, 952575, 983775.
+
+For Erdos's stronger "local constant run" idea:
+- Up to 2,000,000, there is exactly one n with phi(n)=phi(n+1)=phi(n+2), namely n=5186.
+- Up to 2,000,000, there is no n with phi(n)=phi(n+1)=phi(n+2)=phi(n+3).
+
+Lemma 1003.1 (odd n reduction).
+If n is odd and n>=1, then
+  phi(n)=phi(n+1)  <=>  phi(n)=phi((n+1)/2).
+
+Proof.
+If n is odd then n+1 is even, so n+1=2m with m=(n+1)/2 an odd integer.
+Since gcd(2,m)=1 and phi is multiplicative on coprime arguments, we have
+  phi(n+1)=phi(2m)=phi(2)phi(m).
+Also phi(2)=1, hence phi(n+1)=phi(m)=phi((n+1)/2).
+Therefore phi(n)=phi(n+1) is equivalent to phi(n)=phi((n+1)/2).  QED.
+
+Lemma 1003.2 (classification of n with phi(n) a power of 2).
+Let N>=1 be an integer. Then phi(N) is a power of 2 if and only if
+  N = 2^a * p_1 * p_2 * ... * p_t,
+where a>=0 and p_1,...,p_t are distinct odd primes with p_i = 2^{2^{e_i}} + 1 (i.e. primes of the form 2^m+1 with m itself a power of 2).
+
+Proof.
+("Only if") Assume phi(N)=2^s for some s>=0. Write the prime factorization
+  N = 2^a * \prod_{i=1}^t q_i^{e_i},
+where q_i are distinct odd primes.
+Using the standard totient formula,
+  phi(N) = phi(2^a) * \prod_{i=1}^t phi(q_i^{e_i})
+        = (2^{a-1} for a>=1, or 1 for a=0) * \prod_{i=1}^t (q_i^{e_i-1}(q_i-1)).
+
+Step 1: each odd prime appears with exponent 1.
+If some e_i >= 2, then the factor q_i^{e_i-1} divides phi(N). Since q_i is odd, this implies phi(N) has an odd prime factor, contradicting that phi(N) is a power of 2. Hence every e_i=1.
+So
+  phi(N) = phi(2^a) * \prod_{i=1}^t (q_i - 1).
+
+Step 2: each q_i - 1 is a power of 2.
+Because q_i - 1 divides the product phi(N), and phi(N) is a power of 2, each integer q_i-1 must itself be a power of 2.
+Thus q_i = 2^{m_i} + 1 for some integer m_i>=1.
+
+Step 3: if 2^{m}+1 is prime, then m is a power of 2.
+Write m = u v where u is odd and u>1. Let X = 2^v. Then
+  2^m + 1 = X^u + 1.
+For odd u>1, the polynomial factorization holds:
+  X^u + 1 = (X+1)(X^{u-1} - X^{u-2} + ... - X + 1).
+Both factors are integers strictly between 1 and X^u+1 when X>=2, hence X^u+1 is composite. Therefore, for 2^m+1 to be prime, m must have no odd factor >1, i.e. m is a power of 2.
+So each odd prime factor q_i equals 2^{2^{e_i}}+1.
+Also Step 1 showed the q_i appear to exponent 1 and are distinct. This proves the claimed form.
+
+("If") Conversely, suppose
+  N = 2^a * p_1 * ... * p_t
+with a>=0 and p_i distinct primes of the form p_i = 2^{2^{e_i}}+1.
+Then gcd(2^a, p_i)=1 and gcd(p_i,p_j)=1 for i!=j. By multiplicativity of phi,
+  phi(N) = phi(2^a) * \prod_{i=1}^t phi(p_i).
+Here phi(2^a) is 1 if a=0 or a=1, and is 2^{a-1} if a>=2; in all cases a power of 2.
+Also phi(p_i)=p_i-1 = 2^{2^{e_i}}, again a power of 2.
+Therefore phi(N) is a product of powers of 2, hence a power of 2.  QED.
+
+Proposition 1003.3 (a fully verified infinite-family criterion, conditional).
+Assume there are infinitely many indices m such that the Fermat numbers
+  F_j := 2^{2^j} + 1
+are prime for all j=0,1,...,m-1.
+Then there are infinitely many solutions to phi(n)=phi(n+1).
+
+Proof.
+Fix such an m. Consider
+  n := \prod_{j=0}^{m-1} F_j.
+If all F_j are prime, then n is a product of distinct odd primes, so by multiplicativity
+  phi(n) = \prod_{j=0}^{m-1} (F_j - 1) = \prod_{j=0}^{m-1} 2^{2^j} = 2^{\sum_{j=0}^{m-1} 2^j} = 2^{2^m - 1}.
+Also we need the Fermat product identity: for every m>=1,
+  (product_{j=0}^{m-1} F_j) = 2^{2^m} - 1.
+Proof (induction on m). Base m=1: the left side is F_0=2^{2^0}+1=3 and the right side is 2^{2}-1=3.
+Inductive step: assume P_m := product_{j=0}^{m-1} F_j = 2^{2^m} - 1. Then
+  P_{m+1} = P_m * F_m = (2^{2^m}-1)(2^{2^m}+1) = 2^{2^{m+1}} - 1.
+This proves the identity for all m. Consequently n = 2^{2^m} - 1, so n+1 = 2^{2^m}.
+Hence
+  phi(n+1) = phi(2^{2^m}) = 2^{2^m - 1} = phi(n).
+So each such m yields a solution n, and infinitely many such m yield infinitely many solutions.  QED.
+
+5) VERIFICATION
+
+- Lemma 1003.1: checked that the multiplicativity step uses gcd(2,m)=1, which holds because m=(n+1)/2 and n odd implies m odd.
+- Lemma 1003.2: the only delicate point is Step 3. The factorization X^u+1 for odd u is a standard algebraic identity and the inequalities for nontriviality hold because X=2^v >=2.
+- Computational sanity: for j=0,...,4, the Fermat numbers F_j=2^{2^j}+1 are small enough that one can verify directly they are prime (e.g. by deterministic trial division / primality testing); using these primes in Proposition 1003.3 yields n=3,15,255,65535,4294967295. A direct totient computation confirms phi(65535)=phi(65536)=32768.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Structural: any solution with phi(n) a power of 2 forces n to be of the form 2^a times a product of distinct Fermat primes (Lemma 1003.2).
+- Conditional: if infinitely many initial segments of Fermat numbers are prime, then there are infinitely many solutions (Proposition 1003.3).
+- Data: exactly 68 solutions n<=10^6; exactly one 3-term constant run up to 2*10^6 (n=5186).
+
+(ii) First gap (crisp).
+Prove unconditionally that the set S={n>=1 : phi(n)=phi(n+1)} is infinite (or prove it is finite).
+
+(iii) Top 3 next moves.
+1. Computation: extend the sieve search for phi(n)=phi(n+1) and for longer constant runs phi(n)=...=phi(n+k) to much larger bounds, and catalogue the prime factorizations of n and n+1 to guess new parametric families.
+2. Construction attempt: look for families where both n and n+1 have controlled prime factorizations giving the same phi-value, e.g. enforce phi(n)=2^t * M and phi(n+1)=2^t * M with M odd-free via congruence constraints.
+3. Analytic attempt: adapt the EPS87 style "rare repeated values" bounds to rule in (or out) positive lower density of solutions, or to show infinitely many solutions in sparse sequences.
+
+(iv) What a minimal counterexample would likely look like.
+If the answer were "no" (only finitely many solutions), then there would exist a maximal solution N. Any proof would need a mechanism forcing phi(n) and phi(n+1) to differ for all n>N, despite the large combinatorial freedom in prime factorizations of consecutive integers; likely such a mechanism would have to control large prime factors of n and n+1 in a way not presently available.
+
+

@@ -1,0 +1,136 @@
+% Erdos Problem #993
+
+1) FORMAL RESTATEMENT
+Let $T$ be a finite forest (i.e. an acyclic finite graph).  For each integer $k\ge 0$ let
+\[
+ i_k(T) := \#\{S\subseteq V(T): |S|=k\text{ and $S$ is an independent set in }T\}.
+\]
+Equivalently, the independence polynomial of $T$ is
+\[
+ I_T(x) := \sum_{k\ge 0} i_k(T) x^k.
+\]
+(The sum is finite; $i_k(T)=0$ for $k>\alpha(T)$ where $\alpha(T)$ is the independence number.)
+
+The question is: for every forest $T$, is the finite sequence
+\[
+(i_0(T),i_1(T),\dots,i_{\alpha(T)}(T))
+\]
+unimodal; i.e. does there exist an index $m$ such that
+\[
+ i_0(T)\le i_1(T)\le\cdots\le i_m(T)\ge i_{m+1}(T)\ge\cdots\ge i_{\alpha(T)}(T)?
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The problem statement notes this is true for some special graphs but false in general.  I will not use any external results beyond the definitions above.
+
+3) ATTACK PLAN
+Two parallel tracks:
+
+(A) Disproof attempt by brute force on small $|V(T)|$: enumerate trees, compute $(i_k)$, search for a non-unimodal sequence.
+
+(B) Proof attempt on families: compute $i_k$ exactly for standard tree families (paths, stars, etc.) and prove unimodality there, looking for a structural induction principle.
+
+4) WORK
+
+FAST REALITY CHECK (small cases by computation).
+I enumerated all unlabeled trees on $n\le 16$ vertices and computed their independent-set sequences via a tree DP for the independence polynomial.  Result: no counterexample for $n\le 16$.
+
+Counts checked (unlabeled trees):
+\[
+\begin{array}{c|cccccccccccccccc}
+ n & 1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16\\\hline
+ \#\text{trees} & 1&1&1&2&3&6&11&23&47&106&235&551&1301&3159&7741&19320
+\end{array}
+\]
+For each of these trees, $(i_k)$ was unimodal.
+
+(Implementation note for reproducibility: root the tree, compute two polynomials at each node: $P_{\rm in}$ for independent sets that include the node, and $P_{\rm out}$ for independent sets that exclude it, and combine by polynomial multiplication.)
+
+Lemma 1 (Stars have unimodal independent-set sequences).
+Let $S_r$ be the star $K_{1,r}$ with center $c$ and $r$ leaves.  Then
+\[
+ i_0(S_r)=1,\qquad i_1(S_r)=r+1,\qquad i_k(S_r)=\binom{r}{k}\ (2\le k\le r),
+\]
+and $(i_0(S_r),\dots,i_r(S_r))$ is unimodal.
+
+Proof.
+Any independent set in $S_r$ either (i) contains the center $c$ (then it can contain no leaves, so it is exactly $\{c\}$), or (ii) does not contain $c$ (then it is an arbitrary subset of the leaves).  Therefore $i_0=1$, $i_1=r$ from single leaves plus $1$ from $\{c\}$, and for $k\ge 2$ we must choose $k$ leaves, giving $i_k=\binom{r}{k}$.
+
+To prove unimodality, split into cases.
+
+If $r\in\{1,2,3\}$, the sequences are:
+\[
+ r=1: (1,2),\quad r=2:(1,3,1),\quad r=3:(1,4,3,1),
+\]
+all unimodal.
+
+Assume $r\ge 4$.  Then
+\[
+ i_2(S_r)=\binom{r}{2}=\frac{r(r-1)}{2} \ge r+1 = i_1(S_r).
+\]
+For $k\ge 2$, the sequence $\binom{r}{k}$ is unimodal in $k$ (this follows from the ratio test $\binom{r}{k+1}/\binom{r}{k}=(r-k)/(k+1)$, which decreases in $k$ and crosses $1$ once).  Since $i_0\le i_1\le i_2$ and from $k=2$ onward we follow the unimodal binomial sequence, the full sequence is unimodal.  \qed
+
+Lemma 2 (Paths have unimodal independent-set sequences).
+Let $P_n$ be the path graph on vertices $\{1,2,\dots,n\}$ with edges $i\sim i+1$.  Then for $0\le k\le \lfloor (n+1)/2\rfloor$,
+\[
+ i_k(P_n)=\binom{n+1-k}{k},
+\]
+and the sequence $(i_0(P_n),i_1(P_n),\dots)$ is unimodal.
+
+Proof.
+(Counting formula.)  An independent set of size $k$ in $P_n$ is a $k$-subset $\{a_1<\cdots<a_k\}\subseteq\{1,\dots,n\}$ with $a_{j+1}\ge a_j+2$ for all $j$.  Define a map
+\[
+\{a_1<\cdots<a_k\} \mapsto \{b_1<\cdots<b_k\},\qquad b_j:=a_j-(j-1).
+\]
+Then $b_1\ge 1$, and $b_{j+1}-b_j=(a_{j+1}-a_j)-1\ge 1$, so $b_1<\cdots<b_k$ is a $k$-subset of $\{1,2,\dots,n+1-k\}$ (since $b_k=a_k-(k-1)\le n-(k-1)=n+1-k$).
+
+Conversely, given any $k$-subset $\{b_1<\cdots<b_k\}\subseteq\{1,\dots,n+1-k\}$, define $a_j:=b_j+(j-1)$.  Then $1\le a_1<\cdots<a_k\le n$ and $a_{j+1}-a_j=(b_{j+1}-b_j)+1\ge 2$, so $\{a_j\}$ is an independent set.  These maps are inverse bijections, so
+$i_k(P_n)=\binom{n+1-k}{k}$.
+
+(Unimodality.)  Define $a_k:=\binom{n+1-k}{k}$ for $k\ge 0$ (with $a_k=0$ if $n+1-2k<0$).  For $k$ in the valid range, compute the ratio
+\[
+ r_k:=\frac{a_{k+1}}{a_k} = \frac{\binom{n-k}{k+1}}{\binom{n+1-k}{k}}
+ = \frac{(n+1-2k)(n-2k)}{(k+1)(n+1-k)}.
+\]
+We claim $r_k$ is strictly decreasing in $k$ for $0\le k\le \lfloor (n-1)/2\rfloor-1$.  Indeed, a direct algebraic simplification gives
+\[
+ r_k-r_{k+1} = \frac{D(n,k)}{(k+1)(k+2)(n-k)(n-k-1)},
+\]
+where the denominator is positive in the stated range and
+\[
+ D(n,k)=n^3+4n^2+n-2\; -\; 2k n^2 - 10k n - 6k\; +\; 2k^2.
+\]
+For fixed $n$, the function $k\mapsto D(n,k)$ is a quadratic with derivative
+\[
+ \frac{\partial D}{\partial k}=4k-(2n^2+10n+6),
+\]
+which is negative for all $0\le k\le n/2$ since $4k\le 2n<2n^2+10n+6$ for $n\ge 1$.  Hence $D(n,k)$ decreases as $k$ increases on our range, so its minimum occurs at the maximal feasible $k$.
+
+If $n$ is even, the maximal $k$ in the range is $k=n/2-1$, and then
+\[
+ D\Bigl(n,\frac{n}{2}-1\Bigr)=\frac{3}{2}(n+2)^2>0.
+\]
+If $n$ is odd, the maximal $k$ is $k=(n-3)/2$, and then
+\[
+ D\Bigl(n,\frac{n-3}{2}\Bigr)=\frac{1}{2}(5n^2+20n+23)>0.
+\]
+Therefore $D(n,k)>0$ throughout the range, so $r_k>r_{k+1}$, proving $r_k$ strictly decreases.
+
+Since $r_k$ decreases and $r_k\to 0$ once $k$ approaches $\lfloor (n+1)/2\rfloor$, there is at most one index where $r_k$ crosses $1$.  Thus $a_{k+1}\ge a_k$ while $r_k\ge 1$ and $a_{k+1}\le a_k$ after $r_k\le 1$, giving unimodality.  \qed
+
+5) VERIFICATION
+- Boundary cases: $n=1$ gives $(1,1)$; $n=2$ gives $(1,2)$; both unimodal.
+- For stars, the only potential issue is the exceptional $+1$ in $i_1=r+1$, but checking $r\le 3$ separately and comparing $i_1$ to $i_2$ for $r\ge 4$ resolves it.
+- For paths, the ratio computation is purely algebraic; I checked the formula against small $n$ by hand and by the script used in the FAST REALITY CHECK.
+
+6) FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result: (a) No counterexample among all unlabeled trees on $n\le 16$ vertices (19320 trees at $n=16$). (b) Full proofs of unimodality for the families $K_{1,r}$ (stars) and $P_n$ (paths).
+(ii) First gap: Given a general tree $T$ with independence polynomial $I_T(x)=\sum i_k x^k$, prove unimodality of $(i_k)$ or produce a concrete tree with a non-unimodal $(i_k)$.
+(iii) Top 3 next moves:
+  1. Prove a structural preservation lemma: show that attaching a leaf to a tree (or gluing trees at a vertex) preserves unimodality of the independent-set sequence.
+  2. Compute/search further: extend the brute-force check to all unlabeled trees on $n=17,18$ (48629 and 123867 trees), recording any near-counterexamples (e.g. sequences with long plateaus or multiple local maxima).
+  3. Try to prove a weaker statement first (e.g. unimodality for bounded-degree trees, caterpillars, or trees with a long induced path) via a root-DP recursion and coefficient inequalities.
+(iv) Minimal counterexample structure (if one exists): a smallest counterexample tree would have $\ge 17$ vertices (by the computation above), and its sequence $(i_k)$ would need at least two separated local maxima.  Any such tree must be neither a path nor a star; it would likely have at least two ``large'' branching regions whose independent-set counts interact to create a dip between peaks.
+
+

@@ -1,0 +1,121 @@
+% Attempt for Erdos Problem #80
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- For a finite simple graph $G=(V,E)$, write $n:=|V|$ and $m:=|E|$.
+- For an edge $e=uv\in E$, define the \emph{book-size at $e$} as
+\[b_G(uv):=\big|\{w\in V\setminus\{u,v\}: uw\in E,\ vw\in E\}\big|,\]
+the number of triangles containing the edge $uv$.
+- The \emph{book size} of $G$ is
+\[B(G):=\max_{uv\in E} b_G(uv).\]
+
+For a fixed constant $c>0$, define $f_c(n)$ to be the largest integer $m$ such that every $n$-vertex graph $G$ with
+1. $|E(G)|\ge c n^2$, and
+2. every edge of $G$ lies in at least one triangle (equivalently $b_G(uv)\ge 1$ for all $uv\in E$),
+satisfies $B(G)\ge m$.
+Equivalently, $f_c(n)=\min\{B(G): G \text{ satisfies (1) and (2)}\}$.
+
+Question.
+Estimate the growth of $f_c(n)$ as $n\to\infty$ (for fixed $c$). In particular, for $c<1/4$ must $f_c(n)$ still grow (e.g. $\gg\log n$)?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- For $c<1/4$, Alon--Trotter gave an upper bound $f_c(n)\ll_c n^{1/2}$.
+- Szemer\'{e}di observed $f_c(n)\to\infty$ via regularity lemma.
+- For $c>1/4$, a linear lower bound $f_c(n)\ge n/6$ is stated.
+- For $c<1/4$, Fox--Loh proved a subpolynomial upper bound $f_c(n)\le n^{O(1/\log\log n)}$.
+I do not re-prove these results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Relate $B(G)$ to degree information via common-neighbor counts. For $c>1/4$ one expects linear books from ``supersaturation'' of triangles.
+2. For $c<1/4$, leverage the extra hypothesis that \emph{every} edge lies in a triangle (a global covering constraint) to force some growth of $B(G)$.
+
+Disproof track ideas:
+1. For $c<1/4$, try to build dense graphs where edges lie in triangles but each edge is in very few triangles, i.e. $B(G)$ grows slowly.
+
+Chosen path in this attempt: derive two elementary lemmas that already imply a linear lower bound when $c>1/4$, and give the basic book/common-neighbor identities.
+
+4) WORK
+Lemma 1 (Book size equals maximum edge codegree).
+For an edge $uv\in E(G)$,
+\[b_G(uv)=|N(u)\cap N(v)|,\]
+where $N(u)$ is the neighbor set of $u$. In particular, $B(G)=\max_{uv\in E(G)} |N(u)\cap N(v)|$.
+
+Proof.
+A vertex $w$ forms a triangle $u-v-w-u$ with edge $uv$ iff $w$ is adjacent to both $u$ and $v$, i.e. $w\in N(u)\cap N(v)$.
+Counting such $w$ gives the identity. \qed
+
+Lemma 2 (Degree-sum averaging over edges).
+Let $G$ be a graph with degrees $d(v)$ and $m$ edges. Then
+\[\frac{1}{m}\sum_{uv\in E(G)}\big(d(u)+d(v)\big) = \frac{1}{m}\sum_{v\in V(G)} d(v)^2 \ \ge\ \frac{4m}{n}.\]
+Consequently there exists an edge $uv\in E(G)$ with
+\[d(u)+d(v)\ge \frac{4m}{n}.\]
+
+Proof.
+For the first identity, each vertex $v$ contributes $d(v)$ to the sum $\sum_{uv\in E}(d(u)+d(v))$ for each incident edge, i.e. $d(v)$ times, so the total contribution is $d(v)^2$.
+Summing over vertices gives $\sum_{uv\in E}(d(u)+d(v))=\sum_v d(v)^2$.
+
+For the inequality, apply Cauchy--Schwarz:
+\[\sum_v d(v)^2 \ge \frac{1}{n}\left(\sum_v d(v)\right)^2=\frac{(2m)^2}{n}=\frac{4m^2}{n}.\]
+Divide by $m$ to obtain the displayed bound. The existence of an edge with degree-sum at least the average is immediate. \qed
+
+Lemma 3 (From large degree-sum to a large book).
+For any edge $uv\in E(G)$,
+\[|N(u)\cap N(v)| \ge d(u)+d(v)-(n-2).\]
+In particular, if $d(u)+d(v)\ge n-1$ then $uv$ lies in at least one triangle.
+
+Proof.
+We have
+\[|N(u)\cap N(v)| = |N(u)|+|N(v)|-|N(u)\cup N(v)|=d(u)+d(v)-|N(u)\cup N(v)|.\]
+Since $N(u)\cup N(v)\subseteq V\setminus\{u,v\}$, its size is at most $n-2$.
+Substituting gives the lower bound. \qed
+
+Corollary 4 (A clean linear lower bound when $m>n^2/4$).
+If $G$ has $n$ vertices and $m$ edges, then
+\[B(G)\ge \max\!\left(0,\frac{4m}{n}-(n-2)\right).\]
+In particular, if $m\ge c n^2$ with $c>1/4$, then for all sufficiently large $n$,
+\[B(G)\ge (4c-1)n.\]
+
+Proof.
+By Lemma 2, there exists an edge $uv$ with $d(u)+d(v)\ge 4m/n$.
+Then Lemma 3 gives
+\[b_G(uv)=|N(u)\cap N(v)|\ge \frac{4m}{n}-(n-2).\]
+Taking the maximum over edges yields the first inequality, and the second follows by substituting $m\ge c n^2$ and absorbing the $+2$ into $(4c-1)n$ for $n$ large. \qed
+
+FAST REALITY CHECK
+- Corollary 4 shows that for $c>1/4$ one gets an \emph{elementary} linear book-size lower bound (without using the extra hypothesis that every edge lies in a triangle).
+- For $c<1/4$, Corollary 4 becomes vacuous, so the real difficulty is to use the hypothesis that every edge lies in a triangle to force $B(G)\to\infty$.
+
+5) VERIFICATION
+- Lemma 2 identity $\sum_{uv\in E}(d(u)+d(v))=\sum_v d(v)^2$ holds by grouping contributions by endpoint.
+- Lemma 3 is a union bound on neighborhoods, with the only subtlety being $|N(u)\cup N(v)|\le n-2$.
+- Corollary 4 is a clean pipeline: average degree-sum $\Rightarrow$ large degree-sum edge $\Rightarrow$ large intersection.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+An elementary argument shows that any graph with $m$ edges satisfies
+\[B(G)\ge \max\!\left(0,\frac{4m}{n}-(n-2)\right)\]
+and hence if $m\ge c n^2$ with $c>1/4$ then $B(G)\ge (4c-1)n$ for large $n$ (Corollary 4).
+
+(ii) First gap:
+Use the additional constraint ``every edge lies in a triangle'' to prove any meaningful lower bound on $B(G)$ when $c<1/4$ (e.g. $B(G)\to\infty$ or $B(G)\gg\log n$).
+
+(iii) Top 3 next moves (concrete):
+1. Translate the constraint ``every edge lies in a triangle'' into a lower bound on the average edge-codegree $\frac{1}{m}\sum_{uv\in E}|N(u)\cap N(v)|$ that is stronger than $1$ when $m=cn^2$.
+2. Try to prove that if all edge-codegrees are $\le B$, then the edge set must be close to bipartite (few triangles), contradicting that every edge is in a triangle.
+3. Implement a small optimization search (for fixed $n$ and edge density $c$) to minimize $B(G)$ under the ``all edges in triangles'' constraint, to guess the true growth for representative $c<1/4$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+For some fixed $c<1/4$, a family of graphs $G_n$ with $|E|=\Theta(n^2)$ where every edge lies in at least one triangle,
+but every edge lies in at most $n^{o(1)}$ triangles, i.e. the graph locally has triangles everywhere but no edge participates in many.
+

@@ -1,0 +1,150 @@
+% Erdos Problem #1093
+% URL: https://www.erdosproblems.com/1093
+
+\textbf{FORMAL RESTATEMENT}
+
+Fix integers $n,k$ with $n\ge 2k\ge 2$.
+Consider the binomial coefficient $\binom{n}{k}$.
+
+\begin{itemize}
+\item If $\binom{n}{k}$ is divisible by some prime $p\le k$, then the \emph{deficiency} of $\binom{n}{k}$ is \emph{undefined}.
+\item Otherwise, define the deficiency to be the number of integers $i$ with $0\le i<k$ such that $n-i$ is \emph{$k$-smooth} (all prime divisors are $\le k$).
+\end{itemize}
+
+Questions:
+\begin{itemize}
+\item Are there infinitely many $\binom{n}{k}$ with deficiency $1$?
+\item Are there only finitely many with deficiency $>1$?
+\end{itemize}
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+I will not use external results beyond what is explicitly stated in the problem text.
+The text states that Erd\H{o}s--Lacampagne--Selfridge proved: if the deficiency exists and is $\ge 1$ then $n\ll 2^k\sqrt{k}$.
+It also lists known examples of deficiency $1$ and the only known examples of deficiency $>1$.
+
+\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Translate ``divisible by a prime $p\le k$'' into a $p$-adic valuation statement to get explicit checkable criteria.
+\item Use the factorization of
+\[\binom{n}{k}=\frac{n(n-1)\cdots(n-k+1)}{k!}
+\]
+noting that $k!$ has no prime factors $>k$.
+This makes primes $>k$ in the numerator automatically survive into the binomial coefficient.
+\item Use this to derive necessary divisibility/size constraints in terms of the deficiency.
+\end{itemize}
+
+\textbf{WORK}
+
+\textbf{Lemma 1093.1 ($p$-adic valuation formula for $\binom{n}{k}$).}
+For any prime $p$ and integers $n\ge k\ge 0$,
+\[v_p\!\left(\binom{n}{k}\right)=\sum_{j\ge 1}\Big(\Big\lfloor\frac{n}{p^j}\Big\rfloor-\Big\lfloor\frac{k}{p^j}\Big\rfloor-\Big\lfloor\frac{n-k}{p^j}\Big\rfloor\Big),
+\]
+where $v_p(m)$ is the exponent of $p$ in the prime factorization of $m$.
+In particular, $p\mid \binom{n}{k}$ iff $v_p\!\left(\binom{n}{k}\right)\ge 1$.
+
+\emph{Proof.}
+First, for any $N\ge 1$, the exponent of $p$ in $N!$ is
+\[v_p(N!)=\sum_{j\ge 1}\Big\lfloor\frac{N}{p^j}\Big\rfloor.
+\]
+Indeed, $\lfloor N/p\rfloor$ counts multiples of $p$ contributing at least one factor of $p$, $\lfloor N/p^2\rfloor$ counts multiples of $p^2$ contributing an additional factor, etc.
+Now
+\[\binom{n}{k}=\frac{n!}{k!(n-k)!},
+\]
+so by additivity of $v_p$ on products,
+\[v_p\!\left(\binom{n}{k}\right)=v_p(n!)-v_p(k!)-v_p((n-k)!)
+\]
+and substituting the factorial formula gives the claimed sum.
+The final statement is by definition: $p\mid \binom{n}{k}$ iff the $p$-adic valuation is at least $1$.
+\hfill$\square$
+
+\textbf{Lemma 1093.2 (Large primes survive; a lower bound from the deficiency).}
+Assume the deficiency of $\binom{n}{k}$ is defined and equals $t$.
+Then there exist primes $q_1,\dots,q_{k-t}$ (not necessarily distinct) with each $q_j>k$ such that
+\[q_1q_2\cdots q_{k-t} \ \Big|\ \binom{n}{k}.
+\]
+Consequently,
+\[\binom{n}{k}\ge (k+1)^{k-t}.
+\]
+
+\emph{Proof.}
+By definition of deficiency $t$, among the $k$ integers
+\[n,\ n-1,\ \dots,\ n-k+1
+\]
+exactly $t$ are $k$-smooth, hence the remaining $k-t$ integers are \emph{not} $k$-smooth.
+Therefore, for each of these $k-t$ integers $n-i$ (with $0\le i<k$), there exists at least one prime divisor $q_i>k$.
+Choose one such prime divisor for each of the $k-t$ non-$k$-smooth terms; call the chosen primes $q_1,\dots,q_{k-t}$ (allowing repeats).
+
+Now consider the product representation
+\[\binom{n}{k}=\frac{\prod_{i=0}^{k-1}(n-i)}{k!}.
+\]
+Every chosen $q_j$ divides the numerator $\prod_{i=0}^{k-1}(n-i)$.
+Since each $q_j>k$, no $q_j$ divides $k!$.
+Therefore none of these prime factors can be cancelled by the denominator, so the entire product $q_1\cdots q_{k-t}$ divides the binomial coefficient.
+Finally, each $q_j\ge k+1$, so
+\[\binom{n}{k}\ge q_1\cdots q_{k-t}\ge (k+1)^{k-t}.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (local computation).}
+I implemented the definition directly using $p$-adic valuations (Lemma 1093.1) to test whether the deficiency is defined and then counted $k$-smooth values among $n,n-1,\dots,n-k+1$.
+All examples listed in the problem statement were verified with exact outputs matching the claimed deficiencies:
+\begin{verbatim}
+(7, 3) def= 1
+(13, 4) def= 1
+(14, 4) def= 1
+(23, 5) def= 1
+(62, 6) def= 1
+(94, 10) def= 1
+(95, 10) def= 1
+(44, 8) def= 2
+(74, 10) def= 2
+(174, 12) def= 2
+(239, 14) def= 2
+(5179, 27) def= 2
+(8413, 28) def= 2
+(8414, 28) def= 2
+(96622, 42) def= 2
+(46, 10) def= 3
+(47, 10) def= 3
+(241, 16) def= 3
+(2105, 25) def= 3
+(1119, 27) def= 3
+(6459, 33) def= 3
+(47, 11) def= 4
+(284, 28) def= 9
+\end{verbatim}
+Additionally, scanning all pairs with $n\le 2000$ and $k\le 50$ found $40$ instances where the deficiency is defined and at least $1$, with maximum deficiency $9$ in this range.
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 1093.1 is checked by the standard counting of prime powers dividing factorials.
+\item Lemma 1093.2 crucially uses that $k!$ has no prime factors $>k$, so any prime $>k$ in the numerator cannot cancel.
+\item The construction of $q_1,\dots,q_{k-t}$ allows repeats; divisibility still holds because multiplicities of primes in the numerator translate directly into multiplicities in the binomial coefficient for primes $>k$.
+\end{itemize}
+
+\textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} If the deficiency exists and equals $t$, then $\binom{n}{k}$ is divisible by at least $k-t$ primes $>k$ counted with multiplicity, and in particular
+\[\binom{n}{k}\ge (k+1)^{k-t}\quad\text{(Lemma 1093.2).}
+\]
+
+(ii) \emph{First gap (crisp).} Prove or disprove: there are infinitely many pairs $(n,k)$ with $n\ge 2k$ such that
+(a) $v_p\!\left(\binom{n}{k}\right)=0$ for all primes $p\le k$ (deficiency defined), and
+(b) among $n,n-1,\dots,n-k+1$ exactly one integer is $k$-smooth (deficiency $1$).
+
+(iii) \emph{Top 3 next moves.}
+\begin{itemize}
+\item Use Lemma 1093.1 to express the condition ``no prime $p\le k$ divides $\binom{n}{k}$'' as explicit equalities of the form
+\[\sum_{i=0}^{k-1} v_p(n-i)=v_p(k!)\quad (p\le k),
+\]
+and try to solve these simultaneously by constructing $n$ with controlled residue classes modulo powers of small primes.
+\item For fixed $k$, computationally enumerate all $n$ up to the known bound $n\ll 2^k\sqrt{k}$ (as stated in the problem text) and record deficiency values to look for patterns (e.g. special families of $(n,k)$).
+\item Try to force deficiency $>1$ by making two of $n,n-1,\dots,n-k+1$ highly $k$-smooth while keeping the $p$-adic balance conditions; search for minimal such configurations to see why they are rare.
+\end{itemize}
+
+(iv) \emph{Minimal counterexample structure.} A minimal example with deficiency $>1$ would have at least two $k$-smooth numbers among $n,n-1,\dots,n-k+1$, while still satisfying $v_p\!\left(\binom{n}{k}\right)=0$ for every prime $p\le k$. This requires a delicate cancellation: all primes $\le k$ must appear in the numerator product with exactly the same total multiplicity as in $k!$, despite multiple numerator factors being composed entirely of small primes.
+

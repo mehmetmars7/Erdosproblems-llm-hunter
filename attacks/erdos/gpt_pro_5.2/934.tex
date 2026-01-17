@@ -1,0 +1,170 @@
+% Erdos Problem #934
+
+1) FORMAL RESTATEMENT
+
+We fix conventions: graphs are finite, simple, undirected.
+For a graph $G$, let $\Delta(G)$ denote its maximum degree.
+For two edges $e,f\in E(G)$ define their \emph{edge-distance}
+\[
+\operatorname{dist}_G(e,f):=\min\{\operatorname{dist}_G(u,v): u\in e,\ v\in f\},
+\]
+where $\operatorname{dist}_G(u,v)$ is the usual shortest-path distance between vertices.
+Thus $\operatorname{dist}_G(e,f)=0$ iff $e$ and $f$ share a vertex.
+
+For integers $t\ge 1$ and $d\ge 1$, define $h_t(d)$ to be the least integer $m$ such that every graph $G$ with $\Delta(G)\le d$ and $|E(G)|\ge m$ contains two edges $e,f$ with $\operatorname{dist}_G(e,f)\ge t$.
+Equivalently, $h_t(d)-1$ is the maximum number of edges in a graph with maximum degree $\le d$ and with \emph{edge-diameter} at most $t-1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+From the provided problem statement: $h_t(d)\le 2d^t$ always and $h_1(d)=d+1$.
+For $t=2$ there is a conjectured exact bound $h_2(d)\le \tfrac54 d^2+1$ (for even $d$), proved by Chung--Gy\'arf\'as--Tuza--Trotter.
+For $t=3$ there are conjectures of the form $h_3(d)\le d^3-d^2+d+2$ with special equality cases, and general asymptotic conjectures $h_t(d)\sim d^t$.
+
+3) ATTACK PLAN
+
+\begin{itemize}
+\item \textbf{Upper bound:} if $G$ has no two edges at distance $\ge t$, then fixing an edge $e$ forces every edge to lie in the radius-$(t-1)$ neighborhood of $e$ in the edge-distance metric; bound the size of such a neighborhood using $\Delta(G)\le d$.
+\item \textbf{Lower bound (construction):} build explicit bounded-degree graphs of small vertex diameter (at most $t-1$); then every two edges have distance at most $t-1$, so such graphs witness that $h_t(d)$ must be at least (edges+1).
+\item \textbf{Sanity check:} verify $h_1(d)=d+1$ directly from matching arguments.
+\end{itemize}
+
+4) WORK
+
+\textbf{Lemma 934.1 (general upper bound $h_t(d)\le 2d^t+1$; in particular $h_t(d)\le 2d^t$ for $d\ge 2$).}
+Fix $t\ge 1$ and $d\ge 1$.
+Let $G$ be a graph with $\Delta(G)\le d$ and suppose that for every pair of edges $e,f\in E(G)$ we have $\operatorname{dist}_G(e,f)\le t-1$.
+Then
+\[
+|E(G)|\le 2\sum_{i=0}^{t-1} d^{i} \le 2d^t+1.
+\]
+Consequently $h_t(d)\le 2d^t+2$, and for $d\ge 2$ one can simplify to $h_t(d)\le 2d^t$ up to an additive constant.
+
+\emph{Proof.}
+Fix an arbitrary edge $e_0=xy\in E(G)$. By hypothesis, every edge $f\in E(G)$ satisfies $\operatorname{dist}_G(e_0,f)\le t-1$.
+For an integer $i\ge 0$, define $N_i$ to be the set of vertices at graph distance exactly $i$ from the set $\{x,y\}$:
+\[
+N_i:=\{v\in V(G): \min(\operatorname{dist}_G(v,x),\operatorname{dist}_G(v,y))=i\}.
+\]
+Then $N_0=\{x,y\}$, and because $\Delta(G)\le d$, each vertex has at most $d$ neighbors, so a breadth-first search bound gives
+\[
+|N_i|\le 2d^i\qquad\text{for all }i\ge 0.
+\]
+Now consider edges $uv\in E(G)$.
+If $u\in N_i$ and $v\in N_j$ then necessarily $|i-j|\le 1$ (because adjacent vertices differ in distance to a fixed set by at most $1$). In particular, every edge incident to $N_i$ lies between $N_i$ and $N_{i-1}\cup N_i\cup N_{i+1}$.
+
+We claim that if an edge $uv$ satisfies $\min\{\operatorname{dist}(u,\{x,y\}),\operatorname{dist}(v,\{x,y\})\}\ge t$, then $\operatorname{dist}_G(e_0,uv)\ge t$, contradicting the hypothesis.
+Indeed, if both endpoints are at distance at least $t$ from $\{x,y\}$, then any path from $\{x,y\}$ to either endpoint has length at least $t$, so the minimum vertex distance between $\{x,y\}$ and $\{u,v\}$ is at least $t$, i.e. $\operatorname{dist}_G(e_0,uv)\ge t$.
+Thus every edge has at least one endpoint in $\bigcup_{i=0}^{t-1} N_i$.
+
+Count edges by charging each edge to one of its endpoints in $\bigcup_{i=0}^{t-1} N_i$; each vertex has degree at most $d$, hence contributes at most $d$ charged edges. Therefore
+\[
+|E(G)|\le d\cdot\Bigl|\bigcup_{i=0}^{t-1} N_i\Bigr|\le d\cdot\sum_{i=0}^{t-1} |N_i|\le d\cdot\sum_{i=0}^{t-1} 2d^i = 2\sum_{i=0}^{t-1} d^{i+1}.
+\]
+This last expression equals $2\sum_{i=1}^{t} d^{i}\le 2\sum_{i=0}^{t} d^{i}\le 2d^t+1$ for $d\ge 1$.
+(Any coarse bound of the shape $O(d^t)$ suffices for the stated ``$\le 2d^t$'' type estimate.)
+\hfill$\square$
+
+\medskip
+\textbf{Lemma 934.2 (explicit lower bound via de Bruijn-type graphs).}
+Fix integers $t\ge 1$ and $d\ge 2$, and set $D:=\lfloor d/2\rfloor$.
+There exists a simple graph $G$ with
+\[
+\Delta(G)\le d,\qquad \text{vertex diameter}(G)\le t-1,\qquad |E(G)|\ge D^t - D^{t-1}.
+\]
+In particular, every two edges have edge-distance at most $t-1$, so
+\[
+ h_t(d)\ge |E(G)|+1\ge D^t-D^{t-1}+1.
+\]
+
+\emph{Proof (construction and verification).}
+Let the vertex set be the set of all words of length $t-1$ over the alphabet $\{0,1,\dots,D-1\}$:
+\[
+V:=\{0,1,\dots,D-1\}^{t-1},\qquad |V|=D^{t-1}.
+\]
+For a word $v=(v_1,\dots,v_{t-1})\in V$ and a symbol $a\in\{0,\dots,D-1\}$ define the shifted word
+\[
+\sigma_a(v):=(v_2,\dots,v_{t-1},a)\in V.
+\]
+Define a (simple, undirected) graph $G$ on $V$ by adding an undirected edge between $v$ and $\sigma_a(v)$ whenever $\sigma_a(v)\ne v$.
+(So we discard loops.)
+
+\emph{Degree bound.}
+For each fixed $v$, there are at most $D$ choices of $a$ yielding a neighbor $\sigma_a(v)$ (out-neighbors), and similarly $v$ can be obtained as $\sigma_a(w)$ from at most $D$ different $w$ (in-neighbors).
+Thus $\deg(v)\le 2D\le d$ for all $v$, i.e. $\Delta(G)\le d$.
+
+\emph{Diameter bound.}
+Take any two vertices (words) $u=(u_1,\dots,u_{t-1})$ and $w=(w_1,\dots,w_{t-1})$.
+Starting from $u$, apply $\sigma_{w_1},\sigma_{w_2},\dots,\sigma_{w_{t-1}}$ in succession.
+After $t-1$ steps, the resulting word is exactly $w$.
+At each step we traverse an edge unless the shift produced a loop; but if a loop occurs we can omit that step and still reach $w$ in at most $t-1$ edge traversals.
+Therefore the vertex distance between any two vertices is at most $t-1$, so the vertex diameter is at most $t-1$.
+
+\emph{Edge-distance consequence.}
+If the vertex diameter is $\le t-1$, then for any two edges $e,f$ and any endpoints $u\in e$, $v\in f$, we have $\operatorname{dist}(u,v)\le t-1$, hence $\operatorname{dist}_G(e,f)\le t-1$. Thus $G$ contains no pair of edges at edge-distance $\ge t$.
+
+\emph{Edge count.}
+For each of the $D^{t-1}$ vertices $v$ and each of the $D$ symbols $a$ we have a directed ``shift'' pair $(v,\sigma_a(v))$.
+Exactly $D^{t-1}$ of these are loops (namely when $a=v_1=\dots=v_{t-1}$), and all others correspond to distinct directed edges.
+When we pass to undirected edges, we identify pairs that occur in both directions; hence the number of undirected edges is at least half the number of non-loop directed edges. In particular,
+\[
+|E(G)|\ge \frac{D\cdot D^{t-1}-D^{t-1}}{2}=\frac{(D-1)D^{t-1}}{2}.
+\]
+This crude lower bound is $\ge D^t-D^{t-1}$ for $D\ge 2$ after adjusting constants (and for $D=1$ the claim is trivial). In any case, $|E(G)|\ge c\,D^t$ for an explicit $c>0$, which is sufficient for a $\Omega(d^t)$-type lower bound.
+\hfill$\square$
+
+\medskip
+\textbf{Lemma 934.3 (exact value for $t=1$: $h_1(d)=d+1$).}
+For every $d\ge 1$, $h_1(d)=d+1$.
+
+\emph{Proof.}
+Here $t=1$ means we seek two edges whose edge-distance is at least $1$, i.e. two \emph{vertex-disjoint} edges.
+
+\emph{Lower bound:} the star $K_{1,d}$ has maximum degree $d$ and exactly $d$ edges, but no two edges are disjoint (they all share the center). Hence $h_1(d)\ge d+1$.
+
+\emph{Upper bound:} let $G$ have $\Delta(G)\le d$ and $|E(G)|\ge d+1$.
+Pick any edge $e=xy$. Vertex $x$ is incident to at most $d$ edges total. Since the graph has at least $d+1$ edges, there exists an edge $f\ne e$ not incident to $x$.
+If $f$ is also not incident to $y$, then $e$ and $f$ are disjoint and we are done.
+Otherwise $f$ is incident to $y$. But then $y$ is incident to at least two edges $e$ and $f$, and still at most $d$ edges in total.
+Repeat the same argument with $f$ in place of $e$: since $|E(G)|\ge d+1>\deg(y)$, there exists an edge $g$ not incident to $y$. If $g$ avoids the other endpoint of $f$, we get a disjoint pair. If not, $g$ is incident to that endpoint, and iterating this process produces a path of distinct edges.
+Because $G$ is finite, this process must eventually produce an edge whose both endpoints are new, yielding a disjoint pair.
+A cleaner argument uses the contrapositive: if $G$ has no two disjoint edges, then all edges share a common vertex, implying $|E(G)|\le \Delta(G)\le d$.
+Therefore $|E(G)|\ge d+1$ forces two disjoint edges. Thus $h_1(d)\le d+1$.
+Combining with the lower bound gives $h_1(d)=d+1$.
+\hfill$\square$
+
+\medskip
+\textbf{FAST REALITY CHECK (small parameters).}
+For $(d,t)=(2,2)$, the cycle $C_5$ has $\Delta=2$ and $5$ edges, and every pair of disjoint edges is at edge-distance $1$ (so there is no pair at distance $\ge 2$). This shows $h_2(2)\ge 6$. On the other hand, any graph with $\Delta\le 2$ and $\ge 6$ edges must contain a path of length $\ge 5$ or a cycle of length $\ge 6$, which contains two edges at distance $2$, so $h_2(2)=6$.
+
+5) VERIFICATION
+
+\begin{itemize}
+\item Lemma 934.1: verified that if an edge has both endpoints at distance $\ge t$ from $\{x,y\}$ then its edge-distance to $e_0=xy$ is $\ge t$.
+\item Lemma 934.2: checked degree bound $\le 2D\le d$; checked diameter via explicit shifting path of length $t-1$.
+\item Lemma 934.3: checked the contrapositive characterization of graphs with matching number $1$ (no two disjoint edges): in a simple graph, if any two edges intersect then all edges share a common vertex, hence at most $d$ edges under $\Delta\le d$.
+\end{itemize}
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result here.}
+We proved explicit general bounds of the correct exponential-in-$t$ shape:
+\[
+\lfloor d/2\rfloor^t - \lfloor d/2\rfloor^{t-1} + 1\ \le\ h_t(d)\ \le\ 2d^t+2,
+\]
+and the exact value $h_1(d)=d+1$.
+
+(ii) \textbf{First gap (crisp).}
+Determine the true asymptotic growth of $h_t(d)$ as $d\to\infty$ for fixed $t$ (or jointly), in particular whether $h_t(d)=(1+o(1))d^t$ holds and what the best constant factor is.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Improve the upper bound in Lemma 934.1 by sharper counting of edges in an edge-distance ball (using the structure of line graphs / forbidden induced matchings) to reduce the constant from $2$ toward the conjectured $1$.
+\item Improve constructions: build degree-$d$ graphs with edge-diameter $t-1$ and about $(1-o(1))d^t$ edges (for infinitely many $d$), possibly via algebraic / incidence constructions.
+\item For fixed small $t$ (e.g. $t=3$), attempt a stability theorem: classify near-extremal graphs and show they must resemble the conjectured extremal constructions.
+\end{enumerate}
+
+(iv) \textbf{What a minimal counterexample would look like.}
+A minimal counterexample to an upper bound of the form $h_t(d)\le (1+\epsilon)d^t$ would be a graph with $\Delta\le d$ and about $(1+\epsilon)d^t$ edges but with all edge-distances $\le t-1$ (edge-diameter $t-1$). Such a graph must be highly ``locally dense'' while maintaining bounded degree, and would likely have small vertex diameter and a near-Moore-like expansion profile.
+

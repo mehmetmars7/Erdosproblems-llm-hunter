@@ -1,0 +1,97 @@
+% Attempt for Erdos Problem #84
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- Let $G$ be a finite simple graph on vertex set $[n]=\{1,\dots,n\}$.
+- Define the \emph{cycle set} of $G$:
+\[C(G):=\{\ell\in\{3,4,\dots,n\}:\ G\text{ contains a cycle of length }\ell\}.\]
+- Define
+\[f(n):=\big|\{C(G):\ G\text{ is a graph on }n\text{ vertices}\}\big|,\]
+the number of distinct cycle sets realizable by $n$-vertex graphs.
+
+Tasks.
+1. Prove $f(n)=o(2^n)$ (i.e. $f(n)/2^n\to 0$).
+2. Prove $f(n)/2^{n/2}\to\infty$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- The first task is solved (Verstra\"{e}te; improved by Nenadov) with very strong quantitative bounds.
+- The second task remains conjectural; Erd\H{o}s--Faudree showed $f(n)>2^{n/2}$.
+I do not re-prove Verstra\"{e}te/Nenadov here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Build explicit families of graphs whose cycle sets can be prescribed in many ways, to get lower bounds on $f(n)$.
+2. Find structural constraints on cycle sets to reduce the number of possibilities and prove $f(n)=o(2^n)$.
+
+Disproof track ideas:
+1. For the $f(n)/2^{n/2}\to\infty$ conjecture, attempt to show only $2^{\Theta(n)}$ cycle sets are possible (which is true), but with exponent at least $1/2$ (nontrivial).
+
+Chosen path in this attempt: prove two basic bounds from first principles: the trivial upper bound, and a constructive lower bound using disjoint unions of cycles (yielding $2^{\Theta(\sqrt n)}$ realized cycle sets). This does not solve either requested asymptotic, but it is fully rigorous progress.
+
+4) WORK
+Lemma 1 (Trivial upper bound).
+For every $n\ge 3$,
+\[f(n)\le 2^{n-2}.\]
+
+Proof.
+Every cycle set is a subset of $\{3,4,\dots,n\}$, which has $n-2$ elements.
+There are exactly $2^{n-2}$ subsets, so $f(n)$ (the number of realizable subsets) is at most $2^{n-2}$. \qed
+
+Lemma 2 (A constructive lower bound via disjoint unions of cycles).
+Let $t\ge 1$ and suppose
+\[\sum_{\ell=3}^{t+2} \ell \le n.\tag{*}\]
+Then $f(n)\ge 2^{t}$.
+
+Proof.
+For each subset $S\subseteq \{3,4,\dots,t+2\}$, construct a graph $G_S$ on $n$ vertices as follows:
+- for each $\ell\in S$, include a cycle $C_\ell$ as a connected component;
+- include the remaining vertices (if any) as isolated vertices (no edges).
+Because components are disjoint, every cycle of $G_S$ lies entirely within one component cycle $C_\ell$.
+Thus the cycle lengths occurring in $G_S$ are exactly the set $S$.
+Therefore the cycle set map $S\mapsto C(G_S)$ is injective on the $2^t$ subsets of $\{3,\dots,t+2\}$, proving $f(n)\ge 2^t$. \qed
+
+Corollary 3 (Explicit growth $f(n)\ge 2^{\Omega(\sqrt n)}$).
+For all sufficiently large $n$,
+\[f(n)\ge 2^{\lfloor \sqrt{2n}\rfloor-3}.\]
+
+Proof.
+Take $t:=\lfloor \sqrt{2n}\rfloor-3$.
+Then
+\[\sum_{\ell=3}^{t+2}\ell = \sum_{\ell=3}^{\lfloor \sqrt{2n}\rfloor-1}\ell \le \sum_{\ell=1}^{\lfloor \sqrt{2n}\rfloor-1}\ell
+ = \frac{(\lfloor \sqrt{2n}\rfloor-1)\lfloor \sqrt{2n}\rfloor}{2}\le n\]
+for $n$ large, so condition (*) holds and Lemma 2 gives $f(n)\ge 2^t$. \qed
+
+FAST REALITY CHECK
+The corollary gives only $f(n)\ge 2^{\Theta(\sqrt n)}$, which is far weaker than the conjectured $f(n)\gg 2^{n/2}$ and far weaker than the known lower bound $f(n)>2^{n/2}$ stated in the problem text.
+So the real challenge is to build graphs whose cycle sets can encode linearly many bits without accidentally introducing many extra cycle lengths.
+
+5) VERIFICATION
+- Lemma 2 relies crucially on disjoint union: disconnected components prevent creation of cycles that mix lengths.
+- Corollary 3 checks the vertex budget using a crude sum-of-integers bound.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved the trivial upper bound $f(n)\le 2^{n-2}$ (Lemma 1) and a constructive lower bound $f(n)\ge 2^{\Omega(\sqrt n)}$ (Corollary 3).
+
+(ii) First gap:
+Prove a meaningful \emph{exponential-in-$n$} lower bound beyond $2^{o(n)}$ (such as the known $2^{n/2}$), or re-prove the deep upper bound $f(n)=o(2^n)$.
+
+(iii) Top 3 next moves (concrete):
+1. Try to reconstruct Erd\H{o}s--Faudree's proof that $f(n)>2^{n/2}$ by explicitly building a family of graphs where cycle sets vary in $\Theta(n)$ independent ways.
+2. Investigate structural constraints on cycle sets (e.g. closure properties, forbidden patterns) that could yield a direct proof that $f(n)=2^{(1-o(1))n}$ is impossible, aiming toward $f(n)=o(2^n)$ without heavy machinery.
+3. For the lower-bound direction, design bounded-degree ``cycle-length selector'' gadgets on $O(1)$ vertices that toggle presence/absence of a particular length while keeping other lengths controlled.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+To refute $f(n)/2^{n/2}\to\infty$, one would need $f(n)\le C 2^{n/2}$ along an infinite sequence of $n$,
+meaning that cycle sets have at most $n/2+O(1)$ bits of freedom; this would require proving a strong global constraint that prevents encoding more than $n/2$ independent choices in cycle-length patterns.
+

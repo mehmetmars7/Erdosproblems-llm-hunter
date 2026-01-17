@@ -1,0 +1,122 @@
+% Erdos Problem #486
+% URL: https://www.erdosproblems.com/486
+
+\subsection*{FORMAL RESTATEMENT}
+Let $A\subseteq\mathbb{N}$ (with $\mathbb{N}=\{1,2,3,\dots\}$). For each $n\in A$, fix a subset $X_n\subseteq \mathbb{Z}/n\mathbb{Z}$.
+Define
+\[
+B := \Bigl\{ m\in\mathbb{N}:\ \forall n\in A\ (n<m\implies m\bmod n\not\in X_n)\Bigr\}.
+\]
+Equivalently, $m\in B$ iff for every modulus $n\in A$ that is \emph{smaller than $m$}, the residue class of $m$ modulo $n$ is \emph{not} one of the forbidden classes $X_n$.
+
+Define the (upper/lower) \emph{logarithmic density} of $B$ (if it exists) by
+\[
+\delta_{\log}(B) := \lim_{x\to\infty}\frac{1}{\log x}\sum_{\substack{m<x\\m\in B}}\frac{1}{m},
+\]
+provided this limit exists.
+
+Question: For \emph{all} choices of $A$ and $\{X_n\}_{n\in A}$, must this limit exist?
+
+Edge cases:
+\begin{itemize}
+\item If $A=\varnothing$, then $B=\mathbb{N}$ and $\delta_{\log}(B)=1$.
+\item If $1\in A$ and $X_1=\mathbb{Z}/1\mathbb{Z}$, then $B\subseteq\{1\}$ (indeed $m\in B$ only possible for $m\le 1$), so $\delta_{\log}(B)=0$.
+\end{itemize}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem statement records that Davenport--Erd\H{o}s proved the answer is \textbf{yes} when $X_n=\{0\}$ for all $n\in A$ (i.e. $B$ is the set of integers not divisible by any $n\in A$ with $n<m$), and that Besicovitch exhibited examples without a \emph{natural} density even in that special case, motivating the logarithmic density question.
+Per the integrity rules for this project, I do not use any external literature beyond what is explicitly stated above.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track:}
+\begin{itemize}
+\item Prove the statement for restricted families (e.g. $A$ finite; $X_n$ empty/full; periodic setups).
+\item Try to approximate the harmonic sum for $B$ via finite truncations $A\cap[1,T]$ and control the tail $n>T$.
+\end{itemize}
+\textbf{Disproof track:}
+\begin{itemize}
+\item Attempt to encode oscillations on logarithmic scales by turning on new congruence restrictions at sparse moduli $n\in A$.
+\end{itemize}
+I only reach restricted positive results (finite $A$, and trivial extremal $X_n$); the general case remains open here.
+
+\subsection*{WORK}
+\paragraph{Lemma 1 (finite $A$ $\Rightarrow$ eventual periodicity $\Rightarrow$ logarithmic density exists).}
+If $A$ is finite, then $B$ has a natural density (hence also a logarithmic density), and this density can be computed from one period modulo $L:=\mathrm{lcm}(A)$.
+
+\paragraph{Proof.}
+Assume $A$ is finite and let $M:=\max(A)$ (if $A=\varnothing$ the conclusion is trivial).
+Let $L:=\mathrm{lcm}(A)$.
+For any integer $m>M$, the defining condition for membership $m\in B$ reads:
+\[m\in B \iff (\forall n\in A)\ \bigl(m\bmod n\not\in X_n\bigr),\]
+because $m>M\ge n$ ensures the implication ``$n<m$'' holds for all $n\in A$.
+Now, for each fixed $n\in A$, the residue $m\bmod n$ is determined by the residue $m\bmod L$ (since $n\mid L$).
+Therefore, for $m>M$, membership $m\in B$ depends only on $m\bmod L$.
+
+Formally, define the subset $S\subseteq \mathbb{Z}/L\mathbb{Z}$ by
+\[S := \{ r\in \mathbb{Z}/L\mathbb{Z} : (\forall n\in A)\ (r\bmod n \not\in X_n)\}.
+\]
+Then for all integers $m>M$,
+\[m\in B \iff (m\bmod L)\in S.
+\]
+Hence $B\cap\{M+1,M+2,\dots\}$ is a union of residue classes modulo $L$.
+Such a set has a natural density equal to $|S|/L$ (because each residue class has density $1/L$), and adding/removing finitely many elements (those $\le M$) does not change the density.
+Therefore $B$ has a natural density $|S|/L$, and in particular the logarithmic density exists and equals the same value.
+\qed
+
+\paragraph{Lemma 2 (two extremal families of forbidden sets).}
+\begin{enumerate}
+\item If there exists $n_0\in A$ with $X_{n_0}=\mathbb{Z}/n_0\mathbb{Z}$, then $B\subseteq\{1,2,\dots,n_0\}$ and $\delta_{\log}(B)=0$.
+\item If $X_n=\varnothing$ for every $n\in A$, then $B=\mathbb{N}$ and $\delta_{\log}(B)=1$.
+\end{enumerate}
+
+\paragraph{Proof.}
+(1) If $X_{n_0}$ is all residue classes, then for any $m>n_0$ we have $m\bmod n_0\in X_{n_0}$, so the defining condition for $B$ fails at $n=n_0$. Thus no $m>n_0$ lies in $B$, i.e. $B\subseteq[1,n_0]$ is finite. For any finite set, the weighted sum $\sum_{m<x,m\in B}1/m$ is bounded as $x\to\infty$, so dividing by $\log x\to\infty$ gives limit $0$.
+
+(2) If every $X_n$ is empty, then the condition ``$m\bmod n\not\in X_n$'' holds for all $m,n$, so $B=\mathbb{N}$. Then
+\[\frac{1}{\log x}\sum_{m<x,\,m\in B}\frac{1}{m}=\frac{1}{\log x}\sum_{m<x}\frac{1}{m}\to 1\]
+because $\sum_{m<x}1/m = \log x + O(1)$.
+\qed
+
+\paragraph{FAST REALITY CHECK (one concrete example).}
+Take $A=\{2\}$ and $X_2=\{0\}$.
+Then $m\in B$ iff either $m\le 2$ or $m$ is odd, so up to finitely many exceptions $B$ is the odd integers.
+Numerically, using the exact identity $\sum_{\substack{m\le X\\ m\ \mathrm{odd}}} \frac1m = H_X - \tfrac12 H_{\lfloor X/2\rfloor}$ (with $H_n$ the $n$th harmonic number), I computed
+\[
+\frac{1}{\log X}\sum_{\substack{m<X\\ m\in B}}\frac1m\approx
+\begin{cases}
+0.5459759644 & X=10^6,\\
+0.5344819734 & X=10^8,\\
+0.5229879822 & X=10^{12},
+\end{cases}
+\]
+which drifts slowly downward toward the expected limit $1/2$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~1: checked that the $m>n$ condition becomes ``all $n\in A$'' once $m>\max(A)$, so only finitely many initial terms are exceptional.
+\item Lemma~2: for the ``full forbidden set'' case, verified directly that all $m>n_0$ are excluded.
+\item The example computation matches the well-known fact that the odd integers have logarithmic density $1/2$ (here demonstrated numerically, not assumed).
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.} If $A$ is finite then $B$ is eventually periodic modulo $L=\mathrm{lcm}(A)$, hence $B$ has a natural (therefore logarithmic) density given by $|S|/L$ where $S\subseteq\mathbb{Z}/L\mathbb{Z}$ is the set of residues avoiding all $X_n$.
+Also, in trivial extremal cases (some $X_n$ is all residues, or all $X_n$ are empty) the logarithmic density exists and equals $0$ or $1$.
+
+(ii) \textbf{First gap (crisp).} For infinite $A$ and arbitrary subsets $X_n\subseteq\mathbb{Z}/n\mathbb{Z}$, prove or disprove that the limit
+\[\lim_{x\to\infty}\frac{1}{\log x}\sum_{\substack{m<x\\m\in B}}\frac1m\]
+exists.
+In particular, I do not have a method to control the effect of infinitely many congruence restrictions turning on at different scales.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Try to approximate $B$ by truncated conditions $A\cap[1,T]$ and prove a quantitative estimate that the harmonic weight contributed by constraints with $n>T$ is $o(\log x)$ uniformly in $x$.
+\item Attempt an explicit oscillatory construction: choose a sparse increasing sequence $n_j\in A$ and forbidden sets $X_{n_j}$ designed to alternately remove/almost preserve integers on logarithmic intervals $[e^{t_j},e^{t_{j+1}}]$.
+\item Special cases: resolve the question when each $X_n$ is a single residue class (the ``$|X_n|=1$'' regime referenced in the statement), or when $|X_n|/n$ has a summable tail.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure.} A counterexample would require two sequences $x_j\to\infty$ along which the normalized harmonic sums for $B$ approach two different limits. Structurally, this would likely come from designing $A$ and $X_n$ so that new moduli $n$ in certain ranges erase a proportion of $B$ that is significant on the logarithmic scale.
+
+\bigskip
+

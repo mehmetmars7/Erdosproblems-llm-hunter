@@ -1,0 +1,109 @@
+% Erdos Problem #1011
+
+1) FORMAL RESTATEMENT
+
+Fix integers r>=2 and n>=1. Define f_r(n) to be the smallest integer m such that every (simple, undirected) graph G on n vertices satisfying
+  e(G) >= m  and  chi(G) >= r
+must contain a triangle (a copy of K_3).
+Determine f_r(n) as a function of r and n.
+
+Edge cases:
+- If r>n then no graph on n vertices has chi(G) >= r, so the condition is vacuous and the minimal m is 0.
+- For r=2 the condition chi(G)>=2 just means "not edgeless".
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+Only what is explicitly stated in the provided problem file:
+- Turan/Mantel implies f_2(n) = floor(n^2/4) + 1.
+- Erdos--Gallai proved f_3(n) = floor((n-1)^2/4) + 2.
+- Simonovits showed an asymptotic expansion f_r(n)= n^2/4 - (g(r)/2)n + O(1) and related g(r) to an odd-cycle deletion parameter for triangle-free graphs of chromatic number >= r.
+- Bounds are quoted for g(r), and a claimed order g(r) ~ r^2 log r is mentioned in the text.
+- For n>=150, an exact formula for f_4(n) is given: f_4(n)=floor((n-3)^2/4)+6.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Reformulate f_r(n) as an extremal problem over triangle-free graphs with large chromatic number: f_r(n) should be "one more than the maximum number of edges in a triangle-free n-vertex graph of chromatic number at least r".
+- Use degree/partition arguments to bound edges in such graphs.
+
+Disproof-track ideas:
+- Not applicable (this is a "determine the function" problem).
+
+I give the clean equivalence lemma, basic monotonicity, and a brute-force sanity check for r=3 at small n.
+
+4) WORK
+
+FAST REALITY CHECK (exact computation for small n, r=3)
+
+For each n in {3,4,5,6,7} I brute-forced all labeled graphs on n vertices, and computed the maximum number of edges among graphs that are triangle-free and non-bipartite (equivalently chi>=3).
+The maxima were:
+- n=3: no such graph exists (max = -1)
+- n=4: no such graph exists (max = -1)
+- n=5: max edges = 5 (achieved by C5)
+- n=6: max edges = 7
+- n=7: max edges = 10
+These match the formula "max edges = floor((n-1)^2/4)+1" for n=5,6,7, consistent with the stated f_3(n)=floor((n-1)^2/4)+2.
+
+Lemma 1011.1 (extremal reformulation).
+For integers r>=2 and n>=1, define
+  M_r(n) := max{ e(G) : |V(G)|=n, G triangle-free, chi(G) >= r },
+with the convention M_r(n)=-infinity if no such graph exists.
+Then
+  f_r(n) = 0 if r>n,
+and for r<=n,
+  f_r(n) = M_r(n) + 1.
+
+Proof.
+Assume r<=n. By definition, f_r(n) is the smallest m such that every graph on n vertices with chi>=r and at least m edges contains a triangle.
+Equivalently, if a graph G on n vertices has chi(G)>=r and contains no triangle (i.e. is triangle-free), then it must satisfy e(G) <= m-1.
+Thus the smallest such m is exactly one larger than the maximum possible number of edges among triangle-free graphs on n vertices with chi>=r, which is M_r(n)+1.
+If there is no triangle-free graph with chi>=r on n vertices, then the implication "chi>=r and e>=m => contains triangle" holds vacuously for m=0, and our edge-case convention r>n captures the most common vacuous situation.
+QED.
+
+Lemma 1011.2 (basic monotonicity in r).
+For fixed n, the function r -> f_r(n) is nonincreasing: for all r>=2,
+  f_{r+1}(n) <= f_r(n).
+
+Proof.
+The class of graphs with chi(G) >= r+1 is a subset of the class with chi(G) >= r.
+Therefore, any edge threshold m that forces a triangle for all graphs with chi>=r also forces a triangle for all graphs with chi>=r+1. Taking the minimal such m gives f_{r+1}(n) <= f_r(n).
+QED.
+
+Lemma 1011.3 (universal upper bound from Mantel).
+For all r>=2 and n>=1,
+  f_r(n) <= floor(n^2/4)+1.
+Moreover, equality holds for r=2.
+
+Proof.
+Mantel's theorem states that any triangle-free graph on n vertices has at most floor(n^2/4) edges. (A complete proof is given in Lemma 1013.2 below, since it is also used there.)
+Thus M_r(n) <= floor(n^2/4) for every r, so by Lemma 1011.1 we have f_r(n) = M_r(n)+1 <= floor(n^2/4)+1.
+For r=2, the condition chi(G)>=2 means G has at least one edge. The complete bipartite graph with parts as equal as possible is triangle-free and has floor(n^2/4) edges, so M_2(n)=floor(n^2/4) and hence f_2(n)=floor(n^2/4)+1.
+QED.
+
+5) VERIFICATION
+
+- Lemma 1011.1: checked both directions: (a) any triangle-free chi>=r graph with edges >= f_r(n) would contradict definition, and (b) choosing m=M_r(n)+1 forces triangles because otherwise we would exceed the maximum.
+- Edge cases: if r>n, chi(G)>=r never happens, so f_r(n)=0 is consistent with the "minimal m" definition.
+- Computation sanity check agrees with the closed form for f_3(n) stated in the problem text in the range where non-bipartite triangle-free graphs exist.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Exact reformulation: f_r(n)=1+M_r(n), where M_r(n) is the maximum number of edges in an n-vertex triangle-free graph with chromatic number at least r (Lemma 1011.1).
+- Basic monotonicity (Lemma 1011.2) and a universal Mantel upper bound f_r(n) <= floor(n^2/4)+1 (Lemma 1011.3).
+- Verified by brute force for r=3 and n up to 7.
+
+(ii) First gap (crisp).
+Determine M_r(n) (equivalently f_r(n)) for general r as an explicit formula in n (including the exact O(1) term) or even determine the correct dependence of the linear term in n uniformly in r.
+
+(iii) Top 3 next moves.
+1. For fixed small r (e.g. r=5,6), attempt to compute or characterize extremal triangle-free graphs with chi>=r and maximal edges, possibly via stability arguments around complete bipartite graphs plus structured "odd-cycle" gadgets.
+2. Understand the parameter g(r) in the Simonovits asymptotic by proving sharp bounds on the minimum number of vertices to delete from a triangle-free chi>=r graph to make it bipartite.
+3. For each r, attempt to find exact extremal constructions matching the asymptotic expansion and then prove optimality via a refined stability theorem.
+
+(iv) What a minimal counterexample would likely look like.
+For a given r, an extremal graph for M_r(n) should be triangle-free, very close to bipartite in edge density (near n^2/4 edges), but forced to have chromatic number >= r by embedding a high-chromatic triangle-free "core" that cannot be removed without deleting many vertices (captured by the g(r) parameter).
+
+

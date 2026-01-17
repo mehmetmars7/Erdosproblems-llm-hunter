@@ -1,0 +1,124 @@
+% Erdos Problem #1089
+% URL: https://www.erdosproblems.com/1089
+
+\textbf{FORMAL RESTATEMENT}
+
+Fix integers $d\ge 1$ and $n\ge 1$.
+For a finite set $P\subset\mathbb{R}^d$ of $m$ distinct points, let $D(P)$ be the set of distances determined by $P$:
+\[D(P)=\{\|x-y\|: x,y\in P,\ x\neq y\}.
+\]
+Define $g_d(n)$ to be the least integer $M$ such that every $M$-point set $P\subset\mathbb{R}^d$ satisfies $|D(P)|\ge n$.
+Equivalently, $g_d(n)-1$ is the maximum size of a point set in $\mathbb{R}^d$ that determines at most $n-1$ distinct distances.
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+I will not use external results beyond what is explicitly stated in the problem text.
+The problem text states: $g_d(n)\gg d^{n-1}$ is ``easy'' (Erd\H{o}s); Erd\H{o}s--Straus proved an upper bound $g_d(n)\le c^{d^{1-b_n}}$ for constants $c,b_n>0$; and small values include $g_1(3)=4$, $g_2(3)=6$, $g_3(3)=7$.
+It also states: the $2^d$ vertices of the $d$-cube determine only $d$ distances, hence $g_d(d+1)>2^d$.
+
+\textbf{ATTACK PLAN}
+
+This is naturally a question about \emph{$s$-distance sets} in Euclidean space.
+\begin{itemize}
+\item (Lower bounds on $g_d(n)$) Construct large sets in $\mathbb{R}^d$ with at most $n-1$ distinct distances.
+\item (Upper bounds on $g_d(n)$) Prove general upper bounds on the size of $s$-distance sets in $\mathbb{R}^d$ via linear algebra (polynomial method).
+\end{itemize}
+
+\textbf{WORK}
+
+\textbf{Lemma 1089.1 (Maximal $(n-1)$-distance sets).}
+Let $M_d(s)$ denote the maximum size of a finite point set in $\mathbb{R}^d$ that determines at most $s$ distinct distances.
+Then for every $n\ge 1$,
+\[g_d(n)=M_d(n-1)+1.
+\]
+
+\emph{Proof.}
+By definition, $g_d(n)$ is the smallest integer $M$ such that every $M$-point set has at least $n$ distances.
+Equivalently, $M-1$ is the largest size of a set having at most $n-1$ distances.
+That largest size is precisely $M_d(n-1)$. Hence $g_d(n)=M_d(n-1)+1$.
+\hfill$\square$
+
+\textbf{Lemma 1089.2 (Explicit $s$-distance sets of size $\binom{d}{s}$).}
+Fix integers $d\ge 1$ and $1\le s\le d$. Let
+\[P_{d,s}=\{x\in\{0,1\}^d: x \text{ has exactly }s\text{ ones}\}.
+\]
+Then $|P_{d,s}|=\binom{d}{s}$ and $P_{d,s}$ determines exactly $s$ distinct distances.
+Consequently,
+\[M_d(s)\ge \binom{d}{s}\quad\text{and}\quad g_d(s+1)>\binom{d}{s}.
+\]
+
+\emph{Proof.}
+The cardinality $|P_{d,s}|=\binom{d}{s}$ is immediate.
+The distance claim is exactly Lemma 1088.1 proved above: between distinct $x,y\in P_{d,s}$, the squared distance is $|A\triangle B|\in\{2,4,\dots,2s\}$, and each value occurs.
+Thus $P_{d,s}$ has exactly $s$ distinct positive distances.
+Therefore $M_d(s)\ge |P_{d,s}|=\binom{d}{s}$, and by Lemma 1089.1, $g_d(s+1)=M_d(s)+1>\binom{d}{s}$.
+\hfill$\square$
+
+\textbf{Lemma 1089.3 (Polynomial-method upper bound for $s$-distance sets).}
+Let $P\subset\mathbb{R}^d$ be a finite set of $m$ points that determines at most $s$ distinct \emph{positive} distances.
+Then
+\[m\le \binom{d+2s}{2s}.
+\]
+In particular,
+\[g_d(n)=M_d(n-1)+1\le \binom{d+2(n-1)}{2(n-1)}+1.
+\]
+
+\emph{Proof.}
+Let the distinct positive squared distances among pairs in $P$ be $\alpha_1,\dots,\alpha_s\in\mathbb{R}_{>0}$.
+For each point $p\in P$, define a polynomial in $d$ variables
+\[F_p(x):=\prod_{j=1}^s\big(\|x-p\|^2-\alpha_j\big).
+\]
+Each factor $\|x-p\|^2-\alpha_j$ is a polynomial of total degree $2$ in $x$, hence $F_p$ has total degree at most $2s$.
+Now evaluate $F_p$ on $P$:
+\begin{itemize}
+\item If $q\in P$ with $q\neq p$, then $\|q-p\|^2\in\{\alpha_1,\dots,\alpha_s\}$, so one factor vanishes and $F_p(q)=0$.
+\item If $q=p$, then $\|p-p\|^2=0$, so
+\[F_p(p)=\prod_{j=1}^s(0-\alpha_j)=(-1)^s\prod_{j=1}^s\alpha_j\neq 0.
+\]
+\end{itemize}
+Thus the evaluation matrix $(F_p(q))_{p,q\in P}$ is diagonal with nonzero diagonal entries.
+In particular, the set of polynomials $\{F_p: p\in P\}$ is linearly independent over $\mathbb{R}$.
+Therefore $m=|P|$ is at most the dimension of the real vector space of polynomials in $d$ variables of total degree $\le 2s$, which equals $\binom{d+2s}{2s}$.
+This proves $m\le \binom{d+2s}{2s}$.
+Applying Lemma 1089.1 with $s=n-1$ yields the stated upper bound on $g_d(n)$.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (local computation).}
+I verified the construction in Lemma 1089.2 for small $(d,s)$ by enumerating $P_{d,s}$ and computing distinct squared distances; e.g.
+\begin{verbatim}
+d=6, s=3, |P|=20, distinct squared distances=[2, 4, 6]
+\end{verbatim}
+which matches the claim ``exactly $s$ distances''.
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 1089.3: the diagonal evaluation argument is sound because $\alpha_j>0$ ensures $F_p(p)\neq 0$.
+\item The bound counts polynomials of degree $\le 2s$ (not homogeneous); the dimension formula $\binom{d+2s}{2s}$ is standard and follows from counting monomials.
+\item No hidden assumptions about ``general position'' are used.
+\end{itemize}
+
+\textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} For fixed $n$ and all $d$,
+\[\binom{d}{n-1} < g_d(n) \le \binom{d+2(n-1)}{2(n-1)}+1.
+\]
+In particular, $g_d(n)=\Omega(d^{n-1})$ and $g_d(n)=O(d^{2n-2})$.
+
+(ii) \emph{First gap (crisp).} Determine the correct exponent of $d$ (or decide whether the growth is superpolynomial/subexponential) for fixed $n$ as $d\to\infty$, and in particular decide whether the limit
+\[\lim_{d\to\infty} \frac{g_d(n)}{d^{n-1}}
+\]
+exists.
+
+(iii) \emph{Top 3 next moves.}
+\begin{itemize}
+\item Strengthen the polynomial-method bound by incorporating additional structure (e.g. restricting to the sphere, using harmonic polynomials) to push the exponent down from $2(n-1)$ toward $n-1$.
+\item Search for improved lower-bound constructions of $(n-1)$-distance sets of size asymptotic to $c\,d^{n-1}$ with a computable constant $c$.
+\item For fixed $n$, do computational optimization for moderate $d$ to guess whether $M_d(n-1)$ is closer to $\binom{d}{n-1}$ or to the upper bound $\binom{d+2(n-1)}{2(n-1)}$.
+\end{itemize}
+
+(iv) \emph{Minimal counterexample structure.} Failure of the limit $g_d(n)/d^{n-1}$ to converge would require two sequences of near-extremal $(n-1)$-distance sets in $\mathbb{R}^d$ whose sizes differ by a nonvanishing fraction of $d^{n-1}$. Any such extremal family would likely be highly symmetric (e.g. coming from combinatorial designs or spherical codes), because random-like sets typically generate many distances.
+
+

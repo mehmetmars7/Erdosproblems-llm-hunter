@@ -1,0 +1,168 @@
+% Erdos Problem #375
+% Attempt for Erdos Problem #375
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES
+% - Computation available (Python/Sage/Mathematica)? YES
+
+## 1) FORMAL RESTATEMENT
+
+Let \(n,k\ge 1\). Assume \(n+1,n+2,\dots,n+k\) are all composite.
+
+**Grimm’s conjecture (as stated):** there exist **distinct primes** \(p_1,\dots,p_k\) such that
+\[
+ p_i\mid (n+i)\qquad (1\le i\le k).
+\]
+
+Equivalently: we can choose, for each of the \(k\) consecutive composite integers, a prime divisor
+so that no prime is chosen twice.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I only record what the provided problem text states:
+
+* The statement is trivial for \(k\le 2\).
+* Grimm proved it for \(k\ll \log n/\log\log n\).
+* Erd\H{o}s and Selfridge improved to \(k\le (1+o(1))\log n\).
+* Ramachandra–Shorey–Tijdeman improved to
+  \(k\ll (\log n/\log\log n)^3\).
+
+---
+
+## 3) ATTACK PLAN
+
+**Proof track (partial results).**
+1. Prove Grimm’s conjecture for small \(k\) beyond the stated “trivial” range.
+2. Reformulate the condition as a matching/assignment problem on prime divisors.
+
+**Disproof track.**
+Search computationally for a counterexample in small ranges for modest \(k\).
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (computation)
+
+For each \(3\le k\le 8\), I checked all \(n\le 200000\) with \(n+1,\dots,n+k\) composite and verified
+(by backtracking over prime factors) that a choice of distinct primes exists in every case.
+
+Also for \(k=4\) I checked all \(n\le 10^6\) with \(n+1,\dots,n+4\) composite and found no
+counterexample.
+
+(These are sanity checks only; no general conclusion from computation alone.)
+
+---
+
+### Lemma 4.1 (Grimm’s conjecture holds for \(k\le 3\))
+Assume \(n+1,\dots,n+k\) are composite.
+
+* For \(k=1\) the statement is immediate.
+* For \(k=2\) the statement is immediate.
+* For \(k=3\) the statement holds for all \(n\).
+
+**Proof.**
+
+\underline{Case \(k=1\).}
+Pick any prime divisor \(p_1\mid (n+1)\).
+
+\underline{Case \(k=2\).}
+Let \(p_1\) be any prime divisor of \(n+1\) and \(p_2\) any prime divisor of \(n+2\).
+Since \(\gcd(n+1,n+2)=1\), no prime divides both, so \(p_1\ne p_2\).
+
+\underline{Case \(k=3\).}
+Let \(N_1=n+1\), \(N_2=n+2\), \(N_3=n+3\). All are composite by assumption.
+Pick any prime divisor \(p_2\mid N_2\).
+Since \(\gcd(N_1,N_2)=\gcd(N_2,N_3)=1\), any primes \(p_1\mid N_1\) and \(p_3\mid N_3\)
+will automatically satisfy \(p_1\ne p_2\) and \(p_3\ne p_2\). So the only potential collision is
+\(p_1=p_3\).
+
+But \(\gcd(N_1,N_3)=\gcd(n+1,n+3)=\gcd(n+1,2)\in\{1,2\}\).
+So \(N_1\) and \(N_3\) share no odd prime factor; the only possible common prime is 2.
+
+If \(n\) is even, then \(N_1,N_3\) are odd, so they share no prime at all; choose any
+\(p_1\mid N_1\), \(p_3\mid N_3\), and all three primes are distinct.
+
+If \(n\) is odd, then \(N_1,N_3\) are even, so they both have the prime 2.
+If both \(N_1\) and \(N_3\) were powers of 2, then two powers of 2 would differ by 2.
+The only powers of 2 differing by 2 are \(2\) and \(4\), but \(2\) is not composite, contradicting
+that \(N_1,N_3\) are composite. Hence at least one of \(N_1,N_3\) has an odd prime divisor.
+
+Choose \(p_1\) to be an odd prime divisor of whichever of \(N_1\) or \(N_3\) has one, and choose
+\(p_3=2\) for the other even number. Then \(p_1\ne p_3\), and as noted \(p_2\) is distinct from both.
+
+Thus Grimm’s condition holds for \(k=3\). \(\square\)
+
+---
+
+### Lemma 4.2 (Matching formulation)
+Fix \(n,k\) with \(n+1,\dots,n+k\) composite.
+For each \(i\in\{1,\dots,k\}\), let
+\[
+P_i := \{\text{primes }p : p\mid (n+i)\}
+\]
+(the set of prime divisors of \(n+i\)).
+
+Then Grimm’s conjecture for this \((n,k)\) is equivalent to the existence of an injection
+\(f:\{1,\dots,k\}\to\mathbb P\) such that \(f(i)\in P_i\) for every \(i\).
+
+**Proof.**
+* Given distinct primes \(p_1,\dots,p_k\) with \(p_i\mid(n+i)\), define \(f(i)=p_i\); this is an injection
+  with \(f(i)\in P_i\).
+* Conversely, given an injection \(f\) with \(f(i)\in P_i\), set \(p_i=f(i)\); then \(p_i\mid(n+i)\)
+  and the primes are distinct.
+
+So the conditions are identical. \(\square\)
+
+---
+
+## 5) VERIFICATION
+
+* Lemma 4.1 (\(k=3\)): the only subtle point is excluding “both endpoints are powers of 2” when
+  \(n\) is odd; the difference-of-powers check is explicit.
+* Lemma 4.2 is a direct rephrasing.
+* Computation: I only claim “no counterexample up to the stated bounds”; this does not prove the
+  conjecture.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* A complete proof that Grimm’s conjecture holds for all \(n\) when \(k\le 3\) (Lemma 4.1).
+* A clean matching/injection formulation of the conjecture (Lemma 4.2).
+* Computational sanity checks: no counterexample found for \(3\le k\le 8\) up to \(n\le 200000\), and
+  for \(k=4\) up to \(n\le 10^6\).
+
+(ii) **Exact first gap.**
+
+Prove or disprove Grimm’s conjecture in full generality:
+\[
+\forall n,k\ge 1:\ \bigl(\forall i\in\{1,\dots,k\}:\ n+i\text{ composite}\bigr)\Rightarrow
+\exists\text{ distinct primes }p_1,\dots,p_k\ \forall i:\ p_i\mid(n+i).
+\]
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Use Lemma 4.2 to apply matching/SDR techniques: prove that for every subset
+   \(I\subseteq\{1,\dots,k\}\), the union \(\bigcup_{i\in I} P_i\) has size at least \(|I|\).
+   (This is exactly the Hall-type obstruction one must rule out.)
+2. Target the first “new” case \(k=4\) with a full proof (beyond computation), exploiting that
+   \(\gcd(n+i,n+j)\) is very small when \(|i-j|\in\{1,2,3\}\).
+3. Try to strengthen known partial results by bounding how many of the \(n+i\) can share a given
+   prime divisor, and controlling the total number of distinct primes dividing the product
+   \(\prod_{i=1}^k(n+i)\).
+
+(iv) **What a minimal counterexample would likely look like.**
+
+A minimal counterexample would be a block of consecutive composites \(n+1,\dots,n+k\) whose prime
+factor sets \(P_i\) have a “bottleneck”: there exists a subset \(I\) of indices such that
+\(\bigcup_{i\in I} P_i\) contains fewer than \(|I|\) primes, forcing any assignment to reuse a prime.
+In such a configuration, many of the \(n+i\) would have to share a very small set of primes (despite
+being mostly coprime in adjacent pairs), so any genuine counterexample is expected to have a highly
+structured pattern of repeated small prime divisors across the block.

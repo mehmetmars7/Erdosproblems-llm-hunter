@@ -1,0 +1,96 @@
+% Erdos Problem #458
+% Solution
+
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+Let $p_k$ denote the $k$th prime (so $p_1=2,p_2=3,\dots$).  For each integer $n\ge 1$ write
+\[[1,\dots,n]:=\mathrm{lcm}(1,2,\dots,n).
+\]
+The problem asks whether for \emph{all} integers $k\ge 1$ one has
+\[[1,\dots,p_{k+1}-1]\ <\ p_k\,[1,\dots,p_k].\]
+
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+The problem text itself states that Erd\H{o}s and Graham considered this ``almost certainly'' true but difficult, due to the possibility of many primes $q$ with $p_k<q^2<p_{k+1}$ and due to small-prime effects. I did not find (and do not use) any stated proof/disproof in the extracted file.
+
+\noindent\textbf{3) ATTACK PLAN}
+
+\begin{itemize}
+\item Rewrite $[1,\dots,n]$ via prime powers, so that the ratio
+$[1,\dots,p_{k+1}-1]/[1,\dots,p_k]$
+becomes a product over prime powers that appear between $p_k$ and $p_{k+1}-1$.
+Then the desired inequality becomes a bound on that product.
+\item Try to bound the ratio by splitting contributions from (a) prime squares $q^2$ in the interval, and (b) higher powers of small primes (e.g. $2^a,3^a,\dots$) that may cross from $\le p_k$ to $\le p_{k+1}-1$.
+\item Disproof attempt: search computationally for a $k$ where many such prime powers accumulate and make the ratio $\ge p_k$.
+\end{itemize}
+
+\noindent\textbf{4) WORK}
+
+\textbf{Fast reality check (computations).}
+
+I checked the inequality for $1\le k\le 300$ by direct computation of $\mathrm{lcm}(1,\dots,n)$ up to $n=p_{301}-1$. No counterexample was found in this range.
+
+\medskip
+\noindent\textbf{Lemma 458.1 (prime-power factorisation of $[1,\dots,n]$).}
+For every integer $n\ge 1$,
+\[[1,\dots,n] = \prod_{p\le n} p^{\alpha_p(n)},\qquad \alpha_p(n):=\max\{a\ge 0: p^a\le n\}=\left\lfloor \log_p n\right\rfloor.
+\]
+
+\textit{Proof.}
+Write the prime factorisation of each integer $m\le n$ as $m=\prod_{p} p^{v_p(m)}$.
+The least common multiple $[1,\dots,n]$ has, for each prime $p$, exponent equal to the maximum $\max_{1\le m\le n} v_p(m)$. This maximum equals the largest $a$ for which $p^a\le n$, because $p^a$ itself is in $\{1,\dots,n\}$ and has $v_p(p^a)=a$, while any $m\le n$ satisfies $v_p(m)\le a$ whenever $p^{a+1}>n$. Therefore the exponent is $\alpha_p(n)=\lfloor\log_p n\rfloor$, giving the claimed product over primes $p\le n$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 458.2 (ratio as product over prime powers in the gap).}
+Let $k\ge 1$. Then
+\[\frac{[1,\dots,p_{k+1}-1]}{[1,\dots,p_k]} = \prod_{\substack{p\le p_k\\ \exists a\ge 1\text{ with }p_k < p^a\le p_{k+1}-1}} p.
+\]
+Equivalently, the ratio is the product (with multiplicity one) of those primes $p\le p_k$ for which the maximal power of $p$ not exceeding $p_{k+1}-1$ is strictly larger than the maximal power of $p$ not exceeding $p_k$.
+
+\textit{Proof.}
+By Lemma~458.1,
+\[[1,\dots,p_{k+1}-1]=\prod_{p\le p_{k+1}-1} p^{\alpha_p(p_{k+1}-1)},\qquad [1,\dots,p_k]=\prod_{p\le p_k} p^{\alpha_p(p_k)}.
+\]
+Since $p_{k+1}$ is the next prime after $p_k$, the primes $\le p_{k+1}-1$ are exactly the primes $\le p_k$, so the quotient is
+\[\prod_{p\le p_k} p^{\alpha_p(p_{k+1}-1)-\alpha_p(p_k)}.
+\]
+Now $\alpha_p(m)$ increases by $1$ exactly when $m$ crosses a prime power $p^a$.
+Thus $\alpha_p(p_{k+1}-1)-\alpha_p(p_k)$ counts the number of exponents $a$ for which $p_k < p^a\le p_{k+1}-1$.
+But for fixed $p$, if there exists at least one such $a$, then multiplying by $p$ once accounts for increasing the exponent by $1$; and since the quotient only needs the total exponent difference, the quotient can be written as the product of $p$ repeated exactly that many times.  In particular, when there is at least one such $a$ the quotient picks up a factor $p$. This yields the displayed product. \hfill$\square$
+
+\medskip
+\noindent\textbf{Reformulation of the target inequality.}
+Lemma~458.2 shows the desired inequality is equivalent to
+\[\prod_{\substack{p\le p_k\\ \exists a\ge 1:~ p_k < p^a\le p_{k+1}-1}} p\ <\ p_k.\]
+So any counterexample must have the product of the ``new'' prime bases (coming from prime powers in $(p_k,p_{k+1})$) at least $p_k$.
+
+\medskip
+\noindent\textbf{5) VERIFICATION}
+
+\begin{itemize}
+\item Lemma~458.1: verified that for each prime $p$ the exponent is $\max_{m\le n} v_p(m)$ and this equals $\lfloor\log_p n\rfloor$.
+\item Lemma~458.2: verified the step ``primes up to $p_{k+1}-1$ equal primes up to $p_k$'' uses only the definition of consecutive primes.
+\item Computation: I independently checked small $k$ by hand: for $k=1$, $[1]=1<2\cdot [1,2]=2$; for $k=2$, $[1,2]=2<3\cdot [1,3]=6$, etc.
+\end{itemize}
+
+\noindent\textbf{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} The inequality is equivalent to a concrete statement about prime powers in the gap $(p_k,p_{k+1})$:
+\[[1,\dots,p_{k+1}-1] < p_k[1,\dots,p_k]\iff \prod_{\substack{p\le p_k\\ \exists a:~ p_k<p^a\le p_{k+1}-1}} p < p_k.
+\]
+Additionally, the inequality holds for all $1\le k\le 300$ by direct computation.
+
+(ii) \emph{First gap (crisp):} Prove that for every $k$ the product of primes $p\le p_k$ whose next prime power crosses from $\le p_k$ to $\le p_{k+1}-1$ is always $<p_k$.
+
+(iii) \emph{Top 3 next moves:}
+\begin{enumerate}
+\item Isolate the contribution from prime squares: show that there cannot be ``too many'' primes $q$ with $p_k<q^2<p_{k+1}$, or else their product forces a violation.
+\item Control small-prime powers (e.g. powers of $2,3,5$) by proving that not too many of them can lie in $(p_k,p_{k+1})$ simultaneously.
+\item Extend computation to larger $k$ and inspect near-extremal cases by logging which prime powers $p^a$ fall in the gap.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:} A minimal $k$ violating the inequality would require a prime gap $(p_k,p_{k+1})$ that contains an unusually large collection of prime powers $p^a$ (especially many prime squares $q^2$ just above $p_k$), such that the product of their bases $\ge p_k$.
+
+

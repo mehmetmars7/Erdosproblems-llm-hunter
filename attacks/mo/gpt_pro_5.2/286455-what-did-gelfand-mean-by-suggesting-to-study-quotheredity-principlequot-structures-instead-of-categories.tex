@@ -1,0 +1,310 @@
+\section{Problem 286455: ``Heredity principle'' structures vs.\ categories (quasideterminants)}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+\paragraph{Ambiguity/misstatement.}
+The attachment is a \emph{meta-question} about what Gelfand meant by ``study heredity-principle structures instead of categories'', and it includes a quotation describing the \emph{heredity principle} for \emph{quasideterminants}. As written it is not a single formal theorem statement.
+
+\paragraph{Minimal corrected mathematical statement.}
+The only explicit mathematical content in the quotation is the \emph{heredity principle for quasideterminants}.
+I will formalize and prove the following standard version (essentially the special case that implies the general block heredity statement):
+
+\begin{theorem}[Heredity for a Schur complement / nested quasideterminants]\label{thm:heredity}
+Let $D$ be a division ring. Let $A\in M_n(D)$ and fix $1\le k<n$. Write $A$ in $2\times 2$ block form
+\[
+A=\begin{pmatrix}
+A_{11} & A_{12}\\
+A_{21} & A_{22}
+\end{pmatrix},
+\]
+where $A_{11}\in M_k(D)$, $A_{22}\in M_{n-k}(D)$ and the off-diagonal blocks have compatible sizes.
+Assume that $A_{22}$ is invertible in $M_{n-k}(D)$ and define the (noncommutative) Schur complement
+\[
+S:=A_{11}-A_{12}A_{22}^{-1}A_{21}\in M_k(D).
+\]
+Then for every $i,j\in\{1,\dots,k\}$ the following hold.
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em]
+\item The quasideterminant $|A|_{ij}$ exists if and only if the quasideterminant $|S|_{ij}$ exists.
+\item In that case one has the equality in $D$:
+\[
+|A|_{ij}=|S|_{ij}.
+\]
+\end{enumerate}
+\end{theorem}
+
+\paragraph{How this yields the ``block heredity principle'' in the quotation.}
+If $A$ is partitioned into equal-sized square blocks so that it can be regarded as a matrix $X$ with entries in a matrix ring, then the block quasideterminant $|X|_{pq}$ is (by definition) a Schur complement of the complementary block submatrix. Theorem~\ref{thm:heredity} then says that taking a quasideterminant inside that block result agrees with taking the corresponding quasideterminant directly in $A$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+Quasideterminants were introduced by Gelfand--Retakh and collaborators as noncommutative analogues of determinants.
+The ``heredity principle'' is stated in many sources; for example it appears as Theorem~1.2.3/1.2.4 in Gelfand--Retakh--Wilson \emph{Quasideterminants} (arXiv:math/0208146).
+
+\subsection*{3) ATTACK PLAN}
+
+\begin{itemize}[leftmargin=2.2em]
+\item \textbf{Proof strategy (chosen):} Expand the definition of a quasideterminant $|A|_{ij}=a_{ij}-r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}$ and compute $(A^{ij})^{-1}$ via a block inversion formula (Schur complement). Show the expression collapses to the quasideterminant of the Schur complement $S$.
+\item \textbf{Adversarial check strategy:} Verify the block-inverse formula by direct multiplication; then verify the simplification step by step, tracking sizes and index deletions.
+\end{itemize}
+
+\subsection*{4) WORK}
+
+\subsubsection*{Phase 0 --- Hygiene: definition and notation}
+
+\begin{definition}[Quasideterminant]\label{def:qd}
+Let $R$ be a ring and $M=(m_{ab})\in M_n(R)$. Fix $1\le i,j\le n$.
+Let $M^{ij}\in M_{n-1}(R)$ be the matrix obtained by deleting row $i$ and column $j$.
+Let $r_i^{(j)}$ be row $i$ of $M$ with the $j$th entry removed (a $1\times (n-1)$ row vector over $R$),
+and let $c_j^{(i)}$ be column $j$ of $M$ with the $i$th entry removed (an $(n-1)\times 1$ column vector over $R$).
+If $M^{ij}$ is invertible in $M_{n-1}(R)$, the \emph{$(i,j)$-quasideterminant} of $M$ is
+\[
+|M|_{ij}\;:=\; m_{ij}\;-\; r_i^{(j)}(M^{ij})^{-1}c_j^{(i)}\;\in R.
+\]
+\end{definition}
+
+In this problem $R=D$ is a division ring, so invertibility in matrix rings is unambiguous.
+
+\subsubsection*{Phase 1 --- Tiny case sanity check}
+
+If $n=2$ and $M=\begin{psmallmatrix}a&b\\ c&d\end{psmallmatrix}$ with $d$ invertible, then
+$|M|_{11}=a-bd^{-1}c$ by Definition~\ref{def:qd}; this is exactly the Schur complement of $d$.
+
+\subsubsection*{Lemma: block inversion with a Schur complement}
+
+\begin{lemma}[Block inverse formula]\label{lem:blockinv}
+Let $D$ be a division ring and let
+\[
+M=\begin{pmatrix}P&Q\\ R&S\end{pmatrix}
+\]
+with $P\in M_k(D)$, $S\in M_{m}(D)$ and compatible $Q,R$.
+Assume $S$ is invertible and set $T:=P-QS^{-1}R\in M_k(D)$.
+Then $M$ is invertible if and only if $T$ is invertible.
+In that case
+\[
+M^{-1}=
+\begin{pmatrix}
+T^{-1} & -T^{-1}QS^{-1}\\
+-\,S^{-1}RT^{-1} & S^{-1}+S^{-1}RT^{-1}QS^{-1}
+\end{pmatrix}.
+\]
+\end{lemma}
+
+\begin{proof}
+Assume $S$ and $T$ are invertible and define the displayed matrix $N$.
+We check $MN=I$; the check $NM=I$ is similar (and follows since a left inverse over a division ring is also a right inverse for square matrices, but we do not use that shortcut).
+
+Compute the block product:
+\[
+MN=
+\begin{pmatrix}
+P&Q\\ R&S
+\end{pmatrix}
+\begin{pmatrix}
+T^{-1} & -T^{-1}QS^{-1}\\
+-\,S^{-1}RT^{-1} & S^{-1}+S^{-1}RT^{-1}QS^{-1}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\star_{11}&\star_{12}\\ \star_{21}&\star_{22}
+\end{pmatrix}.
+\]
+
+\emph{(11)-block:}
+\[
+\star_{11}=PT^{-1}+Q(-S^{-1}RT^{-1})=(P-QS^{-1}R)T^{-1}=TT^{-1}=I_k.
+\]
+
+\emph{(12)-block:}
+\begin{align*}
+\star_{12}
+&=P(-T^{-1}QS^{-1})+Q\bigl(S^{-1}+S^{-1}RT^{-1}QS^{-1}\bigr)\\
+&=-PT^{-1}QS^{-1}+QS^{-1}+QS^{-1}RT^{-1}QS^{-1}\\
+&=\bigl(-PT^{-1}+QS^{-1}RT^{-1}\bigr)QS^{-1}+QS^{-1}\\
+&=-(P-QS^{-1}R)T^{-1}QS^{-1}+QS^{-1}\\
+&=-TT^{-1}QS^{-1}+QS^{-1}=0.
+\end{align*}
+
+\emph{(21)-block:}
+\[
+\star_{21}=RT^{-1}+S(-S^{-1}RT^{-1})=RT^{-1}-RT^{-1}=0.
+\]
+
+\emph{(22)-block:}
+\begin{align*}
+\star_{22}
+&=R(-T^{-1}QS^{-1})+S\bigl(S^{-1}+S^{-1}RT^{-1}QS^{-1}\bigr)\\
+&=-RT^{-1}QS^{-1}+I_m+RT^{-1}QS^{-1}=I_m.
+\end{align*}
+
+Hence $MN=I$, so $M$ is invertible and $M^{-1}=N$.
+
+Conversely, assume $M$ invertible and $S$ invertible. Multiply $M$ on the right by
+$\begin{psmallmatrix}I&-QS^{-1}\\ 0&I\end{psmallmatrix}$ to obtain
+\[
+M\begin{pmatrix}I&-QS^{-1}\\ 0&I\end{pmatrix}
+=
+\begin{pmatrix}P-QS^{-1}R & Q\\ R & S\end{pmatrix}
+=
+\begin{pmatrix}T & Q\\ R & S\end{pmatrix}.
+\]
+The right factor is invertible, so the product is invertible, hence the left block-triangular matrix
+$\begin{psmallmatrix}T&Q\\ R&S\end{psmallmatrix}$ is invertible. Its determinant in the Dieudonn\'e sense is nonzero, but we can argue directly: if $T$ were not invertible then there exists nonzero $x\in D^k$ with $Tx=0$; then $\begin{psmallmatrix}x\\ 0\end{psmallmatrix}$ would lie in the kernel of $\begin{psmallmatrix}T&Q\\ R&S\end{psmallmatrix}$, contradicting invertibility. Thus $T$ is invertible.
+\end{proof}
+
+\subsubsection*{Phase 3 --- Proof of Theorem~\ref{thm:heredity}}
+
+\begin{proof}[Proof of Theorem~\ref{thm:heredity}]
+Fix $i,j\in\{1,\dots,k\}$.
+Write $A$ in blocks as in the theorem and let $S=A_{11}-A_{12}A_{22}^{-1}A_{21}$.
+
+\medskip
+\noindent\textbf{Step 1: relate invertibility of $A^{ij}$ to invertibility of $S^{ij}$.}
+
+Let $A^{ij}$ be $A$ with row $i$ and column $j$ removed.
+Because $i,j$ lie in the $A_{11}$ block, the deletion affects the top-left block but not the bottom-right block.
+Write $A^{ij}$ in $2\times 2$ block form:
+\[
+A^{ij}=
+\begin{pmatrix}
+A_{11}^{ij} & B\\
+C & A_{22}
+\end{pmatrix},
+\]
+where:
+\begin{itemize}[leftmargin=2.2em]
+\item $A_{11}^{ij}$ is $A_{11}$ with row $i$ and column $j$ deleted (a $(k-1)\times (k-1)$ matrix),
+\item $B$ is $A_{12}$ with row $i$ deleted (a $(k-1)\times (n-k)$ matrix),
+\item $C$ is $A_{21}$ with column $j$ deleted (a $(n-k)\times (k-1)$ matrix),
+\item $A_{22}$ is unchanged and invertible by hypothesis.
+\end{itemize}
+Define
+\[
+T:=A_{11}^{ij}-B\,A_{22}^{-1}C\in M_{k-1}(D).
+\]
+By Lemma~\ref{lem:blockinv} (applied with $P=A_{11}^{ij}$, $Q=B$, $R=C$, $S=A_{22}$),
+$A^{ij}$ is invertible if and only if $T$ is invertible.
+
+Next observe that $T$ is exactly the $(i,j)$-minor of $S$:
+indeed, $S=A_{11}-A_{12}A_{22}^{-1}A_{21}$, and deleting row $i$ and column $j$ from $S$
+deletes row $i$ from $A_{12}$ and column $j$ from $A_{21}$, giving
+\[
+S^{ij}=A_{11}^{ij}-B\,A_{22}^{-1}C=T.
+\]
+Therefore, $A^{ij}$ is invertible iff $S^{ij}$ is invertible.
+By Definition~\ref{def:qd}, this proves Theorem~\ref{thm:heredity}(a).
+
+\medskip
+\noindent\textbf{Step 2: compute $|A|_{ij}$.}
+
+Assume now that $A^{ij}$ (equivalently $S^{ij}$) is invertible.
+By Definition~\ref{def:qd},
+\[
+|A|_{ij}=a_{ij}-r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}.
+\]
+We compute the scalar $r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}$ explicitly.
+
+Write the row/column vectors in block form compatible with $A^{ij}$:
+\[
+r_i^{(j)}=\bigl(r_1\;\; r_2\bigr),\qquad
+c_j^{(i)}=\begin{pmatrix}c_1\\ c_2\end{pmatrix},
+\]
+where:
+\begin{itemize}[leftmargin=2.2em]
+\item $r_1$ is row $i$ of $A_{11}$ with column $j$ removed (a $1\times (k-1)$ row),
+\item $r_2$ is row $i$ of $A_{12}$ (a $1\times (n-k)$ row),
+\item $c_1$ is column $j$ of $A_{11}$ with row $i$ removed (a $(k-1)\times 1$ column),
+\item $c_2$ is column $j$ of $A_{21}$ (a $(n-k)\times 1$ column).
+\end{itemize}
+
+Now apply Lemma~\ref{lem:blockinv} to $A^{ij}=\begin{psmallmatrix}A_{11}^{ij}&B\\ C&A_{22}\end{psmallmatrix}$.
+Since $A_{22}$ and $T=S^{ij}$ are invertible, we have
+\[
+(A^{ij})^{-1}=
+\begin{pmatrix}
+T^{-1} & -T^{-1}BA_{22}^{-1}\\
+-\,A_{22}^{-1}CT^{-1} & A_{22}^{-1}+A_{22}^{-1}CT^{-1}BA_{22}^{-1}
+\end{pmatrix}.
+\]
+Therefore
+\begin{align*}
+r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}
+&=\bigl(r_1\;\;r_2\bigr)
+\begin{pmatrix}
+T^{-1} & -T^{-1}BA_{22}^{-1}\\
+-\,A_{22}^{-1}CT^{-1} & A_{22}^{-1}+A_{22}^{-1}CT^{-1}BA_{22}^{-1}
+\end{pmatrix}
+\begin{pmatrix}c_1\\ c_2\end{pmatrix}\\
+&= r_1T^{-1}c_1 - r_1T^{-1}BA_{22}^{-1}c_2
+- r_2A_{22}^{-1}CT^{-1}c_1\\
+&\qquad\qquad
++ r_2A_{22}^{-1}c_2
++ r_2A_{22}^{-1}CT^{-1}BA_{22}^{-1}c_2.
+\end{align*}
+
+Group the four terms involving $T^{-1}$:
+\begin{align*}
+& r_1T^{-1}c_1 - r_1T^{-1}BA_{22}^{-1}c_2
+- r_2A_{22}^{-1}CT^{-1}c_1
++ r_2A_{22}^{-1}CT^{-1}BA_{22}^{-1}c_2\\
+&\qquad = (r_1-r_2A_{22}^{-1}C)\;T^{-1}\;(c_1-BA_{22}^{-1}c_2).
+\end{align*}
+Hence
+\begin{equation}\label{eq:rAc}
+r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}
+=
+(r_1-r_2A_{22}^{-1}C)\;T^{-1}\;(c_1-BA_{22}^{-1}c_2)
+\;+\; r_2A_{22}^{-1}c_2.
+\end{equation}
+
+Now identify these pieces with the corresponding pieces for $S$.
+By the definition $S=A_{11}-A_{12}A_{22}^{-1}A_{21}$ we have:
+\begin{itemize}[leftmargin=2.2em]
+\item The $(i,j)$ entry of $S$ is
+\[
+s_{ij}=a_{ij}-r_2A_{22}^{-1}c_2.
+\]
+\item The row $i$ of $S$ with column $j$ removed is
+\[
+r_S:=r_1-r_2A_{22}^{-1}C
+\]
+(because deleting column $j$ from $A_{21}$ produces $C$).
+\item The column $j$ of $S$ with row $i$ removed is
+\[
+c_S:=c_1-BA_{22}^{-1}c_2
+\]
+(because deleting row $i$ from $A_{12}$ produces $B$).
+\item The minor $S^{ij}$ is exactly $T$ (already shown).
+\end{itemize}
+
+Substitute these identifications into \eqref{eq:rAc}:
+\[
+r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}
+=
+r_S\,(S^{ij})^{-1}\,c_S + (a_{ij}-s_{ij}).
+\]
+Therefore
+\begin{align*}
+|A|_{ij}
+&=a_{ij}-r_i^{(j)}(A^{ij})^{-1}c_j^{(i)}\\
+&=a_{ij}-\Bigl(r_S\,(S^{ij})^{-1}\,c_S + (a_{ij}-s_{ij})\Bigr)\\
+&=s_{ij}-r_S(S^{ij})^{-1}c_S\\
+&=|S|_{ij},
+\end{align*}
+which is exactly Theorem~\ref{thm:heredity}(b).
+\end{proof}
+
+\subsection*{5) VERIFICATION}
+
+\begin{itemize}[leftmargin=2.2em]
+\item \textbf{Quantifiers/checks:} The proof never assumes $A$ itself is invertible; only $A_{22}$ and the relevant minors are inverted. This matches Definition~\ref{def:qd}.
+\item \textbf{Edge cases:} If $k=1$, then $S$ is $1\times 1$ and $|S|_{11}=s_{11}$; the proof reduces to the $2\times 2$ case. If $n-k=1$, the formulas still make sense.
+\item \textbf{Noncommutativity:} All multiplications respect order; we never commute factors.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\begin{center}
+\textbf{PROOF}
+\end{center}
+
+Theorem~\ref{thm:heredity} is proved above.  It is a precise ``heredity principle'' statement: a quasideterminant taken after forming a Schur complement (block quasideterminant) equals the corresponding quasideterminant taken directly in the original matrix, under exactly stated invertibility hypotheses.

@@ -1,0 +1,137 @@
+% Erdos Problem #1002
+
+1) FORMAL RESTATEMENT
+For $\alpha\in(0,1)$ and integer $n\ge 2$, define
+\[
+F(\alpha,n) := \frac{1}{\log n}\sum_{k=1}^n \left(\frac12 - \{\alpha k\}\right).
+\]
+Let $\alpha$ be chosen uniformly from $(0,1)$.  The question is whether there exists an (asymptotic) distribution function $g:\mathbb{R}\to[0,1]$ such that for every real $c$,
+\[
+\lim_{n\to\infty}\,\mathbb{P}\bigl(F(\alpha,n)\le c\bigr)=g(c).
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The statement mentions a theorem of Kesten for the related quantity with an additional random shift $\beta$ in the indicator $\mathbf 1_{[0,\beta)}(\{\alpha k\})$.  I do not use results beyond what is stated.
+
+3) ATTACK PLAN
+Exploit explicit structure of the summand $\frac12-\{x\}$:
+- Rewrite the sum in terms of floor sums $\sum\lfloor \alpha k\rfloor$.
+- Use the Fourier series of the sawtooth function $x\mapsto \frac12-\{x\}$ to express the sum in terms of geometric series $\sum_{k\le n} e^{2\pi i h\alpha k}$.
+- Identify how near-rational $\alpha$ creates large contributions; this is consistent with heavy-tailed limiting distributions.
+
+4) WORK
+
+FAST REALITY CHECK (Monte Carlo sampling).
+I sampled $300$ random rationals $\alpha=a/M$ with $M=1{,}000{,}000{,}007$ prime and computed $F(\alpha,n)$ for $n=20000$.
+The empirical summary:
+\[
+\min\approx -5.1641,\quad \max\approx 6.0323,\quad \text{median}\approx -0.0040,\quad \text{mean}\approx 0.0156,\quad \text{stdev}\approx 0.8945.
+\]
+The spread and outliers are consistent with a heavy-tailed distribution (but this is only a sanity check, not a proof).
+
+Lemma 1 (Mean zero for each fixed $n$).
+For every integer $n\ge 1$,
+\[
+\int_0^1 F(\alpha,n)\,d\alpha = 0.
+\]
+
+Proof.
+Fix $k\ge 1$.  The map $T_k:[0,1]\to[0,1]$ given by $T_k(\alpha)=\{k\alpha\}$ is measure-preserving: for any integrable $g$,
+\[
+\int_0^1 g(\{k\alpha\})\,d\alpha = \int_0^1 g(x)\,dx.
+\]
+To verify this, partition $[0,1)$ into intervals $[j/k,(j+1)/k)$ for $j=0,\dots,k-1$.  On each interval, $\{k\alpha\}=k\alpha-j$ runs bijectively over $[0,1)$ with Jacobian $1/k$, so
+\[
+\int_{j/k}^{(j+1)/k} g(\{k\alpha\})\,d\alpha = \frac{1}{k}\int_0^1 g(x)\,dx,
+\]
+and summing over $j$ gives the claim.
+
+Apply this with $g(x)=\frac12-x$ on $[0,1)$ (so $g(x)=\frac12-\{x\}$ periodically).  Since $\int_0^1 (\frac12-x)dx=0$, we have
+\[
+\int_0^1 \left(\frac12-\{k\alpha\}\right)d\alpha = 0.
+\]
+Summing over $k=1,\dots,n$ and dividing by $\log n$ gives $\int_0^1 F(\alpha,n)d\alpha=0$. \qed
+
+Lemma 2 (Fourier expansion of the sawtooth).
+Define the 1-periodic function $g(x):=\frac12-\{x\}$ (with $\{x\}\in[0,1)$).  Then for $x\notin\mathbb{Z}$,
+\[
+ g(x) = \sum_{h\in\mathbb{Z}\setminus\{0\}} \frac{1}{2\pi i h}\,e^{2\pi i h x}
+ = \sum_{h=1}^\infty \frac{\sin(2\pi h x)}{\pi h}.
+\]
+
+Proof.
+On $x\in(0,1)$ we have $g(x)=\frac12-x$.  For $h\neq 0$, the Fourier coefficient is
+\[
+\widehat g(h)=\int_0^1 \left(\frac12-x\right)e^{-2\pi i h x}\,dx.
+\]
+Integrating by parts (or evaluating directly) yields
+\[
+\widehat g(h)=\frac{1}{2\pi i h}.
+\]
+Also $\widehat g(0)=\int_0^1 (\frac12-x)dx=0$.  Therefore the Fourier series is
+\[
+\sum_{h\neq 0} \widehat g(h)e^{2\pi i h x} = \sum_{h\neq 0} \frac{1}{2\pi i h}e^{2\pi i h x}.
+\]
+Standard Fourier theory for piecewise $C^1$ periodic functions implies this converges to $g(x)$ for $x\notin\mathbb{Z}$ (and to the midpoint of the jump at integers).  Grouping $\pm h$ gives the sine series form. \qed
+
+Lemma 3 (A bounded subsequence along good rational approximants).
+Let $\alpha\in(0,1)$ be irrational and let $p/q$ be a rational with
+\[
+\left|\alpha-\frac{p}{q}\right| < \frac{1}{q^2}.
+\]
+Then
+\[
+\left|\sum_{k=1}^q \left(\frac12-\{\alpha k\}\right) - \frac12\right| \le 3.
+\]
+In particular,
+\[
+|F(\alpha,q)| \le \frac{7/2}{\log q}\xrightarrow[q\to\infty]{}0
+\]
+along any sequence of such approximants with $q\to\infty$.
+
+Proof.
+Write $\delta:=\alpha-p/q$, so $|\delta|<1/q^2$.  For each $k\in\{1,\dots,q\}$, let
+\[
+ u_k:=\left\{\frac{kp}{q}\right\}\in\left\{0,\frac1q,\dots,\frac{q-1}{q}\right\},
+\qquad
+ v_k:=\{k\alpha\}=\{u_k + k\delta\}.
+\]
+Since $|k\delta|\le q|\delta|<1/q$, we have $u_k+k\delta\in(-1/q,1+1/q)$.
+
+Case 1: $u_k\in\{1/q,2/q,\dots,(q-2)/q\}$.  Then $u_k\in[1/q,1-1/q]$, so $u_k+k\delta\in(0,1)$ and hence $v_k=u_k+k\delta$.  Therefore
+\[
+\left|\left(\frac12-v_k\right)-\left(\frac12-u_k\right)\right| = |u_k-v_k| = |k\delta| < \frac{1}{q}.
+\]
+There are exactly $q-2$ such indices $k$.
+
+Case 2: $u_k\in\{0,(q-1)/q\}$.  Then $v_k$ may wrap around mod $1$, but in all cases $\frac12-v_k$ and $\frac12-u_k$ both lie in $[-1/2,1/2]$, hence
+\[
+\left|\left(\frac12-v_k\right)-\left(\frac12-u_k\right)\right|\le 1.
+\]
+There are at most two such indices $k$ (since $u_k$ is a permutation of the $q$ grid points).
+
+Summing the absolute differences and using the triangle inequality gives
+\[
+\left|\sum_{k=1}^q \left(\frac12-v_k\right) - \sum_{k=1}^q \left(\frac12-u_k\right)\right|
+\le (q-2)\cdot \frac{1}{q} + 2\cdot 1 < 3.
+\]
+Finally, since $\{kp/q\}$ runs through all grid points $\{0,1/q,\dots,(q-1)/q\}$,
+\[
+\sum_{k=1}^q \left(\frac12-u_k\right)=\sum_{j=0}^{q-1}\left(\frac12-\frac{j}{q}\right)=\frac12.
+\]
+Combining yields the claimed bound.  Dividing by $\log q$ gives the final displayed conclusion. \qed
+
+5) VERIFICATION
+- Lemma 1 uses only measure-preservation of $\alpha\mapsto\{k\alpha\}$ and the fact that $\int_0^1(\frac12-x)dx=0$.
+- Lemma 2 computes Fourier coefficients explicitly; the only analytic input is standard pointwise convergence away from jump discontinuities.
+- Lemma 3 carefully handles wrap-around only for the two boundary grid points $0$ and $(q-1)/q$.
+
+6) FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result: (a) $\mathbb{E}_\alpha[F(\alpha,n)]=0$ for every $n$ (Lemma 1). (b) Explicit Fourier expansion of the summand and hence a Fourier representation of the entire sum (Lemma 2). (c) For any irrational $\alpha$, along any sequence of rationals $p/q$ with $|\alpha-p/q|<1/q^2$ the normalized value $F(\alpha,q)$ tends to $0$ (Lemma 3).
+(ii) First gap: Prove (or disprove) that the distribution of $F(\alpha,n)$ over $\alpha\in(0,1)$ converges as $n\to\infty$.  Even with Lemma 3, it is unclear whether the distribution stabilizes or oscillates due to arithmetic structure in $n$.
+(iii) Top 3 next moves:
+  1. Use Lemma 2 to express $F(\alpha,n)$ as a sum over Fourier modes of geometric sums and attempt to control the joint contribution of modes with $|h|\lesssim n$ (where denominators $\sin(\pi h\alpha)$ are small).
+  2. Study the distribution of $\sum_{k\le n} \sin(2\pi h\alpha k)$ for random $\alpha$ and how it correlates across $h$, to see whether a stable limit law (e.g. Cauchy-type) is plausible without the extra random $\beta$.
+  3. Search numerically for two sequences $n_j$ and $n'_j$ along which the empirical CDF of $F(\alpha,n)$ differs significantly (suggesting non-convergence), and try to link that to number-theoretic structure of $n$ (e.g. whether $n$ is a convergent denominator for many $\alpha$).
+(iv) Minimal counterexample structure (if no limiting distribution exists): one would need two subsequences $n_j,n'_j\to\infty$ such that the distributions of $F(\alpha,n_j)$ and $F(\alpha,n'_j)$ stay separated (e.g. because one subsequence forces many $\alpha$ to have unusually small denominators $\sin(\pi h\alpha)$ for certain $h$).  Lemma 3 suggests that convergent denominators $q$ produce many $\alpha$ with $F(\alpha,q)$ near $0$, which could drive oscillation in the distribution if such effects are not smoothed out.

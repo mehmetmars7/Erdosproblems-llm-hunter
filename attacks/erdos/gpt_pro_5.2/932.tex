@@ -1,0 +1,92 @@
+% Erdos Problem #932
+
+1) FORMAL RESTATEMENT
+
+Let $p_r$ denote the $r$th prime, and write $g_r:=p_{r+1}-p_r$ for the prime gap.
+For a positive integer $n$, let $P^+(n)$ be the largest prime factor of $n$.
+The property in the problem is:
+\[
+\exists\ \text{at least two integers }n\ \text{with }p_r<n<p_{r+1}\ \text{and }P^+(n)<g_r.
+\]
+The question is whether this happens for infinitely many $r$.
+
+Edge cases: if $g_r=2$ then there are no integers strictly between $p_r$ and $p_{r+1}$; if $g_r=3$ there is exactly one integer in between, so the property cannot hold. Thus any $r$ witnessing the property must have $g_r\ge 4$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+From the provided problem statement: Erd\H{o}s believed the answer is ``yes'' but that such $r$ are sparse, and he could show that the density of $r$ for which at least one such $n$ exists is $0$. The statement was also formalised in Lean in the Google DeepMind Formal Conjectures project (as noted in the source file).
+
+3) ATTACK PLAN
+
+\begin{itemize}
+\item \textbf{Try to build explicit $r$:} a sufficient condition is to find a prime gap in which there are two numbers composed only of primes $<g_r$.
+\item \textbf{Local sufficient conditions:} if an integer $n$ in the gap is small compared to $g_r$, then having a prime factor $\ge g_r$ is impossible.
+\item \textbf{Computation:} scan prime gaps up to some bound and count how many $n$ in each gap satisfy $P^+(n)<g_r$.
+\end{itemize}
+
+4) WORK
+
+\textbf{Lemma 932.1 (a size condition that forces $g_r$-smoothness).}
+Fix $r$ and set $g=g_r$.
+If $n$ is a composite integer satisfying $p_r<n<p_{r+1}$ and $n<2g$, then every prime factor of $n$ is $<g$. (Equivalently, $P^+(n)<g$.)
+
+\emph{Proof.}
+Assume $n$ is composite and $n<2g$.
+Let $q$ be any prime factor of $n$. If $q\ge g$, then $n=q\cdot m$ for some integer $m\ge 2$ (since $n$ is composite). Hence $n\ge 2q\ge 2g$, contradicting $n<2g$.
+Therefore every prime factor $q$ of $n$ satisfies $q<g$, as claimed.
+\hfill$\square$
+
+\medskip
+\textbf{Proposition 932.2 (explicit small example).}
+For $r=4$ we have $(p_r,p_{r+1})=(7,11)$ and $g_4=4$. The integers $8$ and $9$ satisfy $7<8<9<11$ and all their prime factors are $<4$. Hence $r=4$ satisfies the property.
+
+\emph{Proof.}
+Compute: $8=2^3$ has prime factor set $\{2\}$, and $9=3^2$ has prime factor set $\{3\}$. Both $2$ and $3$ are strictly less than $g_4=4$.
+\hfill$\square$
+
+\medskip
+\textbf{FAST REALITY CHECK (local computation up to $200{,}000$).}
+I computed all prime gaps with $p_{r+1}\le 200{,}000$ and counted, for each $r$, how many integers $n$ with $p_r<n<p_{r+1}$ satisfy $P^+(n)<g_r$.
+In this range I found $20$ values of $r$ for which there are \emph{at least two} such integers.
+The first few are:
+\begin{center}
+\begin{tabular}{r|r|r|r|l}
+$r$ & $p_r$ & $p_{r+1}$ & $g_r$ & first two ``good'' $n$\\\hline
+4 & 7 & 11 & 4 & 8,9 \\
+9 & 23 & 29 & 6 & 24,25 \\
+11 & 31 & 37 & 6 & 32,36 \\
+15 & 47 & 53 & 6 & 48,50 \\
+24 & 89 & 97 & 8 & 90,96 \\
+\end{tabular}
+\end{center}
+(Here ``good'' means all prime factors $<g_r$.)
+This is only evidence and does not address infinitude.
+
+5) VERIFICATION
+
+\begin{itemize}
+\item Lemma 932.1: the only use of compositeness is to ensure $m\ge 2$ when writing $n=q m$. If $n$ were prime, it could have $P^+(n)=n\ge g$.
+\item Proposition 932.2: verified by direct factorization.
+\end{itemize}
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result here.}
+A sufficient condition for an integer $n$ in the prime gap to satisfy $P^+(n)<g_r$ is $n<2g_r$ together with compositeness (Lemma 932.1). There are explicit small $r$ with at least two such $n$ (e.g. $r=4$) and computationally many more in small ranges.
+
+(ii) \textbf{First gap (crisp).}
+Prove that there are infinitely many $r$ such that at least two integers $n$ with $p_r<n<p_{r+1}$ satisfy $P^+(n)<p_{r+1}-p_r$.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Try to explicitly construct prime gaps that contain two numbers whose prime factors are all below the gap size (e.g. by combining known ``large gap'' constructions with smooth numbers).
+\item Compute further to much larger bounds to guess the growth rate (frequency) of such $r$, and to look for repeating structural patterns in the good integers.
+\item Seek a theoretical sufficient condition on the residue class structure of $p_r$ modulo small primes that guarantees two $g_r$-smooth integers in $(p_r,p_{r+1})$.
+\end{enumerate}
+
+(iv) \textbf{What a minimal counterexample would look like.}
+A counterexample to the infinitude statement would mean that beyond some $r_0$, every prime gap $(p_r,p_{r+1})$ contains at most one integer whose prime factors are all $<g_r$. In particular, for large $r$ the interval would force most composites to have a prime factor at least the gap size.
+
+

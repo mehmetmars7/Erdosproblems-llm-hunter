@@ -1,0 +1,195 @@
+% Erdos Problem #1045
+% URL: https://www.erdosproblems.com/1045
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $n\ge 2$. Let $z_1,\dots,z_n\in\mathbb C$ satisfy the diameter constraint
+\[
+  |z_i-z_j|\le 2\quad\text{for all }i,j.
+\]
+Define
+\[
+  \Delta(z_1,\dots,z_n):=\prod_{i\ne j}|z_i-z_j|.
+\]
+(Equivalently, if $P:=\prod_{1\le i<j\le n}|z_i-z_j|$ is the unordered product, then $\Delta=P^2$.)
+Determine
+\[
+  M_n:=\max\{\Delta(z_1,\dots,z_n): |z_i-z_j|\le 2\ \forall i,j\},
+\]
+and decide whether maximizers can be taken to be the vertices of a regular $n$-gon (scaled so that the
+diameter equals $2$).
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided text states several known bounds and constructions, and explicitly notes that for $n=4$ and
+$n=6$ there are examples showing the regular polygon is not a maximizer.
+In this writeup I will not rely on any external results; I will give an explicit counterexample for $n=4$
+with full verification.
+
+3) ATTACK PLAN
+
+Proof track (small $n$):
+- For $n=2,3$, determine $M_n$ directly by bounding each distance by $2$.
+- For regular polygons, compute $\Delta$ via Vandermonde determinants.
+
+Disproof track (polygon optimality):
+- Search numerically for $n=4$ to find a configuration beating the square; then simplify it to exact
+  algebraic coordinates and verify rigorously.
+
+4) WORK
+
+FAST REALITY CHECK (small $n$)
+
+For $n=2$:
+- Constraint gives $|z_1-z_2|\le 2$.
+- Then $\Delta=|z_1-z_2|^2\le 4$, achieved by any pair at distance $2$.
+So $M_2=4$.
+
+For $n=3$:
+- There are three unordered distances, each $\le 2$, so
+  $P=\prod_{i<j}|z_i-z_j|\le 2^3=8$, hence $\Delta=P^2\le 64$.
+- Equality requires all three distances $=2$, which is realized by an equilateral triangle of side $2$.
+So $M_3=64$.
+
+Lemma 4.1 (Scaling reduction to diameter $2$)
+
+Let $P(z_1,\dots,z_n)=\prod_{i<j}|z_i-z_j|$.
+If $\operatorname{diam}:=\max_{i<j}|z_i-z_j|<2$, then scaling all points by factor $2/\operatorname{diam}$
+produces a new configuration satisfying the constraints with larger product $P$, hence larger $\Delta$.
+Therefore any maximizer satisfies $\max_{i<j}|z_i-z_j|=2$.
+
+Proof.
+If we replace each $z_i$ by $z_i' := \lambda z_i$ with $\lambda>0$, then all distances scale by $\lambda$.
+Thus $P$ scales by $\lambda^{\binom{n}{2}}$ and $\Delta$ scales by $\lambda^{n(n-1)}$.
+If the diameter is $\operatorname{diam}<2$, choosing $\lambda=2/\operatorname{diam}>1$ keeps all pairwise
+ distances $\le 2$ and strictly increases $P$ and $\Delta$.
+$\square$
+
+Lemma 4.2 (Regular $n$-gon value)
+
+Let $\zeta= e^{2\pi i/n}$ and $u_k=\zeta^k$ for $k=0,1,\dots,n-1$.
+Then
+\[
+  \prod_{0\le i<j\le n-1} |u_i-u_j| = n^{n/2},
+\]
+so for the regular $n$-gon on the unit circle (circumradius $1$), the ordered product is
+\[
+  \Delta_{\mathrm{unit\ circle}} = n^n.
+\]
+To enforce diameter $2$:
+- If $n$ is even, the unit-circle polygon already has diameter $2$, hence $\Delta_{\mathrm{reg}}=n^n$.
+- If $n$ is odd, the maximal chord length on the unit circle is $2\cos(\pi/(2n))$, so scaling by
+  $\sec(\pi/(2n))$ makes the diameter $2$ and multiplies $\Delta$ by the factor
+  $\sec(\pi/(2n))^{n(n-1)}$. Thus
+\[
+  \Delta_{\mathrm{reg}} = \cos\!\left(\frac{\pi}{2n}\right)^{-n(n-1)}\,n^n.
+\]
+
+Proof.
+The Vandermonde determinant identity gives
+\[
+  \prod_{0\le i<j\le n-1} (u_j-u_i) = \prod_{j=1}^{n-1} (\zeta^j-1)^{n-j}.
+\]
+Taking absolute values, using $|\zeta|=1$ and symmetry, one can also use the standard identity
+\[
+  \prod_{j=1}^{n-1} |1-\zeta^j| = n,
+\]
+which follows from evaluating $x^n-1=(x-1)\prod_{j=1}^{n-1}(x-\zeta^j)$ at $x=1$ and taking limits:
+\[
+  n = \lim_{x\to 1} \frac{x^n-1}{x-1} = \prod_{j=1}^{n-1} (1-\zeta^j).
+\]
+Taking absolute values yields $\prod_{j=1}^{n-1}|1-\zeta^j|=n$.
+A standard Vandermonde computation then gives
+$\prod_{i<j}|u_i-u_j|=n^{n/2}$ (equivalently, the discriminant of $x^n-1$ has absolute value $n^n$).
+Thus $\Delta=(\prod_{i<j}|u_i-u_j|)^2=n^n$.
+
+For the diameter scaling: if $n$ is even, opposite vertices exist and are distance $2$ on the unit circle.
+If $n$ is odd, the largest angular separation is $(n-1)\pi/n=\pi-\pi/n$, giving chord length
+$2\sin((\pi-\pi/n)/2)=2\cos(\pi/(2n))$. Scaling distances by $\sec(\pi/(2n))$ multiplies
+$\Delta$ by $\sec(\pi/(2n))^{n(n-1)}$.
+$\square$
+
+Explicit COUNTEREXAMPLE for $n=4$ (regular polygon is not a maximizer)
+
+Consider the four points
+\[
+  z_1=-1,\quad z_2=1,\quad z_3=(1-\sqrt 3)+i,\quad z_4=(1-\sqrt 3)-i.
+\]
+We verify the constraint $|z_i-z_j|\le 2$ and compute $\Delta$.
+
+Step 1: Pairwise distances.
+
+- $|z_1-z_2|=|-2|=2$.
+- $|z_3-z_4|=|2i|=2$.
+- $|z_2-z_3| = |1-(1-\sqrt3)-i| = |\sqrt3-i|=\sqrt{3+1}=2$.
+  Similarly $|z_2-z_4|=2$.
+- $|z_1-z_3| = |-1-(1-\sqrt3)-i| = |(\sqrt3-2)-i|$.
+  Hence
+  \[
+    |z_1-z_3|^2 = (\sqrt3-2)^2+1 = (7-4\sqrt3)+1 = 8-4\sqrt3 =4(2-\sqrt3),
+  \]
+  so $|z_1-z_3|=2\sqrt{2-\sqrt3}$. Likewise $|z_1-z_4|=2\sqrt{2-\sqrt3}$.
+
+All distances are $\le 2$ because $2\sqrt{2-\sqrt3}<2$.
+Thus the constraint is satisfied and diameter is $2$.
+
+Step 2: Product $\Delta$.
+
+The unordered product is
+\[
+  P=\prod_{i<j}|z_i-z_j| = (2)^4\cdot\bigl(2\sqrt{2-\sqrt3}\bigr)^2 = 16\cdot 4(2-\sqrt3)=64(2-\sqrt3).
+\]
+Therefore
+\[
+  \Delta = P^2 = 4096(2-\sqrt3)^2.
+\]
+For the regular square of diameter $2$ (vertices at $\pm 1,\pm i$), the unordered product is
+$P_{\square}=(\sqrt2)^4\cdot 2^2=16$, so $\Delta_{\square}=256$.
+
+To compare, note
+\[
+  P>16 \iff 64(2-\sqrt3)>16 \iff 2-\sqrt3>\tfrac14
+  \iff 7>4\sqrt3 \iff 49>48,
+\]
+which holds.
+Hence $\Delta>256$.
+
+Thus the regular $4$-gon (square) is not a maximizer.
+
+(FAST REALITY CHECK via computation)
+A short numerical optimization with constraints (not reproduced here) found essentially the same
+configuration. A direct numerical evaluation gives $\Delta\approx 294.0795688>256$.
+
+5) VERIFICATION
+
+- All pairwise distances were computed exactly in radicals and shown $\le 2$.
+- The strict inequality $P>16$ was reduced to $49>48$, leaving no numerical ambiguity.
+- Therefore this is a fully rigorous counterexample to the claim that the regular polygon always
+  maximizes $\Delta$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Exact maxima for $n=2,3$: $M_2=4$ and $M_3=64$.
+- Exact value of $\Delta$ for regular $n$-gons scaled to diameter $2$ (Lemma 4.2).
+- A fully explicit counterexample for $n=4$ showing the regular polygon is not a maximizer.
+
+(ii) First gap (crisp statement).
+Determine the exact value of $M_n$ (or even its sharp asymptotics) for general $n\ge 4$.
+
+(iii) Top 3 next moves.
+1. For fixed small $n$ (e.g. $n=4,5,6$), perform rigorous global optimization (or certified numerics)
+   to conjecture exact maximizers and possibly algebraic coordinates.
+2. Prove structural constraints for maximizers (e.g. diameter achieved by multiple pairs, boundary
+   of convex hull, or equal-distance conditions from KKT/Lagrange multipliers).
+3. Seek a general upper bound of the form $\Delta\le C^n n^n$ with explicit best constant $C$, and
+   attempt matching constructions.
+
+(iv) Minimal counterexample structure.
+Any exact maximizer different from the regular polygon should exploit the lack of opposite vertices
+(for odd $n$) or introduce "cluster + antipode" structure for even $n$ (as in the $n=4$ example),
+so that many distances are forced to equal the diameter $2$ while only a few become moderately small.
+
+

@@ -1,0 +1,121 @@
+% Attempt for Erdos Problem #43
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $A\subset\mathbb Z$ is Sidon if all sums $a_1+a_2$ with $a_1\le a_2$ in $A$ are distinct.
+- For $S\subset\mathbb Z$, define $S-S:=\{s-s': s,s'\in S\}$.
+- Let $f(N):=\max\{|S|: S\subset\{1,\dots,N\}\text{ is Sidon}\}$.
+
+Question.
+Assume $A,B\subset\{1,\dots,N\}$ are Sidon and $(A-A)\cap(B-B)=\{0\}$.
+Is it true that
+\[\binom{|A|}{2}+\binom{|B|}{2}\le \binom{f(N)}{2}+O(1)\ ?\]
+If additionally $|A|=|B|$, can one improve to
+\[\binom{|A|}{2}+\binom{|B|}{2}\le (1-c+o(1))\binom{f(N)}{2}\quad\text{for some }c>0?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+The problem text claims:
+- $f(N)\sim \sqrt N$ (reference [30]).
+- A bound of shape $|A|\le (1/\sqrt 2+o(1))\sqrt N$ in the equal-size case is attributed to Tao (in comments).
+- A negative answer to the strengthened $(1-c)$ question is attributed to Barreto (in comments).
+I do not verify these claims here; I only use them as context, not as lemmas.
+
+3) ATTACK PLAN
+Proof track ideas (for the first inequality):
+1. Translate the disjoint-differences condition into injectivity statements (cross-sums or cross-differences) and
+   attempt to bound the total number of distinct differences available in $[-(N-1),N-1]$.
+2. Use additive energy / Cauchy--Schwarz on $(A\cup B)+(A\cup B)\subset [2,2N]$, trying to relate energy to
+   $\binom{|A|}{2}+\binom{|B|}{2}$ under the intersection constraint.
+3. Try to compare $(A-A)\cup(B-B)$ against a near-extremal Sidon set $S$ of size $f(N)$, but controlling $O(1)$ terms
+   seems delicate.
+
+Disproof track ideas:
+1. For the second (strengthened) inequality, the problem text already asserts there is a negative answer for infinitely many $N$.
+   If true, one would try to reproduce such a construction explicitly.
+
+Chosen path in this attempt: prove clean universal inequalities that follow immediately from Sidon + disjoint differences, and run small brute-force checks.
+
+4) WORK
+Lemma 1 (Sidon $\Rightarrow$ distinct positive differences).
+If $A\subset\{1,\dots,N\}$ is Sidon, then the set of positive differences
+$D_A^+:=\{a-a': a,a'\in A,\ a>a'\}$ has size $|D_A^+|=\binom{|A|}{2}$.
+
+Proof.
+Same argument as in Problem \#42: if $a-b=c-d$ with $a>b$ and $c>d$ in $A$, then $a+d=c+b$, and Sidon forces $(a,b)=(c,d)$.
+Thus all positive differences are distinct, and there are exactly $\binom{|A|}{2}$ of them. \qed
+
+Lemma 2 (A universal ``$N-1$'' bound).
+Let $A,B\subset\{1,\dots,N\}$ be Sidon and satisfy $(A-A)\cap(B-B)=\{0\}$.
+Then
+\[\binom{|A|}{2}+\binom{|B|}{2}\le N-1.\]
+
+Proof.
+By Lemma 1, the positive difference sets $D_A^+$ and $D_B^+$ have sizes $\binom{|A|}{2}$ and $\binom{|B|}{2}$.
+Since $(A-A)\cap(B-B)=\{0\}$, in particular no positive integer lies in both $D_A^+$ and $D_B^+$, so $D_A^+\cap D_B^+=\emptyset$.
+But $D_A^+\cup D_B^+\subseteq \{1,\dots,N-1\}$, which has size $N-1$.
+Therefore
+\[\binom{|A|}{2}+\binom{|B|}{2}=|D_A^+|+|D_B^+|=|D_A^+\cup D_B^+|\le N-1.\qed\]
+
+Lemma 3 (Injectivity of cross-differences; product bound).
+Under the same hypotheses, the map
+\[A\times B \to \{-(N-1),\dots,N-1\},\qquad (a,b)\mapsto a-b\]
+is injective. Consequently $|A||B|\le 2N-1$.
+
+Proof.
+Suppose $a-b=a'-b'$ with $a,a'\in A$ and $b,b'\in B$. Rearranging gives
+\[a-a'=b-b'.\]
+The left-hand side lies in $A-A$, the right-hand side lies in $B-B$, so this common value lies in $(A-A)\cap(B-B)=\{0\}$.
+Hence $a=a'$ and $b=b'$, proving injectivity. Since the codomain has size $2N-1$, we get $|A||B|\le 2N-1$. \qed
+
+FAST REALITY CHECK (local brute force for small $N$).
+For $5\le N\le 12$, I enumerated all Sidon subsets of $\{1,\dots,N\}$, computed $f(N)$, and then computed
+\[\max\Big\{\binom{|A|}{2}+\binom{|B|}{2} : A,B\subset[1,N]\text{ Sidon},\ (A-A)\cap(B-B)=\{0\}\Big\}.\]
+Results:
+\[
+\begin{array}{c|c|c|c}
+N & f(N) & \binom{f(N)}{2} & \max\big(\binom{|A|}{2}+\binom{|B|}{2}\big) \\\hline
+8 & 4 & 6 & 7\\
+10 & 4 & 6 & 9\\
+12 & 5 & 10 & 11
+\end{array}
+\]
+So the target bound ``$\le \binom{f(N)}{2}+O(1)$'' holds here with a small absolute constant in these tiny cases.
+This is only a sanity check.
+
+5) VERIFICATION
+- Lemma 2 is logically sound but far weaker than the conjectured $\binom{f(N)}{2}+O(1)$ when $f(N)\sim \sqrt N$
+  (since $N-1\approx 2\binom{\sqrt N}{2}$).
+- Lemma 3 is a clean consequence of the disjoint-difference hypothesis.
+- Computations are exhaustive only for $N\le 12$ and do not speak to asymptotics.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+For any $A,B\subset[1,N]$ Sidon with disjoint difference sets, one always has
+\[\binom{|A|}{2}+\binom{|B|}{2}\le N-1\]
+(Lemma 2) and also $|A||B|\le 2N-1$ (Lemma 3).
+
+(ii) First gap:
+Bridge the factor-of-$2$ gap between the universal $N-1$ bound and the conjectured $\binom{f(N)}{2}+O(1)\approx \tfrac12 N$.
+I do not see an argument that forces $D_A^+\cup D_B^+$ to have size at most about $N/2$.
+
+(iii) Top 3 next moves (concrete):
+1. Express $\binom{|A|}{2}+\binom{|B|}{2}$ as $|D_A^+|+|D_B^+|$ and study structural constraints on two disjoint Golomb rulers in $[1,N]$;
+   try to show their difference sets cannot jointly cover too many residues without creating a 2-sum collision.
+2. Use additive energy of $S=A\cup B$: compute/estimate $E(S)=|\{x_1+x_2=x_3+x_4\}|$ and combine with $|S+S|\le 2N-1$ via Cauchy--Schwarz.
+3. For the equal-size variant, attempt to reproduce the claimed $|A|\le (1/\sqrt 2+o(1))\sqrt N$ bound using only elementary injections.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A sequence of $N\to\infty$ with disjoint Sidon pairs $(A_N,B_N)\subset[1,N]$ such that
+\(\binom{|A_N|}{2}+\binom{|B_N|}{2}\) exceeds \(\binom{f(N)}{2}+C\) for every fixed constant $C$,
+meaning two disjoint Golomb rulers whose positive difference sets jointly cover significantly more than the differences covered
+by any single extremal Sidon set.
+

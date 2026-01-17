@@ -1,0 +1,111 @@
+% Attempt for Erdos Problem #87
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- For a graph $H$, let $R(H)$ be its (2-color) Ramsey number: the least $n$ such that every red/blue coloring of $E(K_n)$ contains a monochromatic copy of $H$.
+- Let $R(k):=R(K_k)$.
+- Fix $k\ge 3$ and consider graphs $G$ with $\chi(G)=k$.
+
+Questions.
+1. For each $\varepsilon>0$, for all large $k$ does every $k$-chromatic graph $G$ satisfy
+\[R(G)>(1-\varepsilon)^k R(k)?\]
+2. Is there an absolute constant $c>0$ such that for all large $k$ and all $k$-chromatic $G$,
+\[R(G)>c\,R(k)?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the statement:
+- The naive conjecture $R(G)\ge R(k)$ is false at $k=4$ (wheel example).
+- Wigderson's observation gives $R(G)\gg 2^{k/2}$ for any $k$-chromatic $G$.
+I re-prove the $2^{k/2}$-type lower bound below (with explicit constants).
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Prove a universal exponential lower bound on $R(G)$ in terms of $\chi(G)$ by extracting a dense critical subgraph and using the probabilistic method.
+2. Compare that universal bound to known bounds for $R(k)$ to approach the ratios in the question.
+
+Disproof track ideas:
+1. Attempt to construct families of $k$-chromatic graphs $G_k$ with unusually small Ramsey numbers compared to $R(k)$.
+
+Chosen path in this attempt: prove Wigderson's universal lower bound $R(G)\ge 2^{\Theta(k)}$ using two problem-specific lemmas.
+
+4) WORK
+Lemma 1 (Critical subgraph has large minimum degree).
+If $\chi(G)=k$, then $G$ contains a subgraph $H\subseteq G$ with $\chi(H)=k$ and minimum degree
+\[\delta(H)\ge k-1.\]
+
+Proof.
+Choose $H\subseteq G$ with $\chi(H)=k$ and with $|V(H)|$ minimal among such subgraphs (a $k$-critical subgraph).
+Then for every vertex $v\in V(H)$, the graph $H-v$ has chromatic number at most $k-1$ by minimality.
+If $d_H(v)\le k-2$ for some $v$, then take a proper $(k-1)$-coloring of $H-v$.
+Among the neighbors of $v$ there are at most $k-2$ vertices, so they use at most $k-2$ colors.
+Therefore there is at least one color unused by the neighbors of $v$; assign that color to $v$ to obtain a proper $(k-1)$-coloring of $H$.
+This contradicts $\chi(H)=k$.
+Hence $d_H(v)\ge k-1$ for all $v$, i.e. $\delta(H)\ge k-1$. \qed
+
+Lemma 2 (Probabilistic lower bound: $R(G)\ge 2^{(k-1)/2}$ for $k$-chromatic $G$).
+Let $G$ be a graph with $\chi(G)=k\ge 3$.
+Then
+\[R(G) > 2^{(k-1)/2-1}\]
+for all sufficiently large $k$ (and in particular $R(G)\gg 2^{k/2}$).
+
+Proof.
+Let $H\subseteq G$ be the $k$-chromatic subgraph from Lemma 1, so $\delta(H)\ge k-1$.
+Let $v:=|V(H)|$ and $e:=|E(H)|$.
+Since $H$ has minimum degree at least $k-1$,
+\[2e=\sum_{x\in V(H)} d_H(x)\ge v(k-1),\]
+so
+\[e\ge \frac{(k-1)v}{2}.\tag{1}\]
+
+Now take $N$ vertices and color each edge of $K_N$ red/blue independently with probability $1/2$ each.
+Fix an injective map $\varphi:V(H)\hookrightarrow [N]$ (an embedding of vertices). The probability that all edges of $\varphi(H)$ are red is $2^{-e}$,
+and similarly for all blue, so the probability that $\varphi(H)$ is monochromatic is $2\cdot 2^{-e}=2^{1-e}$.
+
+There are at most $N^v$ injective maps (crude bound).
+Let $X$ be the number of monochromatic labeled copies of $H$.
+By linearity of expectation,
+\[\mathbb E[X]\le N^v \cdot 2^{1-e}.\]
+Choose $N:=\left\lfloor 2^{(k-1)/2-1}\right\rfloor$.
+Then $N^v \le 2^{v((k-1)/2-1)}$.
+Using (1), we obtain
+\[\mathbb E[X]\le 2^{v((k-1)/2-1)}\cdot 2^{1-e}\le 2^{v((k-1)/2-1)}\cdot 2^{1-(k-1)v/2}=2^{1-v}.\]
+Since $v\ge k\ge 3$, we have $2^{1-v}<1$.
+Therefore there exists a coloring with $X=0$, i.e. with no monochromatic copy of $H$, hence no monochromatic copy of $G$.
+So $R(G)>N\ge 2^{(k-1)/2-1}-1$, proving the claim. \qed
+
+FAST REALITY CHECK
+Lemma 2 gives $R(G)\ge 2^{\Theta(k)}$ uniformly over all $k$-chromatic graphs $G$.
+This matches the scale of the classic probabilistic lower bound for $R(k)$ (also $2^{\Theta(k)}$).
+
+5) VERIFICATION
+- Lemma 1 is standard and the coloring-extension argument is explicit.
+- Lemma 2 uses only union bound and the edge lower bound $e\ge (k-1)v/2$ from minimum degree.
+- The crude bound ``number of embeddings $\le N^v$'' is valid and suffices.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+For every $k$-chromatic graph $G$, one has the uniform exponential lower bound
+\[R(G)\gg 2^{k/2}\]
+(Lemma 2, via the $k$-critical subgraph Lemma 1).
+
+(ii) First gap:
+Compare $R(G)$ to $R(k)$ \emph{multiplicatively} for all $k$-chromatic $G$:
+prove (or refute) that $R(G)$ is always within a factor $c^k$ or even a fixed factor of $R(k)$ as $k\to\infty$.
+
+(iii) Top 3 next moves (concrete):
+1. Identify extremal families of $k$-chromatic graphs (e.g. sparse $k$-chromatic graphs) and try to upper bound their Ramsey numbers to see how small $R(G)$ can get relative to $R(k)$.
+2. Try to prove a lower bound $R(G)\ge R(k)^{1-o(1)}$ or $R(G)\ge cR(k)$ using structural properties forced by $\chi(G)=k$ beyond just minimum degree.
+3. Compute/collect small-$k$ examples where $R(G)<R(k)$ (like the wheel) and study whether the deficit can grow exponentially in $k$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A sequence of graphs $G_k$ with $\chi(G_k)=k$ such that $R(G_k)$ is exponentially smaller than $R(k)$, e.g.
+$R(G_k)\le (1-\varepsilon)^k R(k)$ for some fixed $\varepsilon>0$, which would falsify the first question.
+

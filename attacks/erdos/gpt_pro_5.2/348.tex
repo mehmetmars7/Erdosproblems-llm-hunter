@@ -1,0 +1,315 @@
+% Erdos Problem #348
+% Attempt for Erdos Problem #348
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES
+% - Computation available (Python/Sage/Mathematica)? YES
+
+## 1) FORMAL RESTATEMENT
+
+### 1.1. Ambiguity in the word “complete”
+The problem text itself notes two competing conventions:
+
+* **Strong completeness:**
+  \[
+  \Sigma(A):=\Bigl\{\sum_{i\in B} a_i : B\subset \mathbb N\text{ finite}\Bigr\}=\mathbb N\cup\{0\}.
+  \]
+* **Weak completeness:** \(\Sigma(A)\) contains **all but finitely many** natural numbers, i.e.
+  \[
+  \exists N_0\ \forall N\ge N_0:\ N\in\Sigma(A).
+  \]
+
+The statement “Erd\H{o}s and Graham most likely meant the weaker notion” suggests the intended
+interpretation is **weak completeness**.
+
+I will therefore (i) give a precise treatment of both notions and (ii) prove rigorously that the
+claimed examples (powers of 2; Fibonacci) satisfy the required deletion property in the **strong**
+notion (hence also in the weak notion). The general classification for the weak notion remains open
+(e.g. \(m=2,n=3\) is explicitly stated as unknown).
+
+### 1.2. Conventions
+* \(\mathbb N:=\{1,2,3,\dots\}\) and \(\mathbb N_0:=\{0,1,2,\dots\}\).
+* A “sequence” \(A=\{a_1\le a_2\le\cdots\}\) is an infinite nondecreasing sequence of **positive** integers.
+  (Duplicates are allowed; distinctness in subset sums is by **index**.)
+* For a finite set of indices \(D\subset\mathbb N\), \(A\setminus D\) denotes the sequence obtained by
+  removing the terms \(\{a_i: i\in D\}\) (keeping the remaining terms in nondecreasing order).
+
+### 1.3. Property to classify
+Fix integers \(0\le m<n\). We ask for which pairs \((m,n)\) there exists a complete sequence \(A\)
+(say, in the weak sense unless otherwise stated) such that:
+
+1. (**Robustness**) For every \(D\subset\mathbb N\) with \(|D|=m\), the sequence \(A\setminus D\) is complete.
+2. (**Fragility**) For every \(D\subset\mathbb N\) with \(|D|=n\), the sequence \(A\setminus D\) is not complete.
+
+Edge cases:
+* \(m=0\) means simply “\(A\) is complete.”
+* The “fragility” condition is monotone in \(n\) (proved below): if it holds for some \(n\), it holds
+  for all \(n'\ge n\).
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I do not use any external sources here; I only record what is already in the provided problem text:
+
+* Powers of 2 give an example for \((m,n)=(0,1)\).
+* Fibonacci \(1,1,2,3,5,\dots\) gives an example for \((m,n)=(1,2)\).
+* \((m,n)=(2,3)\) is stated as not known (for the intended weak completeness).
+* van Doorn proved that **no** such sequence exists for \(2\le m<n\) under the **strong** completeness
+  definition \(\Sigma(A)=\mathbb N\) (as stated in the problem text).
+
+---
+
+## 3) ATTACK PLAN
+
+**Proof track (partial results).**
+1. Work in the strong completeness notion (it implies the weak notion).
+2. Use a sharp necessary-and-sufficient condition for strong completeness of a nondecreasing
+   positive sequence in terms of partial sums.
+3. Verify the powers-of-2 and Fibonacci examples with deletion properties by checking this
+   condition after deletions.
+
+**Disproof/obstruction track.**
+Try to derive constraints for \(m\ge 2\) (for the weak notion) from “gap creation” after deletions.
+I did not succeed beyond what is already stated (\(m=2,n=3\) open).
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (computation)
+
+I tested the Fibonacci claims via the strong-completeness partial-sum criterion below.
+Using the first 60 Fibonacci numbers \(1,1,2,3,\dots\):
+
+* After deleting **any single** term among the first 30, the remaining sequence satisfies the
+  strong-completeness inequalities through the first 50 remaining terms.
+* After deleting **any pair** of terms among the first 30, the inequalities fail by (at most) the
+  first 50 remaining terms.
+
+(These are sanity checks only; the proofs below are exact and do not rely on computation.)
+
+---
+
+### Lemma 4.1 (Strong completeness criterion via partial sums)
+Let \(A=(a_1\le a_2\le\cdots)\) be a nondecreasing sequence of positive integers, and define
+\(S_k:=\sum_{i=1}^k a_i\).
+
+**Claim.** The following are equivalent:
+
+(A) \(A\) is **strongly complete**, i.e. every \(N\in\mathbb N_0\) is a sum of distinct terms of \(A\).
+
+(B) \(a_1=1\) and for every \(k\ge 1\),
+\[
+ a_{k+1}\le S_k+1.
+\]
+
+**Proof.**
+
+\underline{(B) \(\Rightarrow\) (A).}
+We prove by induction on \(k\) that the set of subset sums of \(\{a_1,\dots,a_k\}\) contains the entire
+interval \([0,S_k]\cap\mathbb N_0\).
+
+Base \(k=1\): since \(a_1=1\), subset sums are \(\{0,1\}=[0,S_1]\).
+
+Inductive step: assume \([0,S_k]\) is achievable using \(a_1,\dots,a_k\). Consider \(a_{k+1}\).
+* Using no \(a_{k+1}\) we can make all values in \([0,S_k]\).
+* Using \(a_{k+1}\) plus any subset sum of \(a_1,\dots,a_k\), we can make all values in
+  \([a_{k+1}, a_{k+1}+S_k]\).
+
+If \(a_{k+1}\le S_k+1\), then these two intervals overlap or touch:
+\([0,S_k]\cup[a_{k+1},a_{k+1}+S_k]\supseteq [0,S_k+a_{k+1}]=[0,S_{k+1}]\).
+Hence \([0,S_{k+1}]\) is achievable, completing the induction.
+
+Since \(A\) is infinite with positive terms, \(S_k\to\infty\), so every \(N\in\mathbb N_0\) lies in
+\([0,S_k]\) for some \(k\), hence is representable. Thus \(A\) is strongly complete.
+
+\underline{(A) \(\Rightarrow\) (B).}
+If \(a_1\ne 1\), then \(1\notin\Sigma(A)\), contradicting strong completeness, so \(a_1=1\).
+Now fix \(k\ge 1\). Suppose for contradiction that \(a_{k+1}>S_k+1\).
+Any subset sum using only \(a_1,\dots,a_k\) is \(\le S_k\), while any subset sum that uses
+\(a_{k+1}\) is \(\ge a_{k+1}>S_k+1\). Therefore \(S_k+1\) is not representable, contradicting
+strong completeness. Hence \(a_{k+1}\le S_k+1\).
+
+This proves (A)\(\Leftrightarrow\)(B). \(\square\)
+
+---
+
+### Lemma 4.2 (Monotonicity of non-completeness under deletion)
+Let \(A\) be any sequence of positive integers (duplicates allowed). If \(A\) is not complete
+(strong or weak), then any subsequence obtained by deleting additional terms is also not complete.
+
+**Proof.** Deleting terms can only remove available subset sums; i.e. if \(B\subseteq A\) as
+multisets (or by indices), then \(\Sigma(B)\subseteq\Sigma(A)\). If \(\Sigma(A)\) misses infinitely
+many integers (weak incompleteness) or misses some integer (strong incompleteness), then
+\(\Sigma(B)\) also misses those integers. \(\square\)
+
+**Consequence.** If a sequence satisfies the “fragility” condition for some \(n\), then it also
+satisfies it for every \(n'\ge n\).
+
+---
+
+### Proposition 4.3 (Powers of 2 witness \(m=0,n=1\) in the strong sense)
+Let \(A=(1,2,4,8,\dots)\) where \(a_i=2^{i-1}\).
+
+1. \(A\) is strongly complete.
+2. For every single deletion \(D=\{t\}\) (remove \(2^{t-1}\)), the sequence \(A\setminus D\) is not
+   complete (hence the pair \((m,n)=(0,1)\) is achievable).
+
+**Proof.**
+
+1. (Strong completeness.) Here \(S_k=1+2+\cdots+2^{k-1}=2^k-1\), so \(a_{k+1}=2^k=S_k+1\).
+   By Lemma 4.1, \(A\) is strongly complete.
+
+2. (Deleting one term breaks completeness.) Fix \(t\ge 1\) and delete \(2^{t-1}\). Consider the number
+   \(N:=2^{t-1}\). Any subset sum of the remaining powers of 2 is either
+   * \(<2^{t-1}\) if it uses only smaller powers \(1,2,\dots,2^{t-2}\), since their sum is
+     \(2^{t-1}-1\), or
+   * \(\ge 2^t\) if it uses any larger power (since the smallest remaining larger power is \(2^t\)).
+
+   Thus \(N\) cannot be represented, so \(A\setminus\{t\}\) is not strongly complete.
+
+By Lemma 4.2, deleting any \(n\ge 1\) terms also yields a non-complete sequence. \(\square\)
+
+---
+
+### Proposition 4.4 (Fibonacci witnesses \(m=1,n=2\) in the strong sense)
+Let \((F_k)_{k\ge 1}\) be Fibonacci numbers with \(F_1=1, F_2=1\), and \(F_{k+2}=F_{k+1}+F_k\).
+Let \(A=(F_1,F_2,F_3,\dots)=(1,1,2,3,5,\dots)\).
+
+We prove:
+
+1. \(A\) is strongly complete.
+2. After deleting any single term, the remaining sequence is still strongly complete.
+3. After deleting any two terms, the remaining sequence is not strongly complete.
+
+Together, (2) and (3) give the required property for \((m,n)=(1,2)\).
+
+#### Identity used
+For all \(k\ge 1\),
+\[
+\sum_{i=1}^k F_i = F_{k+2}-1.
+\]
+This is proved by induction: it is true for \(k=1\), and
+\(\sum_{i=1}^{k+1}F_i=(F_{k+2}-1)+F_{k+1}=F_{k+3}-1\) using the recurrence.
+
+#### (1) Strong completeness of Fibonacci
+We verify Lemma 4.1(B). We have \(F_1=1\). For \(k\ge 1\), using the identity,
+\[
+S_k=\sum_{i=1}^k F_i = F_{k+2}-1\quad\Rightarrow\quad S_k+1=F_{k+2}.
+\]
+Since \(F_{k+1}<F_{k+2}\), we have \(F_{k+1}\le S_k+1\). Thus Lemma 4.1 implies \(A\) is strongly
+complete.
+
+#### (2) Deleting any one Fibonacci number preserves strong completeness
+Fix \(t\ge 1\) and delete the single term \(F_t\). Let the remaining sequence be
+\(B=(b_1\le b_2\le\cdots)\); note \(b_1=1\) always (because either \(F_1\) or \(F_2\) remains).
+
+We verify Lemma 4.1(B) for \(B\). Consider any stage where the next element of \(B\) is \(F_{k+1}\).
+There are two cases.
+
+*If \(k<t\)*: then none of \(F_1,\dots,F_k\) have been deleted yet (since only \(F_t\) was deleted), so
+the partial sum of previous terms equals \(\sum_{i=1}^k F_i = F_{k+2}-1\). Hence
+\(F_{k+1}\le F_{k+2}= (F_{k+2}-1)+1\), so the inequality holds.
+
+*If \(k\ge t\)*: then among \(F_1,\dots,F_k\) we are missing exactly \(F_t\). Thus the partial sum of
+previous terms equals
+\[
+\sum_{i=1}^k F_i - F_t = (F_{k+2}-1)-F_t.
+\]
+Adding 1 gives \(F_{k+2}-F_t\). Using \(F_{k+2}=F_{k+1}+F_k\), the desired inequality
+\(F_{k+1}\le (\text{previous sum})+1\) becomes
+\[
+F_{k+1}\le F_{k+2}-F_t = F_{k+1}+F_k-F_t.
+\]
+This holds because \(k\ge t\Rightarrow F_k\ge F_t\) (Fibonacci is nondecreasing). Therefore
+Lemma 4.1 applies and \(B\) is strongly complete.
+
+#### (3) Deleting any two Fibonacci numbers destroys strong completeness
+Fix distinct indices \(1\le a<b\) and delete \(F_a\) and \(F_b\). Let \(C\) be the remaining sequence.
+Consider the stage just before \(F_{b+1}\) in \(C\): all Fibonacci numbers \(F_1,\dots,F_b\) except
+\(F_a,F_b\) are included among the previous terms.
+
+Hence the partial sum of previous terms is
+\[
+\sum_{i=1}^b F_i - F_a - F_b = (F_{b+2}-1) - F_a - F_b.
+\]
+Adding 1 gives
+\[
+(F_{b+2}-1)-F_a-F_b +1 = F_{b+2}-F_a-F_b.
+\]
+Using \(F_{b+2}=F_{b+1}+F_b\), this equals
+\[
+F_{b+1}+F_b -F_a -F_b = F_{b+1}-F_a.
+\]
+Since \(F_a\ge 1\), we have \(F_{b+1}-F_a < F_{b+1}\), i.e.
+\[
+F_{b+1} > (\text{previous sum})+1.
+\]
+Thus the necessary condition in Lemma 4.1(B) fails, so \(C\) is not strongly complete.
+
+This proves (1)–(3). \(\square\)
+
+---
+
+## 5) VERIFICATION
+
+* Lemma 4.1: the forward direction uses a standard interval-cover induction; the backward direction
+  isolates the specific missing number \(S_k+1\) when there is a “gap”. Quantifiers are correct.
+* Proposition 4.3: after deleting \(2^{t-1}\), the target number \(2^{t-1}\) cannot be made because all
+  sums of smaller remaining powers are \(\le 2^{t-1}-1\), and any use of a larger remaining power is
+  \(\ge 2^t\).
+* Proposition 4.4(3): the failure occurs exactly at the next Fibonacci number after the largest
+  deleted index, so it does not depend on computational cutoffs.
+* Edge case: deleting both \(F_1\) and \(F_2\) leaves \(2,3,5,\dots\); the proof still detects failure at
+  \(F_3\) since the “previous sum” is 0.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* In the **strong** sense, powers of 2 give a complete sequence such that deleting any \(\ge 1\)
+  element(s) destroys completeness (Proposition 4.3). In particular \((m,n)=(0,1)\) works (and by
+  monotonicity also \((0,n)\) for any \(n\ge 1\)).
+* In the **strong** sense, Fibonacci \(1,1,2,3,5,\dots\) remains complete after deleting any one term
+  but becomes incomplete after deleting any two terms (Proposition 4.4). Thus \((m,n)=(1,2)\) works
+  (and by monotonicity also \((1,n)\) for any \(n\ge 2\)).
+
+(ii) **Exact first gap.**
+
+Under the intended **weak** completeness notion (all but finitely many integers representable), the
+problem asks for a classification of \((m,n)\). The first explicit open instance stated in the
+problem text is:
+
+> Does there exist a weakly complete sequence that remains weakly complete after deleting any
+> \(m=2\) terms, but is not weakly complete after deleting any \(n=3\) terms?
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. **Translate weak completeness into a checkable inequality with “finite slack”:** find a necessary
+   and sufficient criterion (or a usable sufficient criterion) analogous to Lemma 4.1 but allowing a
+   bounded number of initial gaps.
+2. **Attempt a “redundant Fibonacci” construction:** build a sequence satisfying a near-Fibonacci
+   growth condition that is stable under 2 deletions but where any 3 deletions force a gap in the
+   partial-sum inequality at some later scale.
+3. **Computational search for \((m,n)=(2,3)\):** restrict to “structured” candidates (linear recurrences
+   or block-repeated greedy sequences) and test the deletion property on large finite prefixes to
+   discover patterns that suggest a proof.
+
+(iv) **What a minimal counterexample would likely look like.**
+
+If \((m,n)=(2,3)\) is impossible in the weak sense, a minimal obstruction would be a theorem of the
+form:
+
+> Any weakly complete sequence has a set of 3 terms whose removal still leaves infinitely many
+> representable integers.
+
+Equivalently, weak completeness would impose enough redundancy that some triple of deletions cannot
+kill it. Such a result would need a structural description of weakly complete sequences beyond the
+strong partial-sum criterion.
+
+

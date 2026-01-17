@@ -1,0 +1,186 @@
+% Erdos Problem #181
+% Attempt for Erdos Problem #181
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used beyond the problem text; no extra literature claims).
+% - Computation available (Python/Sage/Mathematica)? YES (used for small-n Ramsey computation for $Q_2=C_4$).
+
+PROBLEM
+
+Let $Q_n$ be the $n$-dimensional hypercube graph (so that $Q_n$ has $2^n$ vertices and $n2^{n-1}$ edges). Prove that
+\[R(Q_n) \ll 2^n.\]
+
+OUTPUT
+
+## 1) FORMAL RESTATEMENT
+
+Let $Q_n$ denote the $n$-dimensional hypercube graph with vertex set $\{0,1\}^n$ and edges between vertices at Hamming distance $1$.
+So $|V(Q_n)|=2^n$.
+
+For a graph $H$, let $R(H)$ be its (diagonal) Ramsey number: the smallest integer $N$ such that every 2-coloring of the edges of $K_N$ contains a monochromatic copy of $H$.
+
+The conjecture/problem asks to prove the existence of an absolute constant $C>0$ such that for all $n$,
+\[
+R(Q_n)\le C\,2^n.
+\]
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I will not use or claim any external results beyond what is explicitly written in the problem text.
+
+The problem text reports:
+
+* Trivial bound: $R(Q_n)\le R(K_{2^n})\le C^{2^n}$.
+* Current best known bound: $R(Q_n)\ll 2^{(2-c)n}$ for some small $c>0$.
+
+I do not re-prove those improvements.
+
+---
+
+## 3) ATTACK PLAN
+
+I cannot prove the desired linear-in-$2^n$ bound. I will instead:
+
+1. Record trivial lower and upper bounds with full proofs.
+2. Compute $R(Q_n)$ for the first nontrivial cases $n=1,2$ as a sanity check.
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (tiny $n$)
+
+* $Q_1$ is a single edge, so $R(Q_1)=2$.
+* $Q_2$ is a 4-cycle $C_4$. By brute force enumeration of all 2-edge-colorings of $K_m$ for $m\le 6$, I found
+\[
+R(Q_2)=R(C_4)=6.
+\]
+
+---
+
+### Lemma 4.1 (trivial lower bound)
+
+For every $n\ge 1$,
+\[
+R(Q_n)\ge 2^n.
+\]
+
+**Proof.**
+If $N<2^n$, then the complete graph $K_N$ has fewer than $2^n$ vertices and therefore cannot contain $Q_n$ as a (labeled) subgraph at all, regardless of edge-coloring.
+Hence $N$ does not satisfy the Ramsey property for $Q_n$, so by definition $R(Q_n)>N$.
+Taking $N=2^n-1$ gives $R(Q_n)\ge 2^n$.
+$\square$
+
+---
+
+### Lemma 4.2 (trivial tower-type upper bound via clique Ramsey)
+
+For every $n\ge 1$,
+\[
+R(Q_n)\le R\bigl(K_{2^n}\bigr)\le \binom{2^{n+1}-2}{2^n-1}\le 4^{2^n}=2^{2^{n+1}}.
+\]
+
+**Proof.**
+Since $Q_n$ has $2^n$ vertices, it is a (spanning) subgraph of the complete graph $K_{2^n}$ on the same number of vertices.
+Therefore any monochromatic $K_{2^n}$ contains a monochromatic copy of $Q_n$, and hence
+\[
+R(Q_n)\le R(K_{2^n}).
+\]
+
+It remains to upper bound the diagonal clique Ramsey numbers.
+For integers $s,t\ge 1$, let $R(s,t)$ denote the smallest integer $N$ such that every red/blue coloring of the edges of $K_N$ contains either a red $K_s$ or a blue $K_t$.
+We first prove the standard recursion
+\[
+R(s,t)\le R(s-1,t)+R(s,t-1). \tag{$\*$}
+\]
+
+Fix $s,t\ge 2$ and set $N:=R(s-1,t)+R(s,t-1)$.
+Consider an arbitrary red/blue coloring of the edges of $K_N$.
+Pick a vertex $v$.
+Let $X$ be the set of vertices joined to $v$ by a red edge, and $Y$ the set of vertices joined to $v$ by a blue edge.
+Then $X\cup Y$ is the $N-1$ vertices other than $v$, so $|X|+|Y|=N-1$.
+
+* If $|X|\ge R(s-1,t)$, look at the induced coloring on the complete graph $K_X$.
+  By definition of $R(s-1,t)$, $K_X$ contains either a red $K_{s-1}$ or a blue $K_t$.
+  In the first case, adjoining $v$ gives a red $K_s$ (because $v$ is red-adjacent to all vertices of $X$).
+  In the second case, we already have a blue $K_t$.
+
+* If $|Y|\ge R(s,t-1)$, look at the induced coloring on $K_Y$.
+  By definition of $R(s,t-1)$, $K_Y$ contains either a red $K_s$ or a blue $K_{t-1}$.
+  In the first case we are done.
+  In the second case, adjoining $v$ gives a blue $K_t$ (because $v$ is blue-adjacent to all vertices of $Y$).
+
+Since $|X|+|Y|=R(s-1,t)+R(s,t-1)-1$, at least one of the inequalities $|X|\ge R(s-1,t)$ or $|Y|\ge R(s,t-1)$ must hold.
+Thus every coloring of $K_N$ yields a red $K_s$ or a blue $K_t$, proving $(\*)$.
+
+Next we prove by induction on $s+t$ that
+\[
+R(s,t)\le \binom{s+t-2}{s-1}. \tag{$\dagger$}
+\]
+
+**Base cases.** If $s=1$ or $t=1$, then $R(1,t)=R(s,1)=1$ because a single vertex is a monochromatic $K_1$.
+Also $\binom{s+t-2}{s-1}=\binom{t-1}{0}=1$ (or symmetrically), so $(\dagger)$ holds.
+
+**Inductive step.** Assume $s,t\ge 2$ and that $(\dagger)$ holds for all pairs with smaller sum.
+By $(\*)$ and the induction hypothesis,
+\[
+R(s,t)\le R(s-1,t)+R(s,t-1)
+\le \binom{s+t-3}{s-2}+\binom{s+t-3}{s-1}.
+\]
+By Pascal's identity, the right-hand side equals $\binom{s+t-2}{s-1}$, proving $(\dagger)$.
+
+Now set $s=t:=T$.
+Then the diagonal clique Ramsey number satisfies
+\[
+R(K_T)=R(T,T)\le \binom{2T-2}{T-1}.
+\]
+Finally, since the maximum binomial coefficient is at most the sum of all binomial coefficients,
+\[
+\binom{2T}{T}\le \sum_{j=0}^{2T}\binom{2T}{j}=(1+1)^{2T}=4^T.
+\]
+Also $\binom{2T-2}{T-1}\le \binom{2T}{T}$ (each factor in the product formula increases), hence
+\[
+R(K_T)\le \binom{2T-2}{T-1}\le 4^T.
+\]
+
+Taking $T=2^n$ gives
+\[
+R(Q_n)\le R(K_{2^n})\le \binom{2^{n+1}-2}{2^n-1}\le 4^{2^n}=2^{2^{n+1}}.
+\]
+$\square$
+
+## 5) VERIFICATION
+
+* Lemma 4.1: correct because an $N$-vertex graph cannot contain a graph with more than $N$ vertices.
+* Lemma 4.2: verified: (a) $Q_n\subseteq K_{2^n}$, so any monochromatic $K_{2^n}$ contains a monochromatic copy of $Q_n$; (b) the recursion $R(s,t)\le R(s-1,t)+R(s,t-1)$ and the binomial upper bound $R(s,t)\le \binom{s+t-2}{s-1}$ were proved inside Lemma 4.2; (c) $\binom{2t-2}{t-1}\le 4^t$ follows since the largest binomial coefficient is at most the sum $\sum_{j=0}^{2t}\binom{2t}{j}=4^t$.
+* Computation sanity check: $R(C_4)=6$ is consistent with known small Ramsey behavior and was verified by exhaustive search for $m\le 6$.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+Elementary bounds with full proofs:
+\[
+2^n\le R(Q_n)\le 2^{2^{n+1}}.
+\]
+Also, exact tiny values: $R(Q_1)=2$ and $R(Q_2)=6$.
+
+(ii) **Exact first gap.**
+
+Prove a *linear* upper bound $R(Q_n)=O(2^n)$ (or even a substantially improved exponential bound $2^{(1+o(1))n}$).
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Develop an embedding lemma that finds a monochromatic $Q_n$ inside any 2-colored $K_{C2^n}$ by iterative neighborhood intersection, exploiting the layered structure of $Q_n$.
+2. Prove a density-type statement: in any red/blue coloring of $K_{N}$, one color contains a large subgraph with pseudo-random/expanding properties sufficient to embed $Q_n$.
+3. Compute/estimate $R(Q_3)$ experimentally for small $N$ using SAT/heuristics to get intuition for the true growth.
+
+(iv) **What a minimal counterexample would likely look like.**
+
+A counterexample to $R(Q_n)=O(2^n)$ would be a sequence of 2-colorings of $K_{c2^n}$ (for arbitrarily large $n$ and any fixed $c$) that avoid monochromatic $Q_n$ in both colors. Such colorings would likely need to be highly structured (e.g., based on affine geometries or product constructions) to block embeddings at all scales.

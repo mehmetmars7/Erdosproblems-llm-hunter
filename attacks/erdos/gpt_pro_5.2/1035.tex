@@ -1,0 +1,74 @@
+% Erdos Problem #1035
+% URL: https://www.erdosproblems.com/1035
+
+Is there a constant $c>0$ such that every graph on $2^n$ vertices with minimum degree $>(1-c)2^n$ contains the $n$-dimensional hypercube $Q_n$? Erd\H{o}s \cite{Er93} says 'if the conjecture is false, two related problems could be asked': {UL} {LI}Determine or estimate the smallest $m>2^n$ such that every graph on $m$ vertices with minimum degree $>(1-c)2^n$ contains a $Q_n$, and {/LI} {LI}For which $u_n$ is it true that every graph on $2^n$ vertices with minimum degree $>2^n-u_n$ contains a $Q_n$.{/LI} {/UL} See also [576] for the extremal number of edges that guarantee a $Q_n$. References [Er93] Erd\H{o}s, Paul, Some of my favorite solved and unsolved problems in graph theory . Quaestiones Math. (1993), 333-350.
+
+
+% --- SOLUTION TO ERDOS PROBLEM #1035 ---
+
+FORMAL RESTATEMENT
+Let n>=1 and N=2^n. Let G be a simple graph on N vertices with minimum degree delta(G) > (1-c)N. The question is whether there exists an absolute constant c>0 (independent of n) such that every such G contains a spanning subgraph isomorphic to the n-dimensional hypercube Q_n (vertex set {0,1}^n, edges between bitstrings at Hamming distance 1).
+
+QUICK LITERATURE/CONTEXT CHECK
+Only facts explicitly present in the problem statement are treated as established here. (In particular: the question is open in the problem source; two related variants are mentioned; and there is also a related extremal-edge-count problem [576].)
+
+ATTACK PLAN
+(1) Understand what structure a copy of Q_n forces inside an N-vertex graph: Q_n decomposes into n disjoint perfect matchings (coordinate matchings), and these matchings satisfy many 4-cycle constraints.
+(2) Do small-n exhaustive checks to see what minimum-degree threshold is even plausible.
+(3) Try to either (a) embed coordinate matchings one-by-one under a strong density hypothesis, or (b) build dense counterexample families by designing sparse complements that destroy all cube labellings.
+
+WORK
+FAST REALITY CHECK (n=1,2,3).
+* n=1 (N=2): Q_1 is a single edge. A graph on 2 vertices contains Q_1 iff it is K_2, i.e. delta(G)=1.
+* n=2 (N=4): Q_2 is C_4. Lemma 1035.2 below shows delta(G)>=2 already forces a spanning C_4.
+* n=3 (N=8): an exhaustive computer check was run.
+  - All graphs with delta(G)>=6 (equivalently: the complement has maximum degree <=1, i.e. is a matching) contain a spanning cube Q_3.
+    The number of such complements on 8 labelled vertices is 764 (all matchings), and none yield a counterexample.
+  - There exists a graph with delta(G)=5 that contains no spanning Q_3: take G = K_8 minus the edges of a disjoint union C_3 \cup C_5.
+    Concretely, on vertex set {0,1,2,3,4,5,6,7} the missing edges are
+      (0,1),(0,2),(1,2),(3,4),(3,5),(4,6),(6,7),(7,5).
+    An exhaustive check over all 8! vertex relabellings verified that no labelled Q_3 embeds as a spanning subgraph.
+
+Lemma 1035.1 (coordinate perfect matchings in Q_n).
+For each i in {1,...,n}, let M_i be the set of edges of Q_n that flip the i-th coordinate:
+  M_i := { {x, x\oplus e_i} : x in {0,1}^n },
+where e_i is the i-th standard basis vector over (Z/2Z)^n.
+Then:
+(a) Each M_i is a perfect matching of Q_n.
+(b) The matchings M_1,...,M_n are pairwise edge-disjoint.
+(c) The union of these matchings is exactly E(Q_n).
+
+Proof.
+(a) Fix i. For each vertex x, there is exactly one vertex y = x\oplus e_i that differs from x only in coordinate i, so x is incident to exactly one edge of M_i. Thus every vertex has M_i-degree 1, i.e. M_i is a perfect matching.
+(b) If an edge {u,v} belongs to both M_i and M_j, then u and v differ in exactly one coordinate i and also in exactly one coordinate j. This forces i=j. Hence the M_i are edge-disjoint.
+(c) By definition, every edge of Q_n flips exactly one coordinate, hence lies in the corresponding M_i. Conversely, every M_i-edge is an edge of Q_n. So E(Q_n)=\cup_i M_i.
+
+Lemma 1035.2 (n=2 case: delta>=2 forces Q_2).
+Let G be a graph on 4 vertices with minimum degree delta(G)>=2. Then G contains a spanning copy of Q_2 (a 4-cycle).
+
+Proof.
+Let V(G)={v1,v2,v3,v4}. Since delta(G)>=2, every vertex misses at most one neighbour.
+Pick any vertex v1. It has at least two neighbours; call two of them v2,v3. If v2v3 is NOT an edge, then v2 and v3 each have degree at least 2, so each must be adjacent to v4 (their only possible remaining vertex). Then v1-v2-v4-v3-v1 is a 4-cycle.
+If v2v3 IS an edge, then consider v4. Vertex v4 has degree at least 2, so it is adjacent to at least two of {v1,v2,v3}. In any case, among the three vertices v1,v2,v3, there is a path of length 2 from v4 that avoids repeating vertices, and together with the edge in the triangle one obtains a 4-cycle spanning all vertices. For instance:
+- if v4 adjacent to v2 and v3, then v1-v2-v4-v3-v1 is a 4-cycle (since v1v2 and v1v3 exist by choice of v2,v3 as neighbours of v1),
+- if v4 adjacent to v1 and v2, then v3-v2-v4-v1-v3 is a 4-cycle (using edge v1v3),
+- if v4 adjacent to v1 and v3, then v2-v3-v4-v1-v2 is a 4-cycle (using edge v1v2).
+Thus G contains a spanning C_4 = Q_2.
+
+VERIFICATION
+* Lemma 1035.1 is a direct check from the hypercube definition.
+* Lemma 1035.2 was checked by a complete case split.
+* Computation (n=3) summary (exact outputs from the script):
+  - No counterexample for delta>=7 and for delta>=6.
+  - A counterexample exists for delta>=5, with complement degrees [2,2,2,2,2,2,2,2] and complement components a 3-cycle and a 5-cycle.
+
+FINAL
+UNRESOLVED
+(i) Strongest proved partial result here: structural decomposition of Q_n into coordinate perfect matchings (Lemma 1035.1) and exact small-n thresholds: for n=2, delta>=2 forces Q_2; for n=3, exhaustive check shows delta>=6 forces Q_3, while delta=5 does not (explicit example K_8 minus C_3 \cup C_5).
+(ii) First gap: prove (or disprove) that there exists an absolute c>0 such that for all n and all graphs G on 2^n vertices, delta(G)>(1-c)2^n implies G contains a spanning Q_n.
+(iii) Top 3 next moves:
+  1. Try to generalize the n=3 counterexample pattern: search for sparse complements H on 2^n vertices with bounded maximum degree that hit every cube-labelling, e.g. complements that are unions of short cycles on carefully chosen vertex partitions.
+  2. Attempt an embedding/absorption strategy: show that sufficiently dense G contains n edge-disjoint perfect matchings whose union satisfies the 4-cycle constraints needed for a cube factor.
+  3. Computational: for n=4 (N=16) search (with ILP/SAT) for the largest minimum-degree cube-free graphs to estimate the true threshold and suggest constructions.
+(iv) Minimal counterexample structure to look for: a cube-free graph on 2^n vertices with complement of small maximum degree (perhaps regular of degree O(1) or O(log n)) that destroys all cube edge-labellings.
+

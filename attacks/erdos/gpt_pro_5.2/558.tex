@@ -1,0 +1,210 @@
+% Erdos Problem #558
+
+1) FORMAL RESTATEMENT
+
+Fix integers $2\le s\le t$ and $k\ge 1$.
+Let $K_{s,t}$ denote the complete bipartite graph with parts of sizes $s$ and $t$.
+Define $R(K_{s,t};k)$ to be the least $m$ such that every $k$-edge-colouring of $K_m$ contains a monochromatic copy of $K_{s,t}$.
+
+The problem asks to determine (exactly, or sharply up to constants/exponents) $R(K_{s,t};k)$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement lists several bounds and special cases (Chung--Graham etc.). In this solution file we do not assume any results not explicitly stated there, but we can re-derive standard probabilistic lower bounds and extremal-theoretic upper bounds from scratch.
+
+3) ATTACK PLAN
+
+- Lower bound: random $k$-colouring + union bound on monochromatic $K_{s,t}$.
+- Upper bound: use extremal number $\mathrm{ex}(m,K_{s,t})$ via a K\H{o}v\'ari--S\'os--Tur\'an style double counting. In a $k$-colouring, some colour class has at least $\binom{m}{2}/k$ edges; if this exceeds $\mathrm{ex}(m,K_{s,t})$, that colour contains $K_{s,t}$.
+
+4) WORK
+
+PHASE 1 — FAST REALITY CHECK
+
+- When $k=1$, $R(K_{s,t};1)=s+t$ because $K_{s+t}$ contains $K_{s,t}$.
+- When $(s,t)=(2,2)$ and $k=2$, this is the same as $R(C_4;2)=6$ (verified by brute force in Problem 555).
+
+Lemma 558.1 (Probabilistic lower bound).
+Let $2\le s\le t$ and $k\ge 2$.
+Set
+\[
+m:=\left\lfloor \frac{(s!\,t!)^{1/(s+t)}}{2}\, k^{\frac{st-1}{s+t}}\right\rfloor.
+\]
+Then there exists a $k$-edge-colouring of $K_m$ with no monochromatic $K_{s,t}$.
+Consequently,
+\[
+R(K_{s,t};k) > m \ge c_{s,t}\,k^{\frac{st-1}{s+t}}
+\]
+for $c_{s,t}=(s!\,t!)^{1/(s+t)}/2 - o(1)$.
+
+Proof.
+Colour each edge of $K_m$ independently and uniformly at random from $[k]$.
+For each ordered pair of disjoint vertex sets $(A,B)$ with $|A|=s$ and $|B|=t$, let $X_{A,B}$ be the indicator that all $st$ edges between $A$ and $B$ receive the same colour.
+There are $\binom{m}{s}\binom{m-s}{t}$ such pairs.
+
+For fixed $(A,B)$, the probability that all $st$ edges are monochromatic is:
+choose the common colour ($k$ choices) and then all $st$ edges must be that colour, so
+\[
+\mathbb P(X_{A,B}=1)=k\cdot k^{-st}=k^{1-st}.
+\]
+Let $X:=\sum_{A,B} X_{A,B}$ count monochromatic $K_{s,t}$.
+By linearity of expectation,
+\[
+\mathbb E[X]=\binom{m}{s}\binom{m-s}{t}k^{1-st}.
+\]
+Use the crude bounds $\binom{m}{s}\le m^s/s!$ and $\binom{m-s}{t}\le m^t/t!$ to get
+\[
+\mathbb E[X]\le \frac{m^{s+t}}{s!\,t!}\,k^{1-st}.
+\]
+By the definition of $m$,
+\[
+m^{s+t}\le \left(\frac{(s!\,t!)^{1/(s+t)}}{2}\right)^{s+t}k^{st-1}=\frac{s!\,t!}{2^{s+t}}k^{st-1}.
+\]
+Substituting gives
+\[
+\mathbb E[X]\le \frac{1}{2^{s+t}}<1.
+\]
+Therefore $\mathbb P(X=0)>0$, so there exists a colouring with no monochromatic $K_{s,t}$.
+Hence $R(K_{s,t};k)>m$.
+\qed
+
+Lemma 558.2 (K\H{o}v\'ari--S\'os--Tur\'an extremal bound).
+Let $2\le s\le t$ and let $G$ be a graph on $m$ vertices with no $K_{s,t}$ subgraph.
+Then
+\[
+e(G)\le \frac12\Big((t-1)^{1/s}m^{2-1/s}+(s-1)m\Big).
+\]
+
+Proof.
+For each vertex $v\in V(G)$, count pairs $(S,v)$ where $S\subseteq N(v)$ is an $s$-element subset.
+This gives $\sum_v \binom{d(v)}{s}$.
+
+For a fixed $s$-set $S\subseteq V(G)$, let $c(S)$ be the number of common neighbours of all vertices in $S$.
+If $c(S)\ge t$, then $S$ together with any $t$ of its common neighbours forms a $K_{s,t}$, contradicting the hypothesis.
+Hence $c(S)\le t-1$ for every $S$, so
+\[
+\sum_{v\in V(G)} \binom{d(v)}{s}=
+\sum_{S\in \binom{V(G)}{s}} c(S)
+\le (t-1)\binom{m}{s}.
+\tag{1}
+\]
+
+As in Lemma 555.2, we lower-bound the left-hand side using a convexity argument.
+For an integer $d\ge 0$ we have $\binom{d}{s}=0$ when $d<s$, and for $d\ge s$,
+\[
+\binom{d}{s}=\frac{d(d-1)\cdots(d-s+1)}{s!}\ge \frac{(d-s+1)^s}{s!}
+\]
+since each factor $d-j\ge d-s+1$.
+Thus for every integer $d\ge 0$,
+\[
+\binom{d}{s}\ge \frac{(d-s+1)_+^s}{s!},\qquad (x)_+:=\max\{x,0\}.
+\]
+Apply this with $d=d(v)$ and define
+\[
+X_v:=(d(v)-s+1)_+\ge 0.
+\]
+Then
+\[
+\sum_{v\in V(G)}\binom{d(v)}{s}\ge \frac{1}{s!}\sum_{v\in V(G)} X_v^s.
+\]
+Because $x\mapsto x^s$ is convex on $[0,\infty)$, Jensen's inequality yields
+\[
+\frac{1}{m}\sum_v X_v^s\ge \left(\frac{1}{m}\sum_v X_v\right)^s.
+\]
+Moreover $X_v\ge d(v)-s+1$ for each $v$, hence
+\[
+\sum_v X_v\ge \sum_v (d(v)-s+1)=2e(G)-m(s-1).
+\]
+Putting these together gives
+\[
+\sum_{v\in V(G)} \binom{d(v)}{s}
+\ge \frac{m}{s!}\left(\frac{2e(G)}{m}-(s-1)\right)_+^s.
+\tag{2}
+\]
+
+Combine (2) with (1) and $\binom{m}{s}\le m^s/s!$ to obtain
+\[
+\frac{m}{s!}\left(\frac{2e(G)}{m}-(s-1)\right)_+^s\le (t-1)\frac{m^s}{s!}.
+\]
+Cancel $m/s!$ to get
+\[
+\left(\frac{2e(G)}{m}-(s-1)\right)_+^s\le (t-1)m^{s-1}.
+\]
+Taking $s$-th roots and rearranging yields
+\[
+\frac{2e(G)}{m}\le (s-1)+(t-1)^{1/s}m^{(s-1)/s},
+\]
+which is equivalent to the claimed bound.
+\qed
+
+Lemma 558.3 (A coarse explicit upper bound for $R(K_{s,t};k)$).
+Let $2\le s\le t$ and $k\ge 2$.
+Set
+\[
+M:=\max\{(4k)^s(t-1),\ 4k(s-1)\}+2.
+\]
+Then $R(K_{s,t};k)\le M$.
+
+Proof.
+Let $m\ge M$ and consider any $k$-edge-colouring of $K_m$.
+Let $G$ be the densest colour class, so
+\[
+e(G)\ge \frac{1}{k}\binom{m}{2}=\frac{m(m-1)}{2k}.
+\tag{3}
+\]
+Assume for contradiction that $G$ contains no $K_{s,t}$.
+Then Lemma 558.2 gives
+\[
+e(G)\le \frac12\Big((t-1)^{1/s}m^{2-1/s}+(s-1)m\Big).
+\tag{4}
+\]
+
+We show that for $m\ge M$ the right-hand side of (4) is at most $m^2/(4k)$, while (3) is strictly larger than $m^2/(4k)$.
+
+Because $m\ge (4k)^s(t-1)$, we have $m^{1/s}\ge 4k(t-1)^{1/s}$, so
+\[
+(t-1)^{1/s}m^{2-1/s}=(t-1)^{1/s}\frac{m^2}{m^{1/s}}\le (t-1)^{1/s}\frac{m^2}{4k(t-1)^{1/s}}=\frac{m^2}{4k}.
+\]
+Because $m\ge 4k(s-1)+2\ge 4k(s-1)$, we have
+\[
+(s-1)m\le \frac{m^2}{4k}.
+\]
+Therefore the sum in (4) is at most $\frac12(\frac{m^2}{4k}+\frac{m^2}{4k})=\frac{m^2}{4k}$.
+
+On the other hand, since $m\ge 3$ we have $m-1>m/2$, so
+\[
+\frac{m(m-1)}{2k}>\frac{m^2}{4k}.
+\]
+This contradicts (4), so $G$ must contain a $K_{s,t}$.
+Hence the original colouring contains a monochromatic $K_{s,t}$.
+
+Thus $R(K_{s,t};k)\le m$ for all $m\ge M$, in particular $R(K_{s,t};k)\le M$.
+\qed
+
+5) VERIFICATION
+
+- Lemma 558.1: checked the count of ordered $(A,B)$ pairs and the probability $k^{1-st}$; verified that $\mathbb E[X]<1$ implies existence of a colouring with $X=0$.
+
+- Lemma 558.2: checked the double counting identity for common neighbours and the implication $c(S)\ge t\Rightarrow K_{s,t}$. Verified the convexity/Jensen step using $(d(v)-s+1)_+$.
+
+- Lemma 558.3: the threshold $m\ge (4k)^s(t-1)$ was chosen to make the KST main term $\le m^2/(4k)$, and $m\ge 4k(s-1)$ to control the linear term; strict inequality for the densest colour class follows from $m\ge 3$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result:
+- A fully explicit lower bound $R(K_{s,t};k)\ge c_{s,t}k^{(st-1)/(s+t)}$ via the random-colouring union bound (Lemma 558.1).
+- A fully explicit upper bound $R(K_{s,t};k)\le \max\{(4k)^s(t-1),4k(s-1)\}+2$ from extremal theory (Lemma 558.3), showing $R(K_{s,t};k)=O_{s,t}(k^s)$ for fixed $s,t$.
+
+(ii) First gap (crisp):
+Determine the correct order of growth (in particular, the correct exponent of $k$) for $R(K_{s,t};k)$ in the full parameter range, beyond the proven crude bounds.
+
+(iii) Top 3 next moves:
+1. Improve upper bounds using sharper extremal estimates and/or dependent random choice to approach the Chung--Graham form $(t-1)(k+k^{1/s})^s$.
+2. Improve lower bounds by constructing $k$ edge-disjoint $K_{s,t}$-free graphs on $m$ vertices with near-extremal density (rather than matchings).
+3. For small $(s,t)$, compute exact $R(K_{s,t};k)$ for small $k$ to guess patterns (e.g. projective plane constructions for $(2,2)$).
+
+(iv) Minimal counterexample structure:
+A minimal obstruction to sharper conjectured bounds would be a colouring where each colour class is near-extremal $K_{s,t}$-free (quasirandom bipartite-like), balancing edge densities so that no single colour exceeds $\mathrm{ex}(m,K_{s,t})$.
+

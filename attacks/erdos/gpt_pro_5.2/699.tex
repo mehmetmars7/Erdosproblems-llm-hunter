@@ -1,0 +1,82 @@
+% Erdos Problem #699
+\section*{Erd\H{o}s Problem \#699}
+
+\subsection*{FORMAL RESTATEMENT}
+For each integer $n\ge 2$, consider all pairs of integers $(i,j)$ with $1\le i<j\le \lfloor n/2\rfloor$.
+The question asks whether for every such pair there exists a prime $p\ge i$ such that
+\[p\mid \gcd\Bigl(\binom{n}{i},\binom{n}{j}\Bigr).
+\]
+Equivalently: for every $i<j\le n/2$, the integer $\gcd\bigl(\binom{n}{i},\binom{n}{j}\bigr)$ has at least one prime divisor $\ge i$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The statement notes Sylvester--Schur: for each $1\le i\le n/2$ there exists a prime $p>i$ dividing $\binom{n}{i}$, but the present question requires a \emph{common} prime divisor for two coefficients. The ErdosProblems discussion page (late 2025) lists the same known counterexample landscape as in the problem text and does not indicate a full resolution.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof track:} derive mandatory divisibility constraints on $\binom{n}{k}$ from $n$ and $k$ (e.g. $n/\gcd(n,k)\mid \binom{n}{k}$), then try to force a large prime into the intersection of the prime sets of the two coefficients.
+\item \textbf{Disproof track:} brute-force search for small counterexamples; if none appear, attempt to engineer $n$ with many small prime factors so that all common prime factors of the two coefficients are forced to be small.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 699.1 (a guaranteed large divisor of $\binom{n}{k}$ coming from $n$ and $k$).}
+For integers $n\ge 1$ and $1\le k\le n$, let $g:=\gcd(n,k)$. Then
+\[\frac{n}{g}\ \bigm|\ \binom{n}{k}.
+\]
+
+\emph{Proof.}
+Use the identity
+\[k\binom{n}{k}=n\binom{n-1}{k-1}.
+\]
+Write $n=gn_1$ and $k=gk_1$ with $\gcd(n_1,k_1)=1$. The identity becomes
+\[gk_1\binom{n}{k}=gn_1\binom{n-1}{k-1},\]
+so after canceling $g$ we obtain
+\[k_1\binom{n}{k}=n_1\binom{n-1}{k-1}.
+\]
+The right-hand side is divisible by $n_1$. Since $\gcd(n_1,k_1)=1$, the divisibility $n_1\mid k_1\binom{n}{k}$ implies $n_1\mid \binom{n}{k}$. But $n_1=n/g$, proving the claim. \qed
+
+\medskip
+\textbf{Lemma 699.2 (prime $n$ case of the conjecture).}
+If $n$ is prime, then for every $1\le i<j\le \lfloor n/2\rfloor$ the conjectured property holds with $p=n$.
+
+\emph{Proof.}
+Let $n=p$ be prime. By the binomial theorem,
+\[(1+x)^p = 1 + \sum_{k=1}^{p-1}\binom{p}{k}x^k + x^p.
+\]
+Over $\mathbb{Z}/p\mathbb{Z}$, Fermat's little theorem gives $(1+x)^p\equiv 1+x^p\pmod p$. Comparing coefficients, $p\mid \binom{p}{k}$ for all $1\le k\le p-1$. In particular, $p\mid \binom{p}{i}$ and $p\mid \binom{p}{j}$, hence $p\mid \gcd\bigl(\binom{p}{i},\binom{p}{j}\bigr)$. Finally $p=n\ge i$. \qed
+
+\medskip
+\textbf{FAST REALITY CHECK (computation).}
+I checked the conjecture by brute force for all integers $4\le n\le 300$ and all pairs $1\le i<j\le \lfloor n/2\rfloor$:
+\begin{itemize}
+\item No counterexample was found for $n\le 300$.
+\item In particular, for each tested $(n,i,j)$ the integer $\gcd\bigl(\binom{n}{i},\binom{n}{j}\bigr)$ had some prime factor $\ge i$.
+\end{itemize}
+(The check factors the gcd for each pair, so it is an exact verification in that range.)
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 699.1: verified the coprimality step $\gcd(n_1,k_1)=1$ and used the standard divisibility fact ``if $a\mid bc$ and $\gcd(a,b)=1$ then $a\mid c$.''
+\item Lemma 699.2: checked coefficient comparison mod $p$ and ensured $i,j\le p-1$.
+\item Computational check: ensured loops cover all pairs $i<j\le\lfloor n/2\rfloor$ and that prime factor condition is implemented as ``there exists a prime divisor $\ge i$.''
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}
+\item[(i)] Strongest proved partial results here:
+  \begin{itemize}
+  \item For all $n,k$, $\frac{n}{\gcd(n,k)}\mid \binom{n}{k}$ (Lemma 699.1).
+  \item For prime $n$, the property holds for all pairs $(i,j)$ with witness prime $p=n$ (Lemma 699.2).
+  \item Exhaustive computation found no counterexample for $4\le n\le 300$.
+  \end{itemize}
+\item[(ii)] First gap: for general composite $n$, given $1\le i<j\le n/2$, force the existence of a prime $p\ge i$ dividing \emph{both} $\binom{n}{i}$ and $\binom{n}{j}$.
+\item[(iii)] Top 3 next moves:
+  \begin{enumerate}
+  \item Use $p$-adic valuation formulas (e.g. via carries/base-$p$ expansions) to understand when a prime $p\ge i$ divides both coefficients; target primes in $[i,2i]$.
+  \item For each fixed $i$, attempt to show that the set of $j$ for which \emph{all} primes $\ge i$ fail to divide the gcd is empty by a covering argument on prime intervals.
+  \item Extend computation to larger $n$ but with pruning: for each $(n,i)$ test the ``worst'' $j$ (empirically near $n/2$) and cache gcd factorizations.
+  \end{enumerate}
+\item[(iv)] Minimal counterexample structure: a smallest counterexample would be a composite $n$ with some $i\ge 4$ and $j\in(i,n/2]$ such that every prime divisor of $\gcd\bigl(\binom{n}{i},\binom{n}{j}\bigr)$ is $<i$; computationally one should expect $n$ to have many small prime factors so that $\binom{n}{i}$ and $\binom{n}{j}$ have large common parts supported only on small primes.
+\end{enumerate}
+
+

@@ -1,0 +1,134 @@
+% Erdos Problem #727
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 2$.
+Question: Are there infinitely many integers $n\ge 1$ such that
+\[
+(n+k)!^2 \mid (2n)!\ ?
+\]
+Equivalently, is $\dfrac{(2n)!}{((n+k)!)^2}$ an integer for infinitely many $n$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records:
+
+- The question is open even for $k=2$.
+- For $k=1$, Balakran proved that $(n+1)^2\mid \binom{2n}{n}$ for infinitely many $n$.
+- It is classical that $(n+1)\mid \binom{2n}{n}$ for all $n$.
+- Erd\H{o}s--Graham--Ruzsa--Straus note that Balakran's method yields infinitely many $n$ with $(n+k)!(n+1)!\mid (2n)!$ (indeed for $k<c\log n$).
+
+I do not use additional results.
+
+3) ATTACK PLAN
+
+Proof track ideas:
+- Translate divisibility into $p$-adic inequalities using Legendre's formula for $v_p(m!)$.
+- Seek an explicit infinite family of $n$ where these inequalities hold simultaneously for all primes.
+
+Disproof track ideas:
+- Show that for fixed $k\ge 2$, for all sufficiently large $n$ there exists a prime $p$ with a valuation deficit $v_p((2n)!)-2v_p((n+k)!)<0$.
+
+I can provide exact valuation reformulations and computational evidence for small $n$, but I do not see a complete proof or disproof.
+
+4) WORK
+
+\textbf{FAST REALITY CHECK.}
+
+Using Legendre valuations (script), I searched for solutions:
+
+- For $k=2$, there are already solutions below $500$: $n=208$ and $n=458$.
+  Up to $n\le 5000$ I found $28$ solutions; the first few are
+  \[
+  208,\ 458,\ 987,\ 1220,\ 1455,\ 1597,\ 1889,\ 2012,\ 2144,\ 2330,\dots
+  \]
+- For $k=3$, I found at least one solution below $5000$: $n=3475$.
+- For $k=4$, no solutions were found up to $n\le 5000$.
+
+These computations neither prove nor disprove infinitude.
+
+\medskip
+
+\textbf{Lemma 1 (prime-valuation reformulation).}
+Let $k\ge 1$ and $n\ge 1$ be integers. Then
+\[
+(n+k)!^2 \mid (2n)!
+\]
+if and only if for every prime $p$,
+\[
+ v_p((2n)!) \ \ge\ 2\,v_p((n+k)!),
+\]
+where $v_p(m)$ denotes the exponent of $p$ in the prime factorization of $m$.
+Moreover, for each prime $p$ and integer $m\ge 1$,
+\[
+ v_p(m!) = \sum_{j\ge 1} \left\lfloor \frac{m}{p^j}\right\rfloor.
+\]
+
+\emph{Proof.}
+The divisibility $(n+k)!^2\mid (2n)!$ holds if and only if for each prime $p$, the exponent of $p$ in $(2n)!$ is at least the exponent of $p$ in $(n+k)!^2$, i.e.
+$v_p((2n)!)\ge 2v_p((n+k)!)$.
+
+The formula $v_p(m!)=\sum_{j\ge 1}\lfloor m/p^j\rfloor$ is standard: among $1,2,\dots,m$, exactly $\lfloor m/p\rfloor$ numbers contribute at least one factor of $p$, exactly $\lfloor m/p^2\rfloor$ contribute an additional factor, etc. Summing counts all $p$-powers in the product.
+\qed
+
+\medskip
+
+\textbf{Lemma 2 (the classical divisibility $(n+1)\mid \binom{2n}{n}$).}
+For every integer $n\ge 0$,
+\[
+(n+1)\ \bigm|\ \binom{2n}{n}.
+\]
+Equivalently, the Catalan number
+\[
+C_n:=\frac{1}{n+1}\binom{2n}{n}
+\]
+is an integer for all $n$.
+
+\emph{Proof.}
+Consider lattice paths from $(0,0)$ to $(n,n)$ consisting of steps $E=(1,0)$ and $N=(0,1)$. There are $\binom{2n}{n}$ such paths.
+
+Call a path \emph{good} if it never goes above the diagonal $y=x$ (i.e. for every prefix of the path, the number of $N$ steps is at most the number of $E$ steps). These are Dyck paths of semilength $n$.
+
+Let $G$ be the set of good paths, and $B$ the set of bad paths (those that at some point have $y>x$).
+We will show $|G| = \binom{2n}{n} - \binom{2n}{n+1}$, which equals $\frac{1}{n+1}\binom{2n}{n}$.
+
+\emph{Reflection principle bijection.}
+Define a map $\Psi: B \to \{\text{paths from }(0,0)\text{ to }(n-1,n+1)\}$ as follows.
+Given a bad path, let $t$ be the first time the path reaches a point with $y=x+1$ (i.e. the first step where it goes strictly above the diagonal). Reflect the initial segment of the path up to time $t$ across the line $y=x+1/2$ (equivalently, swap $E$ and $N$ steps in that initial segment). Leave the remainder unchanged.
+
+- This transformation changes the endpoint: in the reflected initial segment, the number of $N$ steps exceeds the number of $E$ steps by $1$ (since it ends at $y=x+1$), and swapping steps converts this to the number of $E$ steps exceeding $N$ steps by $1$. Overall, the total number of $E$ steps decreases by $1$ and the total number of $N$ steps increases by $1$. Hence the path ends at $(n-1,n+1)$.
+
+- The map is bijective: given a path from $(0,0)$ to $(n-1,n+1)$, it must cross the line $y=x+1$ at some first time; swapping the initial segment up to that first crossing recovers a unique bad path from $(0,0)$ to $(n,n)$.
+
+Therefore $|B|=\binom{2n}{n+1}$, since paths to $(n-1,n+1)$ have $n+1$ north steps and $n-1$ east steps.
+So
+\[
+|G| = \binom{2n}{n} - \binom{2n}{n+1}.
+\]
+Using $\binom{2n}{n+1} = \binom{2n}{n}\cdot \frac{n}{n+1}$, we get
+\[
+|G| = \binom{2n}{n}\left(1-\frac{n}{n+1}\right)=\frac{1}{n+1}\binom{2n}{n}.
+\]
+Since $|G|$ is an integer count of paths, $C_n$ is an integer and thus $(n+1)\mid\binom{2n}{n}$.
+\qed
+
+5) VERIFICATION
+
+- Lemma 1 reduces the divisibility question to explicit inequalities for each prime using Legendre's formula; no hidden assumptions.
+- Lemma 2 gives a complete, explicit integrality proof for the $k=1$ divisor $(n+1)$ that appears in the background discussion.
+- The computational search in the FAST REALITY CHECK was implemented directly via Lemma 1 (prime valuations) and explicitly found solutions for $k=2$ and $k=3$ in the stated ranges.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: The divisibility condition is exactly equivalent to the family of prime-valuation inequalities $v_p((2n)!)\ge 2v_p((n+k)!)$ for all primes $p$ (Lemma 1). Additionally, the classical factor $(n+1)\mid\binom{2n}{n}$ is proved via an explicit counting argument (Lemma 2). Computations show many solutions for $k=2$ up to $5000$.
+
+(ii) First gap (crisp): For a fixed $k\ge 2$, prove or disprove that the inequalities $v_p((2n)!)\ge 2v_p((n+k)!)$ hold for infinitely many $n$.
+
+(iii) Top 3 next moves:
+  1. Analyze which primes $p$ are most likely to violate $v_p((2n)!)\ge 2v_p((n+k)!)$ (e.g. primes near $n$ or near $n+k$), and attempt to build $n$ so that the critical inequalities are automatically satisfied.
+  2. Use the digit-sum form of Legendre's formula $v_p(m!)=(m-s_p(m))/(p-1)$ to rephrase the condition in terms of base-$p$ digits of $n$ and $n+k$, searching for a constructive pattern.
+  3. Extend computations to larger ranges and look for a parametric description of the observed solutions for $k=2$ (e.g. clustering around special factorizations of $n$).
+
+(iv) Minimal counterexample structure: If the statement is false for some fixed $k\ge 2$, then there exists $N_0$ such that for all $n\ge N_0$ there is a prime $p$ with valuation deficit $v_p((2n)!)-2v_p((n+k)!)<0$; heuristically such a prime would likely lie in a window where the floors $\lfloor 2n/p^j\rfloor$ and $\lfloor (n+k)/p^j\rfloor$ are especially sensitive (e.g. $p$ near $n$).

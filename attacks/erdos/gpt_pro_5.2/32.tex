@@ -1,0 +1,112 @@
+% Erdős Problem #32
+FORMAL RESTATEMENT
+Let $\mathcal{P}$ be the set of primes.
+A set $A\subseteq\mathbb{N}$ is an \emph{additive complement to the primes} if there exists $N_0$ such that every integer $n\ge N_0$ can be written as
+\[
+ n=p+a\quad\text{with }p\in\mathcal{P},\ a\in A.
+\]
+Write $A(N):=|A\cap\{1,2,\dots,N\}|$.
+The problem asks:
+(1) does there exist such an $A$ with $A(N)=o((\log N)^2)$?
+(2) can one achieve $A(N)=O(\log N)$?
+(3) must every such $A$ satisfy $\liminf_{N\to\infty} A(N)/\log N>1$?
+
+QUICK LITERATURE/CONTEXT CHECK
+The problem text states that Erdős constructed an additive complement with $A(N)\ll (\log N)^2$ (improving Lorentz's $\ll(\log N)^3$), and that Ruzsa proved the lower bound
+\(\liminf A(N)/\log N\ge e^{\gamma}\)
+for any additive complement.
+The $o((\log N)^2)$ and $O(\log N)$ questions remain open in the problem statement.
+
+ATTACK PLAN
+There are two complementary directions:
+(1) Construction: use probabilistic selection of shifts $a$ together with sieve estimates for primes to cover all large integers (a ``set cover'' viewpoint).
+(2) Lower bounds: show that if $A$ is too small, then some residue-class or prime-gap obstruction forces infinitely many integers not representable as $p+a$.
+The lemmas below record elementary obstructions for \emph{finite} complements; turning them into sharp asymptotic lower bounds is the hard step.
+
+WORK
+Lemma 32.1 (no finite additive complement to primes).
+Let $F\subseteq\mathbb{N}$ be finite.
+Then $\mathcal{P}+F$ is not cofinite; in fact there are infinitely many integers $n$ such that $n\notin \mathcal{P}+F$.
+
+Proof.
+Write $F=\{a_1,\dots,a_m\}$.
+Choose distinct primes $q_1,\dots,q_m$ such that $q_i>\max(F)+2$ for all $i$.
+By the Chinese remainder theorem there exists an integer $n$ such that
+\[
+ n\equiv a_i\pmod{q_i}\qquad\text{for each }i=1,\dots,m.
+\]
+Then for each $i$ we have $q_i\mid (n-a_i)$.
+Also $n-a_i\ge q_i$ for all sufficiently large solutions $n$ to these congruences; choosing one such $n$ with $n>\max(F)+\max_i q_i$ ensures $n-a_i>q_i$.
+Hence each $n-a_i$ is a composite multiple of $q_i$, and so $n-a_i\notin\mathcal{P}$ for every $i$.
+Therefore $n\notin \mathcal{P}+F$.
+Since the congruences have infinitely many solutions (modulo $Q:=\prod_i q_i$), this produces infinitely many such $n$.
+\qed
+
+\medskip
+Lemma 32.2 (arbitrarily long gaps for a finite complement).
+Let $F\subseteq\mathbb{N}$ be finite and let $L\ge 1$.
+Then there exists an interval of $L$ consecutive integers, all of which lie outside $\mathcal{P}+F$.
+
+Proof.
+Let $a_{\min}=\min F$ and $a_{\max}=\max F$.
+Choose an integer $K$ so large that
+\(
+K \ge (a_{\max}-a_{\min})+L+1.
+\)
+Consider the classical block of $K-1$ consecutive composite numbers
+\[
+I:=\{K!+2,\ K!+3,\ \dots,\ K!+K\}.
+\]
+For each $2\le j\le K$ the integer $K!+j$ is divisible by $j$ and strictly larger than $j$, hence composite.
+Now consider the intersection of shifted intervals
+\[
+J:=\bigcap_{a\in F} (I+a)=\bigcap_{a\in F}\{K!+2+a,\dots,K!+K+a\}.
+\]
+An integer $n$ lies in $J$ iff for every $a\in F$ we have $n-a\in I$.
+In particular, for $n\in J$ and $a\in F$, the number $n-a$ is composite, so $n\notin \mathcal{P}+F$.
+It remains to show $J$ contains at least $L$ consecutive integers.
+The lower endpoint of $I+a$ is $K!+2+a$ and the upper endpoint is $K!+K+a$, so
+\[
+J\supseteq [K!+2+a_{\max},\ K!+K+a_{\min}].
+\]
+The length of this interval is
+\[
+(K!+K+a_{\min})-(K!+2+a_{\max})+1 = K+a_{\min}-a_{\max}-1.
+\]
+By the choice of $K$, this is at least $L$.
+Thus $J$ contains $L$ consecutive integers, all outside $\mathcal{P}+F$.
+\qed
+
+\medskip
+\textit{Fast reality check (finite set-cover analog).}
+Fix $M$ and ask for the smallest $A\subseteq\{0,1,\dots,M\}$ such that every $n\in\{2,3,\dots,M\}$ can be written $n=p+a$ with $p$ prime and $a\in A$.
+This is a finite set-cover problem (not the asymptotic Erdős problem), but it illustrates how ``few shifts'' can cover an initial range.
+I solved it exactly by branch-and-bound for several $M$:
+\[
+\begin{array}{c|c|l}
+M & \min |A| & \text{one optimal }A\\\hline
+80 & 6 & \{0,1,2,3,4,5\}\\
+100 & 7 & \{0,1,2,3,4,5,93\}\\
+120 & 8 & \{0,1,2,3,4,5,6,7\}\\
+150 & 9 & \{0,1,2,3,16,17,32,33,63\}\\
+200 & 10 & \{0,1,2,3,4,5,8,9,16,17\}\\
+300 & 10 & \{0,1,4,5,8,9,72,73,86,87\}
+\end{array}
+\]
+
+VERIFICATION
+Lemma 32.1 is a direct CRT construction that forces $n-a$ to have a prescribed prime divisor for each $a\in F$.
+Lemma 32.2 uses the factorial composite block and a clean interval-intersection length computation.
+The finite set-cover numbers were verified by direct checking that every $n\le M$ is covered.
+
+FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result recorded in the problem statement: existence of an additive complement with $A(N)\ll (\log N)^2$ and the universal lower bound $\liminf A(N)/\log N\ge e^{\gamma}$. In WORK I proved the elementary fact that no \emph{finite} $F$ can work, and in fact $\mathcal{P}+F$ has arbitrarily long gaps (Lemma 32.2).
+(ii) First gap: bridge the finite-obstruction lemmas to an asymptotic lower bound strong enough to rule out $A(N)=o((\log N)^2)$ or to prove a construction achieving $A(N)=O(\log N)$.
+(iii) Top 3 next moves:
+  (1) Model the coverage condition as a set-cover problem on the integers with ``sets'' $\mathcal{P}+a$ and attempt a probabilistic construction with rigorous sieve bounds.
+  (2) Seek a deterministic obstruction: for a given sparse $A$, force a long interval where all $n-a$ are composite simultaneously (a ``covering congruences'' argument).
+  (3) Push computations further in the finite model to guess the correct constant in the lower bound $\liminf A(N)/\log N$ (e.g. compare to $e^{\gamma}$).
+(iv) Minimal counterexample structure: if $A(N)=O(\log N)$ is impossible, then any additive complement must have $A(N)\gg \log N\,\omega(N)$ for some $\omega\to\infty$; such a statement would likely come from constructing, for any given small $A\cap[1,N]$, a residue-class pattern producing many integers $n$ for which all $n-a$ are forced composite.
+
+

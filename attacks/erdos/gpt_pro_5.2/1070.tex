@@ -1,0 +1,136 @@
+% Erdos Problem #1070
+
+\subsection*{FORMAL RESTATEMENT}
+Given $n$ points in the plane, consider the graph on these $n$ vertices in which two points are adjacent iff their Euclidean distance is exactly $1$.
+Let $f(n)$ be the largest integer such that every set of $n$ points contains an independent set of size at least $f(n)$ (equivalently, the minimum possible independence number among all unit-distance graphs on $n$ vertices).
+The problem asks for estimates on $f(n)$, and in particular whether $f(n)\ge n/4$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file relates this to the chromatic number $\chi$ of the unit distance graph of $\mathbb{R}^2$ (Hadwiger--Nelson).  It states the general bounds $n/\chi\le f(n)\le 2n/7$, with the upper bound via the Moser spindle.  It also states a lower bound $f(n)\ge n^2/(2m_1+n)$ in terms of the maximal number $m_1$ of unit distances among $n$ points.
+
+\subsection*{ATTACK PLAN}
+Prove the general bounds from scratch:
+(1) $f(n)\ge n/\chi$ by pigeonholing a coloring of the plane;
+(2) $f(n)\ge n^2/(2m+n)$ for any graph with $n$ vertices and $m$ edges, then specialize to $m\le m_1(n)$;
+(3) Build an explicit 7-point unit-distance configuration (Moser spindle) with independence number $2$ and replicate it far apart to obtain $f(n)\le 2n/7+O(1)$.
+Include a computational ``FAST REALITY CHECK'' verifying the Moser-spindle adjacency and independence number.
+
+\subsection*{WORK}
+\textbf{Lemma 1070.1 (chromatic number lower bound).}
+Let $\chi$ be the chromatic number of the (infinite) unit distance graph on $\mathbb{R}^2$.
+Then for every $n$, $f(n)\ge \lceil n/\chi\rceil$.
+
+\emph{Proof.}
+By definition of $\chi$, there exists a coloring of all points of $\mathbb{R}^2$ with $\chi$ colors such that no two points at distance $1$ share a color.
+Given any set $P$ of $n$ points, one color class in $P$ has size at least $\lceil n/\chi\rceil$ (pigeonhole principle). Any two points of the same color are not at distance $1$, so that color class is an independent set in the unit-distance graph on $P$.
+Thus every $P$ has an independent set of size at least $\lceil n/\chi\rceil$, i.e. $f(n)\ge \lceil n/\chi\rceil$.
+\qed
+
+\textbf{Lemma 1070.2 (edge-count lower bound on independence).}
+Let $G$ be a finite graph with $n$ vertices and $m$ edges. Then
+\[
+\alpha(G)\ \ge\ \frac{n^2}{2m+n}.
+\]
+Consequently, if $m_1(n)$ denotes the maximum possible number of unit-distance edges among $n$ planar points, then
+\[
+ f(n)\ \ge\ \frac{n^2}{2m_1(n)+n}.
+\]
+
+\emph{Proof.}
+Let the vertex degrees be $d(v)$, $v\in V(G)$, so that $\sum_{v} d(v)=2m$.
+Choose a uniformly random permutation $\pi$ of $V(G)$ and define
+\[
+I(\pi):=\{v\in V(G): v\text{ appears before all its neighbors in }\pi\}.
+\]
+Then $I(\pi)$ is an independent set: if $uv$ is an edge, it is impossible that both $u$ and $v$ appear before each other.
+Fix a vertex $v$ of degree $d(v)$.  Among the set consisting of $v$ and its $d(v)$ neighbors (a set of size $d(v)+1$), each vertex is equally likely to be the earliest in the random permutation $\pi$, hence
+\[
+\mathbb{P}(v\in I(\pi))=\frac{1}{d(v)+1}.
+\]
+By linearity of expectation,
+\[
+\mathbb{E}|I(\pi)|=\sum_{v\in V(G)} \frac{1}{d(v)+1}.
+\]
+Therefore there exists at least one permutation $\pi$ with
+\[
+\alpha(G)\ge |I(\pi)|\ge \sum_{v\in V(G)} \frac{1}{d(v)+1}.
+\]
+Apply Cauchy--Schwarz to the positive numbers $d(v)+1$:
+\[
+\sum_{v} \frac{1}{d(v)+1}
+\ \ge\ \frac{n^2}{\sum_v (d(v)+1)}
+\ =\ \frac{n^2}{2m+n}.
+\]
+This proves $\alpha(G)\ge n^2/(2m+n)$.
+For unit-distance graphs on $n$ planar points, the number of edges is at most $m_1(n)$ by definition, hence $f(n)=\min \alpha\ge n^2/(2m_1(n)+n)$.
+\qed
+
+\textbf{Lemma 1070.3 (a 7-vertex unit-distance graph with $\alpha=2$).}
+There exists a set of $7$ points in the plane whose unit-distance graph has independence number $2$.
+Hence, for every $t\ge 1$,
+\[
+ f(7t)\le 2t,
+\]
+and in particular $f(n)\le \frac{2}{7}n + O(1)$.
+
+\emph{Proof (explicit construction and combinatorial bound).}
+We give coordinates for a Moser-spindle-type configuration.
+Let $\theta>0$ satisfy $2\sqrt{3}\,\sin(\theta/2)=1$.
+Define points
+\[
+A=(0,0),\quad B=(1,0),\quad D=\Bigl(\tfrac12,\tfrac{\sqrt{3}}{2}\Bigr),\quad C=B+D=\Bigl(\tfrac32,\tfrac{\sqrt{3}}{2}\Bigr).
+\]
+Let $R_\theta$ denote rotation by $\theta$ about the origin and set
+\[
+E=R_\theta(B),\quad F=R_\theta(D),\quad G=R_\theta(C).
+\]
+Now check unit distances:
+\begin{itemize}
+\item In $\{A,B,C,D\}$ we have $|AB|=|AD|=|BD|=|BC|=|CD|=1$ (two equilateral triangles sharing the edge $BD$).
+\item In $\{A,E,F,G\}$ we have the analogous five unit distances $|AE|=|AF|=|EF|=|EG|=|FG|=1$ by rotation invariance.
+\item Finally, $|CG|=|C-R_\theta(C)|=1$ by the chord-length equation $2|C|\sin(\theta/2)=1$ and $|C|=\sqrt{3}$.
+\end{itemize}
+Thus the unit-distance graph on the seven vertices $\{A,B,C,D,E,F,G\}$ contains the two triangles $B\!C\!D$ and $E\!F\!G$, and $A$ is adjacent to $B,D,E,F$.
+From this structure we show $\alpha\le 2$:
+\begin{itemize}
+\item If an independent set contains $A$, it cannot contain $B,D,E,F$, and among $\{C,G\}$ it can contain at most one because $C$--$G$ is an edge. So it has size $\le 2$.
+\item If an independent set does not contain $A$, then it meets the triangle $\{B,C,D\}$ in at most one vertex and meets the triangle $\{E,F,G\}$ in at most one vertex, so it has size $\le 2$.
+\end{itemize}
+On the other hand, $\{A,C\}$ is independent (since $A$ is not adjacent to $C$), so $\alpha=2$.
+
+To deduce $f(7t)\le 2t$, place $t$ translated copies of this 7-point configuration so far apart (distance $>2$ between distinct copies) that no unit distances occur between points from different copies.  Any independent set in the union contains at most $2$ vertices from each copy, hence at most $2t$ vertices in total. \qed
+
+\textbf{FAST REALITY CHECK (computation).}
+Using the above coordinates and $\theta=2\arcsin(1/(2\sqrt{3}))\approx 0.5856855$ radians, a brute-force distance check (within $10^{-9}$ tolerance) finds exactly $11$ unit-distance pairs, namely
+\[
+\{AB,AD,AE,AF,BD,BC,CD,CG,EF,EG,FG\},
+\]
+and exhaustive search over all subsets confirms the maximum independent set size is $2$.
+
+\subsection*{VERIFICATION}
+Lemma~1070.1 is a direct pigeonhole argument from the definition of $\chi$.
+Lemma~1070.2 is proved via the Caro--Wei expectation bound and Cauchy--Schwarz; all steps are explicit.
+Lemma~1070.3 supplies coordinates and checks unit distances by construction; the combinatorial argument for $\alpha=2$ uses only the existence of two triangles and the adjacency of $A$.
+The replication argument is verified by choosing inter-copy distances $>2$, ensuring cross-copy distances are $>1$.
+The ``FAST REALITY CHECK'' was done by direct computation on the stated coordinates.
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+
+(i) \emph{Strongest proved partial result:}
+We have general lower bounds $f(n)\ge \lceil n/\chi\rceil$ (Lemma~1070.1) and $f(n)\ge n^2/(2m_1(n)+n)$ (Lemma~1070.2), and an explicit construction giving $f(n)\le 2n/7+O(1)$ (Lemma~1070.3).  In particular, $\limsup f(n)/n\le 2/7$ via the replicated 7-point configuration.
+
+(ii) \emph{First gap (crisp statement):}
+Determine the correct linear growth constant for $f(n)$ (if it exists), and specifically decide whether $f(n)\ge n/4$ holds for all $n$.
+
+(iii) \emph{Top 3 next moves (concrete lemmas/computations):}
+\begin{enumerate}
+\item Improve upper bounds by finding smaller (or denser) finite unit-distance graphs with smaller independence ratio than $2/7$, and then replicate them.
+\item Improve lower bounds by sharpening estimates on $m_1(n)$ (maximum number of unit distances), then plugging into Lemma~1070.2.
+\item For moderate $n$ (say $n\le 50$), attempt computational search (with exact algebraic coordinates) for configurations minimizing the independence number, to guess the best constant and candidate extremizers.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:}
+A counterexample to $f(n)\ge n/4$ would be a concrete $n$-point set whose unit-distance graph has an independent set of size at most $\lfloor n/4\rfloor$.  Any asymptotic counterexample to a conjectured constant $c$ would require a family of finite unit-distance graphs with independence ratio $<c$.
+
+

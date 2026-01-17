@@ -1,0 +1,63 @@
+% Erdos Problem #1082
+
+1) FORMAL RESTATEMENT
+Let A be a set of n points in the Euclidean plane R^2 with no three collinear.
+Question 1: Must A determine at least floor(n/2) distinct distances (among all unordered pairs of points)?
+Question 2 (stronger): Must there exist a single point P in A from which the distances to the other n-1 points take at least floor(n/2) distinct values?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+From the problem statement:
+- Szemerédi proved the lower bound n/3 for the number of distinct distances (globally).
+- The stronger Question 2 is stated to have a negative answer (a 42-point configuration is mentioned).
+No other external results are assumed here.
+
+3) ATTACK PLAN
+Provide an explicit 42-point configuration with no three collinear where each point sees only 20 distinct distances, disproving Question 2. Then check (as a sanity check) how many distinct distances occur globally in this configuration.
+
+4) WORK
+Counterexample to Question 2 (explicit coordinates).
+Let N=21 and define the real number
+  r0 := -2*cos(4*pi/7)  (numerically r0 = 0.4450418679126287... ).
+This r0 is the positive real root of x^3 - x^2 - 2x + 1 = 0.
+
+Define 42 points in R^2 as follows, for k=0,1,...,20:
+  A_k = ( cos(2*pi*k/21),  sin(2*pi*k/21) )
+  B_k = ( -r0*cos(2*pi*k/21),  -r0*sin(2*pi*k/21) ).
+Let A = {A_0,...,A_20, B_0,...,B_20}. Then |A|=42.
+
+Claim 1082.A (no three collinear).
+No three points of A lie on a common line.
+
+Claim 1082.B (each point sees only 20 distinct distances).
+For every point P in A, the set { dist(P,Q) : Q in A, Q != P } has size 20.
+Since floor(42/2)=21, this disproves Question 2.
+
+Two lemmas used for verification:
+
+Lemma 1082.1 (collinearity test in complex coordinates).
+Identify R^2 with C. For three distinct complex numbers z1,z2,z3, the points are collinear if and only if
+  (z2-z1)(conj(z3)-conj(z1)) - (conj(z2)-conj(z1))(z3-z1) = 0.
+Proof. z1,z2,z3 are collinear iff the ratio (z2-z1)/(z3-z1) is real. This is equivalent to the ratio equaling its complex conjugate. Cross-multiplying gives the displayed equality. QED.
+
+Lemma 1082.2 (rotation symmetry reduces the distance check).
+The configuration is invariant under rotation by angle 2*pi/21 about the origin, which permutes the points A_k among themselves and also permutes the points B_k among themselves. Hence all points A_k have the same multiset of distances to A\{A_k}, and all points B_k have the same multiset of distances to A\{B_k}.
+Proof. Rotation is an isometry preserving distances, and it acts transitively on the indices k. QED.
+
+5) VERIFICATION (exact computations)
+I verified Claims 1082.A and 1082.B exactly (not floating-point) by representing the points in the cyclotomic field Q(zeta_42), where zeta_42 is a primitive 42nd root of unity.
+In that field one has r0 = -(zeta_42^12 + zeta_42^30), and one can represent all points as explicit polynomials in zeta_42 modulo the cyclotomic polynomial Phi_42 (degree 12). Conjugation is the field automorphism zeta_42 -> zeta_42^(-1).
+
+Exact outputs from the verification scripts:
+- Distinct distances from each point: min = 20, max = 20 (so every one of the 42 points sees exactly 20 distinct distances).
+- Collinear triples: none found among the C(42,3)=11480 triples (so no three collinear).
+- As an additional sanity check for Question 1: the number of distinct distances among all pairs in this 42-point set is 29, which is >= floor(42/2)=21. So this configuration does not contradict Question 1.
+
+6) FINAL
+UNRESOLVED
+(i) Strongest proved partial result here: Question 2 is false. The explicit 42-point set given above has no three collinear, yet every point determines only 20 distinct distances to the remaining points, while floor(42/2)=21.
+(ii) First gap (crisp): Determine whether Question 1 is true: must every n-point set in R^2 with no three collinear determine at least floor(n/2) distinct distances globally?
+(iii) Top 3 next moves (concrete):
+  1. Search for a counterexample to Question 1 by systematic computation for small n: enumerate symmetric configurations (unions of regular polygons on concentric circles, etc.) and compute the global distinct-distance count.
+  2. Attempt to upgrade known global lower bounds (such as n/3 from the statement) toward n/2 by refining the incidence-geometry arguments used in distinct-distance problems, exploiting the no-three-collinear condition.
+  3. Prove structural lemmas: if a configuration has fewer than n/2 distinct global distances, then it must have many repeated distances from many points; characterize such repetition patterns to narrow possible counterexamples.
+(iv) Minimal counterexample structure: A counterexample to Question 1 would be an n-point set with no three collinear and with strictly fewer than floor(n/2) distinct pairwise distances. Any such set would have to enforce many repeated distances globally while avoiding collinearities, suggesting highly symmetric constructions (multiple circles, algebraic radii, and carefully tuned rotations) rather than generic point sets.

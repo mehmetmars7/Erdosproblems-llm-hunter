@@ -1,0 +1,154 @@
+% Solutions/attempts for Erdos Problems #583--#589
+% Generated automatically from 583-589.tex following PROMPT_STRATEGY.MD.
+
+% Erdos Problem #583
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+
+Let $G=(V,E)$ be a finite simple undirected connected graph with $|V|=n\ge 1$.
+A \emph{path} means a simple path: a sequence of distinct vertices $v_0,v_1,\dots,v_\ell$ with $\ell\ge 1$ and $\{v_{i-1},v_i\}\in E$ for all $i$, and with edge set $\{\{v_{i-1},v_i\}:1\le i\le \ell\}$.
+A \emph{partition of $E$ into edge-disjoint paths} means a collection of paths $P_1,\dots,P_t$ in $G$ such that the sets $E(P_i)$ are pairwise disjoint and
+\[
+E\;=\;\bigsqcup_{i=1}^t E(P_i).
+\]
+(Vertices may repeat across different paths; only edges are disjoint.)
+
+\smallskip
+\noindent\textbf{Conjecture (Erd\H{o}s--Gallai / Gallai path decomposition).}
+For every connected graph $G$ on $n$ vertices there exists such a partition with
+\[
+ t\le \left\lceil \frac n2\right\rceil.
+\]
+Edge cases: for $n=1$ the bound says $t\le 1$ and $E=\varnothing$ admits $t=0$.
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+
+I will not use any literature beyond what is explicitly quoted in the problem statement.
+Context given there: Lov\'asz proved a decomposition into at most $\lfloor n/2\rfloor$ paths and cycles (hence at most $n-1$ paths), Pyber proved a covering by $n/2+O(n^{3/4})$ paths, and Fan proved the non-edge-disjoint version.
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+
+\emph{Proof-track ideas.}
+(1) Reduce to a minimal counterexample and attempt an inductive decomposition by removing a suitable vertex/edge cut and gluing decompositions.
+(2) Try to construct a path decomposition from a pairing of incident edges at vertices (``trail decomposition''), then control simplicity of trails.
+
+\emph{Disproof-track ideas.}
+(1) Search small $n$ exhaustively for a counterexample.
+(2) Try highly connected dense graphs with many odd-degree vertices (where the lower bound $\ge n/2$ is tight) and see if simplicity obstructs.
+
+I carried out (2) for small $n$ computationally; no counterexample appears up to $n=6$.
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 583.1 (parity lower bound for any path partition).}
+Let $G$ be any (not necessarily connected) finite graph and suppose $E(G)$ is partitioned into $t$ edge-disjoint paths. Let $\operatorname{odd}(G)$ denote the number of vertices of odd degree in $G$. Then
+\[
+\operatorname{odd}(G)\le 2t,\qquad\text{hence }\qquad t\ge \frac{\operatorname{odd}(G)}2.
+\]
+
+\noindent\emph{Proof.}
+Fix a partition $E(G)=\bigsqcup_{i=1}^t E(P_i)$.
+For a vertex $v\in V(G)$ and a path $P_i$, the degree $\deg_{P_i}(v)$ in the path subgraph satisfies:
+$\deg_{P_i}(v)=1$ if $v$ is an endpoint of $P_i$, $\deg_{P_i}(v)=2$ if $v$ is an internal vertex of $P_i$, and $\deg_{P_i}(v)=0$ otherwise.
+In particular, $\deg_{P_i}(v)\bmod 2$ equals $1$ precisely when $v$ is an endpoint of $P_i$, and equals $0$ otherwise.
+Summing degrees over the partition gives
+\[
+\deg_G(v)=\sum_{i=1}^t \deg_{P_i}(v).
+\]
+Reducing mod $2$ yields
+\[
+\deg_G(v)\equiv \#\{i: v \text{ is an endpoint of }P_i\}\pmod 2.
+\]
+Therefore $v$ has odd degree in $G$ only if it is an endpoint of an odd number of the paths.
+In particular, the set of odd-degree vertices is contained in the set of vertices that appear as endpoints of at least one path.
+Counting endpoints with multiplicity gives exactly $2t$ endpoints total (each path contributes two distinct endpoints), hence at most $2t$ vertices can have odd endpoint-multiplicity.
+Thus $\operatorname{odd}(G)\le 2t$ and $t\ge \operatorname{odd}(G)/2$.
+\qed
+
+\bigskip
+\noindent\textbf{Lemma 583.2 (trees satisfy the conjecture, in fact $\le \lfloor n/2\rfloor$).}
+Let $T$ be a tree on $n\ge 2$ vertices and let $\operatorname{odd}(T)$ be the number of odd-degree vertices.
+Then the edges of $T$ can be partitioned into exactly $\operatorname{odd}(T)/2$ edge-disjoint paths.
+In particular, since $\operatorname{odd}(T)$ is even and $\operatorname{odd}(T)\le n$ (and for odd $n$ evenness forces $\operatorname{odd}(T)\le n-1$), we have
+\[
+\frac{\operatorname{odd}(T)}2\le \left\lfloor \frac n2\right\rfloor\le \left\lceil \frac n2\right\rceil.
+\]
+
+\noindent\emph{Proof.}
+We describe an explicit ``pairing'' construction that partitions $E(T)$ into trails, and then note that every trail in a tree is a simple path.
+
+\emph{Step 1: pair incident edges at each vertex.}
+For each vertex $v$ of even degree $d(v)$, arbitrarily partition the $d(v)$ incident edges into $d(v)/2$ unordered pairs.
+For each vertex $v$ of odd degree $d(v)$, arbitrarily partition $d(v)-1$ of its incident edges into $(d(v)-1)/2$ unordered pairs, leaving exactly one incident edge unpaired at $v$.
+This can be done independently at each vertex.
+
+\emph{Step 2: define trails by following pairings.}
+Consider the set of ``half-edges'': for each edge $e=uv$ there are two half-edges $e@u$ and $e@v$.
+At a vertex $v$, each paired pair of incident edges $\{e,f\}$ induces a pairing between half-edges $e@v$ and $f@v$.
+Thus, whenever a walk enters $v$ along $e$, it is forced to leave $v$ along the unique edge $f$ paired with $e$ at $v$.
+If the walk enters $v$ along an edge whose half-edge is unpaired at $v$, it terminates at $v$.
+
+Start a walk at each unpaired half-edge (equivalently, at each odd vertex along its unique unpaired incident edge) and follow the deterministic rule above.
+Because every time we traverse an edge we consume it once and the pairing at its endpoints dictates the next step, each edge of $T$ lies on exactly one such maximal walk.
+These maximal walks are edge-disjoint trails whose union of edges is all of $E(T)$.
+Each trail starts and ends at vertices where an incident half-edge is unpaired; by construction, the only vertices with unpaired half-edges are the odd-degree vertices, and each odd vertex has exactly one unpaired half-edge.
+Hence each trail has two (distinct) odd-degree endpoints, and every odd-degree vertex is an endpoint of exactly one trail.
+Therefore the number of trails is exactly $\operatorname{odd}(T)/2$.
+
+\emph{Step 3: in a tree, every trail is a simple path.}
+A trail is a walk with no repeated edges.
+Suppose a trail in a tree repeats some vertex $v$.
+Then the subwalk between the two occurrences of $v$ is a closed walk using no repeated edges.
+In a tree, any closed walk must repeat an edge (because trees have no cycles), contradiction.
+Thus the trail has no repeated vertices and is a simple path.
+
+Combining the steps, $E(T)$ is partitioned into $\operatorname{odd}(T)/2$ edge-disjoint simple paths.
+\qed
+
+\bigskip
+\noindent\textbf{Fast reality check (exhaustive for $n\le 6$).}
+
+I wrote a brute-force search over all connected simple graphs on $n\le 6$ labeled vertices.
+For each graph $G$ it computed the minimum number $p(G)$ of edge-disjoint simple paths whose edge sets partition $E(G)$.
+The maximum of $p(G)$ over connected graphs on $n$ vertices equals $\lceil n/2\rceil$ for each $n\le 6$.
+Explicitly:
+\[
+\begin{array}{c|cccccc}
+ n & 1&2&3&4&5&6\\\hline
+ \max_{G\text{ conn.}} p(G) & 0&1&2&2&3&3\\
+ \lceil n/2\rceil & 1&1&2&2&3&3
+\end{array}
+\]
+Examples attaining the maximum include $K_3$ for $n=3$ and stars $K_{1,n-1}$ for $n=4,6$.
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+
+\emph{Quantifiers.} Lemma 583.1 applies to any graph and any path partition; no hidden assumptions.
+Lemma 583.2 uses that the graph is a tree; the key verification is that a trail in a tree cannot revisit a vertex without creating a cycle.
+
+\emph{Edge cases.} In Lemma 583.2 we assumed $n\ge 2$; for $n=1$ there are no edges and the statement is vacuous.
+
+\emph{Computational check.} The search was exhaustive over all $2^{\binom n2}$ graphs for $n\le 6$, restricting to connected ones, and used dynamic programming over edge subsets to compute $p(G)$.
+This does not prove the conjecture but does rule out counterexamples for $n\le 6$ under the ``simple path'' convention.
+
+\bigskip
+\noindent\textbf{FINAL.}
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: the conjectured bound holds for all trees (indeed $\le\lfloor n/2\rfloor$), and any path partition must use at least $\operatorname{odd}(G)/2$ paths (Lemma 583.1). Exhaustive computation confirms the conjecture for all connected graphs with $n\le 6$.
+
+(ii) First gap (crisp): given an arbitrary connected graph $G$ on $n$ vertices, construct (or prove existence of) an edge-partition into at most $\lceil n/2\rceil$ \emph{simple} paths.
+
+(iii) Top 3 next moves:
+1. Prove the conjecture for 2-edge-connected graphs by producing a decomposition into trails and then showing trails can be made simple without increasing the count.
+2. Establish a structural reduction: show a minimal counterexample must have all degrees odd and be 2-connected (or similar), then attack that restricted class.
+3. Try an induction on $n$ using ear decompositions: remove an ear/path, decompose the remainder, then reinsert while controlling the path count.
+
+(iv) Minimal counterexample structure: would be a connected graph $G$ with $p(G)>\lceil n/2\rceil$, hence (by Lemma 583.1) must have $\operatorname{odd}(G)=n$ when $n$ is even and $\operatorname{odd}(G)=n-1$ when $n$ is odd, i.e. almost all degrees odd. It must also fail all obvious decompositions coming from spanning trees, suggesting dense, highly cyclic graphs where converting trail decompositions into simple paths forces an extra path.
+
+

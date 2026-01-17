@@ -1,0 +1,183 @@
+% Erdos Problem #963
+
+1) FORMAL RESTATEMENT
+
+Let $A\subset\mathbb R$ be a finite set with $|A|=n$.
+
+A subset $B\subseteq A$ is called \emph{dissociated} if for all subsets $S,T\subseteq B$, the implication
+\[
+\sum_{b\in S} b = \sum_{b\in T} b \implies S=T
+\]
+holds. Equivalently, the $2^{|B|}$ subset sums $\sum_{b\in S} b$ (with $S\subseteq B$) are all distinct.
+
+Define $f(n)$ to be the largest integer $k$ such that \emph{every} $n$-element set $A\subset\mathbb R$ contains a dissociated subset $B\subseteq A$ with $|B|\ge k$.
+
+The question asks for estimates of $f(n)$, and in particular whether
+\[
+ f(n)\ge \lfloor \log_2 n\rfloor
+\]
+for all $n$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem text states that Erd\H{o}s noted a greedy algorithm gives $f(n)\ge \lfloor \log_3 n\rfloor$. I reprove this greedy bound below.
+
+No other external results are invoked.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Reprove the greedy $\log_3 n$ lower bound carefully by controlling how many elements are “forbidden” at each step.
+- Seek an upper bound on $f(n)$ by constructing a specific $n$-element set $A$ in which every dissociated subset has bounded size (e.g. $A=\{1,2,\dots,n\}$).
+
+Disproof-track ideas:
+- If $f(n)\ge \lfloor\log_2 n\rfloor$ is false, search for a small $n$ and an explicit set $A$ with no dissociated subset that large.
+
+4) WORK
+
+FAST REALITY CHECK (computation over integer examples):
+
+(i) For the specific set $A=\{1,2,\dots,n\}$, brute force found the maximum dissociated subset size for $n\le 20$:
+\begin{verbatim}
+ n : max |B| with B dissociated and B ⊆ {1,...,n}
+ 1:1
+ 2:2
+ 3:2
+ 4:3
+ 5:3
+ 6:3
+ 7:4
+ 8:4
+ 9:4
+10:4
+11:4
+12:4
+13:5
+14:5
+15:5
+16:5
+17:5
+18:5
+19:5
+20:5
+\end{verbatim}
+This matches $\lfloor \log_2 n\rfloor+1$ for $2\le n\le 20$.
+
+(ii) I also brute-forced, for each $n\le 8$, the minimum (over all $n$-subsets of $\{1,2,\dots,2n\}$) of the maximum dissociated subset size. The minimizing examples were the initial segments $\{1,\dots,n\}$:
+\begin{verbatim}
+ n : min_A max_{B⊆A dissociated} |B|   (searched over A⊆{1,...,2n}, |A|=n)
+ 1:1
+ 2:2
+ 3:2
+ 4:3
+ 5:3
+ 6:3
+ 7:4
+ 8:4
+\end{verbatim}
+This is consistent with (but does not prove) a logarithmic lower bound.
+
+Lemma 963.1 (Equivalent “$\{-1,0,1\}$-relation” formulation).
+A finite set $B\subset\mathbb R$ is dissociated (subset sums all distinct) if and only if the only solution to
+\[
+\sum_{b\in B} \varepsilon_b\, b = 0,\qquad \varepsilon_b\in\{-1,0,1\}
+\]
+is the trivial one $\varepsilon_b=0$ for all $b\in B$.
+
+Proof.
+("Only if") Suppose $B$ is dissociated and $\sum_{b\in B}\varepsilon_b b=0$ with $\varepsilon_b\in\{-1,0,1\}$. Let
+\[
+S=\{b\in B:\varepsilon_b=1\},\qquad T=\{b\in B:\varepsilon_b=-1\}.
+\]
+Then the equation becomes $\sum_{b\in S} b - \sum_{b\in T} b=0$, i.e. $\sum_{b\in S} b = \sum_{b\in T} b$. Dissociativity forces $S=T$, hence $S=T=\varnothing$ and all $\varepsilon_b=0$.
+
+("If") Conversely, assume the only $\{-1,0,1\}$-relation is trivial. If two subsets $S\ne T$ of $B$ had equal sums, then
+\[
+0=\sum_{b\in S}b-\sum_{b\in T}b=
+\sum_{b\in B}\varepsilon_b b
+\]
+where $\varepsilon_b=1$ for $b\in S\setminus T$, $\varepsilon_b=-1$ for $b\in T\setminus S$, and $\varepsilon_b=0$ otherwise. This gives a nontrivial $\{-1,0,1\}$-relation, contradiction. Thus all subset sums are distinct and $B$ is dissociated. $\square$
+
+Lemma 963.2 (Greedy lower bound $f(n)\ge \lfloor \log_3 n\rfloor$).
+For every integer $n\ge 1$, every $n$-element set $A\subset\mathbb R$ contains a dissociated subset of size at least $\lfloor \log_3 n\rfloor$.
+
+Proof.
+We build a dissociated set by a greedy algorithm.
+
+Initialize $B_0=\varnothing$.
+Suppose after $t\ge 0$ steps we have built a dissociated subset $B_t\subseteq A$ with $|B_t|=t$.
+Define the set of all signed sums of $B_t$ by
+\[
+\Sigma_t:=\Big\{\sum_{b\in B_t}\varepsilon_b b:\ \ \varepsilon_b\in\{-1,0,1\}\Big\}.
+\]
+Because $B_t$ is dissociated, Lemma 963.1 implies that there is no nontrivial $\{-1,0,1\}$-relation among the elements of $B_t$.
+If two sign patterns $\varepsilon,\varepsilon'\in\{-1,0,1\}^{B_t}$ produced the same sum, subtracting the equalities would give such a nontrivial relation, a contradiction.
+Therefore the map $\varepsilon\mapsto\sum_{b\in B_t}\varepsilon_b b$ is injective and hence $|\Sigma_t|=3^t$.
+
+Call an element $a\in A\setminus B_t$ \emph{forbidden} if $B_t\cup\{a\}$ is not dissociated.
+By Lemma 963.1, $B_t\cup\{a\}$ fails to be dissociated iff there exists a nontrivial relation
+\[
+\varepsilon_a a + \sum_{b\in B_t}\varepsilon_b b = 0
+\]
+with all coefficients in $\{-1,0,1\}$. Since $B_t$ itself is dissociated, we must have $\varepsilon_a\neq 0$, so $\varepsilon_a=\pm 1$.
+Rearranging gives $a\in\Sigma_t$ or $a\in-\Sigma_t$.
+Thus every forbidden $a$ lies in $\Sigma_t\cup(-\Sigma_t)$, which has size at most $2|\Sigma_t|=2\cdot 3^t$.
+
+If $n>2\cdot 3^t$, then $A$ has more than $2\cdot 3^t$ elements, so there exists some $a\in A$ that is not forbidden.
+Choosing such an $a$ and setting $B_{t+1}:=B_t\cup\{a\}$ preserves dissociativity.
+
+Now let $t_0:=\lfloor\log_3 n\rfloor$. If $t_0=0$ we are done. If $t_0\ge 1$, then $n\ge 3^{t_0}>2\cdot 3^{t_0-1}$ (because $3>2$), and hence for every $s=0,1,\dots,t_0-1$ we have
+\[
+2\cdot 3^s \le 2\cdot 3^{t_0-1} < n.
+\]
+Therefore $n>2\cdot 3^s$ at each stage $s$, so the greedy extension step can be performed $t_0$ times, producing a dissociated subset of size $t_0=\lfloor\log_3 n\rfloor$. $\square$
+
+Lemma 963.3 (A general upper bound from an integer model set).
+Let $A=\{1,2,\dots,n\}\subset\mathbb R$. If $B\subseteq A$ is dissociated and $|B|=t$, then
+\[
+2^t \le 1+ \sum_{b\in B} b \le 1+ tn.
+\]
+In particular,
+\[
+ t\le \log_2(1+tn) \le \log_2(1+n^2) < 2\log_2 n + 1\quad (n\ge 2).
+\]
+Consequently $f(n)\le 2\log_2 n +1$ for all $n\ge 2$.
+
+Proof.
+Because $B$ is dissociated, all $2^t$ subset sums $\sum_{b\in S} b$ (with $S\subseteq B$) are distinct. Since all $b\in B$ are positive integers, these subset sums are integers in the range
+\[
+0 \le \sum_{b\in S}b \le \sum_{b\in B} b.
+\]
+A set of distinct integers inside $[0,\sum_{b\in B} b]$ can have size at most $1+\sum_{b\in B} b$. Therefore
+\[
+2^t \le 1+\sum_{b\in B} b.
+\]
+Also $\sum_{b\in B} b\le t\cdot n$ since each $b\le n$. Combining gives $2^t\le 1+tn$.
+
+Taking $\log_2$ yields $t\le \log_2(1+tn)$. Since trivially $t\le n$, we have $1+tn\le 1+n^2$, hence $t\le \log_2(1+n^2)<2\log_2 n +1$ for $n\ge 2$.
+
+Finally, since $A$ is an explicit $n$-element set for which every dissociated subset has size $\le 2\log_2 n+1$, the worst-case guarantee $f(n)$ cannot exceed $2\log_2 n+1$. $\square$
+
+5) VERIFICATION
+
+- Lemma 963.1: converting equal subset sums to a $\{-1,0,1\}$-relation and back is reversible and uses only set differences.
+- Lemma 963.2: the key step is bounding forbidden elements by $\Sigma_t\cup(-\Sigma_t)$ and using injectivity to get $|\Sigma_t|=3^t$.
+  I checked that if $a\in\Sigma_t$ then there is a relation $a-\sum \varepsilon_b b=0$ producing a collision in subset sums after adding $a$.
+- Lemma 963.3: the inequality $2^t\le 1+\sum_{b\in B}b$ relies on all subset sums being distinct integers in a bounded interval; this holds because $A\subset\mathbb Z_{>0}$ in this lemma.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: the greedy guarantee $f(n)\ge \lfloor\log_3 n\rfloor$ (Lemma 963.2) and an explicit universal upper bound $f(n)\le 2\log_2 n+1$ coming from $A=\{1,\dots,n\}$ (Lemma 963.3), plus the exact characterization of dissociativity via $\{-1,0,1\}$-relations (Lemma 963.1) and small-$n$ computations.
+
+(ii) First gap (crisp): either prove $f(n)\ge \lfloor\log_2 n\rfloor$ for all $n$ (improving the base from $3$ to $2$ in Lemma 963.2), or exhibit an explicit counterexample set $A$ (for some $n$) with no dissociated subset of size $\lfloor\log_2 n\rfloor$.
+
+(iii) Top 3 next moves:
+1. Improve the greedy counting by tightening the forbidden-set bound $|\Sigma_t\cup(-\Sigma_t)|\le 2\cdot 3^t$; any reduction toward $2^t$ could move the base from $3$ toward $2$.
+2. Search computationally (over integer sets and small real perturbations) for a smallest $n$ where the lower bound $\lfloor\log_2 n\rfloor$ might fail, i.e. a set with unusually small maximum dissociated subset.
+3. Prove structural lemmas: characterize sets $A$ that minimize the maximum dissociated subset size, and test whether they are essentially initial segments or dense progressions.
+
+(iv) Minimal counterexample structure (to “$f(n)\ge \lfloor\log_2 n\rfloor$”): a smallest $n$ and an explicit $n$-element set $A\subset\mathbb R$ such that every $B\subseteq A$ of size $\lfloor\log_2 n\rfloor$ admits a nontrivial $\{-1,0,1\}$-relation; heuristically such an $A$ would have many short additive relations among its elements.
+
+

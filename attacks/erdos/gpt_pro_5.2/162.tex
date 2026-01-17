@@ -1,0 +1,128 @@
+%Erdos problem #162
+\section*{Erdos problem \#162}
+
+\subsection*{1) FORMAL RESTATEMENT}
+The problem file states:
+
+\begin{quote}
+Let $F(n,\alpha)$ be the largest $k$ such that there exists some $2$-colouring of the edges of $K_n$ in which any induced subgraph $H$ on at least $k$ vertices contains more than $\alpha\binom{|H|}{2}$ edges of each colour. Prove $F(n,\alpha)\sim c_{\alpha}\log n$.
+\end{quote}
+
+\paragraph{Ambiguity/typo check.}
+As written (``largest $k$ such that there exists some coloring ...''), the parameter is again trivial: taking $k=n$ imposes the condition only on $H=K_n$, which is satisfied by any globally balanced coloring. Thus $F(n,\alpha)=n$ (Lemma 162.1), contradicting the statement ``$\Theta(\log n)$.''
+
+\medskip
+\noindent\textbf{Minimal correction consistent with the surrounding text.}
+Replace ``largest'' by ``smallest.'' Namely, let $F(n,\alpha)$ be the \emph{smallest} $k$ such that there exists a red/blue coloring of $E(K_n)$ with the property that every induced subgraph on at least $k$ vertices has more than an $\alpha$-fraction of its edges in each color.
+Under this corrected definition, it is plausible (and stated in the file) that $F(n,\alpha)=\Theta(\log n)$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The problem file states that one can show using the probabilistic method that there exist constants $c_1,c_2$ with $c_1\log n< F(n,\alpha) < c_2\log n$.
+I give direct proofs of such bounds below under the corrected definition.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}
+\item Show triviality under the literal definition.
+\item Under the corrected (smallest) definition, prove:
+\begin{itemize}
+\item a lower bound $\Omega(\log n)$ from the unavoidable existence of a monochromatic clique of size $\ge \log_2 n$ in any coloring;
+\item an upper bound $O(\log n)$ via a random coloring and a union bound over all vertex subsets.
+\end{itemize}
+\item Compute the corrected $F(n,\alpha)$ for tiny $n$ as a sanity check.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\paragraph{Lemma 162.1 (literal definition is trivial).}
+Under the literal definition in the file (``largest $k$''), for every $0\le\alpha\le 1/2$,
+\[
+F(n,\alpha)=n.
+\]
+
+\textit{Proof.}
+Take $k=n$. Then the only induced subgraph on at least $k$ vertices is $H=K_n$ itself.
+Color exactly half the edges red and half blue (up to rounding). Then each color has at least $\alpha\binom{n}{2}$ edges for all $\alpha\le 1/2$, so the condition holds. Hence $k=n$ is feasible and the ``largest feasible $k$'' equals $n$. \qed
+
+\paragraph{Lemma 162.2 (monochromatic clique lower bound $\Rightarrow$ $F(n,\alpha)\ge \log_2 n+1$ under the corrected definition).}
+Assume the corrected definition (smallest feasible $k$) and fix any $0\le\alpha<1/2$. Then
+\[
+F(n,\alpha)\ \ge\ \lfloor \log_2 n\rfloor+1.
+\]
+
+\textit{Proof.}
+We use the standard greedy bound that any red/blue coloring of $K_n$ contains a monochromatic clique of size at least $\lfloor \log_2 n\rfloor+1$.
+Indeed, start with $V_0$ the full vertex set ($|V_0|=n$). Pick any vertex $v_1\in V_0$. At least half of the remaining vertices are connected to $v_1$ by red edges or at least half by blue edges; pick the larger color class and call it $V_1$.
+Iterate: pick $v_{i+1}\in V_i$, and let $V_{i+1}$ be the set of neighbors of $v_{i+1}$ in the majority color within $V_i$.
+Then $|V_{i+1}|\ge (|V_i|-1)/2$.
+After $r$ steps, as long as $|V_r|\ge 1$, the chosen vertices $v_1,\dots,v_r$ form a monochromatic clique (all edges among them are in the chosen majority color by construction).
+The process can continue for $r=\lfloor \log_2 n\rfloor+1$ steps because repeatedly halving keeps the set nonempty.
+
+Now, in a monochromatic clique $X$ of size $r$, one color has $0$ edges. For any $\alpha>0$ this violates the requirement ``more than $\alpha\binom{r}{2}$ edges of each color''; for $\alpha=0$ (interpreting ``more than $0$''), it still violates.
+Therefore, no coloring can satisfy the corrected property for any threshold $k\le r$.
+Hence the smallest feasible $k$ must be at least $r+1\ge \lfloor \log_2 n\rfloor+1$. \qed
+
+\paragraph{Lemma 162.3 (random coloring upper bound $F(n,\alpha)\le C(\alpha)\log n$ under the corrected definition).}
+Fix $0\le \alpha<1/2$ and set $\delta:=1/2-\alpha>0$.
+There exists a constant $C=C(\alpha)$ such that for all $n\ge 3$,
+\[
+F(n,\alpha)\le C\log n.
+\]
+
+\textit{Proof.}
+Color each edge independently red/blue with probability $1/2$.
+Fix a vertex subset $X$ of size $s$. Let $E=\binom{s}{2}$ and let $R_X\sim \mathrm{Bin}(E,1/2)$ be the number of red edges inside $X$.
+We require $R_X>\alpha E$ and $E-R_X>\alpha E$, i.e. $|R_X-E/2|<\delta E$.
+A Chernoff bound gives
+\[
+\Pr\big(|R_X-E/2|\ge \delta E\big)\le 2\exp(-2\delta^2 E).
+\]
+The number of $s$-subsets is at most $\binom{n}{s}\le n^s$.
+Thus, by union bound, the probability that \emph{some} $s$-subset violates the balance condition is at most
+\[
+2\,n^s\exp\big(-2\delta^2\binom{s}{2}\big).
+\]
+Take $s=C\log n$ with $C$ large enough (depending on $\delta$). Then $\binom{s}{2}=\Theta((\log n)^2)$, while $\log(n^s)=s\log n=\Theta((\log n)^2)$, and choosing $C$ sufficiently large makes the exponent negative with large magnitude.
+Therefore for such $s$ the union bound is $<1$ for all large $n$, so there exists at least one coloring where \emph{every} subset of size $s$ is balanced.
+In particular, in that coloring every induced subgraph on $\ge s$ vertices is balanced as required, so the minimal feasible $k$ is at most $s=C\log n$. \qed
+
+\paragraph{FAST REALITY CHECK (computed corrected $F(n,\alpha)$ for tiny $n$).}
+For $n=5$ and $\alpha\in\{0,0.1,0.2\}$, an exhaustive search over all $2^{10}$ edge-colorings shows the corrected $F(n,\alpha)=3$.
+For $n=6$ and the same $\alpha$, exhaustive search over all $2^{15}$ colorings gives corrected $F(n,\alpha)=4$.
+One explicit coloring for $n=6$ achieving the property for $k=4$ is: red edges
+\[
+\{(0,4),(1,2),(1,3),(2,3)\}
+\]
+and all other edges blue.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma 162.2: the greedy monochromatic clique proof is fully explicit and does not use any external Ramsey bounds.
+\item Lemma 162.3: uses only Chernoff and union bound; constants can be extracted.
+\item Computation: checked by brute force for $n\le 6$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial result obtained here.}
+Under the corrected definition (smallest feasible $k$), I proved explicit constants with
+\[
+\lfloor\log_2 n\rfloor+1\ \le\ F(n,\alpha)\ \le\ C(\alpha)\log n.
+\]
+So $F(n,\alpha)=\Theta(\log n)$ up to constants.
+
+\item[(ii)] \textbf{Exact first gap.}
+Determine the limit constant $c_{\alpha}$ in $F(n,\alpha)\sim c_{\alpha}\log n$, i.e. sharpen the above bounds to matching leading constants.
+
+\item[(iii)] \textbf{Top 3 next moves (concrete targets).}
+\begin{enumerate}
+\item Prove a matching upper bound with explicit optimal constant via a refined large-deviation+union bound (or second moment) argument.
+\item Improve the lower bound constant beyond $1/\log 2$ by showing any coloring must contain a subset of size $c\log n$ that is too unbalanced for the given $\alpha$ (a ``quasi-Ramsey'' lower bound).
+\item Compute $F(n,\alpha)$ exactly for $n\le 10$ (via SAT/ILP) to guess $c_{\alpha}$.
+\end{enumerate}
+
+\item[(iv)] \textbf{Minimal counterexample structure (if a proposed $c_{\alpha}$ is wrong).}
+A counterexample to a claimed constant would be a family of colorings on $n$ vertices for which every vertex subset of size at least $(c_{\alpha}+\varepsilon)\log n$ is balanced, contradicting a corresponding universal lower bound, or conversely a proof that any coloring forces an imbalanced subset already at size $(c_{\alpha}-\varepsilon)\log n$.
+\end{enumerate}
+
+

@@ -1,0 +1,109 @@
+% Erdős Problem #78
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+For $k\ge 2$, let $R(k)$ be the diagonal Ramsey number as in Problem \#77. The task asks:
+
+\emph{Find a constant $C>1$ and give a constructive (explicit) proof that $R(k)>C^k$ for all sufficiently large $k$ (or for all $k$).}
+
+Ambiguity: ``constructive'' can mean at least three inequivalent things:
+\begin{itemize}
+\item (Explicit family) A closed-form description of a graph $G_k$ on at least $C^k$ vertices with $\omega(G_k),\alpha(G_k)<k$.
+\item (Polynomial-time algorithm) A deterministic algorithm that on input $k$ outputs such a graph in time poly$(|V(G_k)|)$.
+\item (Brute-force constructible) Any deterministic finite procedure (possibly exponential time) that outputs such a graph.
+\end{itemize}
+The problem text's ``equivalently'' phrasing indicates the first or second meaning: an explicit construction of a \emph{Ramsey graph} on $n$ vertices with both clique number and independence number $O(\log n)$.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+Per the integrity rule I use only what is stated in the problem text: it records a (non-constructive) probabilistic lower bound $R(k)\gg k2^{k/2}$ and notes that known explicit constructions (Cohen; Li) produce graphs whose largest clique or independent set is much larger than $c\log n$ (polylogarithmic rather than logarithmic), hence do not yield $R(k)>C^k$.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof-track:}
+\begin{itemize}
+\item Translate the problem into explicit Ramsey graphs: produce explicit $G$ on $n$ vertices with $\max\{\omega(G),\alpha(G)\}\le c\log n$.
+\item Try algebraic/pseudorandom constructions (Paley-type, extractor/disperser-based, etc.), but any such attempt would require deep estimates not provided in the problem text.
+\end{itemize}
+\emph{Disproof-track:}
+\begin{itemize}
+\item Not applicable: the statement is an open-ended ``construct a proof'' request rather than a declarative theorem.
+\end{itemize}
+
+In this write-up I prove two concrete, problem-specific facts: (a) the precise equivalence between Ramsey colourings and clique/independent-set avoidance, and (b) a simple explicit polynomial-size construction $R(k)>(k-1)^2$ (far from exponential). I also include a computational sanity check on small instances.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\textbf{Fast reality check (tiny $k$ explicit examples).}
+\begin{itemize}
+\item For $k=3$, the cycle $C_5$ on $5$ vertices has $\omega(C_5)=2$ and $\alpha(C_5)=2$, so it avoids both a triangle and an independent triple. A script confirms $\omega=\alpha=2$.
+\item For $k=4$, the disjoint union of three triangles ($3K_3$) has $n=9$ and $\omega=\alpha=3$ (verified by script).
+\end{itemize}
+
+\medskip
+\noindent\textbf{Lemma 78.1 (Graphs vs. 2-colourings; equivalence of formulations).}
+Let $n,k\in\mathbb{N}$ with $k\ge 2$.
+
+\begin{itemize}
+\item If there exists a red/blue colouring of $E(K_n)$ with no monochromatic $K_k$, then there exists a graph $G$ on $n$ vertices with $\omega(G)<k$ and $\alpha(G)<k$.
+\item Conversely, if there exists a graph $G$ on $n$ vertices with $\omega(G)<k$ and $\alpha(G)<k$, then there exists a red/blue colouring of $E(K_n)$ with no monochromatic $K_k$.
+\end{itemize}
+In particular, $R(k)>n$ if and only if there exists a graph on $n$ vertices with $\omega,\alpha<k$.
+
+\emph{Proof.}
+Given a 2-colouring of $E(K_n)$, define $G$ to be the graph on the same vertex set whose edges are exactly the red edges. Then a red $K_k$ in the colouring is precisely a clique of size $k$ in $G$. A blue $K_k$ in the colouring means that all edges among some $k$-set are blue, i.e. those $k$ vertices form an independent set of size $k$ in $G$ (since none of the edges among them are red).
+
+Thus, ``no monochromatic $K_k$'' is equivalent to ``$G$ has no clique of size $k$ and no independent set of size $k$'', i.e. $\omega(G)<k$ and $\alpha(G)<k$. The converse direction is the same implication read backwards (colour edges of $G$ red and non-edges blue). \qed
+
+\medskip
+\noindent\textbf{Lemma 78.2 (Explicit polynomial lower bound $R(k)>(k-1)^2$).}
+For every integer $k\ge 2$ there is an explicit graph on $(k-1)^2$ vertices with
+\[
+\omega(G)=k-1\quad\text{and}\quad \alpha(G)=k-1.
+\]
+Consequently,
+\[
+R(k)>(k-1)^2\qquad (k\ge 2).
+\]
+
+\emph{Proof.}
+Let $s:=k-1$ and form $G$ as the disjoint union of $s$ copies of the clique $K_s$. Then $|V(G)|=s\cdot s=s^2=(k-1)^2$.
+
+Any clique in $G$ lies entirely within one component (different components have no edges between them), so $\omega(G)=s=k-1$.
+
+Any independent set in $G$ contains at most one vertex from each clique component (because within a clique all vertices are adjacent), so $\alpha(G)=s=k-1$ (achieved by choosing one vertex from each component).
+
+Therefore $G$ contains neither a clique nor an independent set of size $k$. By Lemma 78.1 this implies there exists a 2-colouring of $K_{(k-1)^2}$ with no monochromatic $K_k$, so $R(k)>(k-1)^2$. \qed
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item The equivalence in Lemma 78.1 is exact and uses only the definitions of clique/independent set and colouring.
+\item Lemma 78.2 construction was sanity-checked computationally for $k=3,4,5$:
+  $C_5$ has $(\omega,\alpha)=(2,2)$; $3K_3$ has $(3,3)$; $4K_4$ has $(4,4)$.
+\item The lemma yields only a polynomial bound; it does not approach $C^k$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} An explicit construction gives $R(k)>(k-1)^2$ for all $k\ge 2$ (Lemma 78.2). Also, the exact equivalence between the Ramsey formulation and explicit Ramsey graphs is proved (Lemma 78.1).
+
+(ii) \emph{First gap (crisp):} Produce, for some constant $C>1$, an explicit family $G_k$ with $|V(G_k)|\ge C^k$ and $\omega(G_k),\alpha(G_k)<k$ (or any explicit algorithm with that guarantee).
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Try to derandomize the probabilistic method from Problem \#77 to yield a deterministic polynomial-time construction; a concrete target lemma is: ``there exists an explicit $\varepsilon$-biased (or $t$-wise independent) distribution on edge-colourings such that the union bound still works for $k$-cliques.''
+\item Search for an algebraic graph family where one can prove $\omega,\alpha\le c\log n$ using only elementary estimates (e.g. spectral/eigenvalue methods plus explicit eigenvalue bounds).
+\item Computation: for small $k$ (say $k\le 6$), attempt to algorithmically construct near-Ramsey graphs and look for structural patterns that might suggest a scalable deterministic rule.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure (to the desired constructive statement):} a ``barrier'' would be that every \emph{explicit} candidate family $G_k$ of size $\exp(\Theta(k))$ necessarily has either a clique or independent set of size $\Omega(k)$, i.e. fails pseudorandomness at the $\log n$ scale. Any such barrier would likely manifest via an efficiently checkable structural property forced by explicitness (e.g. low description complexity) that can be exploited to find large homogeneous sets.
+
+

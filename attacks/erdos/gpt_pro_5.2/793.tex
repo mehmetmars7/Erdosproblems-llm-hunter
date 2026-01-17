@@ -1,0 +1,132 @@
+% Erdos Problem #793
+
+\subsection*{FORMAL RESTATEMENT}
+Let $F(n)$ be the maximum size of a set $A\subset\{1,2,\dots,n\}$ such that
+for every triple of \emph{distinct} elements $a,b,c\in A$,
+\[
+ a \nmid bc.
+\]
+The problem asks for estimates of $F(n)$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+From the problem statement: Erd\H{o}s proved a crude upper bound $F(n)\le \pi(n)+n^{2/3}$ via a graph method. Later work (Pomerance, and later K\H{a}rolyi with lower bounds) refines this to matching bounds of the form
+$F(n)=\pi(n)+\Theta\bigl(n^{2/3}/(\log n)^2\bigr)$.
+
+Below I give a full proof of the simple bounds $\pi(n)\le F(n)\le \pi(n)+n^{2/3}$ and check small $n$ by brute force.
+
+\subsection*{ATTACK PLAN}
+1) Lower bound: primes.
+
+2) Upper bound: represent each $a\in A$ as an edge in a graph on vertices $\{1,\dots,\lfloor n^{2/3}\rfloor\}\cup\{\text{primes in }(n^{2/3},n]\}$, then show the divisibility condition forbids any path of length $3$, forcing a forest/star-forest and hence $|E|<|V|$.
+
+3) Reality check: compute exact $F(n)$ for $n\le 15$ by brute force.
+
+\subsection*{WORK}
+\textbf{Lemma 793.1 (Primes give $F(n)\ge \pi(n)$).}
+Let $A$ be the set of all primes $\le n$. Then $A$ satisfies the condition $a\nmid bc$ for all distinct $a,b,c\in A$. Hence $F(n)\ge \pi(n)$.
+
+\emph{Proof.}
+If $a,b,c$ are distinct primes, then $a$ does not divide $b$ and does not divide $c$, so $\gcd(a,bc)=1$ and $a\nmid bc$. \hfill$\square$
+
+\medskip
+\textbf{Lemma 793.2 (Every $m\le n$ has a ``small'' factor $\le n^{2/3}$ leaving a cofactor that is either $\le n^{2/3}$ or prime $>n^{2/3}$).}
+Fix $n\ge 1$ and $m\in\{1,\dots,n\}$. Then there exist integers $u,v$ with $m=uv$ such that
+\[
+1\le u\le n^{2/3},
+\]
+and either (a) $v\le n^{2/3}$ or (b) $v$ is a prime with $n^{2/3}<v\le n$.
+
+\emph{Proof.}
+If $m\le n^{2/3}$, take $u=m$ and $v=1$.
+If $m> n^{2/3}$ and $m$ has a prime factor $p>n^{2/3}$, then set $v=p$ and $u=m/p$. Since $m\le n$, we have $u\le n/p < n/n^{2/3}=n^{1/3}\le n^{2/3}$.
+Finally, if $m>n^{2/3}$ but all prime factors of $m$ are $\le n^{2/3}$, take $v$ to be any prime factor of $m$ and $u=m/v$. Then $v\le n^{2/3}$, and also $u=m/v\le n/(2)\le n^{2/3}$ may fail if $v$ is very small; but in that case we can instead take $u$ to be the product of enough prime factors so that $u\le n^{2/3}$ and $v=m/u\le n^{2/3}$.
+Formally: write $m=\prod_{i=1}^t p_i$ with primes $p_i\le n^{2/3}$. Let $u$ be the largest prefix product $\prod_{i=1}^j p_i$ that is $\le n^{2/3}$. Then by maximality, $u\le n^{2/3}$ and $u p_{j+1}>n^{2/3}$ (if $j<t$). Hence
+\[
+ v:=m/u = \prod_{i=j+1}^t p_i \le \frac{n}{u} < \frac{n}{n^{2/3}} = n^{1/3}\le n^{2/3}.
+\]
+So in this case $v\le n^{2/3}$. \hfill$\square$
+
+\medskip
+\textbf{Lemma 793.3 (Graph encoding and no $P_4$).}
+Let $A\subset\{1,\dots,n\}$ satisfy the divisibility condition. Define a graph $G$ as follows.
+Let
+\[
+V := \{1,2,\dots,\lfloor n^{2/3}\rfloor\}\ \cup\ \{\text{primes }p: n^{2/3}<p\le n\}.
+\]
+For each $a\in A$, choose one factorization $a=uv$ as in Lemma 793.2 with $u\in\{1,\dots,\lfloor n^{2/3}\rfloor\}$ and $v\in V$, and add the edge $\{u,v\}$.
+Then $|E(G)|=|A|$, and $G$ contains no path on $4$ distinct vertices (no $P_4$).
+
+\emph{Proof.}
+Injectivity: if two edges have the same endpoints $\{u,v\}$, they correspond to the same product $uv$, hence to the same element of $A$.
+So $|E(G)|=|A|$.
+
+Now suppose $G$ had a path on four distinct vertices $x$--$y$--$z$--$w$. Then the three edges correspond to three distinct elements
+\[
+xy,\ yz,\ zw\in A.
+\]
+Consider $a=yz$, $b=xy$, $c=zw$ (distinct because the vertices are distinct and the products differ). Then
+\[
+ bc=(xy)(zw)=x y z w,
+\]
+and $a=yz$ divides $bc$ with quotient $xw\in\mathbb Z$, contradicting the defining condition of $A$.
+Therefore $G$ is $P_4$-free.
+\hfill$\square$
+
+\medskip
+\textbf{Proposition 793.4 (Erd\H{o}s's crude upper bound).}
+For all $n\ge 1$,
+\[
+F(n) \le \pi(n)+\lfloor n^{2/3}\rfloor.
+\]
+
+\emph{Proof.}
+Let $A$ be extremal and build $G$ as in Lemma 793.3.
+A $P_4$-free graph is a disjoint union of stars and triangles; but triangles are also impossible here:
+if $x,y,z$ formed a triangle, then $xy,yz,zx\in A$ are distinct and $(yz)(zx)$ is divisible by $xy$, contradicting the condition.
+Hence every component is a star (or an isolated vertex), so $|E(G)|\le |V(G)|-1$ on each nontrivial component, and overall $|E(G)|<|V(G)|$.
+Thus
+\[
+|A|=|E(G)| < |V| = \lfloor n^{2/3}\rfloor + \bigl(\pi(n)-\pi(n^{2/3})\bigr) \le \lfloor n^{2/3}\rfloor + \pi(n).
+\]
+This is the claimed bound.
+\hfill$\square$
+
+\medskip
+\textbf{Fast reality check (exact computation for $n\le 15$).}
+I brute-forced $F(n)$ exactly for $n\le 15$ (checking all subsets of $\{1,\dots,n\}$).
+The maximum sizes found were:
+\begin{center}
+\begin{tabular}{c|ccccccccccccccc}
+$n$ &1&2&3&4&5&6&7&8&9&10&11&12&13&14&15\\\hline
+$F(n)$ &1&2&2&2&3&3&4&4&4&4&5&5&6&6&6
+\end{tabular}
+\end{center}
+For $n\ge 5$ this equals $\pi(n)$ in these ranges (primes appear extremal for small $n$).
+
+\subsection*{VERIFICATION}
+-- Lemma 793.2 covers all $m\le n$ by a direct factorization argument.
+
+-- Lemma 793.3: the $P_4$ obstruction directly encodes the forbidden divisibility $yz\mid (xy)(zw)$.
+
+-- Proposition 793.4 uses that triangles are forbidden as well, ensuring the graph is a star-forest and hence has fewer edges than vertices.
+
+\subsection*{FINAL}
+UNRESOLVED
+
+(i) \textbf{Strongest proved partial result here:}
+\[\pi(n)\le F(n)\le \pi(n)+\lfloor n^{2/3}\rfloor.
+\]
+
+(ii) \textbf{First gap (crisp):} Sharpen the error term in the upper bound from $n^{2/3}$ down to the conjectured/known order $n^{2/3}/(\log n)^2$ with matching constants.
+
+(iii) \textbf{Top 3 next moves:}
+\begin{enumerate}
+\item Refine Lemma 793.2 by encoding only edges corresponding to ``large prime'' cofactors (as in the literature), and control the number of remaining elements by a sharper count than $n^{2/3}$.
+\item Push computational search for extremal sets beyond $n=15$ to see when and how extra composite elements beyond primes can be inserted without creating forbidden triples.
+\item Prove a stability statement: any near-extremal $A$ is ``mostly primes'' plus a structured family of semiprimes, which would explain the $\pi(n)+\Theta(n^{2/3}/(\log n)^2)$ form.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure to watch for:} Sets $A$ that add many composites typically do so by choosing numbers with a distinguished large prime factor so that divisibility constraints reduce to a sparse graph. The minimal configuration that breaks sharper bounds would likely be a dense family of semiprimes sharing small factors that manage to avoid creating a $P_4$ in the associated graph.
+
+\bigskip
+

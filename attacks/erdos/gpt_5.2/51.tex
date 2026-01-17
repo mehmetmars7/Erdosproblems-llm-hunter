@@ -1,0 +1,110 @@
+% Attempt for Erdos Problem #51
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $\phi(n)$ is Euler's totient function.
+- For $a\in\mathbb N$, say $a$ is a totient if $\exists n\in\mathbb N$ with $\phi(n)=a$.
+- For a totient $a$, define
+\[n_a:=\min\{n\in\mathbb N:\phi(n)=a\}.\]
+
+Question.
+Does there exist an infinite set $A\subset\mathbb N$ of totients such that
+\[\lim_{a\to\infty,\ a\in A}\frac{n_a}{a}=+\infty?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Carmichael asked whether $\phi(n)=t$ can have exactly one solution.
+- Erd\H{o}s proved that if such a $t$ exists then infinitely many such $t$ exist.
+I do not use these claims as lemmas below.
+
+3) ATTACK PLAN
+Proof track ideas (existence of such an $A$):
+1. Try to force any solution $n$ of $\phi(n)=a$ to have many distinct small prime factors, making $n/a=n/\phi(n)=\prod_{p\mid n}p/(p-1)$ very large.
+2. Pick $a$ with carefully engineered divisibility constraints so that any preimage must include certain primes (e.g. by forcing many primes $p$ with $p-1\mid a$),
+   and then argue that a smaller preimage cannot exist.
+
+Disproof track ideas (nonexistence):
+1. Try to show a universal upper bound $n_a \le C a (\log\log a)^{O(1)}$ or even $n_a\le Ca$ for all totients $a$.
+2. Look for mechanisms producing small preimages, e.g. primes $p$ with $p-1=a$ or other constructions.
+
+Chosen path in this attempt: prove two unconditional lemmas about the shape of totients/minimal preimages and run a sanity-check computation of $n_a/a$ for $a$ up to $3\times 10^5$.
+
+4) WORK
+Lemma 1 (Parity obstruction: $\phi(n)$ is even for $n>2$).
+If $n>2$ then $\phi(n)$ is even. In particular, every totient $a>2$ is even.
+
+Proof.
+If $n$ is divisible by an odd prime $p$, then $\phi(n)$ is divisible by $\phi(p)=p-1$, which is even, so $\phi(n)$ is even.
+If $n$ has no odd prime factor, then $n=2^k$ with $k\ge 2$ (since $n>2$), and $\phi(2^k)=2^{k-1}$ is even.
+Thus in all cases $n>2\Rightarrow \phi(n)$ even. \qed
+
+Lemma 2 (Prime totients have tiny minimal preimage).
+Let $p$ be an odd prime and set $a:=p-1$. Then $a$ is a totient (since $\phi(p)=p-1$), and the minimal preimage equals $n_a=p$.
+Consequently,
+\[\frac{n_a}{a}=\frac{p}{p-1}\to 1\quad\text{as }p\to\infty.\]
+
+Proof.
+We have $\phi(p)=p-1=a$, so $n_a\le p$.
+On the other hand, for any $n>1$, $\phi(n)\le n-1$ (since among $1,\dots,n$ only $n$ itself is not counted, and at least one number is not coprime unless $n$ is prime; the inequality $\phi(n)\le n-1$ is always true).
+Thus if $\phi(n)=a=p-1$, then $n-1\ge \phi(n)=p-1$, so $n\ge p$.
+Therefore $n_a=p$. The ratio statement is immediate. \qed
+
+Lemma 3 (An infinite family with uniformly bounded $n_a/a$).
+Let $m\ge 1$ and set $a:=2^m$. Then $a$ is a totient because $\phi(2^{m+1})=2^m=a$, and hence
+\[\frac{n_a}{a}\le \frac{2^{m+1}}{2^m}=2.\]
+
+Proof.
+Compute $\phi(2^{m+1})=2^{m+1}-2^m=2^m=a$. By definition of $n_a$ as the smallest preimage, $n_a\le 2^{m+1}$.
+Divide by $a=2^m$ to get $n_a/a\le 2$. \qed
+
+FAST REALITY CHECK (local computation; $a\le 300{,}000$).
+I computed $\phi(n)$ for $1\le n\le 300{,}000$ and for each totient value $a\le 300{,}000$ recorded the smallest $n_a\le 300{,}000$ with $\phi(n_a)=a$.
+Among these $a$, the largest ratios $n_a/a$ observed were about $2.0$:
+top examples (within this search bound):
+\[
+\begin{array}{c|c|c}
+a & n_a & n_a/a\\\hline
+5888 & 11985 & 2.035\\
+10496 & 21165 & 2.016\\
+17408 & 34935 & 2.007\\
+32768 & 65535 & 2.000
+\end{array}
+\]
+Among $a\ge 50{,}000$ (still with $n_a\le 300{,}000$), the largest ratios found were $\approx 1.996$.
+This is consistent with (but does not prove) the possibility that $n_a/a$ might remain bounded, contrary to the question's desired conclusion.
+
+5) VERIFICATION
+- Lemma 1 is standard and the proof splits into ``odd prime factor'' vs ``power of two'' cases.
+- Lemma 2 uses only the elementary inequality $\phi(n)\le n-1$ and the explicit solution $n=p$.
+- Lemma 3 is a direct computation.
+- Computation is limited to preimages $n\le 300{,}000$, so it cannot rule out larger minimal preimages for larger $a$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved basic obstructions and easy families:
+every totient $a>2$ is even (Lemma 1),
+totients of the form $a=p-1$ (odd prime $p$) have $n_a/a\to 1$ (Lemma 2),
+and the infinite family $a=2^m$ has $n_a/a\le 2$ (Lemma 3).
+
+(ii) First gap:
+Construct an infinite set $A$ of totients for which \emph{every} solution $n$ to $\phi(n)=a$ is forced to have very large $n/a$,
+or prove a general upper bound on $n_a/a$ that rules out divergence.
+
+(iii) Top 3 next moves (concrete):
+1. Try to force many primes into any preimage: choose $a$ so that for many primes $p$ one has $p-1\mid a$, and show that any $n$ with $\phi(n)=a$ must be divisible by many of those $p$.
+2. Study the structure of minimal preimages: prove lemmas of the form ``if $\phi(n)=a$ then there exists a solution $n'\le C(a)$ with specified constraints'', aiming to bound $n_a$.
+3. Extend computation to much larger bounds (e.g. $n\le 10^8$) and track the growth of $\max_{a\le X} n_a/a$; if it stays bounded, attempt to conjecture a sharp constant.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+An infinite sequence of totients $a_k$ such that every $n$ with $\phi(n)=a_k$ must include an increasing set of small primes in its factorization,
+forcing $n/\phi(n)=\prod_{p\mid n}p/(p-1)\to\infty$, while simultaneously preventing the existence of alternative preimages with fewer primes (and hence smaller $n$).
+

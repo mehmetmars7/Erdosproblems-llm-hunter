@@ -1,0 +1,200 @@
+% Solutions/attempts generated from 60-65.tex.
+% Each block follows PROMPT_STRATEGY.MD.
+
+% Erdős Problem #60
+% URL: https://www.erdosproblems.com/60
+
+Does every graph on $n$ vertices with $>\mathrm{ex}(n;C_4)$ edges contain $\gg n^{1/2}$ many copies of $C_4$? Conjectured by Erd\H{o}s and Simonovits, who could not even prove that at least $2$ copies of $C_4$ are guaranteed. The behaviour of $\mathrm{ex}(n;C_4)$ is the subject of [765] . He, Ma, and Yang \cite{HeMaYa21} have proved this conjecture when $n=q^2+q+1$ for some even integer $q$. References [HeMaYa21] He, J. and Ma, J. and Yang, T., Some extremal results on 4-cycles . Journal of Combinatorial Theory B (2021).
+
+%Erdos problem 60
+\subsection*{FORMAL RESTATEMENT}
+Fix $n\in\mathbb{N}$, and let $\mathrm{ex}(n;C_4)$ denote the maximum number of edges in a 
+(simple, undirected) graph on $n$ vertices that contains no (not-necessarily-induced) copy of the 4-cycle $C_4$.
+
+For a graph $G$, let $N_G(v)$ be the (open) neighborhood of $v$, and define the number of (not-necessarily-induced) 
+$4$-cycles in $G$ to be
+\[
+C_4(G):=\#\{\text{subgraphs of $G$ that are isomorphic to $C_4$}\},
+\]
+where two $4$-cycles are considered distinct if their edge-sets differ (equivalently, distinct cyclic orderings on the 
+same $4$ vertices arising from different edge choices in $G$ count as distinct).
+
+Question (Erd\H{o}s--Simonovits supersaturation for $C_4$):
+Does there exist an absolute constant $c>0$ such that for all sufficiently large $n$, every graph $G$ on $n$ vertices 
+with $e(G)>\mathrm{ex}(n;C_4)$ satisfies
+\[
+C_4(G)\ge c\,n^{1/2}?
+\]
+Here $\gg n^{1/2}$ means $\ge c n^{1/2}$ for some absolute $c>0$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+Only what is explicitly present in the problem statement above is used as ``given context'':
+(1) The conjecture is attributed to Erd\H{o}s and Simonovits.
+(2) The statement notes that Erd\H{o}s and Simonovits could not prove even that $2$ copies of $C_4$ are forced.
+(3) The statement records that He--Ma--Yang (2021) proved the conjectured bound for the special sequence 
+$n=q^2+q+1$ with $q$ even.
+No other external results are assumed.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item Proof track: derive lower bounds on $C_4(G)$ in terms of basic statistics (degrees, codegrees) and then relate 
+$e(G)>\mathrm{ex}(n;C_4)$ to those statistics.
+\item Disproof track: try to build graphs with $e(G)=\mathrm{ex}(n;C_4)+1$ but with very few $C_4$'s (``near-extremal'' 
+constructions).
+\item Reality-check track: brute force small $n$ to see the smallest possible $C_4(G)$ when $e(G)>\mathrm{ex}(n;C_4)$.
+\end{itemize}
+I pursue the proof track far enough to get explicit inequalities and then use computation for small $n$.
+
+\subsection*{WORK}
+\textbf{Lemma 1 (Codegree formula for $C_4$).}
+Let $G=(V,E)$ be a simple graph on $n$ vertices. For each unordered pair $\{u,v\}\subseteq V$ define the 
+\emph{codegree}
+\[c(u,v):=|N_G(u)\cap N_G(v)|.\]
+Then
+\[
+C_4(G)=\frac12\sum_{\{u,v\}\subseteq V} \binom{c(u,v)}{2}.
+\]
+\emph{Proof.}
+Fix an unordered pair $\{u,v\}$. Choose two distinct vertices $x,y\in N_G(u)\cap N_G(v)$. 
+Then the edges $ux,xv,vy,yu$ are all present, so these four edges form a $4$-cycle 
+$u-x-v-y-u$ (possibly with extra chords in $G$, which does not matter).
+Conversely, any $4$-cycle in $G$ has two opposite vertex-pairs; for each opposite pair $\{u,v\}$, the other two 
+vertices are distinct common neighbors of $u$ and $v$. Thus each $4$-cycle is counted exactly twice by 
+``(opposite pair $\{u,v\}$, choice of the two common neighbors)''. Therefore the total number of $4$-cycles is 
+$\frac12\sum_{\{u,v\}}\binom{c(u,v)}{2}$. \hfill$\square$
+
+\medskip
+\textbf{Lemma 2 (A convexity/Cauchy--Schwarz lower bound).}
+Let $n=|V(G)|$ and set $N:=\binom{n}{2}$. Let
+\[
+S:=\sum_{\{u,v\}\subseteq V} c(u,v).
+\]
+Then
+\[
+C_4(G)\ge \frac14\Big(\frac{S^2}{N}-S\Big).
+\]
+\emph{Proof.}
+From Lemma 1,
+\[
+2C_4(G)=\sum_{\{u,v\}}\binom{c(u,v)}{2}=\sum_{\{u,v\}}\frac{c(u,v)^2-c(u,v)}{2}
+=\frac12\Big(\sum_{\{u,v\}}c(u,v)^2 - S\Big).
+\]
+By Cauchy--Schwarz applied to the $N$ nonnegative numbers $c(u,v)$,
+\[
+\sum_{\{u,v\}}c(u,v)^2\;\ge\;\frac{\big(\sum_{\{u,v\}}c(u,v)\big)^2}{N}=\frac{S^2}{N}.
+\]
+Substituting gives
+\[
+2C_4(G)\ge \frac12\Big(\frac{S^2}{N}-S\Big),
+\]
+which is equivalent to the stated inequality. \hfill$\square$
+
+\medskip
+\textbf{Lemma 3 (Relating $S$ to degrees and edges).}
+Let $d(v)$ be the degree of $v$ in $G$ and let $m:=e(G)$. Then
+\[
+S=\sum_{v\in V}\binom{d(v)}{2}
+\quad\text{and hence}\quad
+S\ge \frac{2m^2}{n}-m.
+\]
+\emph{Proof.}
+A triple $(v,\{u,w\})$ with $u\ne w$ contributes to $\sum_v\binom{d(v)}{2}$ iff $u,w\in N(v)$.
+Equivalently, for the pair $\{u,w\}$, the number of such $v$ is exactly $c(u,w)$. Double counting gives
+$\sum_v\binom{d(v)}{2}=\sum_{\{u,w\}}c(u,w)=S$.
+
+For the inequality, note that
+\[
+S=\sum_v\binom{d(v)}{2}=\frac{1}{2}\sum_v(d(v)^2-d(v))
+=\frac12\Big(\sum_v d(v)^2 -2m\Big).
+\]
+By Cauchy--Schwarz on the degree sequence,
+\[
+\sum_v d(v)^2\ge \frac{(\sum_v d(v))^2}{n}=\frac{(2m)^2}{n}=\frac{4m^2}{n}.
+\]
+Therefore
+\[
+S\ge \frac12\Big(\frac{4m^2}{n}-2m\Big)=\frac{2m^2}{n}-m.
+\]
+\hfill$\square$
+
+\medskip
+\textbf{Corollary 4 (Explicit $C_4$ lower bound from $n,m$).}
+For any simple graph on $n$ vertices with $m$ edges,
+\[
+C_4(G)\ge \frac14\Bigg(\frac{\big(\frac{2m^2}{n}-m\big)^2}{\binom{n}{2}}-\Big(\frac{2m^2}{n}-m\Big)\Bigg).
+\]
+In particular, if $m=(\tfrac12+\varepsilon)n^{3/2}$ for some fixed $\varepsilon>0$ and $n$ is sufficiently large 
+(in terms of $\varepsilon$), then $C_4(G)\ge c(\varepsilon)n^2$ for an explicit $c(\varepsilon)>0$.
+\emph{Proof.}
+Combine Lemma 2 with Lemma 3. For the ``in particular'': plug $m=(\tfrac12+\varepsilon)n^{3/2}$ into 
+$\frac{2m^2}{n}-m$ to get
+\[
+\frac{2m^2}{n}-m
+=\Big(\tfrac12+2\varepsilon+2\varepsilon^2\Big)n^2-\Big(\tfrac12+\varepsilon\Big)n^{3/2},
+\]
+while $\binom{n}{2}=\tfrac12n^2-\tfrac12n$. For $n$ large enough, the $n^2$ term dominates and 
+$S\asymp_{\varepsilon}n^2$, yielding $C_4(G)\gg_{\varepsilon} n^2$. \hfill$\square$
+
+\medskip
+\textbf{FAST REALITY CHECK (exact brute force for small $n$).}
+For $n\le 7$ I exhaustively enumerated all graphs on $n$ vertices and computed $\mathrm{ex}(n;C_4)$ and the minimum 
+possible $C_4(G)$ among graphs with $e(G)>\mathrm{ex}(n;C_4)$. The exact results found were:
+\begin{center}
+\begin{tabular}{c|c|c}
+$n$ & $\mathrm{ex}(n;C_4)$ & $\min\{C_4(G):e(G)=\mathrm{ex}(n;C_4)+1\}$\\
+\hline
+$4$ & $4$ & $1$\\
+$5$ & $6$ & $2$\\
+$6$ & $7$ & $1$\\
+$7$ & $9$ & $1$\\
+\end{tabular}
+\end{center}
+Thus, for $n=6$ and $n=7$, having just one more edge than $\mathrm{ex}(n;C_4)$ can force only a single $4$-cycle, 
+consistent with the statement that even ``$\ge2$ copies'' is nontrivial.
+One explicit example for $n=7$ with $e=10=\mathrm{ex}(7;C_4)+1$ and $C_4(G)=1$ (vertices $0,1,2,3,4,5,6$) has edges
+\[
+\{01,02,05,06,13,14,16,23,25,34\}.
+\]
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 1 check: In a $4$-cycle $(a,b,c,d)$, opposite pairs are $\{a,c\}$ and $\{b,d\}$. For opposite pair 
+$\{a,c\}$, the two other vertices $b,d$ are common neighbors, so the cycle contributes $1$ to $\binom{c(a,c)}{2}$; 
+similarly for $\{b,d\}$. No other pair sees both $b$ and $d$ as common neighbors, so each $4$-cycle is counted 
+exactly twice.
+\item Lemma 2 check: equality case occurs when all codegrees are equal (or as equal as possible), consistent with 
+Cauchy--Schwarz. If $S\le N$ the lower bound may be nonpositive, which is harmless since $C_4(G)\ge0$.
+\item Lemma 3 check: $S=\sum_v\binom{d(v)}{2}$ is a standard double count of length-2 walks with specified endpoints.
+\item Computation check: for $n=7$ the full search is over $2^{21}=2{,}097{,}152$ graphs, feasible; the reported values 
+were obtained by direct enumeration and direct $C_4$ counting via codegrees.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result here: for every $n$-vertex graph with $m$ edges,
+\[
+C_4(G)\ge \frac14\Bigg(\frac{\big(\frac{2m^2}{n}-m\big)^2}{\binom{n}{2}}-\Big(\frac{2m^2}{n}-m\Big)\Bigg),
+\]
+and in particular if $m\ge (\tfrac12+\varepsilon)n^{3/2}$ then $C_4(G)\gg_{\varepsilon} n^2$.
+
+(ii) First gap: turn the hypothesis $m>\mathrm{ex}(n;C_4)$ (which is ``barely above'' the extremal threshold) into a 
+quantitative lower bound on $S=\sum_{\{u,v\}}c(u,v)$ that is strong enough to force $C_4(G)\ge c n^{1/2}$ for a 
+fixed absolute $c>0$. The inequalities above only give substantial $C_4$ counts when $S$ is noticeably larger than 
+$\binom{n}{2}$.
+
+(iii) Top 3 next moves:
+\begin{itemize}
+\item Prove a stability statement: if $e(G)\ge \mathrm{ex}(n;C_4)+1$ and $C_4(G)$ is tiny, then $G$ must be structurally 
+close to a $C_4$-free extremal construction, and quantify how an added edge propagates into many codegree-$\ge2$ pairs.
+\item Compute $\min\{C_4(G): e(G)=\mathrm{ex}(n;C_4)+1\}$ for larger $n$ (beyond $7$) using targeted search or MILP, 
+to see whether ``$1$ forced $C_4$'' persists and what extremal near-counterexamples look like.
+\item Strengthen Lemma 2 by incorporating variance information: relate $\sum c(u,v)^2$ to $m-\mathrm{ex}(n;C_4)$ 
+directly (a refined supersaturation inequality).
+\end{itemize}
+
+(iv) Minimal counterexample structure (if the conjecture were false): a sequence of graphs $G_n$ with 
+$e(G_n)=\mathrm{ex}(n;C_4)+1$ but $C_4(G_n)=o(n^{1/2})$. Such graphs would have codegrees $c(u,v)$ mostly $0$ or $1$ 
+with very few pairs having $c(u,v)\ge2$, i.e., they would be extremely close to $C_4$-free extremal configurations.
+
+

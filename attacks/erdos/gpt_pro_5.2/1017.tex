@@ -1,0 +1,115 @@
+% Erdos Problem #1017
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+For integers $n\ge 1$ and $0\le k\le \binom{n}{2}$, define $f(n,k)$ as follows.
+For a graph $G$ on $n$ vertices with $k$ edges, let $\operatorname{cp}(G)$ be the smallest integer $t$ such that $E(G)$ can be partitioned into $t$ edge-disjoint complete graphs (cliques) (a clique of size $2$ is allowed, i.e. an edge).
+Then
+\[
+f(n,k):=\max\{\operatorname{cp}(G): |V(G)|=n,\ |E(G)|=k\}.
+\]
+The problem asks for estimates of $f(n,k)$ in the dense regime $k>n^2/4$.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem statement reports: (a) a universal bound $f(n,k)\le n^2/4$ for all $k$ (Erd\H{o}s--Goodman--P\'osa), best possible at $k=n^2/4$ via complete bipartite graphs; (b) for $K_4$-free graphs with $\lfloor n^2/4\rfloor+m$ edges, one can force $m$ edge-disjoint triangles (Gy\H{o}ri--Keszegh).
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\emph{Construction track:} Build explicit dense graphs with $k>n^2/4$ whose clique-partition number remains large, giving lower bounds on $f(n,k)$.
+\emph{Upper-bound track:} Try to convert the surplus $k-n^2/4$ into forced edge-disjoint triangles, since each triangle can reduce the clique count by $2$ relative to using edges alone.
+
+\medskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 1 (triangle-free graphs force all cliques to be edges).}
+If $G$ is triangle-free, then every clique in $G$ has size at most $2$, hence $\operatorname{cp}(G)=|E(G)|$.
+
+\textit{Proof.}
+In a triangle-free graph, no three vertices are pairwise adjacent, so no clique of size $\ge 3$ exists.
+Thus the only complete graphs appearing as subgraphs are $K_1$ and $K_2$.
+A partition of $E(G)$ into edge-disjoint cliques therefore partitions $E(G)$ into single edges, requiring exactly $|E(G)|$ cliques.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (a dense family with computable clique-partition number).}
+Let $n$ be even and write $n=2a$.
+Let $A,B$ be a partition of the vertex set with $|A|=|B|=a$.
+Fix an integer $m$ with $0\le m\le \lfloor a/2\rfloor$, and form a graph $G_{a,m}$ by taking all $ab=a^2$ edges between $A$ and $B$ (so $K_{a,a}$) and adding a matching of size $m$ inside $A$.
+Then
+\[
+|E(G_{a,m})| = a^2+m = \frac{n^2}{4}+m,
+\qquad\text{and}\qquad
+\operatorname{cp}(G_{a,m}) = a^2-m = \frac{n^2}{4}-m.
+\]
+
+\textit{Proof.}
+First, $|E(G_{a,m})|=a^2+m$ by construction.
+We show $\operatorname{cp}(G_{a,m})=a^2-m$.
+
+\emph{Step 1: classify cliques in $G_{a,m}$.}
+There are no edges inside $B$.
+Inside $A$ there are exactly the $m$ matching edges and no others.
+Therefore any clique has at most one vertex in $B$ (otherwise it would require an edge inside $B$), and at most two vertices in $A$; moreover, a clique containing two vertices of $A$ must use one of the matching edges.
+Thus every clique is either a single edge, or a triangle consisting of one matching edge $uu'$ in $A$ together with one vertex $b\in B$ and the two cross-edges $ub$ and $u'b$.
+No larger clique exists.
+
+\emph{Step 2: an explicit clique partition with $a^2-m$ cliques.}
+For each matching edge $uu'$ in $A$, choose a fixed vertex $b_0\in B$ and take the triangle $\{u,u',b_0\}$.
+These $m$ triangles are edge-disjoint because the matching edges are disjoint and hence their incident cross-edges $ub_0,u'b_0$ are all distinct.
+Cover all remaining cross-edges (there are $a^2-2m$ of them) by single-edge cliques.
+This produces a clique partition with
+\[
+m + (a^2-2m)=a^2-m\]
+cliques, so $\operatorname{cp}(G_{a,m})\le a^2-m$.
+
+\emph{Step 3: a matching lower bound.}
+Consider any clique partition of $G_{a,m}$.
+Every matching edge inside $A$ must be covered either by a single-edge clique, or by a triangle (as classified in Step 1).
+Let $y$ be the number of triangles used; then $y\le m$ and exactly $y$ matching edges are covered by triangles.
+The remaining $m-y$ matching edges must each be a single-edge clique.
+Each triangle covers exactly two cross-edges, and every cross-edge not in a triangle must be covered by a single-edge clique (since no other clique contains it).
+There are $a^2$ cross-edges total, so the number of single-edge cliques used on cross-edges is $a^2-2y$.
+Therefore any clique partition uses at least
+\[
+\underbrace{y}_{\text{triangles}} + \underbrace{(m-y)}_{\text{matching edges as }K_2} + \underbrace{(a^2-2y)}_{\text{remaining cross-edges as }K_2}
+= a^2+m-2y\ge a^2+m-2m=a^2-m
+\]
+cliques.
+Combined with Step 2, this shows $\operatorname{cp}(G_{a,m})=a^2-m$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Corollary 1 (a concrete lower bound on $f(n,k)$ above Mantel's threshold).}
+For even $n$ and any integer $m$ with $0\le m\le \lfloor n/4\rfloor$,
+\[
+f\Bigl(n,\frac{n^2}{4}+m\Bigr)\ge \frac{n^2}{4}-m.
+\]
+
+\medskip
+\noindent\textbf{FAST REALITY CHECK.}
+A backtracking search for minimum clique partitions (allowing only edges and triangles, which is forced for the family $G_{a,m}$) confirms Lemma 2 for small cases:
+\[
+(n,m)=(6,1):\ \operatorname{cp}=8=9-1;\qquad (n,m)=(8,2):\ \operatorname{cp}=14=16-2.
+\]
+
+\medskip
+\noindent\textbf{VERIFICATION.}
+Lemma 2 relies on an exhaustive classification of possible cliques in $G_{a,m}$, using only the explicit edge set; the lower bound counts cliques by tracking how many cross-edges can be absorbed per triangle.
+No step assumes unpublished structure.
+
+\medskip
+\noindent\textbf{FINAL.}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: an explicit family with $k=\frac{n^2}{4}+m$ edges whose clique partition number is exactly $\frac{n^2}{4}-m$ (Lemma 2), hence a nontrivial lower bound on $f(n,k)$ for $k>n^2/4$.
+
+(ii) First gap (crisp): determine (even up to constant factors) the true maximum of $\operatorname{cp}(G)$ over all $n$-vertex graphs with $k=\frac{n^2}{4}+m$ edges, in particular whether $f(n,\frac{n^2}{4}+m)=\frac{n^2}{4}-\Theta(m)$ holds for some range of $m$.
+
+(iii) Top 3 next moves:
+1. Prove a general lower bound of the form $\operatorname{cp}(G)\ge \frac{n^2}{4}-C\cdot (k-n^2/4)$ valid for all $G$ (or find a construction that violates it).
+2. Prove that every graph with $\frac{n^2}{4}+m$ edges contains at least $\Omega(m)$ edge-disjoint triangles (without assuming $K_4$-free), which would yield a corresponding improvement to the universal $n^2/4$ bound.
+3. Compute $f(n,k)$ exactly for small $n$ (say $n\le 9$) by brute force / integer programming to guess the correct dependence on $m=k-n^2/4$.
+
+(iv) Minimal counterexample structure: a family of graphs with $k=\frac{n^2}{4}+m$ edges in which triangles are forced to overlap heavily (so few edge-disjoint triangles exist) yet the clique-partition number remains close to $n^2/4$; such a family would have to be very close to bipartite while still having $m$ extra edges.
+
+

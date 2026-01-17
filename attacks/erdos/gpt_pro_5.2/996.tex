@@ -1,0 +1,110 @@
+% Erdos Problem #996
+
+1) FORMAL RESTATEMENT
+Let $n_1<n_2<\cdots$ be a lacunary sequence of integers (so $n_{k+1}/n_k\ge q>1$).  Let $f\in L^2([0,1])$ with Fourier series
+\[
+ f(x)\sim \sum_{m\in\mathbb{Z}} \widehat f(m)e^{2\pi i m x},
+\]
+and let $f_n$ denote the $n$-th partial sum of this Fourier series.  The problem asks whether there exists an absolute constant $C>0$ such that the following holds:
+
+If
+\[
+ \|f-f_n\|_2 \ll \frac{1}{(\log\log\log n)^C},
+\]
+then for almost all $\alpha$,
+\[
+ \lim_{N\to\infty}\frac{1}{N}\sum_{k=1}^N f(\{\alpha n_k\}) = \int_0^1 f(x)\,dx.
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The problem statement mentions prior results for stronger decay rates (powers of $\log n$ and $\log\log n$) and special lacunary sequences such as $n_k=a^k$.  I will not use any results not explicitly stated in the problem statement.
+
+3) ATTACK PLAN
+A natural approach is:
+- Prove the convergence for trigonometric polynomials (finite Fourier support).
+- Control the Fourier tail $f-f_n$ using lacunarity plus the assumed decay of $\|f-f_n\|_2$.
+
+The main technical obstacle is to control the contribution of infinitely many Fourier modes and to obtain almost-sure convergence (not just convergence along a sparse subsequence).
+
+4) WORK
+
+FAST REALITY CHECK (sanity simulation).
+Take $n_k=2^k$ and $f(x)=\cos(2\pi x)+\sin(4\pi x)$ (a trigonometric polynomial with mean $0$).  With $\alpha=a/M$ (as in Problem \#995), I computed the empirical averages:
+\[
+\begin{array}{c|cccc}
+ N & 10^2 & 10^3 & 10^4 & 10^5\\\hline
+ \frac1N\sum_{k\le N} f(\{\alpha 2^k\}) & -0.0696 & -0.00984 & 0.000282 & -0.000499
+\end{array}
+\]
+This is consistent with convergence to $0$ for a nice $f$.
+
+Lemma 1 (Exact $L^2$ identity for a single Fourier mode).
+Let $m_1,\dots,m_N$ be distinct integers and let $h\in\mathbb{Z}\setminus\{0\}$.  Define
+\[
+E_N(\alpha):=\sum_{k=1}^N e^{2\pi i h m_k \alpha}.
+\]
+Then
+\[
+\int_0^1 |E_N(\alpha)|^2\,d\alpha = N.
+\]
+
+Proof.
+Expand and integrate:
+\[
+\int_0^1 |E_N(\alpha)|^2 d\alpha
+=\int_0^1 \sum_{k,\ell=1}^N e^{2\pi i h(m_k-m_\ell)\alpha}\,d\alpha
+=\sum_{k,\ell=1}^N \int_0^1 e^{2\pi i h(m_k-m_\ell)\alpha}\,d\alpha.
+\]
+The inner integral equals $1$ if $h(m_k-m_\ell)=0$ and equals $0$ otherwise.  Since $h\neq 0$ and the $m_k$ are distinct, $h(m_k-m_\ell)=0$ iff $k=\ell$.  Therefore the sum equals $N$. \qed
+
+Lemma 2 (Dyadic almost-sure bound for a single Fourier mode).
+Let $m_k=n_k$ be any strictly increasing integer sequence and fix $h\neq 0$.  Then for every $\epsilon>0$, for almost all $\alpha$ there exists $m_0(\alpha)$ such that for all $m\ge m_0$,
+\[
+\left|\sum_{k=1}^{2^m} e^{2\pi i h n_k\alpha}\right| \le K(\alpha,\epsilon)\,\sqrt{2^m}\,m^{\frac12+\epsilon}.
+\]
+
+Proof.
+Apply Lemma 1 with $m_k=n_k$:
+\[
+\int_0^1 \left|\sum_{k=1}^{2^m} e^{2\pi i h n_k\alpha}\right|^2 d\alpha = 2^m.
+\]
+Chebyshev gives
+\[
+\mathbb{P}\left(\left|\sum_{k=1}^{2^m} e^{2\pi i h n_k\alpha}\right|>A\sqrt{2^m}\,m^{\frac12+\epsilon}\right)
+\le \frac{2^m}{A^2 2^m m^{1+2\epsilon}}=\frac{1}{A^2 m^{1+2\epsilon}}.
+\]
+The series $\sum_m m^{-(1+2\epsilon)}$ converges, hence Borel--Cantelli implies the event happens only finitely often for almost all $\alpha$. \qed
+
+Proposition 3 (Dyadic convergence for trigonometric polynomials).
+Let $f(x)=\sum_{|h|\le H} c_h e^{2\pi i h x}$ be a trigonometric polynomial and let $(n_k)$ be any increasing sequence of integers.  Then for almost all $\alpha$,
+\[
+\lim_{m\to\infty}\frac{1}{2^m}\sum_{k=1}^{2^m} f(\{\alpha n_k\}) = c_0 = \int_0^1 f(x)\,dx.
+\]
+
+Proof.
+Write
+\[
+\frac{1}{2^m}\sum_{k=1}^{2^m} f(\{\alpha n_k\}) - c_0
+= \sum_{1\le |h|\le H} c_h \cdot \frac{1}{2^m}\sum_{k=1}^{2^m} e^{2\pi i h\alpha n_k}.
+\]
+For each fixed $h\neq 0$, Lemma 2 implies the inner average is $O\bigl(2^{-m/2} m^{1/2+\epsilon}\bigr)$ for almost all $\alpha$.  Intersecting the full-measure sets over the finite collection $1\le |h|\le H$ yields a full-measure set on which every nonzero frequency has this decay.  Hence the entire sum tends to $0$, giving the claimed dyadic convergence to $c_0$. \qed
+
+Remark.
+Proposition 3 gives convergence along the dyadic subsequence $N=2^m$ for trigonometric polynomials, without any lacunarity assumption on $(n_k)$.  The problem asks for convergence as $N\to\infty$ along all $N$ and for $L^2$ functions, which is substantially stronger.
+
+5) VERIFICATION
+- Lemma 1 is an exact identity (no inequalities except the orthogonality integral).
+- Lemma 2 and Proposition 3 only deliver dyadic subsequence convergence; this is explicitly weaker than the desired $N\to\infty$ convergence.
+- No step used the assumed decay $\|f-f_n\|_2\ll 1/(\log\log\log n)^C$; incorporating that hypothesis is exactly the missing step.
+
+6) FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result: For any increasing integer sequence $(n_k)$ and any trigonometric polynomial $f$, the ergodic averages along the dyadic subsequence $N=2^m$ converge for almost all $\alpha$ to $\int_0^1 f$ (Proposition 3).  This uses an exact $L^2$ identity for each Fourier mode and Borel--Cantelli.
+(ii) First gap: Upgrade dyadic convergence for trigonometric polynomials to full $N\to\infty$ convergence for $L^2$ functions under the very weak Fourier-approximation condition $\|f-f_n\|_2\ll (\log\log\log n)^{-C}$.
+(iii) Top 3 next moves:
+  1. Prove a maximal inequality controlling $\max_{1\le N\le 2^m}\left|\sum_{k\le N} e^{2\pi i h\alpha n_k}\right|$ in $L^2(\alpha)$ for lacunary $(n_k)$; this would convert dyadic control into control for all $N$.
+  2. Develop an $L^2$ estimate for the tail $f-f_n$ along lacunary subsequences: show that lacunarity plus $\|f-f_n\|_2$ small forces $\frac1N\sum_{k\le N}(f-f_n)(\{\alpha n_k\})$ to be small for a.e. $\alpha$.
+  3. Explore counterexamples: attempt to build $f\in L^2$ with extremely slowly decaying Fourier tail and choose a lacunary $(n_k)$ with many multiplicative relations so that tail frequencies resonate and prevent convergence.
+(iv) Minimal counterexample structure (if the statement is false): a counterexample would require (a) an $L^2$ function whose Fourier tail remains ``structured'' despite small $\|f-f_n\|_2$, and (b) a lacunary sequence $(n_k)$ that aligns with this tail (many solutions to $h n_k = h' n_\ell$ among tail frequencies), producing persistent non-vanishing contributions to the averages.
+
+

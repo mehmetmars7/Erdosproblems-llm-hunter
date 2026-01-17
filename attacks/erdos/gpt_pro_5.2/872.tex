@@ -1,0 +1,150 @@
+% Erdos Problem #872
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Fix an integer $n\ge 2$ and let $U=\{2,3,\dots,n\}$.
+A set $A\subseteq U$ is \emph{legal} if it is an antichain in the divisibility poset, i.e.
+\[
+\forall a\neq b\in A,\qquad a\nmid b\text{ and }b\nmid a.
+\]
+A move consists of choosing $x\in U\setminus A$ such that $A\cup\{x\}$ is legal.
+The game ends when there is no legal move; equivalently, when $A$ is a \emph{maximal} (by inclusion) divisibility antichain in $U$.
+
+There are two players:
+\begin{itemize}
+\item \emph{Long} aims to maximize the total number of moves, i.e. maximize the final $|A|$.
+\item \emph{Short} aims to minimize the final $|A|$.
+\end{itemize}
+
+The problem text notes an ambiguity: Erd\H{o}s did not specify which player goes first.
+Accordingly define two game values:
+\begin{itemize}
+\item $g_L(n)$: optimal final $|A|$ if Long moves first;
+\item $g_S(n)$: optimal final $|A|$ if Short moves first.
+\end{itemize}
+
+Question: determine (or bound) $g_L(n),g_S(n)$ asymptotically. In particular:
+\begin{itemize}
+\item Is there an $\varepsilon>0$ such that $g_L(n),g_S(n)\ge \varepsilon n$ for all large $n$?
+\item Is it true that for every fixed $\varepsilon>0$ and all large $n$, one has $g_L(n),g_S(n)\ge (1-\varepsilon)\frac n2$?
+\end{itemize}
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem text positions this as a ``number theoretic variant'' of Hajnal's triangle-free saturation game (and cites results for that graph game). No theorems are stated for the divisibility game itself, beyond the observation about the first-player ambiguity.
+I therefore treat the divisibility-game asymptotics as open from the provided information.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{enumerate}
+\item Analyze extremal sizes of antichains and maximal antichains in the divisibility poset on $\{2,\dots,n\}$.
+\item Identify forced elements in any maximal antichain (e.g. primes $>n/2$).
+\item Compute small $n$ by minimax to detect patterns and formulate plausible bounds/strategies.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 1 (maximum possible game length is $\lceil n/2\rceil$).}
+Let $U=\{2,\dots,n\}$. The maximum size of a legal set (i.e. the width of this poset restricted to $U$) equals $\lceil n/2\rceil$.
+Moreover, the set
+\[
+A_\mathrm{top}:=\{\lfloor n/2\rfloor+1,\ \lfloor n/2\rfloor+2,\ \dots,\ n\}
+\]
+is a maximal legal set of size $\lceil n/2\rceil$.
+
+\noindent\emph{Proof.}
+For each odd integer $m\le n$, consider the chain
+\[
+C_m:=\{m,2m,4m,8m,\dots\}\cap\{1,2,\dots,n\}.
+\]
+Every positive integer $x\le n$ belongs to exactly one such chain: write $x=2^j m$ with $m$ odd.
+Inside a fixed chain $C_m$, divisibility totally orders the elements since $2^j m\mid 2^{j'}m$ iff $j\le j'$.
+Therefore any divisibility antichain intersects each chain in at most one element.
+The number of odd integers $m\le n$ is $\lceil n/2\rceil$, so any legal set in $U$ has size at most $\lceil n/2\rceil$.
+
+Now consider $A_\mathrm{top}$. If $a,b\in A_\mathrm{top}$ with $a<b$, then $2a>n\ge b$, hence $b$ cannot be a multiple of $a$; also $a$ cannot be a multiple of $b$. Thus $A_\mathrm{top}$ is legal.
+To see maximality, take any $x\in U\setminus A_\mathrm{top}$, so $x\le \lfloor n/2\rfloor$.
+Choose $t=\left\lceil\frac{\lfloor n/2\rfloor+1}{x}\right\rceil$. Then $tx\ge \lfloor n/2\rfloor+1$ and also $tx\le n$ because
+\[
+ t\le \frac{\lfloor n/2\rfloor+1}{x}+1\le \frac{n}{x},
+\]
+so $tx\le n$.
+Hence $tx\in A_\mathrm{top}$ and $x\mid tx$, which means $x$ is comparable to an element of $A_\mathrm{top}$ and cannot be added.
+Thus $A_\mathrm{top}$ is maximal.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (large primes are forced in every terminal position).}
+Let $A\subseteq U$ be a maximal legal set. Then every prime $p$ with $\frac n2<p\le n$ must belong to $A$.
+Consequently, every game (regardless of play) lasts at least
+\[
+\pi(n)-\pi(\lfloor n/2\rfloor)
+\]
+moves, where $\pi(x)$ denotes the number of primes $\le x$.
+
+\noindent\emph{Proof.}
+Let $p$ be prime with $n/2<p\le n$. Then $2p>n$, so there is no multiple of $p$ in $U$ other than $p$ itself.
+Also, since $p$ is prime and $1\notin U$, there is no divisor of $p$ in $U$ other than $p$.
+Therefore $p$ is incomparable (under divisibility) with every element of $U\setminus\{p\}$.
+If $p\notin A$, then $A\cup\{p\}$ is still legal, contradicting maximality.
+Thus $p\in A$.
+Counting such primes gives the stated lower bound on $|A|$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{VERIFICATION (FAST REALITY CHECK).}
+I computed exact minimax values for $2\le n\le 24$ by brute-force recursion with memoization.
+The table lists $(g_L(n),g_S(n))$ as well as:
+\begin{itemize}
+\item $m(n)$ = minimum size of a maximal legal set (computed by minimizing over all move sequences),
+\item $M(n)=\lceil n/2\rceil$ (Lemma~1).
+\end{itemize}
+\begin{verbatim}
+ n :  g_L(n)  g_S(n)   m(n)   M(n)
+ 2 :     1       1      1      1
+ 3 :     2       2      2      2
+ 4 :     2       2      2      2
+ 5 :     3       3      3      3
+ 6 :     3       3      3      3
+ 7 :     4       4      4      4
+ 8 :     4       4      4      4
+ 9 :     5       4      4      5
+10 :     5       4      4      5
+11 :     6       5      5      6
+12 :     6       5      5      6
+13 :     7       6      6      7
+14 :     7       6      6      7
+15 :     7       6      6      8
+16 :     7       6      6      8
+17 :     8       7      7      9
+18 :     8       7      7      9
+19 :     9       8      8     10
+20 :     9       8      8     10
+21 :    10       8      8     11
+22 :    10       8      8     11
+23 :    11       9      9     12
+24 :    11       9      9     12
+\end{verbatim}
+These computations verify Lemma~1's upper bound and show that $g_L(n)$ and $g_S(n)$ can differ.
+
+\medskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}.
+
+\noindent(i) \emph{Strongest proved partial result here.}
+Lemma~1: the game always ends in at most $\lceil n/2\rceil$ moves and this is achievable by a maximal antichain.
+Lemma~2: every terminal position contains all primes in $(n/2,n]$, giving a universal lower bound $\pi(n)-\pi(\lfloor n/2\rfloor)$.
+
+\noindent(ii) \emph{First gap (crisp).}
+Prove (or disprove) the existence of a constant $\varepsilon>0$ such that under optimal play (for either starting player) the game value is always $\ge \varepsilon n$ for all sufficiently large $n$.
+
+\noindent(iii) \emph{Top 3 next moves (concrete).}
+\begin{enumerate}
+\item Determine (or bound) $m(n)$, the minimum size of a maximal divisibility antichain in $\{2,\dots,n\}$, since game values satisfy $m(n)\le g_S(n),g_L(n)\le \lceil n/2\rceil$.
+\item Develop explicit strategies: e.g. give Short a strategy producing a maximal antichain of size $\le cn$ (upper bound on game value) or Long a strategy guaranteeing size $\ge cn$ (lower bound).
+\item Compute $g_L(n),g_S(n)$ for larger $n$ (beyond $24$) to guess the limiting ratio and to search for periodic/structural behavior.
+\end{enumerate}
+
+\noindent(iv) \emph{Minimal counterexample structure.}
+A counterexample to ``$g(n)\ge \varepsilon n$'' would be a sequence $n_j\to\infty$ together with Short strategies forcing terminal antichains of size $o(n_j)$. Structurally, this would require constructing very small maximal antichains that nevertheless dominate (by divisibility comparability) almost all numbers in $\{2,\dots,n_j\}$.
+
+

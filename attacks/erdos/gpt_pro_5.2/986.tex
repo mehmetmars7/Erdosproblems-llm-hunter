@@ -1,0 +1,205 @@
+% Erdos problem 986
+
+1) FORMAL RESTATEMENT
+
+Let R(k,n) denote the (off-diagonal) graph Ramsey number: the least integer N such that
+every simple graph G on N vertices contains either
+- a clique K_k, or
+- an independent set of size n.
+
+Conjecture:
+For each fixed integer k>=3 there exist constants c=c(k)>0 and C=C(k)>0 such that for all
+sufficiently large integers n,
+
+  R(k,n) >= C * n^{k-1} / (log n)^c.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem file states that this conjecture is known for k=3 (Spencer) and for k=4
+(Mattheus--Verstraete). It also quotes general upper/lower bounds (not needed for the
+arguments below).
+
+3) ATTACK PLAN
+
+- Prove easy structural facts: recursion and the standard polynomial upper bound.
+- Prove a baseline probabilistic lower bound (weaker than the conjecture but completely
+  self-contained).
+- Do a small-case computation to sanity-check the definition (R(3,3)).
+
+4) WORK
+
+FAST REALITY CHECK (exact small computation): R(3,3)=6.
+
+I verified this by brute force over all graphs on N vertices for N<=6.
+A graph "witnesses R(3,3)>N" if it has no triangle and no independent set of size 3.
+The computation found witnesses for N=3,4,5 and none for N=6.
+One witness on 5 vertices is the 5-cycle.
+
+Exact output from a minimal script:
+\begin{verbatim}
+n 3 exists True
+n 4 exists True
+n 5 exists True
+n 6 exists False
+example mask for n=5 220
+edges [(0, 3), (0, 4), (1, 2), (1, 4), (2, 3)]
+\end{verbatim}
+
+(Here "exists False" at N=6 means there is no graph on 6 vertices avoiding both a triangle
+and an independent triple.)
+
+---
+
+Lemma 986.1 (Ramsey recursion).
+For integers k,n>=2,
+
+  R(k,n) <= R(k-1,n) + R(k,n-1).
+
+Proof.
+Let N = R(k-1,n) + R(k,n-1). Consider any graph G on N vertices and fix a vertex v.
+Partition the remaining N-1 vertices into
+  A = neighbors of v,
+  B = non-neighbors of v.
+Then |A|+|B|=N-1.
+
+If |A| >= R(k-1,n), then the induced subgraph G[A] contains either
+- a K_{k-1}, in which case adding v gives a K_k in G, or
+- an independent set of size n, which is also independent in G.
+
+If |A| < R(k-1,n), then |B| >= N-1-(R(k-1,n)-1) = R(k,n-1). In that case G[B] contains
+either
+- a K_k (done), or
+- an independent set of size n-1; together with v (which is non-adjacent to all of B)
+  this forms an independent set of size n in G.
+
+Thus every graph on N vertices contains K_k or an independent n-set, so R(k,n) <= N.
+\qed
+
+Corollary 986.2 (Erdos--Szekeres binomial upper bound).
+For k,n>=1,
+
+  R(k,n) <= \binom{k+n-2}{k-1}.
+
+Proof.
+Define U(k,n)=\binom{k+n-2}{k-1}. One checks the same recursion
+U(k,n)=U(k-1,n)+U(k,n-1), with base cases U(1,n)=U(k,1)=1.
+Using Lemma 986.1 and induction on k+n gives R(k,n) <= U(k,n).
+\qed
+
+---
+
+Lemma 986.3 (A self-contained probabilistic lower bound).
+Fix an integer k>=3. For all sufficiently large n, there exists a graph on at least
+
+  (1/(2(10k)^{k/2})) * (n/log n)^{k/2}
+
+vertices with no K_k and with independence number < n. Consequently,
+
+  R(k,n) >= c_k * (n/log n)^{k/2}
+
+for a positive constant c_k depending only on k.
+
+Proof.
+Let n be large (so that log n>0 and the estimates below hold). Define
+
+  N := \left\lfloor (n/(10k\,\log n))^{k/2} \right\rfloor,
+  p := (5k\,\log n)/n.
+
+Consider the random graph G ~ G(N,p).
+
+Step 1: bound the expected number X of independent sets of size n.
+For a fixed n-subset S of vertices, the probability it is independent is (1-p)^{\binom{n}{2}}.
+Hence
+
+  E[X] = \binom{N}{n} (1-p)^{\binom{n}{2}}.
+
+Use the crude bounds \binom{N}{n} <= (eN/n)^n and (1-p)^{\binom{n}{2}} <=
+exp(-p\,n(n-1)/2) <= exp(-p\,n^2/3) for n>=2. Thus
+
+  E[X] <= exp( n\log(eN/n) - (p n^2)/3 ).
+
+Now compute a simple upper bound on \log(eN/n): since N <= (n/(10k\log n))^{k/2},
+
+  eN/n <= e * n^{k/2-1} / (10k\log n)^{k/2}.
+
+For fixed k and large n this is <= n^{k/2} (say), hence \log(eN/n) <= (k/2)\log n.
+Therefore
+
+  n\log(eN/n) <= (k/2) n\log n,
+  (p n^2)/3 = (5k\log n)/n * n^2/3 = (5k/3) n\log n.
+
+So the exponent is <= ((k/2) - (5k/3)) n\log n = -(7k/6) n\log n,
+which is < -10 for large n. In particular E[X] < 1/4.
+Thus P(X>=1) <= E[X] < 1/4 (Markov), so with probability > 3/4 the random graph has
+no independent set of size n.
+
+Step 2: bound the expected number Y of K_k subgraphs.
+For each k-subset T, the probability it forms a clique is p^{\binom{k}{2}}. Hence
+
+  E[Y] = \binom{N}{k} p^{\binom{k}{2}} <= N^k p^{\binom{k}{2}}.
+
+Let t=\binom{k}{2}=k(k-1)/2. Using N <= (n/(10k\log n))^{k/2} and p=(5k\log n)/n,
+
+  N^k p^t
+  <= (n/(10k\log n))^{k^2/2} * (5k\log n/n)^{k(k-1)/2}
+  = ( (5k)/(10k) )^{t} * (n^{k/2}/(\log n)^{k/2}) * (1/(10k))^{k/2}
+  = (1/2)^{t} * (n/(10k\log n))^{k/2}.
+
+Since N is the floor of (n/(10k\log n))^{k/2}, for large n we have
+E[Y] <= (1/2)^{t} (N+1) <= (1/2)^{t}*2N <= N/4,
+because t>=3 for k>=3.
+Then P(Y > N/2) <= E[Y]/(N/2) <= (N/4)/(N/2)=1/2 by Markov; in fact the above gives <=1/2.
+So with probability at least 1/2, both events occur:
+- X=0 (no independent n-set), and
+- Y <= N/2 (at most N/2 copies of K_k).
+
+Fix a realization of G with these two properties.
+Delete one vertex from each K_k present in G (choose arbitrarily one vertex per clique).
+Since there are at most N/2 cliques, we delete at most N/2 vertices, leaving an induced
+subgraph G' on at least N/2 vertices.
+
+- G' has no K_k by construction.
+- G' has no independent set of size n: any independent n-set in G' would also be an
+  independent n-set in the original G because deleting vertices does not create new edges.
+
+Thus R(k,n) > |V(G')| >= N/2.
+Substituting the definition of N yields the claimed lower bound with
+c_k = 1/(2(10k)^{k/2}).
+\qed
+
+5) VERIFICATION
+
+- The brute-force computation checks the definition: it finds a 5-vertex witness and
+  verifies none exists on 6 vertices, consistent with the classical statement R(3,3)=6.
+- Lemma 986.1 recursion proof checked by neighborhood partition.
+- Lemma 986.3: all probabilistic inequalities are explicit (Markov + union bound).
+  Deleting vertices cannot create a new independent set of a fixed size.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here:
+    - An elementary upper bound: R(k,n) <= binom{k+n-2}{k-1}.
+    - A self-contained probabilistic lower bound: R(k,n) >= c_k (n/log n)^{k/2}.
+    - Exact small-case computation: R(3,3)=6.
+
+(ii) First gap (crisp statement):
+    Improve the exponent in the lower bound from k/2 to k-1 (up to polylog factors),
+    i.e. prove that for fixed k>=5 the largest K_k-free graphs with independence number < n
+    can have N on the order n^{k-1}/(log n)^{O(1)}.
+
+(iii) Top 3 next moves (concrete):
+    1. Try to adapt sparse random / semi-random constructions to push the exponent from k/2
+       to (k+1)/2 (already nontrivial) without importing heavy external theorems.
+    2. For a fixed k (say k=5), attempt a dedicated construction and compute numerically the
+       best N achievable by heuristic search to guess the right polylog.
+    3. Re-express the conjecture as a statement about maximal size of K_k-free graphs with
+       bounded independence number and look for a container-style counting argument.
+
+(iv) Minimal counterexample structure:
+    A fixed k>=3 for which there exists an infinite sequence n_i->infty with
+      R(k,n_i) << n_i^{k-1}/(log n_i)^{c}
+    for every c>0; equivalently, for infinitely many n there is a K_k-free graph on about
+    n^{k-1}/(log n)^{c} vertices with independence number < n failing for all c.
+

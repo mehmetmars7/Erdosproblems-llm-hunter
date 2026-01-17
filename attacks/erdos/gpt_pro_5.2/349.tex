@@ -1,0 +1,304 @@
+## 1) FORMAL RESTATEMENT
+
+### Basic objects
+
+Fix real parameters (t,\alpha\in(0,\infty)). Define the integer sequence
+[
+a_n:=\big\lfloor t,\alpha^n\big\rfloor,\qquad n\in\mathbb N.
+]
+
+**Convention for (\mathbb N):** (\mathbb N={1,2,3,\dots}).
+(Starting at (n=0) instead changes only finitely many initial terms, which does not affect “all sufficiently large integers” questions.)
+
+Define the **subset-sum set**
+[
+\Sigma(a):=\left{\sum_{j=1}^k a_{n_j}\ :\ k\ge 0,\ n_1,\dots,n_k\in\mathbb N\ \text{pairwise distinct}\right}\subseteq\mathbb Z_{\ge 0}.
+]
+(Empty sum (k=0) equals (0).)
+
+### Completeness (as in additive number theory)
+
+Call ((a_n)) **complete** (more precisely: *cofinitely complete*) if
+[
+\exists N_0\in\mathbb N\ \ \forall m\in\mathbb N\ (m\ge N_0\implies m\in \Sigma(a)).
+]
+Equivalently, (\mathbb N\setminus \Sigma(a)) is finite.
+
+### Ambiguities / misstatements in the pasted problem text
+
+The pasted text says “sum of **distinct integers** of the form (\lfloor t\alpha^n\rfloor).” There are two standard interpretations:
+
+* **(Index-distinct / standard in “distinct terms” problems):** you may use each *term* (a_n) at most once, even if (a_n=a_{n'}) for (n\neq n'). This is exactly the (\Sigma(a)) defined above.
+* **(Value-distinct / literal reading):** you may use each *value* (v\in{a_n:n\in\mathbb N}) at most once, so duplicates would be unusable multiple times. This changes the problem in some parameter regimes (duplicates can matter).
+
+The Erdős-problems discussion notes that the “distinct integers” phrasing is misleading compared to the intended “distinct terms” interpretation in the classical literature on “complete sequences.”
+
+### Minimal corrected “statement” to prove/disprove
+
+As written, the problem is a **classification question** (“for what values…?”), not a proposition with a truth value. The only propositional claim present is the conjectural sentence:
+
+> “It seems likely that the sequence is complete for all (t>0) and all (1<\alpha<\frac{1+\sqrt5}{2}).”
+
+So the **minimal corrected statement** consistent with standard conventions is:
+
+> **Conjecture (C).** For every (t>0) and every (\alpha\in(1,\varphi)) (where (\varphi=\frac{1+\sqrt5}{2})), the sequence (a_n=\lfloor t\alpha^n\rfloor) is complete (in the index-distinct sense).
+
+My job below is to try to prove or disprove Conjecture (C). If I cannot, I must output **UNRESOLVED** with a crisp first gap and rigorous partial results.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+* The excerpt you pasted is essentially the Erdős Problems #349 statement; it highlights complex parameter dependence (e.g. Graham’s result about many disjoint intervals in (\alpha) for suitable (t)).
+* The same discussion page flags the “distinct integers” wording issue and interprets the intended meaning as “distinct terms” (indices).
+* The text mentions the difficulty of even basic parity questions like whether (\lfloor(3/2)^n\rfloor) is odd infinitely often; this is closely related to Mahler-type “Z-number” problems.
+* For context on “integer parts of rational powers,” Dubickas–Novikas (2005) prove various infinitude-of-divisibility/compositeness results for sequences like (\big\lfloor \xi(5/4)^n\big\rfloor) and discuss related earlier results for ((3/2)^n), ((4/3)^n), etc. ([Springer][1])
+
+Nothing in the quick web check I could access gives a complete resolution of Conjecture (C).
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof-track strategies
+
+1. **Growth/overlap + interval propagation.**
+   Show that for (1<\alpha<\varphi) the sequence eventually satisfies a Fibonacci-type inequality (a_{n+2}\le a_{n+1}+a_n). Use this to propagate any sufficiently long block of consecutive representable integers to arbitrarily large integers.
+
+2. **Seed-interval existence.**
+   Try to prove that for every (t>0) (and (1<\alpha<\varphi)) the subset-sum set (\Sigma(a)) contains *some* interval of length at least the next term at some stage. This is the hard combinatorial core.
+
+3. **Greedy/Zeckendorf-type decomposition.**
+   Attempt a greedy representation argument for all large integers using the eventual Fibonacci-type inequality.
+
+### Disproof-track strategies
+
+1. **Modular obstruction construction.**
+   Produce explicit (t,\alpha\in(1,\varphi)) such that all (or all sufficiently large) (a_n) lie in a proper subgroup of (\mathbb Z/m\mathbb Z) in a way that subset sums miss infinitely many residues. This resembles Mahler “avoidance” problems and seems hard.
+
+2. **Superincreasing gaps.**
+   Show (a_{n+1}>\sum_{k\le n}a_k) infinitely often. But for (\alpha<2) this fails asymptotically, so unlikely.
+
+**Best path:** pursue (1)+(2) on the proof track until a precise obstacle emerges; meanwhile check for easy counterexamples (modular/gcd) and do small computations to try to falsify.
+
+---
+
+## 4) WORK
+
+### 4.0 Hygiene: stress points
+
+* **Indexing:** (n\ge 0) vs (n\ge 1) changes only finitely many terms; no effect on “sufficiently large integers” completeness.
+* **Distinctness:** “distinct indices” (standard) vs “distinct values” (literal) can change completeness in some cases; I work in the standard distinct-indices sense for Conjecture (C), and I will explicitly note where the literal interpretation differs.
+* **Degenerate parameters:** (\alpha\le 1), (\alpha\ge 2) should be easier to classify by growth.
+
+---
+
+### 4.1 Phase 1: tiny-case falsification attempts (hand/computation)
+
+**Experiment (not a proof).** I computed subset sums for a few ((t,\alpha)) with (\alpha<\varphi) and found very long intervals of consecutive representable integers already with the first (\sim 25) terms. For example:
+
+* (t=2,\ \alpha=1.4): subset sums of first 25 terms miss only a handful of integers up to their maximum.
+* (t=2,\ \alpha=1.6): similarly high coverage.
+
+These experiments *support* the conjectural completeness for (\alpha<\varphi), but do not constitute a proof because they only test finitely many terms and finitely many target integers.
+
+---
+
+### 4.2 Rigorous partial classifications outside the conjectural region
+
+#### Lemma 1 (bounded-growth obstruction).
+
+If (0<\alpha<1), then ((a_n)) is **not complete**.
+
+**Proof.**
+If (0<\alpha<1), then (t\alpha^n\to 0). Hence (a_n=\lfloor t\alpha^n\rfloor=0) for all sufficiently large (n), so only finitely many terms are positive. Any sum of distinct terms is then bounded above by the sum of those finitely many positive terms, so (\Sigma(a)) is bounded and cannot contain all sufficiently large integers. ∎
+
+#### Lemma 2 ((\alpha=1), distinction matters).
+
+Let (\alpha=1), so (a_n=\lfloor t\rfloor) for all (n).
+
+* Under the **distinct-indices** definition (standard): ((a_n)) is complete iff (\lfloor t\rfloor=1), i.e. (t\in[1,2)).
+* Under the **distinct-values** (literal “distinct integers”) definition: ((a_n)) is never complete (because the set of available distinct values has size (\le 1)).
+
+**Proof (distinct indices).**
+If (\lfloor t\rfloor=d), then any sum of distinct terms is (kd) for some (k\ge 0). This is cofinite in (\mathbb N) iff (d=1). If (d=1), then every (m\in\mathbb N) is the sum of (m) distinct terms (use the first (m) indices), so completeness holds. If (d\neq 1), infinitely many integers are not multiples of (d), so not complete. ∎
+
+**Proof (distinct values).**
+There is at most one distinct positive value (\lfloor t\rfloor). Distinct-value subset sums are ({0,\lfloor t\rfloor}), bounded; hence not complete. ∎
+
+#### Lemma 3 (superincreasing obstruction for (\alpha>2)).
+
+If (\alpha>2), then ((a_n)) is **not complete** for any (t>0) (in either distinct-indices or distinct-values sense).
+
+**Proof.**
+Let (S_n:=\sum_{k=1}^n a_k). For all (k), (a_k\le t\alpha^k), hence
+[
+S_n\le t\sum_{k=1}^n \alpha^k
+= t\alpha\frac{\alpha^n-1}{\alpha-1}
+< \frac{t\alpha^{n+1}}{\alpha-1}.
+]
+Also (a_{n+1}=\lfloor t\alpha^{n+1}\rfloor \ge t\alpha^{n+1}-1).
+
+Consider
+[
+a_{n+1} - S_n
+\ge \left(t\alpha^{n+1}-1\right) - \frac{t\alpha^{n+1}}{\alpha-1}
+= t\alpha^{n+1}\left(1-\frac1{\alpha-1}\right)-1
+= t\alpha^{n+1}\frac{\alpha-2}{\alpha-1}-1.
+]
+Since (\alpha>2), the constant (\frac{\alpha-2}{\alpha-1}>0). Therefore the RHS (\to+\infty) as (n\to\infty). In particular, for all sufficiently large (n),
+[
+a_{n+1} > S_n + 1.
+]
+Fix such an (n). Then the integer (S_n+1) cannot be represented as a sum of distinct terms:
+
+* Any sum using only terms among ({a_1,\dots,a_n}) is (\le S_n).
+* Any sum using some term (a_m) with (m\ge n+1) is (\ge a_{n+1} > S_n+1).
+
+Thus (S_n+1\notin\Sigma(a)). Since this happens for infinitely many (n) (indeed all large (n)), there are infinitely many missing integers, so the sequence is not complete. ∎
+
+This fully settles the “easy” regime (\alpha>2) (negative).
+
+---
+
+### 4.3 A key structural lemma in the conjectural regime (1<\alpha<\varphi)
+
+From here on, assume (1<\alpha<\varphi).
+
+Define (\Delta := \alpha+1-\alpha^2). Then (\Delta>0) exactly when (\alpha<\varphi).
+
+#### Lemma 4 (eventual Fibonacci-type inequality).
+
+Let (1<\alpha<\varphi) and (t>0). Then there exists (N\in\mathbb N) such that for all (n\ge N),
+[
+a_{n+2}\ \le\ a_{n+1}+a_n.
+]
+
+**Proof.**
+Let (b_n:=t\alpha^n) so that (a_n=\lfloor b_n\rfloor).
+Compute the real difference
+[
+(b_{n+1}+b_n) - b_{n+2}
+= t\alpha^{n},(\alpha+1-\alpha^2)
+= t\alpha^n\Delta.
+]
+Because (t>0), (\alpha>1), and (\Delta>0), we have (t\alpha^n\Delta\to+\infty). Hence there exists (N) such that for all (n\ge N),
+[
+b_{n+1}+b_n - b_{n+2} \ge 2.
+]
+Fix (n\ge N). Using (\lfloor x\rfloor \ge x-1) and (\lfloor y\rfloor \le y),
+[
+a_{n+1}+a_n
+= \lfloor b_{n+1}\rfloor+\lfloor b_n\rfloor
+\ge (b_{n+1}-1)+(b_n-1)
+= b_{n+1}+b_n-2
+\ge b_{n+2}
+\ge \lfloor b_{n+2}\rfloor
+= a_{n+2}.
+]
+Thus (a_{n+2}\le a_{n+1}+a_n) for all (n\ge N). ∎
+
+This is a genuinely useful deterministic consequence of (\alpha<\varphi): the integer sequence eventually obeys a Fibonacci-type upper recurrence.
+
+---
+
+### 4.4 Interval propagation mechanism (rigorous)
+
+Let (\Sigma_n) denote the subset-sum set of the first (n) terms:
+[
+\Sigma_n:=\left{\sum_{j=1}^k a_{i_j}:\ 1\le i_1<\cdots<i_k\le n\right}.
+]
+
+#### Lemma 5 (interval propagation).
+
+Suppose (\Sigma_n) contains a full interval of integers ([L,R]) (with (L\le R)). Let (\ell:=R-L+1) be its length.
+If (a_{n+1}\le \ell), then (\Sigma_{n+1}) contains the full interval ([L,R+a_{n+1}]), of length (\ell+a_{n+1}).
+
+**Proof.**
+We have (\Sigma_{n+1}=\Sigma_n\ \cup\ (\Sigma_n+a_{n+1})), where (\Sigma_n+a_{n+1}:={s+a_{n+1}:s\in\Sigma_n}).
+
+Given ([L,R]\subseteq\Sigma_n), we have ([L+a_{n+1},R+a_{n+1}]\subseteq \Sigma_n+a_{n+1}).
+
+If (a_{n+1}\le \ell=R-L+1), then
+[
+L+a_{n+1}\ \le\ L+(R-L+1)\ =\ R+1,
+]
+so the two intervals ([L,R]) and ([L+a_{n+1},R+a_{n+1}]) overlap or touch. Therefore their union is exactly the integer interval ([L,R+a_{n+1}]), contained in (\Sigma_{n+1}). ∎
+
+#### Corollary 6 (from one “seed interval” to completeness, conditional).
+
+Assume there exists (n_0) such that (\Sigma_{n_0}) contains an interval ([L,R]) with length (\ell\ge a_{n_0+1}).
+Then by Lemma 5, (\Sigma_{n_0+k}) contains an interval of increasing length for all (k\ge 0). In particular, if (\ell_k) denotes the interval length after (k) steps, then (\ell_{k+1}=\ell_k+a_{n_0+1+k}) as long as (a_{n_0+1+k}\le \ell_k), which holds at least for (k=0).
+
+This shows the *mechanism*: to prove completeness it would suffice to prove existence of some (n_0) where (\Sigma_{n_0}) contains a consecutive block of length at least (a_{n_0+1}).
+
+**Proof.**
+Immediate from Lemma 5 applied iteratively. ∎
+
+---
+
+### 4.5 Where the proof of Conjecture (C) gets stuck
+
+We now combine Lemma 4 (eventual Fibonacci-type inequality) with Lemma 5 (interval propagation). The remaining challenge is:
+
+> **Seed Interval Problem (SIP).**
+> For every (t>0) and every (1<\alpha<\varphi), does there exist (n_0) such that (\Sigma_{n_0}) contains a full interval of length at least (a_{n_0+1})?
+
+If SIP were proved, then one can attempt to use Lemma 4 (or the weaker overlap inequalities available for (\alpha<2)) to show that once the interval length dominates one term, it quickly dominates future terms as well, forcing (\Sigma(a)) to be cofinite.
+
+However, **I do not have a gap-free proof of SIP** for all (t>0) and (1<\alpha<\varphi). The known complexity phenomena (parameter dependence; Mahler-type avoidance questions; etc.) suggest SIP is genuinely nontrivial and is the first hard obstruction in the proof track.
+
+---
+
+## 5) VERIFICATION
+
+### Check the proved lemmas against edge cases
+
+* **Lemma 1 ((\alpha<1))**: correct; terms eventually (0), subset sums bounded.
+* **Lemma 2 ((\alpha=1))**: carefully separated definitions; with distinct indices, need (\lfloor t\rfloor=1); with distinct values, impossible.
+* **Lemma 3 ((\alpha>2))**: crucial inequality (a_{n+1}>S_n+1) holds for all large (n) since the difference grows like (t\alpha^{n+1}\frac{\alpha-2}{\alpha-1}); thus infinitely many missing integers, so no “sufficiently large” threshold can exist.
+* **Lemma 4 (eventual Fibonacci-type inequality for (\alpha<\varphi))**: the only delicate point is the floor rounding. I enforced a gap of at least (2) in the real inequality to beat the two “(-1)” losses, so the inequality is rigorous.
+* **Lemma 5 (interval propagation)**: purely set-theoretic; no hidden assumptions.
+
+### Quantifier checks
+
+* Lemma 3 produces infinitely many missing integers (S_n+1) (unbounded), so it indeed disproves completeness, not just entire completeness.
+* Lemma 4 gives existence of some (N=N(t,\alpha)), explicit in principle, though not needed.
+
+### Attempt to break the conjecture by cheap modular obstructions
+
+I looked for a simple “all terms are multiples of (d)” obstruction inside (\alpha\in(1,\varphi)). Constructing such a (t) for fixed (\alpha) is essentially a Mahler-type orbit avoidance problem and is not something I can certify rigorously here; and no explicit counterexample emerged from small numerical searches.
+
+So: no counterexample found; no proof completed.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial results obtained**
+
+1. If (0<\alpha<1), the sequence (\lfloor t\alpha^n\rfloor) is not complete (Lemma 1).
+2. If (\alpha=1), completeness depends on the “distinctness” convention; under the standard distinct-indices convention it is complete iff (t\in[1,2)) (Lemma 2).
+3. If (\alpha>2), the sequence is not complete for any (t>0) (Lemma 3).
+4. If (1<\alpha<\varphi), the sequence eventually satisfies the Fibonacci-type inequality (a_{n+2}\le a_{n+1}+a_n) (Lemma 4).
+5. If a subset-sum set (\Sigma_n) contains an interval of length at least (a_{n+1}), then adding (a_{n+1}) extends it to a longer interval (Lemma 5). This provides a deterministic “bootstrap” mechanism toward completeness, conditional on a seed interval.
+
+(ii) **Exact first gap**
+A fully rigorous proof of Conjecture (C) reduces to proving a **Seed Interval Problem**:
+
+> For every (t>0) and (1<\alpha<\varphi), there exists (n_0) such that (\Sigma_{n_0}) contains a block of consecutive integers of length at least (a_{n_0+1}).
+
+I cannot prove SIP with the tools developed above.
+
+(iii) **Top 3 next moves**
+
+1. Prove a deterministic combinatorial theorem: for sequences satisfying eventual Fibonacci-type domination (a_{n+2}\le a_{n+1}+a_n), the subset-sum set must contain an interval whose length is a fixed positive fraction of the total sum (S_n), and then sharpen to “length (\ge a_{n+1})” at some stage.
+2. Develop a **residue-class bootstrap**: show that for (\alpha<\varphi), the set of subset sums of a bounded number of early terms hits every residue mod (d:=\gcd) of a tail, and then use overlap/Σ-properties to lift to cofinite coverage.
+3. Investigate whether known results on (\beta)-expansions for (\beta=\alpha\in(1,\varphi)) can be converted into *integer* subset-sum coverage for (\lfloor t\alpha^n\rfloor), perhaps by controlling cumulative floor errors.
+
+(iv) **What a minimal counterexample would likely look like**
+A counterexample to Conjecture (C) would likely require a **strong arithmetic obstruction**, e.g. that (\lfloor t\alpha^n\rfloor) eventually lies in a proper coset structure modulo some (m), so that subset sums miss infinitely many residues. Constructing such a (t) for a given (\alpha\in(1,\varphi)) resembles Mahler-type “avoidance” problems (as hinted by the difficulty of even parity questions for ((3/2)^n)). ([Springer][1])
+
+[1]: https://link.springer.com/content/pdf/10.1007/s00209-005-0827-4.pdf "Integer parts of powers of rational numbers | Mathematische Zeitschrift"

@@ -1,0 +1,166 @@
+% Erdos Problem #856
+
+\subsection*{FORMAL RESTATEMENT}
+Fix an integer $k\ge 3$.
+For an integer $N\ge 1$, define
+\[
+  f_k(N):=\max\Bigl\{\sum_{n\in A}\frac{1}{n}:\ A\subseteq\{1,2,\dots,N\},\ \text{and $A$ contains no subset $S$ of size $k$ with}\ \\
+  \qquad\qquad\qquad\qquad\qquad \operatorname{lcm}(a,b)=\operatorname{lcm}(a',b')\ \text{for all distinct }a,b,a',b'\in S\Bigr\}.
+\]
+Equivalently: there do not exist distinct $n_1,\dots,n_k\in A$ and an integer $L$ such that $\operatorname{lcm}(n_i,n_j)=L$ for all $i\ne j$.
+
+The task is to estimate the growth of $f_k(N)$ as $N\to\infty$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I do not import external results beyond what is explicitly stated in the problem file. The file states Erd\H{o}s' upper bound $f_k(N)\ll \log N/\log\log N$ (with a sketch), and mentions more refined bounds of the form $(\log N)^{b_k-o(1)}\le f_k(N)\le (\log N)^{c_k+o(1)}$ from Tang--Zhang (2025) and a connection to the sunflower conjecture.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof-track:} Make Erd\H{o}s' sketch gap-free: prove the key ``$<k$ representations'' lemma and supply a self-contained lower bound on $\sum_{p\le N} 1/p$.
+\item \textbf{Lower bounds:} Exhibit large admissible families $A$ giving nontrivial $\sum_{n\in A} 1/n$.
+\item \textbf{Reality-check:} For small $N$ and $k=3$, compute the exact optimum by brute force to sanity-check the forbidden configuration.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 856.1 (Too many $t=ap$ representations create a forbidden $k$-tuple).}
+Let $A\subseteq\{1,\dots,N\}$ satisfy the ``no $k$ with constant pairwise lcm'' condition. Fix an integer $t$.
+Consider representations
+\[
+  t = a p,
+\]
+where $a\in A$ and $p$ is prime.
+Then the number of such representations is at most $k-1$.
+
+\textbf{Proof.}
+Suppose for contradiction that there are $k$ distinct representations $t=a_i p_i$ with $a_i\in A$ and $p_i$ prime.
+If $p_i=p_j$ then $a_i=t/p_i=a_j$, so distinct representations force the primes $p_1,\dots,p_k$ (hence also $a_1,\dots,a_k$) to be pairwise distinct.
+
+Fix $i\ne j$. We claim $\operatorname{lcm}(a_i,a_j)=t$.
+Write the prime factorization of $t$ as $t=\prod_q q^{e_q}$.
+For each prime $q$, the exponent of $q$ in $a_i=t/p_i$ is:
+\begin{itemize}
+\item $e_q-1$ if $q=p_i$,
+\item $e_q$ if $q\ne p_i$.
+\end{itemize}
+If $i\ne j$, then for $q=p_i$ we have $q\ne p_j$, so the exponent of $q$ in $a_j$ is $e_q$, while in $a_i$ it is $e_q-1$. Thus the maximum exponent of $q$ across $a_i,a_j$ is $e_q$.
+Similarly for $q=p_j$. For any other prime $q$, both $a_i$ and $a_j$ have exponent $e_q$.
+Therefore the lcm, which takes the coordinatewise maximum of prime exponents, equals $\prod_q q^{e_q}=t$.
+
+Hence the $k$ distinct elements $a_1,\dots,a_k\in A$ satisfy that every pair has lcm equal to $t$, contradicting the defining property of $A$. Thus there are at most $k-1$ representations.\ $\square$
+
+\medskip
+\textbf{Lemma 856.2 (Elementary lower bound for the prime harmonic sum).}
+For every integer $N\ge 3$,
+\[
+  \sum_{p\le N}\frac{1}{p} \ge \log\log(N+1)-1.
+\]
+
+\textbf{Proof.}
+Consider the finite Euler product
+\[
+  P(N):=\prod_{p\le N}\Bigl(1-\frac{1}{p}\Bigr)^{-1}.
+\]
+Expanding $\prod_{p\le N}(1-1/p)^{-1}$ as a product of geometric series gives
+\[
+  P(N)=\sum_{m\in\mathbb{N}:\ \text{all prime factors of }m\le N} \frac{1}{m} \ \ge\ \sum_{m=1}^{N} \frac{1}{m}=:H_N.
+\]
+Thus $\log P(N)\ge \log H_N$.
+
+Next, for $0<t\le 1/2$ one has the inequality $-\log(1-t)\le t+t^2$ (for example by comparing Taylor series with a remainder bound). For each prime $p\ge 2$ we have $t=1/p\le 1/2$, so
+\[
+  \log P(N)=\sum_{p\le N} -\log\Bigl(1-\frac{1}{p}\Bigr)
+  \le \sum_{p\le N}\Bigl(\frac{1}{p}+\frac{1}{p^2}\Bigr)
+  = \sum_{p\le N}\frac{1}{p} + \sum_{p\le N}\frac{1}{p^2}.
+\]
+Since $\sum_{p\le N} 1/p^2 \le \sum_{n\ge 2} 1/n^2 < 1$, we obtain
+\[
+  \log P(N) \le \sum_{p\le N}\frac{1}{p} + 1.
+\]
+Combine with $\log P(N)\ge \log H_N$ to get
+\[
+  \sum_{p\le N}\frac{1}{p} \ge \log H_N - 1.
+\]
+Finally, the harmonic number satisfies $H_N\ge \int_1^{N+1}\frac{dt}{t}=\log(N+1)$, hence $\log H_N\ge \log\log(N+1)$. This gives the claimed bound.\ $\square$
+
+\medskip
+\textbf{Proposition 856.3 (Erd\H{o}s-type upper bound, fully justified).}
+For every $N\ge 3$ and every $k\ge 3$,
+\[
+  f_k(N) \le \frac{k\,H_{N^2}}{\sum_{p\le N} \frac{1}{p}}
+  \ \le\ \frac{k\,(1+2\log N)}{\log\log(N+1)-1}.
+\]
+In particular $f_k(N)\ll_k \log N/\log\log N$.
+
+\textbf{Proof.}
+Let $A\subseteq\{1,\dots,N\}$ be admissible. Consider
+\[
+  S := \sum_{a\in A}\frac{1}{a}\sum_{p\le N}\frac{1}{p}
+  =\sum_{a\in A}\sum_{p\le N}\frac{1}{ap}.
+\]
+Group terms by $t=ap$:
+\[
+  S = \sum_{t\le N^2} \frac{1}{t}\,R(t),
+\]
+where $R(t)$ is the number of representations $t=ap$ with $a\in A$ and $p$ prime (necessarily $p\le N$ and $a\le N$). By Lemma~856.1, $R(t)\le k-1<k$ for every $t$, hence
+\[
+  S \le k\sum_{t\le N^2}\frac{1}{t} = k H_{N^2}.
+\]
+Therefore
+\[
+  \sum_{a\in A}\frac{1}{a} \le \frac{kH_{N^2}}{\sum_{p\le N} 1/p}.
+\]
+Using $H_{N^2}\le 1+\int_1^{N^2} \frac{dt}{t}=1+2\log N$ and Lemma~856.2 for the denominator gives the explicit bound.
+Maximizing over admissible $A$ yields the same bound for $f_k(N)$.\ $\square$
+
+\medskip
+\textbf{Lemma 856.4 (A simple admissible lower bound from primes).}
+For every $k\ge 3$ and $N\ge 2$, the set $A=\{p\le N: p\text{ prime}\}$ is admissible. Consequently,
+\[
+  f_k(N) \ge \sum_{p\le N}\frac{1}{p}.
+\]
+
+\textbf{Proof.}
+Take any distinct primes $q_1,\dots,q_k\le N$. For $i\ne j$, $\operatorname{lcm}(q_i,q_j)=q_i q_j$, which depends on the pair $(i,j)$ and is not constant across all pairs because, for instance, $\operatorname{lcm}(q_1,q_2)=q_1q_2\ne q_1q_3=\operatorname{lcm}(q_1,q_3)$ when $q_2\ne q_3$.
+Thus no subset of $k$ primes has constant pairwise lcm, so the set of primes is admissible. The displayed lower bound follows immediately.\ $\square$
+
+\medskip
+\textbf{FAST REALITY CHECK (exact optimization for $k=3$ and small $N$).}
+For $k=3$ and small $N$ I brute-forced all subsets $A\subseteq\{1,\dots,N\}$ and computed the maximum of $\sum_{n\in A}1/n$ subject to the constraint that no triple has constant pairwise lcm.
+
+Exact results found:
+\begin{verbatim}
+N=10: f_3(N)=2.662301587301587
+  best A=[1,2,3,4,5,7,8,9]
+N=12: f_3(N)=2.753210678210678
+  best A=[1,2,3,4,5,7,8,9,11]
+N=15: f_3(N)=2.830133755133755
+  best A=[1,2,3,4,5,7,8,9,11,13]
+N=18: f_3(N)=2.9514572845455196
+  best A=[1,2,3,4,5,7,8,9,11,13,16,17]
+N=20: f_3(N)=3.004088863492888
+  best A=[1,2,3,4,5,7,8,9,11,13,16,17,19]
+\end{verbatim}
+(Here ``best A'' is one maximizer found; there can be others.)
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item \textbf{Lemma 856.1:} The lcm computation is checked prime-by-prime using exponents; it uses only the fact that $a_i=t/p_i$ removes exactly one copy of the prime $p_i$ from $t$.
+\item \textbf{Lemma 856.2:} The only analytic ingredient is the inequality $-\log(1-t)\le t+t^2$ for $t\le 1/2$, which follows from Taylor expansion with remainder.
+\item \textbf{Proposition 856.3:} The regrouping by $t=ap$ is exact because every term $1/(ap)$ corresponds to a unique $t$.
+\item \textbf{Computation:} For $N\le 20$ the brute-force search checks all $2^N$ subsets, so the reported optima are exact.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.} For all $k\ge 3$, $f_k(N)\ll_k \log N/\log\log N$ with an explicit bound (Proposition~856.3). Also $f_k(N)\ge \sum_{p\le N} 1/p$ (Lemma~856.4). For $k=3$ and $N\le 20$ the exact values above were computed.
+\item[(ii)] \textbf{First gap (crisp).} Determine the correct asymptotic order of $f_k(N)$ for each fixed $k\ge 3$ (e.g. decide whether $f_k(N)$ grows like $(\log N)^{\alpha_k+o(1)}$ for some explicit exponent $\alpha_k$).
+\item[(iii)] \textbf{Top 3 next moves.}
+  \begin{enumerate}
+  \item For $k=3$, classify exactly which triples $(a,b,c)$ have constant pairwise lcm, and use that structure to build larger-weight admissible sets $A$ (potentially via container/entropy methods).
+  \item Extend exact computations for $k=3$ to larger $N$ (say $N\le 35$ with branch-and-bound) to guess the growth rate and extremal structure.
+  \item For general $k$, translate the condition ``constant pairwise lcm'' into a set-system/sunflower language on prime-exponent vectors and target improved upper bounds.
+  \end{enumerate}
+\item[(iv)] \textbf{Minimal counterexample structure.} A near-extremal family $A$ achieving very large $\sum_{n\in A}1/n$ while avoiding constant-pairwise-lcm $k$-tuples would likely concentrate on integers with restricted prime factor patterns (so that many $t=ap$ representations are forced but still kept below $k$ for each $t$).
+\end{enumerate}
+

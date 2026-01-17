@@ -1,0 +1,400 @@
+## 1) FORMAL RESTATEMENT
+
+I attach **Erdős Problem #92** (equidistant points). The problem statement on the Erdős Problems site is: ([Erdős Problems][1])
+
+> Let (f(n)) be maximal such that there exists a set (A) of (n) points in (\mathbb{R}^2) in which every (x\in A) has at least (f(n)) points in (A) equidistant from (x).
+> Is it true that (f(n)\le n^{o(1)})? Or even (f(n) < n^{O(1/\log\log n)})?
+
+### Definitions with explicit quantifiers
+
+* Let (\mathbb N:={1,2,3,\dots}).
+* For a finite set (A\subset\mathbb R^2) and (x\in A), define for each (r>0)
+  [
+  N_A(x,r):=\bigl|{y\in A\setminus{x}:|x-y|=r}\bigr|.
+  ]
+* Define
+  [
+  g(A):=\min_{x\in A}\ \max_{r>0} N_A(x,r).
+  ]
+  So (g(A)) is the largest integer (t) such that **every** (x\in A) has **some** radius (r=r(x)>0) with at least (t) other points of (A) on the circle centered at (x) of radius (r).
+* Then
+  [
+  f(n):=\max{g(A): A\subset\mathbb R^2,\ |A|=n}.
+  ]
+
+### Meaning of the asymptotic expressions
+
+* (f(n)\le n^{o(1)}) means:
+  [
+  \forall \varepsilon>0\ \exists N(\varepsilon)\ \forall n\ge N(\varepsilon):\ f(n)\le n^\varepsilon.
+  ]
+* (f(n)<n^{O(1/\log\log n)}) means: there exists (C>0) and (N_0) such that for all (n\ge N_0),
+  [
+  f(n)\le n^{C/\log\log n}.
+  ]
+  (Here (\log) is the natural logarithm; changing base only changes (C) by a constant factor.)
+
+### Edge cases / stress points
+
+* (f(1)=0) (since there are no other points).
+* For (n\ge 2), (f(n)\ge 1) (take any two points).
+* The definition allows **different radii** (r(x)) for different (x).
+* No general position assumptions: collinearities, many concyclic points, etc. are allowed.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+The Erdős Problems page states the following known bounds and facts: ([Erdős Problems][1])
+
+* Trivial upper bound: (f(n)\ll n^{1/2}).
+* Pach–Sharir (1992) implies (f(n)\ll n^{2/5}).
+* A circle–point incidence bound of Janzer–Janzer–Methuku–Tardos (2024) implies (f(n)\ll n^{4/11}).
+* Lattice-point constructions give a lower bound (f(n)>n^{c/\log\log n}) for some (c>0).
+* Small exact values (from Fishburn/Erdős–Fishburn): (6) is the smallest (n) with (f(n)=3), and (8) is the smallest (n) with (f(n)=4).
+
+I will **not** assume any deeper “solved status” beyond this; the page is marked open and was last edited Dec 28, 2025. ([Erdős Problems][1])
+
+For the main upper bound (f(n)\ll n^{4/11}), I will use the explicit circle–point incidence theorem stated in JJMT24:
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof-track ideas (upper bounds)
+
+1. **Incidence-geometry reduction (circles centered at the points)**:
+   Choose, for each (x\in A), a circle centered at (x) that contains (\ge t) points. Then total point–circle incidences (\ge nt). Apply best known incidence bounds for points vs circles to upper bound incidences, hence bound (t).
+2. **Crude combinatorial incidence via circle–circle intersections**:
+   Use that two distinct circles intersect in at most two points to get (I=O(n^{3/2})\Rightarrow f(n)=O(n^{1/2})). This is a clean baseline proof.
+3. **Try to exploit “centers belong to the point set”**:
+   Hope for an incidence improvement beyond general circle incidences. I don’t see a rigorous path to beat (4/11) today without new ideas.
+
+### Disproof/construction ideas (lower bounds)
+
+1. **Lattice-grid construction with a “popular radius”**:
+   Use an (m\times m) grid. If we can pick one integer (k) with many representations (k=a^2+b^2) and with (\sqrt{k}\ll m), then every grid point has many neighbors at distance (\sqrt{k}).
+2. **Finite-geometry / algebraic constructions**:
+   Try to build configurations where each point is center of many circles rich in points.
+3. **Recursive “cluster + symmetry” constructions**:
+   Hard to keep the *minimum over points* large; adding clusters tends to create bad points.
+
+**Best path now:** do (1) for an upper bound and (1) for a lower bound, both completely rigorously. This does **not** resolve the open question, but it gives the cleanest proved “progress envelope” around the conjecture.
+
+---
+
+## 4) WORK
+
+### Lemma 0: Small-(n) sanity checks
+
+* (f(1)=0).
+* (f(2)=1).
+* (f(3)=2), because an equilateral triangle has each point at equal distance from the other two, and (f(3)\le 2) since each point has only 2 other points.
+  These don’t touch the asymptotic regime but confirm the definition behaves as intended.
+
+---
+
+### Part A. Upper bound (f(n)\ll n^{4/11}) from circle–point incidences
+
+#### Setup: circles associated to points
+
+Let (A\subset\mathbb R^2) with (|A|=n). Suppose (g(A)\ge t). By definition of (g(A)),
+
+[
+\forall x\in A\ \exists r_x>0:\ N_A(x,r_x)\ge t.
+]
+
+For each (x\in A), define the circle
+[
+C_x := {z\in\mathbb R^2:\ |z-x|=r_x}.
+]
+
+Let (\mathcal C:={C_x:\ x\in A}). Then (|\mathcal C|=n) because circles with different centers are different.
+
+Define the incidence set
+[
+\mathrm{Inc}(A,\mathcal C):={(p,C)\in A\times\mathcal C:\ p\in C},
+]
+and let (I(A,\mathcal C):=|\mathrm{Inc}(A,\mathcal C)|).
+
+**Claim 1.** (I(A,\mathcal C)\ge nt).
+
+**Proof.** For each (x\in A), the circle (C_x) contains at least (t) points of (A\setminus{x}) by construction, i.e. (|A\cap C_x|\ge t). Summing over all (x\in A),
+[
+I(A,\mathcal C)=\sum_{x\in A} |A\cap C_x|\ \ge\ \sum_{x\in A} t\ = nt.
+]
+∎
+
+So bounding (I(A,\mathcal C)) from above bounds (t).
+
+#### External theorem: point–circle incidence bound (JJMT24)
+
+I will use the following corollary (specialized to circles) from Janzer–Janzer–Methuku–Tardos (2024):
+
+> If (\mathcal C) is a collection of (n) circles in the plane and (P) is a set of (m) points, then
+> [
+> I(\mathcal C,P)=O\bigl(m^{2/3}n^{2/3}+m^{6/11}n^{9/11}+m+n\bigr).
+> ]
+
+Interpreting the big-(O): there exists an absolute constant (K>0) such that for all finite (P) and circle collections (\mathcal C),
+[
+I(\mathcal C,P)\le K\bigl(m^{2/3}n^{2/3}+m^{6/11}n^{9/11}+m+n\bigr),
+]
+where (m=|P|), (n=|\mathcal C|).
+
+Apply this with (P=A) and (\mathcal C) as above, so (m=n). Then
+[
+I(A,\mathcal C)\le K\bigl(n^{2/3}n^{2/3}+n^{6/11}n^{9/11}+n+n\bigr)
+=K\bigl(n^{4/3}+n^{15/11}+2n\bigr).
+]
+
+For (n\ge 2), (n^{4/3}\le n^{15/11}) because (15/11-4/3=1/33>0), and (2n\le 2n^{15/11}) for (n\ge 2). Hence there is a constant (K'>0) with
+[
+I(A,\mathcal C)\le K' n^{15/11}\qquad(n\ge 2).
+]
+
+Combine with Claim 1 ((nt\le I)) to get
+[
+nt \le K' n^{15/11}\quad\Rightarrow\quad t\le K' n^{4/11}.
+]
+
+Since this holds for every (A) with (g(A)\ge t), we conclude:
+
+#### Theorem 1 (proved upper bound)
+
+There exists an absolute constant (C>0) such that for all (n\ge 2),
+[
+f(n)\le C, n^{4/11}.
+]
+
+This matches the “(n^{4/11})” upper bound reported on the Erdős Problems page. ([Erdős Problems][1])
+
+∎
+
+---
+
+### Part B. A clean lattice lower bound (f(n)\ge n^{c/\log\log n}) along an infinite sequence
+
+I’ll prove a self-contained version of the lower bound claim from the problem page. ([Erdős Problems][1])
+
+#### Number-theory input: the sum-of-two-squares representation function
+
+Let
+[
+r_2(k):=\bigl|{(a,b)\in\mathbb Z^2:\ a^2+b^2=k}\bigr|.
+]
+A standard formula (e.g., MathWorld) states that if (k) has prime factorization
+[
+k = 2^a \prod_i p_i^{\alpha_i}\prod_j q_j^{\beta_j},
+]
+where (p_i\equiv 1\pmod 4) and (q_j\equiv 3\pmod 4), then (r_2(k)=0) if any (\beta_j) is odd, and otherwise
+[
+r_2(k)=4\prod_i (\alpha_i+1).
+]
+([mathworld.wolfram.com][2])
+
+In particular, if (k=\prod_{i=1}^t p_i) is a product of (t) **distinct** primes (p_i\equiv 1\pmod 4), then (\alpha_i=1) for all (i) and
+[
+r_2(k)=4\cdot 2^t.
+]
+([mathworld.wolfram.com][2])
+
+#### Geometric construction: an (m\times m) integer grid
+
+Fix an integer (m\ge 3), and let
+[
+A:={1,2,\dots,m}^2\subset\mathbb R^2,\qquad n:=|A|=m^2.
+]
+
+Let (k) be a positive integer such that
+[
+\sqrt{k}\le \frac{m-1}{2}
+\quad\text{and}\quad
+k\ \text{is not a perfect square}.
+]
+(The “not a square” condition ensures there are no solutions with a coordinate (0), which simplifies a counting step.)
+
+##### Claim 2. For every (x\in A), there are at least (r_2(k)/4) points (y\in A\setminus{x}) with (|x-y|=\sqrt{k}).
+
+**Proof.**
+
+Let (x=(x_1,x_2)\in A). Consider the set
+[
+S:={(a,b)\in\mathbb Z^2:\ a>0,\ b>0,\ a^2+b^2=k}.
+]
+
+**Step 1: (|S|=r_2(k)/4).**
+Because (k) is not a square, every integer solution ((a,b)) to (a^2+b^2=k) has (a\ne 0) and (b\ne 0). For any solution ((a,b)), exactly one of the four sign choices ((\pm a,\pm b)) lies in the first quadrant with (a>0,b>0). Thus the mapping
+[
+(a,b)\mapsto (|a|,|b|)
+]
+partitions the (r_2(k)) solutions into 4-element sign orbits, and exactly one element of each orbit lies in (S). Therefore (|S|=r_2(k)/4).
+
+**Step 2: For each ((a,b)\in S), build a point (y\in A) at distance (\sqrt{k}) from (x).**
+Fix ((a,b)\in S). Because (a\le \sqrt{k}\le (m-1)/2), we have (a\le m-x_1) or else (x_1>m-a). In the first case, set (s_1=+1), so (x_1+s_1 a=x_1+a\le m). In the second case (x_1>m-a), and since (a\le (m-1)/2) we have (m-a\ge a+1), hence (x_1\ge a+1), so setting (s_1=-1) gives (x_1+s_1 a=x_1-a\ge 1). In either case, we can choose (s_1\in{\pm1}) such that (x_1+s_1 a\in{1,\dots,m}).
+
+Similarly, choose (s_2\in{\pm1}) such that (x_2+s_2 b\in{1,\dots,m}) (using (b\le (m-1)/2)).
+
+Now define
+[
+y:=\bigl(x_1+s_1 a,\ x_2+s_2 b\bigr)\in A.
+]
+Then
+[
+|x-y|^2 = (s_1 a)^2 + (s_2 b)^2 = a^2+b^2 = k,
+]
+so (|x-y|=\sqrt{k}). Also (y\neq x) because (a,b>0).
+
+**Step 3: Different ((a,b)\in S) yield different points (y).**
+Suppose ((a,b),(a',b')\in S) yield the same (y) for the same fixed (x). Then
+[
+(s_1 a,\ s_2 b)=(s_1' a',\ s_2' b')
+]
+for some (s_1,s_2,s_1',s_2'\in{\pm1}). Taking absolute values gives ((a,b)=(a',b')) since all coordinates are positive in (S). Hence the mapping (S\to A) is injective, and (x) has at least (|S|=r_2(k)/4) distinct neighbors in (A) at distance (\sqrt{k}).
+
+This proves Claim 2. ∎
+
+Therefore (g(A)\ge r_2(k)/4), and hence
+[
+f(n)=f(m^2)\ \ge\ r_2(k)/4.
+]
+
+#### Choosing (k) with large (r_2(k))
+
+We want many primes (\equiv 1\pmod 4). The prime number theorem for arithmetic progressions gives
+[
+\pi_{4,1}(x)\sim \frac{\mathrm{Li}(x)}{\varphi(4)}=\frac{\mathrm{Li}(x)}{2},
+]
+so in particular (\pi_{4,1}(x)) grows on the order of (x/\log x). ([Wikipedia][3])
+
+Let
+[
+X := (\log m)^2,
+\qquad
+t := \left\lfloor \frac{\log m}{\log\log m}\right\rfloor - 1.
+]
+For all sufficiently large (m), the asymptotic (\pi_{4,1}(X)\sim X/(2\log X)) implies (\pi_{4,1}(X)\ge t), because
+[
+\frac{X}{\log X} \asymp \frac{\log^2 m}{\log\log m}\ \gg\ \frac{\log m}{\log\log m}\asymp t.
+]
+(Here (\asymp) and (\gg) are in the standard asymptotic sense, and the inequality eventually holds because (\log^2 m) dominates (\log m).)
+
+So for all sufficiently large (m), we can select (t) **distinct primes** (p_1,\dots,p_t\equiv 1\pmod 4) with (p_i\le X). Define
+[
+k:=\prod_{i=1}^t p_i.
+]
+Then (k) is not a square and all its prime factors are (1\pmod4), so (by the formula above)
+[
+r_2(k)=4\cdot 2^t. \tag{*}
+]
+([mathworld.wolfram.com][2])
+
+Also,
+[
+k \le X^t = \exp(t\log X).
+]
+Since (\log X = 2\log\log m), we have
+[
+t\log X \le \left(\frac{\log m}{\log\log m}\right)\cdot 2\log\log m = 2\log m
+]
+up to the “(-1)” slack in (t). More precisely, because (t \le \frac{\log m}{\log\log m}-1),
+[
+t\log X \le 2\log m - 2\log\log m,
+]
+hence
+[
+k \le \exp(2\log m - 2\log\log m)=\frac{m^2}{(\log m)^2}.
+]
+For sufficiently large (m), (\frac{m^2}{(\log m)^2}\le \frac{(m-1)^2}{4}), so (\sqrt{k}\le (m-1)/2), as required to apply Claim 2.
+
+Putting everything together:
+[
+f(m^2)\ \ge\ r_2(k)/4 \stackrel{(*)}= 2^t.
+]
+
+Finally,
+[
+2^t \ge 2^{\frac12\cdot\frac{\log m}{\log\log m}}
+= \exp!\left(\frac{\log 2}{2}\cdot\frac{\log m}{\log\log m}\right)
+]
+for all sufficiently large (m) (since (t) is asymptotic to (\frac{\log m}{\log\log m})). Translating from (m) to (n=m^2) changes (\log\log) only by an additive constant ((\log\log(m^2)=\log(2\log m)=\log\log m + O(1))), so there exists an absolute constant (c>0) and an infinite sequence of (n) (namely (n=m^2) for large (m)) such that
+[
+f(n)\ \ge\ n^{c/\log\log n}.
+]
+
+This is a fully rigorous lattice-style lower bound, consistent with the statement on the problem page. ([Erdős Problems][1])
+
+∎
+
+---
+
+## 5) VERIFICATION
+
+### Check of quantifiers and definitions
+
+* In the incidence upper bound, I used:
+  “(g(A)\ge t)” (\Rightarrow) for each (x\in A) choose a radius (r_x) with at least (t) points on that circle. This is exactly the definition of (g(A)).
+* The incidence count inequality (I\ge nt) is a direct sum over circles (C_x); no multiplicity issues.
+
+### Possible failure modes in the incidence argument
+
+* **Are circles distinct?** Yes: two circles with different centers cannot be identical as sets in (\mathbb R^2).
+* **Does JJMT24 apply to arbitrary circles?** Corollary 1.12 explicitly states the bound for “a collection of circles” in the plane with no extra hypotheses.
+* **Dominant term when (m=n):** I checked exponents (4/3<15/11), so (n^{15/11}) dominates for large (n).
+
+### Possible failure modes in the lattice lower bound
+
+* **Boundary effects:** handled by forcing (\sqrt{k}\le (m-1)/2), guaranteeing that for every coordinate, at least one sign choice keeps you inside ({1,\dots,m}).
+* **Injection from representations to points:** proved: if two signed displacement vectors coincide, their absolute values coincide; because we restrict to (a,b>0), this forces the representation pair to coincide.
+* **Existence of enough primes (1\bmod 4) below ((\log m)^2):** follows from the prime number theorem for arithmetic progressions. ([Wikipedia][3])
+
+Everything above checks out.
+
+---
+
+## 6) FINAL — **UNRESOLVED**
+
+(i) **Strongest fully proved partial results obtained here**
+
+* **Upper bound (proved):** There is an absolute (C) such that for all (n\ge 2),
+  [
+  f(n)\le C,n^{4/11},
+  ]
+  via the JJMT24 point–circle incidence theorem. ([Erdős Problems][1])
+
+* **Lower bound along an infinite sequence (proved):** There exists an absolute (c>0) and infinitely many (n) (e.g. large squares (n=m^2)) such that
+  [
+  f(n)\ge n^{c/\log\log n},
+  ]
+  via an explicit (m\times m) lattice construction and a choice of (k) with many sum-of-two-squares representations. ([mathworld.wolfram.com][2])
+
+(ii) **Exact first gap**
+
+I cannot prove either:
+
+* (f(n)\le n^{o(1)}) (i.e. (f(n)\le n^\varepsilon) for every fixed (\varepsilon>0) and all large (n)), **nor**
+* an explicit counterexample showing (f(n)\ge n^\varepsilon) for some fixed (\varepsilon>0) infinitely often (which would refute (n^{o(1)})).
+
+(iii) **Top 3 next moves**
+
+1. **Exploit the extra structure “each circle’s center is itself a point of (A)”** to seek an incidence bound better than the general (m^{6/11}n^{9/11}) term (which is what forces exponent (4/11)). Concretely: prove a *specialized* bound on incidences between a point set and circles centered at those points.
+2. **Try an energy/double-counting approach on bisectors:** incidences (y\in C_x) correspond to constraints (|x-y|=|x-y'|). Large (f(n)) forces many equal-distance relations; rephrase as many point incidences on perpendicular bisectors and apply line-incidence technology.
+3. **Search for better constructions than grids:** the grid lower bound is only (n^{c/\log\log n}). Try finite-field or algebraic constructions (e.g., projections of higher-dimensional lattice shells, or structured sets with many equal norms) that keep *every* point “rich”.
+
+(iv) **What a minimal counterexample would likely look like (if (f(n)\le n^{o(1)}) is false)**
+
+To refute (f(n)\le n^{o(1)}), one would need a family (A_n) where **every** point is the center of a circle containing (n^\varepsilon) other points, with (\varepsilon>0) fixed. That would force:
+
+* a very dense incidence pattern between points and circles,
+* many points lying on many circles with controlled intersections,
+* likely a highly algebraic configuration (lattice- or finite-geometry-like), because random sets won’t produce (n^\varepsilon)-rich circles for *all* centers.
+
+That’s the current boundary between what is proved (incidence bound (n^{4/11})) and what’s conjectured (subpolynomial).
+
+[1]: https://www.erdosproblems.com/92 "
+  
+    Erdős Problem #92
+  
+"
+[2]: https://mathworld.wolfram.com/SumofSquaresFunction.html "Sum of Squares Function -- from Wolfram MathWorld"
+[3]: https://en.wikipedia.org/wiki/Prime_number_theorem "Prime number theorem - Wikipedia"

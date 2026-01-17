@@ -1,0 +1,166 @@
+% Erdos problem #124
+% Attempt for Erdos Problem #124
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? YES (used for small-case checks)
+
+1) FORMAL RESTATEMENT
+
+For an integer $d\ge 2$ and $k\in\mathbb{N}_0$, define
+\[
+P(d,k) := \Big\{\sum_{i\ge k} \varepsilon_i d^i : \varepsilon_i\in\{0,1\}\text{ and only finitely many }\varepsilon_i\neq 0\Big\}.
+\]
+So $P(d,0)$ is the set of nonnegative integers with base-$d$ digits in $\{0,1\}$.
+
+Given integers $3\le d_1<\cdots<d_r$, consider representations of integers of the form
+\[
+ n = \sum_{j=1}^r c_j a_j, \qquad c_j\in\{0,1\},\ a_j\in P(d_j,k).
+\]
+
+**Ambiguity in the statement.** The problem text writes the condition
+$\sum_{1\le i\le r} 1/(d_r-1)\ge 1$, which simplifies to $r/(d_r-1)\ge 1$ and conflicts with the later sentence "Pomerance observed that the condition $\sum 1/(d_i-1)\ge 1$ is necessary".
+
+**Minimal correction consistent with the surrounding text:** replace the condition by
+\[
+\sum_{i=1}^r \frac{1}{d_i-1}\ \ge\ 1.
+\]
+
+**Question 1 (k=0).** Under $\sum_{i=1}^r 1/(d_i-1)\ge 1$, must every sufficiently large integer be representable as above with $k=0$?
+
+**Question 2 (k\ge 1).** Under $\gcd(d_1,\dots,d_r)=1$ and $\sum_{i=1}^r 1/(d_i-1)\ge 1$, does there exist $k\ge 1$ such that every sufficiently large integer is representable with this fixed $k$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- The first question has a simple positive solution (credited in the text to Aristotle and to a note of V. Alexeev).
+- The second question is conjectured to have a positive answer (BEGL96), and is known for $(d_1,d_2,d_3)=(3,4,7)$ (BEGL96).
+- Pomerance observed the condition $\sum 1/(d_i-1)\ge 1$ is necessary for both questions (Tao sketched explanation).
+
+3) ATTACK PLAN
+
+For Question 1:
+- Reinterpret the allowed representations as subset sums of a multiset of powers.
+- Apply the classical "complete sequence" criterion (coverage by subset sums) and show the key inequality follows from $\sum 1/(d_i-1)\ge 1$.
+
+For Question 2:
+- Prove easy necessary conditions (e.g. $\gcd(d_1,\dots,d_r)=1$).
+- Do computational checks for the known example $(3,4,7)$.
+
+4) WORK
+
+Reformulation.
+For each $d_i$, an element of $P(d_i,0)$ is a subset sum of the power multiset $\{d_i^0,d_i^1,d_i^2,\dots\}$.
+Thus choosing $a_i\in P(d_i,0)$ for each $i$ and summing is equivalent to taking a subset sum of the *disjoint union* multiset
+\[
+\mathcal{M}:=\bigsqcup_{i=1}^r \{d_i^j: j\in\mathbb{N}_0\},
+\]
+where the copies are labeled by $i$ (so, for example, $1=d_i^0$ occurs with multiplicity $r$).
+Therefore Question 1 asks whether $\mathcal{M}$ is a complete sequence (up to finitely many exceptions).
+
+Lemma 4.1 (Subset-sum coverage criterion).
+Let $w_1\le w_2\le\cdots$ be a nondecreasing sequence of positive integers (allowing repetition), and define
+$S_t:=\sum_{j=1}^t w_j$.
+If
+\[
+ w_{t+1} \le S_t+1\quad\text{for all }t\ge 1,
+\]
+then for every $t$ the set of subset sums of $\{w_1,\dots,w_t\}$ contains the entire interval $[0,S_t]\cap\mathbb{Z}$.
+In particular, if the inequality holds for all $t$ and $S_t\to\infty$, then every nonnegative integer is representable as a subset sum of the multiset $\{w_j\}$.
+
+*Proof.* Induct on $t$.
+For $t=1$, subset sums of $\{w_1\}$ are $\{0,w_1\}$, which contains $[0,w_1]$ iff $w_1=1$; in our application $w_1=1$ holds because each progression contributes $1$.
+Assume subset sums of $\{w_1,\dots,w_t\}$ cover all integers $0\le m\le S_t$.
+If $w_{t+1}\le S_t+1$, then adding $w_{t+1}$ to those subset sums gives all integers in the interval $[w_{t+1},w_{t+1}+S_t]$.
+Since $w_{t+1}\le S_t+1$, we have $w_{t+1}\le S_t+1$ so the two intervals $[0,S_t]$ and $[w_{t+1},w_{t+1}+S_t]$ overlap or touch; hence together they cover $[0,S_t+w_{t+1}] = [0,S_{t+1}]$.
+This completes the induction. \qed
+
+Lemma 4.2 (Geometric progression partial sums).
+Fix $d\ge 2$. For any integer $t\ge 1$,
+\[
+1+d+d^2+\cdots+d^{t-1} = \frac{d^t-1}{d-1}.
+\]
+In particular, for $x=d^t$ we have
+\[
+\sum_{\substack{j\ge 0\\ d^j<x}} d^j = \frac{x-1}{d-1}.
+\]
+
+*Proof.* Standard geometric series identity. \qed
+
+Proposition 4.3 (Question 1: sufficient condition).
+Assume $\sum_{i=1}^r \frac{1}{d_i-1}\ge 1$.
+Then every sufficiently large integer is representable as a sum of distinct elements of $\mathcal{M}$ (equivalently in the form $\sum_{i=1}^r c_i a_i$ with $a_i\in P(d_i,0)$).
+
+*Proof.* List the multiset $\mathcal{M}$ in nondecreasing order as $w_1\le w_2\le\cdots$.
+Fix a term $w_{t+1}=x$ in this list. By construction, $x=d_i^k$ for some $i,k\ge 0$, and all terms $<x$ from the $i$-th progression contribute exactly
+$(x-1)/(d_i-1)$ to the total sum of terms $<x$ (Lemma 4.2 when $x$ is itself a power).
+Summing over all progressions,
+\[
+S_t = \sum_{j\le t} w_j \ \ge\ \sum_{i=1}^r \frac{x-1}{d_i-1} \ -\ O(1),
+\]
+where $O(1)$ accounts for the fact that in progressions where $x$ is not exactly a power, the sum of terms $<x$ differs from $(x-1)/(d_i-1)$ by at most a constant depending only on $d_i$.
+In particular there is a constant $C_0$ (depending only on $d_1,\dots,d_r$) such that
+\[
+S_t \ge (x-1)\sum_{i=1}^r \frac{1}{d_i-1} - C_0.
+\]
+If $\sum_{i=1}^r 1/(d_i-1)\ge 1$, then for all sufficiently large $x$ we get $S_t\ge x-1$, i.e.
+$w_{t+1}=x\le S_t+1$.
+Thus the hypothesis of Lemma 4.1 holds for all sufficiently large indices $t$.
+Applying Lemma 4.1 from that index onward shows that all integers above some threshold are representable as subset sums of $\mathcal{M}$.
+Translating back to the original notation gives the desired representation with $k=0$. \qed
+
+Proposition 4.4 (Necessity of $\sum 1/(d_i-1)\ge 1$ for Question 1).
+If $\sum_{i=1}^r 1/(d_i-1) <1$, then infinitely many integers are not representable as subset sums of $\mathcal{M}$, hence Question 1 fails.
+
+*Proof.* Let $x$ be a term of $\mathcal{M}$ that is a large power of the largest base $d_r$ (so $x\to\infty$ along such powers).
+As above, the sum of all terms of $\mathcal{M}$ that are $<x$ is asymptotic to $x\sum 1/(d_i-1)$.
+More precisely, there exists a constant $C_1$ such that
+\[
+\sum_{\substack{w\in\mathcal{M}\\ w<x}} w \le (x-1)\sum_{i=1}^r \frac{1}{d_i-1} + C_1.
+\]
+If $\sum 1/(d_i-1) <1$, then for all sufficiently large $x$ the right-hand side is $<x-1$.
+But any subset sum using only terms $<x$ is at most the sum of all such terms, hence is $<x-1$.
+Any subset sum using at least one term $\ge x$ is $\ge x$.
+Therefore the integer $x-1$ is not representable for all sufficiently large such $x$.
+Since there are infinitely many choices of $x$, infinitely many integers are missed. \qed
+
+Proposition 4.5 (A necessary condition for Question 2: gcd).
+Fix $k\ge 1$.
+If $g:=\gcd(d_1,\dots,d_r)>1$, then no representation with $a_i\in P(d_i,k)$ can produce integers not divisible by $g^k$. In particular, not all sufficiently large integers are representable.
+
+*Proof.* Each $a_i\in P(d_i,k)$ is a sum of powers $d_i^j$ with $j\ge k$, hence is divisible by $d_i^k$.
+If $g\mid d_i$ for all $i$, then $g^k\mid d_i^k\mid a_i$ for all $i$, so $g^k$ divides the whole sum. \qed
+
+FAST REALITY CHECK (computation).
+For $(d_1,d_2,d_3)=(3,4,7)$ (where $\sum 1/(d_i-1)=1$):
+- For $k=0$, all integers $0\le n\le 500$ are representable.
+- For $k=1$, among $0\le n\le 5000$ there are $37$ missing values; the largest missing value is $581$.
+
+5) VERIFICATION
+
+- Lemma 4.1 is standard and the induction is explicit.
+- Proposition 4.3 uses only the geometric-series lower bound and the subset-sum criterion.
+- Proposition 4.4 explicitly produces infinitely many gaps when $\sum 1/(d_i-1)<1$.
+- Proposition 4.5 checks a necessary modular obstruction for $k\ge 1$.
+- The computational checks are consistent with the stated (3,4,7) theorem for some $k\ge 1$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+- For the corrected statement of Question 1, $\sum_{i=1}^r 1/(d_i-1)\ge 1$ is sufficient (Proposition 4.3) and also necessary (Proposition 4.4).
+- For Question 2, $\gcd(d_1,\dots,d_r)=1$ is necessary for any fixed $k\ge 1$ (Proposition 4.5).
+
+(ii) Exact first gap:
+- Prove or disprove Question 2: assuming $\gcd(d_1,\dots,d_r)=1$ and $\sum 1/(d_i-1)\ge 1$, does there exist some $k\ge 1$ for which all sufficiently large integers are representable?
+
+(iii) Top 3 next moves:
+1. For fixed $k$, study the representable residue classes modulo products of $d_i^k$ and attempt a covering/CRT argument.
+2. Try to adapt the complete-sequence method to the truncated multiset of powers $\{d_i^j:j\ge k\}$, quantifying the loss from removing the small powers.
+3. In the spirit of the known $(3,4,7)$ result, search for special triples where a finite "local" argument plus a recursive scaling covers all large integers.
+
+(iv) What a minimal counterexample would likely look like:
+- A set of bases with $\gcd=1$ and $\sum 1/(d_i-1)\ge 1$ but for which, after removing the first $k$ digits, there remains an unavoidable modular obstruction creating infinitely many missing residue classes.
+
+

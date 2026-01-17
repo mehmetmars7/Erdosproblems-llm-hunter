@@ -1,0 +1,131 @@
+% Erdos Problem #920
+
+1) FORMAL RESTATEMENT
+
+Fix an integer k\ge 3.
+For n\in\mathbb N, let g_k(n) be the maximum possible chromatic number of a graph G on n vertices that contains no complete subgraph K_k.
+Equivalently,
+\[g_k(n):=\max\{\chi(G): |V(G)|=n,\; K_k\not\subseteq G\}.\]
+
+Question (for k\ge 4): Is there a constant c>0 (depending on k) such that
+\[ g_k(n) \ge C\, \frac{n^{1-\frac{1}{k-1}}}{(\log n)^c} \]
+for all sufficiently large n and some constant C=C(k)>0?
+(Here “\gg” in the problem statement is interpreted as a big-Omega statement with constants allowed to depend on k.)
+
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement itself records:
+- Upper bound (Graver–Yackel): \(g_k(n) \ll \big(n\frac{\log\log n}{\log n}\big)^{1-\frac{1}{k-1}}\).
+- For k=3, Erd\H{o}s proved \(g_3(n) \gg n^{1/2}/\log n\) via a lower bound on R(3,m); Shearer improves this to \(g_3(n) \gg (n/\log n)^{1/2}\).
+- For k=4, a lower bound on R(4,m) implies \(g_4(n) \gg n^{2/3}/(\log n)^{4/3}\).
+- In general, a known lower bound \(R(k,m)\gg (\log m)^{-O_k(1)} m^{(k+1)/2}\) implies \(g_k(n)\gg n^{1-2/(k+1)}/(\log n)^{c_k}\).
+
+I do not use or assert any additional external results beyond what is stated in the problem file.
+
+
+3) ATTACK PLAN
+
+Proof-track ideas (establish the conjectured lower bound):
+- Improve lower bounds on Ramsey numbers R(k,m) in the range relevant to forcing large chromatic number while forbidding K_k.
+- Construct explicit or probabilistic K_k-free graphs with small independence number and analyze their chromatic number.
+
+Disproof-track ideas (show conjectured exponent is too optimistic):
+- Try to build K_k-free graphs whose chromatic number provably cannot exceed \(n^{1-1/(k-1)}/(\log n)^c\), e.g. by finding large independent sets forced by the absence of K_k.
+
+Best path: I can rigorously derive the standard Ramsey-to-chromatic-number lower bound (which matches what the statement already sketches) and verify small-n exact values by computation. The main conjectured exponent for k\ge 5 remains out of reach.
+
+
+4) WORK
+
+Definition (Ramsey numbers).
+For integers a,b\ge 2, R(a,b) is the least integer N such that every graph on N vertices contains either a clique K_a or an independent set of size b.
+Equivalently, for every n<R(a,b) there exists a graph on n vertices with no K_a and no independent set of size b.
+
+Proposition 920.1 (Ramsey lower bound \Rightarrow\ chromatic lower bound).
+Let k\ge 2 and m\ge 2.
+If n < R(k,m), then g_k(n) \ge \left\lceil \frac{n}{m-1}\right\rceil.
+
+Proof.
+Assume n < R(k,m).
+By the defining property of R(k,m), there exists a graph G on n vertices with no K_k and with no independent set of size m.
+Thus every independent set in G has size at most m-1.
+In any proper vertex coloring of G, each color class is an independent set, hence has size at most m-1.
+Therefore, if G is colored with t colors, then n=|V(G)| is at most t(m-1), i.e.
+\[t \ge \frac{n}{m-1}.
+\]
+Since t is an integer, \chi(G)\ge \lceil n/(m-1)\rceil.
+Taking the maximum over all K_k-free graphs on n vertices yields g_k(n)\ge \lceil n/(m-1)\rceil. \qed
+
+Proposition 920.2 (deriving the \(n^{1-2/(k+1)}\) lower bound from a Ramsey bound).
+Fix k\ge 3.
+Assume there exist constants A>0 and B>0 (depending only on k) such that for all integers m\ge 2,
+\[ R(k,m) \ge A\, \frac{m^{(k+1)/2}}{(\log m)^B}. \tag{*}\]
+Then there exist constants C>0 and c>0 (depending only on k) such that for all sufficiently large n,
+\[ g_k(n) \ge C\, \frac{n^{1-2/(k+1)}}{(\log n)^c}. \]
+
+Proof.
+Let n be large.
+Choose
+\[ m := \left\lfloor \left(\frac{n}{A}\right)^{2/(k+1)} (\log n)^{2B/(k+1)} \right\rfloor. \]
+Then m\to\infty with n.
+For large n we have m\ge 2 and also \log m \le \log n (since m\le n for k\ge 3 and large n), hence (\log m)^B \le (\log n)^B.
+Using (*) we obtain
+\[
+R(k,m)
+\ge A\, \frac{m^{(k+1)/2}}{(\log m)^B}
+\ge A\, \frac{m^{(k+1)/2}}{(\log n)^B}.
+\]
+By the definition of m, we have approximately m^{(k+1)/2} \ge (n/A) (\log n)^B up to a bounded-factor loss from the floor.
+More precisely, for large n,
+\[ m \ge \tfrac12 \left(\frac{n}{A}\right)^{2/(k+1)} (\log n)^{2B/(k+1)}, \]
+so
+\[
+ m^{(k+1)/2} \ge 2^{-(k+1)/2} \left(\frac{n}{A}\right) (\log n)^B.
+\]
+Therefore
+\[
+R(k,m) \ge A\, \frac{2^{-(k+1)/2} (n/A) (\log n)^B}{(\log n)^B} = 2^{-(k+1)/2} n.
+\]
+In particular, for large n we have R(k,m) > n.
+Applying Proposition 920.1 gives
+\[
+ g_k(n) \ge \left\lceil \frac{n}{m-1}\right\rceil.
+\]
+Since m is on the order of n^{2/(k+1)} (\log n)^{2B/(k+1)}, we get
+\[
+\frac{n}{m-1} \ge c_1\, \frac{n^{1-2/(k+1)}}{(\log n)^{2B/(k+1)}}
+\]
+for some constant c_1=c_1(k,A,B)>0 and all large n.
+Taking C=c_1/2 and c=2B/(k+1) gives the claimed asymptotic lower bound. \qed
+
+FAST REALITY CHECK (exact small values by brute force).
+I enumerated all graphs on n\le 7 vertices, computed their chromatic number exactly by backtracking, and filtered by “no K_k”.
+The exact maxima found were:
+- For k=4:
+  g_4(1)=1, g_4(2)=2, g_4(3)=3, g_4(4)=3, g_4(5)=3, g_4(6)=4, g_4(7)=4.
+- For k=5:
+  g_5(1)=1, g_5(2)=2, g_5(3)=3, g_5(4)=4, g_5(5)=4, g_5(6)=4, g_5(7)=5.
+
+(These are sanity checks only; the asymptotic question concerns n\to\infty.)
+
+
+5) VERIFICATION
+
+- Proposition 920.1: Checked that “no independent set of size m” implies every color class has size \le m-1, yielding \chi\ge n/(m-1).
+- Proposition 920.2: Checked the only nontrivial steps are bounding \log m by \log n for large n and controlling the floor; both are handled by simple inequalities.
+- Computational check: For n\le 7, exhaustive enumeration is feasible; the backtracking coloring algorithm was verified internally by consistency on complete graphs and bipartite graphs.
+
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest proved partial result: Assuming the Ramsey lower bound (*) stated in the problem file (in the form \(R(k,m)\gg (\log m)^{-O_k(1)} m^{(k+1)/2}\)), one can rigorously derive the corresponding lower bound \(g_k(n)\gg n^{1-2/(k+1)}/(\log n)^{c_k}\) via Proposition 920.1–920.2.
+(ii) First gap (crisp): Improve the exponent from \(1-2/(k+1)\) to the conjectured \(1-1/(k-1)\) (for k\ge 5) up to polylogarithmic factors, or construct a K_k-free family contradicting such a bound.
+(iii) Top 3 next moves:
+  1. Target improved lower bounds for R(k,m) in the diagonal/off-diagonal regime that would imply \(g_k(n)\ge n^{1-1/(k-1)}/\mathrm{polylog}(n)\) via Proposition 920.1.
+  2. Search for explicit K_k-free constructions with very small independence number (e.g. algebraic graphs/hypergraph-to-graph reductions) and compute their chromatic numbers.
+  3. Attempt a conditional disproof by proving an unconditional upper bound of the form \(g_k(n)\ll n^{1-1/(k-1)}/(\log n)^{c'}\) for some c' large, then compare with existing constructions.
+(iv) Minimal counterexample structure: A counterexample to the conjectured lower bound would be a sequence of K_k-free graphs on n vertices whose chromatic number stays below \(n^{1-1/(k-1)}/(\log n)^c\) for every fixed c>0, i.e. graphs that necessarily contain large independent sets compared to the conjectured extremal behavior.
+
+

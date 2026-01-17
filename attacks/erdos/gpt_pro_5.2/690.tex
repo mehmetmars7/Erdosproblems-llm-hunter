@@ -1,0 +1,151 @@
+% Erdos Solutions for problems 690--695
+% Generated from /mnt/data/690-695.tex, following PROMPT_STRATEGY.MD.
+
+% Erdos Problem #690
+
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+Fix an integer $k\ge 1$. For each prime $p$, define $S_{k,p}\subset\mathbb{N}$ by
+\[
+S_{k,p}:=\{n\in\mathbb{N}:\ \text{if }p_1<p_2<\cdots<p_{\omega(n)}\text{ are the distinct prime divisors of }n,\text{ then }\omega(n)\ge k\text{ and }p_k=p\}.
+\]
+Define
+\[
+d_k(p):=\lim_{x\to\infty}\frac{1}{x}\#\{n\le x: n\in S_{k,p}\},
+\]
+provided the limit exists (natural density). The question asks whether, for fixed $k$, the function $p\mapsto d_k(p)$ is \emph{unimodular/unimodal} along the primes: i.e. whether there exists a prime $p^*(k)$ such that $d_k(p)$ is nondecreasing for primes $p\le p^*(k)$ and nonincreasing for primes $p\ge p^*(k)$. 
+
+\medskip
+\noindent\textbf{Ambiguity note.} The problem is phrased as a question. A minimal “yes/no” statement consistent with standard conventions is:
+
+\smallskip
+\noindent\emph{(Universal unimodality claim)}: “For every fixed $k\ge 1$, the map $p\mapsto d_k(p)$ is unimodular.”
+
+\noindent Below we give an explicit counterexample (already for $k=4$), so this universal claim is false.
+
+\bigskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+The problem statement itself reports that Cambie (2025) proved unimodularity for $1\le k\le 3$ and non-unimodularity for $4\le k\le 20$. In what follows I do \emph{not} rely on any external results beyond what is explicitly stated in the problem file; the disproof below is by a direct density computation for $k=4$.
+
+\bigskip
+\noindent\textbf{3) ATTACK PLAN}
+
+\emph{Proof track (if unimodular):} derive an exact formula for $d_k(p)$ as a finite product/symmetric sum over primes $<p$, then analyze monotonicity.
+
+\emph{Disproof track:} use the same exact formula to compute $d_k(p)$ for small primes and exhibit a “down-then-up” pattern $d_k(p_1)>d_k(p_2)<d_k(p_3)$ with $p_1<p_2<p_3$ primes, which rules out unimodality.
+
+We proceed on the disproof track for $k=4$.
+
+\bigskip
+\noindent\textbf{4) WORK}
+
+\noindent\textbf{Lemma 690.1 (Exact density formula).}
+For any prime $p$ and integer $k\ge 1$, the set $S_{k,p}$ has a natural density and
+\[
+ d_k(p)=\frac{1}{p}\sum_{\substack{S\subseteq\mathcal{P}_{<p}\\ |S|=k-1}}
+ \Bigg(\prod_{q\in S}\frac{1}{q}\Bigg)\Bigg(\prod_{\substack{q<p\\ q\notin S}}\Big(1-\frac{1}{q}\Big)\Bigg),
+\]
+where $\mathcal{P}_{<p}$ denotes the set of primes $q<p$.
+
+\smallskip
+\noindent\emph{Proof.}
+Fix $p$ and $k$. Membership in $S_{k,p}$ is equivalent to the following finite set of divisibility conditions:
+
+- $p\mid n$;
+
+- among primes $q<p$, exactly $k-1$ of them divide $n$.
+
+Indeed, if $p\mid n$ and exactly $k-1$ primes $<p$ divide $n$, then the $k$-th smallest distinct prime divisor is $p$.
+
+For any finite set of distinct primes $Q$, and for each $q\in Q$ a choice of condition “$q\mid n$” or “$q\nmid n$”, the set of integers satisfying all these conditions is a union of residue classes modulo $M:=\prod_{q\in Q}q$. By the Chinese remainder theorem, the density of this set exists and equals
+\[
+\prod_{q\in Q}\begin{cases}
+\frac{1}{q}, & q\mid n,\\
+1-\frac{1}{q}, & q\nmid n.
+\end{cases}
+\]
+(Equivalently, among the $M$ residue classes mod $M$, exactly $M/q$ classes satisfy $q\mid n$ and the choices are independent across distinct primes.)
+
+Now take $Q$ to be the set of primes $\le p$ and sum over all choices in which $p$ is forced to divide $n$, and exactly $k-1$ primes among those $<p$ divide $n$. This gives exactly the displayed sum, multiplied by $1/p$ for the forced event $p\mid n$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 690.2 (Generating function form).}
+Let $p$ be prime and write $\mathcal{P}_{<p}=\{q_1,\dots,q_r\}$. Define the polynomial
+\[
+F_p(z):=\prod_{i=1}^r\Big(\big(1-\frac{1}{q_i}\big)+\frac{z}{q_i}\Big).
+\]
+Then for every $k\ge 1$,
+\[
+ d_k(p)=\frac{1}{p}\,[z^{k-1}]F_p(z),
+\]
+where $[z^{k-1}]F_p(z)$ denotes the coefficient of $z^{k-1}$.
+
+\smallskip
+\noindent\emph{Proof.}
+Expanding the product $F_p(z)$, each factor contributes either $(1-1/q_i)$ (corresponding to $q_i\nmid n$) or $(z/q_i)$ (corresponding to $q_i\mid n$). A monomial $z^{t}$ arises exactly from selecting $t$ primes among $\{q_i\}$ to divide $n$, and its coefficient is the product of the corresponding $1/q_i$ and $(1-1/q_j)$ factors. Therefore $[z^{k-1}]F_p(z)$ equals the sum in Lemma 690.1, and multiplying by $1/p$ enforces $p\mid n$. \hfill$\square$
+
+\medskip
+\noindent\textbf{FAST REALITY CHECK (explicit computation for $k=4$).}
+Using Lemma 690.1/690.2, one can compute $d_4(p)$ exactly as a rational number because the formula involves only finitely many primes $<p$. A short local script (dynamic programming on coefficients of $F_p$) gives:
+\[
+ d_4(13)=\frac{31}{5005}\approx 0.006193806,\qquad
+ d_4(17)=\frac{206}{36465}\approx 0.005649253,\qquad
+ d_4(19)=\frac{1308}{230945}\approx 0.005663686.
+\]
+It also gives (first few nonzero values):
+\[
+ d_4(7)\approx 0.004761905,\ d_4(11)\approx 0.005627706,\ d_4(13)\approx 0.006193806,\ d_4(17)\approx 0.005649253,\ d_4(19)\approx 0.005663686,\ldots
+\]
+
+\medskip
+\noindent\textbf{Proposition 690.3 (Non-unimodularity for $k=4$).}
+The function $p\mapsto d_4(p)$ is \emph{not} unimodular along primes.
+
+\smallskip
+\noindent\emph{Proof.}
+From the computed exact values,
+\[
+ d_4(13)=\frac{31}{5005},\quad d_4(17)=\frac{206}{36465},\quad d_4(19)=\frac{1308}{230945}.
+\]
+First, $d_4(13)>d_4(17)$ because
+\[
+\frac{31}{5005}>\frac{206}{36465}
+\iff 31\cdot 36465>206\cdot 5005
+\iff 1{,}130{,}415>1{,}031{,}030,
+\]
+which holds.
+Second, $d_4(17)<d_4(19)$ because
+\[
+\frac{206}{36465}<\frac{1308}{230945}
+\iff 206\cdot 230945<1308\cdot 36465.
+\]
+Compute both sides:
+\[
+206\cdot 230945=47{,}574{,}670,\qquad 1308\cdot 36465=47{,}696{,}220,
+\]
+so the inequality holds. Hence along the primes we have a decrease from $p=13$ to $p=17$ followed by an increase from $p=17$ to $p=19$. This pattern is incompatible with unimodality (no choice of a single peak prime can make the sequence nondecreasing before the peak and nonincreasing after the peak).
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{5) VERIFICATION}
+
+- \emph{Quantifiers:} The counterexample fixes $k=4$ and exhibits primes $13<17<19$ with $d_4(13)>d_4(17)<d_4(19)$.
+
+- \emph{Density existence:} Lemma 690.1 reduces membership in $S_{k,p}$ to finitely many congruence/divisibility constraints, hence density exists.
+
+- \emph{Computation integrity:} Values were obtained by an explicit finite expansion of $F_p(z)$ (Lemma 690.2), so they are exact rationals; the final inequalities were verified by integer cross-multiplication.
+
+\bigskip
+\noindent\textbf{6) FINAL}
+
+\textbf{FULL SOLUTION}
+
+\textbf{COUNTEREXAMPLE/DISPROOF.}
+The universal unimodality claim (“for every fixed $k\ge 1$, $p\mapsto d_k(p)$ is unimodular”) is false. For $k=4$, the exact values
+\[
+ d_4(13)=\frac{31}{5005}>\frac{206}{36465}=d_4(17)<\frac{1308}{230945}=d_4(19)
+\]
+give a decrease followed by an increase along consecutive primes, contradicting unimodality.
+
+

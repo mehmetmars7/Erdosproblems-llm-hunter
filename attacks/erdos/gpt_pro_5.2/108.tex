@@ -1,0 +1,96 @@
+% Erdos Problem #108
+% Attempt for Erdos Problem #108
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; only facts explicitly stated in the problem text)
+% - Computation available (Python)? YES (not used)
+
+\section*{Erd\H{o}s Problem \#108}
+
+\subsection*{1) FORMAL RESTATEMENT}
+For integers $r\ge4$ and $k\ge2$, define $f(k,r)$ to be the least integer (if it exists) with the following property:
+
+\begin{quote}
+Every (finite) graph $G$ with $\chi(G)\ge f(k,r)$ contains a subgraph $H\subseteq G$ such that $\chi(H)\ge k$ and the girth $g(H)\ge r$.
+\end{quote}
+
+Question: does such a finite $f(k,r)$ exist for every $r\ge4$ and $k\ge2$?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+From the problem text:
+\begin{itemize}
+\item R\"odl proved the case $r=4$.
+\item The ``infinite version'' is open.
+\item Erd\H{o}s asked whether $\lim_{k\to\infty} f(k,r+1)/f(k,r)=\infty$.
+\end{itemize}
+No further literature is used here.
+
+\subsection*{3) ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof track:} attempt to extract from $\chi(G)$ a $k$-chromatic subgraph with large minimum degree, then delete short cycles while preserving chromatic number; or apply probabilistic/iterative thinning.
+\item \textbf{Disproof track:} try to build graphs of arbitrarily large chromatic number in which every large-girth subgraph has bounded chromatic number.
+\end{itemize}
+I do not resolve existence of $f(k,r)$ here.  I record two rigorous, problem-specific lemmas that constrain what $f(k,r)$ would have to look like.
+
+\subsection*{4) WORK}
+\paragraph{Lemma 108.1 ($k$-critical subgraphs have minimum degree $\ge k-1$).}
+Let $G$ be a finite graph with $\chi(G)\ge k$.  Then $G$ contains a subgraph $H\subseteq G$ with $\chi(H)=k$ such that every vertex of $H$ has degree at least $k-1$ within $H$.
+
+\emph{Proof.}
+Among all subgraphs of $G$ with chromatic number at least $k$, choose one with the minimum number of vertices; call it $H$.  Then $\chi(H)\ge k$ by construction, and minimality forces $\chi(H)=k$ because if $\chi(H)\ge k+1$ we could potentially find a smaller subgraph still of chromatic $\ge k$ by deleting vertices, contradicting minimality (more directly: minimality already gives that deleting any vertex drops chromatic number below $k$, hence $\chi(H)=k$).
+
+Now fix a vertex $v\in V(H)$ and consider $H-v$ (delete $v$ and incident edges).  By minimality, $\chi(H-v)\le k-1$.  Let $c:V(H)\setminus\{v\}\to\{1,\dots,k-1\}$ be a proper $(k-1)$-coloring of $H-v$.
+
+If $\deg_H(v)\le k-2$, then among the $k-1$ colors there is at least one color not used on the neighbors of $v$ (pigeonhole principle).  Assigning that unused color to $v$ extends $c$ to a proper $(k-1)$-coloring of all of $H$, contradicting $\chi(H)=k$.  Therefore $\deg_H(v)\ge k-1$ for every $v$. \qed
+
+\paragraph{Lemma 108.2 (Moore-type lower bound from girth and minimum degree).}
+Let $H$ be a finite graph with minimum degree $\delta(H)\ge d\ge2$ and girth $g(H)\ge r$.
+Write $t:=\lfloor (r-1)/2\rfloor$.  Then
+\[
+|V(H)|\ge 1+d\sum_{i=0}^{t-1}(d-1)^i.
+\]
+In particular, $|V(H)|\ge 1+d((d-1)^t-1)/(d-2)$ if $d>2$.
+
+\emph{Proof.}
+Pick a root vertex $v$.  Perform a breadth-first search (BFS) expansion.  Because the girth is at least $r$, the BFS layers out to distance $t$ form a tree: there are no cycles of length $\le 2t+1\le r-1$ (if $r$ is odd) or $\le 2t\le r-2$ (if $r$ is even), so no edge can connect two vertices within the explored ball without creating a short cycle.
+
+At distance $0$ there is $1$ vertex.  At distance $1$, vertex $v$ has at least $d$ neighbors.  Each vertex at distance $i\ge1$ has at least $d-1$ neighbors outside the previous layer (one neighbor is its parent in the BFS tree).  Therefore the number of vertices at distance $i$ is at least $d(d-1)^{i-1}$ for $1\le i\le t$.  Summing gives
+\[
+|V(H)|\ge 1+\sum_{i=1}^t d(d-1)^{i-1} = 1+d\sum_{i=0}^{t-1}(d-1)^i.
+\]
+\qed
+
+\paragraph{Consequence 108.3 (a necessary growth condition).}
+If $f(k,r)$ exists, then there must exist a $k$-chromatic graph of girth at least $r$ and minimum degree at least $k-1$ (take $H$ from Lemma~108.1 inside such a high-$\chi$ graph).  Lemma~108.2 then forces any such witness graph to have at least
+\[
+1+(k-1)\sum_{i=0}^{\lfloor (r-3)/2\rfloor}(k-2)^i
+\]
+vertices.
+
+\subsection*{5) VERIFICATION (FAST REALITY CHECK)}
+\begin{itemize}
+\item If $k=2$, the property is trivial: any graph has a bipartite subgraph with girth $\ge r$ (take a forest). So $f(2,r)=2$ is consistent.
+\item Lemma~108.1 is the standard ``critical subgraph'' argument; the coloring extension step uses only the degree bound and pigeonhole.
+\item Lemma~108.2 BFS-tree counting: the only delicate point is ``no cross edges inside the BFS ball''; any such edge would create a cycle of length at most $2t+1<r$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+
+(i) \emph{Strongest fully proved partial result obtained here.}
+From any $\chi(G)\ge k$ one can extract a $k$-critical subgraph with $\delta\ge k-1$ (Lemma~108.1), and any graph with $\delta\ge d$ and girth $\ge r$ must be large (Lemma~108.2).
+
+(ii) \emph{Exact first gap.}
+A method to pass from high chromatic number to simultaneously (a) girth $\ge r$ and (b) chromatic number $\ge k$ in a subgraph, for all $r\ge4$.
+
+(iii) \emph{Top 3 next moves (concrete targets).}
+\begin{enumerate}
+\item Develop an iterative deletion process that removes all short cycles while controlling chromatic number, perhaps via degree constraints from Lemma~108.1.
+\item Try to prove a ``high girth subgraph lemma'' using random sparsification plus the Lov\'asz Local Lemma, with a chromatic-number lower bound via minimum degree.
+\item Search for candidate counterexample families: graphs with huge chromatic number but forced small cycles everywhere (highly locally dense constructions).
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.}
+A counterexample for some $(k,r)$ would be a family $G_t$ with $\chi(G_t)\to\infty$ such that every subgraph of girth $\ge r$ has $\chi<k$.
+
+

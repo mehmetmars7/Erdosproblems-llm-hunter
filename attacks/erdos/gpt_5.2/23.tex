@@ -1,0 +1,102 @@
+% Attempt for Erdos Problem #23
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $n\ge 1$. Let $G=(V,E)$ be a triangle-free graph on $|V|=5n$ vertices.
+Question: does there always exist a set of edges $F\subseteq E$ with $|F|\le n^2$ such that $G\setminus F$ is bipartite?
+Equivalently, is the \emph{bipartite edge deletion number} of every triangle-free $G$ on $5n$ vertices at most $n^2$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only record what the problem statement itself claims.
+I have not verified those results here.
+
+3) ATTACK PLAN
+Proof track:
+1. Relate "delete edges to make bipartite" to finding a large cut (max-cut), since edges across a cut form a bipartite subgraph.
+2. Use structural properties of triangle-free graphs (e.g. Mantel's bound $e(G)\le |V|^2/4$) to bound deletions.
+3. Improve constants using stability/regularity or semi-definite methods (beyond this attempt).
+
+Disproof track:
+1. Analyze extremal triangle-free graphs (blow-ups of $C_5$) and compute how many edges must be removed.
+2. Try to construct denser triangle-free graphs where every cut misses many edges.
+
+Chosen path: prove a baseline constant via max-cut and verify the blow-up lower bound is plausible.
+
+4) WORK
+Lemma 1 (Max-cut gives a universal $1/2$-deletion bound).
+For any finite graph $G=(V,E)$, there exists a bipartite subgraph with at least $|E|/2$ edges.
+Equivalently, one can delete at most $|E|/2$ edges to make $G$ bipartite.
+
+Proof.
+Choose a random bipartition $V=X\sqcup Y$ by putting each vertex independently into $X$ with probability $1/2$.
+Each edge crosses the cut with probability $1/2$, so the expected number of crossing edges is $|E|/2$.
+Hence there exists a cut with at least $|E|/2$ crossing edges. Keeping those edges yields a bipartite graph. \qed
+
+Lemma 2 (Mantel bound for triangle-free graphs).
+If $G$ is triangle-free on $N$ vertices, then $|E(G)|\le N^2/4$.
+
+Proof.
+For any edge $uv$, triangle-freeness implies $N(u)\cap N(v)=\emptyset$, so $\deg(u)+\deg(v)\le N$.
+Summing $\deg(u)+\deg(v)\le N$ over all edges and noting that the left-hand side equals $\sum_{w\in V} \deg(w)^2$,
+we obtain
+\[\sum_{w\in V}\deg(w)^2 \le N|E|.\]
+By Cauchy--Schwarz, $(\sum_w \deg(w))^2 \le N\sum_w \deg(w)^2 \le N\cdot N|E|=N^2|E|$.
+Since $\sum_w \deg(w)=2|E|$, this gives $4|E|^2\le N^2|E|$, hence $|E|\le N^2/4$. \qed
+
+Corollary 3 (A fully proved but weak constant for Problem 23).
+Every triangle-free graph on $5n$ vertices can be made bipartite by deleting at most $\frac{25}{8}n^2$ edges.
+
+Proof.
+By Lemma 2, $|E|\le (5n)^2/4=25n^2/4$. By Lemma 1, delete at most $|E|/2\le 25n^2/8$ edges. \qed
+
+Lemma 4 (Blow-up of $C_5$ needs at least $n^2$ deletions).
+Let $G$ be the blow-up of $C_5$ with vertex classes $V_0,\dots,V_4$ each of size $n$ and complete bipartite edges
+between $V_i$ and $V_{i+1}$ (indices mod $5$). Then any bipartite subgraph of $G$ has at most $4n^2$ edges.
+In particular, at least $n^2$ edges must be deleted to make $G$ bipartite.
+
+Proof.
+Let $X\sqcup Y$ be any bipartition of $V(G)$, and let $x_i=|V_i\cap X|$.
+For the complete bipartite graph between $V_i$ and $V_{i+1}$, the number of edges \emph{crossing} the cut is
+$x_i(n-x_{i+1})+(n-x_i)x_{i+1}$, so the number of \emph{monochromatic} edges is
+$x_ix_{i+1}+(n-x_i)(n-x_{i+1})$.
+Let $T$ be the total number of monochromatic edges over the five complete bipartite blocks.
+Choose independent uniformly random vertices $v_i\in V_i$ and consider the $5$-cycle
+$v_0v_1v_2v_3v_4v_0$ (all these edges exist in $G$). Any $2$-coloring of a $5$-cycle has at least one monochromatic edge,
+so this random $5$-cycle has at least one monochromatic edge deterministically, hence its expected number of
+monochromatic edges is at least $1$.
+On the other hand, the probability that the edge $v_iv_{i+1}$ is monochromatic equals
+$\bigl(x_ix_{i+1}+(n-x_i)(n-x_{i+1})\bigr)/n^2$.
+Summing over the five edges shows $\mathbb E[\#\text{monochromatic edges in the cycle}]=T/n^2$.
+Therefore $T/n^2\ge 1$, i.e. $T\ge n^2$.
+To obtain a bipartite subgraph from the cut $X\sqcup Y$, one must delete all monochromatic edges, so at least $n^2$ edges
+must be deleted for every cut, and hence for every bipartite subgraph.
+Since $G$ has $5n^2$ edges total, any bipartite subgraph has at most $5n^2-n^2=4n^2$ edges. \qed
+
+5) VERIFICATION
+- Lemma 2: the key identity $\sum_{uv\in E}(\deg u+\deg v)=\sum_w \deg(w)^2$ holds because each incident edge contributes $\deg(w)$.
+- Lemma 4: the probabilistic step is only linearity of expectation; the "at least one monochromatic edge" fact holds because
+  an odd cycle cannot be properly $2$-colored.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+A universal (weak) deletion bound $\le 25n^2/8$ (Corollary 3), and a rigorous lower bound example showing
+$n^2$ deletions can be necessary (Lemma 4).
+
+(ii) First gap:
+No method here improves the constant from $25/8$ down to $1$ (or even close to $1$).
+
+(iii) Top 3 next moves:
+1. Study strengthened max-cut lower bounds specific to triangle-free graphs.
+2. Use stability of triangle-free extremal graphs to show near-extremal graphs are close to bipartite or close to a $C_5$ blow-up.
+3. Implement the known best constants from the literature in a self-contained argument.
+
+(iv) Minimal counterexample structure (if the $n^2$ bound were false):
+A triangle-free graph on $5n$ vertices in which every cut misses more than $n^2$ edges (i.e. every bipartite subgraph
+has fewer than $|E|-n^2$ edges), likely a dense pseudorandom triangle-free construction.

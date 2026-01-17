@@ -1,0 +1,210 @@
+% Erdos Problem #170
+% Attempt for Erdos Problem #170
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used beyond the problem text; no extra literature claims).
+% - Computation available (Python/Sage/Mathematica)? YES (used for small-N exact values).
+
+PROBLEM
+
+Let $F(N)$ be the smallest possible size of $A\subset \{0,1,\ldots,N\}$ such that $\{0,1,\ldots,N\}\subset A-A$. Find the value of
+\[\lim_{N\to \infty}\frac{F(N)}{N^{1/2}}.\]
+
+OUTPUT
+
+## 1) FORMAL RESTATEMENT
+
+For an integer $N\ge 0$, define
+\[
+F(N):=\min\bigl\{|A|: A\subseteq \{0,1,\dots,N\}\text{ and }\{0,1,\dots,N\}\subseteq A-A\bigr\},
+\]
+where
+\[
+A-A:=\{a-b: a,b\in A\}.
+\]
+Since $A\subseteq [0,N]$, the set $A-A$ contains integers in $[-N,N]$.
+The condition $\{0,1,\dots,N\}\subseteq A-A$ means: for every $t\in\{0,1,\dots,N\}$ there exist $a,b\in A$ with $a-b=t$.
+
+We ask about the limit
+\[
+L:=\lim_{N\to\infty}\frac{F(N)}{\sqrt N}
+\]
+(if it exists) and its value.
+
+Edge cases: $F(0)=1$ (take $A=\{0\}$). For $N\ge 1$, $F(N)\ge 2$.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I will not use or claim any external results beyond what is explicitly written in the problem text.
+
+The problem text states the limit exists (Erd\H{o}s–G\'al), and gives published bounds placing it in $[1.56,\sqrt3]$.
+I do not re-prove existence of the limit.
+
+---
+
+## 3) ATTACK PLAN
+
+1. Prove an elementary **counting lower bound** on $F(N)$ using the fact that $A$ determines at most $\binom{|A|}{2}$ distinct positive differences.
+2. Give an explicit constructive **upper bound** $F(N)\le 2\lceil\sqrt N\rceil+O(1)$ via a “two-scale” set.
+3. Compute exact $F(N)$ for small $N$ by brute force to sanity check constants.
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (exact computation for small $N$)
+
+By brute force over subsets of $\{0,1,\dots,N\}$ (with $0$ forced into $A$ wlog), I found the following exact values for $1\le N\le 20$:
+\[
+\begin{array}{c|cccccccccc}
+N&1&2&3&4&5&6&7&8&9&10\\\hline
+F(N)&2&3&3&4&4&4&5&5&5&6
+\end{array}
+\]
+\[
+\begin{array}{c|cccccccccc}
+N&11&12&13&14&15&16&17&18&19&20\\\hline
+F(N)&6&6&6&7&7&7&7&8&8&8
+\end{array}
+\]
+Example optimal sets found by the search include:
+
+* $N=6$: $A=\{0,1,4,6\}$ (size $4$),
+* $N=10$: $A=\{0,1,2,3,6,10\}$ (size $6$).
+
+---
+
+### Lemma 4.1 (counting lower bound)
+
+For every $N\ge 1$,
+\[
+F(N)\ge \min\Bigl\{m\in\mathbb N: \binom{m}{2}\ge N\Bigr\}
+\ \ge\ \frac{1+\sqrt{1+8N}}{2}.
+\]
+In particular,
+\[
+\liminf_{N\to\infty} \frac{F(N)}{\sqrt N}\ \ge\ \sqrt2.
+\]
+
+**Proof.**
+Let $A\subseteq\{0,1,\dots,N\}$ be any set with $\{0,1,\dots,N\}\subseteq A-A$, and let $m:=|A|$.
+
+Consider the set of **positive** differences
+\[
+D_+:=\{a-b: a,b\in A,\ a>b\}\subseteq \{1,2,\dots,N\}.
+\]
+Each unordered pair $\{a,b\}$ with $a\ne b$ contributes exactly one positive difference $|a-b|$, so the number of **distinct** positive differences is at most the number of unordered pairs:
+\[
+|D_+|\le \binom{m}{2}.
+\]
+But the covering condition $\{0,1,\dots,N\}\subseteq A-A$ implies that every integer $t\in\{1,2,\dots,N\}$ occurs as a difference $a-b$ for some $a,b\in A$ with $a>b$, hence $\{1,2,\dots,N\}\subseteq D_+$ and therefore
+\[
+|D_+|\ge N.
+\]
+Combining,
+\[
+\binom{m}{2}\ge |D_+|\ge N.
+\]
+Thus $m\ge \min\{m: \binom{m}{2}\ge N\}$. Solving $m(m-1)/2\ge N$ gives $m\ge (1+\sqrt{1+8N})/2$.
+Dividing by $\sqrt N$ and taking $\liminf$ yields the asymptotic lower bound $\sqrt2$.
+$\square$
+
+---
+
+### Lemma 4.2 (explicit construction: $F(N)\le 2\lceil\sqrt N\rceil+2$)
+
+Let $N\ge 1$ and set $m:=\lceil\sqrt N\rceil$ and $q:=\lfloor N/m\rfloor$.
+Define
+\[
+A:=\{0,1,2,\dots,m\}\ \cup\ \{m,2m,3m,\dots,qm\}\ \cup\ \{N\}.
+\]
+Then $A\subseteq\{0,1,\dots,N\}$ and
+\[
+\{0,1,\dots,N\}\subseteq A-A.
+\]
+Consequently,
+\[
+F(N)\le |A|\le (m+1)+q+1 \le 2m+2 \le 2\lceil\sqrt N\rceil+2.
+\]
+In particular,
+\[
+\limsup_{N\to\infty} \frac{F(N)}{\sqrt N}\le 2.
+\]
+
+**Proof.**
+First, $A\subseteq[0,N]$ is clear because $m\le N$ for $N\ge 1$, and each multiple $jm$ with $1\le j\le q$ satisfies $jm\le qm\le N$.
+
+We show that every $t\in\{0,1,\dots,N\}$ can be written as $t=a-b$ with $a,b\in A$.
+
+**Case 1: $0\le t\le qm$.**
+Write $t=am+r$ with integers $a\ge 0$ and $0\le r<m$.
+
+*If $a=0$*, then $t=r\in\{0,1,\dots,m-1\}\subseteq A$, so $t=t-0$ with $t,0\in A$.
+
+*If $1\le a\le q-1$*, then $(a+1)m\le qm\le N$, so $(a+1)m\in A$ (it is one of the listed multiples). Also $m-r\in\{1,2,\dots,m\}\subseteq A$.
+Then
+\[
+(a+1)m-(m-r)=am+r=t.
+\]
+
+*If $a=q$ and $r=0$*, then $t=qm\in A$ and again $t=t-0$.
+
+So all $t\in[0,qm]$ are covered.
+
+**Case 2: $qm < t\le N$.**
+Let $s:=N-t$ (so $0\le s < N-qm$). Since $q=\lfloor N/m\rfloor$, we can write $N=qm+\rho$ with $0\le \rho < m$, hence $N-qm=\rho<m$. Therefore $0\le s < m$, so $s\in\{0,1,\dots,m-1\}\subseteq A$.
+Because $N\in A$ by definition, we have
+\[
+N-s = N-(N-t)=t,
+\]
+so $t=N-s$ with $N,s\in A$.
+
+This covers all $t\in\{0,1,\dots,N\}$.
+
+Finally, count size: $\{0,1,\dots,m\}$ has size $m+1$, the multiples set has size $q$ but overlaps at $m$, and adding $N$ adds at most one new element. A crude bound is
+\[
+|A|\le (m+1)+q+1.
+\]
+Since $m=\lceil\sqrt N\rceil$ implies $N/m\le m$, we have $q=\lfloor N/m\rfloor\le m$, giving $|A|\le 2m+2$.
+$\square$
+
+---
+
+## 5) VERIFICATION
+
+* Lemma 4.1: the crucial inequality is “distinct positive differences $\le \binom{m}{2}$”. This is correct because each unordered pair of distinct elements yields exactly one absolute difference.
+* Lemma 4.2: the only delicate part is covering the tail $t\in(qm,N]$. Writing $N=qm+\rho$ with $0\le\rho<m$ ensures the remainder range has length $<m$, so $N-t\in\{0,\dots,m-1\}\subseteq A$.
+* Small-$N$ check: for $N=20$, Lemma 4.1 gives $F(20)\ge (1+\sqrt{161})/2\approx 6.84$ (so $F(20)\ge 7$), and the computed exact value is $F(20)=8$. Lemma 4.2 gives $F(20)\le 2\lceil\sqrt{20}\rceil+2=2\cdot5+2=12$, consistent.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+We proved the elementary asymptotic sandwich
+\[
+\sqrt2\ \le\ \liminf_{N\to\infty}\frac{F(N)}{\sqrt N}
+\le\ \limsup_{N\to\infty}\frac{F(N)}{\sqrt N}\ \le\ 2.
+\]
+We also computed exact values of $F(N)$ for $1\le N\le 20$.
+
+(ii) **Exact first gap.**
+
+Determine the exact limit value $\lim_{N\to\infty} F(N)/\sqrt N$ (even narrowing the constant range by a new argument would be progress).
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Improve the lower bound beyond $\sqrt2$ by exploiting collisions among differences more sharply than the crude $\binom{m}{2}$ counting.
+2. Improve explicit constructions (upper bound) by multi-scale designs that cover $[0,N]$ with fewer than $2\sqrt N$ marks.
+3. Compute $F(N)$ for much larger $N$ with branch-and-bound/ILP to test the conjectured constant suggested by computational evidence in the problem text.
+
+(iv) **What a minimal counterexample would likely look like.**
+
+If the believed constant (near $\sqrt3$ per the problem text) is not correct, one would expect an infinite sequence $N_j$ where optimal rulers have a different asymptotic pattern (e.g., requiring substantially more or fewer marks than the best known constructions), detectable by large-scale computations.
+
+

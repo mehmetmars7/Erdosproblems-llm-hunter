@@ -1,0 +1,129 @@
+% Erdos Problem #489
+% URL: https://www.erdosproblems.com/489
+
+\subsection*{FORMAL RESTATEMENT}
+Let $A\subseteq\mathbb{N}$ be a set such that
+\[|A\cap[1,x]| = o(x^{1/2})\quad\text{as }x\to\infty.
+\]
+Define
+\[B := \{ n\ge 1 : \forall a\in A,\ a\nmid n\}.
+\]
+List the elements of $B$ in increasing order as $B=\{b_1<b_2<\cdots\}$ (if $B$ is finite, the sequence terminates).
+Consider the quantity
+\[M(x):=\frac{1}{x}\sum_{\substack{b_i<x}}(b_{i+1}-b_i)^2,\]
+where the sum is over all indices $i$ with $b_i<x$ and $b_{i+1}$ denotes the next element of $B$ (so this sum involves gaps between consecutive elements of $B$ up to scale $x$).
+
+Question: Does $\lim_{x\to\infty} M(x)$ exist, and is it finite?
+
+Edge cases:
+\begin{itemize}
+\item If $1\in A$ then $B=\varnothing$ and $M(x)=0$ for all $x$.
+\item If $A$ is finite then $B$ is periodic modulo $\mathrm{lcm}(A)$, so the limit should exist (proved below).
+\end{itemize}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The statement notes: when $A=\{p^2: p\text{ prime}\}$, $B$ is the squarefree numbers, and Erd\H{o}s proved existence of the limit in that case.
+Per the integrity rule, I do not use any other external results.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track:}
+\begin{itemize}
+\item Prove basic consequences of the sparsity assumption $|A\cap[1,x]|=o(\sqrt x)$.
+\item Prove the limit exists for finite $A$ via periodicity.
+\item Try (unsuccessfully here) to control the second moment of gaps for infinite $A$ from the sparsity assumption.
+\end{itemize}
+\textbf{Disproof track:}
+\begin{itemize}
+\item Try to build a sparse $A$ whose excluded multiples force very irregular gaps in $B$.
+\end{itemize}
+I only reach partial results.
+
+\subsection*{WORK}
+\paragraph{Lemma 1 (the sparsity assumption forces a convergent reciprocal sum).}
+If $A\subseteq\mathbb{N}$ satisfies $|A\cap[1,x]|=o(\sqrt x)$, then
+\[\sum_{a\in A}\frac{1}{a}<\infty.
+\]
+
+\paragraph{Proof.}
+For $j\ge 0$ let $I_j:=(2^j,2^{j+1}]$ and let $A(x):=|A\cap[1,x]|$.
+Then
+\[
+\sum_{a\in A}\frac{1}{a}
+= \sum_{j\ge 0}\sum_{a\in A\cap I_j}\frac{1}{a}
+\le \sum_{j\ge 0}\frac{|A\cap I_j|}{2^j}
+\le \sum_{j\ge 0}\frac{A(2^{j+1})}{2^j}.
+\]
+Since $A(x)=o(\sqrt x)$, for every $\varepsilon>0$ there exists $J(\varepsilon)$ such that for all $j\ge J$ we have
+\[A(2^{j+1}) \le \varepsilon\,\sqrt{2^{j+1}}=\varepsilon\,2^{(j+1)/2}.
+\]
+Therefore for $j\ge J$,
+\[\frac{A(2^{j+1})}{2^j} \le \varepsilon\,\frac{2^{(j+1)/2}}{2^j}=\varepsilon\,2^{-(j-1)/2}.
+\]
+The tail series $\sum_{j\ge J} 2^{-(j-1)/2}$ converges (it is geometric with ratio $2^{-1/2}<1$), so the tail of $\sum_{j\ge 0} A(2^{j+1})/2^j$ is bounded by a constant multiple of $\varepsilon$.
+Since $\varepsilon$ was arbitrary and the initial segment $j<J$ is finite, the full series converges.
+Thus $\sum_{a\in A} 1/a<\infty$.
+\qed
+
+\paragraph{Lemma 2 (finite $A$ $\Rightarrow$ eventual periodicity of $B$ $\Rightarrow$ the limit exists and is finite).}
+If $A$ is finite, then the limit $\lim_{x\to\infty}M(x)$ exists and is finite.
+
+\paragraph{Proof.}
+Assume $A$ is finite and let $L:=\mathrm{lcm}(A)$. Then divisibility by any $a\in A$ depends only on the residue modulo $L$.
+Hence membership in $B$ depends only on $n\bmod L$, so $B$ is a union of residue classes modulo $L$.
+Consequently the indicator sequence $\mathbf{1}_B(n)$ is periodic with period $L$.
+
+From periodicity, the pattern of gaps between consecutive elements of $B$ is eventually periodic as well: once $n$ is large enough to include at least one full period, the sequence of residues in $B$ repeats every $L$.
+Therefore the multiset of gaps occurring in one period is finite, and for large $x$ the sum $\sum_{b_i<x}(b_{i+1}-b_i)^2$ is equal to
+\[Q(x)\cdot G + O(1),
+\]
+where $Q(x)=\lfloor x/L\rfloor$ is the number of full periods up to $x$, and $G$ is the sum of squared gaps contributed by one full period.
+(The $O(1)$ accounts for the incomplete initial/final partial period.)
+Dividing by $x$ gives
+\[M(x)=\frac{Q(x)G}{x}+O\left(\frac{1}{x}\right)=\frac{G}{L}+O\left(\frac{1}{x}\right),
+\]
+so $\lim_{x\to\infty}M(x)=G/L$ exists and is finite.
+\qed
+
+\paragraph{FAST REALITY CHECK (squarefree example).}
+For $A=\{p^2: p\text{ prime}\}$, $B$ is the squarefree numbers.
+Computing $M(x)$ numerically for $x=10^k$ (using exact sieving for squarefreeness up to $x$ and including the last gap crossing $x$), I obtained:
+\[
+M(10)=1.7,\quad
+M(10^2)=2.04,\quad
+M(10^3)=2.038,\quad
+M(10^4)=2.0364,\quad
+M(10^5)=2.04128.
+\]
+These values suggest stabilization near $\approx 2.04$ at this scale, consistent with the existence of a finite limit in this special case (as stated in the problem text).
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~1: verified dyadic decomposition and used only the hypothesis $A(x)=o(\sqrt x)$.
+\item Lemma~2: periodicity argument is purely finite-state; the $O(1)$ remainder term comes from at most $O(L)$ boundary effects in the first/last partial periods.
+\item Numerical check: ensured the last gap $(b_i,b_{i+1})$ with $b_i<x<b_{i+1}$ is included by sieving slightly beyond $x$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+\begin{itemize}
+\item Under the stated hypothesis $|A\cap[1,x]|=o(\sqrt x)$, the reciprocal sum $\sum_{a\in A}1/a$ converges.
+\item If $A$ is finite, then $B$ is periodic modulo $\mathrm{lcm}(A)$ and the limit $\lim_{x\to\infty}M(x)$ exists and is finite.
+\item For the specific infinite example $A=\{p^2\}$ (squarefree numbers), the problem statement asserts Erd\H{o}s proved existence of the limit; my computation for $x\le 10^5$ gives $M(x)$ around $2.04$.
+\end{itemize}
+
+(ii) \textbf{First gap (crisp).} For infinite $A$ with $|A\cap[1,x]|=o(\sqrt x)$, prove that $M(x)$ converges as $x\to\infty$.
+Equivalently, obtain a uniform-in-$x$ control on the second moment of the gaps between consecutive integers avoiding all divisibilities by $A$.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Try to express $\sum_{b_i<x}(b_{i+1}-b_i)^2$ as a weighted count of runs of consecutive integers excluded by multiples of $A$, and bound the total contribution using the convergent reciprocal sum from Lemma~1.
+\item Investigate whether a truncation argument works: define $A_T:=A\cap[1,T]$ and corresponding $B_T$ (periodic), then control the effect of adding moduli $a>T$ on the gap-square average.
+\item Computationally search for sparse $A$ (e.g. sets with $a_j\approx j^2 \log j$) that might create highly irregular gaps, to test the plausibility of counterexamples.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure.} A counterexample would require an $A$ with $|A\cap[1,x]|=o(\sqrt x)$ such that the squared gaps in $B$ exhibit persistent oscillations: there would be infinitely many scales $x$ at which unusually long runs of excluded integers (divisible by some $a\in A$) contribute disproportionately to $\sum (\Delta b_i)^2$, causing $M(x)$ to have at least two distinct subsequential limits.
+
+\bigskip
+

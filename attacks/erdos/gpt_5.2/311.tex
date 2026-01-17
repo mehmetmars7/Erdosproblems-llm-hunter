@@ -1,0 +1,82 @@
+% Attempt for Erdos Problem #311
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For $N\ge 1$, consider subsets $A\subseteq\{1,\dots,N\}$ with the property:
+there is no subset $S\subseteq A$ such that
+\[\sum_{n\in S}\frac1n=1.\tag{$\ast$}\]
+Define
+\[g(N)=\min_{A\subseteq\{1,\dots,N\}\ \text{satisfying}\ (\ast)} \left|1-\sum_{n\in A}\frac1n\right|.\]
+Question: estimate $g(N)$, e.g. whether $g(N)=e^{-(c+o(1))N}$ for some $c\in(0,1)$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement notes a trivial lower bound $g(N)\ge 1/\mathrm{lcm}(1,\dots,N)$. I prove this and give explicit constructions showing small values for some $N$.
+
+3) ATTACK PLAN
+Proof track:
+1. Use the common-denominator $L_N=\mathrm{lcm}(1,\dots,N)$ to bound how close a subset sum can get to $1$.
+2. Build explicit subsets with sums very close to $1$ but strictly below $1$ (so automatically avoiding $(\ast)$).
+3. Compute $g(N)$ exactly for small $N$ to get a sanity check.
+
+Disproof track:
+1. Try to show that any $A$ with $\sum_{n\in A}1/n$ extremely close to $1$ must contain a subset summing to $1$ (a kind of “additive closure” phenomenon).
+
+Chosen path: basic denominator bounds + explicit near-$1$ constructions + small-$N$ computation.
+
+4) WORK
+Lemma 1 (Trivial denominator lower bound).
+Let $L_N=\mathrm{lcm}(1,2,\dots,N)$. For any $A\subseteq\{1,\dots,N\}$,
+\[\sum_{n\in A}\frac1n=\frac{A_N}{L_N}\]
+for some integer $A_N$. Therefore, if $\sum_{n\in A}1/n\ne 1$, then
+\[\left|1-\sum_{n\in A}\frac1n\right|\ge \frac{1}{L_N}.\]
+
+Proof.
+Write
+\[\sum_{n\in A}\frac1n=\frac{1}{L_N}\sum_{n\in A}\frac{L_N}{n}\]
+and note each $L_N/n$ is an integer. Hence the sum equals an integer multiple of $1/L_N$.
+If this rational is not equal to $1$, then its distance from $1$ is at least the spacing $1/L_N$ between consecutive multiples of $1/L_N$. \qed
+
+Lemma 2 (Explicit near-$1$ subset with no subset summing to $1$).
+Let $A=\{2,3,7,43\}\subseteq\{1,\dots,N\}$ for any $N\ge 43$.
+Then
+\[\sum_{n\in A}\frac1n=\frac12+\frac13+\frac17+\frac1{43}=\frac{1805}{1806}=1-\frac{1}{1806}.\]
+In particular, $A$ satisfies $(\ast)$ and yields $g(N)\le 1/1806$ for all $N\ge 43$.
+
+Proof.
+Compute:
+\[\frac12+\frac13+\frac17=\frac{41}{42},\qquad \frac{41}{42}+\frac{1}{43}=\frac{41\cdot 43+42}{42\cdot 43}=\frac{1805}{1806}.\]
+This is strictly less than $1$, so every subset $S\subseteq A$ has sum $\sum_{n\in S}1/n\le \sum_{n\in A}1/n<1$, and therefore no subset can sum to $1$. \qed
+
+FAST REALITY CHECK (computation).
+Exhaustive computation of $g(N)$ for $2\le N\le 15$ (checking all $A\subseteq\{1,\dots,N\}$ and enforcing $(\ast)$) gives:
+\[g(2)=1/2,\ g(3)=1/6,\ g(4)=1/12,\ g(5)=1/30,\ g(6)=1/30,\ g(7)=1/105,\ g(8)=1/120,\]
+\[g(9)=1/252,\ g(10)=1/360,\ g(11)=1/2310,\ g(12)=1/2310,\ g(13)=1/2310,\ g(14)=1/2772,\ g(15)=1/2772.\]
+For instance, at $N=11$ one minimizer is $A=\{2,6,7,10,11\}$ with $\sum_{n\in A}1/n=2311/2310$ and no subset summing to $1$.
+
+5) VERIFICATION
+- Lemma 1 is exact and uses only the common denominator $L_N$.
+- Lemma 2 enforces the “no subset sums to $1$” condition by the strong sufficient condition $\sum_{n\in A}1/n<1$.
+- The computation is complete only for $N\le 15$ and does not suggest the asymptotic behavior by itself.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+For all $N$, $g(N)\ge 1/L_N$ where $L_N=\mathrm{lcm}(1,\dots,N)$ (Lemma 1). For all $N\ge 43$, the explicit set $\{2,3,7,43\}$ gives $g(N)\le 1/1806$ (Lemma 2). Exact values for $N\le 15$ are listed in the reality check.
+
+(ii) First gap:
+Determine the true order of magnitude of $g(N)$ as $N\to\infty$, e.g. whether $g(N)=e^{-(c+o(1))N}$ for some $c\in(0,1)$.
+
+(iii) Top 3 next moves:
+1. Build families of subsets $A\subseteq[1,N]$ with $\sum_{n\in A}1/n$ within $\exp(-\Theta(N))$ of $1$ while keeping $\sum_{n\in A}1/n<1$ (or otherwise certifying $(\ast)$).
+2. Prove a converse “near-1 forces subset-1” theorem: if $\left|1-\sum_{n\in A}1/n\right|$ is extremely small, show $A$ must contain a subset summing exactly to $1$.
+3. Extend exact computation of $g(N)$ to larger $N$ using subset-OR DP over exact rational sums to see growth trends.
+
+(iv) Minimal counterexample structure (if $g(N)$ were much smaller than $e^{-cN}$):
+Families of sets $A_N\subseteq[1,N]$ whose total reciprocal sum lies within $e^{-\omega(N)}$ of $1$ while still avoiding any subset summing to $1$; such $A_N$ would require highly structured cancellations in the subset-sum space without ever hitting $1$ exactly.
+

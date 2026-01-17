@@ -1,0 +1,130 @@
+% Attempt for Erdos Problem #39
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+A set $A\subseteq\mathbb N$ is a Sidon set (a $B_2$-set) if for all $a,b,c,d\in A$,
+\[a+b=c+d\implies \{a,b\}=\{c,d\}.\]
+Let $A(N):=|A\cap\{1,\dots,N\}|$.
+Question: does there exist an infinite Sidon set $A$ such that for every $\varepsilon>0$ there is a constant $c(\varepsilon)>0$ with
+\[A(N)\ge c(\varepsilon)\,N^{1/2-\varepsilon}\quad\text{for all }N\ge 1?
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available. I only quote claims already present in the problem statement.
+
+3) ATTACK PLAN
+Proof track:
+1. Construct explicit infinite Sidon sets by concatenating well-separated finite Sidon blocks.
+2. Use probabilistic constructions on each block and a range-separation argument to preserve the Sidon property globally.
+
+Disproof track:
+1. Try to show any infinite Sidon set must have large gaps forcing $A(N)$ to dip below $N^{1/2-\varepsilon}$ infinitely often.
+
+Chosen path: give a fully proved "trivial" construction with exponent $1/3$ (matching the statement), and record elementary bounds.
+
+4) WORK
+Lemma 1 (Sidon implies distinct positive differences).
+Let $A=\{a_1<a_2<\cdots<a_m\}\subseteq\{1,\dots,N\}$ be Sidon. Then all positive differences $a_j-a_i$ ($1\le i<j\le m$) are distinct.
+In particular,
+\[\binom{m}{2}\le N-1\quad\text{and hence}\quad m<\sqrt{2N}+1.
+\]
+
+Proof.
+Suppose $a_j-a_i=a_{j'}-a_{i'}$ with $i<j$ and $i'<j'$. Then $a_j+a_{i'}=a_{j'}+a_i$.
+By the Sidon property, $\{a_j,a_{i'}\}=\{a_{j'},a_i\}$.
+Since $a_j>a_i$ and $a_{j'}>a_{i'}$, we must have $a_j=a_{j'}$ and $a_i=a_{i'}$, hence the differences are distinct.
+All differences lie in $\{1,2,\dots,N-1\}$, which has size $N-1$, so $\binom{m}{2}\le N-1$.
+Solving $m(m-1)/2\le N-1$ gives $m<\sqrt{2N}+1$. \qed
+
+Lemma 2 (Finite Sidon sets of size $\gg N^{1/3}$ exist).
+For every integer $N\ge 1$ there exists a Sidon set $S\subseteq\{1,\dots,N\}$ with
+\[|S|\ge \frac{1}{5}N^{1/3}.
+\]
+
+Proof.
+Let $p:=\frac{1}{4}N^{-2/3}$ and form a random subset $R\subseteq\{1,\dots,N\}$ by including each integer independently with probability $p$.
+Then $\mathbb E|R|=pN=\frac{1}{4}N^{1/3}$.
+
+Call an ordered quadruple $(a,b,c,d)\in\{1,\dots,N\}^4$ \emph{bad} if $a+b=c+d$ but $(a,b)$ is not a permutation of $(c,d)$.
+If $R$ contains all four entries of a bad quadruple, then $R$ is not Sidon.
+The number of bad quadruples is at most $N^3$: choose $(a,b,c)$ freely (at most $N^3$ choices) and then $d=a+b-c$ is determined;
+we discard choices with $d\notin\{1,\dots,N\}$, so this is an upper bound.
+Each fixed quadruple is contained in $R$ with probability $p^4$, so the expected number $X$ of bad quadruples contained in $R$ satisfies
+\[\mathbb E[X]\le N^3 p^4 = N^3\cdot \frac{1}{4^4}N^{-8/3} = \frac{1}{256}N^{1/3}.
+\]
+
+Starting from $R$, we delete elements one-by-one while there remains any bad quadruple contained in the current set.
+Each deletion removes at least one bad quadruple, so the total number of deletions is at most $X$.
+Let $S$ be the resulting set. Then $S$ is Sidon and
+\[|S|\ge |R|-X.
+\]
+Taking expectations gives
+\[\mathbb E|S|\ge \mathbb E|R|-\mathbb E[X] \ge \left(\frac{1}{4}-\frac{1}{256}\right)N^{1/3}=\frac{63}{256}N^{1/3} > \frac{1}{5}N^{1/3}.
+\]
+Therefore there exists a realization with $|S|\ge \frac{1}{5}N^{1/3}$. \qed
+
+Lemma 3 (An infinite Sidon set with uniform $N^{1/3}$ growth).
+There exists an infinite Sidon set $A\subseteq\mathbb N$ and a constant $c>0$ such that for all $N\ge 1$,
+\[|A\cap\{1,\dots,N\}|\ge c\,N^{1/3}.
+\]
+
+Proof.
+For each $k\ge 1$, set $L_k:=4^k$ and let $S_k\subseteq\{1,\dots,4^{k-1}\}$ be a Sidon set with
+$|S_k|\ge \frac{1}{5}\,(4^{k-1})^{1/3}$, which exists by Lemma 2.
+Define the translated block
+\[A_k:=\{L_k+s:s\in S_k\}\subseteq \{L_k+1,\dots,L_k+4^{k-1}\}.
+\]
+Let $A:=\bigcup_{k\ge 1} A_k$.
+
+We claim $A$ is Sidon.
+Fix $k$. Any sum of two elements from blocks strictly below $k$ is at most
+\[2\max(A_1\cup\cdots\cup A_{k-1}) < 2\left(L_{k-1}+4^{k-2}\right)=2\left(4^{k-1}+4^{k-2}\right)=\frac{5}{2}4^{k-1} < 4^k=L_k.
+\]
+Thus any sum of two elements from blocks $<k$ is $<L_k$.
+On the other hand, any sum involving at least one element of $A_k$ is at least $L_k+1+1 > L_k$.
+So a sum of two elements from blocks $<k$ cannot equal a sum involving an element of block $k$.
+Similarly, if a sum involves an element of $A_k$ but not of $A_{k'}$ for $k'>k$, then that sum is $<2L_{k+1}$ while any sum involving an
+element of $A_{k+1}$ is $>L_{k+1}=4L_k$, hence the block index of the largest summand is determined by the size of the sum.
+Therefore any additive collision $x_1+x_2=y_1+y_2$ in $A$ must occur within a single block $A_k$.
+But each $A_k$ is Sidon (translation preserves the Sidon property), so the collision is trivial.
+Hence $A$ is Sidon.
+
+For the growth bound, for $N\ge L_k$ we have $A_1\cup\cdots\cup A_k\subseteq[1,N]$ and therefore
+\[|A\cap[1,N]|\ge |A_k|=|S_k|\ge \frac{1}{5}(4^{k-1})^{1/3} = \frac{1}{5\cdot 4^{1/3}}\,L_k^{1/3} \ge \frac{1}{5\cdot 4^{1/3}}\,N^{1/3}.
+\]
+So one may take $c:=\frac{1}{5\cdot 4^{1/3}}$. \qed
+
+FAST REALITY CHECK (local computation, greedy Sidon sequence).
+I computed the first 25 terms of the standard greedy Sidon sequence (smallest possible next element) as:
+\[1,2,4,8,13,21,31,45,66,81,97,123,148,182,204,252,290,361,401,475,565,593,662,775,822.\]
+For this prefix: $|A\cap[1,100]|=11$ and $|A\cap[1,1000]|=27$. This is only a sanity check, not a proof of any asymptotic.
+
+5) VERIFICATION
+- Lemma 1 is a standard Sidon $\Rightarrow$ distinct differences argument.
+- Lemma 2 is a probabilistic existence proof with an explicit deletion algorithm; all steps are justified.
+- Lemma 3's key point is range separation of pairwise sums across blocks.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+A fully explicit (though not optimal) infinite Sidon set exists with uniform lower bound $|A\cap[1,N]|\ge cN^{1/3}$ (Lemma 3),
+and every Sidon subset of $[1,N]$ has size $<\sqrt{2N}+1$ (Lemma 1).
+
+(ii) First gap:
+Upgrading the exponent from $1/3$ toward $1/2-\varepsilon$ requires substantially denser finite Sidon blocks (or different ideas);
+no argument here produces an infinite Sidon set with $A(N)\gg_\varepsilon N^{1/2-\varepsilon}$.
+
+(iii) Top 3 next moves (concrete):
+1. Replace Lemma 2's $N^{1/3}$ construction with denser finite Sidon constructions and then re-run the block-separation scheme.
+2. Attempt to formalize the known $\liminf A(N)/N^{1/2}=0$ phenomenon via a self-contained combinatorial argument.
+3. Explore whether controlling $1_A*1_A$ uniformly (as mentioned in the statement) can be reconciled with growth $N^{1/2-\varepsilon}$.
+
+(iv) Minimal counterexample structure (if the answer is negative):
+A proof would need to show that every infinite Sidon set has infinitely many scales $N$ where $A(N)$ is much smaller than $N^{1/2-\varepsilon}$,
+likely via a density-decrement or gap-growth mechanism intrinsic to the Sidon constraint.

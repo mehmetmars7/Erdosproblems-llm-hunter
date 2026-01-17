@@ -1,0 +1,84 @@
+% Erdos Problem #414
+
+\subsection*{FORMAL RESTATEMENT}
+Let $\tau(n)$ be the number of positive divisors of $n$.
+Define
+$$h(n)=n+\tau(n),$$
+and iterate by $h_0(n)=n$ and $h_{k+1}(n)=h(h_k(n))$.
+Question (Spiro): for every $m,n\ge1$, do there exist indices $i,j\ge0$ such that
+$$h_i(m)=h_j(n)?$$
+(Equivalently, do all forward orbits under $h$ intersect?)
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file says Erd\H{o}s and Graham believed the answer is yes.
+No external results are used here.
+
+\subsection*{ATTACK PLAN}
+As in Problem 412, $h(n)>n$ for $n\ge2$, so orbits are strictly increasing and have no cycles.
+To show all orbits intersect, one would want some contraction/invariant argument; to disprove, one would try to build two disjoint increasing orbits.
+We develop basic structural lemmas (growth and parity), then do a computational sanity check for many starting values.
+
+\subsection*{WORK}
+\textbf{Lemma 414.1 (Uniform drift).}
+For every integer $n\ge2$ we have $\tau(n)\ge2$, hence $h(n)\ge n+2$.
+Consequently, for all $k\ge0$,
+$$h_k(n)\ge n+2k,$$
+so every orbit diverges.
+
+\textit{Proof.}
+If $n\ge2$ then $1$ and $n$ are distinct divisors, so $\tau(n)\ge2$.
+Thus $h(n)=n+\tau(n)\ge n+2$.
+Inductively, $h_{k+1}(n)=h(h_k(n))\ge h_k(n)+2$, so $h_k(n)\ge n+2k$.
+\hfill$\square$
+
+\textbf{Lemma 414.2 ($\tau(n)$ is odd iff $n$ is a square).}
+For $n\ge1$, $\tau(n)$ is odd if and only if $n$ is a perfect square.
+
+\textit{Proof.}
+Divisors of $n$ come in pairs $(d,n/d)$.
+These two divisors are distinct unless $d=n/d$, i.e. $d^2=n$.
+So the total number of divisors is odd exactly when there is an unpaired divisor, which happens exactly when $n$ is a square.
+\hfill$\square$
+
+\textbf{Corollary 414.3 (Parity behavior of $h$).}
+If $n$ is not a square, then $\tau(n)$ is even and $h(n)\equiv n\pmod 2$.
+If $n$ is a square, then $\tau(n)$ is odd and $h(n)\equiv n+1\pmod 2$.
+
+\textit{Proof.}
+Immediate from Lemma 414.2.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (exact computations).}
+I precomputed $\tau(t)$ for $t\le 1{,}005{,}000$ by a divisor-count sieve.
+For each start $2\le s\le 1000$, I iterated $v\mapsto v+\tau(v)$ until the value exceeded $10^6$.
+Processing starts in increasing order and recording the first time each value appeared, I observed:
+\begin{itemize}
+  \item $998$ of the $999$ starts in $2..1000$ hit a value already seen in an earlier start's orbit before exceeding $10^6$.
+  \item The number of distinct terminal values (the first value $>10^6$ reached, or the last value before crossing) among starts $2..1000$ was $677$.
+\end{itemize}
+Again, this is only finite evidence: many early mergers happen, but many distinct tails remain by $10^6$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+  \item Lemma 414.1 handles $n=1$ separately: $h(1)=1+\tau(1)=2$, so orbits also increase from $1$.
+  \item Lemma 414.2 is the standard divisor-pairing argument with no hidden assumptions.
+  \item Corollary 414.3 gives a concrete parity rule; note that parity is not preserved, it flips exactly at square terms.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: every orbit under $h(n)=n+\tau(n)$ is strictly increasing and satisfies the linear lower bound $h_k(n)\ge n+2k$ (Lemma 414.1). Also, parity flips occur exactly when an iterate hits a square (Lemma 414.2 and Corollary 414.3).
+
+(ii) First gap: prove that all orbits intersect (i.e. the functional graph has a single infinite forward path), or construct two starting values whose increasing $h$-orbits are disjoint.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+  \item Try to prove that every sufficiently large orbit must hit a square (causing parity flips) infinitely often or must enter some constrained subset where merging can be forced.
+  \item Look for a monotone ``Lyapunov'' function $L(n)$ that decreases under the map when comparing two orbits, enabling a coupling/merging argument.
+  \item Extend computation to much larger caps (e.g. $10^8$) and search for two starts whose orbits remain disjoint up to that cap as counterexample candidates.
+\end{enumerate}
+
+(iv) Minimal counterexample structure: two integers $m,n$ such that the sets $\{h_k(m)\:k\ge0\}$ and $\{h_k(n)\:k\ge0\}$ are disjoint; since orbits are increasing, such a counterexample would exhibit at least two distinct infinite forward paths in the functional graph of $h$.
+
+

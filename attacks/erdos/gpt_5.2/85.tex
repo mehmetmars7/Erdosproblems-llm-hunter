@@ -1,0 +1,109 @@
+% Attempt for Erdos Problem #85
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small $n$ sanity check
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- For an $n$-vertex graph $G$, let $\delta(G)$ be its minimum degree.
+- Let $C_4$ denote the 4-cycle.
+- Define
+\[f(n):=\min\{d\in\mathbb N:\ \text{every graph }G\text{ on }n\text{ vertices with }\delta(G)\ge d \text{ contains a }C_4\}.\]
+Equivalently,
+\[f(n)=1+\max\{\delta(G):\ |V(G)|=n,\ G\text{ is }C_4\text{-free}\}.\]
+
+Question.
+Is $f(n)$ eventually nondecreasing, i.e. does there exist $n_0$ such that $f(n+1)\ge f(n)$ for all $n\ge n_0$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Asymptotically $f(n)=(1+o(1))\sqrt n$.
+I do not use external results from [552] here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Derive general upper bounds on $f(n)$ from double-counting in $C_4$-free graphs (gives $f(n)\le \sqrt n + O(1)$).
+2. Try to compare extremal $C_4$-free graphs on $n$ and $n+1$ vertices to get monotonicity up to bounded error.
+
+Disproof track ideas:
+1. Search for sporadic $n$ where the maximum possible minimum degree of a $C_4$-free graph jumps down, causing $f(n+1)<f(n)$.
+
+Chosen path in this attempt: prove two basic $C_4$-free graph lemmas giving the elementary bound $f(n)\le \sqrt n+O(1)$, and do a small brute-force check for $n\le 7$.
+
+4) WORK
+Lemma 1 (Common-neighbor bound in $C_4$-free graphs).
+If $G$ is $C_4$-free, then any two distinct vertices $u\ne v$ have at most one common neighbor:
+\[|N(u)\cap N(v)|\le 1.\]
+
+Proof.
+If $u$ and $v$ had two distinct common neighbors $x\ne y$, then the four vertices $u,x,v,y$ form the cycle
+\[u-x-v-y-u,\]
+which is a $C_4$. This contradicts $C_4$-freeness. \qed
+
+Lemma 2 (A global constraint on 2-paths).
+If $G$ is $C_4$-free on $n$ vertices with degrees $d(w)$, then
+\[\sum_{w\in V(G)} \binom{d(w)}{2} \le \binom{n}{2}.\]
+
+Proof.
+Count the set of pairs $(w,\{u,v\})$ where $u$ and $v$ are distinct neighbors of $w$ (equivalently, length-2 paths $u-w-v$ with midpoint $w$).
+For fixed $w$, there are $\binom{d(w)}{2}$ such unordered pairs $\{u,v\}$, so the total is $\sum_w \binom{d(w)}{2}$.
+On the other hand, for a fixed unordered pair $\{u,v\}$ of vertices, the number of vertices $w$ adjacent to both $u$ and $v$ is exactly $|N(u)\cap N(v)|$.
+By Lemma 1 this is at most $1$, so each pair $\{u,v\}$ contributes at most one triple $(w,\{u,v\})$.
+There are $\binom{n}{2}$ choices for $\{u,v\}$, hence the total number of such triples is at most $\binom{n}{2}$.
+This gives the inequality. \qed
+
+Corollary 3 (Elementary upper bound $f(n)\le \sqrt n+O(1)$).
+If $G$ is $C_4$-free on $n$ vertices, then
+\[\delta(G)\,(\delta(G)-1)\le n-1.\]
+In particular, any graph on $n$ vertices with minimum degree at least $\lfloor \sqrt{n-1}\rfloor+2$ contains a $C_4$, so
+\[f(n)\le \lfloor \sqrt{n-1}\rfloor+2 < \sqrt n + 2.\]
+
+Proof.
+Apply Lemma 2 and use $d(w)\ge \delta(G)$ for all $w$:
+\[n\binom{\delta(G)}{2} \le \sum_w \binom{d(w)}{2}\le \binom{n}{2}.\]
+Multiply by $2/n$ to obtain $\delta(G)(\delta(G)-1)\le n-1$.
+If $\delta(G)\ge \lfloor \sqrt{n-1}\rfloor+2$, then $\delta(G)(\delta(G)-1)> n-1$, contradiction.
+Thus such a graph cannot be $C_4$-free, proving the bound on $f(n)$. \qed
+
+FAST REALITY CHECK (small $n$ by exhaustive search).
+Using brute force over all graphs for $n\le 7$, I computed the maximum possible minimum degree among $C_4$-free graphs:
+\[
+\begin{array}{c|c|c}
+n & \max\{\delta(G): |V(G)|=n,\ C_4\nsubseteq G\} & f(n)\\\hline
+4 & 1 & 2\\
+5 & 2 & 3\\
+6 & 2 & 3\\
+7 & 2 & 3
+\end{array}
+\]
+So $f(4)=2$ and $f(5)=f(6)=f(7)=3$, consistent with monotonicity at small $n$.
+
+5) VERIFICATION
+- Lemma 1 is a standard ``two common neighbors create a $C_4$'' argument.
+- Lemma 2 is a clean double-counting of 2-paths using Lemma 1.
+- Corollary 3 is algebraic and matches the stated asymptotic $f(n)=O(\sqrt n)$.
+- Computation is exhaustive only for $n\le 7$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved an elementary upper bound $f(n)<\sqrt n+2$ via double counting (Corollary 3).
+
+(ii) First gap:
+Prove eventual monotonicity $f(n+1)\ge f(n)$ (or even the bounded-drop version $f(m)\ge f(n)-c$ for $m>n$).
+The counting lemmas control the scale of $f(n)$ but do not compare adjacent values.
+
+(iii) Top 3 next moves (concrete):
+1. Relate $f(n)$ to the maximum minimum degree in $C_4$-free graphs and study how that extremal quantity behaves under adding a vertex with carefully chosen adjacency.
+2. Use known near-extremal constructions for $\mathrm{ex}(n,C_4)$ (polarity graphs) to estimate $f(n)$ more sharply and see whether the step behavior can be controlled.
+3. Compute $f(n)$ for moderate $n$ using integer programming / SAT (maximizing minimum degree under $C_4$-free constraints) to look for nonmonotone behavior.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+An integer $n$ such that the maximum minimum degree among $C_4$-free graphs on $n+1$ vertices is strictly smaller than the corresponding maximum on $n$ vertices,
+forcing $f(n+1)<f(n)$.
+

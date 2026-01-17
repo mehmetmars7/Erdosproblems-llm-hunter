@@ -1,0 +1,111 @@
+% Erdos Problem #940
+
+1) FORMAL RESTATEMENT
+
+Fix an integer \(r\ge 3\). A positive integer \(n\) is \emph{\(r\)-powerful} if for every prime \(p\mid n\) we have \(p^r\mid n\).
+Let \(\mathcal P_r\) be the set of \(r\)-powerful positive integers (note \(1\in\mathcal P_r\) vacuously).
+Define the representable set
+\[\mathcal S_r := \Big\{m\in\mathbb N: \exists k\in\{1,2,\dots,r\},\ \exists a_1,\dots,a_k\in\mathcal P_r\ \text{with}\ m=a_1+\cdots+a_k\Big\}.
+\]
+Questions:
+(a) Are there infinitely many integers not in \(\mathcal S_r\)?
+(b) Does \(\mathcal S_r\) have natural density 0, i.e.
+\[\lim_{X\to\infty} \frac{|\mathcal S_r\cap [1,X]|}{X}=0?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The statement reports:
+- For \(r=2\), density 0 is ``easy'' and was first proved by Baker--Br\"{u}dern.
+- Erd\H{o}s claimed a counting argument for infinitely many non-representable integers, but Schinzel noted an error.
+- Heath-Brown proved every sufficiently large integer is a sum of at most three 2-powerful numbers.
+I do not use any external results beyond these contextual remarks.
+
+3) ATTACK PLAN
+
+- Prove structural/counting lemmas about \(r\)-powerful numbers (how many are \(\le X\), and how to decompose them).
+- Do a small computational sanity check for small \(X\) and small \(r\) to see how large \(\mathcal S_r\cap[1,X]\) can be.
+
+4) WORK
+
+Fast reality check (explicit computation).
+For \(X=200000\):
+- For \(r=3\): there are 168 many 3-powerful numbers \(\le X\), and \(|\mathcal S_3\cap[1,X]|=161164\) (density \(\approx 0.80582\)).
+- For \(r=4\): there are 72 many 4-powerful numbers \(\le X\), and \(|\mathcal S_4\cap[1,X]|=153107\) (density \(\approx 0.765535\)).
+These are only finite-range measurements and do not address the asymptotic density question.
+
+Lemma 940.1 (Decomposition into an \(r\)-th power times an \((r+1)\)-powerful number).
+Let \(r\ge 2\). Every \(r\)-powerful integer \(n\ge 1\) can be written as
+\[n=a^r\,b\]
+where \(a\ge 1\) is an integer and \(b\) is \((r+1)\)-powerful.
+
+Proof.
+Write \(n=\prod_p p^{e_p}\) with all \(e_p\ge r\).
+For each prime \(p\), define integers \(\alpha_p\ge 0\) and \(\beta_p\ge 0\) as follows.
+- If \(r\mid e_p\), set \(\alpha_p=e_p/r\) and \(\beta_p=0\).
+- If \(r\nmid e_p\), write \(e_p=rq_p+s_p\) with integers \(q_p\ge 1\) and \(1\le s_p\le r-1\). Set \(\alpha_p=q_p-1\) and \(\beta_p=r+s_p\).
+Then \(\beta_p\ge r+1\) in the second case, and \(\beta_p=0\) in the first.
+Define
+\[a:=\prod_p p^{\alpha_p},\qquad b:=\prod_p p^{\beta_p}.
+\]
+Then
+\[a^r b = \prod_p p^{r\alpha_p+\beta_p}.
+\]
+If \(r\mid e_p\), then \(r\alpha_p+\beta_p=r(e_p/r)+0=e_p\). If \(r\nmid e_p\) and \(e_p=rq_p+s_p\), then
+\(r\alpha_p+\beta_p=r(q_p-1)+(r+s_p)=rq_p+s_p=e_p\).
+Thus \(a^r b=n\).
+Finally, in \(b\) each prime exponent \(\beta_p\) is either 0 or at least \(r+1\), so by definition \(b\) is \((r+1)\)-powerful.
+QED.
+
+Lemma 940.2 (Counting \(r\)-powerful numbers).
+For fixed \(r\ge 2\), let \(F_r(X):=|\{n\le X: n\ \text{is $r$-powerful}\}|\). Then
+\[F_r(X)=O_r(X^{1/r}).\]
+
+Proof.
+By Lemma 940.1, every \(r\)-powerful \(n\le X\) can be written as \(n=a^r b\) with \(b\) \((r+1)\)-powerful.
+For any fixed \((r+1)\)-powerful \(b\le X\), the number of integers \(a\ge 1\) with \(a^r b\le X\) is at most \(\lfloor (X/b)^{1/r}\rfloor\le (X/b)^{1/r}\). Hence
+\[F_r(X) \le \sum_{\substack{b\le X\\ b\ \text{$(r+1)$-powerful}}} \Big(\frac{X}{b}\Big)^{1/r}
+= X^{1/r} \sum_{\substack{b\le X\\ b\ \text{$(r+1)$-powerful}}} b^{-1/r}
+\le X^{1/r} \sum_{\substack{b\ge 1\\ b\ \text{$(r+1)$-powerful}}} b^{-1/r}.
+\]
+It remains to show the infinite sum converges. Write each \((r+1)\)-powerful \(b\) as \(b=\prod_p p^{f_p}\) where each \(f_p\in\{0\}\cup\{r+1,r+2,\dots\}\). Then
+\[\sum_{b\ \text{$(r+1)$-powerful}} b^{-1/r}
+= \prod_{p}\Big(1+\sum_{f=r+1}^{\infty} p^{-f/r}\Big)
+= \prod_{p}\Big(1+\frac{p^{-(r+1)/r}}{1-p^{-1/r}}\Big).
+\]
+For each prime \(p\), the factor is finite because \(p^{-1/r}<1\).
+Moreover, for large \(p\) we have \(\frac{1}{1-p^{-1/r}}\le 2\), hence
+\[\log\Big(1+\frac{p^{-(r+1)/r}}{1-p^{-1/r}}\Big) \ll p^{-(r+1)/r}.
+\]
+Since \((r+1)/r=1+1/r>1\), the series \(\sum_{p} p^{-(r+1)/r}\) converges by comparison with \(\sum_{n\ge 2} n^{-(1+1/r)}\). Therefore the Euler product converges to a finite constant \(C_r\), and the sum over \((r+1)\)-powerful \(b\) is finite.
+Thus \(F_r(X)\le C_r X^{1/r}\), proving the claim. QED.
+
+Lemma 940.3 (Squarefree kernel bound for the \(r=2\) case).
+Let \(n\ge 1\) be 2-powerful (squarefull). Write \(n=u^2 v\) where \(v\) is squarefree (so \(u^2\) is the largest square dividing \(n\)). Then
+\[v\le n^{1/3}\qquad\text{and hence}\qquad u^2\ge n^{2/3}.
+\]
+
+Proof.
+Since \(v\) is the squarefree part, we can write \(v=\prod_{p\in S} p\) where \(S\) is the set of primes dividing \(n\) to an odd exponent.
+Because \(n\) is squarefull, every prime divisor appears with exponent at least 2; in particular, every \(p\in S\) appears with exponent at least 3 (it is odd and \(\ge2\)). Thus \(p^3\mid n\) for each \(p\in S\). Since the primes in \(S\) are distinct, their product satisfies
+\[v^3=\prod_{p\in S} p^3 \mid n.
+\]
+Therefore \(v^3\le n\), so \(v\le n^{1/3}\). Finally, \(u^2=n/v\ge n/n^{1/3}=n^{2/3}\). QED.
+
+5) VERIFICATION
+
+- Lemma 940.1: checks \(\alpha_p\ge0\) in the non-multiple case because \(q_p\ge1\), so \(q_p-1\ge0\). Also \(\beta_p\ge r+1\) because \(s_p\ge1\).
+- Lemma 940.2: the Euler product bound uses only that \(\sum_{n\ge2} n^{-(1+1/r)}\) converges; since primes are a subset, \(\sum_p p^{-(1+1/r)}\) also converges.
+- Lemma 940.3: uses that odd exponents in a squarefull number are \(\ge3\).
+- Computations: the reported densities are finite-range; they do not establish any asymptotic claim.
+
+6) FINAL
+
+UNRESOLVED
+(i) Strongest proved partial result: Every \(r\)-powerful number factors as \(a^r b\) with \(b\) \((r+1)\)-powerful (Lemma 940.1), implying the counting bound \(F_r(X)=O_r(X^{1/r})\) (Lemma 940.2). For \(r=2\), the squarefree kernel of a squarefull number is \(\le n^{1/3}\) (Lemma 940.3).
+(ii) First gap: Prove or disprove that \(|\mathcal S_r\cap[1,X]|=o(X)\) as \(X\to\infty\) for each fixed \(r\ge 3\), or even that infinitely many integers are not in \(\mathcal S_r\).
+(iii) Top 3 next moves:
+  1. Improve from \(F_r(X)=O(X^{1/r})\) to a structural description of residue classes modulo large \(r\)-th powers that \(r\)-powerful numbers occupy, then bound how many sums of \(\le r\) such classes can cover.
+  2. For fixed \(r\), compute \(|\mathcal S_r\cap[1,X]|\) for growing \(X\) (beyond \(2\cdot 10^5\)) using a generator for \(r\)-powerful numbers rather than factorising every integer, to see whether the apparent density decreases.
+  3. Attempt to create explicit infinite families of integers with a congruence obstruction to being a sum of \(\le r\) \(r\)-powerful numbers (e.g. mod \(p^r\) for carefully chosen primes \(p\)).
+(iv) Minimal counterexample structure: A hypothetical smallest integer \(m\notin\mathcal S_r\) would have to avoid all representations by \(\le r\) summands from the sparse set \(\mathcal P_r\); given Lemma 940.2, one expects such an \(m\) to lie in a residue class that is poorly approximated by sums of \(r\)-powerful residues modulo many primes \(p^r\), so a promising obstruction would be simultaneous congruences modulo several \(p^r\) forcing each summand to be 0 mod some \(p^r\) while \(m\) is not.
+

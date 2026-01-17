@@ -1,0 +1,107 @@
+%Erdos problem #156
+\section*{Erdos problem \#156}
+
+\subsection*{1) FORMAL RESTATEMENT}
+A Sidon set $A\subseteq\{1,2,\dots,N\}$ is \emph{maximal} (with respect to inclusion) if there is no $x\in\{1,\dots,N\}\setminus A$ such that $A\cup\{x\}$ is still Sidon.
+The question asks whether there always exists a maximal Sidon set of size $O(N^{1/3})$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The problem file states that it is easy to show a greedy construction produces a maximal Sidon set of size $\gg N^{1/3}$, and (as stated in the file) Ruzsa proved existence of maximal Sidon sets of size $\ll (N\log N)^{1/3}$. I do not use those results as black boxes below; I re-prove the $\Omega(N^{1/3})$ lower bound for maximality.
+
+\subsection*{3) ATTACK PLAN}
+A maximal Sidon set $A$ blocks every $x\notin A$ by forcing a sum-collision if $x$ were added. Those collisions imply that every $x$ lies in a structured set built from $A$ such as $A+A-A$ or $(A+A)/2$. Counting the size of these structured sets gives a lower bound on $|A|$.
+
+\subsection*{4) WORK}
+\paragraph{Lemma 156.1 (maximality forces a covering by $A$, $(A+A)/2$, and $A+A-A$).}
+Let $A\subseteq\{1,\dots,N\}$ be Sidon and maximal. Then every $x\in\{1,\dots,N\}$ satisfies at least one of:
+\[
+\text{(i) }x\in A,\qquad
+\text{(ii) }2x\in A+A,\qquad
+\text{(iii) }x\in A+A-A.
+\]
+Equivalently,
+\[
+\{1,\dots,N\}\subseteq A\ \cup\ \tfrac12(A+A)\ \cup\ \(A+A-A\).
+\]
+
+\textit{Proof.}
+Fix $x\in\{1,\dots,N\}\setminus A$. By maximality, $A\cup\{x\}$ is not Sidon, so among the new unordered sums created by adding $x$ there is a collision with an old sum.
+The new sums are of two forms:
+\begin{enumerate}
+\item $x+x=2x$,
+\item $x+a$ for $a\in A$.
+\end{enumerate}
+A collision means either:
+\begin{enumerate}
+\item[(a)] $2x = a+b$ for some $a,b\in A$ (possibly $a=b$). Then $2x\in A+A$, i.e. $x\in\tfrac12(A+A)$.
+\item[(b)] $x+a = b+c$ for some $a,b,c\in A$. Rearranging gives $x=b+c-a\in A+A-A$.
+\end{enumerate}
+Thus every $x\notin A$ lies in $\tfrac12(A+A)$ or in $A+A-A$, establishing the containment. \qed
+
+\paragraph{Lemma 156.2 (a crude but explicit lower bound $|A|=\Omega(N^{1/3})$ for maximal Sidon sets).}
+Let $A\subseteq\{1,\dots,N\}$ be maximal Sidon and let $m=|A|$. Then
+\[
+N \le m + m^2 + m^3,
+\]
+and hence for all $N\ge 1$,
+\[
+|A|\ge \bigl(N/3\bigr)^{1/3}.
+\]
+
+\textit{Proof.}
+From Lemma 156.1,
+\[
+N\le |A| + |\tfrac12(A+A)| + |A+A-A|.
+\]
+Trivially $|\tfrac12(A+A)|\le |A+A|\le m^2$.
+Also $|A+A-A|\le m^3$ because it is the image of $A^3$ under $(b,c,a)\mapsto b+c-a$.
+Thus $N\le m + m^2 + m^3 \le 3m^3$ for $m\ge 1$, which implies $m\ge (N/3)^{1/3}$. \qed
+
+\paragraph{FAST REALITY CHECK (computed small cases).}
+I brute-forced the minimum size of a maximal Sidon set in $\{1,\dots,N\}$ for $N\le 40$.
+Let $m_{\min}(N)$ be this minimum.
+For selected values:
+\[
+\begin{array}{c|c|l}
+N & m_{\min}(N) & \text{example maximal Sidon set}\\\hline
+10 & 3 & \{1,4,6\}\\
+20 & 4 & \{1,4,10,12\}\\
+30 & 5 & \{1,4,10,12,30\}\\
+40 & 5 & \{1,4,10,12,30\}
+\end{array}
+\]
+The full sequence for $2\le N\le 40$ is:
+\[
+2,2,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5.
+\]
+(Starting at $N=2$.) This is compatible with growth slower than $N^{1/3}$ in this tiny range, but not decisive.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma 156.1: enumerates exactly the new sums created by adding $x$ and uses maximality to force a collision.
+\item Lemma 156.2: uses only cardinality bounds $|A+A|\le m^2$ and $|A+A-A|\le m^3$.
+\item Computation: checked by exhaustive backtracking over Sidon subsets and testing maximality by attempted extensions.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial result obtained here.}
+Any maximal Sidon set $A\subseteq\{1,\dots,N\}$ has size $|A|\ge (N/3)^{1/3}$ (Lemma 156.2).
+
+\item[(ii)] \textbf{Exact first gap.}
+Either (a) construct, for every $N$, a maximal Sidon set of size $\le C N^{1/3}$ with an absolute constant $C$, or (b) prove that every maximal Sidon set has size $\omega(N^{1/3})$.
+
+\item[(iii)] \textbf{Top 3 next moves (concrete targets).}
+\begin{enumerate}
+\item Sharpen Lemma 156.2 by bounding $|A+A-A|$ substantially below $m^3$ for Sidon sets (Sidon structure should reduce collisions).
+\item Try explicit constructions built from ``blocks'' that are Sidon internally but whose cross-block sums are arranged to enforce maximality.
+\item Extend brute computations to $N\approx 100$ to guess whether $m_{\min}(N)$ behaves like $c N^{1/3}$.
+\end{enumerate}
+
+\item[(iv)] \textbf{Minimal counterexample structure (if $O(N^{1/3})$ is false).}
+A counterexample would be a sequence $N\to\infty$ such that every maximal Sidon set in $\{1,\dots,N\}$ has size at least $N^{1/3}\,g(N)$ with $g(N)\to\infty$. By Lemma 156.1, this would force the covering $A\cup \tfrac12(A+A)\cup(A+A-A)$ to be ``inefficient'' unless $|A|$ is larger than $N^{1/3}$ by a diverging factor.
+\end{enumerate}
+
+

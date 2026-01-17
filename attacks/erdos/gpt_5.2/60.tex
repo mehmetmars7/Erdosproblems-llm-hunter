@@ -1,0 +1,145 @@
+% Attempt for Erdos Problem #60
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- All graphs are finite, simple, undirected.
+- $\mathrm{ex}(n;C_4)$ is the Tur\'an number for $C_4$: the maximum number of edges in an $n$-vertex graph with no subgraph isomorphic to the 4-cycle $C_4$.
+- For a graph $G$, let $e(G)$ be its number of edges, and let $N_{C_4}(G)$ be the number of (unlabeled) subgraphs of $G$ isomorphic to $C_4$ (not necessarily induced). With this convention, $K_4$ contains $3$ copies of $C_4$.
+
+Question.
+Does there exist an absolute constant $c>0$ such that for every $n$ and every graph $G$ on $n$ vertices with
+$e(G)\ge \mathrm{ex}(n;C_4)+1$ one has
+\[N_{C_4}(G)\ge c\, n^{1/2}?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Erd\H{o}s--Simonovits conjectured the stated ``supersaturation'' strengthening.
+- They could not even prove that $\ge 2$ copies of $C_4$ are forced by $e(G)>\mathrm{ex}(n;C_4)$.
+- He--Ma--Yang proved the conjecture for $n=q^2+q+1$ with $q$ even.
+I do not verify these results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Use a supersaturation/stability approach: show that graphs with $e(G)$ just above $\mathrm{ex}(n;C_4)$ must look like extremal $C_4$-free graphs plus a small perturbation, and that any perturbation creates many $C_4$.
+2. Count $C_4$ via codegrees and try to convert any edge ``excess'' into an aggregate codegree excess.
+3. Analyze extremal constructions for $\mathrm{ex}(n;C_4)$ (polarity-type graphs) and show that adding any edge forces many 4-cycles because many pairs already have codegree $1$.
+
+Disproof track ideas:
+1. Try to build a near-extremal graph (with $\mathrm{ex}(n;C_4)+1$ edges) where the added edge creates only $O(1)$ many $C_4$.
+2. If such a construction exists for arbitrarily large $n$, it would disprove the conjectured $\gg n^{1/2}$ lower bound.
+
+Chosen path in this attempt: prove two general counting lemmas for $N_{C_4}(G)$ and extract a partial supersaturation result far from the extremal threshold, plus a small-$n$ exhaustive sanity check.
+
+4) WORK
+For vertices $u\ne v$, write $N(u)$ for the neighbor set of $u$, and define the \emph{codegree}
+\[\mathrm{codeg}(u,v):=|N(u)\cap N(v)|.\]
+
+Lemma 1 (Codegree formula for $C_4$ counts).
+For any graph $G$ on vertex set $V$,
+\[N_{C_4}(G)=\frac12\sum_{\{u,v\}\in\binom{V}{2}} \binom{\mathrm{codeg}(u,v)}{2}.\]
+
+Proof.
+Fix an unordered pair $\{u,v\}$. Choosing two \emph{distinct} common neighbors $x,y\in N(u)\cap N(v)$ produces a (not necessarily induced) 4-cycle
+\[u-x-v-y-u,\]
+since the edges $ux,xv,vy,yu$ all exist by definition of common neighbors.
+There are exactly $\binom{\mathrm{codeg}(u,v)}{2}$ choices of $\{x,y\}$, hence the sum counts ordered data of the form
+``an unordered pair of opposite vertices $\{u,v\}$ together with the unordered pair of the other two vertices $\{x,y\}$''.
+
+Now fix a specific copy of $C_4$ with vertices $(a,b,c,d)$ in cyclic order: $a-b-c-d-a$.
+It has exactly two unordered pairs of opposite vertices: $\{a,c\}$ and $\{b,d\}$.
+In the sum, the term for $\{a,c\}$ counts this cycle exactly once (choosing common neighbors $\{b,d\}$), and similarly the term for $\{b,d\}$ counts it once.
+No other pair $\{u,v\}$ produces this same 4-cycle, because the opposite pairs in a 4-cycle are uniquely determined.
+Therefore each copy of $C_4$ is counted exactly twice in the right-hand side, proving the factor $1/2$. \qed
+
+Lemma 2 (Cauchy--Schwarz lower bound in terms of total codegree).
+Let
+\[S:=\sum_{\{u,v\}\in\binom{V}{2}} \mathrm{codeg}(u,v).\]
+Then
+\[N_{C_4}(G)\ \ge\ \frac14\left(\frac{S^2}{\binom{n}{2}}-S\right),\]
+where $n=|V|$.
+
+Proof.
+By Lemma 1,
+\[N_{C_4}(G)=\frac12\sum_{\{u,v\}} \binom{\mathrm{codeg}(u,v)}{2}
+=\frac14\sum_{\{u,v\}}\big(\mathrm{codeg}(u,v)^2-\mathrm{codeg}(u,v)\big).\]
+Let $M:=\binom{n}{2}$ be the number of unordered vertex pairs, and denote $k_i:=\mathrm{codeg}(u,v)$ for the $M$ pairs.
+Then $\sum k_i = S$ and
+\[\sum k_i^2 \ge \frac{(\sum k_i)^2}{M}=\frac{S^2}{\binom{n}{2}}\]
+by Cauchy--Schwarz. Substituting into the previous identity yields the stated inequality. \qed
+
+Lemma 3 (Relating $S$ to degrees and edges).
+Let $d(v)$ be the degree of vertex $v$ and let $m:=e(G)$. Then
+\[S=\sum_{v\in V}\binom{d(v)}{2}\ \ge\ \frac{2m^2}{n}-m.\]
+
+Proof.
+First, count triples $(v,\{u,w\})$ where $u,w$ are distinct neighbors of $v$.
+For fixed $v$, there are $\binom{d(v)}{2}$ such unordered pairs $\{u,w\}$, so the total number of such triples is $\sum_v \binom{d(v)}{2}$.
+On the other hand, for a fixed unordered pair $\{u,w\}$, the number of $v$ adjacent to both $u$ and $w$ is exactly $\mathrm{codeg}(u,w)$.
+Thus the same total equals $\sum_{\{u,w\}} \mathrm{codeg}(u,w)=S$.
+
+For the inequality, expand
+\[\sum_{v}\binom{d(v)}{2}=\frac12\sum_v \big(d(v)^2-d(v)\big)=\frac12\left(\sum_v d(v)^2-2m\right)\]
+since $\sum_v d(v)=2m$.
+By Cauchy--Schwarz, $\sum_v d(v)^2 \ge \frac1n(\sum_v d(v))^2=\frac{(2m)^2}{n}$.
+Substituting gives
+\[S\ge \frac12\left(\frac{4m^2}{n}-2m\right)=\frac{2m^2}{n}-m.\qed\]
+
+Corollary 4 (A partial supersaturation statement for $m\gg n^{3/2}$).
+Fix $\delta>0$. If $m\ge (1/2+\delta)\,n^{3/2}$ and $n$ is sufficiently large in terms of $\delta$, then
+\[N_{C_4}(G)\ \ge\ c_\delta\, n^2\]
+for some constant $c_\delta>0$ depending only on $\delta$.
+
+Proof.
+Insert the lower bound from Lemma 3 into Lemma 2.
+When $m\asymp n^{3/2}$ with constant $(1/2+\delta)$, Lemma 3 gives $S\ge (1/2+2\delta+o_\delta(1))n^2$ as $n\to\infty$.
+Since $\binom{n}{2}=(1/2+o(1))n^2$, the expression $\frac14(S^2/\binom{n}{2}-S)$ is then $\asymp_\delta n^2$ and positive for $n$ large.
+This yields the claim. \qed
+
+FAST REALITY CHECK (local computation; exhaustive for small $n$).
+I exhaustively enumerated all graphs on $n$ vertices for $4\le n\le 7$.
+Let $e_n:=\mathrm{ex}(n;C_4)$ and let $m_n$ be the minimum possible number of $C_4$ copies among graphs with $e_n+1$ edges.
+\[
+\begin{array}{c|c|c}
+n & e_n & m_n \\\hline
+4 & 4 & 1\\
+5 & 6 & 2\\
+6 & 7 & 1\\
+7 & 9 & 1
+\end{array}
+\]
+So for small $n$ the ``at least $2$ copies'' phenomenon holds at $n=5$ but fails at $n=4,6,7$.
+
+5) VERIFICATION
+- Lemma 1: each $C_4$ has exactly two opposite-vertex pairs, giving the factor $1/2$.
+- Lemma 2: the inequality comes from $\sum k_i^2\ge (\sum k_i)^2/M$, applied to codegrees over all vertex pairs.
+- Lemma 3: double-counts triples $(v,\{u,w\})$ where $u,w$ are neighbors of $v$, and then applies Cauchy--Schwarz to degrees.
+- Corollary 4 is genuinely far from the extremal threshold: it only gives many $C_4$ when $m$ exceeds the extremal scale by a fixed proportion.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved general counting identities and inequalities for the number of $C_4$ copies in terms of codegrees (Lemmas 1--3),
+and derived a partial supersaturation statement when $m\ge (1/2+\delta)n^{3/2}$ (Corollary 4).
+
+(ii) First gap:
+Convert the hypothesis $m>\mathrm{ex}(n;C_4)$ (which may be as small as $\mathrm{ex}(n;C_4)+1$) into a quantitative lower bound on codegree concentration
+strong enough to force $\gg n^{1/2}$ many $C_4$.
+The simple inequalities above only become effective when $m$ is \emph{far} above the extremal threshold.
+
+(iii) Top 3 next moves (concrete):
+1. Study extremal $C_4$-free graphs for $\mathrm{ex}(n;C_4)$ and prove a stability statement: any $C_4$-free graph with $\mathrm{ex}(n;C_4)-o(n^{3/2})$ edges must be structurally close to a known construction.
+2. Prove a ``local supersaturation'' lemma: adding one edge to a near-extremal $C_4$-free graph forces many 4-cycles because the endpoints already have many common neighbors.
+3. Compute (or bound) the minimal possible $N_{C_4}(G)$ among graphs with $\mathrm{ex}(n;C_4)+1$ edges for larger $n$ (e.g. via heuristic/ILP search) to see whether the conjectured $\gg n^{1/2}$ is numerically plausible.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A family of graphs $G_n$ obtained by adding $O(1)$ carefully chosen edges to a near-extremal $C_4$-free graph with $\mathrm{ex}(n;C_4)$ edges,
+where each added edge creates only $o(n^{1/2})$ new 4-cycles because the endpoints have unusually small common-neighborhood overlap.
+

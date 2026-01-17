@@ -1,0 +1,116 @@
+% Erdos problem #129
+% Solution / disproof for Erdos Problem #129 as written
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? not needed
+
+1) FORMAL RESTATEMENT
+
+Let $R(n;k,r)$ be the least $N$ such that in every $r$-coloring of the edges of $K_N$ there exists a set of $n$ vertices that does **not** contain a copy of $K_k$ in at least one of the $r$ colors.
+(So for $k=3,r=2$, an $n$-set is "bad" if it has no red triangle or no blue triangle.)
+
+**Claim in the problem text.** There exists a constant $C=C(r)>1$ such that
+\[
+R(n;3,r) < C^{\sqrt{n}}\quad\text{for all }n.
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- The text itself states the claim is false for $r=2$ (Erdos--Hajnal--Rado 1965) and sketches the reason: every $n$-set contains $\gg n^2$ edge-disjoint triangles, so a random 2-coloring makes it unlikely for an $n$-set to be triangle-free in a given color.
+
+3) ATTACK PLAN
+
+- Produce a rigorous probabilistic construction for $r=2$ showing $R(n;3,2)\ge c^n$ for some $c>1$.
+- This contradicts the stated upper bound $C^{\sqrt{n}}$.
+
+4) WORK
+
+Lemma 4.1 (Many edge-disjoint triangles in $K_n$).
+Let $n\ge 3$ and let $m=\lfloor n/3\rfloor$.
+Then $K_n$ contains at least $m^2$ edge-disjoint triangles.
+
+*Proof.* Choose disjoint vertex classes $A,B,C$ of size $m$ inside $[n]$.
+Consider the complete tripartite subgraph $K_{m,m,m}$ on $A\cup B\cup C$.
+Label each class by the group $\mathbb{Z}_m$.
+For each pair $(a,b)\in A\times B$, define $c:=a+b\in \mathbb{Z}_m$ and take the triangle $(a,b,c)$.
+This produces exactly $m^2$ triangles.
+Each edge between $A$ and $B$ is used exactly once by construction.
+Given an edge between $B$ and $C$, say $(b,c)$, it appears in exactly one triangle because $a=c-b$ is uniquely determined; similarly for edges between $C$ and $A$.
+Hence these $m^2$ triangles are edge-disjoint. \qed
+
+Lemma 4.2 (A fixed $n$-set is very unlikely to be missing a monochromatic triangle).
+Let $S$ be a fixed set of $n$ vertices in $K_N$, and color edges red/blue independently with probability $1/2$ each.
+Let $t:=\lfloor n/3\rfloor^2$ be the number of edge-disjoint triangles guaranteed by Lemma 4.1 inside $S$.
+Then
+\[
+\mathbb{P}(S\text{ has no red triangle}) \le (7/8)^t,
+\qquad
+\mathbb{P}(S\text{ has no blue triangle}) \le (7/8)^t,
+\]
+and hence
+\[
+\mathbb{P}(S\text{ is bad}) \le 2(7/8)^t.
+\]
+
+*Proof.*
+For each of the $t$ edge-disjoint triangles $T_1,\dots,T_t$ from Lemma 4.1, the event
+$E_i=\{\text{``$T_i$ is entirely red''}\}$ depends only on the colors of the three edges of $T_i$.
+Because the triangles are edge-disjoint, these edge-sets are disjoint, and the events $E_i$ are independent.
+Also $\mathbb{P}(E_i)=(1/2)^3=1/8$.
+Therefore
+\[
+\mathbb{P}(S\text{ has no red triangle}) \le \mathbb{P}(E_1^c\cap\cdots\cap E_t^c)
+= \prod_{i=1}^t (1-1/8) = (7/8)^t.
+\]
+The blue case is identical. The final inequality is a union bound.
+\qed
+
+Lemma 4.3 (Existence of an exponential-size coloring with no bad $n$-set).
+There exists an absolute constant $c>1$ such that for all sufficiently large $n$,
+\[
+R(n;3,2) \ge c^n.
+\]
+
+*Proof.* Let $t:=\lfloor n/3\rfloor^2$.
+For a given $N$, let $X$ be the random variable counting bad $n$-vertex subsets in the random coloring.
+By Lemma 4.2 and linearity of expectation,
+\[
+\mathbb{E}X \le \binom{N}{n}\cdot 2\left(\frac78\right)^t.
+\]
+Use the standard bound $\binom{N}{n}\le (eN/n)^n$.
+Choose $N:=\exp(\gamma n)$ with a small constant $\gamma>0$ to be fixed.
+Then
+\[
+\log \mathbb{E}X \le n\log\left(\frac{eN}{n}\right) + \log 2 + t\log\left(\frac78\right)
+= n\left(\gamma n + O(\log n)\right) + t\log\left(\frac78\right) + O(1).
+\]
+Since $t\sim n^2/9$ and $\log(7/8)<0$, for any fixed $\gamma$ with
+\[
+\gamma < -\frac{1}{9}\log\left(\frac78\right)
+\]
+(and ignoring the lower-order $O(n\log n)$ term for large $n$), the dominant $n^2$ coefficient is negative and thus $\mathbb{E}X<1$ for all sufficiently large $n$.
+Hence there exists a coloring with $X=0$, i.e. with no bad $n$-set.
+For such an $N$, the definition of $R(n;3,2)$ implies $R(n;3,2)>N$.
+Thus $R(n;3,2)\ge \exp(\gamma n)=c^n$ where $c:=e^\gamma>1$.
+\qed
+
+Conclusion: disproof of the stated bound.
+Lemma 4.3 gives $R(n;3,2)\ge c^n$ for some $c>1$ and large $n$, which contradicts any bound of the form $R(n;3,2) < C^{\sqrt{n}}$.
+Therefore the claim "$\exists C(r)$ such that $R(n;3,r) < C(r)^{\sqrt{n}}$" is false as written (already for $r=2$).
+
+5) VERIFICATION
+
+- Lemma 4.1 provides an explicit edge-disjoint packing inside a $K_{m,m,m}$ subgraph.
+- Lemma 4.2 correctly uses independence because triangles are edge-disjoint.
+- The union bound and expectation argument are standard; the exponent comparison shows one can choose $\gamma>0$.
+
+6) FINAL
+
+LABEL: **FULL SOLUTION**
+SUBLABEL: **COUNTEREXAMPLE/DISPROOF**
+
+Explicit disproof: for $r=2$, the probabilistic construction above shows $R(n;3,2)\ge c^n$ for some $c>1$ and all large $n$, contradicting $R(n;3,2)<C^{\sqrt{n}}$.
+
+

@@ -1,0 +1,94 @@
+% Attempt for Erdos Problem #276
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Fix integers $a_0,a_1\in\mathbb{Z}$ and define $(a_n)_{n\ge 0}$ by the Lucas/Fibonacci recurrence
+\[a_{n+2}=a_{n+1}+a_n\qquad(n\ge 0).\]
+Call the sequence \emph{composite} if every $a_n$ is a composite integer (in particular $|a_n|>1$ and $a_n$ is not prime).
+The condition “no integer has a common factor with every term” means
+\[\gcd(a_0,a_1,a_2,\dots)=1.\]
+
+The first (well-posed) question is: does there exist such a sequence?
+The problem statement says Graham exhibited explicit $a_0,a_1$ producing one.
+
+The second question (“without an underlying system of covering congruences responsible”) is not formally defined in the statement; see (ii) in FINAL for a precise blocker and a minimal candidate formalization.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only record what the statement claims: Graham constructed an explicit composite Lucas sequence with $\gcd$ of all terms equal to $1$, using covering systems; and there is a conjectural construction “not explained by a covering system”. I have not verified the literature claims here.
+
+3) ATTACK PLAN
+Proof track:
+1. Prove structural facts: describe $\gcd$ of the whole sequence; periodicity modulo $m$; forced divisibility patterns.
+2. For a proposed “no covering system responsible” formalization, try to show it is satisfied (or violated) by known constructions.
+
+Disproof track:
+1. If a strong formalization is adopted, try to show every composite Lucas sequence necessarily admits a finite covering mechanism (using periodicity mod primes).
+
+Chosen path: establish rigorous invariants and do a concrete sanity check on Graham’s explicit initial values; the “no covering system” part remains ill-defined.
+
+4) WORK
+Lemma 1 (Constant gcd of consecutive terms).
+Let $(a_n)$ satisfy $a_{n+2}=a_{n+1}+a_n$. Then for all $n\ge 0$,
+\[\gcd(a_n,a_{n+1})=\gcd(a_0,a_1).\]
+
+Proof.
+For every $n\ge 0$,
+\[\gcd(a_{n+1},a_{n+2})=\gcd(a_{n+1},a_{n+1}+a_n)=\gcd(a_{n+1},a_n).\]
+Thus $\gcd(a_n,a_{n+1})$ is constant in $n$ by induction. \qed
+
+Lemma 2 (Common divisor of all terms).
+Let $d=\gcd(a_0,a_1)$. Then $d\mid a_n$ for every $n\ge 0$. Moreover, if an integer $q$ divides every $a_n$, then $q\mid d$.
+Consequently,
+\[\gcd(a_0,a_1,a_2,\dots)=\gcd(a_0,a_1).\]
+
+Proof.
+If $d\mid a_0,a_1$ then by the recurrence $d\mid a_2=a_1+a_0$, and inductively $d\mid a_n$ for all $n$.
+Conversely, if $q\mid a_n$ for all $n$ then in particular $q\mid a_0$ and $q\mid a_1$, so $q\mid \gcd(a_0,a_1)=d$.
+This characterizes the gcd of the whole sequence as $d$. \qed
+
+Lemma 3 (Pure periodicity modulo $m$).
+Fix $m\ge 2$. The sequence of pairs $(a_n\bmod m,\ a_{n+1}\bmod m)$ is purely periodic, with period at most $m^2$.
+In particular, $(a_n\bmod m)$ is periodic with period at most $m^2$.
+
+Proof.
+Work in $(\mathbb{Z}/m\mathbb{Z})^2$ and define the update map
+\[T(x,y)=(y,x+y)\pmod m.\]
+Then $T$ is bijective with inverse $T^{-1}(x,y)=(y-x,x)\pmod m$.
+Therefore the orbit of the initial pair $(a_0\bmod m,\ a_1\bmod m)$ under $T$ lies in a finite set of size $m^2$ and, since $T$ is bijective, must be a cycle (no preperiod).
+Hence the pair sequence is periodic with some period $\le m^2$. \qed
+
+FAST REALITY CHECK (computation, Graham’s explicit $a_0,a_1$).
+With
+\[a_0 = 1786772701928802632268715130455793,\quad a_1 = 1059683225053915111058165141686995,\]
+I computed $\gcd(a_0,a_1)=1$, so Lemma 2 confirms the “no common factor with every term” condition is equivalent to this gcd being $1$.
+For the first few terms, a quick trial division search found small prime factors for $a_1,\dots,a_9$ (e.g. $3\mid a_1$, $2\mid a_2$, $7\mid a_3$, $17\mid a_4$); for $a_0$ no prime factor $\le 1000$ was found (I did not factor $a_0$).
+
+5) VERIFICATION
+- Lemmas 1–2 are exact equalities about gcd/divisibility and use only the recurrence.
+- Lemma 3 relies on invertibility of the state update map modulo $m$; the explicit inverse is checked directly.
+- The computational check only verifies $\gcd(a_0,a_1)=1$ and small factors for early terms; it does not verify “all $a_n$ composite”.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Any common divisor of all terms equals $\gcd(a_0,a_1)$ (Lemma 2), and the sequence is purely periodic modulo every $m$ with period $\le m^2$ (Lemma 3). For Graham’s stated initial values, $\gcd(a_0,a_1)=1$.
+
+(ii) First gap:
+The phrase “without an underlying system of covering congruences responsible” is undefined. A minimal formalization I cannot justify from the statement alone is:
+there does not exist a \emph{finite} set of congruences $n\equiv r_j\pmod{M_j}$ together with primes $p_j$ such that for every $n\ge 0$ there is some $j$ with $n\equiv r_j\pmod{M_j}$ and $p_j\mid a_n$.
+Under any such formalization, I do not have a proof or disproof.
+
+(iii) Top 3 next moves:
+1. Fix an explicit formal definition of “covering system responsible” (finite vs infinite cover; whether primes may repeat; whether one covers all $n$ or only all large $n$).
+2. For a proposed Lucas sequence, compute $(a_n\bmod p)$ periods for many small primes $p$ and attempt to \emph{algorithmically} extract a finite covering system if one exists.
+3. Search for smaller initial conditions $(a_0,a_1)$ producing long runs of composite terms with $\gcd(a_0,a_1)=1$, to look for patterns contradicting (or supporting) any covering-system hypothesis.
+
+(iv) Minimal counterexample structure (if the “no covering system” conjecture were false):
+Every composite Lucas sequence with $\gcd(a_0,a_1)=1$ would admit a finite list of congruence classes of indices $n$ whose union is all of $\mathbb{N}$, each class forcing divisibility of $a_n$ by a predetermined prime. Such a certificate would exploit the periodicity in Lemma 3 in an essentially finite way.
+

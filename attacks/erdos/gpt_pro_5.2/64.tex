@@ -1,0 +1,157 @@
+% Erdős Problem #64
+% URL: https://www.erdosproblems.com/64
+
+Does every finite graph with minimum degree at least 3 contain a cycle of length $2^k$ for some $k\geq 2$? Conjectured by Erd\H{o}s and Gy\'{a}rf\'{a}s, who believed the answer must be negative, and in fact for every $r$ there must be a graph of minimum degree at least $r$ without a cycle of length $2^k$ for any $k\geq 2$. This was solved in the affirmative if the minimum degree is larger than some absolute constant by Liu and Montgomery \cite{LiMo20} (therefore disproving the above stronger conjecture of Erd\H{o}s and Gy\'{a}rf\'{a}s). Liu and Montgomery prove a much stronger result: if the average degree of $G$ is sufficiently large then there is some large integer $\ell$ such that for every even integer $m\in [(\log \ell)^8,\ell]$, $G$ contains a cycle of length $m$. An infinite tree with minimum degree $3$ shows that the answer is trivially false for infinite graphs. See also the entry in the graphs problem collection . References [LiMo20] Liu, Hong and Montgomery, Richard, A solution to Erd\H{o}s and Hajnal's odd cycle problem . arXiv:2010.15802 (2020).
+
+%Erdos problem 64
+\subsection*{FORMAL RESTATEMENT}
+Let $G$ be a finite simple graph with minimum degree $\delta(G)\ge 3$.
+Question (Erd\H{o}s--Gy\'{a}rf\'{a}s): must there exist an integer $k\ge2$ such that $G$ contains a simple cycle of 
+length exactly $2^k$?
+(Here $k\ge2$ means the target lengths are $4,8,16,\dots$.)
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+Only what is explicitly stated above is treated as context:
+\begin{itemize}
+\item Erd\H{o}s and Gy\'{a}rf\'{a}s posed the question for $\delta\ge3$ and suggested there might even be counterexamples for 
+all large minimum degrees.
+\item The statement records that for sufficiently large minimum/average degree the answer is affirmative (Liu--Montgomery).
+\item For infinite graphs the statement is false (infinite 3-regular tree).
+\end{itemize}
+No other external results are assumed.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item Prove unconditional facts forced by $\delta(G)\ge3$: existence of cycles, existence of even cycles, and bounds on 
+shortest cycle length.
+\item Do a small-$n$ exhaustive search for potential finite counterexamples where the only available power-of-two cycle 
+lengths are small.
+\item Identify the exact gap: how to force a \emph{specific} power-of-two length rather than just ``some even length''.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 1 (Minimum degree $\ge3$ forces an even cycle).}
+Every finite graph $G$ with $\delta(G)\ge 3$ contains an even cycle.
+
+\emph{Proof.}
+We prove the contrapositive: if a finite graph has no even cycle, then it has a vertex of degree at most $2$.
+
+Assume $G$ has no even cycle. Consider any block (2-connected component) $B$ of $G$.
+If $B$ is acyclic, then $B$ is a single edge $K_2$.
+Otherwise, $B$ contains a cycle $C$.
+Since $G$ has no even cycle, every cycle in $G$ (hence in $B$) is odd, so $|C|$ is odd.
+
+We claim that in this situation $B=C$ (so $B$ is an odd cycle).
+Suppose for contradiction that $B$ has a vertex outside $C$.
+Because $B$ is connected, choose a vertex $x\in V(B)\setminus V(C)$ that has a neighbor $u\in V(C)$ and is chosen so that
+$x$ is at minimum possible distance from $C$ (equivalently, take $x$ to be the last vertex before $C$ on a shortest path
+from some outside vertex to $C$). Then $xu$ is an edge and $x\notin V(C)$.
+
+Since $B$ is 2-connected, $u$ is not a cutvertex of $B$, so $B-u$ is connected.
+In particular, in $B-u$ there is a (simple) path $P$ from $x$ to some vertex $v\in V(C)\setminus\{u\}$.
+Choose such a path $P$ with no repeated vertices.
+By construction, $P$ avoids $u$.
+Also, $P$ cannot meet $C$ at any internal vertex: if an internal vertex of $P$ lay on $C$, then we would obtain a path
+from $x$ to $C$ that hits $C$ earlier than $v$, contradicting the choice of $x$ as being at minimum distance from $C$.
+Thus $P$ intersects $C$ only at its endpoint $v$.
+
+Now, in the cycle $C$, there are exactly two internally vertex-disjoint $u$--$v$ paths; call them $Q_1$ and $Q_2$.
+Their lengths have opposite parity because
+$|Q_1|+|Q_2|=|C|$ is odd.
+Consider the two cycles obtained by concatenation:
+\[\Gamma_i := u\!\stackrel{xu}{-}\!x\;\cup\;P\;\cup\;Q_i\qquad (i=1,2).\]
+Each $\Gamma_i$ is a simple cycle in $B$.
+Its length is $1+|P|+|Q_i|$.
+Since $|Q_1|$ and $|Q_2|$ have opposite parity, the two numbers $1+|P|+|Q_1|$ and $1+|P|+|Q_2|$ have opposite parity.
+Therefore one of $\Gamma_1,\Gamma_2$ is an even cycle, contradicting the assumption that $G$ has no even cycle.
+This contradiction shows that no such $x$ exists, hence $V(B)=V(C)$ and $B$ is exactly an odd cycle.
+
+We have proved: every block of $G$ is either a single edge or an odd cycle.
+The block-cutpoint graph of $G$ is a finite tree, so it has a leaf block $B$.
+If $B$ is a single edge, then one endpoint of that edge is not a cutvertex and has degree $1$ in $G$.
+If $B$ is an odd cycle, then $B$ meets the rest of the graph in at most one cutvertex, so there is a vertex of $B$
+that is not a cutvertex; that vertex has degree $2$ in $G$.
+In either case, $G$ has a vertex of degree at most $2$.
+
+Thus any graph with $\delta(G)\ge 3$ cannot be even-cycle-free; equivalently, it must contain an even cycle.
+\hfill$\square$
+\medskip
+\textbf{Lemma 2 (A short cycle in minimum-degree-$\ge3$ graphs).}
+Let $G$ be a finite graph with $n$ vertices and $\delta(G)\ge3$.
+Define
+\[t := 1+\left\lfloor\log_2\!\left(\frac{n+2}{3}\right)\right\rfloor.\]
+Then $G$ contains a cycle of length at most $2t+1$.
+In particular, for all $n\ge3$ it contains a cycle of length at most $2\lceil\log_2 n\rceil+3$.
+
+\emph{Proof.}
+Let $g$ be the girth of $G$ (the length of a shortest cycle).
+Fix a vertex $r$ and perform BFS from $r$.
+For an integer $s\ge0$, consider the ball $B_s(r)$ of vertices at distance at most $s$ from $r$.
+If $g>2s+1$, then $B_s(r)$ induces a tree:
+if two distinct BFS paths from $r$ met the same vertex within depth $s$, or if there were an extra edge within the explored
+ball, we would obtain a cycle of length at most $2s+1$.
+In such an induced tree, the root $r$ has at least $3$ children, and every other vertex has at least $2$ children:
+indeed, a vertex $x$ at level $i\ge1$ has at least $3$ neighbors in $G$, one of which is its parent in the BFS tree.
+If $x$ had any other neighbor in level $i-1$ or in level $i$, this would create a cycle of length at most $2s+1$,
+contradicting $g>2s+1$.
+Hence, under $g>2s+1$, all remaining neighbors of $x$ must lie in level $i+1$, giving at least $2$ children.
+Therefore
+\[
+|B_s(r)| \ge 1 + 3\sum_{i=0}^{s-1}2^i = 3\cdot 2^s-2.
+\]
+Thus, if $g>2s+1$ then necessarily $n\ge 3\cdot 2^s-2$.
+Contrapositively, if $3\cdot 2^s-2>n$, then $g\le 2s+1$.
+
+Now take $s=t$ as defined in the lemma.
+By definition of $t$, we have $2^{t-1} \le (n+2)/3 < 2^t$, so $3\cdot 2^t-2>n$.
+Hence $g\le 2t+1$, i.e., $G$ contains a cycle of length at most $2t+1$.
+Finally, since $(n+2)/3\le n$ for $n\ge3$, we have $t\le 1+\lfloor\log_2 n\rfloor\le \lceil\log_2 n\rceil+1$,
+which implies the weaker explicit bound $2t+1\le 2\lceil\log_2 n\rceil+3$.
+\hfill$\square$
+\medskip
+\textbf{FAST REALITY CHECK (exact for $n\le7$).}
+For $n\le7$, the only power-of-two cycle length available is $4$.
+I exhaustively searched all graphs on $n=7$ vertices and found:
+\begin{quote}
+Every graph on $7$ vertices with minimum degree at least $3$ contains at least one $4$-cycle.
+\end{quote}
+So there is no counterexample with $n\le7$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 1: the key structural claim is ``a block with exactly one cycle must be that cycle'', which is standard: 
+2-connected + unicyclic forces the whole component to be the cycle.
+The leaf-block argument is a standard use of the block-cutpoint tree.
+\item Lemma 2: the BFS growth lower bound uses a worst-case tree expansion argument; the ``collision implies short cycle'' 
+step is justified by explicitly constructing a cycle from two distinct paths in the BFS tree.
+\item Computation: the exhaustive search for $n=7$ ranges over $2^{21}$ graphs and filters by minimum degree, then checks 
+for $4$-cycles by codegree counting; it found no counterexample.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result here: every finite graph with $\delta\ge3$ contains an even cycle (Lemma 1), and in 
+addition contains a cycle of length at most $2\lceil\log_2 n\rceil+3$ (Lemma 2).
+Also, by exhaustive search, the Erd\H{o}s--Gy\'{a}rf\'{a}s property holds for all graphs with $n\le7$.
+
+(ii) First gap: strengthen the existence of \emph{some} even cycle to the existence of a cycle whose length is exactly a 
+power of two.
+Formally: given that $G$ contains some even cycle length $\ell$, prove that $G$ must contain a cycle length $2^k$ for 
+some $k\ge2$, or construct a graph with $\delta\ge3$ whose even cycle lengths avoid all powers of two.
+
+(iii) Top 3 next moves:
+\begin{itemize}
+\item Search for explicit constructions (e.g., sparse regular graphs of large girth) whose cycle-length set avoids 
+$\{4,8,16,\dots\}$; computational search over cubic graphs of moderate size could help.
+\item Try to prove ``interval'' results: show that $\delta\ge3$ forces the existence of cycles of all even lengths in some 
+interval $[L,2L]$; such a result would immediately imply a power-of-two length.
+\item Explore whether adding expansion hypotheses (or using existing high-min-degree cycle-distribution theorems, if allowed) 
+can be adapted down to $\delta=3$.
+\end{itemize}
+
+(iv) Minimal counterexample structure (if the conjecture were false): a finite graph with $\delta\ge3$ whose set of cycle 
+lengths contains no power of two. Such a graph must in particular avoid $4$-cycles, so it would have girth at least $5$, 
+and also avoid $8$-cycles, $16$-cycles, etc., suggesting a highly constrained cycle spectrum.
+
+

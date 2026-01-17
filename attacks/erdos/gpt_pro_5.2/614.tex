@@ -1,0 +1,189 @@
+% Erdos Problem #614
+% URL: https://www.erdosproblems.com/614
+
+FORMAL RESTATEMENT
+Fix integers $n\ge 1$ and $k\ge 0$ with $k+2\le n$.
+Let $f(n,k)$ be the minimum integer $m$ for which there exists a graph $G$ on $n$
+vertices with $m$ edges such that:
+
+\medskip
+\noindent For every subset $S\subseteq V(G)$ with $|S|=k+2$, the induced subgraph
+$G[S]$ has maximum degree at least $k$.
+
+Equivalently, every $(k+2)$-vertex induced subgraph contains a vertex adjacent
+(to other vertices of $S$) to at least $k$ of the $k+1$ possible neighbors.
+
+The problem asks to determine $f(n,k)$.
+
+QUICK LITERATURE/CONTEXT CHECK
+I do not use external sources; I only use information in the problem file.
+The problem file states that a similar question for hypergraphs was asked by
+Erd\H{o}s, R\'enyi, and S\'os.
+No formula for $f(n,k)$ is provided there.
+
+ATTACK PLAN
+Reformulate the local degree condition in several convenient ways:
+\begin{itemize}
+\item For small $k$ (notably $k=1$) the condition becomes a familiar extremal
+property (no independent set of size $3$), allowing an exact answer.
+\item For large $k$ near $n$, the condition collapses to a global degree
+requirement (e.g., when $k=n-2$).
+\item For general $k$, pass to the complement graph to turn ``max degree $\ge k$''
+into a statement about existence of a vertex of induced degree $\le1$.
+\end{itemize}
+Also do small-$n$ brute force to sanity-check formulas.
+
+WORK
+\textbf{Lemma 1 (exact value for $k=1$).}
+For $n\ge 3$,
+\[
+ f(n,1)=\binom{n}{2}-\Bigl\lfloor\frac{n^2}{4}\Bigr\rfloor.
+\]
+
+\emph{Proof.}
+When $k=1$, the condition says:
+for every $3$-vertex set $S$, the induced graph $G[S]$ has maximum degree at
+least $1$. A $3$-vertex graph has maximum degree $0$ iff it has no edges.
+Thus the condition is equivalent to: \emph{every $3$ vertices span at least one
+edge}, i.e., $G$ has no independent set of size $3$.
+Equivalently, the independence number satisfies $\alpha(G)\le2$.
+
+Let $\overline{G}$ be the complement graph. Then $\alpha(G)\le2$ iff
+$\overline{G}$ has no triangle: an independent triple in $G$ is exactly a
+triangle in $\overline{G}$.
+So our problem is:
+minimize $e(G)$ subject to $\overline{G}$ being triangle-free.
+Since $e(G)+e(\overline{G})=\binom{n}{2}$, this is equivalent to maximizing the
+number of edges in a triangle-free $n$-vertex graph.
+
+We now prove Mantel's theorem:
+\emph{a triangle-free graph on $n$ vertices has at most $\lfloor n^2/4\rfloor$
+edges}.
+Let $H$ be triangle-free with $m:=e(H)$ edges. For each edge $xy\in E(H)$, the sets
+$N(x)\setminus\{y\}$ and $N(y)\setminus\{x\}$ are disjoint (otherwise a common
+neighbor would form a triangle with edge $xy$).
+Hence
+\[
+(\deg(x)-1)+(\deg(y)-1) \le n-2\quad\text{for every edge }xy.
+\]
+Summing over all edges gives
+\[
+\sum_{xy\in E(H)} (\deg(x)+\deg(y)) \le m\,n.
+\]
+But the left-hand side equals $\sum_{x\in V(H)} \deg(x)^2$ because each vertex $x$
+contributes $\deg(x)$ to the sum for each incident edge, i.e., contributes
+$\deg(x)\cdot \deg(x)=\deg(x)^2$.
+So
+\[
+\sum_{x} \deg(x)^2 \le m\,n.
+\]
+By Cauchy--Schwarz,
+$\sum_x \deg(x)^2 \ge \frac{1}{n}\bigl(\sum_x \deg(x)\bigr)^2
+=\frac{1}{n}(2m)^2=\frac{4m^2}{n}$.
+Thus $\frac{4m^2}{n}\le mn$, i.e. $4m\le n^2$, so $m\le n^2/4$.
+Since $m$ is an integer, $m\le \lfloor n^2/4\rfloor$.
+
+Therefore $\max e(\overline{G}) = \lfloor n^2/4\rfloor$, and hence
+\[
+ f(n,1)=\binom{n}{2}-\Bigl\lfloor\frac{n^2}{4}\Bigr\rfloor.
+\hfill \square
+\]
+
+\medskip
+\textbf{Lemma 2 (exact value for $k=n-2$).}
+For every $n\ge2$,
+\[
+ f(n,n-2)=n-2.
+\]
+
+\emph{Proof.}
+Here $k+2=n$, so the condition is just that the whole graph $G$ has
+maximum degree at least $n-2$.
+
+\underline{Lower bound.}
+If $G$ has $m$ edges then its maximum degree is at most $m$ (since every edge
+contributes to the degree of at most two vertices and a single vertex can be
+incident to at most all $m$ edges). Thus if $m\le n-3$ then
+$\Delta(G)\le m\le n-3$, violating the requirement $\Delta(G)\ge n-2$.
+So $f(n,n-2)\ge n-2$.
+
+\underline{Construction.}
+Take vertices $v,u_1,\dots,u_{n-2},w$.
+Connect $v$ to each $u_i$ (for $1\le i\le n-2$), and add no other edges.
+This graph has exactly $n-2$ edges and has maximum degree $\deg(v)=n-2$.
+Hence $f(n,n-2)\le n-2$.
+Combining gives equality.
+\hfill $\square$
+
+\medskip
+\textbf{Lemma 3 (complement reformulation for general $k$).}
+Let $G$ be a graph and $H:=\overline{G}$ its complement.
+For fixed $k$ and $n$, $G$ satisfies
+``every $(k+2)$-set induces maximum degree $\ge k$''
+if and only if $H$ satisfies:
+
+\medskip
+\noindent for every $S\subseteq V(H)$ with $|S|=k+2$, the induced subgraph $H[S]$
+contains a vertex of (induced) degree $\le 1$.
+
+\emph{Proof.}
+Fix $S$ with $|S|=k+2$ and fix $v\in S$.
+In $G[S]$, the degree of $v$ equals the number of neighbors of $v$ in $S\setminus\{v\}$.
+In $H[S]$, the degree of $v$ equals the number of \emph{non}-neighbors of $v$ in
+$S\setminus\{v\}$.
+Since $|S\setminus\{v\}|=k+1$, we have
+\[
+\deg_{G[S]}(v) + \deg_{H[S]}(v) = k+1.
+\]
+Therefore $\deg_{G[S]}(v)\ge k$ is equivalent to $\deg_{H[S]}(v)\le 1$.
+Taking the maximum over $v$ on the left is equivalent to taking the minimum
+condition ``there exists $v$ with $\deg_{H[S]}(v)\le 1$'' on the right.
+\hfill $\square$
+
+VERIFICATION
+\textbf{FAST REALITY CHECK (computation).}
+I brute-forced $f(n,k)$ for all $n\le7$ by enumerating all graphs on $n$ labeled
+vertices and checking the defining property.
+The exact values found were:
+\[
+\begin{array}{c|l}
+ n & (k\mapsto f(n,k))\\\hline
+3 & f(3,1)=1\\
+4 & f(4,1)=2,\ f(4,2)=2\\
+5 & f(5,1)=4,\ f(5,2)=4,\ f(5,3)=3\\
+6 & f(6,1)=6,\ f(6,2)=8,\ f(6,3)=7,\ f(6,4)=4\\
+7 & f(7,1)=9,\ f(7,2)=12,\ f(7,3)=11,\ f(7,4)=9,\ f(7,5)=5
+\end{array}
+\]
+These match Lemma 1 for $k=1$ (e.g. $f(7,1)=\binom72-\lfloor 49/4\rfloor=21-12=9$)
+and Lemma 2 for $k=n-2$ (e.g. $f(7,5)=5$).
+
+FINAL
+**UNRESOLVED**
+(i) Strongest proved partial results: an exact formula for $f(n,1)$ (Lemma 1),
+an exact formula for $f(n,n-2)$ (Lemma 2), and an exact complement reformulation
+(Lemma 3). Exhaustive computation gives exact $f(n,k)$ for $n\le7$.
+
+(ii) First gap (crisp): determine $f(n,k)$ for general parameters
+$2\le k\le n-3$ (even asymptotically) and characterize extremal graphs.
+
+(iii) Top 3 next moves:
+1. Use Lemma 3 to translate the problem to maximizing edges in the complement
+under the local condition ``every $(k+2)$-subset has a vertex of induced degree
+$\le1$''; attempt to classify extremal complements.
+2. Push exact computation to $n=8,9$ using smarter search (isomorph rejection,
+SAT/ILP) to guess a general formula or pattern.
+3. Look for natural extremal constructions (e.g., multipartite, blow-ups of
+small graphs) whose complements just barely avoid induced minimum degree $\ge2$
+on $(k+2)$ vertices.
+
+(iv) Minimal counterexample structure:
+Given a conjectured formula for $f(n,k)$, a minimal counterexample would be a
+graph $G$ on $n$ vertices with fewer edges than the conjectured minimum, yet in
+which every $(k+2)$-subset has a vertex adjacent to all but at most one other
+vertex; equivalently (Lemma 3), its complement would be very dense while still
+ensuring that every $(k+2)$-subset contains a vertex of induced degree $0$ or $1$.
+Such complements are expected to contain many dense subgraphs but to have a
+``forced leaf'' in every $(k+2)$-vertex induced subgraph.
+
+

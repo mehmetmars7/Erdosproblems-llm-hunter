@@ -1,0 +1,99 @@
+% Erdos problem #123
+% Attempt for Erdos Problem #123
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? YES (used for small-case checks)
+
+1) FORMAL RESTATEMENT
+
+Fix integers $a,b,c\ge 2$ with $\gcd(a,b)=\gcd(a,c)=\gcd(b,c)=1$.
+Let
+\[
+S(a,b,c)\;:=\;\{a^k b^\ell c^m : k,\ell,m\in \mathbb{N}_0\}\subset \mathbb{N}.
+\]
+(So $1\in S$.)
+
+A finite subset $T\subset S$ is called *divisibility-antichain* if for any two distinct $x,y\in T$ neither $x\mid y$ nor $y\mid x$.
+
+Call $S$ *$d$-complete* if there exists $N_0$ such that every integer $n\ge N_0$ can be written as
+\[
+ n = \sum_{t=1}^M s_t
+\]
+for some finite divisibility-antichain $\{s_1,\dots,s_M\}\subset S$ (in particular all $s_t$ are distinct).
+
+**Problem.** Determine for which pairwise coprime triples $(a,b,c)$ the set $S(a,b,c)$ is $d$-complete.
+
+Stress points / edge cases to watch:
+- The antichain condition forbids using both $1$ and any other element (since $1$ divides everything).
+- Divisibility structure depends strongly on prime factorizations; pairwise coprime assumption is crucial.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- Erdos and Lewin (1981) proved $S(a,b,c)$ is $d$-complete for $(a,b,c)=(3,5,7)$.
+- For $(a,b,c)=(2,5,c)$ with $c$ odd and $c\not\equiv 1\pmod 4$, the sequence is $d$-complete (quoted as due to Erdos and Szekeres, 1960).
+- Ma and Chen (1990) proved $d$-completeness for $(a,b,c)=(2,3,5)$.
+- Erdos conjectured a stronger form for $(2,3,5)$: for every $\varepsilon>0$, all large integers can be represented as a sum of distinct non-dividing elements of $\{2^k3^\ell5^m\}$, all lying in $[b_1,(1+\varepsilon)b_1)$.
+
+3) ATTACK PLAN
+
+- Translate divisibility into a partial order on exponent vectors $(k,\ell,m)$.
+- Try to understand antichains in that poset and whether their value-sums can cover long intervals.
+- Do small computational searches for representability thresholds for specific triples (sanity checks).
+
+4) WORK
+
+Lemma 4.1 (Coordinatewise divisibility).
+Let $(a,b,c)$ be pairwise coprime and let
+$x=a^k b^\ell c^m$ and $y=a^{k'} b^{\ell'} c^{m'}$.
+Then
+\[
+ x\mid y \quad\Longleftrightarrow\quad k\le k',\ \ell\le \ell',\ m\le m'.
+\]
+
+*Proof.* Because $a,b,c$ are pairwise coprime, every prime factor of $a$ is coprime to $b$ and $c$, etc. Thus in the prime factorization of $x$ the primes coming from $a$ occur to exponents proportional to $k$, those from $b$ proportional to $\ell$, and those from $c$ proportional to $m$, and these groups of primes are disjoint. Therefore $x\mid y$ holds exactly when the $a$-part of $x$ divides the $a$-part of $y$ (i.e. $k\le k'$), and similarly for the $b$- and $c$-parts. \qed
+
+Lemma 4.2 (Antichains are antichains of exponent vectors).
+A finite set $T\subset S(a,b,c)$ is a divisibility-antichain if and only if the corresponding set of exponent vectors
+\[\{(k,\ell,m): a^k b^\ell c^m\in T\}\subset \mathbb{N}_0^3\]
+is an antichain under the product order $\preceq$ defined by
+$(k,\ell,m)\preceq (k',\ell',m')$ iff $k\le k'$, $\ell\le \ell'$, $m\le m'$. 
+
+*Proof.* Immediate from Lemma 4.1. \qed
+
+FAST REALITY CHECK (computation).
+For each triple, I generated all monomials $a^k b^\ell c^m\le X$ and searched (by backtracking) for representations of each $n\le X$ as a sum of distinct monomials with the antichain condition. Results:
+- For $(a,b,c)=(2,3,5)$: every integer $1\le n\le 1000$ is representable.
+- For $(a,b,c)=(3,5,7)$: among $1\le n\le 1000$ exactly the following $19$ integers are *not* representable:
+\[
+\{2,4,6,11,13,17,18,19,20,23,29,33,37,43,51,92,100,148,185\}.
+\]
+In particular, all integers $186\le n\le 1000$ are representable in this sense.
+
+5) VERIFICATION
+
+- Lemma 4.1 uses only disjointness of prime factors of $a,b,c$; pairwise coprime is exactly what is needed.
+- Lemma 4.2 is a direct reformulation.
+- The computation only uses summands $\le X$, which is valid because all summands are positive; any representation of $n\le X$ uses summands $\le n\le X$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+- The divisibility relation in $S(a,b,c)$ is exactly coordinatewise on exponent vectors (Lemma 4.1), so the antichain condition is an antichain condition in $\mathbb{N}_0^3$ (Lemma 4.2).
+- Computational evidence: $(2,3,5)$ represents all $n\le 1000$; $(3,5,7)$ represents all $186\le n\le 1000$.
+
+(ii) Exact first gap:
+- Prove (or disprove) that for every pairwise coprime triple $(a,b,c)$, the set $S(a,b,c)$ is $d$-complete (or classify precisely which triples are).
+
+(iii) Top 3 next moves:
+1. Try to build a greedy / covering argument on the exponent-poset antichains that yields long intervals of attainable sums.
+2. Attempt a minimal-counterexample analysis: if a large $n$ is not representable, constrain the maximal element in any candidate antichain and derive contradictions.
+3. Search for structured counterexamples where antichains are forced to be too sparse (e.g., when one base is a large prime vs a small base) and test computationally for growing gaps.
+
+(iv) What a minimal counterexample would likely look like:
+- A triple where one base is so small that divisibility-comparabilities force antichains to concentrate on a narrow "layer" of exponent vectors, potentially limiting attainable sums; or conversely where one base is huge so available summands are too lacunary.
+
+

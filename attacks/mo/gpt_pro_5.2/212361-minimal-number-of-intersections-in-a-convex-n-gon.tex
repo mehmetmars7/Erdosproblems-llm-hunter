@@ -1,0 +1,198 @@
+\section{Problem 212361: Minimal number of intersections in a convex $n$-gon}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+\paragraph{Definitions.}
+Let $P$ be a convex polygon in the Euclidean plane with $n\ge 3$ vertices labeled in cyclic order.
+A \emph{diagonal} is a line segment joining two non-adjacent vertices.
+Consider all diagonals of $P$ and all their intersection points \emph{in the interior of $P$}. If several diagonals pass through the same interior point, that point is counted once.
+
+Let $I(P)$ be the number of distinct interior intersection points of diagonals of $P$.
+Define
+\[
+f(n):=\min\{I(P):\ P\text{ is a convex }n\text{-gon}\}.
+\]
+
+\paragraph{Question (as in the attachment).}
+Determine the asymptotic growth of $f(n)$ as $n\to\infty$; in particular, is it true that
+\[
+f(n)\sim \frac{1}{24}n^4\ ?
+\]
+
+\paragraph{Stress points.}
+\begin{itemize}
+\item For a generic convex $n$-gon (no three diagonals concurrent), $I(P)=\binom{n}{4}\sim \frac1{24}n^4$.
+\item The minimization seeks to maximize concurrency of diagonals subject to convexity.
+\item Total number of intersecting \emph{pairs} of diagonals is always $\binom{n}{4}$ (each 4-tuple of vertices yields exactly one crossing pair), but we count \emph{distinct} intersection points.
+\end{itemize}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK (web available)}
+The attachment already cites Poonen--Rubinstein for the regular $n$-gon count and states that Szemer\'edi--Trotter implies a lower bound $f(n) \ge c n^4$ for some absolute $c>0$. I treat these as standard context and re-derive the $\Omega(n^4)$ bound carefully below using incidence theory.
+
+\subsection*{3) ATTACK PLAN}
+
+\paragraph{Proof track.}
+To prove $f(n)\sim \frac1{24}n^4$, one would need a lower bound of the form
+\[
+I(P)\ge \left(\frac1{24}-o(1)\right)n^4
+\]
+for every convex $n$-gon $P$.
+
+\paragraph{Disproof track.}
+To disprove the asymptotic constant $1/24$, it would suffice to construct a family of convex $n$-gons $P_n$ with
+\[
+\limsup_{n\to\infty}\frac{I(P_n)}{n^4} < \frac1{24}.
+\]
+
+\paragraph{Chosen path.}
+I can give a complete, gap-free proof that $f(n)=\Theta(n^4)$ (i.e.\ both $f(n)\le \binom{n}{4}$ and $f(n)\ge c n^4$ for an absolute $c>0$), using the Szemer\'edi--Trotter incidence theorem. I do not resolve the sharper constant question.
+
+\subsection*{4) WORK}
+
+\begin{theorem}[Trivial upper bound]\label{thm:upper}
+For all $n\ge 3$, $f(n)\le \binom{n}{4}$.
+\end{theorem}
+
+\begin{proof}
+Take any convex $n$-gon in general position (no three diagonals concurrent). Then each choice of $4$ vertices determines exactly one intersection point (the crossing of the two diagonals of that quadrilateral), and distinct $4$-tuples yield distinct intersection points. Hence $I(P)=\binom{n}{4}$ for such a polygon, so $f(n)\le \binom{n}{4}$.
+\end{proof}
+
+\begin{theorem}[Lower bound $f(n)=\Omega(n^4)$ via incidence theory]\label{thm:lower}
+There exists an absolute constant $c>0$ such that for every $n\ge 3$ and every convex $n$-gon $P$,
+\[
+I(P)\ge c\, n^4.
+\]
+Consequently, $f(n)=\Theta(n^4)$.
+\end{theorem}
+
+\begin{proof}
+Fix a convex $n$-gon $P$ and let $S$ be the set of its $n$ vertices. Let $\mathcal L$ be the set of straight lines determined by its diagonals. Since no three vertices of a convex polygon are collinear, each diagonal determines a distinct line; thus
+\[
+|\mathcal L| = \binom{n}{2}-n = \frac{n(n-3)}{2} =:N.
+\]
+Let $\mathcal P$ be the set of distinct interior intersection points of diagonals; thus $|\mathcal P|=I(P)$.
+
+For each point $p\in\mathcal P$, let $m(p)$ be the number of diagonal-lines in $\mathcal L$ passing through $p$. Then $m(p)\ge 2$.
+
+\paragraph{Key identity: the number of crossing \emph{pairs} of diagonals is fixed.}
+In a convex $n$-gon, each choice of $4$ vertices in cyclic order yields exactly one pair of diagonals that cross in the interior. Hence the total number of pairs of diagonals (equivalently, pairs of lines from $\mathcal L$ corresponding to diagonals) that intersect in the interior is exactly
+\[
+\binom{n}{4}.
+\]
+On the other hand, at a point $p$ where $m(p)$ diagonals concur, the number of intersecting pairs of diagonals contributed at $p$ is $\binom{m(p)}{2}$. Summing over $p\in\mathcal P$ gives
+\begin{equation}\label{eq:pairs}
+\sum_{p\in\mathcal P} \binom{m(p)}{2} = \binom{n}{4}.
+\end{equation}
+
+\paragraph{Incidence notation.}
+Let
+\[
+I := \sum_{p\in\mathcal P} m(p)
+\]
+be the total number of incidences between points in $\mathcal P$ and lines in $\mathcal L$.
+
+\paragraph{Step 1: a lower bound on $I$ from \eqref{eq:pairs}.}
+For each $p$, we have
+\[
+\binom{m(p)}{2} = \frac{m(p)(m(p)-1)}{2} \le \frac{m(p)^2}{2}.
+\]
+Hence \eqref{eq:pairs} implies
+\[
+\binom{n}{4} \le \frac12 \sum_{p\in\mathcal P} m(p)^2.
+\]
+By Cauchy--Schwarz,
+\[
+\sum_{p\in\mathcal P} m(p)^2 \ \ge\ \frac{\left(\sum_{p\in\mathcal P} m(p)\right)^2}{|\mathcal P|} \ =\ \frac{I^2}{|\mathcal P|}.
+\]
+Therefore
+\[
+\binom{n}{4} \le \frac12\cdot \frac{I^2}{|\mathcal P|},
+\quad\text{i.e.}\quad
+I \ge \sqrt{2\binom{n}{4}\,|\mathcal P|}.
+\]
+Since $\binom{n}{4}\ge \frac{n^4}{24} - O(n^3)$, for all $n\ge 8$ we have a crude bound $\binom{n}{4}\ge \frac{n^4}{48}$. Thus for $n\ge 8$,
+\begin{equation}\label{eq:I-lower}
+I \ge \sqrt{2\cdot \frac{n^4}{48}\,|\mathcal P|} = \frac{n^2}{\sqrt{24}}\sqrt{|\mathcal P|}.
+\end{equation}
+
+\paragraph{Step 2: an upper bound on $I$ by Szemer\'edi--Trotter.}
+The Szemer\'edi--Trotter theorem states that there is an absolute constant $C_{\mathrm{ST}}$ such that for any finite set of points $\mathcal P$ and lines $\mathcal L$ in the plane,
+\[
+I(\mathcal P,\mathcal L)\ \le\ C_{\mathrm{ST}}\bigl(|\mathcal P|^{2/3}|\mathcal L|^{2/3} + |\mathcal P| + |\mathcal L|\bigr).
+\]
+Apply this with our sets $\mathcal P$ and $\mathcal L$:
+\begin{equation}\label{eq:I-upper}
+I \le C_{\mathrm{ST}}\bigl(|\mathcal P|^{2/3}N^{2/3} + |\mathcal P| + N\bigr).
+\end{equation}
+
+\paragraph{Step 3: combine \eqref{eq:I-lower} and \eqref{eq:I-upper} to force $|\mathcal P|=\Omega(n^4)$.}
+For large $n$, $N=\frac{n(n-3)}2 \le \frac{n^2}{2}$ and also $N\ge \frac{n^2}{4}$ for $n\ge 6$.
+
+Assume $n\ge 8$. Combine \eqref{eq:I-lower} and \eqref{eq:I-upper}:
+\[
+\frac{n^2}{\sqrt{24}}\sqrt{|\mathcal P|}\ \le\ C_{\mathrm{ST}}\bigl(|\mathcal P|^{2/3}N^{2/3} + |\mathcal P| + N\bigr).
+\]
+We now show that if $|\mathcal P|$ were $o(n^4)$, this inequality would fail for $n$ large. The cleanest way is to compare dominant exponents.
+
+Let $|\mathcal P| = n^a$. Then the left side scales as $n^{2+a/2}$.
+The first term on the right side scales as
+\[
+|\mathcal P|^{2/3}N^{2/3}\ \asymp\ n^{2a/3}\cdot n^{4/3} = n^{(2a+4)/3}.
+\]
+For the inequality to hold for large $n$, we must have
+\[
+2+\frac{a}{2}\ \le\ \frac{2a+4}{3}
+\quad\Longleftrightarrow\quad
+12+3a \le 4a+8
+\quad\Longleftrightarrow\quad
+a\ge 4.
+\]
+Thus $|\mathcal P| \ge c n^4$ for some $c>0$ depending only on $C_{\mathrm{ST}}$ (and the coarse constants used above), for all sufficiently large $n$.
+
+To handle small $n$ (say $3\le n<8$), note $f(n)\ge 0$ and we can decrease $c$ if necessary so that $I(P)\ge c n^4$ holds vacuously for all $n$ (e.g.\ take $c$ smaller than $\min_{3\le n<8} f(n)/n^4$). This yields a uniform absolute constant $c>0$.
+
+Therefore $I(P)=|\mathcal P|\ge c n^4$ for all $n$, proving the theorem.
+\end{proof}
+
+\paragraph{Concrete computation sanity check (regular polygons).}
+A quick numerical computation for regular $n$-gons gives:
+\[
+I(\text{regular }6\text{-gon})=13<\binom64=15,\qquad
+I(\text{regular }8\text{-gon})=49<\binom84=70,
+\]
+illustrating how concurrency reduces the count of \emph{distinct} intersection points while leaving the number of crossing pairs fixed at $\binom{n}{4}$.
+
+\subsection*{5) VERIFICATION}
+
+\paragraph{Identity \eqref{eq:pairs}.}
+For any convex $n$-gon, diagonals cross iff their endpoints interleave along the cyclic order; each 4-tuple of vertices yields exactly one such crossing pair. Concurrency does not change the count of crossing pairs, only their grouping by intersection point, hence \eqref{eq:pairs}.
+
+\paragraph{Use of Szemer\'edi--Trotter.}
+The theorem applies to finite sets of points and lines; our diagonals determine distinct lines because of convexity (no three vertices collinear). All incidences counted are standard point-line incidences in $\mathbb R^2$.
+
+\paragraph{Exponent comparison.}
+The scaling argument rigorously shows any exponent $a<4$ is impossible. Since the inequality is quantitative, one can extract an explicit $c>0$ from $C_{\mathrm{ST}}$ if desired; I did not optimize constants.
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED.}
+
+\paragraph{Strongest fully proved partial result.}
+$f(n)=\Theta(n^4)$, with an explicit proof of a lower bound $f(n)\ge c n^4$ (Theorem~\ref{thm:lower}) and trivial upper bound $f(n)\le \binom{n}{4}$ (Theorem~\ref{thm:upper}).
+
+\paragraph{Exact first gap.}
+Determine the \emph{best} possible asymptotic constant:
+\[
+\lim_{n\to\infty}\frac{f(n)}{n^4},
+\]
+or even show whether this limit exists; in particular, decide if it equals $1/24$.
+
+\paragraph{Top 3 next moves.}
+\begin{enumerate}[label=\arabic*.]
+\item Develop sharper incidence bounds tailored to the special set of lines coming from diagonals of a convex polygon (additional structure beyond arbitrary lines).
+\item Construct explicit convex $n$-gons with engineered high-multiplicity intersection points to push the constant below $1/24$ (or prove such engineering cannot beat the generic constant).
+\item Investigate whether extremizers must be affinely regular or come from projective/finite-geometry configurations (as in extremal incidence problems).
+\end{enumerate}
+
+\paragraph{What a minimal counterexample would likely look like.}
+A disproof of $f(n)\sim \frac1{24}n^4$ would be a family of convex polygons $P_n$ with a positive fraction of the $\binom{n}{4}$ crossing pairs concentrated into intersection points of multiplicity $\gg 1$, lowering $I(P_n)$ by a constant factor.

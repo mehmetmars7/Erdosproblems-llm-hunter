@@ -1,0 +1,155 @@
+% Erdos problem 985
+
+1) FORMAL RESTATEMENT
+
+Given a prime p, let ord_p(a) denote the multiplicative order of a modulo p, i.e.
+ord_p(a) is the least positive integer t such that a^t \equiv 1 (mod p), assuming p \nmid a.
+An integer a is a primitive root modulo p if ord_p(a)=p-1.
+
+Literal statement (as written in the problem file):
+
+  (S_lit)  For every prime p, there exists a prime q<p such that ord_p(q)=p-1.
+
+Immediate ambiguity/edge case:
+- If p=2, there is no prime q<p, so (S_lit) is false for the literal quantifier "every prime".
+
+Minimal corrected statement (the version that seems intended in the number-theoretic context):
+
+  (S)  For every odd prime p, there exists a prime q<p such that ord_p(q)=p-1.
+
+Everything below separates (S_lit) (which is trivially false) from (S) (which appears open).
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem file points out a relationship with Artin-type questions about primes that are
+primitive roots modulo p (e.g. whether 2 is a primitive root for infinitely many primes p).
+No resolution is stated in the problem file for (S).
+
+3) ATTACK PLAN
+
+A natural approach to (S) is to rewrite the indicator of "q is a primitive root mod p" as a
+combination of multiplicative characters modulo p (or via inclusion-exclusion over prime
+divisors of p-1), and then try to show that at least one such residue class is hit by a prime
+q<p. This would require nontrivial cancellation in prime sums twisted by characters.
+
+A disproof would require an odd prime p such that every prime q<p lies in the union of the
+proper subgroups of (Z/pZ)^* (equivalently, every such q has order strictly dividing p-1).
+
+In this writeup I record (i) exact small-case computations giving strong evidence for (S)
+through p<=200000, and (ii) two structural lemmas that repackage the condition "q is a
+primitive root" in ways that may help an analytic attack.
+
+4) WORK
+
+FAST REALITY CHECK (explicit computation)
+
+I checked (S) for all odd primes p <= 200000 by brute force:
+- For each odd prime p, factor p-1 and then test primes q<p in increasing order using the
+  standard criterion q^{(p-1)/r} \not\equiv 1 (mod p) for each prime divisor r of p-1.
+
+Outcome:
+- No counterexample to (S) was found for 3 <= p <= 200000.
+- Among these p, the largest value of the *least* prime primitive root q was 149, attained at
+  p=190321.
+
+For small primes the least such q begins as:
+  p :  3  5  7 11 13 17 19 23 29 31 37 41 43 47 53 ...
+  q :  2  2  3  2  2  3  2  5  2  3  2  7  3  5  2 ...
+
+(These are sanity checks only; they do not constitute a proof.)
+
+---
+
+Lemma 985.1 (primitive root criterion via prime divisors of p-1).
+Let p be an odd prime and let a be an integer with p \nmid a. Let p-1 = \prod_{i=1}^t r_i^{e_i}
+be the prime factorization, with distinct primes r_i. Then the following are equivalent:
+
+  (i) ord_p(a) = p-1.
+  (ii) For every i, we have a^{(p-1)/r_i} \not\equiv 1 (mod p).
+
+Proof.
+The multiplicative group G=(Z/pZ)^* is cyclic of order |G|=p-1.
+Let d=ord_p(a). Then d divides p-1. Condition (ii) says that for each prime r_i | (p-1),
+we do not have a^{(p-1)/r_i} \equiv 1.
+
+( i => ii ) If ord_p(a)=p-1 then the order is not a proper divisor, so in particular it is not
+contained in the subgroup of index r_i. Equivalently, if a^{(p-1)/r_i}\equiv 1 then ord_p(a)
+would divide (p-1)/r_i < p-1, contradiction.
+
+( ii => i ) Suppose (ii) holds but ord_p(a)=d < p-1. Then p-1 = d*m for some integer m>1.
+Pick any prime r dividing m. Then d divides (p-1)/r. Hence a^{(p-1)/r} \equiv 1 (mod p).
+But r is a prime divisor of p-1, so this contradicts (ii).
+Therefore d cannot be < p-1, so d=p-1.
+
+This proves (i) <=> (ii).
+
+---
+
+Lemma 985.2 (safe prime reduction to quadratic nonresidues).
+Assume p is a safe prime, i.e. p=2r+1 where r is an odd prime.
+For an integer a with p \nmid a, the following are equivalent:
+
+  (i) a is a primitive root modulo p.
+  (ii) a is a quadratic nonresidue modulo p and a \not\equiv -1 (mod p).
+
+Proof.
+Since (Z/pZ)^* is cyclic of order 2r, its subgroup of squares has index 2 and hence has
+order r. Thus:
+- If a is a square, then ord_p(a) divides r, so a cannot have order 2r.
+- If a is not a square, then ord_p(a) is divisible by 2.
+
+In a cyclic group of order 2r with r prime, the only possible orders are 1,2,r,2r.
+Among nonsquares, the only element of order 2 is -1 (since the unique element of order 2
+in (Z/pZ)^* is -1). Therefore any nonsquare a \not\equiv -1 must have order 2r, i.e. is a
+primitive root.
+Conversely, any primitive root has order 2r, hence is not a square and is not -1.
+
+So (i) <=> (ii).
+
+---
+
+Lemma 985.3 (counting primitive roots).
+For an odd prime p, the number of primitive roots modulo p is \varphi(p-1).
+
+Proof.
+Let g be a fixed generator of (Z/pZ)^*, which is cyclic of order p-1. Every element has the
+form g^t for a unique t mod (p-1). The order of g^t is (p-1)/gcd(t,p-1). Thus g^t has order
+p-1 iff gcd(t,p-1)=1. The number of residues t mod (p-1) coprime to (p-1) is \varphi(p-1).
+
+5) VERIFICATION
+
+- Literal disproof: For p=2 there is no prime q<p, so (S_lit) is false.
+- Lemma 985.1 is the standard group-theoretic criterion and was checked against the
+  computation: for each p the code used exactly this criterion.
+- Lemma 985.2 was sanity-checked on a safe prime, e.g. p=11 (r=5): quadratic nonresidues
+  are {2,6,7,8,10}, excluding -1=10 leaves {2,6,7,8}, all of which indeed have order 10.
+
+6) FINAL
+
+**UNRESOLVED** (for the corrected statement (S) over odd primes).
+
+(i) Strongest proved partial result here:
+    - (S_lit) is false (counterexample p=2).
+    - For odd primes p, primitive roots are characterized by Lemma 985.1, and for safe primes
+      by Lemma 985.2.
+    - Computation: (S) holds for all odd primes p<=200000; the maximal least prime primitive
+      root in this range is 149 at p=190321.
+
+(ii) First gap (crisp statement):
+    Prove that for every odd prime p, the set of primitive roots modulo p contains at least
+    one prime q<p.
+
+(iii) Top 3 next moves (concrete):
+    1. (Character-sum route) Write the primitive-root indicator via inclusion-exclusion over
+       prime divisors of p-1 and attempt to show that \sum_{q<p, q prime} 1_{q primitive root}
+       is positive, using explicit bounds for prime sums twisted by characters mod p.
+    2. (Safe-prime subproblem) For p=2r+1, reduce to showing there is a prime q<p with
+       Legendre symbol (q/p)=-1 and q\ne p-1; attempt this first.
+    3. Extend computations to much larger p and try to detect growth patterns of the least
+       prime primitive root, in particular whether it stays "small" compared to p.
+
+(iv) Minimal counterexample structure (what a disproof would look like):
+    An odd prime p such that every prime q<p lies in the union of proper subgroups of
+    (Z/pZ)^*. Equivalently, letting r run over prime divisors of p-1,
+      for every prime q<p there exists r|p-1 with q^{(p-1)/r} \equiv 1 (mod p).
+

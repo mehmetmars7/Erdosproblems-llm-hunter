@@ -1,0 +1,134 @@
+% Erdos Problem #119
+% Attempt for Erdos Problem #119
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; only facts explicitly stated in the problem text)
+% - Computation available (Python)? YES (used for small numerical sanity checks)
+
+\section*{Erd\H{o}s Problem \#119}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $(z_i)_{i\ge1}$ be a sequence of complex numbers with $|z_i|=1$ for all $i$.
+For $n\ge1$ define the monic polynomial
+\[
+ p_n(z)=\prod_{i=1}^n (z-z_i).
+\]
+Define
+\[
+ M_n := \max_{|z|=1} |p_n(z)|.
+\]
+Questions:
+\begin{enumerate}
+\item Is $\limsup_{n\to\infty} M_n = \infty$?
+\item Is there $c>0$ such that $M_n>n^c$ for infinitely many $n$?
+\item Is there $c>0$ such that for all sufficiently large $n$,
+\[
+\sum_{k\le n} M_k > n^{1+c}?
+\]
+\end{enumerate}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+From the problem text:
+\begin{itemize}
+\item (1) is true (Wagner), with the weaker growth $M_n>(\log n)^c$ infinitely often.
+\item (2) is true (Beck): $\max_{n\le N} M_n > N^c$ for some $c>0$.
+\item (3) seems open.
+\item There exist sequences with $M_n\le n+1$ for all $n$ (Erd\H{o}s) and even $M_n\ll n^{1-c}$ for some $c>0$ (Linden).
+\end{itemize}
+I do not re-prove (1) or (2).  I give basic quantitative identities and a sanity-check computation.
+
+\subsection*{3) ATTACK PLAN}
+To force large $M_n$, one might try to prove that $p_n$ cannot stay uniformly small on the unit circle for too long, perhaps using Fourier/energy or potential theory.  For the sum question (3), one would aim for a lower bound on many $M_k$ simultaneously.
+Here I only establish two ``first principles'' lemmas about averages and $L^2$ norms.
+
+\subsection*{4) WORK}
+\paragraph{Lemma 119.1 (mean of $\log|p_n|$ on the circle is $0$).}
+For every $n\ge1$,
+\[
+\frac{1}{2\pi}\int_0^{2\pi} \log\big|p_n(e^{it})\big|\,dt = 0.
+\]
+
+\emph{Proof.}
+Write $p_n(z)=\prod_{j=1}^n (z-z_j)$.  Then
+\[
+\log|p_n(e^{it})| = \sum_{j=1}^n \log|e^{it}-z_j|.
+\]
+Fix a single $z_j$ with $|z_j|=1$ and rotate so $z_j=1$ (rotation preserves the integral over $t$).  Then
+\[
+\frac{1}{2\pi}\int_0^{2\pi} \log|e^{it}-1|\,dt
+=\frac{1}{2\pi}\int_0^{2\pi} \log\big(2|\sin(t/2)|\big)\,dt.
+\]
+The classical integral identity
+\(
+\int_0^{\pi} \log(\sin u)\,du = -\pi\log 2
+\)
+implies
+\(
+\int_0^{2\pi} \log(2|\sin(t/2)|)\,dt = 0.
+\)
+Therefore each summand has mean $0$, and summing over $j=1,\dots,n$ gives the claim.
+\qed
+
+\paragraph{Lemma 119.2 ($L^2$ lower bound on $M_n$).}
+Let $p_n(z)=\sum_{k=0}^n a_k z^k$ (so $a_n=1$ and $a_0=(-1)^n z_1\cdots z_n$ has modulus $1$).  Then
+\[
+\frac{1}{2\pi}\int_0^{2\pi} |p_n(e^{it})|^2\,dt = \sum_{k=0}^n |a_k|^2 \ge 2,
+\]
+and hence
+\[
+M_n\ge \sqrt{2}.
+\]
+
+\emph{Proof.}
+By Parseval's identity for trigonometric polynomials,
+\[
+\frac{1}{2\pi}\int_0^{2\pi} \Big|\sum_{k=0}^n a_k e^{ikt}\Big|^2 dt = \sum_{k=0}^n |a_k|^2.
+\]
+Since $a_n=1$ and $|a_0|=|z_1\cdots z_n|=1$, we have $\sum_{k=0}^n |a_k|^2\ge |a_0|^2+|a_n|^2=2$.
+Finally, $M_n^2=\max_{|z|=1}|p_n(z)|^2\ge$ the average value of $|p_n|^2$ on the circle, so $M_n^2\ge2$.
+\qed
+
+\paragraph{FAST REALITY CHECK (numerical sampling for one explicit sequence).}
+Take $z_j = e^{2\pi i\, j\varphi}$ where $\varphi=(\sqrt5-1)/2$ (an irrational).  For $1\le n\le 200$, I approximated $M_n$ by evaluating $|p_n(z)|$ on a uniform grid of $4096$ points on the unit circle.  This gives a lower bound on the true $M_n$.
+
+The sampled values (selected) were:
+\[
+\begin{array}{c|c}
+ n & \text{sampled }M_n\\\hline
+ 10 & 5.15\cdots\\
+ 20 & 19.50\cdots\\
+ 50 & 12.64\cdots\\
+ 100 & 15.17\cdots\\
+ 200 & 15.69\cdots
+\end{array}
+\]
+and the maximum sampled value over $1\le n\le 200$ was about $134.6$ (at $n=143$).
+This is consistent with unbounded growth in this example, but does not constitute a proof.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma~119.1 uses the standard integral $\int_0^{\pi} \log(\sin u)du=-\pi\log2$.  The integrand has an integrable singularity; the identity is classical and can be checked by Fourier series.
+\item Lemma~119.2: Parseval is exact; the step $M_n^2\ge$ average is just ``max $\ge$ mean''.
+\item Numerical check is only a sanity check: grid sampling underestimates the true maximum.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+
+(i) \emph{Strongest fully proved partial result obtained here.}
+The exact mean-zero identity for $\log|p_n|$ on the circle (Lemma~119.1) and the uniform lower bound $M_n\ge\sqrt2$ (Lemma~119.2).
+
+(ii) \emph{Exact first gap.}
+A proof (for the open part (3)) that $\sum_{k\le n} M_k$ must grow faster than $n^{1+c}$ for some $c>0$, uniformly for all large $n$.
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Try to turn Lemma~119.1 into a quantitative lower bound on large deviations of $\log|p_n|$ (entropy/large deviations) implying many large $M_n$.
+\item Use potential theory on the circle: relate $\log|p_n|$ to the discrete logarithmic potential of the points $z_i$.
+\item Search for worst-case sequences (those with very small $M_n$) and attempt to prove that even there, partial sums $\sum M_k$ must grow superlinearly.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.}
+A counterexample to (3) would be a sequence $(z_i)$ for which $M_n$ is often small (e.g. $M_n\ll n^{\varepsilon}$ for all large $n$) and additionally $\sum_{k\le n} M_k$ stays $O(n^{1+c_0})$ for every fixed $c_0>0$.
+
+

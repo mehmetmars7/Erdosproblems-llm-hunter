@@ -1,0 +1,159 @@
+% Erdos Problem #995
+
+1) FORMAL RESTATEMENT
+Let $n_1<n_2<\cdots$ be a lacunary sequence of integers, meaning: there exists $q>1$ such that
+\[
+ n_{k+1}\ge q\,n_k\qquad\text{for all }k\ge 1.
+\]
+Let $f\in L^2([0,1])$ and write $\{x\}$ for the fractional part of $x$.
+Define the partial sums
+\[
+ S_N(\alpha):=\sum_{k=1}^N f(\{\alpha n_k\}).
+\]
+The problem asks for the growth rate of $S_N(\alpha)$ for almost all $\alpha\in(0,1)$; in particular it asks whether
+\[
+ S_N(\alpha)=o\bigl(N\sqrt{\log\log N}\bigr)\qquad\text{for a.e. }\alpha.
+\]
+
+IMPORTANT AMBIGUITY NOTE.
+As written, the question does not subtract the mean $\int_0^1 f$.  If $\mu:=\int_0^1 f\neq 0$, then $S_N(\alpha)=\mu N+o(N)$ would imply the displayed bound is automatically true because $\mu N = o(N\sqrt{\log\log N})$.  Thus the genuinely nontrivial regime is the centered case $\int_0^1 f=0$ (or equivalently, study $S_N(\alpha)-N\mu$).
+
+Also, the quoted upper bound in the problem statement contains the expression $\sum_{1\le k\le N}\sum_{1\le k\le N}f(\{\alpha n_k\})$, which appears to repeat the same index; I do not rely on that line.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The statement itself includes an Erd\H{o}s lower bound example and an upper bound with a possible typographical issue.  I will not claim anything beyond the statement and what is proved below.
+
+3) ATTACK PLAN
+Use Fourier expansion and almost-orthogonality.
+- Truncate $f$ to a trigonometric polynomial $f_H$.
+- Expand $S_N$ in Fourier modes.
+- Use orthogonality in $\alpha$ and lacunarity to control the number of ``resonant'' solutions to $h n_k = h' n_\ell$.
+- Convert $L^2$ bounds into almost-sure bounds by Chebyshev + Borel--Cantelli on a sparse subsequence (e.g. dyadic $N$).
+
+4) WORK
+
+FAST REALITY CHECK (sanity simulation).
+Take the lacunary sequence $n_k=2^k$ and the bounded function $f(x)=\sin(2\pi x)$ (mean $0$).  To avoid floating-point artifacts, I sampled $\alpha=a/M$ with $M=1{,}000{,}000{,}007$ prime and random $a$.
+For one such sample ($a=926{,}756{,}583$) I computed the maximum of $|S_n(\alpha)|$ over $1\le n\le 200{,}000$:
+\[
+\max_{1\le n\le 200000}|S_n(\alpha)|\approx 260.5504\ \text{(attained at }n=48277\text{)}.
+\]
+This gives
+\[
+\frac{\max_{n\le 200000}|S_n(\alpha)|}{\sqrt{200000}}\approx 0.5826,
+\qquad
+\frac{\max_{n\le 200000}|S_n(\alpha)|}{\sqrt{200000\,\log\log(200000)}}\approx 0.3683.
+\]
+This is only a heuristic check (a rational $\alpha$ is not ``a.e.'') but it is consistent with $\sqrt{N}$-type fluctuations for a nice $f$.
+
+Lemma 1 (Resonances are local for lacunary sequences).
+Assume $(n_k)$ is lacunary with ratio $q>1$.  Fix an integer $H\ge 2$ and define
+\[
+L:=\left\lceil \log_q H\right\rceil.
+\]
+If integers $h,h'$ satisfy $1\le |h|,|h'|\le H$ and indices $k,\ell$ satisfy
+\[
+ h\,n_k = h'\,n_\ell,
+\]
+then $|k-\ell|\le L$.
+
+Proof.
+If $k=\ell$ there is nothing to show.  Suppose $k>\ell$.  Since $(n_k)$ is lacunary,
+\[
+\frac{n_k}{n_\ell} \ge q^{k-\ell}.
+\]
+From $|h|n_k=|h'|n_\ell$ we also have
+\[
+\frac{n_k}{n_\ell} = \frac{|h'|}{|h|} \le H.
+\]
+Thus $q^{k-\ell}\le H$, i.e. $k-\ell\le \log_q H\le L$.  The case $\ell>k$ is symmetric, giving $|k-\ell|\le L$. \qed
+
+Lemma 2 ($L^2$ bound for lacunary sums of a trigonometric polynomial).
+Let $(n_k)$ be lacunary with ratio $q>1$.  Let $f$ be a trigonometric polynomial
+\[
+ f(x)=\sum_{1\le |h|\le H} c_h e^{2\pi i h x},\qquad c_h\in\mathbb{C},
+\]
+(with $c_0=0$, so $\int_0^1 f=0$).  Define
+\[
+ S_N(\alpha)=\sum_{k=1}^N f(\{\alpha n_k\}).
+\]
+Then for all $N\ge 1$,
+\[
+\int_0^1 |S_N(\alpha)|^2\,d\alpha \le C(q,H)\, N\,\|f\|_2^2,
+\]
+where $\|f\|_2^2=\int_0^1 |f(x)|^2dx=\sum_{1\le |h|\le H}|c_h|^2$ and one may take
+\[
+ C(q,H):=2H\,(2L+1),\qquad L=\lceil \log_q H\rceil.
+\]
+
+Proof.
+Expand and integrate:
+\[
+S_N(\alpha)=\sum_{k=1}^N \sum_{1\le |h|\le H} c_h\,e^{2\pi i h\alpha n_k}
+=\sum_{1\le |h|\le H} c_h \Bigl(\sum_{k=1}^N e^{2\pi i h\alpha n_k}\Bigr).
+\]
+Therefore
+\[
+|S_N(\alpha)|^2 = \sum_{h,h'} c_h\overline{c_{h'}}\sum_{k,\ell=1}^N e^{2\pi i\alpha(h n_k-h' n_\ell)}.
+\]
+Integrating over $\alpha\in[0,1]$ uses orthogonality of characters:
+\[
+\int_0^1 e^{2\pi i\alpha m}\,d\alpha = \begin{cases}1,&m=0,\\0,&m\in\mathbb{Z}\setminus\{0\}.
+\end{cases}
+\]
+So
+\[
+\int_0^1 |S_N(\alpha)|^2 d\alpha
+= \sum_{h,h'} c_h\overline{c_{h'}}\,M_{h,h'},
+\]
+where
+\[
+M_{h,h'} := \#\{(k,\ell)\in\{1,\dots,N\}^2 : h n_k = h' n_\ell\}.
+\]
+By Lemma 1, for each fixed pair $(h,h')$ with $1\le |h|,|h'|\le H$, any solution must satisfy $|k-\ell|\le L$.  For each $k$ there are at most $(2L+1)$ indices $\ell$ with $|k-\ell|\le L$, hence
+\[
+M_{h,h'}\le N(2L+1).
+\]
+Thus, using the triangle inequality,
+\[
+\int_0^1 |S_N|^2 d\alpha
+\le N(2L+1)\sum_{h,h'} |c_h|\,|c_{h'}|
+= N(2L+1)\Bigl(\sum_{1\le |h|\le H}|c_h|\Bigr)^2.
+\]
+Finally, by Cauchy--Schwarz with $2H$ terms,
+\[
+\Bigl(\sum_{1\le |h|\le H}|c_h|\Bigr)^2 \le (2H)\sum_{1\le |h|\le H}|c_h|^2 = (2H)\|f\|_2^2.
+\]
+Combining gives the claim with $C(q,H)=2H(2L+1)$. \qed
+
+Corollary (Almost-sure dyadic bound for trigonometric polynomials).
+Under the assumptions of Lemma 2, fix $\epsilon>0$.  Then for almost all $\alpha$ there exists $m_0(\alpha)$ such that for all integers $m\ge m_0$,
+\[
+|S_{2^m}(\alpha)| \le K(\alpha,\epsilon)\,\sqrt{2^m}\,m^{\frac12+\epsilon}.
+\]
+
+Proof.
+By Chebyshev and Lemma 2,
+\[
+\mathbb{P}\bigl(|S_{2^m}(\alpha)|>A\sqrt{2^m}\,m^{\frac12+\epsilon}\bigr)
+\le \frac{\int_0^1 |S_{2^m}(\alpha)|^2 d\alpha}{A^2 2^m m^{1+2\epsilon}}
+\le \frac{C(q,H)\|f\|_2^2}{A^2\,m^{1+2\epsilon}}.
+\]
+The series $\sum_m m^{-(1+2\epsilon)}$ converges, so by Borel--Cantelli the event occurs only finitely often for almost all $\alpha$.  Taking $A$ large and absorbing it into $K(\alpha,\epsilon)$ gives the claim. \qed
+
+5) VERIFICATION
+- Lemma 1 uses only the lacunary ratio and boundedness of $|h|,|h'|$.
+- In Lemma 2 the only place lacunarity is used is to bound $M_{h,h'}$; all other steps are exact.
+- The corollary gives bounds along the dyadic subsequence $N=2^m$; extending to all $N$ would require a maximal inequality within dyadic blocks, which is not proved here.
+
+6) FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result: For trigonometric polynomials $f$ (finite Fourier support) and lacunary $(n_k)$, an $L^2$ bound of the form $\int|S_N|^2\ll N\|f\|_2^2$ with an explicit constant depending on $q$ and the Fourier cutoff, and hence an almost-sure bound $|S_{2^m}(\alpha)|\ll \sqrt{2^m}\,m^{1/2+\epsilon}$ along dyadic $N=2^m$.
+(ii) First gap: Extend these bounds from trigonometric polynomials to arbitrary $f\in L^2([0,1])$ without strong Fourier decay, and reconcile with the Erd\H{o}s lower-bound construction in the statement.
+(iii) Top 3 next moves:
+  1. Prove a maximal inequality for $\max_{N\le 2^m}|S_N(\alpha)|$ for lacunary sums of trigonometric polynomials, to upgrade the dyadic bound to a bound holding for all $N$.
+  2. Develop a weighted resonance count controlling sums over all frequencies (not just $|h|\le H$), to treat general $L^2$ functions by Fourier approximation.
+  3. Try to reproduce (from scratch) a lower-bound construction: identify which Fourier patterns in $f$ and multiplicative relations among $(n_k)$ can force $S_N(\alpha)$ to have near-linear growth on a positive-measure set.
+(iv) Minimal counterexample structure (if the $o(N\sqrt{\log\log N})$ bound is false): one would need a lacunary sequence with many exact multiplicative relations $n_k/n_\ell=h'/h$ across scales and an $L^2$ function $f$ whose Fourier mass concentrates on corresponding frequencies, so that many cross-terms add coherently rather than cancel.
+
+

@@ -1,0 +1,103 @@
+% Erdos Problem #413
+
+\subsection*{FORMAL RESTATEMENT}
+Let $\omega(n)$ be the number of distinct prime divisors of $n$ (with $\omega(1)=0$).
+Call an integer $n\ge2$ a \emph{barrier for $\omega$} if
+\[
+  m+\omega(m)\le n\qquad\text{for every integer }m<n.
+\]
+Questions:
+\begin{enumerate}
+  \item Are there infinitely many barriers for $\omega$?
+  \item Does there exist $\epsilon>0$ such that there are infinitely many $n$ with
+  $$m+\epsilon\,\omega(m)\le n\qquad\text{for all }m<n?$$
+\end{enumerate}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file states that Erd\H{o}s called such $n$ ``barriers'' and believed $\omega$ (and also $\Omega$) should have infinitely many.
+It also notes sieve methods were suggested but not (then) strong enough.
+No external results are used here.
+
+\subsection*{ATTACK PLAN}
+Rewrite the barrier condition as constraints on the last few integers before $n$:
+for $m=n-d$ we require $\omega(n-d)\le d$.
+Since $\omega(t)\le \log_2 t$, all constraints with $d\ge \log_2 n$ are automatic.
+Thus only a short interval just below $n$ matters.
+We will:
+\begin{itemize}
+  \item Prove simple necessary conditions (e.g. $n-1$ must be a prime power).
+  \item Prove the ``short interval'' reduction rigorously.
+  \item Compute barriers up to $10^6$ as a sanity check.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 413.1 (A barrier forces $n-1$ to be a prime power).}
+If $n\ge2$ is a barrier for $\omega$, then $\omega(n-1)=1$; equivalently, $n-1=p^a$ for some prime $p$ and integer $a\ge1$.
+
+\textit{Proof.}
+Apply the defining inequality with $m=n-1$:
+$$(n-1)+\omega(n-1)\le n,$$
+so $\omega(n-1)\le 1$.
+Since $n-1\ge1$ and $n\ge2$, we have $n-1\ge1$; moreover $n-1\ge2$ unless $n=2$.
+For $n>2$, $n-1\ge2$ has at least one prime divisor so $\omega(n-1)\ge1$, hence $\omega(n-1)=1$, i.e. $n-1$ is a prime power.
+(For $n=2$, $n-1=1$ and the barrier condition holds trivially.)
+\hfill$\square$
+
+\textbf{Lemma 413.2 (Only a short interval matters).}
+Fix $n\ge2$ and set $L=\lceil \log_2 n\rceil$.
+If
+$$m+\omega(m)\le n$$
+holds for all integers $m$ with $n-L\le m<n$, then it holds for all $m<n$; i.e. $n$ is a barrier.
+
+\textit{Proof.}
+Let $m<n-L$.
+Then $n-m> L-1 \ge \log_2 n -1$ and in particular $n-m\ge \log_2 n\ge \log_2 m$.
+Since $\omega(m)$ counts distinct primes dividing $m$, we have the elementary bound $\omega(m)\le \log_2 m$ (because $m$ is at least the product of $\omega(m)$ distinct primes, which is at least $2^{\omega(m)}$).
+Thus $\omega(m)\le \log_2 m\le \log_2 n\le n-m$, i.e. $m+\omega(m)\le n$.
+So all constraints with $m<n-L$ are automatic; only $m\in[n-L,n)$ need checking.
+\hfill$\square$
+
+\textbf{Proposition 413.3 (Running-maximum reformulation).}
+Define $A(m)=m+\omega(m)$ and $M(n)=\max_{1\le m<n} A(m)$.
+Then $n\ge2$ is a barrier for $\omega$ if and only if $M(n)\le n$ (equivalently $M(n)=n$ for $n>2$).
+
+\textit{Proof.}
+The barrier condition is exactly $A(m)\le n$ for all $m<n$, which is equivalent to the maximum of the left-hand side over $m<n$ being $\le n$.
+For $n>2$, Lemma 413.1 shows $A(n-1)\ge n$, so $M(n)\ge n$; hence $M(n)\le n$ is equivalent to $M(n)=n$.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (exact computations).}
+I computed $\omega(m)$ for $m\le 10^6$ by a prime sieve and checked the barrier condition by maintaining the running maximum of $m+\omega(m)$.
+Results:
+\begin{itemize}
+  \item There are $5943$ barriers $n\le 10^6$.
+  \item The first $30$ are
+  $$2,3,4,5,6,8,9,10,12,14,17,18,20,24,26,28,30,33,38,42,48,50,54,60,65,74,82,84,90,98.$$
+  \item The largest barrier $\le 10^6$ is $999774$.
+  \item For the relaxed condition with $\epsilon=1/2$ (i.e. $m+\omega(m)/2\le n$), among $n\le 200000$ there are $78361$ such ``$\epsilon$-barriers'', and in fact $n=200000$ itself satisfies the condition in that range.
+\end{itemize}
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+  \item Lemma 413.1 is a one-line necessary condition; it correctly treats the edge case $n=2$.
+  \item Lemma 413.2 uses only $2^{\omega(m)}\le m$, which is exact and elementary.
+  \item The computation was a direct sieve; no probabilistic assumptions.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: A barrier $n>2$ must satisfy that $n-1$ is a prime power (Lemma 413.1), and verifying the barrier property only requires checking the last $L=\lceil \log_2 n\rceil$ integers below $n$ (Lemma 413.2). Computation confirms many barriers exist up to $10^6$ (exactly $5943$).
+
+(ii) First gap: prove (or disprove) that barriers exist for infinitely many $n$; concretely, show there are infinitely many $n$ such that $\omega(n-d)\le d$ for every $1\le d\le \lceil \log_2 n\rceil$.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+  \item Use sieve methods on the short interval $[n-L,n)$ with $L\asymp \log n$ to show that infinitely many prime powers $p^a$ have the property that all of $p^a-1,p^a-2,\dots,p^a-L$ have at most $d$ distinct primes at distance $d$.
+  \item Experiment computationally with the structure of $n-1$ (prime vs higher prime power) among barriers, and with the distribution of $\omega(n-d)$ near barriers, to guess a constructive infinite family.
+  \item For the $\epsilon$-variant, try to prove existence for some explicit $\epsilon$ by showing a positive density of $n$ satisfy $m+\epsilon\omega(m)\le n$ for all $m<n$ (using the short-interval reduction).
+\end{enumerate}
+
+(iv) Minimal counterexample structure: if only finitely many barriers exist, there is a largest barrier $n_0$; then for every $n>n_0$ there exists some $m<n$ with $m+\omega(m)>n$, and by Lemma 413.2 such a witness $m$ can be chosen within $\lceil \log_2 n\rceil$ of $n$.
+
+

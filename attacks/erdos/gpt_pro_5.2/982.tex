@@ -1,0 +1,122 @@
+% Erdos Problem #982
+
+1) FORMAL RESTATEMENT
+
+Let $V=\{v_1,\dots,v_n\}\subset\mathbb R^2$ be the vertex set of a (strictly) convex polygon with $n\ge 3$ vertices.
+For a vertex $v\in V$, define
+\[
+D(v):=\#\bigl\{\|v-w\|: w\in V\setminus\{v\}\bigr\},
+\]
+i.e. the number of distinct Euclidean distances from $v$ to the other vertices.
+Define
+\[
+f(n):=\min_{\text{convex }n\text{-gons }V}\;\max_{v\in V} D(v).
+\]
+The problem states the conjecture that $f(n)=\lfloor n/2\rfloor$, i.e. every convex $n$-gon has a vertex with at least $\lfloor n/2\rfloor$ distinct distances to the other vertices.
+It also notes that a regular $n$-gon has $D(v)=\lfloor n/2\rfloor$ for every vertex, so $f(n)\le \lfloor n/2\rfloor$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided statement lists known lower bounds for $f(n)$ (Moser; Erd\H{o}s--Fishburn; Dumitrescu; Nivasch--Pach--Pinchasi--Zerbib).
+A quick web search (2026-01-16) did not surface an explicit proof of the conjectured value $\lfloor n/2\rfloor$ beyond what is stated there.
+
+3) ATTACK PLAN
+
+Proof track: relate small $D(v)$ to many repeated distances from $v$, hence many isosceles triangles with apex $v$. Upper bound the total number of isosceles triangles determined by vertices in convex position; then deduce a lower bound on $\max_v D(v)$.
+Disproof track: construct convex polygons with unusually many repeated distances from each vertex.
+
+I will carry out the standard isosceles-triangle counting argument yielding Moser's $\lceil n/3\rceil$ bound, and verify the regular polygon upper bound.
+
+4) WORK
+
+FAST REALITY CHECK
+
+- $n=3$: an equilateral triangle has $D(v)=1$ for each vertex, so $f(3)=1=\lfloor 3/2\rfloor$.
+- $n=4$: a square has $D(v)=2$ for each vertex, so $f(4)\le 2=\lfloor 4/2\rfloor$.
+- Regular $n$-gons have $D(v)=\lfloor n/2\rfloor$ (proved below).
+
+Lemma 4.1 (regular $n$-gon achieves $\lfloor n/2\rfloor$ distinct distances).
+In a regular $n$-gon, for each vertex $v$,
+\[
+D(v)=\lfloor n/2\rfloor.
+\]
+
+Proof.
+Label vertices $v_0,v_1,\dots,v_{n-1}$ around the circle. The distance from $v_0$ to $v_j$ depends only on
+$\min\{j,n-j\}$, because chords with central angles $2\pi j/n$ and $2\pi(n-j)/n$ have the same length.
+As $j$ ranges from $1$ to $n-1$, the values of $\min\{j,n-j\}$ range exactly over
+$1,2,\dots,\lfloor n/2\rfloor$, each occurring at least once. Distinct such values give distinct chord lengths.
+Hence there are exactly $\lfloor n/2\rfloor$ distinct distances from $v_0$ to the other vertices; by symmetry the same holds for any vertex. \qed
+
+Lemma 4.2 (at most two isosceles apices per base in convex position).
+Let $V$ be the vertex set of a strictly convex polygon.
+Fix an unordered pair of distinct vertices $\{a,b\}\subset V$.
+Then there are at most two vertices $c\in V\setminus\{a,b\}$ such that $\|c-a\|=\|c-b\|$.
+Equivalently, for each base segment $ab$, there are at most two isosceles triangles $\triangle abc$ with vertices in $V$ having $ab$ as the base.
+
+Proof.
+The locus of points $x\in\mathbb R^2$ satisfying $\|x-a\|=\|x-b\|$ is the perpendicular bisector line $\ell$ of segment $ab$.
+Thus any vertex $c$ with $\|c-a\|=\|c-b\|$ must lie on $\ell$.
+Because $V$ is the vertex set of a strictly convex polygon, no three vertices are collinear.
+Hence $\ell$ can contain at most two vertices of $V$. \qed
+
+Lemma 4.3 (Moser-type lower bound $f(n)\ge \lceil n/3\rceil$).
+For every strictly convex $n$-gon with vertex set $V$, there exists a vertex $v\in V$ with
+\[
+D(v)\ge \left\lceil\frac{n}{3}\right\rceil.
+\]
+In particular, $f(n)\ge \lceil n/3\rceil$.
+
+Proof.
+For a vertex $v\in V$, consider the multiset of the $n-1$ distances $\|v-w\|$ for $w\in V\setminus\{v\}$.
+Group the $n-1$ other vertices into classes according to equal distance from $v$.
+If these class sizes are $s_1,\dots,s_t$ (so $t=D(v)$ and $\sum_i s_i=n-1$), then the number of isosceles triangles with apex $v$ (i.e. triangles $\triangle v w_1 w_2$ with $\|v-w_1\|=\|v-w_2\|$) equals
+\[
+I(v)=\sum_{i=1}^t \binom{s_i}{2}.
+\]
+Using $\binom{s}{2}=(s^2-s)/2$ and Cauchy--Schwarz,
+\[
+\sum_{i=1}^t s_i^2\;\ge\;\frac{(\sum_i s_i)^2}{t}=\frac{(n-1)^2}{D(v)}.
+\]
+Therefore
+\[
+I(v)=\frac12\Bigl(\sum_i s_i^2-(n-1)\Bigr)\ge \frac12\Bigl(\frac{(n-1)^2}{D(v)}-(n-1)\Bigr).
+\]
+Summing over all vertices $v\in V$ gives a lower bound on the total number $I$ of isosceles triangles determined by $V$:
+\[
+I\;=\;\sum_{v\in V} I(v)\;\ge\;\frac{n}{2}\Bigl(\frac{(n-1)^2}{D_{\max}}-(n-1)\Bigr),
+\]
+where $D_{\max}:=\max_{v\in V}D(v)$.
+On the other hand, by Lemma 4.2, each unordered base pair $\{a,b\}$ supports at most two isosceles triangles with base $ab$, hence
+\[
+I\le 2\binom{n}{2}=n(n-1).
+\]
+Combining the inequalities and dividing by $n>0$:
+\[
+\frac12\Bigl(\frac{(n-1)^2}{D_{\max}}-(n-1)\Bigr)\le (n-1).
+\]
+Rearrange:
+\[
+\frac{(n-1)^2}{D_{\max}}\le 3(n-1)\quad\Rightarrow\quad D_{\max}\ge \frac{n-1}{3}.
+\]
+Since $D_{\max}$ is an integer, $D_{\max}\ge \lceil (n-1)/3\rceil=\lceil n/3\rceil$.
+This shows that some vertex has at least $\lceil n/3\rceil$ distinct distances. \qed
+
+5) VERIFICATION
+
+- Lemma 4.2 uses the ``strictly convex'' hypothesis to exclude collinear triples of vertices.
+- In Lemma 4.3 the upper bound $I\le 2\binom{n}{2}$ counts isosceles triangles by their base; equilateral triangles (if they occur) may be counted multiple times, but this only strengthens the inequality.
+- For $n=3$, Lemma 4.3 gives $\lceil n/3\rceil=1$, consistent with the equilateral triangle example.
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest proved partial result: $f(n)\le \lfloor n/2\rfloor$ by the regular $n$-gon (Lemma 4.1), and $f(n)\ge \lceil n/3\rceil$ by the isosceles-triangle counting argument (Lemma 4.3).
+(ii) First gap (crisp): improve the general lower bound from $\lceil n/3\rceil$ to $\lfloor n/2\rfloor$ (or exhibit a convex $n$-gon in which every vertex determines fewer than $\lfloor n/2\rfloor$ distinct distances).
+(iii) Top 3 next moves:
+  1. Sharpen Lemma 4.2 by proving a stronger upper bound on isosceles triangles in convex position that accounts for geometric constraints beyond collinearity, potentially lowering the factor $2$.
+  2. Use additive-combinatorial structure of distance sets from a vertex on a convex polygon to show that many repeated distances force a forbidden configuration (e.g. too many equal chords), improving the Cauchy--Schwarz step.
+  3. Computation/experiments: search (numerically) for convex polygons with many repeated distances from each vertex to identify plausible extremal constructions beyond the regular polygon.
+(iv) Minimal counterexample structure: a polygon contradicting the conjecture would have to force, for every vertex $v$, at least two other vertices at the same distance from $v$ among more than $n-1-\lfloor n/2\rfloor$ neighbors; equivalently it would need many isosceles triangles with each vertex serving as an apex, while keeping the total number of isosceles triangles from blowing up.
+
+

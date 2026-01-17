@@ -1,0 +1,140 @@
+% Solutions/partial progress for Erdos Problems #852--#856
+% (Generated following PROMPT_STRATEGY.MD format.)
+
+% Erdos Problem #852
+
+\subsection*{FORMAL RESTATEMENT}
+Let $p_1=2<p_2=3<p_3=5<\cdots$ be the increasing sequence of primes and define the prime gaps
+\[
+  d_n := p_{n+1}-p_n \qquad (n\ge 1).
+\]
+\emph{Ambiguity note.} The problem text says: ``$h(x)$ be maximal such that for some $n<x$ the numbers $d_n,\ldots,d_{n+h(x)-1}$ are all distinct.''  As written, the endpoint index $n+h(x)-1$ is not constrained to be $\le x$.
+
+\emph{Minimal corrected convention used below.} For an integer $x\ge 1$, define
+\[
+  h(x) := \max\Bigl\{h\in\mathbb{N}: \exists n\in\{1,2,\dots,x-h+1\}\ \text{s.t.}\ d_n,d_{n+1},\dots,d_{n+h-1}\ \text{are pairwise distinct}\Bigr\}.
+\]
+Equivalently, $h(x)$ is the maximum length of a contiguous block of pairwise distinct values inside the finite sequence $(d_1,\dots,d_x)$.
+
+The task is to estimate $h(x)$ as $x\to\infty$, and in particular to decide whether:
+\[
+  (\exists c>0)(\forall x\ \text{large})\quad h(x)>(\log x)^c,\qquad\text{and whether }\quad h(x)=o(\log x).
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I do not import external results beyond what is explicitly stated in the problem file.  The statement notes that Brun's sieve implies $h(x)\to\infty$ as $x\to\infty$.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof-track (lower bounds):} Try to construct, via sieve ideas, intervals containing primes whose consecutive gaps realize many distinct even values.
+\item \textbf{Proof-track (upper bounds):} Relate ``distinct gaps'' to the size of the largest gap available in the block, or to the growth of $p_n$ via $\sum d_i = p_{n+h}-p_n$.
+\item \textbf{Disproof-track:} Search computationally for evidence that $h(x)$ grows too slowly/too fast compared with $(\log x)^c$ or $\log x$.
+\end{itemize}
+I can only execute the elementary upper-bound track and a reality-check computation here.
+
+\subsection*{WORK}
+\textbf{Lemma 852.1 (Even gaps past $p_2$).}
+For every $n\ge 2$, $d_n$ is an even positive integer.
+
+\textbf{Proof.}
+For $n\ge 2$, both primes $p_n$ and $p_{n+1}$ are odd (since $p_1=2$ is the only even prime).  The difference of two odd integers is even, and $p_{n+1}>p_n$ so $d_n>0$.\ $\square$
+
+\medskip
+\textbf{Lemma 852.2 (Distinct even gaps force quadratic total length).}
+Fix integers $n\ge 2$ and $h\ge 1$. If the $h$ consecutive gaps $d_n,d_{n+1},\dots,d_{n+h-1}$ are pairwise distinct, then
+\[
+  p_{n+h}-p_n = \sum_{i=0}^{h-1} d_{n+i} \ \ge\ h(h+1).
+\]
+
+\textbf{Proof.}
+By Lemma~852.1, each $d_{n+i}$ is an even positive integer. Write $d_{n+i}=2e_i$ with $e_i\in\mathbb{N}$. Pairwise distinctness of the $d_{n+i}$ implies pairwise distinctness of the $e_i$.
+
+Among $h$ distinct positive integers, the minimum possible sum is $1+2+\cdots+h = h(h+1)/2$ (achieved by the set $\{1,2,\dots,h\}$). Therefore
+\[
+  \sum_{i=0}^{h-1} e_i \ge \frac{h(h+1)}{2}
+  \quad\Rightarrow\quad
+  \sum_{i=0}^{h-1} d_{n+i} = 2\sum_{i=0}^{h-1} e_i \ge h(h+1).
+\]
+Finally, telescoping gives $\sum_{i=0}^{h-1} d_{n+i} = (p_{n+1}-p_n)+\cdots+(p_{n+h}-p_{n+h-1})=p_{n+h}-p_n$.\ $\square$
+
+\medskip
+\textbf{Lemma 852.3 (A basic max-gap upper bound).}
+For every integer $x\ge 1$,
+\[
+  h(x) \le \max\{d_1,d_2,\dots,d_x\}.
+\]
+
+\textbf{Proof.}
+Take any block $d_n,\dots,d_{n+h-1}$ of length $h$ consisting of pairwise distinct positive integers. Then the maximum of these $h$ integers is at least $h$ (because $\{1,2,\dots,h\}$ is the smallest possible set of $h$ distinct positives in the pointwise order). Therefore $h\le \max(d_n,\dots,d_{n+h-1})$. Maximizing over all such blocks inside $\{1,\dots,x\}$ yields $h(x)\le \max_{1\le i\le x} d_i$.\ $\square$
+
+\medskip
+\textbf{Proposition 852.4 (A $p_{x+1}$-based upper bound).}
+For every integer $x\ge 1$,
+\[
+  h(x)\bigl(h(x)-1\bigr) \le p_{x+1}-3.
+\]
+In particular, $h(x) < \sqrt{p_{x+1}}+1$.
+
+\textbf{Proof.}
+Let $h:=h(x)$ and choose $n\in\{1,\dots,x-h+1\}$ such that $d_n,\dots,d_{n+h-1}$ are pairwise distinct.
+
+\emph{Case 1:} $n\ge 2$. Then Lemma~852.2 applies to the length-$h$ block and gives
+$p_{n+h}-p_n=\sum_{i=0}^{h-1} d_{n+i}\ge h(h+1)\ge h(h-1)$. Since $n+h\le x+1$ we have $p_{n+h}\le p_{x+1}$, and also $p_n\ge p_2=3$, so
+$h(h-1)\le p_{n+h}-p_n \le p_{x+1}-3$.
+
+\emph{Case 2:} $n=1$. If $h=1$ then the claimed inequality $h(h-1)\le p_{x+1}-3$ is $0\le p_{x+1}-3$, which holds because $p_{x+1}\ge p_2=3$. If $h\ge 2$, then the sub-block $d_2,\dots,d_h$ has length $h-1$, consists of even gaps, and is still pairwise distinct. Applying Lemma~852.2 with start index $2$ and length $h-1$ gives
+$p_{h+1}-p_2=\sum_{i=2}^{h} d_i\ge (h-1)h$. Because $h\le x$ we have $p_{h+1}\le p_{x+1}$, hence $(h-1)h\le p_{x+1}-3$.
+
+In both cases, $h(h-1)\le p_{x+1}-3$. Finally, $h(h-1)<p_{x+1}$ implies $h^2<p_{x+1}+h$, hence $h<\sqrt{p_{x+1}}+1$.\ $\square$
+
+
+\medskip
+\textbf{FAST REALITY CHECK (computed small cases).}
+I computed $h(x)$ for various $x$ by generating the first $x+1$ primes and applying a standard sliding-window ``longest subarray with distinct entries'' scan to the gap sequence $(d_1,\dots,d_x)$.
+
+Results:
+\begin{verbatim}
+First 20 gaps:
+[1, 2, 2, 4, 2, 4, 2, 4, 6, 2, 6, 4, 2, 4, 6, 6, 2, 6, 4, 2]
+
+h(x) for x=1..20:
+1:1, 2:2, 3:2, 4:2, 5:2, 6:2, 7:2, 8:2, 9:3, 10:3,
+11:3, 12:3, 13:3, 14:3, 15:3, 16:3, 17:3, 18:3, 19:3, 20:3.
+
+Selected larger x:
+ h(10)=3
+ h(100)=6
+ h(1,000)=9
+ h(10,000)=13
+ h(100,000)=15
+ h(200,000)=16
+ h(1,000,000)=18
+
+For x=1,000,000 one witness block of length 18 occurs at gap indices
+849,875..849,892 with gaps
+[4, 12, 32, 6, 16, 80, 24, 22, 72, 8, 28, 30, 84, 2, 46, 14, 10, 26]
+(all distinct), spanning primes 13,010,143 to 13,010,659.
+\end{verbatim}
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item \textbf{Quantifiers/indices:} Under the corrected convention, a ``block inside the first $x$ gaps'' means $n+h-1\le x$. All lemmas/proofs use only such blocks.
+\item \textbf{Edge cases:} $d_1=1$ is the only odd prime gap; Lemma~852.1 explicitly starts at $n\ge 2$. Lemma~852.2 also starts at $n\ge 2$.
+\item \textbf{Lemma 852.2 minimal-sum step:} The reduction $d_{n+i}=2e_i$ is valid because all these gaps are even; distinctness is preserved under division by $2$.
+\item \textbf{Computation:} The reported $h(x)$ values were obtained by an exact scan of the finite list of gaps (no randomness). The witness block for $x=10^6$ was explicitly extracted and checked to have 18 distinct entries.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.} Lemma~852.3 gives $h(x)\le\max_{1\le n\le x} d_n$. Proposition~852.4 gives the unconditional bound $h(x)(h(x)-1)\le p_{x+1}-3$, hence $h(x)<\sqrt{p_{x+1}}+1$.
+\item[(ii)] \textbf{First gap (crisp).} Prove a nontrivial lower bound of the form $h(x)>(\log x)^c$ for some absolute $c>0$ and all sufficiently large $x$ (or else construct infinitely many $x$ violating it).
+\item[(iii)] \textbf{Top 3 next moves.}
+  \begin{enumerate}
+  \item Prove (via sieve) existence of a block of consecutive primes $p_n,\dots,p_{n+m}$ with pairwise distinct gaps $d_n,\dots,d_{n+m-1}$ of length $m\gg (\log x)^c$ when $n\asymp x$.
+  \item Strengthen the ``$h\le\max d$'' upper bound by proving that among $\asymp\log x$ consecutive gaps some value must repeat (e.g. by showing only $o(\log x)$ many distinct gap values can occur in such a window).
+  \item Extend computations to much larger $x$ (e.g. $x\ge 10^8$) to test whether $h(x)$ grows like $\log\log x$, a small power of $\log x$, or something else.
+  \end{enumerate}
+\item[(iv)] \textbf{Minimal counterexample structure.} A counterexample to ``$h(x)>(\log x)^c$ eventually'' would be a sequence $x_j\to\infty$ such that every block of length $\lceil(\log x_j)^c\rceil$ inside $(d_1,\dots,d_{x_j})$ contains a repeated gap value.
+\end{enumerate}
+

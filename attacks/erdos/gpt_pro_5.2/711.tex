@@ -1,0 +1,155 @@
+% Erdos Problem #711
+
+1) “FORMAL RESTATEMENT”
+
+Fix integers $n\ge 1$ and $m\in\mathbb Z$. To remove an endpoint ambiguity in the source text, I will work with the following convention:
+
+- For an integer $L\ge 1$, write $(m,m+L]_{\mathbb Z}:=\{m+1,m+2,\dots,m+L\}$.
+
+Define $f(n,m)$ to be the minimum $L\in\mathbb N$ such that there exist \emph{distinct} integers
+\[
+ a_1,\dots,a_n\in (m,m+L]_{\mathbb Z}
+\]
+with
+\[
+ k\mid a_k\quad\text{for every }k\in\{1,2,\dots,n\}.
+\]
+(If one uses the open interval $(m,m+L)\cap\mathbb Z$ instead, the value changes by at most $1$; none of the asymptotic questions in the problem are affected.)
+
+The problem asks for proofs of the following two asymptotic statements as $n\to\infty$:
+
+(A) \emph{Near-linear worst-case length:}
+\[
+\max_{m\in\mathbb Z} f(n,m) \le n^{1+o(1)}.
+\]
+Equivalently: for every $\varepsilon>0$ there exists $n_0(\varepsilon)$ such that for all $n\ge n_0(\varepsilon)$,
+\[
+\max_m f(n,m) \le n^{1+\varepsilon}.
+\]
+
+(B) \emph{Unbounded offset from the diagonal:}
+\[
+\max_{m\in\mathbb Z}\bigl(f(n,m)-f(n,n)\bigr)\to\infty.
+\]
+
+Stress points / edge cases: $n=1,2$ (definition sanity), dependence on endpoint convention (changes by $O(1)$), and the possibility that the maximizing $m$ is highly structured (e.g. $m$ divisible by many small integers).
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+Only what is explicitly stated in the problem text:
+
+- Erd\H{o}s--Pomerance proved $\max_m f(n,m)\ll n^{3/2}$ and bounds of size $n(\log n)^{1/2}$ for $f(n,n)$.
+- van Doorn (2026, per the statement) proved the second question affirmatively, giving for large $n$ some $m=m(n)$ with
+\[
+ f(n,m)-f(n,n) \gg \frac{\log n}{\log\log n}\,n.
+\]
+
+Per the integrity rules, I do not use any results beyond what is written above.
+
+3) “ATTACK PLAN”
+
+Proof track ideas (not completed here):
+
+- Reformulate as a system of distinct representatives (SDR) for sets of multiples $S_k := \{x\in(m,m+L]_{\mathbb Z}: k\mid x\}$ and try to verify Hall's condition for $L=n^{1+o(1)}$.
+- Greedy/iterative matching: order $k$ by size or by smoothness, and show each step has enough unused multiples.
+- Use structure of the divisibility poset (numbers with many divisors cause collisions) and isolate a sparse set of "bad" points.
+
+Disproof track ideas: try to find $m$ for which the sets $S_k$ overlap too much (e.g. many of the $S_k$ concentrated on a short list of highly divisible integers) to force $f(n,m)$ large.
+
+I did not find a complete proof of (A) or an explicit counterexample to (A). I provide verified basic bounds and small-case data.
+
+4) “WORK”
+
+\textbf{FAST REALITY CHECK (small cases, exact computation).}
+
+For the convention $(m,m+L]_{\mathbb Z}=\{m+1,\dots,m+L\}$, I computed $f(n,m)$ exactly for $n\le 8$ by reducing the existence of $(a_k)$ to a bipartite matching problem and checking all $m$ modulo $\mathrm{lcm}(1,\dots,n)$ (justified below).
+
+Results (exact):
+
+- $n=1$: $\max_m f(1,m)=1$ and $f(1,1)=1$.
+- $n=2$: $\max_m f(2,m)=2$ and $f(2,2)=2$.
+- $n=3$: $\max_m f(3,m)=4$ (attained at $m\equiv 4\pmod 6$); $f(3,3)=3$; so $\max_m(f(3,m)-f(3,3))=1$.
+- $n=4$: $\max_m f(4,m)=6$ (attained at $m\equiv 9\pmod{12}$); $f(4,4)=5$; max difference $=1$.
+- $n=5$: $\max_m f(5,m)=8$ (attained at $m\equiv 16\pmod{60}$); $f(5,5)=5$; max difference $=3$.
+- $n=6$: $\max_m f(6,m)=10$ (attained at $m\equiv 25\pmod{60}$); $f(6,6)=8$; max difference $=2$.
+- $n=7$: $\max_m f(7,m)=12$ (attained at $m\equiv 36\pmod{420}$); $f(7,7)=8$; max difference $=4$.
+- $n=8$: $\max_m f(8,m)=14$ (attained at $m\equiv 49\pmod{840}$); $f(8,8)=10$; max difference $=4$.
+
+Example (worst-case residue for $n=5$): for $m=16$, $f(5,16)=8$ and one valid choice in $(16,24]_{\mathbb Z}$ is
+\[
+(a_1,a_2,a_3,a_4,a_5)=(17,18,21,24,20),
+\]
+which are distinct and satisfy $k\mid a_k$.
+
+\medskip
+\textbf{Lemma 1 (Elementary quadratic upper bound).}
+For all integers $n\ge 1$ and $m\in\mathbb Z$,
+\[
+ f(n,m)\le \sum_{k=1}^n k = \frac{n(n+1)}2.
+\]
+
+\emph{Proof.}
+Let $L:=\frac{n(n+1)}2$. Consider the interval of integers
+\[
+(m,m+L]_{\mathbb Z} = \{m+1,\dots,m+L\}.
+\]
+Partition it into consecutive blocks $B_k$ of lengths $k$:
+\[
+B_k := \{ m+1+\tfrac{(k-1)k}{2},\; m+2+\tfrac{(k-1)k}{2},\;\dots,\; m+k+\tfrac{(k-1)k}{2}\}\quad (1\le k\le n).
+\]
+These blocks are disjoint and their union is exactly $\{m+1,\dots,m+L\}$.
+
+Fix $k\in\{1,\dots,n\}$. The block $B_k$ consists of $k$ consecutive integers.
+Consider their residues modulo $k$. If $x$ runs through $B_k$ in increasing order, then $x\bmod k$ runs through all residues $0,1,\dots,k-1$ exactly once. Hence there exists \emph{exactly one} element $a_k\in B_k$ with $a_k\equiv 0\pmod k$, i.e. $k\mid a_k$.
+
+Since the blocks $B_k$ are disjoint, the selected integers $a_1,\dots,a_n$ are distinct, all lie in $(m,m+L]_{\mathbb Z}$, and satisfy $k\mid a_k$ for each $k$. Therefore $f(n,m)\le L=\frac{n(n+1)}2$.
+\qed
+
+\medskip
+\textbf{Lemma 2 (Periodicity in $m$).}
+Let $L_n:=\mathrm{lcm}(1,2,\dots,n)$. Then for every $m\in\mathbb Z$,
+\[
+ f(n,m+L_n)=f(n,m).
+\]
+
+\emph{Proof.}
+Let $L:=f(n,m)$. By definition there exist distinct integers $a_1,\dots,a_n\in(m,m+L]_{\mathbb Z}$ with $k\mid a_k$ for all $k\le n$.
+Since $L_n$ is a multiple of each $k\le n$, we have $k\mid (a_k+L_n)$ for all $k$.
+Also $a_k+L_n\in(m+L_n,(m+L_n)+L]_{\mathbb Z}$ and distinctness is preserved by translation.
+Thus $f(n,m+L_n)\le L=f(n,m)$.
+
+Applying the same argument with $m$ replaced by $m+L_n$ and translating by $-L_n$ gives $f(n,m)\le f(n,m+L_n)$.
+Hence $f(n,m+L_n)=f(n,m)$.
+\qed
+
+5) “VERIFICATION”
+
+- Lemma 1: Checked for $n=1,2,3$ by explicit construction and by the general modular argument; the key fact (a block of $k$ consecutive integers contains exactly one multiple of $k$) is correct.
+- Lemma 2: Verified that translation by $L_n$ preserves divisibility by every $k\le n$ and preserves the "window" length $L$.
+- Endpoint convention: if the original definition uses an open interval $(m,m+L)$ rather than $(m,m+L]_{\mathbb Z}$, all statements above shift by at most $1$ (and Lemma 1 becomes $f(n,m)\le \frac{n(n+1)}2+1$); the computed small values would also shift by at most $1$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here: for all $m$, $f(n,m)\le \frac{n(n+1)}2$ (explicit construction), and $f(n,m)$ is periodic in $m$ with period $\mathrm{lcm}(1,\dots,n)$. Exact values were computed for $n\le 8$.
+
+(ii) First gap (crisp statement): prove that for every $\varepsilon>0$ and all sufficiently large $n$,
+\[
+\max_{m\in\mathbb Z} f(n,m) \le n^{1+\varepsilon}.
+\]
+Equivalently, show Hall's condition (or an explicit matching algorithm) succeeds in every interval of length $n^{1+\varepsilon}$ for all large $n$.
+
+(iii) Top 3 next moves (concrete targets):
+
+1. (Hall target) Prove that for $L=n^{1+\varepsilon}$ and every subset $K\subseteq\{1,\dots,n\}$,
+\[\bigl|\bigcup_{k\in K} S_k\bigr|\ge |K|,\qquad S_k:=\{x\in(m,m+L]_{\mathbb Z}:k\mid x\},\]
+uniformly in $m$.
+
+2. (Greedy target) Design an ordering of $k\in\{1,\dots,n\}$ and prove a greedy SDR algorithm succeeds for $L=n^{1+\varepsilon}$ by lower-bounding the number of currently-unused multiples at each step.
+
+3. (Computation target) For moderate $n$ (say $n\le 50$), compute $\max_m f(n,m)$ over one period $m\bmod\mathrm{lcm}(1,\dots,n)$ and look for patterns in the maximizing residues (e.g. whether $m$ tends to be close to a square, highly divisible, etc.).
+
+(iv) Minimal counterexample structure (if (A) is false): one would expect a sequence $m=m(n)$ for which, in the short interval $(m,m+n^{1+o(1)}]$, many of the sets of multiples $S_k$ concentrate on a comparatively tiny set of highly divisible integers (forcing large overlaps and violating Hall for some $K$ concentrated on small moduli). Concretely, a "bad" $m$ would likely be arranged so that $m+1,\dots,m+L$ contains unusually many integers with large gcds or unusually few integers in certain residue classes modulo many $k$.
+
+

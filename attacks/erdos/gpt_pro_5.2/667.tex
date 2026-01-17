@@ -1,0 +1,267 @@
+% Erdos Problem #667
+
+% Problem statement (from 665-670.tex):
+% Let $p,q\geq 1$ be fixed integers. We define $H(n)=H(n;p,q)$ to be the largest $m$ such that any graph on $n$ vertices where every set of $p$ vertices spans at least $q$ edges must contain a complete graph on $m$ vertices. Is $c(p,q)=\liminf \frac{\log H(n)}{\log n}$ a strictly increasing function of $q$ for $1\leq q\leq \binom{p-1}{2}+1$?
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Fix integers $p\ge 1$ and $q\ge 1$.
+For each integer $n\ge p$, let $\mathcal{G}(n;p,q)$ be the class of (simple, undirected) graphs $G$ on vertex set $[n]$ such that every subset $S\subseteq [n]$ with $|S|=p$ spans at least $q$ edges of $G$.
+Define
+\[
+H(n)=H(n;p,q) := \max\big\{ m\in\mathbb{N} : \text{every } G\in\mathcal{G}(n;p,q) \text{ contains a } K_m\big\}.
+\]
+Equivalently, $H(n)=\min\{\omega(G): G\in\mathcal{G}(n;p,q)\}$ where $\omega(G)$ is the clique number.
+Define
+\[
+c(p,q) := \liminf_{n\to\infty} \frac{\log H(n;p,q)}{\log n},
+\]
+where the base of the logarithm is irrelevant.
+
+The question asks whether for fixed $p$ the function $q\mapsto c(p,q)$ is \emph{strictly increasing} on the integer range
+$1\le q\le \binom{p-1}{2}+1$.
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The supplied statement notes:
+\begin{itemize}
+\item $q=1$ corresponds to the classical Ramsey problem (forbidding independent sets of size $p$), and records the bounds $\frac1{p-1}\le c(p,1)\le \frac{2}{p+1}$.
+\item It is ``easy to see'' that if $q=\binom{p-1}{2}+1$ then $c(p,q)=1$.
+\item Erd\H{o}s--Faudree--Rousseau--Schelp showed $c(p,\binom{p-1}{2})\le 1/2$.
+\end{itemize}
+Per project rules, I do not rely on any external results beyond what is written above.
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item \textbf{Proof track:} Prove general monotonicity in $q$. Prove the endpoint value $c(p,\binom{p-1}{2}+1)=1$ directly. Solve at least one nontrivial special case completely (I do $p=3,q=2$).
+\item \textbf{Disproof track:} Try to find some $p$ and adjacent $q<q+1$ for which the asymptotic exponent does \emph{not} change, by constructing graphs with the stronger local-edge condition but with clique number comparable to the weaker case. No such construction was found here.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\medskip
+\noindent\textbf{Fast reality check (small $n$ by brute force).}
+I exhaustively enumerated all graphs on $n\le 6$ vertices and computed $H(n;p,q)$ for a few small $(p,q)$.
+The exact values found were:
+\begin{verbatim}
+p=3, q=1:  H(3)=2, H(4)=2, H(5)=2, H(6)=3
+p=3, q=2:  H(3)=2, H(4)=2, H(5)=3, H(6)=3
+p=4, q=1:  H(4)=2, H(5)=2, H(6)=2
+p=4, q=2:  H(4)=2, H(5)=2, H(6)=2
+p=4, q=3:  H(4)=2, H(5)=2, H(6)=2
+p=4, q=4:  H(4)=2, H(5)=3, H(6)=3
+\end{verbatim}
+These sanity checks are consistent with the general monotonicity in $q$ and show, for example, that the $p=3$ case already has a strict increase between $q=1$ and $q=2$.
+
+\medskip
+\noindent\textbf{Lemma 667.1 (Monotonicity in $q$).}
+For fixed $p$ and $n$, if $q'\ge q$ then $H(n;p,q')\ge H(n;p,q)$.
+Consequently $c(p,q)$ is a nondecreasing function of $q$.
+
+\noindent\emph{Proof.}
+If $q'\ge q$, then the property ``every $p$-set spans at least $q'$ edges'' implies the weaker property ``every $p$-set spans at least $q$ edges''. Hence
+\[\mathcal{G}(n;p,q')\subseteq \mathcal{G}(n;p,q).\]
+Taking minima of clique number over a smaller class can only increase the minimum:
+\[
+H(n;p,q') 
+= \min_{G\in\mathcal{G}(n;p,q')} \omega(G)
+\ge \min_{G\in\mathcal{G}(n;p,q)} \omega(G)
+= H(n;p,q).
+\]
+For the liminf exponent, the inequality $H(n;p,q')\ge H(n;p,q)$ implies
+\(\log H(n;p,q')/\log n\ge \log H(n;p,q)/\log n\) for each $n$, and hence taking $\liminf$ over $n$ yields $c(p,q')\ge c(p,q)$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 667.2 (Endpoint $q=\binom{p-1}{2}+1$ forces a linear clique).}
+Let $p\ge 2$ and set $q_\max := \binom{p-1}{2}+1$.
+If a graph $G$ on $n$ vertices satisfies that every $p$-vertex subset spans at least $q_\max$ edges, then $G$ contains a clique of size at least $\lceil n/(p-1)\rceil$.
+In particular, for this $q_\max$ we have $H(n;p,q_\max)\ge \lceil n/(p-1)\rceil$ for all $n$, and therefore $c(p,q_\max)=1$.
+
+\noindent\emph{Proof.}
+Let $\overline{G}$ be the complement graph.
+Fix a vertex $v$ of $\overline{G}$. Suppose $\deg_{\overline{G}}(v)\ge p-1$.
+Choose $p-1$ distinct neighbors $u_1,\dots,u_{p-1}$ of $v$ in $\overline{G}$ and consider the $p$-set
+$S=\{v,u_1,\dots,u_{p-1}\}$.
+In $G$, the vertex $v$ is non-adjacent to each $u_i$, so among the ${p\choose 2}$ possible edges inside $S$, at least $(p-1)$ edges are missing.
+Therefore the induced subgraph $G[S]$ has at most
+\[
+\binom{p}{2}-(p-1) 
+= \frac{p(p-1)}{2}-(p-1)
+= (p-1)\frac{p-2}{2}
+= \binom{p-1}{2}
+\]
+edges.
+But $\binom{p-1}{2} < \binom{p-1}{2}+1=q_\max$, contradicting the assumption that every $p$-set spans at least $q_\max$ edges.
+Hence \emph{every} vertex of $\overline{G}$ has degree at most $p-2$:
+\[
+\Delta(\overline{G})\le p-2.
+\]
+
+A graph with maximum degree $\Delta$ is properly colorable with $\Delta+1$ colors via a greedy algorithm (order the vertices arbitrarily; at each step there are at most $\Delta$ forbidden colors).
+Applying this with $\Delta=p-2$ shows that $\overline{G}$ is $(p-1)$-colorable.
+Thus its vertex set can be partitioned into $p-1$ independent sets; one of these sets has size at least $\lceil n/(p-1)\rceil$.
+An independent set in $\overline{G}$ is exactly a clique in $G$.
+Therefore $\omega(G)\ge \lceil n/(p-1)\rceil$.
+
+Finally, since $H(n;p,q_\max)$ is the minimum possible clique number among such graphs, we obtain $H(n;p,q_\max)\ge \lceil n/(p-1)\rceil$.
+Consequently
+\[
+\frac{\log H(n;p,q_\max)}{\log n} \ge \frac{\log( n/(p-1))}{\log n} \to 1
+\quad (n\to\infty),
+\]
+so $c(p,q_\max)=1$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 667.3 (Exact solution for $(p,q)=(3,2)$).}
+For $p=3$ and $q=2$, one has
+\[
+H(n;3,2)=\left\lceil \frac{n}{2}\right\rceil \quad\text{for all } n\ge 3,
+\]
+and hence $c(3,2)=1$.
+
+\noindent\emph{Proof.}
+Let $G$ be a graph on $n$ vertices such that every set of $3$ vertices spans at least $2$ edges.
+Equivalently, for every triple, the induced subgraph is not a single edge plus an isolated vertex, and not the empty graph.
+
+Let $\overline{G}$ be the complement.
+A triple in $G$ with at least $2$ edges corresponds to a triple in $\overline{G}$ with at most $1$ edge (since a triple has exactly $3$ possible edges total).
+Thus every triple of vertices spans \emph{at most one} edge in $\overline{G}$.
+
+\emph{Claim: $\overline{G}$ has maximum degree at most $1$.}
+Indeed, if some vertex $v$ of $\overline{G}$ had two distinct neighbors $x,y$, then the triple $\{v,x,y\}$ would span at least the two edges $vx$ and $vy$ in $\overline{G}$, contradicting the ``at most one edge per triple'' property.
+So $\Delta(\overline{G})\le 1$.
+Therefore $\overline{G}$ is a disjoint union of edges (a matching) and isolated vertices.
+Let the matching have size $t$.
+Then $2t\le n$ and in particular $t\le \lfloor n/2\rfloor$.
+
+A clique in $G$ is an independent set in $\overline{G}$. In a matching on $2t$ vertices plus $n-2t$ isolated vertices, the largest independent set has size $(n-2t)+t = n-t$ (take all isolated vertices and one endpoint from each matched edge).
+Thus
+\[
+\omega(G)=\alpha(\overline{G})=n-t \ge n-\left\lfloor \frac{n}{2}\right\rfloor = \left\lceil \frac{n}{2}\right\rceil.
+\]
+So every such $G$ contains a clique of size at least $\lceil n/2\rceil$, proving
+$H(n;3,2)\ge \lceil n/2\rceil$.
+
+To show equality, we exhibit a graph meeting the condition with clique number exactly $\lceil n/2\rceil$.
+Take $\overline{G}$ to be a matching of size $\lfloor n/2\rfloor$ (a perfect matching if $n$ is even, or a matching plus one isolated vertex if $n$ is odd).
+Then every triple of vertices in $\overline{G}$ contains at most one matching edge (because matching edges are disjoint), so every triple in $G$ has at least $2$ edges.
+In this construction $t=\lfloor n/2\rfloor$, hence $\omega(G)=n-t=\lceil n/2\rceil$.
+Therefore $H(n;3,2)\le \lceil n/2\rceil$.
+Combining the inequalities gives equality.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 667.4 (Elementary lower bound for $q=1$).}
+Fix $p\ge 2$.
+There is a constant $C_p>0$ such that for all $n\ge p$,
+\[
+H(n;p,1) \ge C_p\, n^{1/(p-1)}.
+\]
+In particular $c(p,1)\ge 1/(p-1)$.
+
+\noindent\emph{Proof.}
+Let $R(p,m)$ denote the usual Ramsey number: the least $N$ such that every graph on $N$ vertices contains either an independent set of size $p$ or a clique of size $m$.
+We will prove by induction on $p+m$ the standard recursion
+\begin{equation}
+R(p,m)\le R(p-1,m)+R(p,m-1).
+\tag{$\ast$}
+\end{equation}
+Given ($\ast$), we will show that $R(p,m)\le \binom{p+m-2}{p-1}$, which implies the desired polynomial lower bound on $H(n;p,1)$.
+
+\emph{Step 1: proof of the recursion ($\ast$).}
+Consider any graph $G$ on $N:=R(p-1,m)+R(p,m-1)$ vertices.
+Pick any vertex $v$.
+Let $N(v)$ be the neighbor set of $v$ and $\overline{N}(v)$ the non-neighbor set (excluding $v$ itself).
+Then $|N(v)|+|\overline{N}(v)|=N-1$.
+If $|N(v)|\ge R(p,m-1)$, then by definition of $R(p,m-1)$, the induced subgraph on $N(v)$ contains either:
+(i) an independent set of size $p$, which is also independent in $G$, or
+(ii) a clique of size $m-1$, which together with $v$ forms a clique of size $m$.
+If instead $|N(v)|<R(p,m-1)$, then
+\[
+|\overline{N}(v)| = (N-1)-|N(v)| \ge (R(p-1,m)+R(p,m-1)-1) - (R(p,m-1)-1)=R(p-1,m).
+\]
+Then by definition of $R(p-1,m)$, the induced subgraph on $\overline{N}(v)$ contains either:
+(i) an independent set of size $p-1$, which together with $v$ forms an independent set of size $p$ in $G$ (since $v$ is non-adjacent to all vertices in $\overline{N}(v)$), or
+(ii) a clique of size $m$.
+In all cases $G$ contains an independent set of size $p$ or a clique of size $m$.
+Therefore $N\ge R(p,m)$, proving ($\ast$).
+
+\emph{Step 2: a closed-form upper bound for $R(p,m)$.}
+We prove by induction on $p+m$ that
+\begin{equation}
+R(p,m) \le \binom{p+m-2}{p-1}.
+\tag{$\dagger$}
+\end{equation}
+Base cases: If $p=1$ then $R(1,m)=1$ and $\binom{m-1}{0}=1$.
+If $m=1$ then $R(p,1)=1$ and $\binom{p-1}{p-1}=1$.
+Inductive step: assuming ($\dagger$) for smaller $(p+m)$, apply ($\ast$) and Pascal's identity:
+\[
+R(p,m)\le R(p-1,m)+R(p,m-1)
+\le \binom{p+m-3}{p-2}+\binom{p+m-3}{p-1}
+=\binom{p+m-2}{p-1}.
+\]
+This proves ($\dagger$).
+
+\emph{Step 3: convert to a lower bound on $H(n;p,1)$.}
+If $G$ is an $n$-vertex graph with the property ``every $p$ vertices span at least one edge'' then $G$ has no independent set of size $p$.
+By definition of Ramsey numbers, if $n\ge R(p,m)$ then $G$ must contain a $K_m$.
+Therefore $H(n;p,1)$ is at least the largest $m$ such that $R(p,m)\le n$.
+Using ($\dagger$), it suffices that
+\[
+\binom{p+m-2}{p-1}\le n.
+\]
+A crude bound valid for all $m\ge 1$ is
+\(
+\binom{p+m-2}{p-1} \le (p+m-2)^{p-1}.
+\)
+Thus it is enough that $(p+m-2)^{p-1}\le n$, i.e. $m\le n^{1/(p-1)}-(p-2)$.
+For $n$ large this gives $m\ge \tfrac12 n^{1/(p-1)}$ (say), and for all $n\ge p$ we can set
+$C_p := 1/(2\cdot 2^{p-2})$ or any fixed positive constant after checking finitely many small $n$.
+In particular $H(n;p,1)\ge C_p n^{1/(p-1)}$, so $c(p,1)\ge 1/(p-1)$.
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item Lemma 667.2: verified the degree argument in $\overline{G}$ uses exactly the threshold $q_\max=\binom{p-1}{2}+1$.
+\item Lemma 667.3: checked both directions (structure of $\overline{G}$ and construction achieving equality).
+\item Small-$n$ brute force values (listed above) agree with Lemma 667.3 for $(p,q)=(3,2)$ and with Lemma 667.2 at the endpoint (e.g., for $p=4,q=4$ the lower bound gives clique $\ge \lceil n/3\rceil$, and brute force shows $H(6)=3$ which matches $\lceil 6/3\rceil$).
+\end{itemize}
+
+\bigskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}.
+
+\smallskip
+\noindent(i) \emph{Strongest proved partial results.}
+\begin{itemize}
+\item $q\mapsto c(p,q)$ is nondecreasing (Lemma 667.1).
+\item For $q=\binom{p-1}{2}+1$, one has $H(n)\ge \lceil n/(p-1)\rceil$ and hence $c(p,q)=1$ (Lemma 667.2).
+\item For $(p,q)=(3,2)$ one has the exact formula $H(n)=\lceil n/2\rceil$ and hence $c(3,2)=1$ (Lemma 667.3).
+\item For $q=1$, an elementary Ramsey recursion gives $c(p,1)\ge 1/(p-1)$ (Lemma 667.4), matching the lower bound stated in the problem text.
+\end{itemize}
+
+\noindent(ii) \emph{First gap (crisp statement).}
+Prove or disprove: for fixed $p\ge 4$ and each integer $q$ with $1\le q<\binom{p-1}{2}+1$, one has
+\[
+c(p,q+1) > c(p,q).
+\]
+
+\noindent(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item \textbf{Target a concrete first unknown:} settle strictness for $p=4$ between $q=1$ and $q=2$ by constructing (or ruling out) $n$-vertex graphs with the $q=2$ local condition but clique number $\le n^{\alpha}$ where $\alpha$ matches the best known exponent for $q=1$.
+\item \textbf{Hereditary-class approach:} the condition ``every $p$-set spans at least $q$ edges'' forbids a finite family of induced $p$-vertex graphs; try to prove a polynomial Erd\H{o}s--Hajnal-type bound on the clique number with an exponent that increases with $q$.
+\item \textbf{Computation-guided constructions:} for fixed small $(p,q)$ (e.g. $(4,2)$ and $(4,3)$), use SAT/ILP to search for large graphs with the local condition and unusually small clique number, to guess extremal structures for a potential plateau.
+\end{enumerate}
+
+\noindent(iv) \emph{What a minimal counterexample would likely look like.}
+A failure of strictness would mean there exist $p\ge 4$ and $q<q+1$ and a sequence $n_t\to\infty$ with graphs $G_t$ on $n_t$ vertices such that:
+\begin{itemize}
+\item every $p$-subset of $V(G_t)$ spans at least $q+1$ edges, but
+\item $\omega(G_t)$ grows only like $n_t^{c(p,q)+o(1)}$ (i.e., no exponent improvement over the weaker $q$-condition).
+\end{itemize}
+Such $G_t$ would have to be ``Ramsey-like'' (small clique) while also forbidding a strictly larger family of sparse induced $p$-vertex patterns than the $q$-case.
+
+

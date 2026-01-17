@@ -1,0 +1,108 @@
+% Erdos Problem #935
+
+1) FORMAL RESTATEMENT
+
+Fix an integer \(\ell\ge 1\). For a positive integer \(m\) with prime factorisation
+\[m=\prod_{p} p^{v_p(m)},\]
+define its \emph{powerful part}
+\[Q_2(m):=\prod_{p:\,v_p(m)\ge 2} p^{v_p(m)}.\]
+Equivalently, \(Q_2(m)\) is the largest powerful (squarefull) divisor of \(m\), and
+\(Q_2(m)=m/\prod_{p:\,v_p(m)=1}p\).
+For \(n\in\mathbb N\) set
+\[P_{n,\ell}:=\prod_{i=0}^{\ell} (n+i).\]
+The questions are:
+
+(a) For every \(\varepsilon>0\) and \(\ell\ge 1\), does there exist \(N(\varepsilon,\ell)\) such that for all \(n\ge N(\varepsilon,\ell)\),
+\[Q_2(P_{n,\ell})<n^{2+\varepsilon}?\]
+
+(b) For \(\ell\ge 2\), is
+\[\limsup_{n\to\infty} \frac{Q_2(P_{n,\ell})}{n^2}=+\infty?\]
+
+(c) For \(\ell\ge 2\), is
+\[\lim_{n\to\infty} \frac{Q_2(P_{n,\ell})}{n^{\ell+1}}=0?\]
+
+Edge cases: \(n\) is intended large; \(Q_2(1)=1\). All questions are about the asymptotic regime \(n\to\infty\) with \(\ell\) fixed.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement itself notes:
+(i) Erd\H{o}s wrote that (a), if true, seems very difficult to prove.
+(ii) A result of Mahler implies \(\limsup_{n\to\infty} Q_2(P_{n,\ell})/n^2\ge 1\) for every fixed \(\ell\ge 1\).
+I do not use any other external results.
+
+3) ATTACK PLAN
+
+Proof track ideas:
+- Decompose \(Q_2(P_{n,\ell})\) prime-by-prime via \(v_p(P_{n,\ell})=\sum_{i=0}^{\ell} v_p(n+i)\).
+- Separate primes \(p\le \ell\) (which can divide multiple factors) from primes \(p>\ell\) (which can divide at most one factor), and try to bound the contribution of each regime.
+
+Disproof/construction ideas:
+- Try to make several of \(n,n+1,\dots,n+\ell\) very squareful simultaneously (e.g. consecutive powerful numbers), so that \(Q_2(P_{n,\ell})\) becomes large.
+- Use CRT constraints \(n\equiv -i\pmod{q_i^2}\) to force large square divisors in each factor.
+
+Given current tools, I can rigorously prove only structural lemmas and provide computational evidence; I do not reach a full proof or counterexample to (a)–(c).
+
+4) WORK
+
+Fast reality check (explicit computation).
+Using direct prime-factorisation computations (sympy factorisation) of \(Q_2(P_{n,\ell})\) for small ranges:
+- For \(\ell=1\): \(\max_{1\le n\le 500} Q_2(P_{n,1})/n^2 = 1.125\) attained at \(n=8\).
+- For \(\ell=2\): \(\max_{1\le n\le 100000} Q_2(P_{n,2})/n^2 = 338.0344897959184\) attained at \(n=9800\), where
+  \(Q_2(9800\cdot 9801\cdot 9802)=32464832400\).
+- For \(\ell=3\): \(\max_{1\le n\le 50000} Q_2(P_{n,3})/n^2 = 432.77173469387753\) attained at \(n=1680\).
+- For \(\ell=4\): \(\max_{1\le n\le 20000} Q_2(P_{n,4})/n^2 = 48078.584176085664\) attained at \(n=6724\).
+Sample values suggesting \(Q_2(P_{n,\ell})/n^{\ell+1}\) is small for these ranges:
+for \(\ell=2\), at \(n=100,200,500\) the ratios are approximately \(2\cdot 10^{-4},\ 5\cdot 10^{-5},\ 8\cdot 10^{-6}\), respectively.
+
+Lemma 935.1 (Large primes hit at most one factor).
+Let \(\ell\ge 1\) and \(p\) be a prime with \(p>\ell\). Then among \(n,n+1,\dots,n+\ell\) there is \emph{at most one} integer divisible by \(p\).
+
+Proof.
+Assume for contradiction that \(p\mid (n+i)\) and \(p\mid (n+j)\) for some \(0\le i<j\le \ell\). Then \(p\mid (n+j)-(n+i)=j-i\). But \(1\le j-i\le \ell<p\), so \(j-i\) is a positive integer strictly smaller than \(p\), hence cannot be divisible by the prime \(p\). Contradiction. QED.
+
+Lemma 935.2 (Characterisation of the \(p>\ell\) contribution to \(Q_2\)).
+Let \(\ell\ge 1\), \(p\) prime with \(p>\ell\), and \(P_{n,\ell}=\prod_{i=0}^{\ell}(n+i)\).
+Then either \(v_p(P_{n,\ell})=0\), or there is a unique \(i\in\{0,\dots,\ell\}\) such that
+\[v_p(P_{n,\ell})=v_p(n+i).\]
+In particular, for \(p>\ell\), the prime \(p\) appears in \(Q_2(P_{n,\ell})\) (i.e. \(v_p(P_{n,\ell})\ge 2\)) if and only if \(p^2\mid (n+i)\) for that unique index \(i\).
+
+Proof.
+By Lemma 935.1, there is at most one index \(i\) with \(p\mid (n+i)\). If none exists, then \(v_p(P_{n,\ell})=0\). If such an \(i\) exists, then \(p\nmid (n+j)\) for all \(j\ne i\), hence \(v_p(n+j)=0\) for \(j\ne i\). By additivity of \(p\)-adic valuation on products,
+\[v_p(P_{n,\ell})=\sum_{j=0}^{\ell} v_p(n+j)=v_p(n+i).\]
+The final statement is then immediate from the definition of \(Q_2\): for any prime \(p\), it contributes to \(Q_2\) exactly when its valuation is at least \(2\). QED.
+
+Lemma 935.3 (Crude bound for small primes).
+Fix \(\ell\ge 1\). For any prime \(p\le \ell\) and any \(n\ge 1\),
+\[v_p(P_{n,\ell}) \le (\ell+1)\,\Big\lfloor \log_p(n+\ell)\Big\rfloor.
+\]
+Consequently,
+\[\prod_{p\le \ell} p^{v_p(P_{n,\ell})} \le (n+\ell)^{(\ell+1)\pi(\ell)}.
+\]
+
+Proof.
+For each \(i\in\{0,\dots,\ell\}\) we have \(n+i\le n+\ell\). If \(p^{k}\mid (n+i)\) then \(p^{k}\le n+\ell\), hence \(k\le \lfloor \log_p(n+\ell)\rfloor\). Thus
+\(v_p(n+i)\le \lfloor \log_p(n+\ell)\rfloor\) for every \(i\), and summing over \(i\) gives the valuation bound.
+Exponentiating and multiplying over the finitely many primes \(p\le \ell\) yields
+\[\prod_{p\le \ell} p^{v_p(P_{n,\ell})} \le \prod_{p\le \ell} p^{(\ell+1)\log_p(n+\ell)} = \prod_{p\le \ell} (n+\ell)^{\ell+1}=(n+\ell)^{(\ell+1)\pi(\ell)}.
+\]
+(Here we used that \(p^{\log_p(n+\ell)}=n+\ell\).) QED.
+
+5) VERIFICATION
+
+- Lemma 935.1: the only place where \(p>\ell\) is used is to ensure \(j-i < p\). This is correct.
+- Lemma 935.2: uses additivity \(v_p(\prod m_i)=\sum v_p(m_i)\), valid for integers.
+- Lemma 935.3: checks that \(v_p(m)\le \lfloor\log_p m\rfloor\) for \(m\ge1\), since \(p^{v_p(m)}\le m\). This is correct.
+- Computations: the reported maxima depend on the search ranges stated. They are not claims about the true global maxima.
+
+6) FINAL
+
+UNRESOLVED
+(i) Strongest proved partial result: For fixed \(\ell\), primes \(p>\ell\) contribute to \(Q_2(P_{n,\ell})\) only via square divisibility inside a single factor (Lemma 935.2), and primes \(p\le \ell\) have total contribution at most \((n+\ell)^{(\ell+1)\pi(\ell)}\) (Lemma 935.3).
+(ii) First gap: Prove or disprove that for each fixed \(\ell\ge1\) and every \(\varepsilon>0\) one has \(Q_2(P_{n,\ell})=O(n^{2+\varepsilon})\) as \(n\to\infty\).
+(iii) Top 3 next moves:
+  1. Prove a lower bound on the product of primes that divide \(P_{n,\ell}\) to exponent exactly \(1\) (equivalently, a lower bound on \(\prod_{p: v_p(P_{n,\ell})=1} p\)) to upper-bound \(Q_2(P_{n,\ell})=P_{n,\ell}/\prod_{v_p=1}p\).
+  2. Control how often several of \(n,n+1,\dots,n+\ell\) can be simultaneously very squareful; even a quantitative bound on the count of \(i\) with a large square divisor of \(n+i\) would feed into (a) and (c).
+  3. Extend the brute-force search for \(\ell=2,3\) to locate families with unusually large \(Q_2(P_{n,\ell})/n^2\) and look for a CRT-driven parametrisation.
+(iv) Minimal counterexample structure: A counterexample sequence to (a) would require infinitely many \(n\) for which many primes (including some larger than \(\ell\)) occur with valuation \(\ge2\) in \(P_{n,\ell}\), i.e. several of the factors \(n+i\) must contain large square divisors and the small primes \(p\le \ell\) must contribute unusually large valuations across the block.
+
+

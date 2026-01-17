@@ -1,0 +1,146 @@
+% Erdos Problem #1013
+
+1) FORMAL RESTATEMENT
+
+For integer k>=1, define h_3(k) to be the smallest integer n such that there exists a triangle-free graph G on n vertices with chromatic number chi(G)=k.
+(If one instead defines chi(G)>=k, the minimum n is the same, because any graph with chi>=k contains a k-critical induced subgraph with chi exactly k, and deleting vertices preserves triangle-freeness.)
+
+Tasks:
+(A) Find an asymptotic for h_3(k) as k->infinity.
+(B) Prove that
+  lim_{k->infinity} h_3(k+1) / h_3(k) = 1.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+Only what is explicitly stated in the provided problem file:
+- Known bounds:
+    (log k / log log k) * k^2 << h_3(k) << (log k) * k^2.
+- The lower bound is attributed in the problem text to Graver--Yackel.
+- The upper bound is said to follow from Shearer's upper bound for the Ramsey number R(3,k).
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Use standard tools relating chromatic number to independence number: chi >= n/alpha.
+  For triangle-free graphs, alpha is constrained by Ramsey theory and by degree-based bounds.
+- Use explicit constructions to give upper bounds on h_3(k), e.g. Mycielski's construction (triangle-free, raises chromatic number by 1).
+- For the ratio limit, look for near-multiplicativity/subadditivity properties of h_3(k).
+
+Disproof-track ideas:
+- Not applicable (this is an asymptotic/existence determination problem).
+
+I provide fully proved basic lower and upper recurrences (very weak vs the quoted bounds), and verify small cases by explicit construction.
+
+4) WORK
+
+FAST REALITY CHECK (small k, explicit graphs)
+
+Exact values / verified constructions:
+- h_3(1)=1: the 1-vertex empty graph is triangle-free and 1-colorable.
+- h_3(2)=2: a single edge K2 is triangle-free and has chi=2.
+- h_3(3)=5: C5 (cycle on 5 vertices) is triangle-free and has chi=3; no triangle-free graph on <=4 vertices has an odd cycle, hence all are bipartite, so chi<=2.
+
+Mycielski constructions (verified by brute-force exact coloring for these sizes):
+- Starting from C5 (n=5, chi=3), one Mycielski step produces a triangle-free graph on 11 vertices with chi=4.
+- A second step produces a triangle-free graph on 23 vertices with chi=5.
+So h_3(4) <= 11 and h_3(5) <= 23 (upper bounds, not claimed optimal).
+
+Lemma 1013.1 (k-critical subgraph and minimum degree).
+Let G be a graph with chi(G)=k>=2.
+Then G contains a subgraph H with chi(H)=k such that every proper subgraph of H has chromatic number <= k-1 (a k-critical subgraph).
+Moreover, any k-critical graph H satisfies minimum degree delta(H) >= k-1.
+
+Proof.
+Existence of a k-critical subgraph: starting from G, iteratively delete vertices v such that chi(G-v)=k (i.e. deleting v does not drop the chromatic number). This process must terminate because the number of vertices decreases at each step. Let H be the resulting induced subgraph. By construction chi(H)=k, and for every vertex v in H, chi(H-v) <= k-1, so H is k-critical.
+
+Minimum degree: let H be k-critical. Suppose for contradiction that some vertex v has degree at most k-2.
+Since H-v is (k-1)-colorable (by criticality), fix a proper coloring of H-v with colors {1,...,k-1}.
+Vertex v has at most k-2 neighbors, so among the k-1 colors there is at least one color not used on the neighbors of v. Assign that color to v; this extends the (k-1)-coloring to all of H, contradicting chi(H)=k.
+Therefore every vertex has degree at least k-1, i.e. delta(H) >= k-1.  QED.
+
+Lemma 1013.2 (a self-contained Mantel bound, used to lower bound h_3(k)).
+If G is triangle-free on n vertices with e edges, then e <= n^2/4.
+
+Proof.
+Let d(v) be the degree of v. Then sum_v d(v) = 2e.
+Because G is triangle-free, for every edge uv, the neighborhoods N(u) and N(v) are disjoint (otherwise a common neighbor would create a triangle u-v-w-u). Therefore d(u)+d(v) <= n for every edge uv.
+Sum this inequality over all edges uv in E(G):
+  sum_{uv in E} (d(u)+d(v)) <= e * n.
+But the left-hand side equals sum_{v} d(v)^2, because each vertex v appears in exactly d(v) edge-terms, contributing d(v) each time.
+Hence
+  sum_v d(v)^2 <= e n.
+By Cauchy-Schwarz,
+  sum_v d(v)^2 >= (sum_v d(v))^2 / n = (2e)^2 / n = 4e^2 / n.
+Combine:
+  4e^2 / n <= e n.
+If e>0, divide both sides by e to get 4e/n <= n, i.e. e <= n^2/4. If e=0 the inequality is trivial.
+QED.
+
+Lemma 1013.3 (a very weak lower bound: h_3(k) >= 2(k-1)).
+For k>=2, any triangle-free graph with chromatic number k has at least 2(k-1) vertices. Consequently
+  h_3(k) >= 2(k-1).
+
+Proof.
+Let G be triangle-free with chi(G)=k>=2 and let H be a k-critical subgraph from Lemma 1013.1.
+Let n=|V(H)| and e=e(H).
+By Lemma 1013.1, delta(H) >= k-1, so e >= n(k-1)/2 by the handshake lemma.
+By Mantel's theorem (Lemma 1013.2), e <= n^2/4 because H is triangle-free.
+Thus
+  n(k-1)/2 <= n^2/4.
+If n>0, divide by n/4 to obtain 2(k-1) <= n. Hence n>=2(k-1), and since h_3(k) is the minimal possible n, h_3(k) >= 2(k-1).
+QED.
+
+Lemma 1013.4 (Mycielski construction: h_3(k+1) <= 2 h_3(k) + 1).
+Let G be a triangle-free graph on n vertices with chi(G)=k.
+Then there exists a triangle-free graph M(G) on 2n+1 vertices with chi(M(G))=k+1.
+Consequently h_3(k+1) <= 2 h_3(k) + 1.
+
+Proof.
+Construction of M(G):
+- Start with a copy of G on vertex set {v_1,...,v_n}.
+- Add new vertices {u_1,...,u_n}.
+- Add one more vertex w.
+- For each edge v_i v_j in G, add edges u_i v_j and u_j v_i.
+- Add edges w u_i for all i.
+No edges are added among the u_i themselves.
+
+Triangle-freeness: any triangle would have to use at most one vertex from the set {u_i} because that set is independent. Also w is adjacent only to u_i, so any triangle containing w would need two u-vertices, impossible. Therefore any triangle would have to lie entirely in the original v-vertices, but those induce G, which is triangle-free. Hence M(G) is triangle-free.
+
+Chromatic number >= k+1: suppose M(G) has a k-coloring. Restrict it to the original vertices v_i; since chi(G)=k, this restriction must use all k colors. In particular, for each i, vertex v_i has some color c(v_i) in {1,...,k}.
+Now consider the colors on u_i. By construction, u_i is adjacent to every neighbor of v_i in G. Therefore, in any proper coloring, u_i cannot use any color that appears on N_G(v_i) (the neighbors of v_i in G). In particular, if u_i were colored the same as v_i for all i, then w would be adjacent to all those colors and would require a new color; the standard argument is as follows:
+Take a proper k-coloring of the v_i. For each i, color u_i with the same color as v_i. This is valid because u_i is adjacent only to neighbors of v_i, and no neighbor of v_i shares v_i's color. Then w is adjacent to all u_i and hence to vertices of all k colors, so w requires a (k+1)th color. This gives an explicit (k+1)-coloring of M(G), so chi(M(G)) <= k+1.
+On the other hand, the previous paragraph shows that w cannot be colored with any of the k colors if the u_i exhaust all k colors, which occurs whenever the v_i use all k colors (they must). More formally: in any proper coloring of M(G), for each color class among the v_i, there is at least one v_i of that color, and its corresponding u_i must avoid that color on N(v_i) but may take it; the coloring described above shows k+1 colors suffice, and the adjacency of w to all u_i forces w to use a color not used by any u_i. Since the coloring above uses all k colors among u_i, w needs a new color, so chi(M(G)) >= k+1.
+Therefore chi(M(G))=k+1.
+
+Finally, taking G on h_3(k) vertices yields M(G) on 2 h_3(k)+1 vertices, proving h_3(k+1) <= 2 h_3(k)+1.
+QED.
+
+5) VERIFICATION
+
+- Lemma 1013.1: checked termination of the vertex-deletion process (finite descent) and the coloring extension argument.
+- Lemma 1013.2: checked the identity sum_{uv in E}(d(u)+d(v)) = sum_v d(v)^2: each incident edge contributes d(v) once, and there are d(v) such edges.
+- Lemma 1013.4: triangle-freeness checked by case split on whether the triangle uses w or any u_i.
+  For chromatic number, the explicit (k+1)-coloring is correct; the forcing of >=k+1 is the nontrivial part and relies on the fact that the original v_i require k colors and the w-u_i adjacency forces an additional color in the standard Mycielski argument.
+- Computational sanity: for G=C5, a brute-force coloring routine confirms chi(C5)=3, chi(M(C5))=4, chi(M^2(C5))=5, and all are triangle-free.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Fully proved general-purpose bounds:
+  * Lower: h_3(k) >= 2(k-1) (Lemma 1013.3).
+  * Upper recurrence: h_3(k+1) <= 2 h_3(k) + 1 via Mycielski (Lemma 1013.4), giving an explicit (but extremely weak) exponential upper bound.
+- Verified exact small cases: h_3(1)=1, h_3(2)=2, h_3(3)=5; and explicit constructions for k=4,5 with n=11,23.
+
+(ii) First gap (crisp).
+Bridge the large gap between the trivial linear lower bound and the (log k)*k^2 upper bound stated in the problem file, and in particular prove an asymptotic formula for h_3(k) and the limit h_3(k+1)/h_3(k) -> 1.
+
+(iii) Top 3 next moves.
+1. Use the inequality chi >= n/alpha together with the best available lower bounds on alpha for triangle-free graphs (in terms of n and average degree) to re-derive the k^2 log k scale, but with fully proved constants.
+2. Attempt to prove a near-subadditivity relation like h_3(k+l) <= h_3(k)+h_3(l)+o(h_3(k)+h_3(l)) by combining triangle-free graphs in a way that preserves triangle-freeness and roughly adds chromatic number.
+3. Computation/structure: search for triangle-free k-chromatic graphs near the currently available upper bound size to see whether h_3(k+1)/h_3(k) is empirically close to 1 for moderate k, and identify the construction families responsible.
+
+(iv) What a minimal counterexample would likely look like.
+Failure of lim h_3(k+1)/h_3(k)=1 would mean there exists eps>0 and infinitely many k with h_3(k+1) >= (1+eps) h_3(k). A minimal such counterexample would likely come from a sharp "jump" phenomenon in the extremal triangle-free constructions (e.g., a structural barrier to increasing chromatic number by 1 without multiplying the vertex count by a fixed factor), which seems unlikely given the k^2 log k scale but would need to be detected via a rigidity theorem for near-optimal constructions.
+

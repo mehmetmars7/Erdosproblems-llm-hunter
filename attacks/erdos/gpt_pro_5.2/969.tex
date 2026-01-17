@@ -1,0 +1,150 @@
+% Erdos Problem #969
+
+1) FORMAL RESTATEMENT
+
+Let $Q(x)$ denote the number of squarefree integers in the interval $[1,x]$ for real $x\ge 1$; i.e.
+\[
+Q(x)=\bigl|\{n\in\mathbb Z: 1\le n\le x\ \text{and } n \text{ is not divisible by } p^2\ \text{for any prime }p\}\bigr|.
+\]
+
+Define the error term $E(x)$ by
+\[
+Q(x)=\frac{6}{\pi^2}x + E(x).
+\]
+
+The problem asks for the true order of magnitude of $E(x)$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem text states:
+- An elementary bound $E(x)\ll x^{1/2}$.
+- PNT implies $E(x)=o(x^{1/2})$.
+- Best unconditional upper bounds are of shape $x^{1/2-o(1)}$ (Walfisz).
+- A lower bound $E(x)\gg x^{1/4}$ (Evelyn--Linfoot), believed to be sharp.
+- RH would follow from $E(x)\ll x^{1/4}$; even on RH, the exact order is unknown.
+
+Below I reprove the elementary bound $E(x)=O(\sqrt x)$ from scratch.
+
+3) ATTACK PLAN
+
+- Use the standard squarefree indicator identity $\mathbf 1_{\text{sqfree}}(n)=\sum_{d^2\mid n}\mu(d)$, derive an explicit summatory formula for $Q(x)$, and estimate it with an explicit error term.
+- Compute $E(x)$ for small $x$ to sanity-check magnitudes.
+
+4) WORK
+
+FAST REALITY CHECK (computation for $x\le 20000$):
+
+I computed $Q(x)$ exactly for $x\le 20000$ and hence $E(x)=Q(x)-\frac{6}{\pi^2}x$.
+
+\begin{verbatim}
+Over x<=20000: max |E(x)| = 8.978502... at x=18471
+Sample values:
+ x=10    Q(x)=7     E(x)=0.920729...
+ x=100   Q(x)=61    E(x)=0.207290...
+ x=1000  Q(x)=608   E(x)=0.072898...
+ x=10000 Q(x)=6083  E(x)=3.728981...
+ x=20000 Q(x)=12160 E(x)=1.457963...
+\end{verbatim}
+
+Lemma 969.1 (Squarefree indicator and summatory formula).
+Let $\mu$ be the M\"obius function. For each integer $n\ge 1$,
+\[
+\mathbf 1_{\text{squarefree}}(n)=\sum_{d^2\mid n} \mu(d).
+\]
+Consequently, for real $x\ge 1$,
+\[
+Q(x)=\sum_{n\le x} \sum_{d^2\mid n}\mu(d) = \sum_{d\le \sqrt x} \mu(d)\,\Big\lfloor\frac{x}{d^2}\Big\rfloor.
+\]
+
+Proof.
+Fix $n\ge 1$ and write its prime factorization $n=\prod_p p^{e_p}$.
+A divisor $d$ satisfies $d^2\mid n$ iff $d=\prod_p p^{f_p}$ with $0\le 2f_p\le e_p$, i.e. $0\le f_p\le \lfloor e_p/2\rfloor$.
+Then
+\[
+\sum_{d^2\mid n}\mu(d) = \prod_p \Big(\sum_{f=0}^{\lfloor e_p/2\rfloor} \mu(p^f)\Big),
+\]
+because $\mu$ is completely multiplicative on squarefree arguments and $\mu(p^f)=0$ for $f\ge 2$.
+So each local factor equals:
+- If $e_p\in\{0,1\}$, then $\lfloor e_p/2\rfloor=0$ and the factor is $\mu(1)=1$.
+- If $e_p\ge 2$, then $\lfloor e_p/2\rfloor\ge 1$ and the factor is $\mu(1)+\mu(p)=1-1=0$.
+Therefore the product equals $1$ iff all $e_p\le 1$ (i.e. $n$ is squarefree), and equals $0$ otherwise. This proves the identity.
+
+Summing over $1\le n\le x$ gives
+\[
+Q(x)=\sum_{n\le x} \sum_{d^2\mid n} \mu(d).
+\]
+Swap the order of summation (finite sum): for each fixed $d$, the condition $d^2\mid n$ means $n=d^2 m$ and $m\le x/d^2$, giving exactly $\lfloor x/d^2\rfloor$ choices of $n\le x$. Also $d^2\le x$ implies $d\le \sqrt x$. Hence
+\[
+Q(x)=\sum_{d\le \sqrt x} \mu(d)\,\Big\lfloor \frac{x}{d^2}\Big\rfloor.
+\]
+$\square$
+
+Lemma 969.2 (Elementary error bound $E(x)=O(\sqrt x)$).
+For all real $x\ge 1$,
+\[
+Q(x)=x\sum_{d\ge 1}\frac{\mu(d)}{d^2} + O(\sqrt x),
+\]
+and since $\sum_{d\ge 1}\mu(d)/d^2 = 1/\zeta(2)=6/\pi^2$, this yields
+\[
+E(x)=O(\sqrt x).
+\]
+
+Proof.
+Start from Lemma 969.1:
+\[
+Q(x)=\sum_{d\le \sqrt x} \mu(d)\,\Big\lfloor\frac{x}{d^2}\Big\rfloor.
+\]
+Use $\lfloor y\rfloor = y + O(1)$ uniformly in $y$:
+\[
+\Big\lfloor\frac{x}{d^2}\Big\rfloor = \frac{x}{d^2} + O(1).
+\]
+Therefore
+\[
+Q(x)= x\sum_{d\le \sqrt x}\frac{\mu(d)}{d^2} + O\Big(\sum_{d\le \sqrt x} 1\Big)
+= x\sum_{d\le \sqrt x}\frac{\mu(d)}{d^2} + O(\sqrt x).
+\]
+Next, the tail of the absolutely convergent series satisfies
+\[
+\sum_{d>\sqrt x}\Big|\frac{\mu(d)}{d^2}\Big| \le \sum_{d>\sqrt x} \frac{1}{d^2} \le \int_{\sqrt x}^{\infty} \frac{dt}{t^2} = \frac{1}{\sqrt x}.
+\]
+Multiplying by $x$ gives
+\[
+ x\sum_{d\le \sqrt x}\frac{\mu(d)}{d^2} = x\sum_{d\ge 1}\frac{\mu(d)}{d^2} + O(\sqrt x).
+\]
+Combine with the previous expression for $Q(x)$ to obtain
+\[
+Q(x)=x\sum_{d\ge 1}\frac{\mu(d)}{d^2} + O(\sqrt x).
+\]
+Finally, using the Euler product (valid for $\Re(s)>1$)
+\[
+\zeta(s)=\prod_p \frac{1}{1-p^{-s}},
+\]
+one computes
+\[
+\sum_{d\ge 1}\frac{\mu(d)}{d^s} = \prod_p (1-p^{-s}) = \frac{1}{\zeta(s)}
+\]
+for $\Re(s)>1$.
+At $s=2$ this gives $\sum_{d\ge 1} \mu(d)/d^2 = 1/\zeta(2)=6/\pi^2$.
+Thus $Q(x)=\frac{6}{\pi^2}x+O(\sqrt x)$, i.e. $E(x)=O(\sqrt x)$. $\square$
+
+5) VERIFICATION
+
+- Lemma 969.1: verified the multiplicative factor computation: any prime square dividing $n$ forces a local factor $1+\mu(p)=0$.
+- Lemma 969.2: verified that replacing $\lfloor x/d^2\rfloor$ by $x/d^2$ incurs total error $O(\sqrt x)$ because there are $\lfloor\sqrt x\rfloor$ terms.
+  The tail bound uses an integral comparison for $\sum_{d>\sqrt x}1/d^2$.
+- Computation sanity: $|E(x)|$ stayed under $9$ for $x\le 20000$; this is consistent with (but far from proving) $O(\sqrt x)$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: the exact summatory formula $Q(x)=\sum_{d\le\sqrt x}\mu(d)\lfloor x/d^2\rfloor$ (Lemma 969.1) and the elementary bound $E(x)=O(\sqrt x)$ (Lemma 969.2), plus small-$x$ numerical values above.
+
+(ii) First gap (crisp): improve the exponent $1/2$ in the unconditional bound $E(x)=O(x^{1/2})$ by a power saving (or prove a matching lower bound), without invoking results not already stated in the problem.
+
+(iii) Top 3 next moves:
+1. Attempt to sharpen Lemma 969.2 by replacing the crude $O(1)$ floor error with cancellation in $\sum_{d\le\sqrt x}\mu(d)$ or in related exponential sums.
+2. Compute $E(x)$ for much larger $x$ and track maxima of $|E(x)|/x^{\alpha}$ for candidate exponents $\alpha\in\{1/4,11/35,1/2\}$ to see numerical behavior.
+3. Prove conditional implications rigorously: e.g. derive how a bound $E(x)=O(x^{1/4+\varepsilon})$ would constrain the zeros of $\zeta(s)$, making every step explicit.
+
+(iv) Minimal counterexample structure (to the heuristic “$|E(x)|\asymp x^{1/4}$”): a smallest $x$ at which $|E(x)|$ exceeds $x^{1/4+\varepsilon}$ for some fixed $\varepsilon>0$ (if such $\varepsilon$ exists), or alternatively a sequence $x_j\to\infty$ with $|E(x_j)|/x_j^{1/4}\to\infty$.

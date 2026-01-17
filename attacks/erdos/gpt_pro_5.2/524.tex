@@ -1,0 +1,139 @@
+% Erdos Problem #524
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+For $t\in(0,1)$, choose a binary expansion
+\[t=\sum_{k=1}^\infty \epsilon_k(t)2^{-k},\qquad \epsilon_k(t)\in\{0,1\}.
+\]
+(For dyadic rationals there are two expansions; these form a countable set of Lebesgue measure $0$, so they can be ignored in ``almost all $t$'' statements.)
+Define signs $a_k(t)=(-1)^{\epsilon_k(t)}\in\{-1,1\}$ and for $n\ge 1$ define
+\[P_n(t;x)=\sum_{k=1}^n a_k(t) x^k,\qquad x\in[-1,1],
+\]
+and
+\[M_n(t)=\max_{x\in[-1,1]} |P_n(t;x)|.
+\]
+Question: Determine the correct order of magnitude of $M_n(t)$ for Lebesgue-a.e. $t$.
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem statement attributes the question to Salem--Zygmund, and reports (i) a result of Chung that for almost all $t$ there are infinitely many $n$ with $M_n(t)\ll (n/\log\log n)^{1/2}$, and (ii) an (unpublished) result of Erd\H{o}s that for almost all $t$ and every $\varepsilon>0$, $\lim_{n\to\infty} M_n(t)/n^{1/2-\varepsilon}=\infty$.
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item \emph{Proof track idea 1:} Model $a_k(t)$ as i.i.d. Rademacher signs (valid for a.e. $t$) and treat $P_n(t;\cdot)$ as a random process on $[-1,1]$; then control $\sup$ via discretization + concentration or chaining.
+\item \emph{Proof track idea 2:} Analyze the contribution near $x=\pm 1$ separately (where variance is $\asymp n$) and compare to a Gaussian process with similar covariance.
+\item \emph{Disproof track:} Construct a set of $t$ of positive measure where the digits have atypical long correlations forcing much larger (or much smaller) $M_n(t)$ than any proposed ``typical'' order.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\medskip
+\noindent\textbf{Fast reality check (Monte Carlo, grid-max approximation).}
+We sampled i.i.d. random signs $a_1,\dots,a_n$ and approximated $\max_{x\in[-1,1]}|\sum_{k\le n} a_k x^k|$ on a uniform grid of $8001$ points. For 30 samples each $n$:
+\begin{verbatim}
+{'n': 10, 'samples': 30, 'avg_M': 3.9466599700994154, 'min_M': 2.0, 'max_M': 8.0}
+{'n': 20, 'samples': 30, 'avg_M': 5.552696460366131, 'min_M': 1.2789913066823837, 'max_M': 12.0}
+{'n': 50, 'samples': 30, 'avg_M': 7.169544432138646, 'min_M': 2.0, 'max_M': 18.0}
+{'n': 100, 'samples': 30, 'avg_M': 13.390316749438387, 'min_M': 2.394691054102984, 'max_M': 26.0}
+\end{verbatim}
+These are only numerical sanity checks (grid approximation; finite samples).
+
+\medskip
+\noindent\textbf{Lemma 524.1 (binary digits are i.i.d. for Lebesgue-a.e. $t$).}
+Let $t$ be uniformly distributed on $(0,1)$ (Lebesgue measure). Then for each fixed $m\ge 1$, the vector $(\epsilon_1(t),\dots,\epsilon_m(t))$ is uniform on $\{0,1\}^m$. In particular, the coordinate digits $(\epsilon_k(t))_{k\ge 1}$ are independent Bernoulli$(1/2)$ random variables, and $(a_k(t))_{k\ge 1}$ are independent uniform signs.
+
+\noindent\textbf{Proof.}
+Fix $m\ge 1$ and fix a pattern $(b_1,\dots,b_m)\in\{0,1\}^m$. The set
+\[A_{b_1,\dots,b_m}=\{t\in(0,1): \epsilon_1(t)=b_1,\dots,\epsilon_m(t)=b_m\}
+\]
+consists of exactly the dyadic interval
+\[\Big[\sum_{k=1}^m b_k 2^{-k},\ \sum_{k=1}^m b_k 2^{-k}+2^{-m}\Big)
+\]
+except possibly for its right endpoint (a dyadic rational). Therefore its Lebesgue measure is exactly $2^{-m}$.
+Since there are $2^m$ such patterns and the intervals form a partition of $(0,1)$ up to endpoints, it follows that $(\epsilon_1,\dots,\epsilon_m)$ is uniform on $\{0,1\}^m$.
+Uniformity for all $m$ implies the digits are i.i.d. Bernoulli$(1/2)$, and then $a_k=(-1)^{\epsilon_k}$ are i.i.d. uniform signs.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 524.2 (a crude almost sure upper bound: $M_n(t)=O(\sqrt{n\log n})$).}
+There exists an absolute constant $C>0$ such that for Lebesgue-a.e. $t$,
+\[M_n(t) \le C\sqrt{n\log n}\qquad\text{for all sufficiently large }n.
+\]
+
+\noindent\textbf{Proof.}
+By Lemma~524.1 we may treat $(a_k(t))_{k\ge 1}$ as i.i.d. uniform signs on a probability space.
+Fix $n\ge 2$ and define the random polynomial
+\[P_n(x)=\sum_{k=1}^n a_k x^k,\qquad x\in[-1,1].
+\]
+
+\emph{Step 1: concentration at a fixed point.}
+Fix $x\in[-1,1]$. The summands $X_k=a_k x^k$ are independent, mean $0$, and satisfy $|X_k|\le |x|^k\le 1$.
+Hoeffding's inequality therefore gives, for any $t>0$,
+\[\mathbb P\big(|P_n(x)|\ge t\big) \le 2\exp\Big(-\frac{t^2}{2\sum_{k=1}^n |x|^{2k}}\Big).
+\]
+Since $\sum_{k=1}^n |x|^{2k}\le n$, we obtain the uniform bound
+\[\mathbb P\big(|P_n(x)|\ge t\big) \le 2\exp\Big(-\frac{t^2}{2n}\Big)\qquad (x\in[-1,1]). \tag{*}
+\]
+
+\emph{Step 2: discretize $[-1,1]$.}
+For each $n$, let $\mathcal G_n$ be a uniform grid in $[-1,1]$ with spacing $\delta_n=1/n^2$.
+Then $|\mathcal G_n|\le 2n^2+1\le 3n^2$ for $n\ge 2$.
+
+We also bound the derivative deterministically:
+\[|P_n'(x)| = \Big|\sum_{k=1}^n k a_k x^{k-1}\Big| \le \sum_{k=1}^n k |x|^{k-1} \le \sum_{k=1}^n k = \frac{n(n+1)}{2} \le n^2\qquad (x\in[-1,1]).\]
+Thus $P_n$ is $n^2$-Lipschitz on $[-1,1]$.
+Therefore for every $x\in[-1,1]$ there exists $y\in\mathcal G_n$ with $|x-y|\le\delta_n$ and
+\[|P_n(x)|\le |P_n(y)| + n^2|x-y| \le |P_n(y)|+1.
+\]
+Taking maxima,
+\[M_n\le 1 + \max_{y\in\mathcal G_n} |P_n(y)|.\tag{**}
+\]
+
+\emph{Step 3: union bound on the grid.}
+Set $t_n=\sqrt{10 n\log n}$. By (*) and the union bound,
+\[\mathbb P\Big(\max_{y\in\mathcal G_n}|P_n(y)|\ge t_n\Big)
+\le |\mathcal G_n|\cdot 2\exp\Big(-\frac{t_n^2}{2n}\Big)
+\le 3n^2\cdot 2\exp\big(-5\log n\big)
+=6 n^{-3}.
+\]
+This series is summable: $\sum_{n\ge 2} 6n^{-3}<\infty$.
+By the Borel--Cantelli lemma, almost surely there exists $n_0$ such that for all $n\ge n_0$,
+\[\max_{y\in\mathcal G_n}|P_n(y)|<t_n.
+\]
+Combining with (**) yields for all $n\ge n_0$,
+\[M_n < 1 + \sqrt{10 n\log n} \le C\sqrt{n\log n}
+\]
+with e.g. $C=\sqrt{10}+1$.
+Translating back from randomness of $a_k$ to Lebesgue-a.e. $t$ via Lemma~524.1 completes the proof.
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item Lemma~524.1: The only subtlety is the non-uniqueness of binary expansions at dyadic rationals; we explicitly noted this is measure $0$.
+\item Lemma~524.2: We used Hoeffding with bounds $|X_k|\le 1$ and variance proxy $\sum |x|^{2k}\le n$. The derivative bound is deterministic and holds for all sign choices.
+\item The Borel--Cantelli application requires summability, which we checked: $6n^{-3}$ is summable.
+\item The bound is crude; it does not match the sharper $\sqrt{n/\log\log n}$-type behavior mentioned in the problem statement.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:}
+For Lebesgue-a.e. $t$, $M_n(t)=O(\sqrt{n\log n})$ (Lemma~524.2).
+
+(ii) \emph{First gap (crisp):}
+Determine the true almost-sure order of $M_n(t)$, i.e. sharpen the upper bound and prove a matching lower bound on the correct scale (the problem statement suggests subtle iterated-log effects).
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Replace the crude grid+Hoeffding argument by a chaining/entropy bound using the covariance structure of $P_n(x)$ to reduce the extra $\sqrt{\log n}$ factor.
+\item Prove a lower bound by constructing, for typical sign sequences, a point $x$ close to $1$ (or $-1$) where partial sums add constructively, e.g. show that for a.e. $t$ there exist infinitely many $n$ with $M_n(t)\ge c\sqrt{n\log\log n}$.
+\item Computation: estimate $M_n/\sqrt{n}$ and $M_n\sqrt{\log\log n/n}$ for larger $n$ in simulations with finer maximization (e.g. optimizing over $x$ by derivative root-finding) to guess the right normalization.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:}
+If a proposed order (e.g. $\asymp \sqrt{n}$) is false, a counterexample for ``almost all $t$'' would have to show that typical digit sequences force larger growth (e.g. $\sqrt{n\log\log n}$) or smaller growth infinitely often. Such behavior would likely be driven by rare long runs/blocks in the binary digits that create near-geometric alignment of signs for $x$ extremely close to $\pm 1$.
+
+

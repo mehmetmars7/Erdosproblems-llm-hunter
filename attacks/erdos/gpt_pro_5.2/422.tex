@@ -1,0 +1,123 @@
+% Erdos problem #422
+
+\subsection*{FORMAL RESTATEMENT}
+\textbf{Definition (recursive rule).} Define $f(1)=f(2)=1$. For $n\ge 3$, attempt to define
+\[
+ f(n) = f\big(n-f(n-1)\big)+f\big(n-f(n-2)\big),
+\]
+provided that the arguments $n-f(n-1)$ and $n-f(n-2)$ are positive integers for which $f(\cdot)$ has already been defined.
+
+\textbf{Well-definedness.} Say the sequence is \emph{well-defined up to $N$} if for every $3\le n\le N$, both indices $n-f(n-1)$ and $n-f(n-2)$ lie in $\{1,2,\dots,n-1\}$.
+
+\textbf{Questions.}
+\begin{itemize}
+\item[(Q1)] Is $f(n)$ well-defined for all $n\in\mathbb{N}$?
+\item[(Q2)] Does the range $\{f(n): n\in\mathbb{N}\}$ omit infinitely many positive integers?
+\item[(Q3)] Describe the growth/behaviour of $f(n)$.
+\end{itemize}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The extracted statement notes that this is asked by Hofstadter, that the sequence begins $1,1,2,3,3,4,\dots$ and is OEIS A005185, and that it is not known whether $f(n)$ is well-defined for all $n$.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof-track ideas (show well-defined for all $n$).}
+\begin{itemize}
+\item Prove an inductive upper bound $f(n)\le n$ (or stronger) for all $n$; this would force $n+1-f(n)\ge 1$ and keep indices positive.
+\item Derive structural monotonicity or ``almost monotonicity'' properties to control growth.
+\end{itemize}
+\textbf{Disproof-track ideas.}
+\begin{itemize}
+\item Search computationally for the first $n$ such that either $n-f(n-1)\le 0$ or $n-f(n-2)\le 0$.
+\item For missing values, examine the set of attained values up to large $N$ and look for systematic gaps.
+\end{itemize}
+
+\subsection*{WORK}
+\subsubsection*{Fast reality check (computation)}
+Direct computation of the recursion (checking indices at each step) shows:
+\begin{itemize}
+\item The sequence is well-defined for all $n\le 1{,}000{,}000$.
+\item The first $50$ values (computed) are:
+\begin{verbatim}
+1, 1, 2, 3, 3, 4, 5, 5, 6, 6,
+6, 8, 8, 8, 10, 9, 10, 11, 11, 12,
+12, 12, 12, 16, 14, 14, 16, 16, 16, 16,
+20, 17, 17, 20, 21, 19, 20, 22, 21, 22,
+23, 23, 24, 24, 24, 24, 24, 32, 24, 25
+\end{verbatim}
+\item For $N=200{,}000$, the maximum value attained is $\max_{n\le N} f(n)=108{,}656$.
+Among integers $1\le m\le 200$, the following $42$ values were \emph{not} attained by $\{f(1),\dots,f(N)\}$:
+\begin{verbatim}
+7, 13, 15, 18, 27, 29, 34, 36, 49, 51,
+59, 67, 70, 74, 81, 89, 95, 97, 98, 99,
+102, 103, 117, 126, 127, 131, 134, 141, 142, 145,
+150, 158, 163, 166, 181, 183, 189, 191, 195, 197, 198, 199
+\end{verbatim}
+\end{itemize}
+These computations do not prove infinite omission, but they show many gaps persist at least up to $N=200{,}000$.
+
+\subsubsection*{Lemma 422.1 (Non-circularity and the only obstruction)}
+\textbf{Lemma.} Suppose $f(1),\dots,f(n-1)$ are defined and are positive integers. Then the only potential obstruction to defining $f(n)$ via
+\[
+ f(n)=f(n-f(n-1))+f(n-f(n-2))
+\]
+is that one (or both) of the indices $n-f(n-1)$, $n-f(n-2)$ is $\le 0$. If both indices are $\ge 1$, then they automatically satisfy $\le n-1$ and the recursion uses only previously defined values.
+
+\textbf{Proof.}
+Since $f(n-1)$ and $f(n-2)$ are positive integers, we have $f(n-1)\ge 1$ and $f(n-2)\ge 1$, hence
+\[
+n-f(n-1)\le n-1,\qquad n-f(n-2)\le n-1.
+\]
+Therefore, if both indices are at least $1$, then they lie in the set $\{1,2,\dots,n-1\}$.
+By hypothesis, $f$ is already defined on $\{1,\dots,n-1\}$, so both terms on the right-hand side are defined, and the recursion determines $f(n)$ uniquely as a positive integer.
+Thus failure can only occur if an index is $\le 0$.
+\hfill$\square$
+
+\subsubsection*{Lemma 422.2 (A uniform lower bound and characterisation of $f(n)=2$)}
+\textbf{Lemma.} For every $n\ge 3$ for which $f(n)$ is defined, one has $f(n)\ge 2$.
+Moreover, $f(n)=2$ if and only if both indices $n-f(n-1)$ and $n-f(n-2)$ lie in $\{1,2\}$.
+
+\textbf{Proof.}
+Assume $f(n)$ is defined. Then both indices
+\[
+a=n-f(n-1),\quad b=n-f(n-2)
+\]
+are positive integers, and
+\[
+f(n)=f(a)+f(b).
+\]
+Since $f(1)=f(2)=1$ and (by definition of the recursion) all defined values of $f$ are positive integers, we have $f(a)\ge 1$ and $f(b)\ge 1$. Hence $f(n)=f(a)+f(b)\ge 2$.
+
+Also, $f(n)=2$ holds if and only if $f(a)=f(b)=1$.
+Because the only indices with value $1$ among the initially specified values are $1$ and $2$ (i.e. $f(1)=f(2)=1$), this occurs exactly when $a,b\in\{1,2\}$.
+\hfill$\square$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~422.1 explicitly isolates the issue: indices are always $<n$ (no circular dependence) once they are positive.
+\item Lemma~422.2 uses only positivity of the already-defined values and the initial conditions $f(1)=f(2)=1$.
+\item The computational checks explicitly verified the positivity of the indices at each step up to $n=10^6$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result here.}
+Two rigorous structural lemmas:
+\begin{itemize}
+\item Well-definedness fails only if an index becomes nonpositive; if indices stay positive then the recursion is non-circular and uniquely defines $f(n)$ from earlier values (Lemma~422.1).
+\item For all defined $n\ge 3$, $f(n)\ge 2$, with a sharp characterisation of when equality holds (Lemma~422.2).
+\end{itemize}
+Plus exact computation showing the recursion produces a well-defined sequence up to $n=1{,}000{,}000$, and that many integers (e.g. $7,13,15,\dots$) are not attained among $\{f(n):n\le 200{,}000\}$.
+\item[(ii)] \textbf{First gap (crisp).}
+Either prove $f(n)$ is well-defined for all $n$ (e.g. by showing $f(n)\le n$ for all $n$, which would guarantee positivity of the indices), or else exhibit an explicit $n$ with $n-f(n-1)\le 0$ or $n-f(n-2)\le 0$.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Push computation further (e.g. to $n=10^7$) to look for any breakdown of the index-positivity condition, and to gather statistics on which integers are missed.
+\item Attempt to prove an inductive upper bound of the form $f(n)\le c n$ with $c<1$ or at least $f(n)\le n$; any such bound would immediately imply global well-definedness.
+\item Search for invariant or near-invariant quantities (e.g. relationships between $f(n)$ and $n$ modulo small integers, or bounds on successive differences) that could force persistent gaps in the range.
+\end{itemize}
+\item[(iv)] \textbf{What a minimal counterexample would likely look like.}
+A minimal counterexample to well-definedness would be the smallest $n$ such that $f(n-1)\ge n$ or $f(n-2)\ge n$, making an index nonpositive. Such a counterexample would require an unusually rapid growth spike in $f$ relative to $n$.
+A minimal counterexample to ``misses infinitely many integers'' would be evidence that beyond some point the range becomes cofinite; computationally, one would expect the set of missing values up to $\max_{k\le N} f(k)$ to shrink to zero density as $N\to\infty$.
+\end{enumerate}
+

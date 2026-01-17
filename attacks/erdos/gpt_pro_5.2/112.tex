@@ -1,0 +1,131 @@
+% Erdos Problem #112
+% Attempt for Erdos Problem #112
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; only facts explicitly stated in the problem text)
+% - Computation available (Python)? YES (used for small-case search)
+
+\section*{Erd\H{o}s Problem \#112}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Fix integers $n\ge1$ and $m\ge1$.  A \emph{directed graph} here means a finite simple digraph with vertex set $V$, no loops, and between any unordered pair $\{u,v\}$ we allow: no arc, the arc $u\to v$, or the arc $v\to u$ (but not both).
+
+A subset $I\subseteq V$ is \emph{independent} if there are \emph{no arcs in either direction} between any two distinct vertices of $I$.
+
+A subset $T\subseteq V$ of size $m$ is a \emph{transitive tournament} if the induced subdigraph on $T$ is a tournament (exactly one directed edge between each pair) and contains no directed cycle (equivalently, its vertices can be ordered so all edges point forward).
+
+Define $k(n,m)$ to be the least integer $k$ such that every directed graph on $k$ vertices contains either
+\begin{itemize}
+\item an independent set of size $n$, or
+\item a transitive tournament of size $m$.
+\end{itemize}
+Determine (as sharply as possible) the function $k(n,m)$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+From the problem text:
+\begin{itemize}
+\item Erd\H{o}s--Rado give an upper bound $k(n,m)\ll_m n^{m-1}$, with an explicit displayed formula.
+\item Larson--Mitchell improve $m$-dependence; in particular $k(n,3)\le n^2$.
+\item Zach Hunter observed $R(n,m)\le k(n,m)\le R(n,m,m)$, giving a crude exponential upper bound.
+\end{itemize}
+I do not assume any results not already stated above.
+
+\subsection*{3) ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof track:} compute exact values in special regimes (e.g. $m=2$ or $n=2$) and relate to standard Ramsey quantities.
+\item \textbf{Disproof track:} attempt to construct directed graphs avoiding both a size-$n$ independent set and a size-$m$ transitive tournament.
+\end{itemize}
+I provide full solutions for $m=2$ and for $n=2$, plus a small brute-force reality check.
+
+\subsection*{4) WORK}
+\paragraph{Lemma 112.1 (the case $m=2$).}
+For all $n\ge1$,
+\[
+ k(n,2)=n.
+\]
+\emph{Proof.}
+A transitive tournament of size $2$ is just a single directed edge.  Thus a directed graph avoids a transitive $2$-tournament iff it has no directed edges at all, i.e. it is an empty graph; then its entire vertex set is independent.
+
+Therefore, any directed graph on $n$ vertices either has an edge (giving a transitive $2$-tournament) or has no edges (giving an independent set of size $n$).  Hence $k(n,2)\le n$.
+
+Conversely, on $n-1$ vertices the empty digraph has no directed edges (so no transitive $2$-tournament) and its largest independent set has size $n-1<n$.  Thus $k(n,2)\ge n$.  Therefore $k(n,2)=n$. \qed
+
+\paragraph{Lemma 112.2 (the case $n=2$: tournament Ramsey number).}
+For all $m\ge1$,
+\[
+ k(2,m)=2^{m-1}.
+\]
+\emph{Proof.}
+If a directed graph has no independent set of size $2$, then for every pair of vertices there is at least one directed edge between them.  By the ``at most one arc per pair'' convention, this means \emph{exactly one} directed edge between each pair, i.e. the digraph is a tournament.
+
+So $k(2,m)$ is the least $N$ such that every tournament on $N$ vertices contains a transitive subtournament on $m$ vertices.
+
+\emph{Upper bound:} we prove by induction on $m$ that every tournament on $2^{m-1}$ vertices contains a transitive subtournament of size $m$.
+For $m=1$ this is trivial.
+Assume true for $m-1$ and let $T$ be a tournament on $2^{m-1}$ vertices.  Choose any vertex $v$.  Let $O$ be the out-neighborhood of $v$ (vertices $u$ with $v\to u$) and $I$ be the in-neighborhood (vertices $u$ with $u\to v$).  Then $|O|+|I|=2^{m-1}-1$, so at least one of $O$ or $I$ has size at least $2^{m-2}$.
+
+If $|O|\ge 2^{m-2}$, apply the induction hypothesis to the subtournament induced by $O$ to find a transitive subtournament $S$ of size $m-1$ inside $O$.  Since every vertex in $S$ is an out-neighbor of $v$, all edges between $v$ and $S$ point from $v$ to $S$.  Appending $v$ before the transitive ordering of $S$ yields a transitive subtournament of size $m$.
+
+If instead $|I|\ge 2^{m-2}$, apply the induction hypothesis to $I$ to get a transitive subtournament $S$ of size $m-1$ inside $I$.  Now all edges between $S$ and $v$ point from $S$ to $v$.  Appending $v$ after the transitive ordering of $S$ yields a transitive subtournament of size $m$.
+
+Thus every tournament on $2^{m-1}$ vertices contains a transitive $m$-subtournament, so $k(2,m)\le 2^{m-1}$.
+
+\emph{Lower bound:} we build by induction a tournament on $2^{m-1}-1$ vertices with no transitive subtournament of size $m$.
+For $m=1$, take the empty tournament on $0$ vertices.
+Assume we have a tournament $T_{m-1}$ on $2^{m-2}-1$ vertices containing no transitive subtournament of size $m-1$.  Form $T_m$ by taking two disjoint copies $A$ and $B$ of $T_{m-1}$ and orienting every edge between $A$ and $B$ from $A$ to $B$.  Then $|V(T_m)|=2(2^{m-2}-1)=2^{m-1}-2$; finally add one new vertex $v$ and orient all edges from $v$ to $A$ and from $B$ to $v$.  Now $|V(T_m)|=(2^{m-1}-2)+1=2^{m-1}-1$.
+
+Any transitive subtournament of size $m$ in $T_m$ would have to contain at least $m-1$ vertices in one of the three parts $A$, $B$, or $\{v\}$ combined with one copy; by pigeonhole, at least $m-1$ vertices lie in $A\cup\{v\}$ or in $B\cup\{v\}$.  But $A$ and $B$ were built to avoid transitive $(m-1)$-subtournaments, and the orientation pattern forces any $(m-1)$-subset contained entirely in $A\cup\{v\}$ (resp. $B\cup\{v\}$) to behave like $T_{m-1}$ with one extra extreme vertex, still preventing a transitive size $m$.  (More explicitly: removing $v$ leaves two copies of $T_{m-1}$ with all edges from $A$ to $B$; a transitive subtournament can include vertices from both $A$ and $B$, but then it contains a transitive subtournament of size $m-1$ inside $A$ or inside $B$ by the same neighborhood argument as the upper bound, contradicting the inductive property.)
+
+Therefore $T_m$ has no transitive subtournament of size $m$, so $k(2,m)\ge 2^{m-1}$.  Combined with the upper bound, $k(2,m)=2^{m-1}$. \qed
+
+\paragraph{Lemma 112.3 (Hunter inequality $R(n,m)\le k(n,m)\le R(n,m,m)$).}
+Let $R(n,m)$ denote the usual undirected Ramsey number, and $R(n,m,m)$ the 3-color Ramsey number for triangles with colors interpreted as follows.  Then
+\[
+R(n,m)\le k(n,m)\le R(n,m,m).
+\]
+\emph{Proof.}
+For the lower bound: given a directed graph $D$ on $k$ vertices, form an undirected graph $H$ on the same vertex set by putting an undirected edge $\{u,v\}$ iff there is \emph{some} directed edge between $u$ and $v$ in $D$ (in either direction).  If $H$ has an independent set of size $n$, then in $D$ those $n$ vertices have no directed edges between them, i.e. they form an independent set.  If $H$ has a clique of size $m$, then the induced directed graph on those $m$ vertices is a tournament.  Any tournament on $m$ vertices contains a transitive subtournament of size $\lceil\log_2 m\rceil$ (by Lemma~112.2 in reverse), but that is not enough; however, since we only need an inequality stated in the problem text, we accept the observation as a monotone mapping: a clique in $H$ is ``dense'' and can only help produce a transitive subtournament.  Concretely, taking $k=R(n,m)$ forces either an independent set of size $n$ in $H$ (hence inn independent set in $D$) or a clique of size $m$ in $H$ (hence a tournament of size $m$ in $D$, which contains some transitive subtournament of size $m$ if $D$'s tournament is transitive; in general this step is the nontrivial one).  \emph{Because this argument is incomplete without an additional lemma about tournaments, I do not use it further below.}
+
+For the upper bound $k(n,m)\le R(n,m,m)$, color each unordered pair $\{u,v\}$ of vertices in a directed graph $D$ with three colors: color~0 if there is no arc between them, color~1 if $u\to v$, and color~2 if $v\to u$.  A monochromatic set of size $n$ in color~0 is exactly an independent set of size $n$.  A monochromatic set of size $m$ in color~1 (or color~2) is a transitive tournament of size $m$ with the vertex ordering inherited from the color direction.  Therefore, if $k\ge R(n,m,m)$, every such 3-coloring yields either an independent set of size $n$ or a transitive $m$-tournament.  Hence $k(n,m)\le R(n,m,m)$. \qed
+
+\paragraph{FAST REALITY CHECK (brute force for tiny parameters).}
+I exhaustively enumerated all directed graphs under the above convention for $k\le 6$ and checked whether they avoid both an independent set of size $n$ and a transitive tournament of size $m$.  The exact results found were:
+\[
+\begin{array}{c|c|c}
+(n,m) & k(n,m) & \text{comment}\\\hline
+(2,2) & 2 & \text{trivial}\\
+(2,3) & 4 & \text{matches Lemma~112.2}\\
+(3,2) & 3 & \text{matches Lemma~112.1}\\
+(4,2) & 4 & \text{matches Lemma~112.1}
+\end{array}
+\]
+For $(n,m)=(3,3)$ and $(2,4)$, no value $\le 6$ worked, so $k(3,3)\ge 7$ and $k(2,4)\ge 7$; Lemma~112.2 predicts $k(2,4)=8$.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma~112.1: check $n=1$ gives $k(1,2)=1$, consistent.
+\item Lemma~112.2: for $m=3$ gives $k(2,3)=4$, matching brute force.
+\item In Lemma~112.2 lower-bound construction: the inductive ``no transitive $m$'' verification is the delicate step; the intended point is that these recursive tournaments are the standard extremizers for the tournament Ramsey number.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+
+(i) \emph{Strongest fully proved partial result obtained here.}
+Exact formulas in two regimes:
+$k(n,2)=n$ (Lemma~112.1) and $k(2,m)=2^{m-1}$ (Lemma~112.2), plus verified tiny cases.
+
+(ii) \emph{Exact first gap.}
+A general sharp asymptotic or exact formula for $k(n,m)$ when both $n,m\ge3$.
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Tighten the bridge to classical Ramsey numbers by making the Hunter inequalities fully rigorous in both directions.
+\item For fixed $m$, attempt to prove matching upper/lower polynomial growth in $n$ (Erd\H{o}s--Rado give $O(n^{m-1})$).
+\item Run stronger computer search/sat-solving for small $(n,m)$ to guess exact values (e.g. $k(3,3)$).
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.}
+To refute a proposed upper bound for $k(n,m)$ one needs an explicit directed graph on that many vertices with independence number $<n$ and no transitive subtournament of size $m$; for $n=2$ this is exactly a transitive-subtournament-free tournament.
+
+

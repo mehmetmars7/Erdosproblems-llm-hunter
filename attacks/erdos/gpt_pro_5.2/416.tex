@@ -1,0 +1,138 @@
+% erdos_solutions.tex
+% Partial work for Erd\H{o}s problems extracted in 416-422.tex.
+% This file follows PROMPT_STRATEGY.MD: FORMAL RESTATEMENT / QUICK CONTEXT / ATTACK PLAN / WORK / VERIFICATION / FINAL.
+
+% Erdos problem #416
+
+\subsection*{FORMAL RESTATEMENT}
+\textbf{Definitions.}
+\begin{itemize}
+\item $\mathbb{N}=\{1,2,3,\dots\}$.
+\item Euler's totient function $\varphi:\mathbb{N}\to\mathbb{N}$ is
+\[
+\varphi(m)=\#\{1\le a\le m : \gcd(a,m)=1\}.
+\]
+\item For real $x\ge 0$, define
+\[
+V(x)=\#\{n\in\mathbb{N}: n\le x \ \text{and}\ \exists m\in\mathbb{N}\ \text{with}\ \varphi(m)=n\}.
+\]
+(Equivalently, $V(x)$ is the number of \emph{distinct totients} $\le x$.)
+\end{itemize}
+
+\textbf{Questions.}
+\begin{itemize}
+\item[(Q1)] Does $\displaystyle \lim_{x\to\infty} \frac{V(2x)}{V(x)}=2$?
+\item[(Q2)] Does $V(x)$ admit an asymptotic formula as $x\to\infty$?
+\end{itemize}
+\textbf{Edge cases.} For $0\le x<1$ one has $V(x)=0$. For $1\le x<2$ one has $V(x)=1$ since $\varphi(1)=\varphi(2)=1$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem statement (as given in the extracted file) records progressively sharper information on $V(x)$: Pillai proved $V(x)=o(x)$, Erd\H{o}s proved $V(x)=x(\log x)^{-1+o(1)}$, Maier--Pomerance proved
+\[
+V(x)=\frac{x}{\log x}\exp\big((C+o(1))(\log\log\log x)^2\big),
+\]
+and Ford proved a two-sided estimate of the shape
+\[
+V(x)\asymp \frac{x}{\log x}\exp\Big( C_1(\log\log\log x-\log\log\log\log x)^2+ C_2\log\log\log x- C_3\log\log\log\log x\Big)
+\]
+with explicit constants $C_i>0$. The remaining issue is that these do not yield an asymptotic constant, nor do they settle whether $V(2x)/V(x)\to 2$.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof-track ideas (for $V(2x)/V(x)\to 2$).}
+\begin{itemize}
+\item Use the best-known description of $V(x)$ as $\frac{x}{\log x}$ times a ``slowly varying'' factor, and attempt to show that factor is asymptotically stable under $x\mapsto 2x$.
+\item Translate the question into a statement about how many \emph{new} totients appear between $x$ and $2x$ (i.e. $V(2x)-V(x)$) and seek matching upper/lower bounds.
+\end{itemize}
+\textbf{Disproof-track ideas.}
+\begin{itemize}
+\item Try to exhibit sequences $x_j$ for which $V(2x_j)/V(x_j)$ oscillates, by forcing unusually many/few totients near the endpoints.
+\item Look for ``rigidity'' obstructions: for instance, totients are mostly even and have strong multiplicative constraints; see if those could force $V(2x)/V(x)$ away from $2$.
+\end{itemize}
+Given the deep context already cited in the statement, I focus below on rigorous elementary bounds and sanity-check computations; I do not attempt to reproduce the cited deep estimates.
+
+\subsection*{WORK}
+\subsubsection*{Fast reality check (exact computation for small $x$)}
+Using the inequality from Problem \#417 below (Lemma~417.1), any totient value $\le x$ occurs as $\varphi(m)$ for some $m\le 2x^2$. Thus $V(x)$ can be computed exactly for moderate $x$ by enumerating $\varphi(m)$ for $m\le 2x^2$ and counting distinct values $\le x$.
+
+Exact values obtained (via a totient sieve) are:
+\begin{verbatim}
+ x    V(x)   V(2x)   V(2x)/V(x)
+ 10     6      10      1.6666666667
+ 20    10      17      1.7000000000
+ 50    21      38      1.8095238095
+ 100   38      72      1.8947368421
+ 200   72     131      1.8194444444
+ 500  158     291      1.8417721519
+ 1000 291     543      1.8659793814
+\end{verbatim}
+These ratios are far from conclusive but show $V(2x)/V(x)<2$ for these $x$.
+
+\subsubsection*{Lemma 416.1 (Parity of totients)}
+\textbf{Lemma.} If $m>2$ then $\varphi(m)$ is even. Consequently, if $n>1$ and $\varphi(m)=n$ for some $m$, then $n$ is even. Therefore, for all real $x\ge 0$,
+\[
+V(x)\le 1+\big\lfloor \tfrac{x}{2}\big\rfloor.
+\]
+
+\textbf{Proof.}
+Fix $m>2$. Let
+\[
+R=\{a\in\{1,2,\dots,m\}: \gcd(a,m)=1\}.
+\]
+Then $\#R=\varphi(m)$ by definition.
+Define a map $T:R\to R$ by $T(a)=m-a$.
+If $\gcd(a,m)=1$ then $\gcd(m-a,m)=\gcd(a,m)=1$, so $T$ maps $R$ to itself.
+Also $T$ is an involution: $T(T(a))=a$.
+If $T(a)=a$ then $m-a=a$, so $m=2a$ and in particular $m$ is even and $a=m/2$.
+But then $\gcd(a,m)=\gcd(m/2,m)=m/2>1$ (since $m>2$), contradicting $a\in R$.
+Hence $T$ has no fixed points on $R$, so it partitions $R$ into disjoint $2$-element orbits. Therefore $\#R$ is even, i.e. $\varphi(m)$ is even.
+
+Now suppose $\varphi(m)=n>1$. Then $m\ne 1,2$ because $\varphi(1)=\varphi(2)=1$, hence $m>2$ and the first part implies $n$ is even.
+Thus the set of totients $\le x$ is contained in $\{1\}\cup\{2,4,6,\dots,2\lfloor x/2\rfloor\}$.
+This set has size $1+\lfloor x/2\rfloor$, so $V(x)$ is at most this size.
+\hfill$\square$
+
+\subsubsection*{Lemma 416.2 (Primes give many distinct totients)}
+\textbf{Lemma.} For all real $x\ge 1$,
+\[
+V(x)\ge \pi(x+1),
+\]
+where $\pi(y)$ is the number of primes $\le y$.
+
+\textbf{Proof.}
+Let $p$ be any prime with $p\le x+1$. Then $\varphi(p)=p-1$ (since the reduced residues modulo a prime are exactly $1,2,\dots,p-1$). Hence $p-1$ is a totient value and $p-1\le x$.
+If $p\ne q$ are distinct primes then $p-1\ne q-1$, so the totients $\{p-1: p\le x+1\text{ prime}\}$ are all distinct. Therefore there are at least $\pi(x+1)$ distinct totients $\le x$, i.e. $V(x)\ge \pi(x+1)$.
+\hfill$\square$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~416.1 explicitly excludes the exceptional cases $m=1,2$ where $\varphi(m)=1$ is odd; the proof checks that the involution $a\mapsto m-a$ has no fixed point because $a=m/2$ would not be coprime to $m$.
+\item Lemma~416.2 uses only the identity $\varphi(p)=p-1$ for primes $p$, and injectivity of $p\mapsto p-1$.
+\item The computation of $V(x)$ used the bound $m\le 2x^2$ for totients $\le x$ proved as Lemma~417.1 below; this is independently verifiable.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result here.}
+Elementary bounds
+\[
+\pi(x+1)\le V(x)\le 1+\lfloor x/2\rfloor
+\]
+for all $x\ge 1$ (Lemmas~416.1--416.2), together with exact computed values of $V(x)$ for $x\le 1000$ (table above).
+\item[(ii)] \textbf{First gap (crisp).}
+Prove or disprove
+\[
+\lim_{x\to\infty}\frac{V(2x)}{V(x)}=2.
+\]
+Equivalently, show that for every $\varepsilon>0$ there exists $X$ such that for all $x\ge X$,
+$\big|V(2x)-2V(x)\big|\le \varepsilon V(x)$; or exhibit a sequence $x_j\to\infty$ along which the ratio fails to approach $2$.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Try to upgrade the two-sided estimates for $V(x)$ stated in the problem (in particular the explicit exponent structure in Ford's estimate) to a true asymptotic, or at least show the multiplicative correction factor is ``slowly varying'' enough to imply $V(2x)/V(x)\to 2$.
+\item Compute $V(x)$ for much larger $x$ (e.g. up to $10^7$ or $10^8$) using a totient sieve plus the bound $m\le 2x^2$, and numerically examine $V(2x)/V(x)$ to search for systematic drift or oscillation.
+\item Study the increment $V(2x)-V(x)$ by estimating the number of totients landing in $(x,2x]$; any matching upper and lower bounds of order $V(x)$ would be decisive.
+\end{itemize}
+\item[(iv)] \textbf{What a minimal counterexample would likely look like.}
+If $V(2x)/V(x)$ fails to converge to $2$, one expects a sequence $x_j$ where the ``local density'' of totients near $x_j$ is atypically high or low, producing persistent oscillation in $V(2x_j)-2V(x_j)$. A minimal counterexample would likely come from constructing intervals with anomalously many (or few) new totient values, rather than from parity-type constraints (already accounted for in Lemma~416.1).
+\end{enumerate}
+

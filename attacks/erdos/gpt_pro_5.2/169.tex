@@ -1,0 +1,217 @@
+% Erdos Problem #169
+% Attempt for Erdos Problem #169
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used beyond the problem text; no extra literature claims).
+% - Computation available (Python/Sage/Mathematica)? YES (used for small truncations).
+
+PROBLEM
+
+Let $k\geq 3$ and $f(k)$ be the supremum of $\sum_{n\in A}\frac{1}{n}$ as $A$ ranges over all sets of positive integers which do not contain a $k$-term arithmetic progression. Estimate $f(k)$. Is
+\[\lim_{k\to \infty}\frac{f(k)}{\log W(k)}=\infty\]
+where $W(k)$ is the van der Waerden number?
+
+OUTPUT
+
+## 1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 3$.
+
+A set $A\subseteq\mathbb N:=\{1,2,3,\dots\}$ is **$k$-AP-free** if it contains no arithmetic progression of length $k$, i.e. there do not exist integers $a\ge 1$ and $d\ge 1$ such that
+\[
+\{a,a+d,a+2d,\dots,a+(k-1)d\}\subseteq A.
+\]
+
+Define
+\[
+f(k):=\sup\Bigl\{\sum_{n\in A}\frac{1}{n}: A\subseteq\mathbb N\text{ is $k$-AP-free}\Bigr\}\in[0,\infty].
+\]
+
+Let $W(k)$ denote the (two-color) van der Waerden number: the smallest $N$ such that every 2-coloring of $\{1,2,\dots,N\}$ contains a monochromatic $k$-term arithmetic progression.
+
+Questions:
+
+1. Give good lower/upper estimates for $f(k)$.
+2. Decide whether
+\[
+\lim_{k\to\infty} \frac{f(k)}{\log W(k)} = \infty.
+\]
+
+Edge cases: for each fixed $k$, finite sets are allowed, so $f(k)\ge \sum_{n=1}^{k-1} \frac1n$ always.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I will not use or claim any external results beyond what is explicitly written in the problem text.
+
+The problem text reports several lower bounds (Berlekamp; Gerver), record values for $f(3),f(4)$, and a statement that improving $f(k)/\log W(k)\ge 1/2$ to any constant $>1/2$ is open.
+
+---
+
+## 3) ATTACK PLAN
+
+Proof-track (partial):
+
+1. Prove unconditional, elementary lower bounds on $f(k)$ (using explicit finite $k$-AP-free sets).
+2. Prove the “trivial” inequality $f(k)\ge \tfrac12\log W(k)$ from the definition of $W(k)$.
+3. Do a small-$N$ computational reality check for the finite truncation problem
+\[
+F_k(N):=\max\Bigl\{\sum_{n\in A}\frac1n: A\subseteq\{1,\dots,N\}\text{ is $k$-AP-free}\Bigr\},
+\]
+noting $F_k(N)\le f(k)$.
+
+Disproof-track for the limit question is out of reach here (it would require upper bounds or constructions beyond elementary arguments).
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (finite truncations)
+
+For small $N$ I computed exact values of $F_k(N)$ by brute force optimization.
+
+*For $k=3$ (no 3-term APs):*
+\[
+\begin{array}{c|cccccccccc}
+N&1&2&3&4&5&6&7&8&9&10\\\hline
+F_3(N)&1&1.5&1.5&1.75&1.95&1.95&1.95&1.95&1.986111\dots&2.05
+\end{array}
+\]
+\[
+\begin{array}{c|cccccccccc}
+N&11&12&13&14&15&16&17&18&19&20\\\hline
+F_3(N)&2.140909\dots&2.140909\dots&2.217832\dots&2.289260\dots&2.289260\dots&2.289260\dots&2.289260\dots&2.289260\dots&2.289260\dots&2.289260\dots
+\end{array}
+\]
+
+*For $k=4$ (no 4-term APs), computed for $1\le N\le 16$:* 
+\[
+\begin{array}{c|cccccccc}
+N&1&2&3&4&5&6&7&8\\\hline
+F_4(N)&1&1.5&1.833333\dots&1.833333\dots&2.033333\dots&2.2&2.2&2.325
+\end{array}
+\]
+\[
+\begin{array}{c|cccccccc}
+N&9&10&11&12&13&14&15&16\\\hline
+F_4(N)&2.436111\dots&2.536111\dots&2.536111\dots&2.536111\dots&2.536111\dots&2.556684\dots&2.602777\dots&2.665277\dots
+\end{array}
+\]
+
+These are **lower bounds** for $f(3),f(4)$ because finite sets are allowed in the supremum definition.
+
+---
+
+### Lemma 4.1 (monotonicity in $k$)
+
+For $k\ge 3$,
+\[
+f(k)\le f(k+1).
+\]
+
+**Proof.**
+If a set $A\subseteq\mathbb N$ contains a $(k+1)$-term arithmetic progression, then it certainly contains a $k$-term arithmetic progression (take the first $k$ terms). Contrapositively, if $A$ is $k$-AP-free, then it is also $(k+1)$-AP-free.
+
+Therefore the class of $k$-AP-free sets is contained in the class of $(k+1)$-AP-free sets. Taking suprema of the same functional $\sum_{n\in A}1/n$ over a larger class cannot decrease the value, so $f(k)\le f(k+1)$.
+$\square$
+
+---
+
+### Lemma 4.2 (finite-set lower bound)
+
+For every $k\ge 3$,
+\[
+f(k)\ge \sum_{n=1}^{k-1}\frac{1}{n}.
+\]
+
+**Proof.**
+The set $A:=\{1,2,\dots,k-1\}$ has size $k-1$, hence it cannot contain any $k$-term arithmetic progression (a $k$-term AP requires $k$ distinct elements). Thus $A$ is $k$-AP-free, and so
+\[
+f(k)\ge \sum_{n\in A}\frac1n=\sum_{n=1}^{k-1}\frac1n.
+\]
+$\square$
+
+---
+
+### Lemma 4.3 (the “trivial” $1/2$ bound from $W(k)$)
+
+For every $k\ge 3$,
+\[
+f(k)\ge \frac12\log W(k),
+\]
+and hence
+\[
+\frac{f(k)}{\log W(k)}\ge \frac12.
+\]
+
+**Proof.**
+By definition of $W(k)$, there exists a 2-coloring of $\{1,2,\dots,W(k)-1\}$ with **no** monochromatic $k$-term arithmetic progression.
+Let $R$ and $B$ be the red and blue color classes. Then both $R$ and $B$ are $k$-AP-free sets.
+
+Moreover,
+\[
+\sum_{n\in R}\frac1n+\sum_{n\in B}\frac1n=\sum_{n=1}^{W(k)-1}\frac1n=:H_{W(k)-1}.
+\]
+Therefore at least one of the two sums is at least half:
+\[
+\max\Bigl\{\sum_{n\in R}\frac1n,\ \sum_{n\in B}\frac1n\Bigr\}\ge \frac12 H_{W(k)-1}.
+\]
+Since $R$ and $B$ are admissible in the definition of $f(k)$, we obtain
+\[
+f(k)\ge \frac12 H_{W(k)-1}.
+\]
+
+It remains to lower bound $H_{W(k)-1}$.
+For every integer $m\ge 1$, we have the integral comparison
+\[
+\frac1i \ge \int_{i}^{i+1}\frac{dx}{x}
+\quad\text{for each }i=1,2,\dots,m.
+\]
+Summing gives
+\[
+H_m=\sum_{i=1}^m\frac1i \ge \int_{1}^{m+1}\frac{dx}{x}=\log(m+1).
+\]
+Taking $m=W(k)-1$ yields $H_{W(k)-1}\ge \log W(k)$ and hence
+\[
+f(k)\ge \frac12\log W(k).
+\]
+$\square$
+
+---
+
+## 5) VERIFICATION
+
+* Lemma 4.2 is valid because a $k$-term AP requires $k$ distinct terms, so any set of size $<k$ is automatically $k$-AP-free.
+* Lemma 4.3 uses only the definition of $W(k)$ and the harmonic-number lower bound $H_m\ge\log(m+1)$, proved by a standard integral estimate.
+* The computed truncation values $F_3(N),F_4(N)$ are consistent with Lemma 4.2: e.g. for $k=3$, Lemma 4.2 gives $f(3)\ge 1+1/2=1.5$, and indeed $F_3(2)=1.5$.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+We proved elementary lower bounds
+\[
+f(k)\ge \sum_{n=1}^{k-1}\frac1n\qquad\text{and}\qquad f(k)\ge \frac12\log W(k).
+\]
+We also computed exact finite truncation maxima $F_3(N)$ for $N\le 20$ and $F_4(N)$ for $N\le 16$.
+
+(ii) **Exact first gap.**
+
+Any nontrivial **upper bound** on $f(k)$ (even finiteness of $f(3)$) is beyond what I can prove here, and I cannot improve the bound $f(k)/\log W(k)\ge 1/2$ to any constant $>1/2$.
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Prove or disprove finiteness of $f(3)$ by constructing a 3-AP-free set with divergent harmonic series or proving such divergence is impossible.
+2. Attempt to build structured $k$-AP-free “digit-restricted” sets (Kempner-type) with provably large harmonic sums and compare to known lower bounds.
+3. Seek a mechanism linking large harmonic sum to large van der Waerden numbers to attack whether $f(k)/\log W(k)\to\infty$.
+
+(iv) **What a minimal counterexample would likely look like.**
+
+If $\lim_{k\to\infty} f(k)/\log W(k)=\infty$ is false, then there is a constant $C$ and infinitely many $k$ with $f(k)\le C\log W(k)$. Any such counterexample would require an upper-bounding principle that converts “no $k$-AP” into a strong restriction on harmonic sum, uniformly over all $k$.
+
+

@@ -1,0 +1,113 @@
+% Attempt for Erdos Problem #78
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not needed
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $R(k)$ is the diagonal Ramsey number.
+- For a finite graph $G$, let $\omega(G)$ be its clique number and $\alpha(G)$ its independence number.
+
+Goal (constructive lower bound).
+Give an explicit (deterministic, efficiently describable) family of graphs $G_k$ on $n_k$ vertices such that
+\[\omega(G_k)<k\quad\text{and}\quad \alpha(G_k)<k,\]
+with $n_k\ge C^k$ for some constant $C>1$.
+Equivalently, prove constructively that $R(k)>C^k$ for some $C>1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+The problem text notes nonconstructive probabilistic lower bounds and partial constructive results (Cohen, Li).
+I do not reproduce those deep constructions here; I focus on elementary equivalences and a standard amplification operation that any explicit construction could use.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Re-express the problem in terms of explicit Ramsey graphs: graphs with both $\omega(G)$ and $\alpha(G)$ at most $c\log n$.
+2. Identify closure properties: how to combine smaller Ramsey graphs to create larger ones while controlling $\omega$ and $\alpha$ (lexicographic products).
+3. Search for an explicit base graph with $\omega,\alpha=O(\log n)$; this is the core open challenge.
+
+Disproof track ideas:
+1. Disprove by showing that no explicit construction can beat subexponential in $k$ (unlikely and not formalized by current information).
+
+Chosen path in this attempt: prove two problem-specific lemmas (equivalence and amplification) that make the objective precise and modular.
+
+4) WORK
+Lemma 1 (Ramsey-number equivalence with clique/independence avoidance).
+Let $k\ge 2$ and $n\ge 1$.
+Then $R(k)>n$ if and only if there exists a (simple) graph $G$ on $n$ vertices such that
+\[\omega(G)<k\quad\text{and}\quad \alpha(G)<k.\]
+
+Proof.
+($\Rightarrow$) If $R(k)>n$, then by definition there exists a 2-coloring of the edges of $K_n$ with no monochromatic $K_k$.
+Let $G$ be the graph whose edges are the red edges.
+If $G$ contained a clique of size $k$, then those edges would form a red $K_k$, contradiction.
+Thus $\omega(G)<k$.
+If $G$ contained an independent set of size $k$, then all edges among that vertex set are blue, giving a blue $K_k$, contradiction.
+Thus $\alpha(G)<k$.
+
+($\Leftarrow$) Conversely, if there exists a graph $G$ on $n$ vertices with $\omega(G)<k$ and $\alpha(G)<k$, color edges of $K_n$ red if they are edges of $G$ and blue otherwise.
+Then there is no red $K_k$ (since $\omega(G)<k$) and no blue $K_k$ (since a blue $K_k$ would be an independent set of size $k$ in $G$).
+Thus this coloring avoids monochromatic $K_k$, so $R(k)>n$. \qed
+
+Lemma 2 (Lexicographic product amplifies Ramsey graphs).
+For graphs $G$ and $H$, define the lexicographic product $G\circ H$ as the graph on $V(G)\times V(H)$ where
+$(g,h)$ is adjacent to $(g',h')$ iff either $gg'\in E(G)$, or $g=g'$ and $hh'\in E(H)$.
+Then
+\[\omega(G\circ H)=\omega(G)\,\omega(H)\qquad\text{and}\qquad \alpha(G\circ H)=\alpha(G)\,\alpha(H).\]
+In particular, if $\omega(G)<k$ and $\alpha(G)<k$ and $\omega(H)<\ell$ and $\alpha(H)<\ell$, then
+$\omega(G\circ H)<k\ell$ and $\alpha(G\circ H)<k\ell$, while $|V(G\circ H)|=|V(G)|\,|V(H)|$.
+
+Proof.
+Let $C\subseteq V(G)\times V(H)$ be a clique in $G\circ H$.
+Project $C$ to $V(G)$: let $S:=\{g\in V(G): \exists h\ (g,h)\in C\}$.
+If $g\ne g'$ are in $S$, then for any $(g,h),(g',h')\in C$ we must have $(g,h)$ adjacent to $(g',h')$, which can only happen if $gg'\in E(G)$ (since $g\ne g'$).
+Thus $S$ is a clique in $G$, so $|S|\le \omega(G)$.
+For each fixed $g\in S$, the fiber $C_g:=\{h:(g,h)\in C\}$ must be a clique in $H$ (because adjacency inside the same $g$ fiber is exactly adjacency in $H$).
+So $|C_g|\le \omega(H)$.
+Therefore
+\[|C|=\sum_{g\in S} |C_g|\le |S|\cdot \omega(H)\le \omega(G)\omega(H),\]
+showing $\omega(G\circ H)\le \omega(G)\omega(H)$.
+Equality is achieved by taking a clique $S$ in $G$ of size $\omega(G)$ and, for each $g\in S$, taking a clique in $H$ of size $\omega(H)$; their product set is a clique in $G\circ H$.
+Hence $\omega(G\circ H)=\omega(G)\omega(H)$.
+
+For independence sets, let $I\subseteq V(G)\times V(H)$ be independent.
+If $g\ne g'$ are both in the projection $S:=\{g:\exists h\ (g,h)\in I\}$, then for any $(g,h)\in I$ and $(g',h')\in I$ we must have no adjacency, which forces $gg'\notin E(G)$.
+Thus $S$ is an independent set in $G$, so $|S|\le \alpha(G)$.
+Within each fiber $g$, the set $I_g:=\{h:(g,h)\in I\}$ must be independent in $H$, so $|I_g|\le \alpha(H)$.
+Thus $|I|\le \alpha(G)\alpha(H)$, and equality is achieved by taking $S$ an independent set of size $\alpha(G)$ and in each fiber an independent set of size $\alpha(H)$.
+Therefore $\alpha(G\circ H)=\alpha(G)\alpha(H)$.
+The final statement follows immediately. \qed
+
+FAST REALITY CHECK
+Lemma 1 explains the equivalence in the problem statement:
+an explicit lower bound $R(k)>C^k$ is equivalent to an explicit family of graphs on $n$ vertices with $\omega,\alpha = O(\log n)$.
+Lemma 2 shows a standard way to combine constructions: if one can explicitly build a graph on $N$ vertices with $\omega,\alpha \le t$,
+then the $m$-fold lexicographic power has $N^m$ vertices and $\omega,\alpha \le t^m$.
+This modularizes the task: the bottleneck is producing a base graph with $t$ comparable to $O(\log N)$.
+
+5) VERIFICATION
+- Lemma 1 is a direct translation between 2-colorings and graphs/complements.
+- Lemma 2 is checked by projecting cliques/independent sets to $G$ and fibers to $H$, and showing both upper and lower bounds match.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved the exact equivalence between constructive Ramsey lower bounds and explicit graphs with simultaneously small clique and independence numbers (Lemma 1),
+and proved an amplification operation (lexicographic product) that multiplies both clique and independence numbers while multiplying vertex counts (Lemma 2).
+
+(ii) First gap:
+Provide an explicit graph family on $n$ vertices with $\omega(G),\alpha(G)\le c\log n$ for some absolute $c>0$.
+That is exactly the missing ingredient needed (via Lemma 1) to get $R(k)>C^k$ constructively.
+
+(iii) Top 3 next moves (concrete):
+1. Pick a candidate explicit pseudorandom graph family (e.g. based on finite fields) and attempt to prove $\omega,\alpha=O(\log n)$ using only accessible exponential-sum bounds.
+2. Use Lemma 2 to amplify any explicit construction that achieves $\omega,\alpha\le (\log n)^C$ and see whether iterating/bootstrapping can reduce the exponent $C$ (it typically does not, but may yield optimized constants).
+3. Recast the goal as constructing explicit 2-colorings of $K_n$ with no monochromatic clique/independent set larger than $c\log n$, and explore derandomization tools (extractors/dispersers) that could certify this property.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A complexity-theoretic barrier showing that any explicit family of graphs describable within a given resource bound must contain a clique or independent set of size $\ge (\log n)^{1+\delta}$,
+which would rule out achieving $O(\log n)$ and hence would prevent any constructive $R(k)>C^k$ result. (No such barrier is established here.)
+

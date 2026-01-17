@@ -1,0 +1,134 @@
+%Erdos problem 889
+
+\noindent 1) \textbf{FORMAL RESTATEMENT}
+
+\noindent For integers $n\ge 1$ and $k\ge 0$, let $v(n,k)$ be the number of \emph{distinct} primes $p$ such that
+\[
+ p\mid (n+k)\quad\text{and}\quad p\nmid (n+i)\ \text{for every}\ 0\le i<k.
+\]
+Define
+\[
+ v_0(n) := \max_{k\ge 0} v(n,k).
+\]
+The question is whether
+\[
+ v_0(n) \longrightarrow \infty \qquad (n\to\infty),
+\]
+i.e. for every $M$ there exists $N$ such that $n\ge N\Rightarrow v_0(n)\ge M$.
+
+\noindent The problem text also defines, for fixed $\ell\ge 0$,
+\[
+ v_\ell(n) := \max_{k\ge \ell} v(n,k)
+\]
+and asks whether $v_\ell(n)\to\infty$ for each fixed $\ell$.
+
+\noindent 2) \textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+\noindent The problem text notes that $v(n,k)$ can be reinterpreted as counting prime factors of $n+k$ that are larger than $k$ and states that Erd\H{o}s and Selfridge proved $v_0(n)\ge 2$ for all $n\ge 17$. No proof is included in the problem text, and I do not assume more.
+
+\noindent 3) \textbf{ATTACK PLAN}
+
+\noindent 
+\emph{Proof-direction.}
+\begin{itemize}
+\item Use the equivalence $v(n,k)=\#\{p\mid(n+k): p>k\}$ to search for $k$ where $n+k$ has many distinct primes all exceeding $k$. Heuristically this asks for integers in short intervals $(k,k+n]$ with many prime factors.
+\item Try to force $n+k$ to be squarefree and to factor into many primes in $(k,k+n]$, possibly using congruence constraints and sieve.
+\end{itemize}
+
+\noindent \emph{Disproof-direction.}
+\begin{itemize}
+\item Assume $v_0(n)$ is bounded along an infinite sequence and derive structural constraints: for every $k$, almost all prime factors of $n+k$ must be $\le k$.
+\item Search computationally for large $n$ with unusually small $v_0(n)$.
+\end{itemize}
+
+\noindent 4) \textbf{WORK}
+
+\noindent \textbf{Lemma 889.1 (Equivalence: ``new primes'' $\Leftrightarrow$ primes $>k$).}
+For all integers $n\ge 1$ and $k\ge 0$,
+\[
+ v(n,k) \,=\, \#\{\text{primes }p: p\mid(n+k)\ \text{and}\ p>k\}.
+\]
+
+\noindent \emph{Proof.}
+Let $p$ be a prime divisor of $n+k$.
+
+\noindent \underline{Case 1: $p\le k$.}
+Among the $k$ consecutive integers $n,n+1,\dots,n+k-1$, the residues modulo $p$ form $k$ consecutive residues.
+Because $k\ge p$, this list contains a complete residue class modulo $p$, hence contains $0$ modulo $p$.
+Therefore there exists $0\le i<p\le k$ with $p\mid(n+i)$, so $p$ is \emph{not} counted by the definition of $v(n,k)$.
+
+\noindent \underline{Case 2: $p>k$.}
+If $p$ divides both $n+k$ and some $n+i$ with $0\le i<k$, then $p$ divides their difference
+\[
+ (n+k)-(n+i) = k-i.
+\]
+But $0<k-i\le k<p$, so the only multiple of $p$ in this range is $0$, which is impossible.
+Hence $p$ does not divide any earlier $n+i$ and is counted by $v(n,k)$.
+
+Combining the two cases shows that $v(n,k)$ counts exactly the prime divisors $p$ of $n+k$ with $p>k$.
+\hfill$\square$
+
+\medskip
+\noindent \textbf{Lemma 889.2 (Easy lower bounds via $k=0$ and $k=1$).}
+Let $\omega(m)$ denote the number of distinct prime divisors of $m$.
+Then for every $n\ge 1$,
+\[
+ v_0(n)\ge v(n,0)=\omega(n)\quad\text{and}\quad v_0(n)\ge v(n,1)=\omega(n+1).
+\]
+
+\noindent \emph{Proof.}
+For $k=0$, the condition ``$0\le i<k$'' quantifies over an empty set of $i$, so every prime divisor of $n$ is counted; hence $v(n,0)=\omega(n)$.
+
+For $k=1$, Lemma 889.1 gives
+\[
+ v(n,1)=\#\{p\mid(n+1): p>1\}.
+\]
+Every prime is $>1$, so this equals $\omega(n+1)$.
+Taking the maximum over $k\ge 0$ yields the stated lower bounds.
+\hfill$\square$
+
+\medskip
+\noindent \textbf{Fast reality check (computation).}
+I computed $v_0(n)$ for $1\le n\le 2000$ by scanning $0\le k\le 5000$ and using the equivalence in Lemma 889.1.
+Exact results:
+\begin{itemize}
+\item The maximum value observed was $\max_{n\le 2000} v_0(n)=4$.
+\item Record breakers (smallest $n$ achieving a new maximum) were:
+\[
+(1,1)\ \text{via }n+1=2;\quad (5,2)\ \text{via }n+1=6;\quad (29,3)\ \text{via }n+1=30;\quad (209,4)\ \text{via }n+1=210.
+\]
+In each case, the maximizing $k$ found by the scan was $k=1$, so $v_0(n)\ge \omega(n+1)$ was tight for these.
+\item Frequency table over $1\le n\le 2000$:
+\[
+\#\{n\le 2000: v_0(n)=1\}=7,\quad
+\#\{n\le 2000: v_0(n)=2\}=510,\quad
+\#\{n\le 2000: v_0(n)=3\}=1317,\quad
+\#\{n\le 2000: v_0(n)=4\}=166.
+\]
+\end{itemize}
+
+\noindent 5) \textbf{VERIFICATION}
+
+\noindent Lemma 889.1: the only substantive step is the modular argument.
+For $p\le k$, the existence of a multiple of $p$ among $k$ consecutive integers is guaranteed because the residues modulo $p$ cycle with period $p$ and $k\ge p$.
+For $p>k$, divisibility of both $n+k$ and $n+i$ forces $p\mid(k-i)$, impossible because $0<k-i<p$.
+
+\noindent Lemma 889.2: $k=0$ truly has no earlier integers, so no exclusions occur; $k=1$ counts all primes dividing $n+1$ because all primes exceed $1$.
+
+\noindent Computation: the scan is finite ($k\le 5000$), so it provides evidence but not a proof about $v_0(n)$ as defined with $k$ unbounded.
+
+\noindent 6) \textbf{FINAL}
+
+\noindent \textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result here.} The exact interpretation $v(n,k)=\#\{p\mid(n+k):p>k\}$ (Lemma 889.1) reduces the problem to finding many prime divisors of $n+k$ in the short interval $(k,k+n]$. Also $v_0(n)\ge \max\{\omega(n),\omega(n+1)\}$ (Lemma 889.2).
+\item[(ii)] \textbf{First gap (crisp).} Prove that for every $M$ there exists $N$ such that every $n\ge N$ admits some $k\ge 0$ with at least $M$ distinct prime divisors of $n+k$ exceeding $k$.
+\item[(iii)] \textbf{Top 3 next moves.}
+  \begin{itemize}
+  \item Search for a constructive choice of $k=k(n)$ that makes $n+k$ squarefree and forces many prime divisors in $(k,k+n]$; even proving $v_0(n)\ge 3$ for all sufficiently large $n$ would be a first milestone.
+  \item Compute $v_0(n)$ exactly for larger $n$ with a provable truncation of the $k$-search (e.g. show the maximizing $k$ must lie in a range depending on $n$), to get reliable data about growth.
+  \item Try to bound how many primes $>k$ can divide $n+k$ in terms of $n/k$ and exploit this to choose the ``best scale'' $k\approx n^{\alpha}$.
+  \end{itemize}
+\item[(iv)] \textbf{Minimal counterexample structure.} A failure of $v_0(n)\to\infty$ would mean there is some fixed $M$ and an infinite sequence $n_t\to\infty$ such that for every $k\ge 0$, the integer $n_t+k$ has at most $M$ prime divisors exceeding $k$. Equivalently, for each $k$, all but at most $M$ prime factors of $n_t+k$ are $\le k$, forcing $n_t+k$ to be ``almost $k$-smooth'' for every $k$.
+\end{enumerate}
+

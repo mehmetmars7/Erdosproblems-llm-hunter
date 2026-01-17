@@ -1,0 +1,119 @@
+% Erdos Problem #457
+% Solution
+
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+We first isolate two (minor) ambiguities in the statement as extracted.
+
+\begin{itemize}
+\item The expression ``$\prod_{1\le i\le \log n}$'' uses a non-integer upper limit.  In what follows I interpret
+\[k(n):=\lfloor \log n\rfloor\qquad(\log=\log_e)\]
+(and note that changing to $\lceil\log n\rceil$ or a different logarithm base only perturbs constants).
+\item The text claims that taking $n$ to be the product of primes between $\log n$ and $(2+o(1))\log n$ gives an example with $q(n,\log n)\ge (2+o(1))\log n$.  For the literal definition
+\[q(n,k):=\min\{\text{prime }p: p\nmid \prod_{i=1}^k (n+i)\},\]
+this appears inconsistent (Lemma~457.3 below makes this precise).  A ``minimal correction'' that makes the example valid is to replace the product by $\prod_{0\le i\le k}(n+i)$ (include the factor $n$).  In this writeup I treat the \emph{literal} definition from the file, and separately note what changes under the corrected variant.
+\end{itemize}
+
+\noindent\textbf{Literal problem.}
+
+Define for integers $n\ge 2$ and $k\ge 0$
+\[P(n,k):=\prod_{i=1}^k (n+i)\quad (\text{empty product }=1),\qquad q(n,k):=\min\{\text{prime }p: p\nmid P(n,k)\}.
+\]
+Question A: Does there exist $\varepsilon>0$ and infinitely many integers $n$ such that
+\[q(n,k(n))\ \ge\ (2+\varepsilon)\log n\ ?\]
+Equivalently, for infinitely many $n$, \emph{every} prime $p\le (2+\varepsilon)\log n$ divides $P(n,k(n))$.
+
+Question B (from the ``more generally'' clause): Does there exist $\varepsilon>0$ such that for all sufficiently large $n$,
+\[q(n,k(n))\ <\ (1-\varepsilon)(\log n)^2\ ?\]
+
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+A quick check of the Erd\H{o}s problems page for \#457 (discussion thread) contains only heuristics (e.g. a comment suggesting typical size around $\log n\,\frac{\log\log n}{\log\log\log n}$) and does not give a proof or disproof of either Question A or B.  I do not rely on any external results beyond what is proved below.
+
+\noindent\textbf{3) ATTACK PLAN}
+
+\begin{itemize}
+\item \emph{Proof track for Question A:} try to use a Chinese-remainder-type construction to force, simultaneously for many primes $p$ in $(k, (2+\varepsilon)\log n]$, the congruence $n\equiv -i_p\pmod p$ with some $1\le i_p\le k$. The difficulty is that $k=\Theta(\log n)$ depends on $n$, so one must control the size of $n$ produced by CRT.
+\item \emph{Disproof track for Question A:} attempt to show that for large $n$ there is always some prime $p\le (2+\varepsilon)\log n$ that misses the interval $\{n+1,\dots,n+k\}$. This resembles very strong control of prime gaps/residue distribution and seems out of reach.
+\item \emph{For Question B:} try to prove a universal upper bound on $q(n,k)$ (with $k\asymp \log n$), e.g. by showing that among primes up to $\asymp (\log n)^2$ one must miss the interval; but again this looks like deep distributional input.
+\end{itemize}
+
+Given the open nature, I focus on (i) exact reformulations that isolate what must be shown, and (ii) sanity-check computations.
+
+\noindent\textbf{4) WORK}
+
+\textbf{Fast reality check (computations).}
+
+I computed $q(n,\lfloor\log n\rfloor)$ for $2\le n\le 200{,}000$ (natural log).  The largest observed ratio $q(n,\lfloor\log n\rfloor)/\log n$ in this range was about $5.068$ at $n=113{,}729$ (where $\lfloor\log n\rfloor=11$ and $q=59$).  In the same range there were many $n$ with $q\ge 3\log n$, but this is not informative asymptotically since $\log n$ is small here.
+
+I also tested the \emph{suggested} construction ``$n$ is the product of primes in $(y,2y]$'' as a proxy for ``primes between $\log n$ and $2\log n$'': for $y=25,30,35,40,45,50$ this gives $\log n\approx 22$--$43$ and the observed ratios $q(n,\lfloor\log n\rfloor)/\log n$ were in the range $1.01$--$1.70$, not near $2$.
+
+\medskip
+\noindent\textbf{Lemma 457.1 (small primes always divide).}
+For integers $n\ge 1$ and $k\ge 1$, every prime $p\le k$ divides $P(n,k)=\prod_{i=1}^k (n+i)$.  Consequently, $q(n,k)>k$.
+
+\textit{Proof.}
+Fix a prime $p\le k$. Consider the residues $n+1,n+2,\dots,n+p$ modulo $p$. They form a complete residue system modulo $p$, hence one of them is congruent to $0\pmod p$, i.e. $p\mid (n+i)$ for some $1\le i\le p\le k$. Therefore $p\mid P(n,k)$. Since this holds for every prime $p\le k$, the least prime not dividing $P(n,k)$ must satisfy $q(n,k)>k$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 457.2 (exact divisibility criterion for $p>k$).}
+Let $n\ge 1$, $k\ge 1$, and let $p$ be a prime with $p>k$. Then
+\[p\mid P(n,k)\ \Longleftrightarrow\ \text{the residue }r\equiv -n\pmod p\text{ satisfies }1\le r\le k.
+\]
+Equivalently, writing $n\equiv a\pmod p$ with $0\le a\le p-1$, one has
+\[p\mid P(n,k)\ \Longleftrightarrow\ a\in\{p-k,p-k+1,\dots,p-1\}.
+\]
+
+\textit{Proof.}
+Since $p>k$, among the integers $n+1,\dots,n+k$ there can be at most one multiple of $p$.
+
+If $p\mid P(n,k)$ then $p\mid (n+i)$ for some $1\le i\le k$, so $n\equiv -i\pmod p$. Let $r\equiv -n\pmod p$ be the unique residue in $\{0,1,\dots,p-1\}$; then $i\equiv r\pmod p$. But $1\le i\le k<p$ forces $i=r$ and hence $1\le r\le k$.
+
+Conversely, if the residue $r\equiv -n\pmod p$ satisfies $1\le r\le k$, then $n+r\equiv 0\pmod p$ and $1\le r\le k$ implies $p\mid (n+r)$, so $p\mid P(n,k)$. The alternative formulation in terms of $a\equiv n\pmod p$ is immediate because $r\equiv -a\pmod p$ and $1\le r\le k$ is equivalent to $a\in\{p-k,\dots,p-1\}$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 457.3 (large prime factors of $n$ force $q(n,k)$ small).}
+Let $n\ge 1$, $k\ge 1$, and let $p$ be a prime divisor of $n$ with $p>k$. Then $p\nmid P(n,k)$, hence
+\[q(n,k)\ \le\ p.
+\]
+In particular, if $n$ has a prime factor in $(k,2k]$, then $q(n,k)\le 2k$.
+
+\textit{Proof.}
+If $p\mid n$ then for each $1\le i\le k$ we have $n+i\equiv i\pmod p$. Because $p>k$, none of the integers $1,2,\dots,k$ is divisible by $p$, so $p\nmid (n+i)$ for all $1\le i\le k$. Therefore $p\nmid P(n,k)$, so by definition $q(n,k)\le p$. The final sentence is immediate. \hfill$\square$
+
+\medskip
+\noindent\textbf{Consequence of Lemma 457.3 (inconsistency with the stated ``example'').}
+For the \emph{literal} definition $P(n,k)=\prod_{i=1}^k(n+i)$, if one takes $k=\lfloor\log n\rfloor$ and constructs $n$ to have all prime factors in $(\log n,2\log n]$, then Lemma~457.3 implies $q(n,k)\le$ (smallest prime factor of $n$) $\asymp \log n$, not $\asymp 2\log n$.  This suggests that the informal ``example'' in the statement would instead apply to the corrected variant that includes the factor $n$.
+
+\medskip
+\noindent\textbf{5) VERIFICATION}
+
+\begin{itemize}
+\item Lemma~457.1: checked the quantifiers. Requires $k\ge 1$. For $k=0$, the statement ``$q(n,0)>0$'' is vacuous; indeed $P(n,0)=1$ and $q(n,0)=2$.
+\item Lemma~457.2: the condition $p>k$ is essential; when $p\le k$ there can be multiple multiples and the residue criterion changes (but Lemma~457.1 already covers that regime).
+\item Lemma~457.3: also requires $p>k$; if $p\le k$ then $p\mid n$ implies $p\mid(n+p)$ and hence $p$ \emph{does} divide the product.
+\item Numerical sanity checks: for many random small $n,k$ I spot-checked Lemma~457.2 by brute force (in the scripts used to compute $q$).
+\end{itemize}
+
+\noindent\textbf{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} For $k=\lfloor\log n\rfloor$ and any prime $p>k$, one has the exact criterion
+\[p\mid \prod_{i=1}^k (n+i)\iff (-n\bmod p)\in\{1,2,\dots,k\},\]
+and in particular any prime divisor $p$ of $n$ with $p>k$ is automatically \emph{absent} from the product, giving $q(n,k)\le p$.
+
+(ii) \emph{First gap (crisp):} Prove or disprove the existence of $\varepsilon>0$ and infinitely many $n$ such that for every prime
+\[k(n)<p\le (2+\varepsilon)\log n\quad\text{one has}\quad (-n\bmod p)\in\{1,2,\dots,k(n)\}.
+\]
+
+(iii) \emph{Top 3 next moves:}
+\begin{enumerate}
+\item Try a CRT construction for primes $p$ in a moving window $[k, (2+\varepsilon)k]$ with a chosen residue $n\equiv -i_p\pmod p$, $1\le i_p\le k$, and quantify the resulting size of $n$ to see whether one can keep $\log n\asymp k$.
+\item Run a larger computation searching for $n$ maximizing $q(n,\lfloor\log n\rfloor)/\log n$ and examine the residue pattern $n\bmod p$ for primes $p$ near $\log n$.
+\item For Question B, attempt to show that among primes $p\le (\log n)^2$ there must exist one with $(-n\bmod p)\notin\{1,\dots,\lfloor\log n\rfloor\}$, e.g. via a counting/sieve inequality.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:} If Question A is false, then for every fixed $\varepsilon>0$ there is $N(\varepsilon)$ such that for all $n\ge N(\varepsilon)$ one can find a prime $p\le (2+\varepsilon)\log n$ with $(-n\bmod p)\notin\{1,\dots,\lfloor\log n\rfloor\}$; any ``extremal'' near-counterexample would have $(-n\bmod p)$ landing in $\{1,\dots,\lfloor\log n\rfloor\}$ for almost all primes up to about $2\log n$ and would necessarily avoid having any prime factor of $n$ exceeding $\lfloor\log n\rfloor$ (by Lemma~457.3).
+
+

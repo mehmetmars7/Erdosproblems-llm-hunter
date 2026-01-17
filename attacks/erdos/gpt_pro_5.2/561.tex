@@ -1,0 +1,165 @@
+% Erdos Problem #561
+
+1) FORMAL RESTATEMENT
+
+Let $F_1$ and $F_2$ be forests each of whose connected components is a star.
+Write
+\[
+F_1=\bigcup_{i=1}^s K_{1,n_i},\qquad F_2=\bigcup_{j=1}^t K_{1,m_j},
+\]
+where the unions are disjoint unions of components (vertex-disjoint), and assume the sequences are nonincreasing:
+\[
+n_1\ge n_2\ge \cdots \ge n_s,\qquad m_1\ge m_2\ge \cdots \ge m_t.
+\]
+(Here $K_{1,r}$ denotes the star with $r$ leaves, i.e. $r$ edges.)
+
+Define the size Ramsey number $\hat R(F_1,F_2)$ to be the least $M$ such that there exists a graph $H$ with $|E(H)|=M$ satisfying: every red/blue colouring of $E(H)$ contains either a red copy of $F_1$ or a blue copy of $F_2$.
+
+The problem statement claims:
+\[
+\hat{R}(F_1,F_2)=\sum_{k=2}^{s+2} \max\{n_i+m_j-1: i+j=k\}.
+\]
+There is an apparent misstatement: the upper limit $s+2$ does not involve $t$ and cannot be correct for general $t$.
+A minimal correction consistent with the usual ``diagonal'' indexing is
+\[
+\hat{R}(F_1,F_2)\stackrel{?}{=}\sum_{k=2}^{s+t} \ell_k,\qquad
+\ell_k:= \max\{n_i+m_j-1: 1\le i\le s,\ 1\le j\le t,\ i+j=k\}.
+\]
+In what follows, we (a) prove the exact base case $s=t=1$, and (b) prove a coarse general upper bound of the correct qualitative form.
+We do not complete a proof of the full claimed formula.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement notes that Burr--Erd\H{o}s--Faudree--Rousseau--Schelp proved the formula when all $n_i$ are equal and all $m_j$ are equal.
+We do not assume any further external results.
+
+3) ATTACK PLAN
+
+- First, settle the base case of a single star versus a single star by exact computation of $\hat R(K_{1,a},K_{1,b})$.
+- Second, build a general explicit Ramsey host graph for $(F_1,F_2)$ as a disjoint union of stars large enough to guarantee either $s$ red stars or $t$ blue stars by a pigeonhole principle.
+- The full diagonal-sum formula likely requires a refined induction/majorization argument on the sequences $(n_i)$ and $(m_j)$; we do not complete that here.
+
+4) WORK
+
+PHASE 1 — FAST REALITY CHECK
+
+- $s=t=1$, $a=b=1$: $K_{1,1}$ is an edge, so $\hat R(K_{1,1},K_{1,1})=1$.
+- $s=t=1$, $a=b=2$: the formula below predicts $\hat R(K_{1,2},K_{1,2})=3$; indeed $K_{1,3}$ forces at least two edges of one colour at its centre.
+
+Lemma 561.1 (Exact size Ramsey number for a star versus a star).
+For all integers $a,b\ge 1$,
+\[
+\hat{R}(K_{1,a},K_{1,b})=a+b-1.
+\]
+
+Proof.
+(Upper bound.) Let $H$ be the star $K_{1,a+b-1}$ with centre $c$.
+Consider any red/blue colouring of its $a+b-1$ edges.
+Let $r$ be the number of red edges incident to $c$ and $b'$ the number of blue edges; then $r+b'=a+b-1$.
+If $r\ge a$, then the red edges at $c$ contain a red copy of $K_{1,a}$.
+Otherwise $r\le a-1$, so $b'=a+b-1-r\ge a+b-1-(a-1)=b$, and the blue edges at $c$ contain a blue copy of $K_{1,b}$.
+Thus every colouring of $H$ yields a red $K_{1,a}$ or a blue $K_{1,b}$, so $\hat{R}(K_{1,a},K_{1,b})\le a+b-1$.
+
+(Lower bound.) Let $H$ be any graph with at most $a+b-2$ edges.
+We will produce a red/blue colouring of $E(H)$ with no red $K_{1,a}$ and no blue $K_{1,b}$.
+
+Fix an arbitrary order of the edges of $H$ and colour them one by one.
+During the process we maintain the invariants
+\[
+\deg_{\text{red}}(v)\le a-1\quad\text{and}\quad \deg_{\text{blue}}(v)\le b-1\qquad\text{for every vertex }v.
+\]
+When an uncoloured edge $uv$ is to be coloured, we do the following:
+
+- If $\deg_{\text{red}}(u)\le a-2$ and $\deg_{\text{red}}(v)\le a-2$, colour $uv$ red.
+
+- Otherwise, colour $uv$ blue.
+
+We claim that this never violates the blue-degree invariant, so the algorithm always finishes.
+Indeed, the only way colouring $uv$ blue could violate an invariant is if one endpoint already has blue degree $b-1$.
+So suppose that when we reach an uncoloured edge $uv$:
+
+(i) we cannot colour it red (so at least one endpoint, say $u$, already has $\deg_{\text{red}}(u)=a-1$), and
+
+(ii) colouring it blue would violate the blue constraint (so at least one endpoint, say $v$, already has $\deg_{\text{blue}}(v)=b-1$).
+
+If $u=v$, then at this moment the vertex $u$ is already incident to at least $(a-1)+(b-1)=a+b-2$ coloured edges (namely its red edges plus its blue edges), and it is also incident to the still-uncoloured edge $uv$.
+Hence $\deg_H(u)\ge a+b-1$, which forces $|E(H)|\ge \deg_H(u)\ge a+b-1$, contradicting $|E(H)|\le a+b-2$.
+
+If $u\neq v$, then the set of edges contributing to $\deg_{\text{red}}(u)=a-1$ are all incident to $u$, and the set contributing to $\deg_{\text{blue}}(v)=b-1$ are all incident to $v$.
+These two edge-sets are disjoint (an edge cannot be incident to both $u$ and $v$ unless it is the edge $uv$ itself, which is still uncoloured).
+Therefore $H$ contains at least $(a-1)+(b-1)=a+b-2$ already-coloured edges plus the additional edge $uv$, so $|E(H)|\ge a+b-1$, again contradicting $|E(H)|\le a+b-2$.
+
+Thus case (i)+(ii) cannot occur, and the greedy procedure always succeeds.
+At the end we have $\deg_{\text{red}}(v)\le a-1$ and $\deg_{\text{blue}}(v)\le b-1$ for all $v$, so there is no red $K_{1,a}$ and no blue $K_{1,b}$.
+
+This shows that no graph with at most $a+b-2$ edges is Ramsey for $(K_{1,a},K_{1,b})$, i.e. $\hat{R}(K_{1,a},K_{1,b})\ge a+b-1$.
+Combining with the upper bound gives equality.
+\qed
+
+Remark.
+The lower-bound colouring argument above used only the inequality $\deg_H(x)\le |E(H)|$; it is therefore valid for all graphs $H$ on at most $a+b-2$ edges.
+
+Lemma 561.2 (A coarse general upper bound for star forests).
+Let $F_1=\bigcup_{i=1}^s K_{1,n_i}$ and $F_2=\bigcup_{j=1}^t K_{1,m_j}$.
+Set $N:=\max_i n_i$ and $M:=\max_j m_j$.
+Then
+\[
+\hat{R}(F_1,F_2)\le (s+t-1)(N+M-1).
+\]
+
+Proof.
+Construct a host graph $H$ as the disjoint union of $s+t-1$ stars, each isomorphic to $K_{1,N+M-1}$.
+Then
+\[
+|E(H)|=(s+t-1)(N+M-1).
+\]
+
+Consider any red/blue colouring of $E(H)$.
+Each component star has $N+M-1$ edges, so by Lemma 561.1 applied within each component star, each component contains either a red $K_{1,N}$ or a blue $K_{1,M}$.
+
+If at least $s$ components contain a red $K_{1,N}$, then choosing any $s$ of these components yields $s$ vertex-disjoint red stars each of size $N$.
+Since $N\ge n_i$ for every $i$, each such red $K_{1,N}$ contains a red copy of $K_{1,n_i}$ as a substar.
+Thus we can realize a red copy of $F_1$ (possibly after shrinking each red star to the required size).
+
+Otherwise, fewer than $s$ components contain a red $K_{1,N}$, so at least
+\[
+(s+t-1)-(s-1)=t
+\]
+components contain a blue $K_{1,M}$.
+Choosing any $t$ of them yields $t$ vertex-disjoint blue stars of size $M$, and since $M\ge m_j$ for all $j$, these contain a blue copy of $F_2$.
+
+Thus every colouring of $H$ yields a red $F_1$ or a blue $F_2$, so $\hat{R}(F_1,F_2)\le |E(H)|$.
+\qed
+
+5) VERIFICATION
+
+- Ambiguity: the formula in the problem statement uses $\sum_{k=2}^{s+2}$, which cannot depend on $t$; the corrected plausible upper limit is $s+t$. The solutions above explicitly separate this issue.
+
+- Lemma 561.1: upper bound is a direct pigeonhole on the star centre.
+For the lower bound, the greedy colouring maintains degree constraints and cannot get stuck because that would force at least $a+b-1$ edges, contradicting $|E(H)|\le a+b-2$.
+
+- Lemma 561.2: components are vertex-disjoint, so assembling disjoint stars is immediate; shrinking a $K_{1,N}$ to $K_{1,n_i}$ is valid because the star subgraph is obtained by selecting $n_i$ incident edges.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result:
+- Exact evaluation for the base case $\hat{R}(K_{1,a},K_{1,b})=a+b-1$ (Lemma 561.1).
+- A general explicit upper bound $\hat{R}(F_1,F_2)\le (s+t-1)(N+M-1)$ for arbitrary star forests (Lemma 561.2).
+
+(ii) First gap (crisp):
+Prove (or disprove) the full diagonal-max formula
+\[
+\hat{R}(F_1,F_2)=\sum_{k=2}^{s+t} \max\{n_i+m_j-1:\ i+j=k\},
+\]
+and reconcile it with the apparent typo $\sum_{k=2}^{s+2}$ in the literal statement.
+
+(iii) Top 3 next moves:
+1. Attempt an inductive proof on $s+t$ for star-forest Ramsey graphs restricted to being star forests, using Lemma 561.1 as the base and a ``split off one star'' recursion.
+2. Prove a matching lower bound for the RHS by showing any graph with fewer than $\sum \ell_k$ edges admits a 2-colouring avoiding both $F_1$ and $F_2$; this likely needs a degree-sequence majorization argument tailored to $(n_i)$ and $(m_j)$.
+3. Compute small nontrivial instances (e.g. $(s,t)=(2,2)$ with small $(n_1,n_2,m_1,m_2)$) by exhaustive search over host graphs to test the formula and identify extremal host graph shapes.
+
+(iv) Minimal counterexample structure:
+A minimal counterexample to the claimed equality would likely have small $(s,t)$ (e.g. $(2,2)$) and moderately unbalanced star sizes, with a host graph that is not itself a star forest (perhaps with shared leaves allowing re-use across components) beating the diagonal-sum edge count. Conversely, if the formula is true, a minimal extremal host graph should be a star forest with component sizes exactly $\ell_k$ edges admitting a 2-colouring avoiding both. Extremal cases likely occur when the maxima $\ell_k$ are achieved by different $(i,j)$ pairs along different diagonals, forcing nontrivial assignment issues.
+

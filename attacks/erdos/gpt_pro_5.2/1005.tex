@@ -1,0 +1,100 @@
+% Erdos Problem #1005
+
+1) FORMAL RESTATEMENT
+
+Fix an integer n>=4. Let F_n be the Farey sequence of order n: the list of all reduced fractions a/b in [0,1] with 0<=a<=b<=n and gcd(a,b)=1, arranged in increasing numerical order. Write this sequence as
+  a_1/b_1 < a_2/b_2 < ... < a_M/b_M.
+Define f(n) to be the largest integer f with the property:
+  for all indices 1<=k<l<=M with l-k <= f, one has (a_k - a_l)(b_k - b_l) >= 0.
+Equivalently: any two Farey fractions within index-distance <= f are "similarly ordered", meaning the ordering of numerators agrees with the ordering of denominators (allowing ties).
+Question: estimate f(n). In particular, does there exist a constant c>0 such that f(n) = (c+o(1)) n?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+Only what is explicitly stated in the provided problem file:
+- Mayer proved f(n) -> infinity as n -> infinity.
+- Erdos proved f(n) is bounded below by a positive constant times n (written f(n) >> n).
+- van Doorn proved (1/12 - o(1)) n <= f(n) <= (1/4) n + O(1), and conjectures the upper bound is asymptotically optimal.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Use elementary Farey properties (mediants, density, local denominator constraints) to bound how quickly an inversion (a increases while b decreases) can occur.
+- Try to locate the minimal inversion distance explicitly and relate it to the geometry of visible lattice points.
+
+Disproof/construction ideas:
+- Produce explicit short-distance inversions to get upper bounds; produce long inversion-free neighborhoods to get lower bounds.
+
+I focus on rigorous local lemmas + exact computations to understand the constant.
+
+4) WORK
+
+FAST REALITY CHECK (exact computations)
+
+I computed f(n) exactly by generating the Farey sequence F_n and searching the smallest index-distance d for which an inversion pair occurs; then f(n)=d-1.
+The results for selected n are:
+- f(100)=26 (ratio 0.26)
+- f(150)=39 (ratio 0.26)
+- f(200)=51 (ratio 0.255)
+- f(300)=76 (ratio about 0.25333)
+- f(400)=101 (ratio 0.2525)
+- f(500)=126 (ratio 0.252)
+For small n:
+- f(4)=2, f(5)=3, f(6)=3, f(7)=4, f(8)=3, f(9)=3, f(10)=4.
+These ratios trending toward about 0.25 match the stated (1/4)n+O(1) upper bound and its conjectured optimality.
+
+Lemma 1005.1 (denominator-sum obstruction for consecutive terms).
+Let a/b < c/d be consecutive terms in the Farey sequence F_n (order n). Then b+d > n.
+
+Proof.
+Consider the mediant fraction (a+c)/(b+d). It satisfies
+  a/b < (a+c)/(b+d) < c/d
+for all positive denominators b,d (a standard cross-multiplication check).
+If b+d <= n, then (a+c)/(b+d) reduces to some fraction p/q in lowest terms with q dividing b+d, hence q <= b+d <= n. Therefore p/q is a reduced fraction in [0,1] with denominator <=n lying strictly between a/b and c/d, contradicting that a/b and c/d are consecutive in F_n.
+Hence b+d > n.  QED.
+
+Lemma 1005.2 (consecutive Farey fractions are always similarly ordered).
+Let a/b < c/d be consecutive terms in F_n. Then (a-c)(b-d) >= 0.
+Equivalently, one cannot have a<c and b>d for consecutive terms.
+
+Proof.
+Assume for contradiction that a/b < c/d are consecutive and that a<c but b>d.
+Then comparing fractions with the same denominator b gives a/b < c/b (since a<c).
+Comparing fractions with the same numerator c gives c/b < c/d (since b>d implies 1/b < 1/d).
+Therefore
+  a/b < c/b < c/d.
+The fraction c/b reduces to some reduced fraction p/q with q <= b. Since b <= n (because b is a denominator in F_n), we have q <= n, so p/q is a term of F_n. It lies strictly between a/b and c/d, contradicting consecutivity.
+Thus the pattern a<c and b>d is impossible for consecutive terms, hence (a-c)(b-d) >= 0 must hold.
+QED.
+
+Consequence.
+Lemma 1005.2 immediately implies f(n) >= 1 for all n>=1, since all pairs at distance 1 are similarly ordered. Of course the problem concerns the true growth rate f(n) ~ c n.
+
+5) VERIFICATION
+
+- Lemma 1005.1: the only subtlety is that the mediant may not be reduced, but reducing cannot increase the denominator, so the reduced form still has denominator <= b+d.
+- Lemma 1005.2: checked that the reduced form of c/b has denominator <= b, and b<=n holds because a/b is in F_n.
+- Computation: the algorithm that searches the smallest inversion-distance d is correct because the defining property of f(n) is "all inversion pairs have distance >= f(n)+1".
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Two clean, fully proved local structural facts about F_n: consecutive denominators satisfy b+d>n (Lemma 1005.1), and every consecutive pair is similarly ordered (Lemma 1005.2).
+- Exact computed values of f(n) up to n=500, showing ratios near 0.252 and apparently drifting toward 0.25.
+
+(ii) First gap (crisp).
+Prove an asymptotic f(n) = (c+o(1)) n and identify the constant c (in particular, prove or refute c=1/4).
+
+(iii) Top 3 next moves.
+1. Computation: extend exact computations of f(n) to larger n (say n up to several thousand) using the minimal-distance search to estimate the limiting constant and to identify which inversion pairs realize the minimum.
+2. Structure: classify the "first inversion" pairs (k,l) that attain distance f(n)+1 in terms of Diophantine relations among a_k/b_k and a_l/b_l; attempt to pin down an explicit infinite family of near-extremal inversions giving the 1/4 upper bound.
+3. Geometry: reinterpret the Farey fractions as primitive lattice points (b,a) in the triangle 0<=a<=b<=n sorted by slope a/b, and study how long the slope-ordered list can avoid coordinate inversions; seek a convex-geometry argument yielding the sharp constant.
+
+(iv) What a minimal counterexample would likely look like.
+If the conjectured constant c=1/4 is not optimal, then either:
+- there exist infinitely many n where f(n) <= (1/4 - eps)n for some eps>0 (so one needs a systematically shorter inversion distance), or
+- there exist infinitely many n where f(n) >= (1/4 + eps)n (so one needs a uniformly longer inversion-free window). In both cases, the minimal inversion pairs would need a describable arithmetic pattern among denominators near n/2.
+
+

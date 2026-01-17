@@ -1,0 +1,179 @@
+% Erdos Problem #585
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+
+For $n\ge 1$, let $m(n)$ be the maximum number of edges in a simple undirected graph $G$ on $n$ vertices with the following forbidden configuration:
+
+There do not exist two cycles $C_1,C_2\subseteq G$ such that
+\[
+V(C_1)=V(C_2)\quad\text{and}\quad E(C_1)\cap E(C_2)=\varnothing.
+\]
+(Each $C_i$ is a simple cycle; equality of vertex sets means each is a Hamilton cycle on that vertex set.)
+
+Question: determine/estimate the growth of $m(n)$.
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+
+I will not use any literature beyond what is explicitly quoted in the problem statement: a construction with $\gg n\log\log n$ edges and an upper bound $n(\log n)^{O(1)}$ are mentioned there.
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+
+\emph{Proof-track ideas.}
+(1) Identify small unavoidable subgraphs: show that high density forces two edge-disjoint cycles on some vertex set.
+(2) Try Tur\'an-type reductions: show the forbidden configuration implies forbidding some complete graph or other dense pattern, yielding an $O(n^2)$ upper bound.
+
+\emph{Disproof/construction track ideas.}
+(1) Explicit sparse constructions with no $4$-regular subgraphs (as referenced in the problem statement) plausibly avoid the forbidden configuration.
+(2) For small $n$, brute force compute $m(n)$ exactly to understand the finite extremals.
+
+Here I only prove easy structural upper bounds (quadratic) and compute $m(n)$ for $n\le 7$.
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 585.1 (vacuity for $n\le 4$ and exact small $n$ behavior).}
+If $n\le 4$, then no graph on $n$ vertices contains two edge-disjoint cycles with the same vertex set.
+Consequently $m(n)=\binom n2$ for $n\le 4$.
+If $n=5$, then the forbidden configuration occurs if and only if $G\cong K_5$, hence $m(5)=9$.
+
+\noindent\emph{Proof.}
+A cycle uses at least $3$ vertices.
+If $n\le 4$, then the only possible vertex sets of cycles have size $3$ or $4$.
+On $3$ vertices the complete graph has only $3$ edges, so it cannot contain two edge-disjoint $3$-cycles (which would require $6$ edges).
+On $4$ vertices there are at most $6$ edges, while two edge-disjoint $4$-cycles would require $8$ distinct edges; impossible.
+Thus the forbidden configuration cannot occur for $n\le 4$, so the complete graph $K_n$ is allowed and $m(n)=\binom n2$.
+
+For $n=5$, any cycle with vertex set of size $5$ is a $5$-cycle using $5$ edges.
+Two edge-disjoint $5$-cycles on the same vertex set would require $10$ distinct edges.
+But $10$ is the total number of edges on $5$ vertices, so such a pair exists if and only if the induced subgraph on those $5$ vertices is $K_5$, i.e. $G$ contains a $K_5$ subgraph. Since $n=5$, that means $G\cong K_5$.
+Therefore, among $5$-vertex graphs, exactly $K_5$ is forbidden, so the maximum allowed edge count is $9$.
+\qed
+
+\bigskip
+\noindent\textbf{Lemma 585.2 ($K_5$ forces the forbidden configuration; Tur\'an bound for $K_5$-free graphs).}
+The complete graph $K_5$ contains two edge-disjoint cycles with the same vertex set.
+Therefore, any graph $G$ counted by $m(n)$ is $K_5$-free.
+Moreover, any $K_5$-free graph on $n$ vertices has at most
+\[
+\left\lfloor \frac{3n^2}{8}\right\rfloor
+\]
+edges.
+
+\noindent\emph{Proof (two parts).}
+
+\emph{Part A: $K_5$ contains two edge-disjoint $5$-cycles on the same vertex set.}
+Label the vertices of $K_5$ by $0,1,2,3,4$.
+Consider the two cycles
+\[
+C_1: 0-1-2-3-4-0,\qquad
+C_2: 0-2-4-1-3-0.
+\]
+Their edge sets are
+\[
+E(C_1)=\{01,12,23,34,40\},\qquad
+E(C_2)=\{02,24,41,13,30\}.
+\]
+These are disjoint sets of edges, and both cycles use all five vertices.
+Hence $K_5$ contains the forbidden configuration.
+Thus any graph without the forbidden configuration must be $K_5$-free.
+
+\emph{Part B: $K_5$-free graphs have at most $\lfloor 3n^2/8\rfloor$ edges (a self-contained Tur\'an argument for $r=4$).}
+Let $G$ be a $K_5$-free graph on $n$ vertices with the maximum possible number of edges.
+We first show that $G$ must be complete multipartite, and then that it has at most $4$ parts.
+
+\emph{Step 1 (Zykov symmetrization to get a complete multipartite graph).}
+Suppose there exist two nonadjacent vertices $u\ne v$ with different neighborhoods: $N(u)\ne N(v)$.
+Construct a new graph $G'$ on the same vertex set by deleting all edges incident to $u$ and then joining $u$ to exactly the vertices in $N(v)$.
+Equivalently, $u$ becomes a ``clone'' of $v$ (they have identical neighborhoods).
+
+Claim: $e(G')\ge e(G)$.
+Indeed, the new degree of $u$ equals $\deg_G(v)$.
+Since $u$ and $v$ were nonadjacent and neighborhoods differ, we have either $\deg_G(v)>\deg_G(u)$ or $\deg_G(v)<\deg_G(u)$.
+If $\deg_G(v)\ge \deg_G(u)$ then cloning cannot decrease edges.
+If $\deg_G(v)<\deg_G(u)$ we instead clone $v$ to $u$.
+In either case, we can perform a cloning operation on some nonadjacent pair without decreasing the edge count.
+
+Claim: $G'$ remains $K_5$-free.
+Any $K_5$ in $G'$ that does not include $u$ would already be a $K_5$ in $G$.
+If a $K_5$ in $G'$ includes $u$, then the other four vertices must all lie in $N_{G'}(u)=N_G(v)$.
+Those four vertices form a $K_4$ in $G'[N_G(v)]$, hence also in $G[N_G(v)]$.
+But then in $G$, the vertex $v$ together with that $K_4$ would form a $K_5$, contradiction.
+So $G'$ is $K_5$-free.
+
+By repeating this operation, we obtain a $K_5$-free graph with at least as many edges as $G$ in which every pair of nonadjacent vertices have identical neighborhoods.
+In such a graph, ``nonadjacent'' is an equivalence relation: if $x$ is nonadjacent to $y$, then $N(x)=N(y)$, and then any $z$ nonadjacent to $y$ has $N(z)=N(y)$, hence $z$ is also nonadjacent to $x$.
+Thus the vertex set partitions into independent sets (equivalence classes), and vertices from different classes are adjacent to each other.
+Therefore the graph is complete multipartite.
+
+\emph{Step 2 (at most four parts).}
+If a complete multipartite graph has at least $5$ parts, then choosing one vertex from each of five parts yields a $K_5$ (since all cross edges are present).
+Hence a $K_5$-free complete multipartite graph has at most $4$ parts.
+So $G$ is a complete $4$-partite graph with part sizes $n_1,n_2,n_3,n_4$ summing to $n$ (allowing some $n_i=0$).
+Its number of edges is
+\[
+ e(G)=\sum_{1\le i<j\le 4} n_i n_j
+ =\frac12\left(\left(\sum_{i=1}^4 n_i\right)^2-\sum_{i=1}^4 n_i^2\right)
+ =\frac12\left(n^2-\sum_{i=1}^4 n_i^2\right).
+\]
+To maximize $e(G)$ for fixed $n$, we must minimize $\sum n_i^2$.
+A standard convexity/averaging argument shows that $\sum n_i^2$ is minimized when the $n_i$ are as equal as possible: if $n_i\ge n_j+2$, then replacing $(n_i,n_j)$ by $(n_i-1,n_j+1)$ decreases the sum of squares because
+\[
+(n_i-1)^2+(n_j+1)^2-(n_i^2+n_j^2)= -2(n_i-n_j)+2<0.
+\]
+Iterating, we reach a balanced partition with $n_i\in\{\lfloor n/4\rfloor,\lceil n/4\rceil\}$.
+In that balanced case one checks directly that
+\[
+\sum_{i=1}^4 n_i^2\ge 4\left(\frac n4\right)^2=\frac{n^2}{4}
+\]
+(with equality when $4\mid n$).
+Hence
+\[
+ e(G)=\frac12\left(n^2-\sum n_i^2\right)\le \frac12\left(n^2-\frac{n^2}{4}\right)=\frac{3n^2}{8}.
+\]
+Since $e(G)$ is an integer, $e(G)\le\lfloor 3n^2/8\rfloor$.
+\qed
+
+\bigskip
+\noindent\textbf{Fast reality check (exact values for $n\le 7$ by brute force).}
+
+I exhaustively enumerated all graphs on $n\le 7$ labeled vertices and tested whether they contain two edge-disjoint cycles with the same vertex set.
+The resulting exact maxima are:
+\[
+\begin{array}{c|ccccccc}
+ n & 1&2&3&4&5&6&7\\\hline
+ m(n) & 0&1&3&6&9&12&16
+\end{array}
+\]
+An example achieving $m(6)=12$ is $K_6$ with the triangle on vertices $\{3,4,5\}$ deleted.
+An example achieving $m(7)=16$ is $K_7$ with the five edges
+$\{25,26,34,36,45\}$ deleted (in the vertex labeling $0,1,2,3,4,5,6$).
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+
+\emph{Lemma 585.2 Part A.} The two $5$-cycles listed are easily checked to be edge-disjoint and spanning.
+
+\emph{Lemma 585.2 Part B.} The symmetrization step preserves $K_5$-freeness because any $K_5$ using the cloned vertex would imply a $K_4$ inside a neighborhood, which would create a $K_5$ with the original vertex.
+The balancing step uses an explicit decrease in sum of squares and is therefore rigorous.
+
+\emph{Computation.} The brute force check treated the forbidden configuration as: there exists a vertex subset $S$ such that the induced subgraph on $S$ contains two edge-disjoint Hamilton cycles. It is exact for $n\le 7$.
+
+\bigskip
+\noindent\textbf{FINAL.}
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: any graph avoiding the forbidden configuration is $K_5$-free and hence has at most $\lfloor 3n^2/8\rfloor$ edges (Lemma 585.2). Exact values are computed for $n\le 7$ with $m(7)=16$.
+
+(ii) First gap (crisp): improve the crude quadratic upper bound to match the known near-linear (polylog) upper bounds, i.e. prove $m(n)=o(n^2)$ (or even $m(n)=n(\log n)^{O(1)}$) without importing heavy machinery.
+
+(iii) Top 3 next moves:
+1. Find a purely combinatorial mechanism forcing two edge-disjoint Hamilton cycles on some vertex set once $e(G)$ exceeds $Cn\log^C n$.
+2. Strengthen the ``$K_5$-free'' observation: identify a much sparser forbidden family implied by the two-cycle condition and prove a sharp extremal bound for that family.
+3. Computation: for $n=8,9$ (where full enumeration is too large), use SAT/ILP or backtracking to search for dense examples and guess the extremal structure.
+
+(iv) Minimal counterexample structure (to a conjectured near-linear upper bound): would be a graph with $\omega(n)$ edges but arranged so that every vertex subset supporting a Hamilton cycle supports at most one edge-disjoint Hamilton cycle; heuristically this suggests avoiding any reasonably regular dense subgraph, e.g. graphs engineered to have no $4$-regular subgraphs on any vertex set.
+
+

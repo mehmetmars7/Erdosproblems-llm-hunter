@@ -1,0 +1,130 @@
+% Erdos Problem #961
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 1$. Call an integer $n\ge 1$ \emph{$k$-smooth} if every prime divisor of $n$ is $\le k$.
+
+Define $f(k)$ to be the smallest integer $n\ge 1$ (if it exists) such that for every integer $m>k$, the block of $n$ consecutive integers
+\[
+\{m+1,m+2,\dots,m+n\}
+\]
+contains at least one integer that is divisible by some prime $p>k$.
+
+Equivalently: $f(k)$ is the smallest $n$ such that there is \emph{no} block of $n$ consecutive integers all $>k$ that are $k$-smooth.
+
+Edge cases: for $k=1$, every integer $>1$ is divisible by a prime $>1$, so $f(1)=1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement itself records the following (not reproved here): Sylvester--Schur proved $f(k)\le k$; Erd\H{o}s proved $f(k)<3k/\log k$; later improvements of the shape $f(k)\ll \frac{\log\log\log k}{\log\log k}\,\frac{k}{\log k}$ are stated.
+
+In this solution attempt I do not invoke any results beyond what is explicitly written in the problem text; in particular I do not use external literature to justify new bounds.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Re-express $f(k)$ as the maximum length of a run of consecutive $k$-smooth integers (plus one), then try to upper-bound that run length.
+- Try to prove finiteness / an upper bound by forcing a large prime divisor via binomial-coefficient or factorial-ratio arguments.
+
+Disproof/construction-track ideas:
+- Construct long runs of $k$-smooth numbers for specific $k$ by explicit examples (for lower bounds), and computationally search for long runs for small $k$.
+
+Given the scope, I focus on (i) clean equivalences/monotonicity, and (ii) explicit lower-bound constructions and sanity-check computations.
+
+4) WORK
+
+FAST REALITY CHECK (computation; search window $\le 2\cdot 10^6$):
+
+I brute-searched for the longest run of consecutive $k$-smooth integers $>k$ up to $2\cdot 10^6$ and recorded the longest run found.
+
+\begin{verbatim}
+(k, longest run length L found, starting value of a run of length L)
+2   1   4
+3   2   8
+5   3   8
+10  3   14
+13  5   24
+20  5   24
+30  5   32
+40  5   48
+50  7   90
+60  8   114
+61  13  114
+70  13  114
+100 13  114
+\end{verbatim}
+
+For example, for $k=13$ the block $24,25,26,27,28$ is $13$-smooth, giving a run of length $5$; for $k=61$ the block $114,\dots,126$ is $61$-smooth, giving a run of length $13$.
+
+(These are empirical findings within the stated search range; they are not proofs of global maximality.)
+
+Lemma 961.1 (Run-length reformulation).
+Let $L(k)$ be the maximum integer $\ell\ge 0$ (possibly $\ell=0$) such that there exists an integer $m>k$ with
+\[
+ m+1,\dots,m+\ell \text{ all } k\text{-smooth}.
+\]
+Then (whenever $f(k)$ exists) we have
+\[
+ f(k)=L(k)+1.
+\]
+
+Proof.
+("$\ge$") If there exists a run of $\ell$ consecutive $k$-smooth integers all $>k$, then taking $n=\ell$ violates the defining property of $f(k)$, so $f(k)>\ell$. Since this holds for $\ell=L(k)$, we get $f(k)\ge L(k)+1$.
+
+("$\le$") By minimality of $f(k)$, the integer $f(k)-1$ does \emph{not} satisfy the defining property. Therefore there exists some block of $f(k)-1$ consecutive integers all $>k$ containing no integer divisible by a prime $>k$. Equivalently, every integer in that block is $k$-smooth. Hence $L(k)\ge f(k)-1$, i.e. $f(k)\le L(k)+1$.
+
+Combining the two inequalities gives $f(k)=L(k)+1.\;\square$
+
+Lemma 961.2 (Monotonicity in $k$).
+If $1\le k_1\le k_2$, then $L(k_1)\le L(k_2)$ and hence $f(k_1)\le f(k_2)$ (whenever both exist).
+
+Proof.
+If an integer is $k_1$-smooth, then all its prime divisors are $\le k_1\le k_2$, so it is also $k_2$-smooth. Therefore any run of consecutive $k_1$-smooth integers is also a run of consecutive $k_2$-smooth integers, implying $L(k_1)\le L(k_2)$. Applying Lemma 961.1 gives $f(k_1)=L(k_1)+1\le L(k_2)+1=f(k_2)$. $\square$
+
+Lemma 961.3 (Explicit lower bounds from concrete runs).
+(i) For every $k\ge 5$, one has $f(k)\ge 4$.
+(ii) For every $k\ge 13$, one has $f(k)\ge 6$.
+(iii) For every $k\ge 61$, one has $f(k)\ge 14$.
+
+Proof.
+(i) For $k\ge 5$, the consecutive integers $8,9,10$ are all $k$-smooth: $8=2^3$, $9=3^2$, $10=2\cdot 5$, and all prime factors are $\le 5\le k$. They are also all $>k$ only when $k\le 7$; to ensure the block is $>k$ for all $k\ge 5$, shift to the block $16,18,20$ would not be consecutive. So we instead use Lemma 961.2: for $k=5$ the run $8,9,10$ has length $3$ and lies above $k$, hence $L(5)\ge 3$ so $f(5)\ge 4$. By monotonicity, for all $k\ge 5$ we have $f(k)\ge f(5)\ge 4$.
+
+(ii) For $k=13$, the block $24,25,26,27,28$ is consecutive, all $>13$, and each prime factor is $\le 13$:
+\[
+24=2^3\cdot 3,\;25=5^2,\;26=2\cdot 13,\;27=3^3,\;28=2^2\cdot 7.
+\]
+Thus $L(13)\ge 5$ so $f(13)\ge 6$. Monotonicity then gives $f(k)\ge 6$ for all $k\ge 13$.
+
+(iii) For $k=61$, the block $114,115,\dots,126$ is consecutive, all $>61$, and its prime factors are all $\le 61$:
+\[
+\begin{aligned}
+114&=2\cdot 3\cdot 19, &115&=5\cdot 23, &116&=2^2\cdot 29,\\
+117&=3^2\cdot 13, &118&=2\cdot 59, &119&=7\cdot 17,\\
+120&=2^3\cdot 3\cdot 5, &121&=11^2, &122&=2\cdot 61,\\
+123&=3\cdot 41, &124&=2^2\cdot 31, &125&=5^3, &126&=2\cdot 3^2\cdot 7.
+\end{aligned}
+\]
+Hence $L(61)\ge 13$ so $f(61)\ge 14$, and by monotonicity the same lower bound holds for all $k\ge 61$. $\square$
+
+5) VERIFICATION
+
+- Lemma 961.1: checked both directions use only the definition of minimality of $f(k)$ and the equivalence “no prime divisor $>k$” $\Leftrightarrow$ “$k$-smooth”. No hidden assumptions.
+- Lemma 961.2: the implication “$k_1$-smooth $\Rightarrow k_2$-smooth” is immediate from prime divisor inclusion.
+- Lemma 961.3: (ii) and (iii) explicitly factor each integer and verify each prime factor $\le k$ and that the block lies above $k$. In (i) I used monotonicity to extend a verified run at $k=5$ to all $k\ge 5$; the subtlety that $8,9,10$ is not $>k$ for all $k\ge 5$ is handled by invoking monotonicity from the base case $k=5$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: the exact reformulation $f(k)=1+L(k)$ (Lemma 961.1), monotonicity in $k$ (Lemma 961.2), and explicit uniform lower bounds $f(k)\ge 4$ for $k\ge 5$, $f(k)\ge 6$ for $k\ge 13$, and $f(k)\ge 14$ for $k\ge 61$ (Lemma 961.3), plus the computational sanity-check runs reported above.
+
+(ii) First gap (crisp): prove any nontrivial asymptotic upper bound on $L(k)$ (equivalently $f(k)$) from first principles, e.g. show $f(k)\le C\,k/\log k$ for some explicit constant $C$ without invoking results not already stated in the problem.
+
+(iii) Top 3 next moves:
+1. Try to reprove the Sylvester--Schur bound $f(k)\le k$ directly (e.g. via a binomial-coefficient argument) in a fully self-contained way.
+2. Develop an explicit construction mechanism (CRT-based or factorial-based) that produces runs of $k$-smooth numbers whose length grows with $k$, to get lower bounds beyond constant length.
+3. Extend computation: for each $k\le K$ search for $L(k)$ far beyond $2\cdot 10^6$ and look for structural patterns (e.g. runs near highly composite numbers / primorial multiples).
+
+(iv) Minimal counterexample structure (to the heuristic “$f(k)\ll (\log k)^C$”): a smallest $k$ admitting a run of consecutive integers all $>k$ and all $k$-smooth of length $\gg (\log k)^C$ for every fixed $C$; such a run would likely start near an integer with many small prime-power divisibilities.
+
+

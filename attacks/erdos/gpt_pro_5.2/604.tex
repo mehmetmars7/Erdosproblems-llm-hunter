@@ -1,0 +1,128 @@
+% Erdos Problem #604
+% Solutions/partial progress file (auto-generated)
+
+1) FORMAL RESTATEMENT
+
+Let $A\subset\mathbb R^2$ be a set of $n\ge 2$ distinct points.
+For $x\in A$, define the \emph{pinned distance set}
+\[
+D(x):=\{\,\|x-y\|: y\in A,\ y\neq x\,\}
+\]
+and let $d(x):=|D(x)|$.
+The question asks whether one must have
+\[
+\exists x\in A\ \text{with}\ d(x)\gg n^{1-o(1)}
+\]
+(and perhaps even $d(x)\gg n/\sqrt{\log n}$).
+Here $f(n)\gg g(n)$ means there exists an absolute $c>0$ and $N$ such that for all $n\ge N$, $f(n)\ge c g(n)$; and $n^{1-o(1)}$ means: for every $\varepsilon>0$, $d(x)\ge c(\varepsilon)n^{1-\varepsilon}$ for all large $n$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+No web lookups performed. Using only what is stated in the problem file.
+- The integer grid example suggests the bound $\gg n/\sqrt{\log n}$ would be best possible.
+- The best bound recorded in the file is $\gg n^{c-o(1)}$ with $c\approx 0.864137$, attributed there to Katz--Tardos.
+- Erd\H{o}s conjectured (as recorded) that $\sum_{x\in A} d(x)\gg n^2/\sqrt{\log n}$.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Relate small $d(x)$ to many repeated distances from $x$, i.e. many isosceles triangles with apex $x$.
+- Express the total number of isosceles triangles via incidences between points and perpendicular bisectors.
+- Seek an upper bound on these incidences; any nontrivial upper bound on isosceles triangles would force a lower bound on some $d(x)$.
+
+Disproof/construction ideas:
+- Try structured point sets (integer grids, Cartesian products, points on circles) and compute $d(x)$ to see how small it can be.
+
+4) WORK
+
+(FAST REALITY CHECK via computation: integer grids)
+I computed $d(x)$ for $m\times m$ integer grids $A=\{0,1,\dots,m-1\}^2$ (so $n=m^2$), using squared distances.
+Exact outputs:
+- $m=10$ ($n=100$): $\min_x d(x)=19$, $\max_x d(x)=50$, average $\approx 37.24$.
+- $m=30$ ($n=900$): $\min_x d(x)=119$, $\max_x d(x)=381$, average $\approx 266.73$; the maximum value $381$ occurs at exactly $4$ grid points.
+(These are consistent with the heuristic $\max_x d(x)$ being on the order of $n/\sqrt{\log n}$ for grids.)
+
+Lemma 604.1 (small pinned-distance sets force many isosceles triangles).
+Let $A\subset\mathbb R^2$ have $|A|=n\ge 2$ and fix $x\in A$.
+For each distance value $r\in D(x)$, let
+\[
+t_r := |\{y\in A\setminus\{x\}: \|x-y\|=r\}|.
+\]
+Then $\sum_{r\in D(x)} t_r = n-1$.
+If $d(x)=|D(x)|\le D$, then the number $T_x$ of \emph{unordered} isosceles triangles with apex $x$,
+\[
+T_x := |\{\{y,z\}\subseteq A\setminus\{x\}: y\neq z,\ \|x-y\|=\|x-z\|\}|,
+\]
+satisfies
+\[
+T_x \ge d(x)\binom{\frac{n-1}{d(x)}}{2} \ge \binom{\left\lceil\frac{n-1}{D}\right\rceil}{2}.
+\]
+Consequently, if $d(x)\le D$ for all $x\in A$, the total number $T:=\sum_{x\in A} T_x$ satisfies
+\[
+T \ge n\binom{\left\lceil\frac{n-1}{D}\right\rceil}{2}.
+\]
+
+Proof.
+For fixed $x$, we have
+\[
+T_x = \sum_{r\in D(x)} \binom{t_r}{2}.
+\]
+The function $t\mapsto \binom{t}{2}=\frac{t(t-1)}{2}$ is convex for real $t\ge 0$.
+By Jensen's inequality applied to the multiset $(t_r)_{r\in D(x)}$ (or by the discrete smoothing argument: moving one unit of mass from a smaller $t_r$ to a larger one increases the sum), the sum $\sum_r \binom{t_r}{2}$ is minimised, subject to $\sum_r t_r=n-1$, when the $t_r$ are as equal as possible.
+In particular,
+\[
+\sum_{r\in D(x)} \binom{t_r}{2} \ge d(x)\binom{\frac{n-1}{d(x)}}{2}.
+\]
+If $d(x)\le D$ then $(n-1)/d(x)\ge (n-1)/D$, so at least one $t_r\ge \lceil (n-1)/D\rceil$ by pigeonhole, which yields
+$T_x=\sum_r\binom{t_r}{2}\ge \binom{\lceil (n-1)/D\rceil}{2}$.
+Summing over $x$ gives the claimed lower bound on $T$.
+\qed
+
+Lemma 604.2 (bisector incidence identity for isosceles triangles).
+Let $A\subset\mathbb R^2$ be finite.
+For two distinct points $y\neq z$ in $\mathbb R^2$, let $B(y,z)$ denote the perpendicular bisector line of the segment $yz$.
+Let $T^{\mathrm{ord}}$ be the number of \emph{ordered} isosceles triangles
+\[
+T^{\mathrm{ord}} := |\{(x,y,z)\in A^3: y\neq z,\ \|x-y\|=\|x-z\|\}|.
+\]
+Then
+\[
+T^{\mathrm{ord}} = \sum_{(y,z)\in A^2,\ y\neq z} |A\cap B(y,z)|.
+\]
+
+Proof.
+Fix an ordered pair $(y,z)$ with $y\neq z$.
+A point $x\in\mathbb R^2$ satisfies $\|x-y\|=\|x-z\|$ if and only if $x$ lies on the perpendicular bisector $B(y,z)$ (this is the standard characterisation of bisectors in Euclidean geometry).
+Therefore, for fixed $(y,z)$, the number of points $x\in A$ forming an ordered isosceles triangle $(x,y,z)$ is exactly $|A\cap B(y,z)|$.
+Summing over all ordered pairs $(y,z)$ with $y\neq z$ yields the identity.
+\qed
+
+5) VERIFICATION
+
+- Lemma 604.1: checked extremes. If $d(x)=n-1$, then $t_r=1$ for all $r$ and $T_x=0$; the bound gives $d\binom{(n-1)/d}{2}=(n-1)\binom{1}{2}=0$.
+If $d(x)=1$, then all $n-1$ points lie on one circle around $x$, so $T_x=\binom{n-1}{2}$; the bound gives $1\cdot\binom{n-1}{2}$.
+- Lemma 604.2: no degeneracy issues when $y\neq z$; the bisector line is well-defined.
+- Computation sanity: in $2\times 2$ grid ($n=4$), each point has distances $1$ and $\sqrt2$, so $d(x)=2$ for all $x$, matching output.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result:
+A reduction: if every point has $d(x)\le D$, then the configuration must determine at least $n\binom{\lceil (n-1)/D\rceil}{2}$ isosceles triangles (Lemma 604.1), and the total number of ordered isosceles triangles equals a perpendicular-bisector incidence sum (Lemma 604.2).
+
+(ii) First gap (crisp statement):
+Prove a nontrivial upper bound on
+$\sum_{(y,z)\in A^2,\ y\neq z} |A\cap B(y,z)|$
+valid for all $n$-point sets $A\subset\mathbb R^2$ that is strong enough to force $\max_x d(x)\gg n^{1-o(1)}$ (or $\gg n/\sqrt{\log n}$).
+
+(iii) Top 3 next moves:
+1. For candidate extremal sets (integer grids, Cartesian products, points on circles), compute/estimate both $\max_x d(x)$ and the bisector-incidence sum to see what upper bounds are plausible.
+2. Target a lemma of the form: most bisector lines contain $O(1)$ points of $A$, with only few exceptional lines; then sum and combine with Lemma 604.1.
+3. Try to bound the number of pairs $(y,z)$ that share the same bisector line, and/or exploit that many pairs forcing the same bisector suggests strong additive structure.
+
+(iv) Minimal counterexample structure (if the strongest conjecture $\gg n/\sqrt{\log n}$ is false):
+A counterexample would be a sequence of sets $A_n$ with $|A_n|=n$ such that \emph{every} $x\in A_n$ has $d(x)=o(n/\sqrt{\log n})$.
+By Lemma 604.1, such a set would generate \emph{superquadratically} many isosceles triangles, hence would have many points lying on many shared perpendicular bisectors (strong global structure, plausibly lattice-like).
+
+

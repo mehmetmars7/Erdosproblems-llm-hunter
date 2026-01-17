@@ -1,0 +1,98 @@
+% Erdos Problem #962
+
+1) FORMAL RESTATEMENT
+
+For an integer $n\ge 1$, define $k(n)$ to be the largest integer $k\ge 1$ such that there exists an integer $m\le n$ with the property that each of
+\[
+ m+1,\;m+2,\;\dots,\;m+k
+\]
+is divisible by at least one prime $p>k$.
+
+Equivalently, for each $i\in\{1,\dots,k\}$, the integer $m+i$ has a prime factor exceeding $k$.
+
+Edge case: $k(1)=1$ because taking $m=1$ gives $m+1=2$ divisible by a prime $2>1$, and $k\ge 2$ is impossible since $m+1=2$ is not divisible by a prime $>2$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records (not reproved here) a claimed Erd\H{o}s lower bound $k(n)\gg_\varepsilon \exp((\log n)^{1/2-\varepsilon})$ and a heuristic upper bound $k(n)=o(n^\varepsilon)$, and mentions an argument (attributed in the problem text to Tao) giving $k(n)\le (1+o(1))n^{1/2}$, plus a stated lower bound due to Tang.
+
+In this solution attempt I do not invoke any results beyond what is explicitly written in the problem text.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Translate the condition into constraints on prime divisors $>k$ across the block, especially using the fact that a prime $>k$ cannot divide two different numbers among $k$ consecutive integers.
+- Use those constraints to get elementary necessary conditions (e.g. on $m$ relative to $k$), and attempt to turn them into upper bounds on $k(n)$.
+
+Construction-track ideas:
+- For small $n$, brute force search for the maximizing $(m,k)$ to get a feel for growth.
+
+4) WORK
+
+FAST REALITY CHECK (computation; exact for the searched ranges):
+
+I brute-forced $k(n)$ for selected $n$ by searching all $m\le n$ and all $k$ up to $3n$ (this upper cutoff did not change the optimum for the reported $n$).
+
+\begin{verbatim}
+(n, k(n), an m achieving it)
+10   2   4
+20   4   18
+50   4   18
+100  6   64
+200  9   150
+500  12  405
+1000 14  735
+
+First n where k(n) increases:
+1 -> k=1 (m=1)
+4 -> k=2 (m=4)
+12 -> k=3 (m=12)
+18 -> k=4 (m=18)
+54 -> k=5 (m=54)
+64 -> k=6 (m=64)
+112 -> k=7 (m=112)
+150 -> k=9 (m=150)
+\end{verbatim}
+
+Lemma 962.1 (Large primes cannot repeat within the block).
+Assume $m,k$ satisfy Lemma 962's defining property. If a prime $p>k$ divides $m+i$ and $m+j$ for some $1\le i<j\le k$, then this is impossible. Consequently, each prime $p>k$ can divide at most one of the integers $m+1,\dots,m+k$.
+
+Proof.
+If $p\mid (m+i)$ and $p\mid (m+j)$ then $p\mid (m+j)-(m+i)=j-i$. But $1\le j-i\le k-1<k<p$, so the only multiple of $p$ in this range is $0$, contradiction. Therefore no such pair $i<j$ exists, and a prime $>k$ divides at most one member of the block. $\square$
+
+Lemma 962.2 (A necessary condition: $m\ge k$).
+If there exist integers $m,k$ with $m+1,\dots,m+k$ each divisible by some prime $>k$, then necessarily $m\ge k$.
+
+Proof.
+For each $i\in\{1,\dots,k\}$ pick a prime $p_i>k$ dividing $m+i$. By Lemma 962.1 the primes $p_1,\dots,p_k$ are pairwise distinct. Thus $\{p_1,\dots,p_k\}$ is a set of $k$ distinct integers each $>k$, so its minimum possible value (as a multiset of integers) is at least $\{k+1,k+2,\dots,2k\}$ after ordering. In particular, for each $i$ we have $p_i\ge k+1$ and hence $m+i\ge p_i\ge k+1$. Taking $i=1$ gives $m+1\ge k+1$, i.e. $m\ge k$.
+
+(Equivalently, since the interval $(k,m+k]$ has length $m$ and would have to contain $k$ distinct primes $>k$, one must have $m\ge k$.) $\square$
+
+Corollary 962.3 (Trivial upper bound $k(n)\le n$).
+For every $n\ge 1$, $k(n)\le n$.
+
+Proof.
+If $k(n)\ge k$, there exists $m\le n$ witnessing the property for this $k$. Lemma 962.2 forces $k\le m\le n$, so $k\le n$. Taking the largest such $k$ gives $k(n)\le n$. $\square$
+
+5) VERIFICATION
+
+- Lemma 962.1: the key inequality is $j-i<k<p$, which holds since $1\le j-i\le k-1$ and $p>k$.
+- Lemma 962.2: the only substantive step is that $k$ distinct integers each $>k$ must include one $\ge k+1$; using $i=1$ suffices to deduce $m\ge k$.
+- Computations: the brute force checked all $m\le n$ and verified the condition for each $k$ tested; expanding the search cap from $n$ to $3n$ did not change the reported $k(n)$ for the displayed values.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: Lemma 962.1 (a prime $>k$ cannot divide two numbers in the block) and Lemma 962.2 (any witness must have $m\ge k$), yielding the unconditional bound $k(n)\le n$, plus exact small-$n$ computations listed above.
+
+(ii) First gap (crisp): prove any asymptotically nontrivial upper bound on $k(n)$ (e.g. $k(n)=o(n)$ or $k(n)\ll n^{1/2}$) without invoking results not already stated in the problem.
+
+(iii) Top 3 next moves:
+1. Strengthen Lemma 962.2 by exploiting additional structure of the congruences $m\equiv -i\pmod{p_i}$ with many distinct moduli $p_i>k$.
+2. Use computation to search for optimizing pairs $(m,k)$ for larger $n$ and look for patterns (e.g. $m$ highly composite), suggesting a constructive lower bound.
+3. Try to convert the “distinct primes” constraint into a quantitative limitation by bounding how many primes $>k$ can divide numbers in a length-$k$ interval near $m\le n$.
+
+(iv) Minimal counterexample structure (to the heuristic “$k(n)=o(n^\varepsilon)$ for all $\varepsilon>0$”): a smallest $n$ for which there exists a witness $(m,k)$ with $m\le n$ and $k\ge n^\varepsilon$, meaning a length-$k$ block where every integer has a prime factor exceeding $k$; Lemma 962.1 forces these large primes to be distinct across the block.
+
+

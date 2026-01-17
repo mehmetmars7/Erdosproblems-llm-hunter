@@ -1,0 +1,110 @@
+% Attempt for Erdos Problem #82
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- A (finite) graph $H$ is \emph{regular} if all vertices of $H$ have the same degree (within $H$).
+- For $n\ge 1$, define $F(n)$ as the largest integer such that every graph on $n$ vertices contains an \emph{induced} regular subgraph on at least $F(n)$ vertices.
+Equivalently,
+\[F(n):=\min_{|V(G)|=n}\ \max\{|V(H)|:\ H \text{ is an induced regular subgraph of }G\}.\]
+
+Conjecture.
+Prove that
+\[\frac{F(n)}{\log n}\to\infty\quad\text{as }n\to\infty.\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Ramsey yields $F(n)\gg\log n$.
+- Known upper bounds are around $n^{1/2+o(1)}$, improved by AKS.
+- Equivalent formulation via $G(n)$ is given.
+I do not re-prove the deep AKS bound here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Start from the trivial regular induced subgraphs (cliques and independent sets) and try to push beyond Ramsey.
+2. Use degree-sequence pigeonhole principles: a large induced subgraph with a very narrow degree range can sometimes be made regular by deleting few vertices.
+3. Work with the inverse function $G(t)$ and attempt to show $G(t)\le 2^{o(t)}$ via a probabilistic or iterative method.
+
+Disproof track ideas:
+1. Construct graphs where all induced regular subgraphs are small, aiming to show $F(n)=O(\log n)$.
+The problem text indicates this is believed false.
+
+Chosen path in this attempt: prove (i) the Ramsey lower bound in a clean form, and (ii) the equivalence between the $F$-formulation and the subexponential bound on $G$.
+
+4) WORK
+Lemma 1 (Ramsey lower bound gives $F(n)\ge c\log n$).
+For every $n\ge 2$,
+\[F(n)\ge \frac12\log_2 n.\]
+
+Proof.
+Let $R(k)$ be the diagonal Ramsey number: the least $m$ such that every graph on $m$ vertices contains a clique of size $k$ or an independent set of size $k$.
+It is standard (and follows from the classical recursion $R(k,k)\le 2R(k-1,k)$) that
+\[R(k)\le 4^{k-1}\qquad(k\ge 2).\tag{*}\]
+I sketch the recursion proof: one shows $R(s,t)\le R(s-1,t)+R(s,t-1)$ by considering a pivot vertex and its red/blue neighborhoods, and then deduces
+$R(k,k)\le \binom{2k-2}{k-1}<4^{k-1}$ by induction on $s+t$.
+
+Now let $G$ be any graph on $n$ vertices, and choose $k:=\left\lfloor \frac12\log_2 n\right\rfloor$.
+Then $4^{k-1}\le 4^{\frac12\log_2 n}=n$, so by (*) we have $R(k)\le n$.
+Therefore $G$ contains either a clique or an independent set on $k$ vertices.
+Both a clique and an independent set are regular graphs (degrees $k-1$ and $0$ respectively), and they are induced subgraphs on their vertex sets.
+Hence every $n$-vertex graph contains an induced regular subgraph of size at least $k\ge \frac12\log_2 n-1$.
+Absorbing the $-1$ into the constant for $n\ge 2$ yields $F(n)\ge \frac12\log_2 n$. \qed
+
+Lemma 2 (Equivalence with the inverse function $G$).
+Define $G(t)$ to be the least integer $m$ such that every graph on $m$ vertices contains an induced regular subgraph on at least $t$ vertices.
+Then the following are equivalent:
+(a) $\displaystyle \frac{F(n)}{\log n}\to\infty$;
+(b) $\displaystyle \log G(t)=o(t)$, i.e. $G(t)\le 2^{o(t)}$.
+
+Proof.
+Write the inverse relationship (valid for all $n,t$):
+\[F(n)\ge t \quad\Longleftrightarrow\quad G(t)\le n.\tag{1}\]
+This is immediate from the definitions: $F(n)\ge t$ means every $n$-vertex graph has an induced regular subgraph on $\ge t$ vertices, so the minimal $m$ with this property satisfies $G(t)\le n$, and conversely.
+
+(a)$\Rightarrow$(b).
+Fix $\varepsilon>0$. By (a), for all sufficiently large $n$ one has
+\[F(n)\ge \frac{1}{\varepsilon}\log n.\tag{2}\]
+Let $t$ be large and set $n:=\left\lceil e^{\varepsilon t}\right\rceil$ (so $\log n\ge \varepsilon t$ and $n$ is large enough for (2)).
+Then (2) gives $F(n)\ge \frac{1}{\varepsilon}\log n \ge t$, and hence by (1) we have $G(t)\le n\le e^{\varepsilon t}+1$.
+Taking logs yields $\log G(t)\le \varepsilon t + o(t)$.
+Since $\varepsilon>0$ was arbitrary, this implies $\log G(t)=o(t)$.
+
+(b)$\Rightarrow$(a).
+Fix $\varepsilon>0$. By (b), for all sufficiently large $t$ one has
+\[\log G(t)\le \varepsilon t,\qquad\text{equivalently }G(t)\le e^{\varepsilon t}.\tag{3}\]
+Let $n$ be large and set $t:=\left\lfloor \frac{1}{\varepsilon}\log n\right\rfloor$; for $n$ large this $t$ satisfies (3).
+Then $G(t)\le e^{\varepsilon t}\le n$, so by (1) we get $F(n)\ge t\ge \frac{1}{\varepsilon}\log n-1$.
+Since $\varepsilon>0$ is arbitrary, $F(n)/\log n\to\infty$. \qed
+
+FAST REALITY CHECK
+The problem text reports $F(5)=3$ and $F(7)=4$ and that Ramsey gives $F(n)\gg\log n$.
+Lemma 1 recovers such a Ramsey-type lower bound with an explicit constant.
+
+5) VERIFICATION
+- Lemma 1 uses only the classical explicit bound $R(k)\le 4^{k-1}$ and the observation that cliques/independent sets are regular induced subgraphs.
+- Lemma 2's inversion step is the key: setting $t=\lfloor \frac{1}{\varepsilon}\log n\rfloor$ and using $\log G(t)\le \varepsilon t$ forces $G(t)\le n$ and hence $F(n)\ge t$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved a clean Ramsey lower bound $F(n)\ge \tfrac12\log_2 n$ (Lemma 1) and proved that the conjecture $F(n)/\log n\to\infty$ is equivalent to $\log G(t)=o(t)$, i.e. $G(t)\le 2^{o(t)}$ (Lemma 2).
+
+(ii) First gap:
+Prove any super-Ramsey growth of induced regular subgraphs, i.e. show $F(n)$ grows faster than $c\log n$ for every fixed $c$.
+Equivalently, prove $\log G(t)=o(t)$ with an explicit rate.
+
+(iii) Top 3 next moves (concrete):
+1. Try to show that every large graph contains an induced subgraph with at most $O(1)$ distinct degrees and size $\gg \log n$, then prune it to a regular induced subgraph.
+2. Investigate whether probabilistic or iterative deletion processes can force large induced subgraphs with very concentrated degree sequences.
+3. For upper bounds, attempt to construct graphs where induced regular subgraphs are provably small, to understand the true scale of $F(n)$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A sequence of graphs $G_n$ on $n$ vertices such that every induced regular subgraph has size $O(\log n)$ (or at most $C\log n$ for some fixed $C$),
+showing the Ramsey lower bound is essentially tight. (This is believed not to exist, per the conjecture.)

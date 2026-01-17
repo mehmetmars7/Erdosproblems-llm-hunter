@@ -1,0 +1,210 @@
+% Erdos Problem #1095
+
+\medskip
+\noindent\textbf{FORMAL RESTATEMENT}
+
+\smallskip
+\noindent
+Fix an integer $k\ge 1$. Define
+\[
+ g(k)=\min\Big\{n\in\mathbb{Z}:\ n>k+1\ \text{and every prime divisor of }\binom{n}{k}\text{ is }>k\Big\}.
+\]
+Equivalently, $g(k)$ is the least $n>k+1$ such that
+\[
+\operatorname{lpf}\!\left(\binom{n}{k}\right)>k,
+\]
+or equivalently such that $\binom{n}{k}$ is not divisible by any prime $p\le k$.
+
+\smallskip
+\noindent
+Edge case: if no such $n$ existed, one could set $g(k)=\infty$; the problem statement (and the computations below) indicate $g(k)<\infty$ for each fixed $k$.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+\smallskip
+\noindent
+The problem text records several bounds and conjectures (Ecklund--Erd\H{o}s--Selfridge lower/upper bounds, conjecture $g(k)<L_k$ for large $k$, and conjectures about $\limsup g(k+1)/g(k)$ and $\liminf g(k+1)/g(k)$). Per the integrity rule for this task, I do not assert any additional literature beyond what is written in the problem file.
+
+\medskip
+\noindent\textbf{ATTACK PLAN}
+
+\smallskip
+\noindent
+\begin{itemize}
+\item Translate ``$p\mid\binom{n}{k}$'' into a clean digit condition modulo $p$ (Lucas' theorem), yielding a necessary-and-sufficient criterion for $\operatorname{lpf}(\binom{n}{k})>k$.
+\item Use that criterion to (i) prove $g(k)$ is finite with an explicit (very crude) upper bound via CRT, and (ii) compute $g(k)$ for small $k$ exactly as a sanity check.
+\end{itemize}
+
+\medskip
+\noindent\textbf{WORK}
+
+\smallskip
+\noindent\textbf{Lemma 1095.1 (Lucas congruence, proved).}
+Let $p$ be a prime. Write $n$ and $k$ in base $p$:
+\[
+ n=\sum_{i=0}^t n_i p^i,\qquad k=\sum_{i=0}^t k_i p^i,
+\]
+with digits $0\le n_i,k_i<p$. Then
+\[
+\binom{n}{k}\equiv \prod_{i=0}^t \binom{n_i}{k_i} \pmod p.
+\]
+(Here $\binom{a}{b}=0$ if $b>a$.)
+
+\smallskip
+\noindent\emph{Proof.}
+Work in the polynomial ring $\mathbb{F}_p[x]$. In characteristic $p$ we have the ``freshman's dream'' identity
+\[
+(1+x)^p \equiv 1+x^p \pmod p.
+\]
+Iterating, for each $i\ge 0$,
+\[
+(1+x)^{p^i} \equiv 1+x^{p^i} \pmod p.
+\]
+Now use the base-$p$ expansion of $n$:
+\[
+(1+x)^n=(1+x)^{\sum_i n_i p^i}=\prod_{i=0}^t (1+x)^{n_i p^i}=\prod_{i=0}^t \bigl((1+x)^{p^i}\bigr)^{n_i}.
+\]
+Reducing modulo $p$ and applying the previous congruence,
+\[
+(1+x)^n \equiv \prod_{i=0}^t (1+x^{p^i})^{n_i} \pmod p.
+\]
+Expand each factor:
+\[
+(1+x^{p^i})^{n_i}=\sum_{j=0}^{n_i} \binom{n_i}{j} x^{j p^i}.
+\]
+When multiplying these expansions over all $i$, the coefficient of $x^k$ comes from choosing, for each $i$, a term $x^{k_i p^i}$ so that the total exponent is $\sum_i k_i p^i=k$; this choice is unique because base-$p$ expansion is unique. The resulting coefficient is exactly $\prod_i \binom{n_i}{k_i}$. Therefore the coefficient of $x^k$ on the right-hand side is congruent to $\prod_i \binom{n_i}{k_i}\pmod p$.
+
+On the left-hand side, the coefficient of $x^k$ in $(1+x)^n$ is $\binom{n}{k}$. This proves the congruence. \qed
+
+\smallskip
+\noindent\textbf{Lemma 1095.2 (digit criterion for divisibility).}
+With notation as in Lemma 1095.1, we have
+\[
+ p\mid\binom{n}{k}\quad\Longleftrightarrow\quad \exists i\text{ such that }k_i>n_i.
+\]
+Equivalently, $p\nmid\binom{n}{k}$ if and only if every base-$p$ digit of $k$ is at most the corresponding digit of $n$.
+
+\smallskip
+\noindent\emph{Proof.}
+By Lemma 1095.1,
+\[
+\binom{n}{k}\equiv \prod_i \binom{n_i}{k_i} \pmod p.
+\]
+For each digit pair $(n_i,k_i)$ with $0\le n_i,k_i<p$, the integer $\binom{n_i}{k_i}$ lies in $\{0,1,\dots,\binom{p-1}{\lfloor (p-1)/2\rfloor}\}$, hence in particular it is an integer strictly smaller than $p$. Therefore $\binom{n_i}{k_i}\equiv 0\pmod p$ if and only if $\binom{n_i}{k_i}=0$ as an integer, which happens if and only if $k_i>n_i$.
+
+Thus the product is $0\pmod p$ if and only if at least one factor is $0\pmod p$, i.e. if and only if some $k_i>n_i$. \qed
+
+\smallskip
+\noindent\textbf{Lemma 1095.3 (explicit finiteness / CRT upper bound).}
+For each fixed $k\ge 1$, $g(k)<\infty$. More precisely, let $\mathcal{P}_k$ be the set of primes $p\le k$. For each $p\in\mathcal{P}_k$ choose an integer exponent $m_p\ge 1$ such that $p^{m_p}>k$, and define
+\[
+M:=\prod_{p\in\mathcal{P}_k} p^{m_p}.
+\]
+Then for every integer $t\ge 1$, the integer
+\[
+ n:=k+tM
+\]
+satisfies $n>k+1$ and $\operatorname{lpf}(\binom{n}{k})>k$. In particular,
+\[
+ g(k)\le k+M.
+\]
+
+\smallskip
+\noindent\emph{Proof.}
+Fix a prime $p\le k$. Because $p^{m_p}>k$, we have $k<p^{m_p}$. Consider $n=k+tM$. Since $p^{m_p}\mid M$, we have $n\equiv k\pmod{p^{m_p}}$, so we can write
+\[
+ n=k + p^{m_p}u
+\]
+for some integer $u$. Because $0\le k<p^{m_p}$, adding the multiple $p^{m_p}u$ does not affect the base-$p$ digits of $n$ in positions $0,1,\dots,m_p-1$: explicitly, the residue of $n$ modulo $p^{m_p}$ is exactly $k$, so the first $m_p$ base-$p$ digits of $n$ coincide with those of $k$.
+
+Now write $k$ in base $p$ as $k=\sum_{i=0}^{m_p-1} k_i p^i$ (possible because $k<p^{m_p}$), so all digits $k_i$ for $i\ge m_p$ are $0$. The base-$p$ expansion of $n$ has digits $n_i=k_i$ for $0\le i<m_p$, and some digits $n_i\in\{0,\dots,p-1\}$ for $i\ge m_p$. Therefore for every $i$ we have $k_i\le n_i$ (equality for $i<m_p$, and $k_i=0\le n_i$ for $i\ge m_p$).
+
+By Lemma 1095.2, this digitwise inequality implies $p\nmid \binom{n}{k}$.
+Since this holds for every prime $p\le k$, the binomial coefficient $\binom{n}{k}$ has no prime divisor $\le k$, i.e. all its prime factors are $>k$. This shows $n$ is admissible in the definition of $g(k)$, hence $g(k)\le n=k+tM$. Taking $t=1$ gives $g(k)\le k+M$.
+
+Finally, since $M\ge 2$ for $k\ge 2$, we have $n>k+1$ for all $t\ge 1$. For $k=1$, $\mathcal{P}_1=\emptyset$ and the statement is vacuous; directly, $g(1)=3$ from the computation below. \qed
+
+\smallskip
+\noindent\textbf{FAST REALITY CHECK (exact computation for $k\le 30$).}
+
+\smallskip
+\noindent
+I computed $g(k)$ for $1\le k\le 30$ by brute-force search in $n$ using $p$-adic valuations to test whether any prime $\le k$ divides $\binom{n}{k}$. The resulting values (together with $\operatorname{lpf}(\binom{g(k)}{k})$) are:
+\[
+\begin{array}{r|r|r}
+ k & g(k) & \operatorname{lpf}\!\left(\binom{g(k)}{k}\right) \\\hline
+ 1& 3& 3\\
+ 2& 6& 3\\
+ 3& 7& 5\\
+ 4& 7& 5\\
+ 5& 23& 7\\
+ 6& 62& 19\\
+ 7& 143& 11\\
+ 8& 44& 11\\
+ 9& 159& 11\\
+ 10& 46& 11\\
+ 11& 47& 13\\
+ 12& 174& 13\\
+ 13& 2239& 17\\
+ 14& 239& 17\\
+ 15& 719& 17\\
+ 16& 241& 17\\
+ 17& 5849& 19\\
+ 18& 2098& 19\\
+ 19& 2099& 23\\
+ 20& 43196& 23\\
+ 21& 14871& 23\\
+ 22& 19574& 23\\
+ 23& 35423& 29\\
+ 24& 193049& 31\\
+ 25& 2105& 29\\
+ 26& 36287& 29\\
+ 27& 1119& 29\\
+ 28& 284& 29\\
+ 29& 240479& 31\\
+ 30& 58782& 31
+\end{array}
+\]
+These values are visibly non-monotone (e.g. $g(10)=46<g(9)=159$ and $g(28)=284\ll g(24)=193049$).
+
+\medskip
+\noindent\textbf{VERIFICATION}
+
+\smallskip
+\noindent
+\begin{itemize}
+\item Lemma 1095.1 is verified by a coefficient extraction argument in $\mathbb{F}_p[x]$ using $(1+x)^{p^i}\equiv 1+x^{p^i}$.
+\item Lemma 1095.2 uses only the fact that for $0\le n_i<p$, $\binom{n_i}{k_i}$ is an integer $<p$, so being $0\bmod p$ is equivalent to being $0$.
+\item Lemma 1095.3: the only subtle point is ``no carry'' in base $p$ for the lowest $m_p$ digits. This is ensured because $k<p^{m_p}$, so $n\equiv k\pmod{p^{m_p}}$ forces the first $m_p$ digits to match those of $k$.
+\item Computational check: $g(k)$ was confirmed by testing all $n$ from $k+2$ upward until the first $n$ with $p\nmid\binom{n}{k}$ for all primes $p\le k$, and verifying that at $n=g(k)$ the least prime factor of $\binom{n}{k}$ indeed exceeds $k$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{UNRESOLVED}
+
+\smallskip
+\noindent
+(i) \emph{Strongest proved partial result here.}
+Lucas' congruence (Lemma 1095.1) gives an exact digitwise characterization (Lemma 1095.2) of when a given prime $p$ divides $\binom{n}{k}$. Using this, Lemma 1095.3 proves $g(k)<\infty$ for every fixed $k$ and provides an explicit (very crude) upper bound $g(k)\le k+M$ with $M=\prod_{p\le k}p^{m_p}$.
+Exact values of $g(k)$ were computed for $k\le 30$ (table above).
+
+\smallskip
+\noindent
+(ii) \emph{First gap (crisp).}
+Derive any sharp asymptotic estimate for $g(k)$ as $k\to\infty$ (even within a correct exponential scale), improving substantially on the CRT-type bound of Lemma 1095.3.
+
+\smallskip
+\noindent
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Optimize the CRT construction by choosing moduli that enforce the digit inequalities $k_i\le n_i$ for all primes $p\le k$ with much smaller combined modulus than $\prod_{p\le k}p^{m_p}$.
+\item Use the digit criterion to search for structured families of $(n,k)$ with $\operatorname{lpf}(\binom{n}{k})>k$ and attempt to translate ``many primes $p\le k$ simultaneously'' into a lower bound on $n$.
+\item Extend computations of $g(k)$ to larger $k$ to test proposed growth laws and to study the conjectured oscillations in $g(k+1)/g(k)$.
+\end{enumerate}
+
+\smallskip
+\noindent
+(iv) \emph{Minimal counterexample structure.}
+If a proposed upper bound of the form $g(k)\le \exp(Ck/\log k)$ were false, a ``minimal counterexample'' would be a $k$ for which every $n$ up to that scale fails the digit inequalities for at least one prime $p\le k$. In Lucas-theorem terms, this would mean that for each $n$ below the proposed bound, there exists some prime $p\le k$ and some digit position where $k$ has a digit exceeding the corresponding digit of $n$ in base $p$.
+

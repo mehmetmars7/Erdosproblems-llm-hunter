@@ -1,0 +1,146 @@
+% Erdos Problem #1049
+% URL: https://www.erdosproblems.com/1049
+
+1) FORMAL RESTATEMENT
+
+Let $t>1$ be a rational number.
+Define the Lambert series
+\[
+  S(t):=\sum_{n=1}^\infty \frac{1}{t^n-1}.
+\]
+The problem states the identity
+\[
+  S(t)=\sum_{n=1}^\infty \frac{\tau(n)}{t^n},
+\]
+where $\tau(n)$ is the number of positive divisors of $n$.
+Question: Is $S(t)$ irrational for every rational $t>1$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided text states this is a conjecture of Chowla, and that Erd\H{o}s proved irrationality when
+$t\ge 2$ is an integer. I will not assume Erd\H{o}s' proof; instead I give partial structural lemmas
+and identify the precise blocker to completing an irrationality proof.
+
+3) ATTACK PLAN
+
+Proof track:
+- Prove the divisor-sum identity rigorously from geometric series (Lemma 4.1).
+- Try to adapt a base-$t$ (or base-$b$) digit-block argument: produce long stretches where the
+  coefficients $\tau(n)$ have large divisibility properties to force zeros in an expansion.
+
+Disproof track:
+- Attempt to find a rational $t>1$ with algebraic relations that might cause telescoping or known
+  rationality; attempt numerical recognition for small rationals (fast check).
+
+4) WORK
+
+FAST REALITY CHECK (numerics)
+
+Using partial sums (computed in Python with high precision):
+- $t=2$: $S(2)\approx 1.6066951524152917637833015231909\dots$
+- $t=3/2$: $S(3/2)\approx 3.8971550754986773894172694282364\dots$
+No obvious rationality pattern is visible from truncations.
+
+Lemma 4.1 (Divisor-sum identity)
+
+For every real $t>1$,
+\[
+  \sum_{n=1}^\infty \frac{1}{t^n-1}=\sum_{m=1}^\infty \frac{\tau(m)}{t^m}.
+\]
+
+Proof.
+For $t>1$ and each $n\ge 1$ we have the absolutely convergent geometric series
+\[
+  \frac{1}{t^n-1} = \frac{t^{-n}}{1-t^{-n}} = \sum_{k=1}^\infty t^{-nk}.
+\]
+Summing over $n$ and using absolute convergence to justify rearrangement,
+\[
+  \sum_{n=1}^\infty \frac{1}{t^n-1} = \sum_{n=1}^\infty\sum_{k=1}^\infty t^{-nk}.
+\]
+Let $m=nk$. For each fixed $m\ge 1$, the number of pairs $(n,k)$ with $nk=m$ is exactly $\tau(m)$.
+Therefore the double sum equals
+\[
+  \sum_{m=1}^\infty \tau(m) t^{-m} = \sum_{m=1}^\infty \frac{\tau(m)}{t^m}.
+\]
+$\square$
+
+Lemma 4.2 (CRT construction: long blocks where $\tau$ is divisible by a given integer)
+
+Fix an integer $b\ge 2$ and an integer $k\ge 1$.
+There exists an integer $N$ such that
+\[
+  b\mid \tau(N+1),\ \dots,\ b\mid\tau(N+k).
+\]
+More strongly, there exists $N$ such that
+\[
+  b^k \mid \tau(N+1),\ \dots,\ b^k\mid\tau(N+k).
+\]
+
+Proof.
+We prove the stronger statement.
+Choose distinct primes $p_1,\dots,p_k$ with $p_i>k$ and $p_i> b$.
+For each $i$, impose the congruence
+\[
+  N+i \equiv p_i^{\,b^k-1} \pmod{p_i^{\,b^k}}.
+\]
+This implies $p_i^{b^k-1}\mid (N+i)$ but $p_i^{b^k}\nmid (N+i)$, i.e.
+the exact $p_i$-adic valuation of $N+i$ is $b^k-1$.
+Write the prime factorization of $N+i$ as
+$N+i=p_i^{b^k-1}m_i$ with $p_i\nmid m_i$.
+Then
+\[
+  \tau(N+i)=\tau(p_i^{b^k-1})\,\tau(m_i)=b^k\,\tau(m_i),
+\]
+so $b^k\mid\tau(N+i)$.
+
+The moduli $p_i^{b^k}$ are pairwise coprime, so by the Chinese remainder theorem there exists $N$
+solving all $k$ congruences simultaneously.
+$\square$
+
+What this lemma does NOT yet give:
+To turn Lemma 4.2 into an irrationality proof for $S(b)=\sum \tau(n)/b^n$, one typically needs to
+control carries in a base-$b$ expansion (or to build exceptionally good rational approximations with
+controlled denominators). Lemma 4.2 alone does not control the contribution of $\tau(N+j)$ for
+$j>k$ to the first $k$ digits of $\{b^N S(b)\}$.
+
+5) VERIFICATION
+
+- Lemma 4.1 uses only absolute convergence for $t>1$ and a divisor-counting bijection.
+- Lemma 4.2 is fully constructive and uses only CRT and the formula $\tau(p^a)=a+1$.
+- No step assumes unproved distribution of primes in arithmetic progressions.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- The divisor-sum identity $S(t)=\sum \tau(n)/t^n$ for all $t>1$ (Lemma 4.1).
+- For each integer base $b\ge 2$ and each $k$, there exist arbitrarily long blocks of consecutive integers
+  on which $\tau$ is divisible by $b^k$ (Lemma 4.2).
+
+(ii) First gap (crisp statement).
+Give a complete, carry-controlled digit-block argument (or another rational approximation argument)
+showing that for every integer $b\ge 2$,
+\[
+  S(b)=\sum_{n\ge 1}\frac{\tau(n)}{b^n}\ \text{is irrational}.
+\]
+In particular: starting from Lemma 4.2, show that one can force a block of base-$b$ digits of $S(b)$
+(equivalently of $\{b^N S(b)\}$) to be all $0$ while ensuring the expansion is not eventually periodic.
+
+(iii) Top 3 next moves.
+1. Strengthen Lemma 4.2 to impose a structured pattern on $\tau(N+j)$ for $j>k$ that provably prevents
+   carry into the first $k$ digits of $\{b^N S(b)\}$.
+2. Replace base-$b$ expansion with a Diophantine approximation approach: find infinitely many $N$ for which
+   $\|b^N S(b)\|$ (distance to nearest integer) is strictly between $0$ and $b^{-k}$, contradicting rationality.
+3. For rational $t=a/b$, attempt to clear denominators to transform $S(t)$ into a similar Lambert series
+   in an integer base (e.g. express in terms of $a^{-n}$) and see whether an Erd\H{o}s-style argument can
+   be adapted.
+
+(iv) Minimal counterexample structure.
+If Chowla's conjecture fails, a counterexample would be a rational $t>1$ for which the digit/carry
+structure of the coefficients $\tau(n)$ in base $t$ conspires to become eventually periodic.
+Any such $t$ would likely have special algebraic structure (e.g. a low-height fraction) and might be
+detectable by high-precision computation plus rational reconstruction; no such candidate has emerged
+from the quick numerical checks above.
+
+

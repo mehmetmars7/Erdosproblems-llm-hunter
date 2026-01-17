@@ -1,0 +1,94 @@
+% Attempt for Erdos Problem #307
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Question (prime version): do there exist finite nonempty sets of primes $P,Q$ such that
+\[1=\left(\sum_{p\in P}\frac1p\right)\left(\sum_{q\in Q}\frac1q\right)?\]
+
+Question (weakened coprime version): if we allow $P,Q$ to be finite sets of pairwise coprime integers (not necessarily prime),
+does such an identity exist? What if additionally $1\notin P\cup Q$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement gives explicit examples for the weakened version (allowing $1$) and claims simple necessary conditions for the prime version. I verify those necessary conditions and the examples.
+
+3) ATTACK PLAN
+Proof track:
+1. Prove structural constraints on sums of reciprocals of primes (exact reduced denominator).
+2. Deduce disjointness of $P$ and $Q$ in the prime version and a lower bound on $|P\cup Q|$ from $\sum 1/p\ge 2$.
+3. Attempt to use these constraints to narrow the Diophantine search space (computationally, if feasible).
+
+Disproof track:
+1. Try to show no solutions exist by analyzing prime-adic valuations in the reduced forms of the two sums.
+
+Chosen path: prove the easy necessary conditions and do small numeric sanity checks; the existence question remains open here.
+
+4) WORK
+Lemma 1 (Reduced form of a sum of reciprocal primes).
+Let $P$ be a finite set of primes and set
+\[x=\sum_{p\in P}\frac1p.\]
+Then
+\[x=\frac{A}{\prod_{p\in P}p}\]
+for some integer $A$, and moreover $\gcd\!\left(A,\prod_{p\in P}p\right)=1$ (so the denominator in lowest terms is exactly $\prod_{p\in P}p$).
+
+Proof.
+Let $D=\prod_{p\in P}p$. Then
+\[x=\frac{1}{D}\sum_{p\in P}\frac{D}{p}=\frac{A}{D}\]
+with $A=\sum_{p\in P} D/p\in\mathbb{Z}$.
+Fix $p_0\in P$. Reduce $A$ modulo $p_0$.
+For $p\ne p_0$, the term $D/p$ is divisible by $p_0$ (since it still contains the factor $p_0$), hence $D/p\equiv 0\pmod{p_0}$.
+For $p=p_0$, the term $D/p_0=\prod_{p\in P\setminus\{p_0\}}p$ is not divisible by $p_0$, so $A\not\equiv 0\pmod{p_0}$.
+Thus no prime in $P$ divides $A$, i.e. $\gcd(A,D)=1$. \qed
+
+Lemma 2 (Prime version forces disjointness and a size lower bound).
+If $P,Q$ are finite sets of primes and
+\[1=\left(\sum_{p\in P}\frac1p\right)\left(\sum_{q\in Q}\frac1q\right),\]
+then:
+(a) $P\cap Q=\varnothing$.
+(b) $\sum_{r\in P\cup Q}\frac1r\ge 2$ and hence $|P\cup Q|\ge 59$.
+
+Proof.
+Let $x=\sum_{p\in P}1/p$ and $y=\sum_{q\in Q}1/q$, so $xy=1$.
+By Lemma 1, $x=A/D_P$ and $y=B/D_Q$ in lowest terms with $D_P=\prod_{p\in P}p$ and $D_Q=\prod_{q\in Q}q$.
+If some prime $p$ lay in $P\cap Q$, then $p\mid D_P$ and $p\mid D_Q$ while $p\nmid A,B$.
+Thus $p^2\mid D_P D_Q$ and $p\nmid AB$, so the reduced form of $xy=AB/(D_P D_Q)$ would have denominator divisible by $p^2$, contradicting $xy=1$.
+Hence $P\cap Q=\varnothing$.
+
+For (b), since $x,y>0$ and $xy=1$, AM--GM gives $x+y\ge 2\sqrt{xy}=2$.
+But $x+y=\sum_{r\in P\cup Q}1/r$, giving the stated inequality.
+Finally, by exact computation (see FAST REALITY CHECK), the sum of reciprocals of the first $58$ primes is $<2$ while for the first $59$ primes it is $>2$.
+Therefore any set of primes with reciprocal sum $\ge 2$ has size at least $59$. \qed
+
+FAST REALITY CHECK (computation).
+- Verified the weakened examples:
+\[(1+1/5)(1/2+1/3)=(6/5)(5/6)=1,\qquad (1+1/41)(1/2+1/3+1/7)=(42/41)(41/42)=1.\]
+- Checked prime-reciprocal thresholds exactly:
+\[\sum_{i=1}^{58}\frac{1}{p_i}<2<\sum_{i=1}^{59}\frac{1}{p_i}\]
+where $p_i$ is the $i$th prime. Hence Lemma 2 gives $|P\cup Q|\ge 59$ (note: the problem statement says $\ge 60$, but the threshold is reached at $59$).
+
+5) VERIFICATION
+- Lemma 1’s “no cancellation” claim is checked prime-by-prime using a single congruence class.
+- Lemma 2(a) uses Lemma 1 to force denominators squarefree and uncancellable; the $p^2$ obstruction is exact.
+- Lemma 2(b) is purely AM--GM plus a computed threshold.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+If a solution with prime sets exists, then $P$ and $Q$ must be disjoint and $\sum_{r\in P\cup Q}1/r\ge 2$, forcing $|P\cup Q|\ge 59$ (Lemmas 1–2).
+
+(ii) First gap:
+Construct explicit prime sets $P,Q$ satisfying the product identity, or prove that no such prime sets can exist.
+
+(iii) Top 3 next moves:
+1. Use Lemma 1 to rewrite the problem as an explicit Diophantine equation $AB=D_P D_Q$ with coprimality constraints and attempt to derive contradictions modulo carefully chosen primes.
+2. Perform a guided computational search over candidate sets of primes (likely huge, but one might impose additional structure such as bounding the largest prime or forcing near-equality of $x$ and $y$).
+3. Analyze the weakened “pairwise coprime” version with $1\notin P\cup Q$ first; any construction there might be adaptable to primes via splitting identities.
+
+(iv) Minimal counterexample structure (if a solution exists):
+A solution must involve at least $59$ distinct primes split into two disjoint groups $P,Q$, with $\sum_{p\in P}1/p$ and $\sum_{q\in Q}1/q$ being reduced fractions whose numerators multiply to the product of all primes used.
+

@@ -1,0 +1,121 @@
+% Erdos Problem #451
+
+\textbf{FORMAL RESTATEMENT}
+
+Fix an integer $k\ge 1$. Let
+\[
+P_k:=\prod_{\substack{p\ \text{prime}\\ k<p<2k}} p
+\]
+(with the convention that an empty product equals $1$). Define $n_k$ to be the smallest integer $n$ such that
+\begin{itemize}
+\item $n>2k$, and
+\item the integer $\prod_{i=1}^k (n-i)$ has \emph{no} prime divisor $p$ with $k<p<2k$.
+\end{itemize}
+Equivalently,
+\[
+\forall\text{ primes }p\in (k,2k):\quad p\nmid\prod_{i=1}^k(n-i).
+\]
+The problem asks for good asymptotic estimates (upper and lower bounds) on $n_k$ as $k\to\infty$.
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+Only what is stated in the problem text is used here: Erd\H{o}s--Graham claim one can prove $n_k>k^{1+c}$ for some $c>0$; Erd\H{o}s conjectures $n_k<e^{o(k)}$ but $n_k>k^d$ for every fixed $d$; Adenwalla notes an ``easy'' upper bound $n_k\le \prod_{k<p<2k}p=e^{O(k)}$.
+Per the integrity constraint, I do not import any external theorems beyond elementary facts proved below.
+
+\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Re-express the condition in congruence form: for each prime $p\in(k,2k)$, forbid $k$ residue classes modulo $p$. Then use the Chinese remainder theorem (CRT) to (i) prove existence, (ii) count admissible residue classes modulo $P_k$, and (iii) obtain a clean explicit upper bound $n_k\le 2k+P_k$.
+\item FAST REALITY CHECK: compute $n_k$ for small $k$ to see size/behavior.
+\item For lower bounds or sharper asymptotics one needs information about how ``dense'' these admissible residue classes are and/or about the size of $P_k$; I record the first precise gap at the end.
+\end{itemize}
+
+\textbf{WORK}
+
+\emph{Fast reality check (exact computation for small $k$).}
+By brute force search (checking all $n>2k$) I found:
+\begin{center}
+\begin{tabular}{r|r\qquad r|r\qquad r|r\qquad r|r}
+$k$ & $n_k$ & $k$ & $n_k$ & $k$ & $n_k$ & $k$ & $n_k$\\\hline
+1&3  & 6&21 & 11&51 & 16&340\\
+2&6  & 7&21 & 12&338& 17&113\\
+3&9  & 8&22 & 13&133& 18&114\\
+4&20 & 9&65 & 14&321& 19&368\\
+5&13 &10&220& 15&339& 20&550\\
+\end{tabular}
+\end{center}
+(Computed by a minimal Python script using exact primality/divisibility tests.)
+
+\medskip
+
+\textbf{Lemma 451.1 (congruence characterization and count mod $P_k$).}
+For an integer $n$, the condition
+\[
+\forall\text{ primes }p\in(k,2k):\ p\nmid \prod_{i=1}^k(n-i)
+\]
+holds if and only if for every prime $p\in(k,2k)$,
+\[
+ n\bmod p\not\in\{1,2,\dots,k\}.
+\]
+Moreover, the set of residues $a\in\mathbb Z/P_k\mathbb Z$ satisfying this condition has exactly
+\[
+\prod_{\substack{p\ \text{prime}\\ k<p<2k}} (p-k)
+\]
+elements.
+
+\emph{Proof.}
+Fix a prime $p\in(k,2k)$. Since $p$ is prime, $p\mid\prod_{i=1}^k(n-i)$ is equivalent to $p\mid (n-i)$ for at least one $i\in\{1,\dots,k\}$. The latter is equivalent to $n\equiv i\pmod p$ for some $i\in\{1,\dots,k\}$, i.e. $n\bmod p\in\{1,\dots,k\}$. Negating yields the stated equivalence.
+
+For the count: for each such prime $p$, the forbidden residue set $\{1,\dots,k\}\subset \mathbb Z/p\mathbb Z$ has size $k$ and (since $p>k$) is a proper subset of $\mathbb Z/p\mathbb Z$, so the allowed residue set has size $p-k$. Because the moduli $p$ appearing in $P_k$ are pairwise coprime, CRT gives a bijection
+\[
+\mathbb Z/P_k\mathbb Z \cong \prod_{k<p<2k} \mathbb Z/p\mathbb Z.
+\]
+Under this bijection, choosing an admissible residue class modulo $P_k$ is equivalent to choosing independently an admissible residue class modulo each $p$. Hence the number of admissible residues modulo $P_k$ is the product of the counts $p-k$.
+\qed
+
+\medskip
+
+\textbf{Lemma 451.2 (existence and an explicit upper bound).}
+For every $k\ge 1$, an $n$ satisfying the defining condition exists, and in fact
+\[
+ n_k\le 2k+P_k.
+\]
+
+\emph{Proof.}
+By Lemma 451.1, for each prime $p\in(k,2k)$ there exists at least one residue class $a_p\in\mathbb Z/p\mathbb Z$ avoiding $\{1,\dots,k\}$ (because $p-k\ge 1$). Fix one such choice for each $p$. By CRT there exists an integer $a$ such that
+\[
+ a\equiv a_p\pmod p\quad\text{for all primes }p\in(k,2k).
+\]
+Then $a$ satisfies the avoidance condition of Lemma 451.1, hence $\prod_{i=1}^k(a-i)$ has no prime factor in $(k,2k)$.
+
+Now consider the arithmetic progression $a+tP_k$ ($t\in\mathbb Z$). Every term is congruent to $a$ modulo each $p\mid P_k$, so every term satisfies the avoidance condition, hence every term satisfies the defining property.
+Choose the smallest $t\ge 0$ such that $n:=a+tP_k>2k$. Then $n\le 2k+P_k$ (because $tP_k\le 2k+P_k-a$ and $a\ge 0$ can be taken in $[0,P_k-1]$), and $n$ satisfies the property. By definition of $n_k$ as the smallest such integer, $n_k\le n\le 2k+P_k$.
+\qed
+
+\medskip
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item \emph{Quantifiers / edge cases.} If there are no primes in $(k,2k)$ then $P_k=1$ and the condition is vacuous, so indeed $n_k=2k+1\le 2k+P_k$.
+\item \emph{Lemma 451.1.} The only subtle point is that $p\mid\prod (n-i)$ iff $p\mid (n-i)$ for some $i$, which holds because $p$ is prime. This is used correctly.
+\item \emph{Lemma 451.2.} CRT applies because the moduli are distinct primes. The choice of $t$ ensures $n\in(2k,2k+P_k]$, so the stated upper bound is correct.
+\item \emph{Sanity check vs computed values.} For $k=5$, primes in $(5,10)$ are $\{7\}$ so $P_5=7$ and the bound gives $n_5\le 17$; computed $n_5=13$ is consistent.
+\end{itemize}
+
+\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} The admissible $n$ form a nonempty set of residue classes modulo $P_k=\prod_{k<p<2k}p$, of exact size $\prod_{k<p<2k}(p-k)$ (Lemma 451.1). In particular $n_k\le 2k+P_k$ (Lemma 451.2).
+
+(ii) \emph{First gap (crisp).} Prove any nontrivial asymptotic upper bound on $n_k$ that eliminates the primorial $P_k$ (e.g. $n_k\le \exp(o(k\log k))$ or even $n_k\le \exp(Ck)$) \emph{without} importing unproved information about the size of $\prod_{k<p<2k}p$.
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Prove effective bounds on $\log P_k=\sum_{k<p<2k}\log p$ using only elementary estimates acceptable in this project (an explicit Chebyshev-type bound on $\vartheta(x)$ would immediately sharpen Lemma 451.2).
+\item Use Lemma 451.1 to estimate the density $\prod_{k<p<2k}(1-k/p)$ and then attempt a pigeonhole/spacing argument to upper bound the smallest positive admissible residue, i.e. to control the least admissible $n$ rather than mere existence.
+\item Computation: extend the exact $n_k$ table to, say, $k\le 200$; examine growth of $\log n_k$ vs $k$ and test heuristics suggested by the residue density.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.} A ``minimal counterexample'' to a conjectured upper bound $n_k\le F(k)$ would be a $k$ for which \emph{every} admissible residue class modulo $P_k$ has its smallest positive representative $>F(k)$; equivalently, all admissible residues lie in $(F(k),P_k)$ when reduced to $[1,P_k]$.
+
+

@@ -1,0 +1,106 @@
+% Erdos Problem #1135
+
+\subsection*{FORMAL RESTATEMENT}
+Define $f:\mathbb{N}\to\mathbb{N}$ by
+\[
+ f(n)=\begin{cases}
+ n/2,&\text{if $n$ is even},\\
+ (3n+1)/2,&\text{if $n$ is odd}.
+ \end{cases}
+\]
+For $k\ge 1$, let $f^{(k)}$ denote the $k$-fold iterate.
+The Collatz conjecture (as stated) asks:
+\[
+\forall m\in\mathbb{N}_{\ge 1},\ \exists k\ge 1\text{ such that } f^{(k)}(m)=1.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I only record context explicitly stated in the problem file.
+The file identifies this as the Collatz conjecture, and notes (historically) that Erd\H{o}s referred to it as ``hopeless''.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track ideas.}
+\begin{itemize}
+\item Prove closure properties of the set of starting values that reach $1$ (e.g. stability under multiplying by powers of $2$), then attempt to expand this set.
+\item Analyze parity sequences and attempt to show average contraction.
+\end{itemize}
+\textbf{Disproof track ideas.}
+\begin{itemize}
+\item Search for a nontrivial cycle (other than $1\mapsto 1$) or an orbit that diverges.
+\item Use computation to push bounds and look for anomalies.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 1135.1 (well-definedness and one-step decrease on evens).}
+For every $n\in\mathbb{N}$, $f(n)\in\mathbb{N}$. If $n$ is even and $n\ge 2$, then $f(n)=n/2<n$.
+
+\emph{Proof.}
+If $n$ is even then $n/2\in\mathbb{N}$.
+If $n$ is odd then $3n+1$ is even, so $(3n+1)/2\in\mathbb{N}$.
+For even $n\ge 2$, $n/2<n$ is immediate.
+\qed
+
+\textbf{Lemma 1135.2 (powers of $2$ reach $1$).}
+If $m=2^t$ with $t\ge 0$, then $f^{(t)}(m)=1$.
+
+\emph{Proof.}
+For $t=0$ we have $m=1$ and the claim is trivial.
+For $t\ge 1$, $m$ is even, so $f(m)=m/2=2^{t-1}$.
+Iterating, one obtains $f^{(k)}(2^t)=2^{t-k}$ for $0\le k\le t$.
+In particular $f^{(t)}(2^t)=2^0=1$.
+\qed
+
+\textbf{Lemma 1135.3 (closure under multiplying by powers of $2$).}
+Suppose $m\ge 1$ is such that $f^{(k)}(m)=1$ for some $k\ge 0$.
+Then for every $s\ge 0$ we have $f^{(k+s)}(2^s m)=1$.
+
+\emph{Proof.}
+Starting from $2^s m$, the first $s$ iterations apply the ``even'' rule repeatedly, yielding
+\[
+ f^{(s)}(2^s m)=m.
+\]
+Applying $k$ further iterations gives $f^{(k+s)}(2^s m)=f^{(k)}(m)=1$.
+\qed
+
+\textbf{FAST REALITY CHECK (computation up to $10^5$).}
+I computed the trajectories for all starting values $m\le 100000$ and verified they reach $1$.
+I also recorded (a) the maximum number of steps to reach $1$ among these starts, and (b) the largest value encountered in any such trajectory.
+\begin{verbatim}
+Checked m<= 1000: all reached 1 under this computation.
+  max steps: 113 achieved by m=871
+  max value encountered: 125252 first seen starting from m=703
+Checked m<= 10000: all reached 1 under this computation.
+  max steps: 165 achieved by m=6171
+  max value encountered: 13557212 first seen starting from m=9663
+Checked m<= 100000: all reached 1 under this computation.
+  max steps: 221 achieved by m=77031
+  max value encountered: 785412368 first seen starting from m=77671
+\end{verbatim}
+This is, of course, not a proof for all $m$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemmas 1135.1--1135.3 are straightforward and use only integer arithmetic.
+\item The computation checks only finitely many starting values.
+\item The algorithm used the exact iteration rule given and terminated trajectories when they hit a previously computed value or $1$; the reported maxima were tracked explicitly.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+All powers of $2$ reach $1$ (Lemma 1135.2), and the set of starting values that reach $1$ is closed under multiplication by powers of $2$ (Lemma 1135.3).
+
+(ii) \textbf{First gap (crisp).}
+Prove that every $m\ge 1$ reaches $1$ under iteration of $f$, or exhibit an explicit counterexample (a divergent orbit or nontrivial cycle).
+
+(iii) \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Establish a quantitative contraction-in-expectation estimate over residue classes (e.g. average behavior of $\log f(n)-\log n$) and turn it into a deterministic recurrence.
+\item Search for structural invariants preventing cycles and showing eventual descent below the starting value.
+\item Extend verified computational bounds with certified methods (interval arithmetic / proof certificates) to cover larger ranges and to study statistics of stopping times.
+\end{itemize}
+
+(iv) \textbf{Minimal counterexample structure.}
+A minimal counterexample would be either (a) the smallest $m$ whose orbit never hits $1$, which would necessarily avoid all numbers already known to reach $1$, or (b) the smallest nontrivial cycle under $f$.
+

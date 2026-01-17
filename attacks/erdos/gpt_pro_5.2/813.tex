@@ -1,0 +1,90 @@
+% Erdos Problem #813
+\subsection*{Erdos Problem \#813}
+
+\paragraph{FORMAL RESTATEMENT.}
+For $n\in\mathbb{N}$, define $h(n)$ to be the least integer $t$ such that every (simple, undirected) graph $G$ on $n$ vertices with the property
+\[
+(\forall S\subseteq V(G),\ |S|=7)\ \text{the induced subgraph }G[S]\text{ contains a triangle }(K_3)
+\]
+must contain a clique of size at least $t$ (i.e. $\omega(G)\ge t$).
+The problem asks for asymptotics of $h(n)$, in particular whether there exist constants $c_1,c_2>0$ with
+\[
+n^{1/3+c_1} \ll h(n) \ll n^{1/2-c_2}.
+\]
+
+\paragraph{QUICK LITERATURE/CONTEXT CHECK.}
+The statement records that Erd\H{o}s and Hajnal proved $n^{1/3}\ll h(n)\ll n^{1/2}$ and that Buci\'c and Sudakov proved $h(n)\gg n^{5/12-o(1)}$. I do not use any results not already stated in the problem text.
+
+\paragraph{ATTACK PLAN.}
+\emph{Proof track:} try to convert the local ``every $7$ vertices span a triangle'' condition into a global density/structure statement, then feed it into a clique-finding method.
+
+\emph{Disproof track:} attempt to construct graphs where all $7$-sets contain a triangle but the maximum clique is as small as possible; for small $n$, search for $K_4$-free examples.
+
+\paragraph{WORK.}
+\textbf{Lemma 813.1 (immediate consequence: bounded independence number).}
+If $G$ satisfies the local property that every $7$-vertex set spans a triangle, then $\alpha(G)\le 6$.
+
+\emph{Proof.}
+If $G$ had an independent set $I$ of size $7$, then the induced subgraph $G[I]$ would have no edges, hence no triangle, contradicting the defining property.
+Therefore no independent set has size $7$, i.e. $\alpha(G)\le 6$.
+\hfill $\square$
+
+\textbf{Lemma 813.2 (a provable but weak lower bound on $h(n)$).}
+Let $t$ be the largest integer such that $\binom{t+5}{6}\le n$. Then every $n$-vertex graph with the local property must contain a clique of size at least $t$. In particular,
+\[
+h(n) \ge \max\{t\in\mathbb{N}: \binom{t+5}{6}\le n\} = \Omega(n^{1/6}).
+\]
+
+\emph{Proof.}
+By Lemma 813.1 such a graph $G$ has no independent set of size $7$.
+Consider the (off-diagonal) Ramsey number $R(t,7)$: the least $N$ such that every graph on $N$ vertices contains either a $K_t$ or an independent set of size $7$.
+If $n\ge R(t,7)$, then $G$ must contain a $K_t$ because the alternative (an independent set of size $7$) is forbidden.
+
+It remains to show that $R(t,7)\le \binom{t+5}{6}$.
+This follows from the standard Erd\H{o}s--Szekeres recursion for Ramsey numbers:
+\[
+R(a,b) \le R(a-1,b) + R(a,b-1)\quad (a,b\ge2),
+\]
+together with the initial values $R(1,b)=1$ and $R(a,1)=1$.
+Indeed, fix $N=R(a-1,b)+R(a,b-1)$ and any graph $H$ on $N$ vertices.
+Pick a vertex $v$. Let $N_1$ be the number of neighbours of $v$ in $H$ and $N_0$ the number of non-neighbours; then $N_0+N_1=N-1$.
+If $N_1\ge R(a-1,b)$, then within the neighbour set either there is a $K_{a-1}$ (which together with $v$ gives a $K_a$) or there is an independent set of size $b$ (which is also independent in $H$).
+If $N_1< R(a-1,b)$, then $N_0\ge R(a,b-1)$ and applying the same reasoning in the non-neighbour set yields either a $K_a$ (already in the non-neighbour set) or an independent set of size $b-1$ that together with $v$ forms an independent set of size $b$.
+Thus $R(a,b)\le R(a-1,b)+R(a,b-1)$.
+Iterating this recursion yields the binomial bound
+\[
+R(a,b) \le \binom{a+b-2}{a-1}.
+\]
+Setting $a=t$ and $b=7$ gives $R(t,7)\le \binom{t+5}{t-1}=\binom{t+5}{6}$.
+Therefore if $n\ge \binom{t+5}{6}$, every $n$-vertex graph with no independent set of size $7$ must contain a $K_t$.
+\hfill $\square$
+
+\textbf{FAST REALITY CHECK (small $n$ via explicit examples).}
+For $n<7$, the local condition is vacuous (there are no $7$-subsets), so $h(n)=1$ for $1\le n\le 6$.
+For $n=7$, the condition is ``$G$ contains a triangle'', hence $h(7)=3$.
+
+For $n=8$ and $n=9$, I found explicit $K_4$-free graphs satisfying the local property, so $h(8)=h(9)=3$.
+One such graph on $8$ vertices (labelled $1,\dots,8$) has edge set
+\[
+\{12,15,25,37,46,47,48,56,78\},
+\]
+and one such graph on $9$ vertices has edge set
+\[
+\{14,17,24,26,28,35,38,39,47,56,59,67,68,89\}.
+\]
+In each case an exhaustive check over all $7$-subsets confirms the local condition, and an exhaustive check over all $4$-subsets confirms $\omega(G)=3$.
+
+\paragraph{VERIFICATION.}
+Lemma 813.1: an independent set on $7$ vertices induces an edgeless (hence triangle-free) graph, so it is forbidden.
+Lemma 813.2: the only nontrivial step is the Ramsey recursion argument; the neighbour/non-neighbour split is checked case-by-case and uses only the definition of $R(a,b)$.
+For the exhibited $n=8,9$ graphs, both (a) ``every $7$-subset contains a triangle'' and (b) ``no $4$-subset is a clique'' are finite checks (done computationally).
+
+\paragraph{FINAL.} \textbf{UNRESOLVED.}
+\begin{enumerate}
+\item[(i)] Strongest proved partial results here: the local condition implies $\alpha(G)\le6$ (Lemma 813.1), and hence a universal lower bound $h(n)=\Omega(n^{1/6})$ via the elementary binomial Ramsey upper bound (Lemma 813.2). Also, exact small values: $h(n)=1$ for $n\le6$ and $h(7)=h(8)=h(9)=3$ by explicit examples.
+\item[(ii)] First gap: prove a power-type lower bound $h(n)\ge n^{1/3+\varepsilon}$ (for some fixed $\varepsilon>0$) from the local triangle condition alone, without importing external theorems.
+\item[(iii)] Top 3 next moves: (1) attempt to show the local condition forces a global edge density $e(G)\ge \delta n^2$ with explicit $\delta>0$, then combine with a clique-finding lemma; (2) strengthen Lemma 813.1 by bounding the size of induced triangle-free subgraphs more sharply than $6$ in terms of other parameters (e.g. by forcing many triangles through each vertex); (3) computationally search for larger $n$ for which $\omega(G)=3$ is still possible under the local condition, to guide candidate extremal constructions.
+\item[(iv)] A minimal counterexample to any conjectured lower bound $h(n)\ge n^{\beta}$ would be a family of graphs $G_n$ with $|V|=n$, every $7$-set spanning a triangle, but with clique number $\omega(G_n)=o(n^{\beta})$; given Lemma 813.1 these would necessarily have bounded independence number but avoid large cliques, i.e. behave like Ramsey graphs with an additional local triangle-forcing constraint.
+\end{enumerate}
+
+

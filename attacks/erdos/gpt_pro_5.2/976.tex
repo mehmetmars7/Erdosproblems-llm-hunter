@@ -1,0 +1,151 @@
+% Solutions/attempts for Erd\H{o}s problems #976, #978, #979, #982, #983.
+% Generated: 2026-01-16.
+% Integrity note: I do not claim any literature results beyond those explicitly stated in the provided problem statements.
+
+% Erdos Problem #976
+
+1) FORMAL RESTATEMENT
+
+Let $f\in\mathbb Z[x]$ be irreducible over $\mathbb Z$ and have degree $d\ge 2$.
+For an integer $N\ne 0$, write $P^+(N)$ for the largest prime divisor of $|N|$.
+For $n\ge 1$ define
+\[
+F_f(n)\;:=\;\max_{1\le m\le n} P^+\bigl(f(m)\bigr).
+\]
+Equivalently,
+\[
+F_f(n)\;=\; P^+\Bigl(\prod_{m=1}^n f(m)\Bigr),
+\]
+where prime divisors are taken of the absolute value.
+The problem asks for estimates of $F_f(n)$ as $n\to\infty$, and in particular asks whether
+there exists $c>0$ (depending on $f$) such that $F_f(n)\gg n^{1+c}$, or even $F_f(n)\gg n^d$.
+
+Edge cases/conventions:
+- Since $f$ is irreducible of degree $\ge 2$, $f$ has no integer roots, hence $f(m)\ne 0$ for all integers $m$.
+- $f(m)$ may be negative; prime divisors are those of $|f(m)|$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided problem statement already lists several lower bounds and references.
+A quick web search (2026-01-16) did not surface an explicit resolution of the questions beyond what is already stated there, so I treat the problem as open in the form asked.
+
+3) ATTACK PLAN
+
+Proof track (high-level): if all prime factors of $\prod_{m\le n} f(m)$ were $\le y$, then the product would be $y$-smooth; to contradict this one needs upper bounds on the total $p$-adic valuation contributed by small primes. This typically requires delicate control of the number of solutions of $f(x)\equiv 0\pmod{p^a}$ for many primes and exponents.
+
+Disproof track (high-level): try to construct an irreducible $f$ for which $f(1),\dots,f(n)$ are unusually smooth for infinitely many $n$.
+
+In this write-up I only establish elementary structural lemmas and provide a fast computational sanity check for sample polynomials.
+
+4) WORK
+
+FAST REALITY CHECK (sample polynomials; exact computations)
+
+For $f(x)=x^2+1$ (degree $2$):
+\[
+\begin{array}{c|c|c}
+ n & F_f(n) & \text{witness }m\text{ with }P^+(f(m))=F_f(n)\\\hline
+ 5 & 17 & m=4,\ f(4)=17\\
+ 10 & 101 & m=10,\ f(10)=101\\
+ 20 & 401 & m=20,\ f(20)=401\\
+ 50 & 1601 & m=40,\ f(40)=1601\\
+ 100 & 8837 & m=94,\ f(94)=8837\\
+ 200 & 33857 & m=184,\ f(184)=33857
+\end{array}
+\]
+
+For $f(x)=x^3+2$ (degree $3$):
+\[
+\begin{array}{c|c|c}
+ n & F_f(n) & \text{witness }m\\\hline
+ 5 & 127 & m=5,\ f(5)=127\\
+ 10 & 257 & m=8,\ f(8)=514=2\cdot 257\\
+ 20 & 4001 & m=20,\ f(20)=8002=2\cdot 4001\\
+ 50 & 91127 & m=45,\ f(45)=91127\\
+ 100 & 571789 & m=83,\ f(83)=571789\\
+ 200 & 6751271 & m=189,\ f(189)=6751271
+\end{array}
+\]
+These samples are consistent with (but do not prove) growth on the order of $n^d$.
+
+Lemma 4.1 (equivalence of definitions).
+For every $n\ge 1$,
+\[
+\max_{1\le m\le n} P^+\bigl(f(m)\bigr)
+\;=\; P^+\Bigl(\prod_{m=1}^n f(m)\Bigr).
+\]
+
+Proof.
+Let $M:=\prod_{m=1}^n f(m)$. Every prime divisor of some $f(m)$ divides $M$, so
+$\max_{m\le n}P^+(f(m))\le P^+(M)$. Conversely, any prime divisor of $M$ divides some factor $f(m)$,
+so $P^+(M)\le \max_{m\le n}P^+(f(m))$. \qed
+
+Lemma 4.2 (polynomial growth gives a trivial upper bound).
+There exists a constant $C_f>0$ such that for all $n\ge 1$,
+\[
+F_f(n)\le C_f\, n^d.
+\]
+
+Proof.
+Write $f(x)=\sum_{i=0}^d a_i x^i$ with $a_i\in\mathbb Z$ and $a_d\ne 0$.
+For $1\le m\le n$,
+\[
+|f(m)|\le \sum_{i=0}^d |a_i|\, |m|^i\le \Bigl(\sum_{i=0}^d |a_i|\Bigr) n^d.
+\]
+Let $C_f:=\sum_{i=0}^d |a_i|$. Any prime divisor of $f(m)$ is at most $|f(m)|$, hence
+$P^+(f(m))\le C_f n^d$ for each $m\le n$, and taking a maximum gives the claim. \qed
+
+Lemma 4.3 (bounded gcd of consecutive values via a Bezout identity).
+Let $g(x):=f(x+1)\in\mathbb Z[x]$. Then $f$ and $g$ are coprime in $\mathbb Q[x]$, hence there exist
+polynomials $A,B\in\mathbb Z[x]$ and a nonzero integer $R$ such that
+\[
+A(x)f(x)+B(x)f(x+1)=R\quad\text{in }\mathbb Z[x].
+\]
+Consequently, for every integer $n$,
+\[
+\gcd\bigl(f(n),f(n+1)\bigr)\mid R.
+\]
+In particular, if a prime $p$ divides both $f(n)$ and $f(n+1)$ for some $n$, then $p\mid R$.
+
+Proof.
+First, $f$ and $f(x+1)$ are not associates in $\mathbb Q[x]$: if $f(x+1)=c f(x)$ for some constant $c\in\mathbb Q^\times$, comparing leading coefficients forces $c=1$, hence $f(x+1)=f(x)$, impossible for a nonconstant polynomial. Therefore $\gcd(f,g)=1$ in $\mathbb Q[x]$.
+So there exist $\alpha,\beta\in\mathbb Q[x]$ such that $\alpha(x)f(x)+\beta(x)g(x)=1$.
+Clearing denominators yields $A,B\in\mathbb Z[x]$ and $R\in\mathbb Z\setminus\{0\}$ with
+$A f + B g = R$.
+Evaluating at an integer $n$ gives $A(n)f(n)+B(n)f(n+1)=R$, hence any common divisor of $f(n)$ and $f(n+1)$ divides $R$. \qed
+
+Lemma 4.4 (root-count bound mod $p$ gives a basic divisor-count bound).
+Assume $f\not\equiv 0\pmod p$ in $(\mathbb Z/p\mathbb Z)[x]$.
+Then the congruence $f(m)\equiv 0\pmod p$ has at most $d$ solutions modulo $p$.
+Consequently, for every $n\ge 1$,
+\[
+\#\{1\le m\le n: p\mid f(m)\}\le d\,\Bigl(\Bigl\lfloor\frac{n}{p}\Bigr\rfloor+1\Bigr).
+\]
+
+Proof.
+Over the field $\mathbb F_p$, a nonzero polynomial of degree $d$ has at most $d$ roots.
+Let $S\subset\{0,1,\dots,p-1\}$ be the set of residue classes $r$ with $f(r)\equiv 0\pmod p$; then $|S|\le d$.
+For each $r\in S$, the integers $m\in[1,n]$ with $m\equiv r\pmod p$ form an arithmetic progression
+of size at most $\lfloor n/p\rfloor+1$. Summing over $r\in S$ gives the stated bound. \qed
+
+5) VERIFICATION
+
+- The upper bound (Lemma 4.2) is a direct size bound and is valid even when $f(m)$ changes sign.
+- Lemma 4.3: the only subtle point is that $f(x)$ and $f(x+1)$ are coprime in $\mathbb Q[x]$.
+  If they had a common factor in $\mathbb Q[x]$, then since $f$ is irreducible, $f$ itself would divide $f(x+1)$,
+  forcing $f(x+1)=f(x)$ and contradicting nonconstancy.
+- Lemma 4.4 requires $f\not\equiv 0\pmod p$; since $f$ is irreducible, it is primitive, but this does not prevent
+  $f\equiv 0\pmod p$ for some $p$ (it would require every coefficient divisible by $p$, which cannot happen for a primitive polynomial). Thus for irreducible $f\in\mathbb Z[x]$, the hypothesis holds for every prime $p$.
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest proved partial result: elementary structure bounds include the trivial upper bound $F_f(n)\le C_f n^d$ (Lemma 4.2), a uniform bound on $\gcd(f(n),f(n+1))$ (Lemma 4.3), and a uniform bound on the count of $m\le n$ for which a given prime $p$ divides $f(m)$ (Lemma 4.4). Exact computations for sample irreducible polynomials of degrees $2$ and $3$ up to $n=200$ are recorded above.
+(ii) First gap (crisp): prove any superlinear lower bound of the form $F_f(n)\ge c\,n^{1+\varepsilon}$ (or even $\ge c\,n\log n$) for a general irreducible $f\in\mathbb Z[x]$ by an argument that controls contributions of small primes to $\prod_{m\le n} f(m)$.
+(iii) Top 3 next moves:
+  1. Prove a uniform bound (in terms of $d$) on $\#\{x\bmod p^a: f(x)\equiv 0\pmod{p^a}\}$ for most primes $p$ and all $a\ge 1$, and turn it into a bound on $\sum_{m\le n} v_p(f(m))$.
+  2. Combine such $p$-adic bounds with a smooth-number estimate to show that assuming all prime factors are $\le y$ forces $\log\prod_{m\le n}|f(m)|\ll n\log y$, contradicting the $\asymp d n\log n$ growth.
+  3. Computationally: for additional polynomials $f$ (varying degrees and leading coefficients), compute $F_f(n)$ and track the ratio $F_f(n)/n^d$ and the location of the maximizing $m$ to look for patterns that might inform the $p$-adic counting step.
+(iv) Minimal counterexample structure: a putative obstruction to $F_f(n)\gg n^{1+\varepsilon}$ would be an irreducible polynomial $f$ together with an infinite sequence $n_j\to\infty$ such that all values $f(1),\dots,f(n_j)$ are unusually $y_j$-smooth with $y_j\le n_j^{1+\varepsilon}$, i.e. the set of prime divisors of $\prod_{m\le n_j} f(m)$ stays below $n_j^{1+\varepsilon}$.
+
+

@@ -1,0 +1,99 @@
+% Erdos Problem #423
+% URL: https://www.erdosproblems.com/423
+
+FORMAL RESTATEMENT
+Let $(a_k)_{k\ge 1}$ be a sequence of positive integers defined recursively as follows.
+\[
+ a_1:=1,\qquad a_2:=2.
+\]
+For each $k\ge 3$, let $a_k$ be the least integer $m$ such that
+(i) $m>a_{k-1}$, and
+(ii) there exist integers $1\le i<j\le k-1$ with
+\[
+ m=\sum_{t=i}^j a_t.
+\]
+(Thus $m$ is the sum of at least two consecutive earlier terms of the sequence.)
+
+The problem asks for the asymptotic behaviour of $a_k$ as $k\to\infty$ (e.g. growth rate, density of the set $\{a_k\}$ in $\mathbb N$, and/or the typical size of the gap $a_k-k$).
+
+Edge conventions: $\mathbb N=\{1,2,3,\dots\}$. “Consecutive” means consecutive indices. Sums must involve at least two terms, i.e. $j-i+1\ge 2$.
+
+QUICK LITERATURE/CONTEXT CHECK
+The problem statement attributes the question to Hofstadter/Ulam and identifies the sequence as OEIS A005243. No external results are used here beyond what is explicitly in the problem statement.
+
+ATTACK PLAN
+Proof track ideas.
+1) Control the set of consecutive sums produced by the initial segment $(a_1,\dots,a_{k})$; if one can show these sums cover a long interval above $a_k$, then the greedy rule would force $a_{k+1}=a_k+1$ for long stretches, suggesting $a_k\sim k$.
+2) Establish deterministic upper bounds on $a_k$ in terms of earlier terms (e.g. a Fibonacci-type inequality), then try to sharpen to a linear bound.
+
+Disproof/construction ideas.
+1) Try to show there are infinitely many “forbidden” integers that can never occur (or occur only after being skipped), forcing $a_k\ge (1+\delta)k$ along a subsequence.
+2) Search computationally for persistent congruence obstructions or structured gaps.
+
+WORK
+Fast reality check (explicit computation).
+Using a minimal Python implementation of the greedy definition (maintaining all consecutive-sum values incrementally), the first terms are
+\[
+1,2,3,5,6,8,10,11,14,16,17,18,19,21,22,24,25,29,30,32,\dots
+\]
+For selected indices $m$ the computed values $a_m$ and the “missing count” $a_m-m$ are:
+\[
+\begin{array}{c|c|c}
+ m & a_m & a_m-m\\\hline
+10&16&6\\
+20&32&12\\
+50&78&28\\
+100&146&46\\
+200&267&67\\
+500&612&112\\
+1000&1149&149\\
+2000&2189&189\\
+5000&5261&261
+\end{array}
+\]
+(These data suggest $a_m/m\downarrow 1$ and $a_m-m$ grows slowly, but this is only empirical.)
+
+Lemma 423.1 (two-term upper bound).
+For every $k\ge 3$,
+\[
+ a_k\le a_{k-1}+a_{k-2}.
+\]
+Proof.
+Fix $k\ge 3$. By definition, $a_k$ is the least integer $>a_{k-1}$ that is a sum of at least two consecutive earlier terms among $a_1,\dots,a_{k-1}$.
+The integer $s:=a_{k-2}+a_{k-1}$ is the sum of two consecutive earlier terms (indices $k-2$ and $k-1$). Also $s>a_{k-1}$ because $a_{k-2}\ge 1$.
+Therefore $s$ is an admissible candidate in the minimisation defining $a_k$. Since $a_k$ is the least admissible candidate, we must have $a_k\le s=a_{k-2}+a_{k-1}$.
+\hfill $\square$
+
+Lemma 423.2 (Fibonacci domination).
+Define $(F_k)_{k\ge 1}$ by $F_1=1$, $F_2=2$, and $F_k=F_{k-1}+F_{k-2}$ for $k\ge 3$.
+Then for all $k\ge 1$,
+\[
+ a_k\le F_k.
+\]
+Proof.
+We argue by induction on $k$.
+For $k=1,2$ we have $a_1=1=F_1$ and $a_2=2=F_2$.
+Assume $k\ge 3$ and that $a_{k-1}\le F_{k-1}$ and $a_{k-2}\le F_{k-2}$. By Lemma 423.1,
+\[
+ a_k\le a_{k-1}+a_{k-2}\le F_{k-1}+F_{k-2}=F_k.
+\]
+This completes the induction.
+\hfill $\square$
+
+VERIFICATION
+- Quantifiers: Lemma 423.1 requires $k\ge 3$ so that $a_{k-2}$ exists and the block $(a_{k-2},a_{k-1})$ has length $2$.
+- Strictness: $a_{k-2}\ge 1$ guarantees $a_{k-2}+a_{k-1}>a_{k-1}$, so the candidate sum is indeed admissible.
+- Lemma 423.2 uses only Lemma 423.1 and the exact same initial conditions.
+- Computations: the greedy construction was implemented exactly as in the definition (candidate must be a consecutive sum of at least two earlier terms). The listed values match the sequence prefix stated in the problem statement.
+
+FINAL
+**UNRESOLVED**
+(i) Strongest proved partial result: the greedy sequence satisfies the deterministic upper bound $a_k\le F_k$ where $F_k$ is the Fibonacci-type sequence with $F_1=1,F_2=2$ (Lemma 423.2). Trivially $a_k\ge k$ since $(a_k)$ is strictly increasing in $\mathbb N$.
+(ii) First gap (crisp): prove any nontrivial asymptotic beyond exponential domination, e.g. show $a_k=O(k)$ or even $\lim_{k\to\infty}a_k/k=1$.
+(iii) Top 3 next moves:
+  1. Prove an interval-covering lemma: show that the set of consecutive sums from $(a_1,\dots,a_k)$ contains an interval $[a_k+1,a_k+L_k]$ with $L_k\to\infty$.
+  2. Quantify gap control: attempt to prove a bound of the form $a_{k+1}-a_k\le C\,k^\alpha$ for some $\alpha<1$ by analysing new suffix sums created when $a_{k+1}$ is added.
+  3. Computation-guided structure: search for an explicit description of the “missing set” $\{1,2,\dots,a_k\}\setminus\{a_1,\dots,a_k\}$ (e.g. via residues or greedy invariants) and try to prove it has density $0$.
+(iv) Minimal counterexample structure: if one conjectures $a_k\sim k$, a minimal counterexample would require a subsequence $k_j$ and a fixed $\delta>0$ with $a_{k_j}\ge (1+\delta)k_j$, equivalently that up to height $a_{k_j}$ there are at least $\delta k_j$ integers never selected by the greedy rule; such a failure would likely manifest as long stretches with no new consecutive-sum values near the current maximum.
+
+

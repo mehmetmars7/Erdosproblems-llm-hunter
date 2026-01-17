@@ -1,0 +1,153 @@
+% Erdos Problem #726
+
+1) FORMAL RESTATEMENT
+
+For an integer $n\ge 2$ define
+\[
+S(n) := \sum_{p\le n} \frac{1}{p}\,\mathbf 1\big( n\bmod p \in (p/2,\,p)\big),
+\]
+where the sum runs over primes $p$, and $\mathbf 1(\cdot)$ is the indicator of the stated condition.
+Explicitly, $\mathbf 1(n\bmod p\in(p/2,p))=1$ iff there exists an integer residue $r$ with $p/2<r<p$ and $n\equiv r\pmod p$.
+
+Conjecture (Erd\H{o}s--Graham--Ruzsa--Straus): as $n\to\infty$ over integers,
+\[
+S(n) \sim \frac{1}{2}\log\log n.
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records this as a conjecture, and compares it to Mertens' estimate
+\[
+\sum_{p\le n}\frac{1}{p}\sim \log\log n.
+\]
+I do not use additional literature.
+
+3) ATTACK PLAN
+
+Proof track ideas:
+- Rewrite $S(n)=\sum_{p\le n}(1/p)\,\mathbf 1(\{n/p\}>1/2)$ and try to show the indicator behaves like a fair coin for most primes.
+- Prove first the mean value over $n\le N$ is $(1/2)\log\log N+O(1)$, then attempt to bound fluctuations.
+
+Disproof track ideas:
+- Construct a sequence $n$ for which $n\bmod p$ lies mostly in $[0,p/2]$ for a large range of primes, forcing $S(n)$ to be $o(\log\log n)$.
+
+I can rigorously prove the mean order over $n\le N$; the pointwise asymptotic remains open.
+
+4) WORK
+
+\textbf{FAST REALITY CHECK.}
+
+A direct computation of $S(n)$ gives (values rounded):
+
+- $S(50)\approx 0.679$, while $(1/2)\log\log 50\approx 0.682$.
+- $S(200)\approx 0.850$, while $(1/2)\log\log 200\approx 0.834$.
+- Near $n=10^6$, $S(n)$ varies noticeably (e.g. $S(1{,}000{,}004)\approx 1.416$ and $S(1{,}000{,}015)\approx 0.688$) while $(1/2)\log\log(10^6)\approx 1.313$.
+
+These are consistent with a slowly growing main term and $O(1)$-scale fluctuations at this range.
+
+\medskip
+
+\textbf{Lemma 1 (local density of the condition mod $p$).}
+Let $p$ be prime.
+
+- If $p=2$, then for all integers $n$, $\mathbf 1(n\bmod 2\in(1,2))=0$.
+
+- If $p$ is odd, then among the residues $r\in\{0,1,\dots,p-1\}$ there are exactly $(p-1)/2$ residues satisfying $p/2<r<p$.
+Equivalently, for odd $p$,
+\[
+\frac{1}{p}\sum_{r=0}^{p-1} \mathbf 1(r\in(p/2,p)) = \frac{p-1}{2p} = \frac12-\frac{1}{2p}.
+\]
+
+\emph{Proof.}
+For $p=2$ the open interval $(p/2,p)=(1,2)$ contains no integer residue class mod $2$, so the indicator is always $0$.
+
+Now assume $p$ is odd. Then $p/2$ is not an integer, and the integers $r$ with $p/2<r<p$ are exactly
+\[
+\frac{p+1}{2},\ \frac{p+3}{2},\ \dots,\ p-1.
+\]
+This is an arithmetic progression with first term $(p+1)/2$ and last term $p-1$, hence it contains
+\[
+(p-1) - \frac{p+1}{2} + 1 = \frac{p-1}{2}
+\]
+integers.
+Dividing by $p$ gives the stated average.
+\qed
+
+\medskip
+
+\textbf{Lemma 2 (mean order over $n\le N$).}
+Let $N\ge 3$. Then
+\[
+\frac{1}{N}\sum_{n=1}^N S(n) = \frac12\sum_{p\le N}\frac{1}{p} + O(1),
+\]
+and consequently (using Mertens' estimate from the statement)
+\[
+\frac{1}{N}\sum_{n=1}^N S(n) = \frac12\log\log N + O(1).
+\]
+
+\emph{Proof.}
+Start from the definition and swap summations:
+\[
+\sum_{n=1}^N S(n)
+= \sum_{n=1}^N\sum_{p\le n} \frac{1}{p}\,\mathbf 1(n\bmod p\in(p/2,p))
+= \sum_{p\le N}\frac{1}{p}\sum_{n=p}^N \mathbf 1(n\bmod p\in(p/2,p)).
+\]
+(The inner sum starts at $n=p$ since for $n<p$ the prime $p$ does not appear in $S(n)$.)
+
+Fix a prime $p\le N$. Consider the sequence of residues $n\bmod p$ as $n$ runs over an interval of length $p$.
+In each full block of $p$ consecutive integers, the residues cover $\{0,1,\dots,p-1\}$ exactly once.
+By Lemma 1, in a full block of length $p$ there are exactly $(p-1)/2$ values with residue in $(p/2,p)$ for odd $p$, and $0$ such values for $p=2$.
+
+Write $N = ap + b$ with integers $a=\lfloor N/p\rfloor$ and $0\le b<p$.
+Then among $\{1,2,\dots,N\}$, the number of $n$ with $n\bmod p\in(p/2,p)$ equals
+\[
+a\cdot \frac{p-1}{2} + O(p),
+\]
+where the $O(p)$ term accounts for the incomplete final block of length $b$ and the initial shift from starting at $n=1$ instead of $n=0$.
+The same estimate holds if we restrict to $n\in\{p,p+1,\dots,N\}$ since removing the first $p-1$ values changes the count by at most $p$.
+Thus
+\[
+\sum_{n=p}^N \mathbf 1(n\bmod p\in(p/2,p)) = a\cdot \frac{p-1}{2} + O(p).
+\]
+Multiply by $1/p$ and sum over primes $p\le N$:
+\[
+\sum_{n=1}^N S(n) = \sum_{p\le N} \frac{1}{p}\left(\frac{p-1}{2}\left\lfloor\frac{N}{p}\right\rfloor + O(p)\right).
+\]
+Use $\lfloor N/p\rfloor = N/p + O(1)$ to get
+\[
+\sum_{n=1}^N S(n) = \sum_{p\le N}\left(\frac{N}{2p} - \frac{N}{2p^2}\right) + O\left(\sum_{p\le N}1\right).
+\]
+Divide by $N$:
+\[
+\frac{1}{N}\sum_{n=1}^N S(n) = \frac12\sum_{p\le N}\frac{1}{p} - \frac12\sum_{p\le N}\frac{1}{p^2} + O\left(\frac{\pi(N)}{N}\right).
+\]
+The sum $\sum_{p\le N}1/p^2$ is bounded uniformly in $N$ (since $\sum_p1/p^2<\infty$), and $\pi(N)/N\to 0$.
+Hence
+\[
+\frac{1}{N}\sum_{n=1}^N S(n) = \frac12\sum_{p\le N}\frac{1}{p} + O(1).
+\]
+Finally, by Mertens' estimate $\sum_{p\le N}1/p\sim\log\log N$, so the mean is $(1/2)\log\log N+O(1)$.
+\qed
+
+5) VERIFICATION
+
+- Lemma 1 carefully treats $p=2$ separately; for odd primes the residue count is exact.
+- In Lemma 2, all error terms are controlled explicitly by $O(p)$ per prime and the fact that $\sum_{p\le N}1/p^2$ converges.
+- The computation examples in the FAST REALITY CHECK are consistent with a $(1/2)\log\log n$ main term but are far too small to be diagnostic.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: The mean value over $n\le N$ satisfies $\frac{1}{N}\sum_{n\le N}S(n)=\frac12\log\log N+O(1)$ (Lemma 2), and the exact local density of the condition modulo each prime is given by Lemma 1.
+
+(ii) First gap (crisp): Prove or disprove the pointwise asymptotic $S(n)\sim \tfrac12\log\log n$ as $n\to\infty$ (not just on average).
+
+(iii) Top 3 next moves:
+  1. Prove a uniform bound on fluctuations, e.g. show $S(n)=\tfrac12\log\log n + o(\log\log n)$ for all $n$, or at least for a density-$1$ set of $n$.
+  2. Study correlations of the events $\{n\bmod p\in(p/2,p)\}$ across primes (large-sieve type estimates) to control the deviation from the mean.
+  3. Run computations for much larger $n$ and analyze the empirical distribution of $S(n)-\tfrac12\log\log n$ to guess the correct fluctuation scale.
+
+(iv) Minimal counterexample structure: If the conjecture fails, a minimal counterexample would be a sequence $n\to\infty$ for which the residues $n\bmod p$ land in $[0,p/2]$ for a positive proportion of primes up to $n^\alpha$ (for some fixed $\alpha>0$), creating a deficit of order $\log\log n$ in $S(n)$.
+
+

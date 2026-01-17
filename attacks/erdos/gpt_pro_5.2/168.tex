@@ -1,0 +1,217 @@
+% Erdos Problem #168
+% Attempt for Erdos Problem #168
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used beyond the problem text; no extra literature claims).
+% - Computation available (Python/Sage/Mathematica)? YES (used for small-N exact values).
+
+PROBLEM
+
+Let $F(N)$ be the size of the largest subset of $\{1,\ldots,N\}$ which does not contain any set of the form $\{n,2n,3n\}$. What is
+\[ \lim_{N\to \infty}\frac{F(N)}{N}?\]
+Is this limit irrational?
+
+OUTPUT
+
+## 1) FORMAL RESTATEMENT
+
+For each integer $N\ge 1$, define
+\[
+F(N):=\max\bigl\{|A|: A\subseteq [N]:=\{1,2,\dots,N\}\text{ and }\forall n\in\mathbb N\ (\{n,2n,3n\}\not\subseteq A)\bigr\}.
+\]
+Equivalently, $A$ is admissible iff for every $n$ with $3n\le N$ we do **not** have $n,2n,3n\in A$ simultaneously.
+
+The questions are:
+
+1. Does the limit $\displaystyle L:=\lim_{N\to\infty} \frac{F(N)}{N}$ exist? (The problem text says yes.)
+2. Compute $L$.
+3. Decide whether $L$ is irrational.
+
+Edge cases: $F(1)=1$, $F(2)=2$. For $N\ge 3$ the constraint is non-vacuous.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I will **not** use or claim any external results beyond what is explicitly written in the problem text.
+
+The problem text states:
+
+* Graham–Spencer–Witsenhausen (1977) proved the limit exists and gave a formula in terms of $3$-smooth numbers.
+* Eberhard reportedly computed the limit numerically as $0.800965\cdots$ using that formula.
+
+I do not re-prove existence of the limit or the formula here.
+
+---
+
+## 3) ATTACK PLAN
+
+Proof-track (partial):
+
+1. Prove simple explicit **lower bounds** on $F(N)$ by giving constructive admissible sets.
+2. Prove simple explicit **upper bounds** on $F(N)$ by finding many **pairwise disjoint** forbidden triples; each forces at least one element to be omitted.
+3. Do a small-$N$ brute-force reality check to sanity check the bounds and the qualitative size of $F(N)/N$.
+
+Disproof-track for “irrationality”: not currently feasible by elementary means; any proof of irrationality would need a deep structural description of the limit.
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (exact computation for small $N$)
+
+I computed the exact values of $F(N)$ for $1\le N\le 30$ by brute force search over subsets with pruning.
+The output was:
+
+\[
+\begin{array}{c|cccccccccc}
+N&1&2&3&4&5&6&7&8&9&10\\\hline
+F(N)&1&2&2&3&4&5&6&7&7&8
+\end{array}
+\]
+\[
+\begin{array}{c|cccccccccc}
+N&11&12&13&14&15&16&17&18&19&20\\\hline
+F(N)&9&10&11&12&12&13&14&14&15&16
+\end{array}
+\]
+\[
+\begin{array}{c|cccccccccc}
+N&21&22&23&24&25&26&27&28&29&30\\\hline
+F(N)&16&17&18&19&20&21&21&22&23&24
+\end{array}
+\]
+
+In particular $F(30)/30=0.8$ and many values hover around $0.8$–$0.88$ at these small sizes.
+
+---
+
+### Lemma 4.1 (simple constructive lower bound)
+
+For every $N\ge 1$,
+\[
+F(N)\ge N-\left\lfloor \frac N3\right\rfloor\ge \frac{2N}{3}.
+\]
+
+**Proof.**
+Let
+\[
+A:=\{\lfloor N/3\rfloor+1,\ \lfloor N/3\rfloor+2,\ \dots,\ N\}.
+\]
+Then $|A|=N-\lfloor N/3\rfloor$.
+
+Suppose for contradiction that $A$ contains a forbidden triple $\{n,2n,3n\}$.
+Then in particular $n\in A$, so
+\[
+ n\ge \lfloor N/3\rfloor+1 > N/3.
+\]
+But then $3n>N$, contradicting that $3n\in A\subseteq [N]$.
+Hence $A$ is admissible and therefore $F(N)\ge |A|=N-\lfloor N/3\rfloor$.
+Finally, since $\lfloor N/3\rfloor\le N/3$, we get $N-\lfloor N/3\rfloor\ge 2N/3$.
+$\square$
+
+---
+
+### Lemma 4.2 (disjoint-triples upper bound)
+
+For every $N\ge 1$,
+\[
+F(N)\le N-\Bigl(\bigl\lfloor \tfrac N3\bigr\rfloor-\bigl\lfloor \tfrac N4\bigr\rfloor\Bigr)
+\le \frac{11}{12}N+1.
+\]
+
+**Proof.**
+Define the index set
+\[
+T:=\Bigl\{n\in\mathbb N: \Bigl\lfloor \frac N4\Bigr\rfloor < n \le \Bigl\lfloor \frac N3\Bigr\rfloor\Bigr\}.
+\]
+For each $n\in T$ consider the triple
+\[
+\tau(n):=\{n,2n,3n\}.
+\]
+
+**Step 1: each $\tau(n)$ lies in $[N]$.**
+Since $n\le \lfloor N/3\rfloor$, we have $3n\le N$, hence $n,2n,3n\in [N]$.
+
+**Step 2: the triples $\{\tau(n):n\in T\}$ are pairwise disjoint.**
+Fix $n\in T$. Then
+\[
+\frac N4 < n \le \frac N3
+\quad\Longrightarrow\quad
+\frac N2 < 2n \le \frac{2N}{3}
+\quad\Longrightarrow\quad
+\frac{3N}{4} < 3n \le N.
+\]
+So
+\[
+ n\in (N/4,N/3],\qquad 2n\in (N/2,2N/3],\qquad 3n\in (3N/4,N].
+\]
+These three intervals are pairwise disjoint because
+\[
+N/3 < N/2 \quad\text{and}\quad 2N/3 < 3N/4.
+\]
+Now if $n\ne n'$ are in $T$, then $n$ and $n'$ are distinct elements in the first interval. Also $2n\ne 2n'$ and $3n\ne 3n'$. Finally, no element of $\tau(n)$ can equal an element of $\tau(n')$ across different “scales” because those lie in disjoint intervals. Hence $\tau(n)\cap \tau(n')=\emptyset$.
+
+**Step 3: counting.**
+Any admissible set $A\subseteq [N]$ must miss at least one element of each forbidden triple $\tau(n)$, and these triples are disjoint. Therefore
+\[
+|A|\le N-|T|.
+\]
+Since $T$ is exactly the integers $n$ with $\lfloor N/4\rfloor<n\le \lfloor N/3\rfloor$, we have
+\[
+|T|=\Bigl\lfloor \frac N3\Bigr\rfloor-\Bigl\lfloor \frac N4\Bigr\rfloor,
+\]
+so
+\[
+F(N)\le N-|T|=N-\Bigl(\bigl\lfloor \tfrac N3\bigr\rfloor-\bigl\lfloor \tfrac N4\bigr\rfloor\Bigr).
+\]
+For the simplified inequality, note
+\[
+\Bigl\lfloor \frac N3\Bigr\rfloor\ge \frac N3-1
+\quad\text{and}\quad
+\Bigl\lfloor \frac N4\Bigr\rfloor\le \frac N4,
+\]
+hence
+\[
+|T|\ge \Bigl(\frac N3-1\Bigr)-\frac N4=\frac N{12}-1.
+\]
+So $F(N)\le N-(N/12-1)=\frac{11}{12}N+1$.
+$\square$
+
+---
+
+## 5) VERIFICATION
+
+* The lower bound set $A=\{\lfloor N/3\rfloor+1,\dots,N\}$ passes the defining test: any forbidden triple must start with $n\le N/3$, but $A$ contains no such $n$.
+* The disjointness proof in Lemma 4.2 uses only interval separation and is valid for all real $N$; floors only affect the endpoints and do not create overlaps because the intervals are open/closed in a way that still preserves $2N/3<3N/4$.
+* Small-$N$ check: for $N=30$, Lemma 4.1 gives $F(30)\ge 30-10=20$, Lemma 4.2 gives $F(30)\le 30-(10-7)=27$. The computed value was $F(30)=24$, which lies in the interval.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+For all $N$,
+\[
+\frac{2}{3}\le \frac{F(N)}{N}\le \frac{11}{12}+\frac{1}{N}.
+\]
+Also, exact values of $F(N)$ for $1\le N\le 30$ were computed and recorded above.
+
+(ii) **Exact first gap.**
+
+Determine the exact value of $\displaystyle \lim_{N\to\infty} F(N)/N$ (or prove the limit exists by an elementary method), and then decide whether that limit is irrational.
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Implement the Graham–Spencer–Witsenhausen recursion (as described in the problem text) and reproduce the numerical limit to high precision, to conjecture algebraic relations (if any).
+2. Prove sharper elementary upper bounds by constructing a larger disjoint family of forbidden triples (a larger matching in the 3-uniform hypergraph of triples $\{n,2n,3n\}$).
+3. Prove sharper lower bounds by a structured greedy construction that chooses many elements from $[1,N/3]$ while controlling conflicts with their doubles and triples.
+
+(iv) **What a minimal counterexample would likely look like.**
+
+For irrationality: a “counterexample” would be a proof that the limit is rational. Any such proof would likely have to show the GSW series/formula collapses to a rational value (e.g., periodicity in the underlying recursion on $3$-smooth numbers). I do not currently see a mechanism to force such periodicity.
+
+

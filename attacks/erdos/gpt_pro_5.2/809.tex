@@ -1,0 +1,185 @@
+## 1) FORMAL RESTATEMENT
+
+Fix an integer (k\ge 3). For each integer (n\ge 1), define (F_k(n)) to be the minimum integer (r\ge 1) such that there exist
+
+* a **simple** undirected graph (G=(V,E)) with (|V|=n) and (|E|=\lfloor n^2/4\rfloor+1), and
+* an **edge-colouring** (\varphi:E\to [r]={1,2,\dots,r}),
+
+with the property that **every** subgraph (H\subseteq G) isomorphic to the odd cycle (C_{2k+1}) is **rainbow** under (\varphi); i.e. (\varphi) is injective on (E(H)) (no colour repeats among the (2k+1) edges of that cycle).
+
+Question (Burr–Erdős–Graham–Sós):
+[
+F_k(n)\sim \frac{n^2}{8}\quad (n\to\infty),
+]
+meaning (\displaystyle \lim_{n\to\infty}\frac{F_k(n)}{n^2}=\frac18).
+
+Conventions/edge cases:
+
+* If (n<2k+1), then (G) contains no (C_{2k+1}), so the rainbow constraint is vacuous.
+* Logs are irrelevant here.
+* Graphs are finite, simple, undirected.
+
+Stress points:
+
+* The edge count (\lfloor n^2/4\rfloor+1) is just **one above** Mantel’s bound for triangle-free / bipartite extremality, so (G) is “barely non-bipartite”.
+* A single (C_{2k+1}) already forces (r\ge 2k+1).
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK (web browsing)
+
+* The ErdosProblems entry for #809 states: Burr–Erdős–Graham–Sós proved (F_k(n)\gg n^2).
+* For context: for (n) large compared to (k), the extremal number for odd cycles satisfies
+  [
+  \mathrm{ex}(n,C_{2k+1})=\left\lfloor\frac{n^2}{4}\right\rfloor \quad\text{(for } n\ge 4k-2\text{)},
+  ]
+  attributed to Füredi–Gunderson.
+  Hence for (n\ge 4k-2), any graph with (\lfloor n^2/4\rfloor+1) edges must contain at least one (C_{2k+1}), so the rainbow condition is asymptotically non-vacuous.
+
+I did not find any indication (up to the site’s 2025 update cadence) that the asymptotic (\sim n^2/8) has been resolved.
+
+---
+
+## 3) ATTACK PLAN
+
+**Proof strategies (to try to prove (F_k(n)\sim n^2/8))**
+
+1. **Upper bound construction:** build (G) with (\lfloor n^2/4\rfloor+1) edges and an edge-colouring using ((1/8+o(1))n^2) colours. Natural route: make the “cycle-conflict graph” on edges sparse enough that many edges can share colours safely (no two same-coloured edges lie on a common (C_{2k+1})).
+2. **Lower bound via conflicts:** show that in every such (G), there is a large set of edges pairwise forced to have distinct colours because any two lie together in some (C_{2k+1}). Turning this into a sharp constant (1/8) is the hard part.
+3. **Stability + supersaturation:** use that (G) is near-bipartite (by stability around Mantel) and argue that the forced “odd-cycle mechanism” creates a dense conflict relation on at least (\sim n^2/4) edges, yielding a quadratic colour lower bound with a constant.
+
+**Disproof/construction strategies (to falsify (\sim n^2/8))**
+
+1. Produce a family with (F_k(n)\le (1/8-\varepsilon)n^2) (a better colouring than conjectured).
+2. Prove a universal lower bound (F_k(n)\ge (1/8+\varepsilon)n^2) (show conjectured constant too small).
+
+**Best path chosen in the work below:** I focused on (i) small-case sanity and (ii) analyzing the most natural “one edge above bipartite extremal” graph, to see what colour lower bounds it forces. This yields a rigorous (but negative-for-construction) structural lemma.
+
+---
+
+## 4) WORK
+
+### PHASE 1 — FAST REALITY CHECK
+
+**Vacuous regime.** If (n<2k+1), then no (C_{2k+1}) exists in any (n)-vertex graph, so the rainbow condition is vacuous. Any graph (G) with (\lfloor n^2/4\rfloor+1) edges (exists for all (n\ge 3)) can be coloured with one colour. Hence:
+[
+\boxed{n<2k+1\ \Rightarrow\ F_k(n)=1.}
+]
+
+**Non-vacuous regime for large (n).** If (n\ge 4k-2), then (\mathrm{ex}(n,C_{2k+1})=\lfloor n^2/4\rfloor).
+So any (G) with (\lfloor n^2/4\rfloor+1) edges contains at least one (C_{2k+1}), and a rainbow (C_{2k+1}) needs at least (2k+1) distinct colours. Therefore:
+[
+\boxed{n\ge 4k-2\ \Rightarrow\ F_k(n)\ge 2k+1.}
+]
+
+Trivial upper bound:
+[
+F_k(n)\le \lfloor n^2/4\rfloor+1
+]
+by colouring each edge distinctly.
+
+---
+
+### PHASE 2 — A rigorous “stress test” on the obvious near-extremal graph
+
+A natural candidate (G) with (\lfloor n^2/4\rfloor+1) edges is:
+[
+G_0 := K_{a,b}\ \cup\ {uv},
+]
+where (a=\lfloor n/2\rfloor), (b=\lceil n/2\rceil), (A\sqcup B) is the bipartition of (K_{a,b}), and (u,v\in A) are distinct.
+
+This is “one extra edge on top of Mantel”.
+
+I now prove that in (G_0), the rainbow requirement actually forces **almost all** bipartite edges to have **distinct** colours, i.e. (r) must be (\sim n^2/4). This shows (G_0) cannot be close to achieving an (n^2/8) upper bound.
+
+#### Lemma (two bipartite edges are co-cyclic with (uv))
+
+Fix (k\ge 3). Suppose (a\ge k+1) and (b\ge k). Let (G_0=K_{a,b}\cup{uv}) as above with (u,v\in A).
+
+Let (e_1,e_2) be two distinct edges of the complete bipartite part with endpoints in ((A\setminus{u,v})\times B). Then there exists a cycle (C\subseteq G_0) with
+[
+C\cong C_{2k+1}\quad\text{and}\quad {uv,e_1,e_2}\subseteq E(C).
+]
+
+**Proof.** It suffices to construct a **simple** (u)-to-(v) path (P) of length (2k) inside (K_{a,b}) that contains both (e_1) and (e_2). Then adding the edge (uv) closes (P) into a (C_{2k+1}).
+
+Because the bipartite part is complete, any alternating sequence of distinct vertices
+[
+u\in A,\ B,\ A,\ B,\ \dots,\ B,\ v\in A
+]
+gives a valid path. So we only must ensure:
+
+1. alternation,
+2. no vertex repetition,
+3. the two required edges appear somewhere among the consecutive pairs.
+
+Since (k\ge 3), the path has at least (k) (B)-vertices and (k-1) intermediate (A)-vertices. Our assumptions (b\ge k), (a\ge k+1) guarantee there are enough distinct vertices available to realize any prescribed constant-size “pattern” near the start (containing (e_1,e_2)) and then complete the remainder with fresh vertices.
+
+Concretely: build an initial alternating prefix starting at (u) that traverses (e_1) and (e_2) (if they share an endpoint, place them consecutively through that shared endpoint; if they are disjoint, place them as two separate consecutive (B!-!A) steps). This uses at most 2 intermediate (A)-vertices from (A\setminus{u,v}) and at most 2 vertices from (B). Then extend the alternating walk to reach (v) using fresh vertices; completeness ensures all required edges exist. The result is a simple (u)-to-(v) path of length exactly (2k) containing (e_1,e_2). Adding (uv) yields the desired (C_{2k+1}). ∎
+
+#### Corollary (large forced number of colours in (G_0))
+
+In any edge-colouring (\varphi) of (G_0) in which every (C_{2k+1}) is rainbow, all edges between (A\setminus{u,v}) and (B) must have **pairwise distinct** colours. Hence
+[
+r \ \ge\ |E(A\setminus{u,v},B)|=(a-2)b.
+]
+For balanced (a=\lfloor n/2\rfloor), (b=\lceil n/2\rceil),
+[
+(a-2)b=\left\lfloor\frac{n^2}{4}\right\rfloor-\Theta(n),
+]
+so this particular (G_0) requires
+[
+\boxed{r\ge \left\lfloor\frac{n^2}{4}\right\rfloor-O(n).}
+]
+
+**Proof.** If two distinct edges (e_1,e_2) in (E(A\setminus{u,v},B)) shared a colour, then by the lemma there is a (C_{2k+1}) containing both, so that cycle would repeat a colour—contradiction. Therefore all those edges have distinct colours, so (r) is at least their count. ∎
+
+**Interpretation:** the “obvious” near-extremal graph (K_{a,b}+uv) is extremely hostile to colour reuse; it forces (\sim n^2/4) colours, not (\sim n^2/8). So any graph witnessing (F_k(n)\sim n^2/8) (if true) must have a much sparser “two edges lie on a common (C_{2k+1})” relation on a positive fraction of its edges.
+
+---
+
+## 5) VERIFICATION (adversarial self-check)
+
+* **Vacuous case (n<2k+1):** correct; no (C_{2k+1}) subgraph exists.
+* **Non-vacuous trigger (n\ge 4k-2):** depends on (\mathrm{ex}(n,C_{2k+1})=\lfloor n^2/4\rfloor) for that range, cited.
+* **Key lemma on (G_0):** the only delicate point is ensuring the two specified edges can be embedded in a simple alternating (u)-to-(v) path of length (2k) without vertex repetition. The availability conditions (a\ge k+1), (b\ge k) ensure we can choose all intermediate vertices distinct while reserving the endpoints needed for the forced edges. Completeness of (K_{a,b}) guarantees the necessary adjacencies.
+
+No step uses hidden assumptions beyond simplicity and completeness.
+
+---
+
+## 6) FINAL: **UNRESOLVED**
+
+I did **not** produce either:
+
+* a complete proof that (F_k(n)\sim n^2/8), or
+* an explicit counterexample disproving that asymptotic.
+
+### (i) Strongest fully proved partial results here
+
+1. (F_k(n)=1) for (n<2k+1).
+2. For (n\ge 4k-2), (F_k(n)\ge 2k+1).
+3. For the canonical graph (G_0=K_{\lfloor n/2\rfloor,\lceil n/2\rceil}+uv), any valid colouring needs
+   [
+   r\ge (a-2)b = \left\lfloor\frac{n^2}{4}\right\rfloor - O(n),
+   ]
+   so (G_0) cannot witness a (\sim n^2/8) upper bound.
+
+### (ii) First gap
+
+Construct (or rule out) an (n)-vertex graph with (\lfloor n^2/4\rfloor+1) edges whose edge-set can be partitioned into (\sim n^2/8) colour classes such that no two edges in a class lie on a common (C_{2k+1}).
+
+### (iii) Top 3 next moves
+
+1. Identify minimizers of (F_k(n)) structurally: what graphs with (\lfloor n^2/4\rfloor+1) edges minimize the “cycle conflict graph” on edges?
+2. Attempt an explicit upper-bound construction where every (C_{2k+1}) must pass through a sparse “bottleneck” set of edges (so colours can be reused heavily outside that set).
+3. Compute small-(n) optimizers (fixed (k)) to guess the extremal pattern for (G) and for the colouring (even a heuristic can suggest the right structure).
+
+### (iv) What a minimal counterexample would likely look like
+
+If the conjecture (F_k(n)\sim n^2/8) is false, then for some (\varepsilon>0) infinitely many (n) would satisfy either:
+
+* (F_k(n)\le (1/8-\varepsilon)n^2) via a graph where most edges fall into “non-co-cyclic” pairs (allowing more reuse), or
+* (F_k(n)\ge (1/8+\varepsilon)n^2) via a universal argument that every such (G) has a conflict relation too dense to permit (\sim m/2) colouring.
+
+My proved lemma shows the most obvious near-Mantel graph (K_{a,b}+uv) lies in the *opposite* extreme, forcing (\sim n^2/4) colours.

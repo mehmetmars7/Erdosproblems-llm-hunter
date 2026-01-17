@@ -1,0 +1,158 @@
+% Erdos Problem #576
+
+1) FORMAL RESTATEMENT
+
+For an integer $k\ge 1$, let $Q_k$ denote the $k$-dimensional hypercube graph.
+Thus $Q_k$ has vertex set $\{0,1\}^k$ (so $2^k$ vertices) and an edge between two bitstrings iff they differ in exactly one coordinate; hence $e(Q_k)=k2^{k-1}$.
+
+Define $\mathrm{ex}(n;Q_k)$ as the maximum number of edges in an $n$-vertex graph containing no subgraph isomorphic to $Q_k$.
+
+Determine the asymptotic behavior (as $n\to\infty$ with fixed $k$) of $\mathrm{ex}(n;Q_k)$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The source file records:
+- Erd\H{o}s--Simonovits proved for $Q_3$ that $(\tfrac12+o(1))n^{3/2}\le \mathrm{ex}(n;Q_3)\ll n^{8/5}$, and for $Q_3$ minus an edge, $\mathrm{ex}(n;G)\asymp n^{3/2}$.
+- A theorem of Sudakov--Tomon implies $\mathrm{ex}(n;Q_k)=o(n^{2-1/k})$.
+- Janzer--Sudakov improved this to $\mathrm{ex}(n;Q_k)\ll_k n^{2-\frac{1}{k-1}+\frac{1}{(k-1)2^{k-1}}}$.
+The Erd\H{o}s Problems website currently lists #576 as open (discussion thread exists).
+
+3) ATTACK PLAN
+
+Proof-track ideas (upper bounds):
+- Relate $Q_k$-free graphs to forbidding large complete bipartite subgraphs (since $Q_k$ is bipartite with equal parts), giving a soft K\"ov\'ari--S\'os--Tur\'an type bound.
+- Use the stronger stated results (Sudakov--Tomon; Janzer--Sudakov) as context but do not re-prove them here.
+
+Construction-track ideas (lower bounds):
+- Since $Q_k$ contains a $C_4$ for $k\ge 2$, any $C_4$-free construction gives a $Q_k$-free construction, yielding $\Omega(n^{3/2})$ edges.
+
+I give two elementary comparison lemmas and small-$n$ exact checks; the true exponent for fixed $k\ge 3$ remains unresolved.
+
+4) WORK
+
+\textbf{FAST REALITY CHECK.}
+- For $k=1$, $Q_1=K_2$, so $\mathrm{ex}(n;Q_1)=0$.
+- For $k=2$, $Q_2=C_4$.
+- For $k=3$, $Q_3$ has $8$ vertices, so for $n\le 7$, every $n$-vertex graph is $Q_3$-free and $\mathrm{ex}(n;Q_3)=\binom{n}{2}$.
+- Exact computation for $n=8$ (search over complements of $K_8$) gives
+\[\mathrm{ex}(8;Q_3)=23.
+\]
+
+\medskip
+\textbf{Lemma 576.1 ($C_4$-free graphs are $Q_k$-free for $k\ge 2$).}
+For every $k\ge 2$ and every $n$,
+\[
+\mathrm{ex}(n;Q_k)\ge \mathrm{ex}(n;C_4).
+\]
+\emph{Proof.}
+For $k\ge 2$, the hypercube $Q_k$ contains a 4-cycle: fix $k-2$ coordinates and vary the remaining two coordinates to get a copy of $Q_2=C_4$ as a subgraph.
+Thus, if a graph $G$ is $C_4$-free then it cannot contain $Q_k$ (since any copy of $Q_k$ would contain a copy of $C_4$).
+Therefore every $C_4$-free $n$-vertex graph is also $Q_k$-free.
+Taking maxima of edge counts over these classes yields
+$\mathrm{ex}(n;Q_k)\ge \mathrm{ex}(n;C_4)$.
+\qed
+
+\medskip
+\textbf{Lemma 576.2 ($Q_k$-free implies $K_{t,t}$-free for $t=2^{k-1}$).}
+Let $k\ge 1$ and set $t=2^{k-1}$.
+Then $Q_k$ is a subgraph of the complete bipartite graph $K_{t,t}$. Consequently, for every $n$,
+\[
+\mathrm{ex}(n;Q_k)\le \mathrm{ex}(n;K_{t,t}).
+\]
+\emph{Proof.}
+The hypercube $Q_k$ is bipartite: partition vertices by parity of Hamming weight (even vs odd), yielding two parts each of size $2^{k-1}=t$.
+Every edge of $Q_k$ joins an even-parity vertex to an odd-parity vertex.
+Thus $Q_k$ is a bipartite graph with parts of size $t$, hence it is a subgraph of $K_{t,t}$ (map the two parts injectively onto the two parts of $K_{t,t}$; all required cross edges exist in $K_{t,t}$).
+
+If an $n$-vertex graph $G$ contains a copy of $K_{t,t}$, then it also contains a copy of $Q_k$ (since $Q_k\subseteq K_{t,t}$).
+Therefore, if $G$ is $Q_k$-free, it must be $K_{t,t}$-free.
+Taking maxima over $Q_k$-free graphs gives
+$\mathrm{ex}(n;Q_k)\le \mathrm{ex}(n;K_{t,t})$.
+\qed
+
+\medskip
+\textbf{Lemma 576.3 (elementary K\"ov\'ari--S\'os--Tur\'an type bound for $K_{s,t}$).}
+Let $2\le s\le t$ be integers and let $G$ be an $n$-vertex graph with no $K_{s,t}$ subgraph.
+Then
+\[
+ e(G) \le (t-1)^{1/s}\, n^{2-1/s} + \frac{s-1}{2}n.
+\]
+\emph{Proof.}
+Let the degrees be $d(v)$.
+Count the number of pairs $(S,v)$ where $S\subseteq V(G)$ is an $s$-element set and $v$ is a common neighbor of all vertices in $S$.
+
+On one hand, for a fixed vertex $v$, the number of $s$-sets $S$ contained in its neighborhood is $\binom{d(v)}{s}$, so the total number of pairs equals
+\[ X:=\sum_{v\in V(G)}\binom{d(v)}{s}. \]
+
+On the other hand, fix an $s$-set $S$. If $S$ had $t$ or more common neighbors, then $S$ together with any $t$ of those common neighbors would span a $K_{s,t}$.
+Because $G$ is $K_{s,t}$-free, every $s$-set has at most $t-1$ common neighbors.
+There are $\binom{n}{s}$ choices for $S$, so
+\[ X\le (t-1)\binom{n}{s}. \]
+
+We now lower bound $X$ in terms of $m=e(G)$.
+Let $\bar d=\frac{1}{n}\sum_v d(v)=\frac{2m}{n}$.
+The function $f(x)=\binom{x}{s}$ is convex for real $x\ge s-1$ (it is a degree-$s$ polynomial with nonnegative second derivative on $[s-1,\infty)$).
+Applying Jensen's inequality to the multiset $\{d(v)\}$ gives
+\[
+\frac{1}{n}\sum_v \binom{d(v)}{s}\ \ge\ \binom{\bar d}{s}.
+\]
+Thus $X\ge n\binom{\bar d}{s}$.
+Using the crude lower bound $\binom{x}{s}\ge \frac{1}{s!}(x-s+1)^s$ for real $x\ge s-1$ (expand $(x)(x-1)\cdots(x-s+1)$ and drop all but the smallest factor), we obtain
+\[
+X\ge n\cdot \frac{1}{s!}\,(\bar d-s+1)^s.
+\]
+Combine with $X\le (t-1)\binom{n}{s}\le (t-1)\frac{n^s}{s!}$ to get
+\[
+ n(\bar d-s+1)^s \le (t-1)n^s.
+\]
+Dividing by $n$ and taking $s$-th roots:
+\[
+\bar d - (s-1) \le (t-1)^{1/s} n^{1-1/s}.
+\]
+Therefore
+\[
+\bar d\le (t-1)^{1/s} n^{1-1/s} + (s-1).
+\]
+Multiplying by $n/2$ gives
+\[
+ m=\frac{n\bar d}{2} \le \frac{n}{2}(t-1)^{1/s} n^{1-1/s} + \frac{s-1}{2}n,
+\]
+which is the stated bound.
+\qed
+
+\medskip
+\textbf{Immediate corollary for cubes.}
+Taking $s=t=2^{k-1}$ in Lemma~576.3 and using Lemma~576.2 yields a soft upper bound
+\[
+\mathrm{ex}(n;Q_k) \le O_k\big(n^{2-1/2^{k-1}}\big),
+\]
+which is far weaker than the bounds quoted in the problem statement for large $k$, but is fully elementary.
+
+5) VERIFICATION
+
+- Lemma~576.1: verified explicitly that $Q_k$ contains a $C_4$ for all $k\ge2$ by fixing $k-2$ coordinates.
+- Lemma~576.2: verified bipartition sizes are equal to $2^{k-1}$ and that any bipartite graph on parts of size $t$ embeds into $K_{t,t}$.
+- Lemma~576.3: the double counting uses only that an $s$-set cannot have $\ge t$ common neighbors, else forms $K_{s,t}$. Jensen/convexity step requires $\bar d\ge s-1$; if $\bar d<s-1$, then $m<\tfrac{s-1}{2}n$ and the bound holds trivially.
+- Small $n$ check: $\mathrm{ex}(8;Q_3)=23$ is consistent with the general upper bound $\binom{8}{2}=28$ and the trivial lower bound from $C_4$-free constructions.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest fully proved partial result:  
+Elementary comparisons give
+\[\mathrm{ex}(n;C_4)\le \mathrm{ex}(n;Q_k)\le \mathrm{ex}(n;K_{2^{k-1},2^{k-1}}),\]
+and Lemma~576.3 gives $\mathrm{ex}(n;Q_k)=O_k(n^{2-1/2^{k-1}})$. The source file also records much stronger known upper bounds (Sudakov--Tomon; Janzer--Sudakov).
+
+(ii) First gap (crisp):  
+Determine the correct exponent (and constant) in the growth of $\mathrm{ex}(n;Q_k)$ for fixed $k\ge 3$; even for $k=3$ it is unknown whether $\mathrm{ex}(n;Q_3)$ is closer to $n^{3/2}$ or $n^{8/5}$.
+
+(iii) Top 3 next moves (concrete):
+1. Improve the elementary $K_{t,t}$ comparison by exploiting the specific sparse/regular structure of $Q_k$ (e.g., many 4-cycles) rather than only part sizes.
+2. For $k=3$, attempt a stability/supersaturation approach: show that graphs with $\gg n^{3/2}$ edges contain many $C_4$ in a structured way that forces a cube.
+3. Computation: exact $\mathrm{ex}(n;Q_3)$ for $n=9,10$ via MILP/backtracking to guess extremal families.
+
+(iv) Minimal counterexample structure:  
+If one conjectures $\mathrm{ex}(n;Q_3)\asymp n^{8/5}$, a disproof would require constructing $Q_3$-free graphs with $\gg n^{8/5}$ edges or proving a matching $O(n^{8/5})$ upper bound. Any extremal family must avoid the 8-vertex cube while still allowing many $C_4$'s (since forbidding all $C_4$ would drop to $\Theta(n^{3/2})$).
+
+

@@ -1,0 +1,180 @@
+% Erdos Problem #364
+% Attempt for Erdos Problem #364
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES
+% - Computation available (Python/Sage/Mathematica)? YES
+
+## 1) FORMAL RESTATEMENT
+
+A positive integer \(n\) is **powerful** (a.k.a. **2-full**, **squareful**) if
+\[
+\forall\text{ primes }p:\ p\mid n\ \Rightarrow\ p^2\mid n.
+\]
+
+The problem asks:
+
+> Does there exist \(N\in\mathbb N\) such that \(N,\,N+1,\,N+2\) are all powerful?
+
+(Equivalently: do there exist three consecutive positive integers all powerful?)
+
+Edge cases:
+* \(1\) is powerful by the given definition (no prime divides 1).
+* \(2\) is not powerful.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+I only record what the provided problem text states (no additional external claims):
+
+* There are infinitely many **pairs** of consecutive powerful numbers from solutions to
+  \(x^2=8y^2+1\).
+* The abc conjecture would imply only finitely many such **triples**.
+* There are no **quadruples** of consecutive powerful numbers.
+* A computational claim (OEIS A060355) is mentioned: no such triples with \(n<10^{22}\).
+
+---
+
+## 3) ATTACK PLAN
+
+**Proof track (partial structure).**
+1. Prove standard structural characterizations of powerful numbers.
+2. Prove rigorously the infinite consecutive-pairs construction from Pell’s equation.
+3. Prove the easy obstruction for 4 consecutive powerful numbers.
+
+**Disproof track.**
+Try to find a triple by computation in a modest range. (No triple found up to \(10^6\).)
+
+---
+
+## 4) WORK
+
+### Phase 1: FAST REALITY CHECK (computation)
+
+I brute-searched \(N\le 10^6\) and found **no** triple \((N,N+1,N+2)\) with all three powerful.
+
+---
+
+### Lemma 4.1 (Powerful \(\Leftrightarrow a^2 b^3\) with \(b\) squarefree)
+A positive integer \(n\) is powerful if and only if it can be written as
+\[
+ n=a^2 b^3
+\]
+with \(a,b\in\mathbb N\) and \(b\) squarefree.
+
+**Proof.**
+
+\underline{(\(\Rightarrow\)).}
+Write the prime factorization \(n=\prod_p p^{e_p}\) with each \(e_p\ge 0\). Powerfulness means:
+whenever \(e_p>0\), we have \(e_p\ge 2\).
+
+Define
+\[
+ b:=\prod_{p: e_p\text{ odd}} p\quad\text{(so }b\text{ is squarefree),}\qquad
+ a:=\prod_p p^{(e_p-3\cdot\mathbf 1_{e_p\text{ odd}})/2}.
+\]
+This makes sense because:
+* if \(e_p\) is even, the exponent is \(e_p/2\in\mathbb N_0\);
+* if \(e_p\) is odd and \(e_p\ge 3\), then \((e_p-3)/2\in\mathbb N_0\).
+
+Then for each prime \(p\), the exponent of \(p\) in \(a^2 b^3\) is
+\(2\cdot\frac{e_p-3\cdot\mathbf 1_{e_p\text{ odd}}}{2} + 3\cdot\mathbf 1_{e_p\text{ odd}}=e_p\).
+Hence \(n=a^2 b^3\).
+
+\underline{(\(\Leftarrow\)).}
+If \(n=a^2 b^3\), then for any prime \(p\mid n\), either \(p\mid a\) (then \(p^2\mid a^2\mid n\))
+or \(p\mid b\) (then \(p^3\mid b^3\mid n\), so in particular \(p^2\mid n\)). Thus \(n\) is powerful.
+
+This proves the equivalence. \(\square\)
+
+---
+
+### Lemma 4.2 (Infinite consecutive pairs from Pell)
+Let \((x,y)\in\mathbb N^2\) satisfy the Pell equation
+\[
+ x^2-8y^2=1.
+\]
+Then \(8y^2\) and \(x^2\) are consecutive powerful numbers.
+
+**Proof.** The Pell equation gives \(x^2=8y^2+1\), so \(x^2\) and \(8y^2\) differ by 1.
+
+* \(x^2\) is a perfect square, hence for every prime \(p\mid x^2\) we have \(p^2\mid x^2\); thus \(x^2\)
+  is powerful.
+* \(8y^2 = 2^3\cdot y^2\). Any prime divisor of \(y\) occurs in \(y^2\) with exponent at least 2, and
+  the prime 2 occurs with exponent 3. Hence every prime divisor of \(8y^2\) has exponent at least 2,
+  so \(8y^2\) is powerful.
+
+To see there are infinitely many positive integer solutions, start from the solution \((x_1,y_1)=(3,1)\)
+(since \(3^2-8\cdot 1^2=1\)) and define recursively
+\[
+x_{t+1}=3x_t+8y_t,\qquad y_{t+1}=x_t+3y_t.
+\]
+If \(x_t^2-8y_t^2=1\), then
+\[
+x_{t+1}^2-8y_{t+1}^2=(3x_t+8y_t)^2-8(x_t+3y_t)^2=x_t^2-8y_t^2=1,
+\]
+so \((x_{t+1},y_{t+1})\) is also a solution. Moreover \(x_{t+1}=3x_t+8y_t>x_t\), hence the
+solutions are all distinct and infinite in number.
+
+Therefore there are infinitely many such consecutive powerful pairs. \(\square\)
+
+---
+
+### Lemma 4.3 (No four consecutive powerful numbers)
+There do not exist four consecutive positive integers all of which are powerful.
+
+**Proof.** Among any four consecutive integers, exactly one is congruent to \(2\pmod 4\).
+Such an integer has 2-adic valuation exactly 1, i.e. it is divisible by 2 but not by 4.
+Hence for that integer \(n\), the prime \(2\mid n\) but \(2^2\nmid n\), so \(n\) is not powerful.
+\(\square\)
+
+---
+
+## 5) VERIFICATION
+
+* Lemma 4.1: the construction of \(a,b\) assigns odd exponents to \(b\) (once each) and the remaining
+  even part to \(a^2\); the exponent check is explicit prime-by-prime.
+* Lemma 4.2: the only property used is “square implies powerful” and “\(y^2\) gives exponent \(\ge 2\)”
+  plus the explicit exponent 3 of 2 in 8.
+* Lemma 4.3: the mod-4 argument is airtight.
+* Computation is only a sanity check; no conclusions beyond \(10^6\) are claimed.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* There are infinitely many pairs of consecutive powerful numbers of the form \((8y^2, x^2)\) coming
+  from Pell solutions \(x^2-8y^2=1\) (Lemma 4.2).
+* There are no four consecutive powerful numbers (Lemma 4.3).
+* A brute-force search finds no triple \((N,N+1,N+2)\) of powerful numbers with \(N\le 10^6\).
+
+(ii) **Exact first gap.**
+
+Prove or disprove:
+\[
+\exists N\in\mathbb N:\ N,\ N+1,\ N+2\text{ are all powerful}.
+\]
+
+(iii) **Top 3 next moves (concrete targets).**
+
+1. Use Lemma 4.1 to parametrize a hypothetical triple as
+   \(N=a^2b^3\), \(N+1=c^2d^3\), \(N+2=e^2f^3\) with squarefree \(b,d,f\), and exploit gcd constraints
+   \(\gcd(N,N+1)=\gcd(N+1,N+2)=1\).
+2. Search for strong modular obstructions: for a powerful \(n\), \(n\equiv 0,1\pmod 4\); combine such
+   restrictions across three consecutive integers to narrow cases.
+3. If allowed to assume abc (as the problem text mentions), formalize the implication “finitely many
+   triples” and try to obtain an unconditional weaker bound (e.g. growth gaps between powerful numbers).
+
+(iv) **What a minimal counterexample would likely look like.**
+
+If a triple exists, the smallest \(N\) must be very large (computational evidence suggests no small
+examples). Structurally, by coprimality, the three powerful numbers would have disjoint prime sets
+pairwise, forcing a delicate arrangement where each of \(N, N+1, N+2\) is composed entirely of prime
+powers \(\ge 2\) yet adjacent numbers share no primes.
+
+

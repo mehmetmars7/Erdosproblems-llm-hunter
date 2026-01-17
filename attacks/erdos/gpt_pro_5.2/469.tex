@@ -1,0 +1,123 @@
+% Erdos Problem #469
+% URL: https://www.erdosproblems.com/469
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+Call an integer $n\ge 2$ \emph{pseudoperfect} if $n$ can be written as a sum of \emph{distinct proper divisors} of $n$. (Proper divisors are positive divisors $<n$; the divisor $1$ is allowed.)
+
+Let $A$ be the set of \emph{primitive pseudoperfect} numbers: $n\in A$ if $n$ is pseudoperfect but no proper divisor $m\mid n$ with $m<n$ is pseudoperfect.
+
+Question: Does the sum of reciprocals converge?
+\[
+\sum_{n\in A}\frac{1}{n}\ \stackrel{?}{<}\ \infty.
+\]
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+The problem statement mentions that these numbers are listed as A006036 in OEIS and cites \cite{BeEr74}. I will not assume any OEIS facts and will work from the definition, plus direct computation.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\begin{itemize}
+\item Prove basic necessary conditions for pseudoperfectness (in particular, $\sigma(n)\ge 2n$).
+\item Give explicit examples of primitive pseudoperfect numbers with full verification.
+\item Compute the initial segment of $A$ and partial sums $\sum_{n\in A,\ n\le X} 1/n$ for moderate $X$ to see whether the sum plausibly converges.
+\end{itemize}
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\textbf{Lemma 469.1 (pseudoperfect $\Rightarrow$ abundant or perfect).}
+If $n$ is pseudoperfect, then
+\[
+\sigma(n)\ge 2n\quad\text{equivalently}\quad \sum_{\substack{d\mid n\\ d<n}} d\ \ge\ n.
+\]
+
+\textit{Proof.}
+If $n$ is pseudoperfect, there exists a subset $S$ of proper divisors of $n$ with $\sum_{d\in S} d=n$. The sum of \emph{all} proper divisors is at least the sum over $S$, hence at least $n$. Therefore $\sigma(n)-n\ge n$, i.e. $\sigma(n)\ge 2n$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 469.2 (no prime power is pseudoperfect).}
+Let $n=p^k$ with $p$ prime and $k\ge 1$. Then $n$ is \emph{not} pseudoperfect.
+
+\textit{Proof.}
+The proper divisors of $p^k$ are $1,p,p^2,\dots,p^{k-1}$, whose sum equals
+\[
+1+p+\cdots+p^{k-1}=\frac{p^k-1}{p-1}.
+\]
+We claim this is strictly less than $p^k$. Indeed
+\[
+\frac{p^k-1}{p-1}<p^k\ \Longleftrightarrow\ p^k-1<p^k(p-1)=p^{k+1}-p^k,
+\]
+which holds for all $p\ge 2$ since $p^{k+1}-p^k\ge p^k>p^k-1$. Thus even the \emph{total} sum of proper divisors is $<n$, so no subset can sum to $n$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 469.3 (explicit primitive pseudoperfect example: $20\in A$).}
+The integer $20$ is primitive pseudoperfect.
+
+\textit{Proof.}
+The proper divisors of $20$ are $1,2,4,5,10$. They have a distinct-sum representation
+\[
+20=10+5+4+1.
+\]
+So $20$ is pseudoperfect. Its proper divisors are $1,2,4,5,10$; none of $2,4,5,10$ is pseudoperfect because in each case the sum of all proper divisors is $<m$ (respectively $1<2$, $1+2=3<4$, $1<5$, and $1+2+5=8<10$). Hence $20$ has no pseudoperfect proper divisor, so $20\in A$. \hfill$\square$
+
+\medskip
+\noindent\textbf{FAST REALITY CHECK (computations).}
+
+I computed all primitive pseudoperfect numbers up to several limits using exact subset-sum (bitset DP) over proper divisors, and filtered primitiveness by checking proper divisors.
+
+Results:
+\begin{verbatim}
+limit   |A ∩ [1,limit]|   partial sum  Σ_{n∈A, n≤limit} 1/n
+20000   163                0.33312907483095244
+50000   299                0.3372780998948891
+100000  490                0.3400146761643518
+200000  667                0.34128359582091095
+\end{verbatim}
+The first 25 elements of $A$ found were
+\begin{verbatim}
+[6, 20, 28, 88, 104, 272, 304, 350, 368, 464, 490, 496, 550, 572,
+ 650, 748, 770, 910, 945, 1184, 1190, 1312, 1330, 1376, 1430]
+\end{verbatim}
+and among those $\le 200000$ there were $117$ odd elements (for example $945\in A$).
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Lemma~469.1 is immediate from monotonicity of ``sum of all proper divisors'' versus ``sum of a subset''.
+\item Lemma~469.2 checks the full proper-divisor sum of a prime power and shows it is $<n$, which is decisive.
+\item The computation uses an exact subset-sum DP over the (finite) list of proper divisors, so there are no probabilistic approximations.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.} \textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+Pseudoperfect numbers are necessarily abundant/perfect ($\sigma(n)\ge 2n$, Lemma~469.1) and no prime power is pseudoperfect (Lemma~469.2). Computations up to $200000$ found $667$ primitive pseudoperfect numbers and a partial reciprocal sum $\sum_{n\in A,\ n\le 200000}1/n\approx 0.3412835958$.
+
+(ii) \textbf{First gap (crisp).}
+Prove either
+\[
+\sum_{n\in A}\frac1n<\infty
+\]
+or
+\[
+\sum_{n\in A}\frac1n=\infty.
+\]
+A concrete intermediate target is to obtain a quantitative upper bound on the counting function $A(x):=|\{n\in A:n\le x\}|$ strong enough to decide convergence/divergence (e.g. $A(x)\ll x/(\log x)^{1+\varepsilon}$ would imply convergence).
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Derive structural restrictions on primitive pseudoperfect numbers stronger than Lemma~469.1--469.2 (e.g. constraints on the size of the smallest prime factor, or on the pattern of abundancy $\sigma(n)/n$) and convert them into a counting bound.
+\item Look for infinite families inside $A$ (or prove they cannot exist). Any explicit parametrized family gives information about convergence by comparison tests.
+\item Extend computation (e.g. to $10^6$ or beyond) and track both $A(x)$ and partial sums $\sum_{n\in A, n\le x}1/n$ to guess the correct growth regime.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure.}
+If the sum diverges, there must exist many primitive pseudoperfect numbers at each scale, roughly enough that $\sum_{n\in A\cap[2^k,2^{k+1})}1/n$ does not go to $0$ as $k\to\infty$. This would require an infinite supply of primitive pseudoperfect numbers with controlled multiplicative structure (since Lemma~469.2 rules out prime powers), possibly forming relatively dense clusters.
+
+

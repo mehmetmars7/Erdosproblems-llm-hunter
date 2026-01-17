@@ -1,0 +1,144 @@
+% Erdős Problem #18
+
+1) FORMAL RESTATEMENT
+
+A positive integer $m$ is \emph{practical} if every integer $x$ with $1\le x<m$ can be written as a sum of \emph{distinct} positive divisors of $m$.
+
+For a practical $m$, define $h(m)$ to be the smallest integer $h\ge 0$ such that every integer $x$ with $1\le x<m$ can be written as a sum of at most $h$ distinct divisors of $m$.
+
+Questions:
+
+(Q1) Are there infinitely many practical $m$ with
+\[
+h(m) < (\log\log m)^{O(1)}?
+\]
+Interpreting the $O(1)$: does there exist a constant $C>0$ and infinitely many practical $m$ such that $h(m)\le (\log\log m)^C$?
+
+(Q2) For factorials, is it true that
+\[
+h(n!) < n^{o(1)}\ ?
+\]
+More strongly, is $h(n!)<(\log n)^{O(1)}$?
+
+(Edge case: $m=1$ is practical vacuously; then the set $\{x:1\le x<m\}$ is empty, so the minimal $h(1)$ is $0$.)
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided problem text states (without proof here) that Erd\H{o}s showed $h(n!)<n$ and that Vose proved there are infinitely many practical $m$ with $h(m)\ll (\log m)^{1/2}$. I do not use or claim any additional literature beyond what is explicitly stated in the problem file.
+
+3) ATTACK PLAN
+
+Proof track (ambitious):
+- Try to construct infinite families of practical $m$ whose divisor structure allows representing all $x<m$ with few divisors, e.g., by ensuring a near-binary hierarchy among divisors.
+- Specifically for $n!$, exploit its extremely rich divisor set to compress representations.
+
+Disproof track (ambitious):
+- Try to prove a lower bound on $h(m)$ for all practical $m$ (or for $m=n!$) that is larger than any polylogarithm in $\log\log m$ (respectively larger than any polylogarithm in $\log n$).
+
+What I can deliver: two fully proved structural lemmas, plus exact computed values of $h(n!)$ for small $n$.
+
+4) WORK
+
+FAST REALITY CHECK (exact computation for small factorials)
+
+I computed $h(n!)$ exactly for $1\le n\le 9$ by dynamic programming over the divisor set of $n!$.
+
+Method (briefly): list all positive divisors $d$ of $m=n!$. For each sum $s<m$, compute the minimum number of distinct divisors needed to make $s$ via a standard 0--1 knapsack DP. Then $h(m)$ is the maximum of these minima over $1\le s<m$. This also verifies practicality (all states finite).
+
+Exact results:
+\[
+\begin{array}{c|c|c}
+ n & n! & h(n!)\\\hline
+ 1 & 1 & 0\\
+ 2 & 2 & 1\\
+ 3 & 6 & 2\\
+ 4 & 24 & 3\\
+ 5 & 120 & 4\\
+ 6 & 720 & 5\\
+ 7 & 5040 & 5\\
+ 8 & 40320 & 6\\
+ 9 & 362880 & 7
+\end{array}
+\]
+In particular, these computations confirm that $n!$ is practical for $n\le 9$ and that $h(n!)$ is substantially smaller than $n$ already for $n=7$ (where $h(7!)=5$).
+
+Lemma 18.1 (a necessary condition: practical $m>1$ must be even).
+If $m$ is practical and $m>1$, then $2\mid m$.
+
+Proof.
+Assume $m>1$ is practical. By definition, the integer $x=2$ satisfies $1\le 2<m$ (since $m>2$ or $m=2$; in either case $2\le m$ and if $m=2$ then the statement is trivially true).
+
+Because $m$ is practical, $2$ must be representable as a sum of distinct positive divisors of $m$.
+
+- If $2$ itself is a divisor of $m$, then $2\mid m$ and we are done.
+
+- Otherwise, the representation of $2$ as a sum of distinct positive divisors must use only divisors $\le 1$ (because any divisor $d\ge 3$ would make the sum $\ge 3$). The only positive divisor $\le 1$ is $1$, but $1+1$ is not allowed since the divisors must be distinct.
+
+Thus the only possibility is that $2$ is a divisor of $m$. Hence $2\mid m$. $\square$
+
+Lemma 18.2 (exact formula for powers of two).
+For every integer $k\ge 1$,
+- $m=2^k$ is practical, and
+- $h(2^k)=k$.
+
+Proof.
+First note that the positive divisors of $2^k$ are exactly
+\[
+1,2,2^2,\dots,2^{k-1},2^k.
+\]
+
+(Practicality.) Let $x$ be any integer with $1\le x<2^k$. Write the binary expansion
+\[
+x = \sum_{j=0}^{k-1} b_j 2^j,\qquad b_j\in\{0,1\}.
+\]
+Then $x$ is a sum of the distinct divisors $2^j$ for which $b_j=1$. This uses distinct divisors and represents every $x<2^k$. Hence $2^k$ is practical.
+
+(Upper bound on $h$.) The representation above uses at most $k$ divisors (one per binary digit), so $h(2^k)\le k$.
+
+(Lower bound on $h$.) Consider $x=2^k-1$. Its binary expansion has $b_j=1$ for all $0\le j\le k-1$, so any sum of distinct divisors equaling $2^k-1$ must use all divisors $1,2,\dots,2^{k-1}$, i.e., at least $k$ divisors.
+
+To justify the last sentence: the sum of all divisors $<2^{k-1}$ is
+\[
+1+2+\cdots+2^{k-2} = 2^{k-1}-1,
+\]
+so without using the divisor $2^{k-1}$ the maximum attainable sum is $2^{k-1}-1 < 2^k-1$. Therefore $2^{k-1}$ must be included. Subtracting it leaves $2^{k-1}-1$, and repeating the same argument inductively forces inclusion of $2^{k-2},\dots,1$. Hence any representation of $2^k-1$ needs at least $k$ divisors.
+
+Thus $h(2^k)\ge k$, and combined with $h(2^k)\le k$ we get $h(2^k)=k$. $\square$
+
+5) VERIFICATION
+
+- Lemma 18.1 uses only the definition of practical and the distinctness requirement; all cases covered (including $m=2$).
+- Lemma 18.2: the upper bound uses the binary expansion (standard and explicit). The lower bound is proved by a monotone maximum-sum argument that does not assume uniqueness.
+- Computation check: for $n=6$, the DP gives $h(720)=5$; this is consistent with the trivial upper bound $h(n!)<n$ quoted in the problem file (here $5<6$).
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result:
+- Structural necessity: any practical $m>1$ is even (Lemma 18.1).
+- An infinite explicit family with exact $h$: $h(2^k)=k=\log_2 m$ (Lemma 18.2).
+- Exact computed values of $h(n!)$ for $n\le 9$ listed above.
+
+(ii) First gap (crisp):
+Prove or disprove the existence of constants $C>0$ and infinitely many practical $m$ with
+\[
+h(m)\le (\log\log m)^C.
+\]
+In particular, for factorials decide whether there exists $C>0$ such that for all sufficiently large $n$,
+\[
+h(n!)\le (\log n)^C.
+\]
+
+(iii) Top 3 next moves (concrete):
+1. For factorials: attempt to prove a deterministic encoding lemma of the form
+   \[\forall x<n!\ \exists\text{ divisors }d_1,\dots,d_t\mid n!\text{ distinct with }t\le C(\log n)^A\text{ and }x=\sum d_j.\]
+   Even proving $t\le C\log n$ would be meaningful.
+2. Search for families $m$ whose divisors contain a ``nearly geometric'' subsequence that can generate the whole interval $[1,m)$ with few terms; formalize via a greedy representation algorithm and bound the number of steps.
+3. Computationally: extend exact $h(n!)$ beyond $n=9$ (e.g. $n\le 11$) using optimized DP/meet-in-the-middle to guess growth and to identify the worst-case $x$ requiring $h(n!)$ terms.
+
+(iv) Minimal counterexample structure:
+- For (Q1), a disproof would require showing that for every $C$ there are only finitely many practical $m$ with $h(m)\le (\log\log m)^C$; a minimal counterexample to the optimistic statement would likely be a practical number with unusually ``flat'' divisor set (few mid-sized divisors) forcing long subset-sum representations.
+- For (Q2), a minimal obstruction would be an explicit sequence $x_n<n!$ such that every representation of $x_n$ as a sum of distinct divisors of $n!$ needs $\gg (\log n)^C$ terms for all fixed $C$.
+
+

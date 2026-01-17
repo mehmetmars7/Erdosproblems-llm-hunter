@@ -1,0 +1,169 @@
+% Erdos Problem #1110
+% URL: https://www.erdosproblems.com/1110
+
+\subsection*{FORMAL RESTATEMENT}
+Let $p>q\ge 2$ be coprime integers.
+Let
+\[\mathcal{S} := \{p^k q^\ell : k,\ell\in\mathbb{Z}_{\ge 0}\}.\]
+A \emph{representation} of a positive integer $n$ is a finite set of \emph{distinct} elements $\{s_1,\dots,s_m\}\subseteq\mathcal{S}$ such that
+\[n=s_1+\cdots+s_m\]
+and no $s_i$ divides $s_j$ for $i\ne j$.
+(Equivalently, the exponent pairs $(k_i,\ell_i)$ form an antichain in the product order: $(k_i,\ell_i)\not\le (k_j,\ell_j)$ and $(k_j,\ell_j)\not\le (k_i,\ell_i)$ for $i\ne j$.)
+We call $n$ \emph{representable} if it has such a representation.
+
+The problem asks (for $\{p,q\}\ne\{2,3\}$):
+\begin{itemize}
+\item What can be said about the asymptotic density of \emph{non-representable} numbers?
+\item Are there infinitely many \emph{coprime non-representable} numbers?
+(Here the natural interpretation is: infinitely many non-representable $n$ with $\gcd(n,pq)=1$.)
+\end{itemize}
+
+It also asks (in the special case $\{p,q\}=\{2,3\}$) about the fastest-growing function $f(n)\to\infty$ such that every sufficiently large $n$ has a representation by $2^k3^\ell$ with all summands $>f(n)$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file states (Erd\H{o}s--Lewin) that there are finitely many non-representable numbers if and only if $\{p,q\}=\{2,3\}$, and it includes a short induction proof that every $n$ is representable for $\{2,3\}$.
+It also reports several results of Yu--Chen and Yang--Zhao about density and about the function $f(n)$.
+I will not use any results not explicitly stated in the problem file.
+
+\textbf{Note.} My small-scale computations below suggest that for some pairs (e.g. $(p,q)=(11,2)$) non-representable numbers are extremely frequent up to $50{,}000$, which would be inconsistent with ``density zero of non-representables''. This could indicate that the density statement in the problem text is about representables (or has hypotheses swapped), or that the true asymptotic regime occurs far beyond the tested range. I do not rely on that contextual sentence.
+
+\subsection*{ATTACK PLAN}
+\emph{Proof-track strategies.}
+\begin{itemize}
+\item For $\{2,3\}$, formalize and verify the given induction, including the non-divisibility check.
+\item For general $(p,q)$, exploit scaling closure: if $n$ is representable then so are $pn$ and $qn$; attempt to combine this with a ``basis'' of representable residues.
+\item Look for modular obstructions (e.g. modulo $p^a$ or $q^b$) to produce infinite non-representables or to bound density.
+\end{itemize}
+
+\emph{Disproof/Construction strategies.}
+\begin{itemize}
+\item Computationally enumerate representable sums for given $(p,q)$ and look for patterns in the non-representable set.
+\item Try to force nonrepresentability by considering numbers in short intervals where all available antichain sums are too sparse.
+\end{itemize}
+
+\subsection*{WORK}
+\paragraph{FAST REALITY CHECK (computation).}
+For fixed $(p,q)$ and a bound $N$, I enumerated all antichains of the poset of exponent pairs $(k,\ell)$ with $p^k q^\ell\le N$, and recorded the set of achievable sums $\le N$.
+The following are exact counts for representability in $\{0,1,\dots,N\}$.
+
+\begin{itemize}
+\item $(p,q)=(3,2)$ (i.e. $\{2,3\}$): for $N=500$, every integer $0\le n\le 500$ was representable (non-representables: $0$).
+
+\item $(p,q)=(5,2)$: the fraction of non-representables decreased but stayed substantial:
+\[
+\begin{array}{c|c|c}
+N & \#\{1\le n\le N: n \text{ non-representable}\} & \text{density}\\hline
+2000 & 785 & 0.3925\\
+50000 & 15638 & 0.31275\\
+200000 & 52995 & 0.264975
+\end{array}
+\]
+For $N=200$, the first $30$ non-representables were
+\[3,6,11,12,15,17,19,22,23,24,30,31,34,38,44,46,47,48,49,55,59,60,62,63,68,71,73,75,76,79.\]
+
+\item $(p,q)=(11,2)$: representables were very sparse in the tested range; for $N=50000$ the non-representable density was about $0.89948$.
+For $N=200$, the first $30$ non-representables were
+\[3,5,6,7,9,10,12,14,17,18,20,21,23,24,25,28,29,31,33,34,35,36,37,39,40,41,42,45,46,47.\]
+\end{itemize}
+
+These computations illustrate that representability behavior varies strongly with $(p,q)$.
+
+\paragraph{Lemma 1110.1 (the $\{2,3\}$ case: every $n$ is representable).}
+Let $p=3$ and $q=2$.
+Then every integer $n\ge 1$ is representable as a sum of distinct numbers of the form $2^a3^b$, with no summand dividing another.
+Moreover, one can ensure the stronger property:
+\begin{quote}
+If $n$ is even, then $n$ has a representation in which every summand is even.
+\end{quote}
+
+\paragraph{Proof.}
+We prove the stronger property by induction on $n\ge 1$.
+
+\emph{Base cases.}
+For $n=1$, take the single summand $1=2^0 3^0$.
+For $n=2$, take the single summand $2=2^1 3^0$ (even summand).
+
+\emph{Inductive step.}
+Assume the claim holds for all positive integers $<n$.
+
+\underline{Case 1: $n$ even.}
+Write $n=2m$ with $m<n$.
+By the induction hypothesis applied to $m$, there is a representation
+\[m=\sum_{i=1}^t 2^{a_i}3^{b_i}
+\]
+with distinct summands and no divisibility among them.
+Multiplying by $2$ gives
+\[n=2m=\sum_{i=1}^t 2^{a_i+1}3^{b_i}.
+\]
+All summands are even.
+If $2^{a_i}3^{b_i}$ does not divide $2^{a_j}3^{b_j}$ then $(a_i,b_i)$ is not coordinatewise $\le (a_j,b_j)$.
+Adding $1$ to every $a_i$ preserves all coordinatewise comparisons, so none of the new summands divides another.
+Distinctness is also preserved.
+Thus this is a valid representation of $n$ with all summands even.
+
+\underline{Case 2: $n$ odd.}
+Let $3^k$ be the largest power of $3$ such that $3^k\le n$.
+Define $m:=n-3^k$.
+Then $m\ge 0$ and $m$ is even (odd minus odd).
+If $m=0$, then $n=3^k$ is representable with a single summand.
+If $m>0$, then by Case 1 applied to $m$ (since $m<n$), there exists a representation
+\[m=\sum_{i=1}^t 2^{a_i}3^{b_i}
+\]
+in which every summand is even, hence each $a_i\ge 1$.
+Then
+\[n=3^k + \sum_{i=1}^t 2^{a_i}3^{b_i}
+\]
+is a sum of allowed terms.
+We must check the non-divisibility condition.
+Since $3^k$ is odd, it cannot divide any even summand $2^{a_i}3^{b_i}$.
+Conversely, an even summand cannot divide $3^k$ because any divisor of $3^k$ is odd.
+Thus no divisibility relation involves $3^k$.
+Among the even summands, the induction hypothesis already guarantees no divisibility.
+Finally, $3^k$ is distinct from the even summands.
+Hence this is a valid representation of $n$.
+
+This completes the induction. \hfill $\square$
+
+\paragraph{Lemma 1110.2 (scaling closure).}
+Fix coprime integers $p>q\ge 2$.
+If $n$ is representable, then $pn$ and $qn$ are representable.
+
+\paragraph{Proof.}
+Suppose $n=\sum_{i=1}^m p^{k_i}q^{\ell_i}$ is a representation with no divisibility among the summands.
+Then
+\[pn=\sum_{i=1}^m p^{k_i+1}q^{\ell_i}\]
+uses summands still of the form $p^k q^\ell$.
+For two indices $i\ne j$, we have
+\[p^{k_i}q^{\ell_i}\mid p^{k_j}q^{\ell_j} \iff (k_i\le k_j\ \text{and}\ \ell_i\le \ell_j).
+\]
+Adding $1$ to both $k_i$ and $k_j$ preserves the truth of $k_i\le k_j$, so the divisibility relations among summands are unchanged.
+Hence no new divisibility relation is created, and the summands remain distinct.
+Thus $pn$ is representable.
+The same argument with $q$ in place of $p$ shows $qn$ is representable. \hfill $\square$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item In Lemma 1110.1 (odd case), the key non-divisibility check is parity: the representation of $m$ uses only even terms, so no even term can divide the odd term $3^k$, and $3^k$ cannot divide any even term.
+\item Lemma 1110.2 uses only the coprimeness of $p$ and $q$ to interpret divisibility as coordinatewise comparison of exponent pairs, which is valid because $p$ and $q$ have disjoint prime factors.
+\item The computations enumerate all antichains among terms $\le N$ and sum them, so the representability check within $[0,N]$ is exhaustive.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+Lemma 1110.1 gives a complete proof that for $\{p,q\}=\{2,3\}$ every integer is representable (with the stronger parity property).
+Lemma 1110.2 shows representability is closed under multiplication by $p$ and by $q$.
+
+(ii) \textbf{First gap.}
+For $\{p,q\}\ne\{2,3\}$, determine whether the set of non-representable integers has positive density, zero density, or fails to have a density; and determine whether infinitely many $n$ with $\gcd(n,pq)=1$ are non-representable.
+
+(iii) \textbf{Top 3 next moves.}
+1. For fixed $(p,q)$, attempt to find an explicit modular obstruction: a modulus $M$ such that the set of achievable sums modulo $M$ misses a residue class, and then lift to an infinite family.
+2. Use Lemma 1110.2 to reduce the problem to ``primitive'' nonrepresentables (those not divisible by $p$ or $q$) and study their distribution.
+3. Extend computation to larger $N$ for representative parameter regimes (e.g. $q=2$ with various $p$) and attempt to fit the growth of the counting function of nonrepresentables; in particular, test whether the nonrepresentable density appears to converge.
+
+(iv) \textbf{What a minimal counterexample would likely look like.}
+A minimal non-representable integer (for fixed $(p,q)$) should be coprime to $pq$ (otherwise Lemma 1110.2 forces entire multiplicative chains of nonrepresentables), and it should avoid being close to a single large term $p^k q^\ell$ in a way that would allow a greedy subtraction while maintaining the antichain condition. Structurally, it would likely lie in a residue class that is hard to hit by antichain sums modulo some $M$.
+
+

@@ -1,0 +1,99 @@
+% Attempt for Erdos Problem #278
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Fix integers $2\le n_1<\cdots<n_r$. For each $i$ choose a residue class $a_i\pmod{n_i}$ and let
+\[U(a_1,\dots,a_r)=\bigcup_{i=1}^r \{m\in\mathbb{Z}: m\equiv a_i\!\!\!\pmod{n_i}\}\]
+be the set of integers covered by at least one congruence.
+Since $U$ is periodic (period dividing $L=\mathrm{lcm}(n_1,\dots,n_r)$), it has a natural density
+\[\mathbf{d}(U)=\lim_{N\to\infty}\frac{|U\cap[-N,N]|}{2N+1}=\frac{|U\bmod L|}{L}.\]
+
+Question 1: Determine/estimate $\max_{(a_i)} \mathbf{d}(U)$.
+
+Question 2: Is $\min_{(a_i)} \mathbf{d}(U)$ attained when all $a_i$ are equal (e.g. all $0$)?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only record what the problem statement itself claims: Simpson observed a general lower bound (an inclusion--exclusion expression in lcms) which is achieved when all $a_i$ are equal, settling Question 2. I do not re-prove the full general statement here; I prove special cases and sanity-check computationally.
+
+3) ATTACK PLAN
+Proof track:
+1. Reduce density computations to counting covered residues modulo $L=\mathrm{lcm}(n_i)$.
+2. Prove Question 2 in tractable cases: $r=2$ and the pairwise coprime case (where density is independent of residues).
+3. For Question 1, look for constructions maximizing coverage by making overlaps as small as possible; compare to the trivial upper bound $\sum 1/n_i$.
+
+Disproof track:
+1. For Question 2, attempt to find small moduli where a nontrivial choice of residues gives smaller union than the aligned choice; brute force small examples.
+
+Chosen path: rigorous reductions + special-case proofs; brute force confirms the “all equal” choice minimizes density in tested examples.
+
+4) WORK
+Lemma 1 (Density via one period).
+Let $L=\mathrm{lcm}(n_1,\dots,n_r)$. Then $U$ is periodic modulo $L$ and
+\[\mathbf{d}(U)=\frac{|\{x\in\{0,\dots,L-1\}: x\equiv a_i\pmod{n_i}\ \text{for some }i\}|}{L}.\]
+
+Proof.
+Membership in $U$ depends only on the residue class of $m$ modulo each $n_i$, hence only on $m\bmod L$.
+Therefore $U$ is a union of residue classes modulo $L$. The natural density of any union of residue classes modulo $L$
+is exactly the proportion of residues modulo $L$ it occupies, which is the displayed formula. \qed
+
+Lemma 2 (Pairwise coprime moduli: density is independent of residues).
+Assume $\gcd(n_i,n_j)=1$ for all $i\ne j$. Then for any residue choices $(a_i)$,
+\[\mathbf{d}(U)=1-\prod_{i=1}^r\Bigl(1-\frac1{n_i}\Bigr).\]
+In particular, the minimum equals the maximum and is achieved when all $a_i$ are equal.
+
+Proof.
+Let $L=\prod_{i=1}^r n_i$ (pairwise coprime).
+By Lemma 1 it suffices to count residues $x\bmod L$ that avoid all congruences $x\equiv a_i\pmod{n_i}$.
+For a fixed $i$, there are exactly $n_i-1$ choices of $x\bmod n_i$ that avoid $a_i$.
+By the Chinese Remainder Theorem, choices modulo different $n_i$ combine independently, so the number of residues modulo $L$
+that avoid all $r$ congruences is $\prod_{i=1}^r (n_i-1)$.
+Thus the uncovered density is $\prod_{i=1}^r (n_i-1)/n_i$, and the covered density is the stated complement. \qed
+
+Lemma 3 (Two moduli: aligned residues minimize the union).
+Let $r=2$ with moduli $n_1,n_2$ and residues $a_1\pmod{n_1}$, $a_2\pmod{n_2}$.
+Let $g=\gcd(n_1,n_2)$ and $M=\mathrm{lcm}(n_1,n_2)$. Then
+\[\mathbf{d}(U)=\frac1{n_1}+\frac1{n_2}-\delta,\]
+where $\delta$ equals $1/M$ if $a_1\equiv a_2\pmod g$ (the congruences are compatible) and equals $0$ otherwise.
+Hence the minimum density is attained when $a_1\equiv a_2\pmod g$ (in particular when $a_1=a_2$ as integers).
+
+Proof.
+By Lemma 1, work modulo $M$.
+Each congruence class has density $1/n_i$.
+Their intersection is the set of $x$ satisfying $x\equiv a_1\pmod{n_1}$ and $x\equiv a_2\pmod{n_2}$, which is either empty or
+a single congruence class modulo $M$ (Chinese remainder for non-coprime moduli), hence has density $0$ or $1/M$.
+Inclusion--exclusion for two sets gives the formula.
+Since the intersection term is subtracted, the union is minimized when the intersection is nonempty (maximal), i.e. when $a_1\equiv a_2\pmod g$. \qed
+
+FAST REALITY CHECK (computation).
+For $(n_i)=(2,3,4,6)$ I exhaustively checked all residue choices and found:
+minimum density $=2/3$, achieved at $(a_i)=(0,0,0,0)$, and maximum density $=11/12$ (e.g. at $(0,0,1,1)$).
+This matches the inclusion--exclusion value in the problem statement for the aligned choice.
+
+5) VERIFICATION
+- Lemma 1 is a standard periodicity reduction; the limit defining density exists because of periodicity.
+- Lemma 2 uses CRT in a counting form; no probabilistic independence assumption is needed.
+- Lemma 3 carefully distinguishes the compatible vs incompatible case via $\gcd(n_1,n_2)$.
+- The computation is a finite check modulo $L$; it does not prove Question 2 in general.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Question 2 holds for $r=2$ (Lemma 3) and for pairwise coprime moduli (Lemma 2). Density computation reduces to counting residues modulo $L=\mathrm{lcm}(n_i)$ (Lemma 1).
+
+(ii) First gap:
+Prove for \emph{arbitrary} moduli $n_1<\dots<n_r$ that the minimum of $\mathbf{d}(U)$ over residue choices is attained when all $a_i$ are equal, i.e. establish Simpson’s general inequality in full.
+
+(iii) Top 3 next moves:
+1. Attempt a general “compression/shifting” argument on $\mathbb{Z}/L\mathbb{Z}$ showing unions of cosets of subgroups are minimized when the cosets have nonempty intersection.
+2. Develop an exact formula for $\max_{(a_i)}\mathbf{d}(U)$ (Question 1), at least in terms of the divisor lattice of the $n_i$.
+3. Extend the brute-force verification to larger random sets $A$ to look for extremal patterns that might guide the proof of Question 1/2.
+
+(iv) Minimal counterexample structure (if Question 2 were false):
+A smallest set of moduli $(n_i)$ and residue choice $(a_i)$ such that $\mathbf{d}(U)$ is \emph{smaller} than in the aligned case $(a_i\equiv a)$; this would require a delicate pattern of forced higher-order overlaps reducing the union beyond what alignment produces.
+

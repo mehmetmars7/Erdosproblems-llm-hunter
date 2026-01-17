@@ -1,0 +1,155 @@
+% Attempt for Erdos Problem #81
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- A \emph{clique} in a graph is a complete subgraph (on some vertex set $K$).
+- An \emph{edge-partition into cliques} is a family of cliques $K_1,\dots,K_t$ such that the sets of edges $E(K_i)$ are pairwise disjoint and
+\[E(G)=\bigsqcup_{i=1}^t E(K_i).\]
+Let $\mathrm{cp}(G)$ be the minimum possible such $t$ (the clique-partition number).
+- A graph $G$ is \emph{chordal} if it has no induced cycle of length $\ge 4$.
+- A graph $G$ is \emph{split} if its vertices can be partitioned as $V=C\sqcup I$ where $C$ is a clique and $I$ is an independent set.
+Every split graph is chordal.
+
+Question.
+Is it true that every chordal graph $G$ on $n$ vertices satisfies
+\[\mathrm{cp}(G)\le \frac{n^2}{6}+O(n)?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- EOZ93 proved an upper bound $(1/4-\varepsilon)n^2$ for chordal graphs.
+- CEO94 proved $\frac{3}{16}n^2+O(n)$ for split graphs.
+- The split example ``clique of size $n/3$ joined to independent set of size $2n/3$'' shows $\mathrm{cp}(G)\ge n^2/6+O(n)$ can be necessary.
+I do not use any results beyond what I prove below.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Understand the extremal split example and compute its clique-partition number exactly; this clarifies why $n^2/6$ appears.
+2. Attempt to exploit chordal structure (perfect elimination orderings / clique trees) to build clique partitions near the split-graph lower bound.
+
+Disproof track ideas:
+1. Search for chordal graphs whose clique-partition number exceeds $n^2/6$ by a fixed fraction, potentially via dense overlap patterns of maximal cliques.
+
+Chosen path in this attempt: completely analyze the split example from the statement, proving it indeed forces $\mathrm{cp}(G)=n^2/6+O(n)$, by matching lower and upper bounds.
+
+4) WORK
+Consider the following split graph $G=G(a,b)$:
+- Vertex set $V=C\sqcup I$ with $|C|=a$, $|I|=b$.
+- $C$ induces a clique (all edges inside $C$).
+- $I$ induces an independent set (no edges inside $I$).
+- All edges between $C$ and $I$ are present (complete bipartite between $C$ and $I$).
+
+This is exactly the example described in the problem statement when $a=\lfloor n/3\rfloor$ and $b=\lceil 2n/3\rceil$.
+
+Lemma 1 (Lower bound for $\mathrm{cp}(G(a,b))$).
+For the split graph $G(a,b)$ defined above,
+\[\mathrm{cp}(G(a,b))\ \ge\ ab-\binom{a}{2}.\]
+
+Proof.
+Let $K_1,\dots,K_t$ be any clique-partition of $E(G(a,b))$.
+Since $I$ is independent, every clique $K_j$ contains at most one vertex from $I$.
+Let $J$ be the set of indices $j$ such that $K_j$ contains a vertex of $I$.
+For $j\in J$, write
+\[s_j:=|K_j\cap C|\in\{1,2,\dots,a\}.\]
+Then $K_j$ covers exactly $s_j$ cross-edges between its unique vertex in $I$ and the $s_j$ vertices of $C$.
+Because the cross-edges between $C$ and $I$ form a complete bipartite graph with $ab$ edges and must be partitioned,
+we have
+\[\sum_{j\in J} s_j = ab.\tag{1}\]
+
+Also, for each $j\in J$, the clique $K_j$ contains all edges inside $K_j\cap C$, contributing $\binom{s_j}{2}$ edges of the clique $C$.
+Because the partition is edge-disjoint and the total number of edges inside $C$ is $\binom{a}{2}$, we have
+\[\sum_{j\in J} \binom{s_j}{2} \ \le\ \binom{a}{2}.\tag{2}\]
+
+Finally, note that for every integer $s\ge 1$,
+\[s \le 1+\binom{s}{2},\]
+since $\binom{s}{2}=0$ for $s=1$ and $\binom{s}{2}\ge s-1$ for $s\ge 2$.
+Summing this inequality over $j\in J$ and using (1) gives
+\[ab=\sum_{j\in J} s_j \le \sum_{j\in J}\left(1+\binom{s_j}{2}\right)=|J|+\sum_{j\in J}\binom{s_j}{2}\le |J|+\binom{a}{2}\]
+by (2). Therefore
+\[|J|\ge ab-\binom{a}{2}.\]
+Since $t\ge |J|$, we conclude $\mathrm{cp}(G(a,b))\ge ab-\binom{a}{2}$. \qed
+
+Lemma 2 (Matching upper bound when $b\ge a$).
+Assume $b\ge a$. Then
+\[\mathrm{cp}(G(a,b))\ \le\ ab-\binom{a}{2}.\]
+
+Proof.
+We explicitly construct a clique partition with exactly $ab-\binom{a}{2}$ cliques.
+
+Step 1: partition the edges inside $C$ into matchings.
+The complete graph $K_a$ on vertex set $C$ admits a proper edge-coloring with at most $a$ colors such that each color class is a matching:
+- if $a$ is even, $K_a$ decomposes into $a-1$ perfect matchings;
+- if $a$ is odd, $K_a$ decomposes into $a$ matchings (classical ``round-robin'' construction).
+In all cases, we obtain matchings $M_1,\dots,M_r$ whose disjoint union is $E(C)$, with $r\le a$.
+
+Since $b\ge a\ge r$, choose distinct vertices $i_1,\dots,i_r\in I$.
+
+Step 2: use each matching edge to form a triangle clique.
+For each $\ell\in\{1,\dots,r\}$ and each edge $\{u,v\}\in M_\ell$, define the clique (triangle)
+\[K_{\ell,\{u,v\}}:=\{i_\ell,u,v\}.\]
+This is a clique because $u,v\in C$ are adjacent and $i_\ell$ is adjacent to all of $C$.
+Its edge set consists of exactly three edges: $uv$ (inside $C$) and the two cross edges $i_\ell u$ and $i_\ell v$.
+
+Because the matchings are edge-disjoint, the edges $uv$ covered by these triangles are disjoint and cover all inside-$C$ edges.
+Also, within a fixed matching $M_\ell$, the edges are vertex-disjoint, so the cross edges $i_\ell u$ and $i_\ell v$ used are all distinct.
+Across different $\ell$, the $i_\ell$ are distinct, so cross edges also do not overlap.
+Thus these triangle cliques are edge-disjoint.
+
+Total triangles created: $|E(C)|=\binom{a}{2}$, and they cover:
+- all $\binom{a}{2}$ edges of $C$,
+- and $2\binom{a}{2}$ cross edges between $C$ and $I$.
+
+Step 3: cover remaining cross edges individually.
+There are $ab$ cross edges total, so the number of cross edges not yet covered is
+\[ab-2\binom{a}{2}.\]
+Cover each remaining cross edge by a 2-vertex clique (an edge).
+
+Total cliques in this partition:
+\[\binom{a}{2} + \big(ab-2\binom{a}{2}\big)=ab-\binom{a}{2}.\]
+This proves $\mathrm{cp}(G(a,b))\le ab-\binom{a}{2}$ when $b\ge a$. \qed
+
+Corollary 3 (The split example forces $n^2/6+O(n)$ cliques).
+Let $n$ be divisible by $3$ and take $a=n/3$, $b=2n/3$. Then $G(a,b)$ is split (hence chordal) and
+\[\mathrm{cp}(G(a,b)) = ab-\binom{a}{2} = \frac{n^2}{6}+\frac{n}{6}.\]
+In particular, $\mathrm{cp}(G(a,b))\ge n^2/6+O(n)$, matching the statement's lower-bound example.
+
+Proof.
+Here $b=2n/3\ge a=n/3$, so Lemmas 1--2 give equality $\mathrm{cp}(G(a,b))=ab-\binom{a}{2}$.
+Compute:
+\[ab=\frac{n^2}{9}\cdot 2=\frac{2n^2}{9},\qquad \binom{a}{2}=\binom{n/3}{2}=\frac{n^2}{18}-\frac{n}{6}.\]
+Subtracting yields $\frac{n^2}{6}+\frac{n}{6}$. \qed
+
+FAST REALITY CHECK
+The extremal split example is not only a lower-bound witness: Lemmas 1--2 show its clique-partition number can be computed exactly, and equals $n^2/6+O(n)$.
+
+5) VERIFICATION
+- Lemma 1 uses only: (i) each clique hits at most one vertex of $I$; (ii) disjointness of inside-$C$ edges; and (iii) the inequality $s\le 1+\binom{s}{2}$.
+- Lemma 2 relies on existence of a proper edge-coloring of $K_a$ into matchings; this is standard and easy to construct explicitly (round-robin).
+- Corollary 3 checks arithmetic and shows the constant $1/6$ arises from ``cross edges minus inside edges''.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved that the canonical split example in the statement has
+\[\mathrm{cp}(G)=\frac{n^2}{6}+O(n)\]
+indeed, exactly $\frac{n^2}{6}+\frac{n}{6}$ when $n$ is divisible by $3$ (Corollary 3).
+
+(ii) First gap:
+Extend from this split-graph analysis to \emph{all} chordal graphs: prove or refute that every chordal $n$-vertex graph satisfies
+$\mathrm{cp}(G)\le n^2/6+O(n)$.
+
+(iii) Top 3 next moves (concrete):
+1. Use chordal structure (perfect elimination order / clique tree) to decompose the edge set into a controlled number of split-like pieces and attempt to apply Lemma 1-style accounting.
+2. Search for chordal graphs with many overlapping maximal cliques and attempt to lower bound $\mathrm{cp}(G)$ above $n^2/6$ by adapting the ``cross edges vs inside edges'' argument.
+3. For special subclasses (interval graphs, block graphs, split graphs), attempt to compute $\mathrm{cp}(G)$ up to $O(n)$ and see whether $n^2/6$ is the correct universal leading term.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A chordal graph formed by gluing many large cliques along large overlaps, arranged so that any clique partition is forced to use many cliques because edges are ``shared'' between different maximal cliques in a way that blocks the efficient triangle-based packing used in Lemma 2.
+

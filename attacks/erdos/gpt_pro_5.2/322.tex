@@ -1,0 +1,244 @@
+% Erdos Problem #322
+% URL: https://www.erdosproblems.com/322
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 3$.
+
+Ambiguity note.
+The phrase ``sum of $k$ many $k$th powers'' could mean either:
+(a) $n=x_1^k+\cdots+x_k^k$ with $x_i\in\mathbb Z_{\ge 0}$ (allowing $0$), or
+(b) the same but with $x_i\in\mathbb N$ (positive).
+Also, $1_A^{(k)}$ in additive combinatorics typically counts \emph{ordered} representations.
+
+Minimal corrected convention (used below).
+Let
+\[
+A_k:=\{m^k: m\in\mathbb Z_{\ge 0}\}
+\]
+and define
+\[
+r_k(n):=1_{A_k}^{(k)}(n):=\bigl|\{(x_1,\dots,x_k)\in \mathbb Z_{\ge 0}^k: x_1^k+\cdots+x_k^k=n\}\bigr|.
+\]
+(So $r_k(n)$ counts ordered $k$-tuples of nonnegative integers.)
+
+Questions in the problem statement:
+
+(Q1) Determine the order of growth (in $n$) of $r_k(n)$.
+
+(Q2) Does there exist a constant $c>0$ and infinitely many $n$ such that $r_k(n)>n^c$?
+
+Edge cases.
+$r_k(0)=1$ (all $x_i=0$). For $n>0$, $r_k(n)\ge 0$.
+
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+I do not claim any results beyond what the problem statement itself records.
+In particular, the statement says:
+
+* Hypothesis $K$ (Hardy--Littlewood): $r_k(n)\le n^{o(1)}$; Mahler disproved this for $k=3$ by constructing infinitely many $n$ with $r_3(n)\gg n^{1/12}$.
+* Erd\H{o}s (independently with Chowla) proved that for every $k\ge 3$ there are infinitely many $n$ with
+\[
+r_k(n)\gg n^{c/\log\log n}
+\]
+for some constant $c=c(k)>0$.
+
+
+3) ATTACK PLAN
+
+Give elementary bounds that can be proved from first principles:
+
+(1) A trivial pointwise upper bound on $r_k(n)$ by bounding each $x_i$.
+
+(2) First-moment bounds: estimate $\sum_{n\le N} r_k(n)$ by counting lattice points in a region $x_1^k+\cdots+x_k^k\le N$.
+
+Also: compute $r_k(n)$ for small $n$ and small $k$ as a sanity check.
+
+
+4) WORK
+
+PHASE 1: FAST REALITY CHECK (computed maxima on small ranges)
+
+For $k=3$ (three cubes) and $k=4$ (four fourth powers), I computed $\max_{n\le N_{\max}} r_k(n)$ for several $N_{\max}$.
+The exact values found (ordered representations, $x_i\ge 0$) are:
+
+$k=3$:
+\[
+\begin{array}{c|cccc}
+N_{\max} & 200 & 500 & 1000 & 2000\\\hline
+\max_{n\le N_{\max}} r_3(n) & 6 & 9 & 12 & 12
+\end{array}
+\]
+with maximizing $n$ equal to $9,216,855,1729$ respectively.
+
+$k=4$:
+\[
+\begin{array}{c|cccc}
+N_{\max} & 500 & 1000 & 2000 & 5000\\\hline
+\max_{n\le N_{\max}} r_4(n) & 24 & 24 & 28 & 36
+\end{array}
+\]
+with maximizing $n$ equal to $98,98,1393,4803$ respectively.
+
+These computations show that on small ranges $r_k(n)$ can be moderately large, but they do not address the asymptotic questions.
+
+
+Lemma 322.1 (trivial pointwise upper bound).
+
+For every $k\ge 3$ and every integer $n\ge 1$,
+\[
+r_k(n)\le \bigl(\lfloor n^{1/k}\rfloor+1\bigr)^k \le (2n^{1/k})^k = 2^k n.
+\]
+
+Proof.
+If $x_1^k+\cdots+x_k^k=n$ with $x_i\ge 0$, then in particular $x_i^k\le n$ for each $i$, hence $0\le x_i\le\lfloor n^{1/k}\rfloor$.
+So the number of possible ordered $k$-tuples $(x_1,\dots,x_k)$ is at most $(\lfloor n^{1/k}\rfloor+1)^k$.
+This bounds $r_k(n)$.
+The second inequality uses $\lfloor n^{1/k}\rfloor+1\le 2n^{1/k}$ for $n\ge 1$. \qed
+
+
+Lemma 322.2 (first-moment bounds: $\sum_{n\le N} r_k(n)=\Theta_k(N)$).
+
+Define
+\[
+R_k(N):=\sum_{n=0}^{\lfloor N\rfloor} r_k(n)=\bigl|\{(x_1,\dots,x_k)\in\mathbb Z_{\ge 0}^k: x_1^k+\cdots+x_k^k\le N\}\bigr|.
+\]
+Then there exist constants $0<c_k\le C_k<\infty$ (depending only on $k$) such that for all $N\ge 1$,
+\[
+c_k\,N\ \le\ R_k(N)\ \le\ C_k\,N.
+\]
+
+Proof.
+Let
+\[
+\Omega_N:=\{(t_1,\dots,t_k)\in\mathbb R_{\ge 0}^k: t_1^k+\cdots+t_k^k\le N\}.
+\]
+A standard lattice-point/volume comparison for monotone sets gives
+\[
+\mathrm{vol}(\Omega_{N-1})\ \le\ R_k(N)\ \le\ \mathrm{vol}(\Omega_{N+k}).
+\]
+I justify these two inequalities explicitly.
+
+Upper bound.
+For each integer lattice point $x=(x_1,\dots,x_k)\in\mathbb Z_{\ge 0}^k$, consider the unit cube
+$Q_x:=x+[0,1)^k$. If $x\in\Omega_N\cap\mathbb Z^k$, then for any $t\in Q_x$ we have $t_i\le x_i+1$, hence
+\[
+\sum_{i=1}^k t_i^k \le \sum_{i=1}^k (x_i+1)^k.
+\]
+Using the binomial expansion, $(x_i+1)^k\le x_i^k + k(x_i+1)^{k-1}\le x_i^k + k(x_i+1)^{k-1}$, but we only need a crude bound:
+for $x_i\ge 0$, $(x_i+1)^k\le x_i^k + k(x_i+1)^{k-1}\le x_i^k + k(x_i+1)^{k}$, which implies $(x_i+1)^k\le (k+1)(x_i+1)^k$ tautologically; instead use the simple inequality
+\[(x_i+1)^k\le x_i^k + k(x_i+1)^{k-1} + \cdots +1 \le x_i^k + k(x_i+1)^{k-1} + \cdots + (x_i+1)^{k-1}\le x_i^k + k(x_i+1)^{k-1} + \cdots\le x_i^k + k(x_i+1)^{k-1} + \cdots + (x_i+1)^{k-1} \le x_i^k + k(x_i+1)^{k-1} + \cdots\le x_i^k + k(x_i+1)^{k-1} + \cdots\le x_i^k + k(x_i+1)^{k-1} + \cdots\le x_i^k + k(x_i+1)^{k-1} + \cdots\]
+This is messy; use a cleaner coarse bound:
+for $u\ge 0$ and integer $k\ge 1$,
+\[(u+1)^k \le u^k + k(u+1)^{k-1} \le u^k + k(u+1)^{k}.
+\]
+Summing over $i$ and using $x_i+1\le x_i+1$ gives
+\[
+\sum_{i=1}^k (x_i+1)^k \le \sum_{i=1}^k x_i^k + k\sum_{i=1}^k (x_i+1)^k.
+\]
+Rearranging yields
+\[
+(1-k)\sum_{i=1}^k (x_i+1)^k \le \sum_{i=1}^k x_i^k.
+\]
+This is not useful because $1-k<0$.
+
+So instead, use a direct (and correct) inclusion with a fixed additive slack:
+for any $t\in Q_x$, we have $t_i\le x_i+1$, hence
+\[
+\sum_{i=1}^k t_i^k \le \sum_{i=1}^k (x_i+1)^k.
+\]
+Now apply the binomial theorem:
+\[
+(x_i+1)^k = x_i^k + kx_i^{k-1} + \binom{k}{2}x_i^{k-2}+\cdots + 1 \le x_i^k + k(x_i+1)^{k-1} + \cdots + (x_i+1)^{0}.
+\]
+Each term in the sum is at most $(x_i+1)^{k-1}$ for $x_i\ge 0$, and there are $k$ such terms beyond $x_i^k$, so
+\[
+(x_i+1)^k \le x_i^k + k(x_i+1)^{k-1} \le x_i^k + k(x_i+1)^k,
+\]
+again not helpful.
+
+At this point, abandon the ``$N+k$'' slack and use a simpler, correct lattice-volume sandwich that does not require delicate slack:
+Because $\Omega_N$ is monotone (if $t\in\Omega_N$ and $0\le s_i\le t_i$ then $s\in\Omega_N$), we have the standard bounds
+\[
+\mathrm{vol}(\Omega_N)\le R_k(N)\le \mathrm{vol}(\Omega_N+[0,1]^k).
+\]
+Moreover, $\Omega_N+[0,1]^k\subseteq \Omega_{N'}$ for some $N'=N+O_k(N^{(k-1)/k})$, which still yields an upper bound $R_k(N)\ll_k N$.
+Since the goal is just $R_k(N)=\Theta_k(N)$, a coarse comparison suffices.
+
+So I instead compute the volume exactly up to scaling:
+Let $\Omega_1=\{t\ge 0: t_1^k+\cdots+t_k^k\le 1\}$. The scaling map $t\mapsto N^{1/k}t$ shows
+\[
+\mathrm{vol}(\Omega_N)=N\,\mathrm{vol}(\Omega_1).
+\]
+Similarly, for any fixed constant $c>0$, $\mathrm{vol}(\Omega_{cN})=cN\,\mathrm{vol}(\Omega_1)$.
+
+Now bound $R_k(N)$ between two constant multiples of $\mathrm{vol}(\Omega_N)$:
+
+Lower bound.
+All integer points with $0\le x_i\le \lfloor (N/k)^{1/k}\rfloor$ satisfy
+\[
+\sum_{i=1}^k x_i^k \le k\cdot \left(\frac{N}{k}\right)=N.
+\]
+There are $(\lfloor (N/k)^{1/k}\rfloor+1)^k\ge ((N/k)^{1/k})^k = N/k$ such points.
+So $R_k(N)\ge N/k$.
+Thus we can take $c_k=1/k$.
+
+Upper bound.
+If $x_1^k+\cdots+x_k^k\le N$, then each $x_i\le N^{1/k}$. Hence all solutions lie in the box $[0,\lfloor N^{1/k}\rfloor]^k$, which contains at most $(N^{1/k}+1)^k\le (2N^{1/k})^k=2^k N$ integer points.
+So $R_k(N)\le 2^k N$, i.e. we may take $C_k=2^k$.
+
+Combining gives $c_k N\le R_k(N)\le C_k N$ for all $N\ge 1$. \qed
+
+
+Lemma 322.3 (a uniform lower bound on $\limsup r_k(n)$).
+
+For each $m\ge 1$, we have $r_k(m^k)\ge k$.
+
+Proof.
+For $n=m^k$, each choice of index $1\le j\le k$ gives an ordered representation
+\[
+(x_1,\dots,x_k)=(0,\dots,0,\underbrace{m}_{j\text{th position}},0,\dots,0)
+\]
+with sum $m^k$. These $k$ tuples are distinct, hence $r_k(m^k)\ge k$. \qed
+
+
+5) VERIFICATION
+
+-- Lemma 322.1: the only input is the bound $x_i\le\lfloor n^{1/k}\rfloor$; no hidden assumptions.
+
+-- Lemma 322.2: I used a direct combinatorial box lower bound and box upper bound, avoiding any subtle geometry-of-numbers step.
+The constants are explicit: $R_k(N)\in [N/k, 2^k N]$.
+
+-- Computation: the brute-force search enumerates all $k$-tuples with coordinates $0\le x_i\le\lfloor N_{\max}^{1/k}\rfloor$.
+
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result obtained here.
+
+* Pointwise bound: $r_k(n)\le 2^k n$ for all $n\ge 1$ (Lemma 322.1).
+* First moment: $\sum_{n\le N} r_k(n)=\Theta_k(N)$ with explicit bounds $\frac{1}{k}N\le\sum_{n\le N}r_k(n)\le 2^k N$ (Lemma 322.2).
+* Uniform limsup lower bound: $\limsup_{n\to\infty} r_k(n)\ge k$ (Lemma 322.3).
+
+(ii) Exact first gap.
+
+For (Q2), to prove existence of a fixed $c>0$ with $r_k(n)>n^c$ for infinitely many $n$ when $k\ge 4$.
+My elementary bounds do not exceed $O(n)$ and do not produce any polynomial-size lower bound along an infinite sequence.
+
+(iii) Top 3 next moves (concrete targets).
+
+1. Try to construct explicit families of equalities
+\[x_1^k+\cdots+x_k^k=y_1^k+\cdots+y_k^k\]
+with many solutions, then use them to force large $r_k(n)$.
+2. Prove a nontrivial lower bound on a second moment such as $\sum_{n\le N} r_k(n)^2$, which would imply a nontrivial lower bound on $\max_{n\le N} r_k(n)$.
+3. In computations, search for $n$ with unusually large $r_k(n)$ for $k=4,5$ in larger ranges, to guess candidate parametric constructions.
+
+(iv) What a minimal counterexample would likely look like.
+
+If the answer to (Q2) were negative for some fixed $k\ge 4$, then for every $c>0$ we would have $r_k(n)\le n^c$ for all sufficiently large $n$.
+Any proof of that would need strong structural control on solutions to $x_1^k+\cdots+x_k^k=n$, preventing concentration of many $k$-tuples at a single sum.
+
+

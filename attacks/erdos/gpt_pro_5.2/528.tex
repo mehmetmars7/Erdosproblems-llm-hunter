@@ -1,0 +1,117 @@
+% Erdos Problem #528
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Fix $k\in\mathbb N$.
+A \emph{self-avoiding walk} (SAW) of length $n$ in $\mathbb Z^k$ is a sequence of vertices $(v_0,v_1,\dots,v_n)$ with $v_0=0$, $\|v_{i+1}-v_i\|_1=1$ for each $i$ (nearest-neighbor steps), and all vertices $v_0,\dots,v_n$ distinct.
+Let $f(n,k)$ be the number of such SAWs.
+Define
+\[C_k = \lim_{n\to\infty} f(n,k)^{1/n}
+\]
+(if the limit exists). The problem asks to determine $C_k$.
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem statement reports that Hammersley--Morton showed $C_k$ exists; it is also stated that $k\le C_k\le 2k-1$. Further asymptotics and numerical bounds for $k=2$ are mentioned in the statement.
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item \emph{Proof track (existence and basic bounds):} Prove submultiplicativity $f(n+m,k)\le f(n,k)f(m,k)$, apply Fekete's lemma to $\log f(n,k)$ to show $\lim (1/n)\log f(n,k)$ exists, hence $C_k$ exists. Prove trivial bounds by explicit constructions and by comparison to non-backtracking walks.
+\item \emph{Determination track:} For fixed $k$, try to compute/estimate $C_k$ by bounding $f(n,k)$ via combinatorial decompositions or expansions (lace expansion, etc.). For large $k$, try asymptotic expansion.
+\item \emph{Disproof track:} Not applicable to existence (existence is known and also follows from the submultiplicativity proof below). ``Determine $C_k$'' remains open in the exact sense for small $k$.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\medskip
+\noindent\textbf{Fast reality check (exact enumeration for small $n$).}
+By brute-force backtracking we computed $f(n,k)$ for $n\le 10$ for $k=2,3$:
+\begin{verbatim}
+k=2 vals n=0..10: [1, 4, 12, 36, 100, 284, 780, 2172, 5916, 16268, 44100]
+  n 10 f^{1/n} 2.913693458576192
+k=3 vals n=0..10: [1, 6, 30, 150, 726, 3534, 16926, 81390, 387966, 1853886, 8809878]
+  n 10 f^{1/n} 4.948766803773582
+\end{verbatim}
+(Here $f^{1/n}$ denotes $f(n,k)^{1/n}$.) These approach known approximate values slowly.
+
+\medskip
+\noindent\textbf{Lemma 528.1 (submultiplicativity and existence of $C_k$).}
+For every $k\ge 1$ and all integers $m,n\ge 0$,
+\[f(n+m,k)\le f(n,k)\,f(m,k).
+\]
+Consequently the limit $\lim_{n\to\infty} f(n,k)^{1/n}$ exists (finite) and equals $\inf_{n\ge 1} f(n,k)^{1/n}$.
+
+\noindent\textbf{Proof.}
+Fix $k$.
+Given a SAW $\omega=(v_0,\dots,v_{n+m})$ of length $n+m$, define its prefix $\omega^{(1)}=(v_0,\dots,v_n)$ (a SAW of length $n$ from the origin) and its suffix translated to the origin
+\[\omega^{(2)} = (w_0,\dots,w_m),\qquad w_j = v_{n+j}-v_n.
+\]
+Because $\omega$ is self-avoiding, the suffix vertices $v_n,\dots,v_{n+m}$ are distinct; hence $(w_0,\dots,w_m)$ are distinct as well, and successive differences are still unit vectors, so $\omega^{(2)}$ is a SAW of length $m$ from the origin.
+
+Thus we have a map
+\[\Phi: \{\text{SAWs of length }n+m\} \to \{\text{SAWs of length }n\}\times\{\text{SAWs of length }m\}
+\]
+given by $\Phi(\omega)=(\omega^{(1)},\omega^{(2)})$.
+This map is injective: if $\Phi(\omega)=\Phi(\omega')$, then the prefixes coincide and end at the same vertex, and the translated suffixes coincide, so the full sequences coincide.
+Therefore
+\[f(n+m,k)\le f(n,k)f(m,k).
+\]
+
+Define $a_n=\log f(n,k)$ for $n\ge 1$. The inequality is $a_{n+m}\le a_n+a_m$, i.e. $(a_n)$ is subadditive.
+By Fekete's lemma,
+\[\lim_{n\to\infty}\frac{a_n}{n} = \inf_{n\ge 1}\frac{a_n}{n}.
+\]
+Exponentiating yields existence of $\lim_{n\to\infty} f(n,k)^{1/n}$ and the identity with the infimum.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 528.2 (trivial bounds $k\le C_k\le 2k-1$).}
+For every integer $k\ge 1$,
+\[k\le C_k\le 2k-1.
+\]
+
+\noindent\textbf{Proof.}
+\emph{Lower bound.}
+Consider only walks that at each step increment one coordinate by $+1$ (never stepping in negative directions). There are exactly $k$ choices at each step, hence $k^n$ such walks of length $n$. Any such walk is self-avoiding because every step strictly increases the $\ell_1$-norm and coordinates are nondecreasing, so no vertex repeats.
+Thus $f(n,k)\ge k^n$ for all $n$, hence $f(n,k)^{1/n}\ge k$ and taking $n\to\infty$ gives $C_k\ge k$.
+
+\emph{Upper bound.}
+A self-avoiding walk is in particular non-backtracking: after taking a step, the next step cannot immediately return to the previous vertex, because that would repeat a vertex.
+The number of non-backtracking walks of length $n$ from the origin is exactly $2k(2k-1)^{n-1}$: there are $2k$ choices for the first step and then at each subsequent step at most $2k-1$ choices (anything except the immediate reverse).
+Therefore
+\[f(n,k)\le 2k(2k-1)^{n-1}.
+\]
+Taking $n$th roots,
+\[f(n,k)^{1/n}\le (2k)^{1/n}(2k-1)^{(n-1)/n}.
+\]
+Letting $n\to\infty$ yields $C_k\le 2k-1$.
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item Lemma~528.1: The injection $\omega\mapsto(\omega^{(1)},\omega^{(2)})$ is correct because translation preserves self-avoidance of the suffix and the splitting point is fixed at step $n$.
+\item Lemma~528.2 lower bound: monotone ``positive-steps-only'' walks cannot self-intersect because the $\ell_1$-norm strictly increases by $1$ each step.
+\item Lemma~528.2 upper bound: self-avoiding implies non-backtracking, so bounding by the number of non-backtracking walks is valid.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:}
+Existence of $C_k$ via submultiplicativity (Lemma~528.1) and the basic bounds $k\le C_k\le 2k-1$ (Lemma~528.2).
+
+(ii) \emph{First gap (crisp):}
+Determine $C_k$ explicitly (even for $k=2$) or prove sharper rigorous bounds/asymptotics beyond $k\le C_k\le 2k-1$.
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item For fixed small $k$ (especially $k=2$), compute $f(n,k)$ for larger $n$ using transfer-matrix or pruning algorithms to tighten numerical bounds on $C_k$.
+\item Prove improved rigorous upper/lower bounds for $C_2$ by constructing families of SAWs for lower bounds and using combinatorial decompositions for upper bounds.
+\item For large $k$, attempt to re-derive the first terms of the $1/k$ asymptotic expansion by bounding the contribution of self-intersections perturbatively.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:}
+If one conjectures a specific closed form for $C_k$, a counterexample would consist of a rigorous bound separating $C_k$ from that value; since $C_k$ exists and is deterministic, ``counterexamples'' here are quantitative separations rather than structural pathologies.
+

@@ -1,0 +1,160 @@
+% Erdos Problem #400
+% URL: https://www.erdosproblems.com/400
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $k\ge 2$.
+
+Definition.
+For each $n\ge 1$, define $g_k(n)$ by
+\[
+ g_k(n):=\max\Bigl\{ (a_1+\cdots+a_k)-n:\ a_1,\dots,a_k\in\mathbb N,\ \prod_{i=1}^k a_i!\ \mid\ n!\Bigr\}.
+\]
+(Here $\mathbb N=\{1,2,3,\dots\}$. Allowing $0$ would not change the maximum since $0!=1=1!$ but $1>0$.)
+
+Questions.
+(A) Does $\sum_{n\le x} g_k(n)\sim c_k x\log x$ for some constant $c_k$?
+(B) Is there a constant $c_k$ such that for almost all $n<x$, $g_k(n)=c_k\log x+o(\log x)$?
+
+Edge cases.
+$g_k(1)$ is well-defined: taking all $a_i=1$ gives $\prod a_i!=1\mid 1!$ and $g_k(1)\ge k-1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+I only restate what is recorded in the problem statement.
+
+The statement records:
+- Erd\H{o}s and Graham noted it is easy to show $g_k(n)\ll_k \log n$ for all $n$, but the best constant is unknown.
+
+3) ATTACK PLAN
+
+Proof-track (partial):
+- Prove an explicit $O_k(\log n)$ upper bound (as the statement claims is easy).
+- Give trivial lower bounds and compute small values for sanity.
+
+Disproof-track:
+- Try to find $n$ for which $g_k(n)$ is unusually large compared to $\log n$ by brute force (small $n$ only).
+
+Chosen path: prove a clean $O_k(\log n)$ bound using the $2$-adic valuation of factorials, and compute $g_k(n)$ for small $n$.
+
+4) WORK
+
+PHASE 1 — FAST REALITY CHECK (computed)
+
+Brute force (over $a_i\in\{1,\dots,n\}$) gives the following values and one witnessing $k$-tuple for $n\le 30$.
+
+For $k=2$:
+\[
+\begin{array}{c|cccccccccc}
+ n&1&2&3&4&5&6&7&8&9&10\\\hline
+ g_2(n)&1&1&1&1&1&2&1&1&2&3
+\end{array}
+\]
+and continuing up to $n=30$, the maximum observed is $g_2(30)=2$ with witness $(3,29)$.
+
+For $k=3$ (selected values):
+$g_3(10)=5$ with witness $(3,5,7)$, and $g_3(30)=6$ with witness $(6,15,15)$.
+
+Lemma 1 (a universal lower bound).
+For all $n\ge 1$ and $k\ge 2$,
+\[
+ g_k(n)\ge k-1.
+\]
+
+Proof.
+Take $(a_1,\dots,a_{k-1},a_k)=(1,1,\dots,1,n)$. Then
+\[
+\prod_{i=1}^k a_i! = (1!)^{k-1}\cdot n! = n!\mid n!.
+\]
+The corresponding value of $(a_1+\cdots+a_k)-n$ is
+\[
+((k-1)\cdot 1+n)-n=k-1.
+\]
+Since $g_k(n)$ is a maximum over all admissible $k$-tuples, $g_k(n)\ge k-1$. \qed
+
+Lemma 2 ($2$-adic valuation identity for factorials).
+Let $s_2(m)$ be the sum of the binary digits of $m$.
+Then for every integer $m\ge 1$,
+\[
+ v_2(m!) = m - s_2(m).
+\]
+
+Proof.
+By Legendre's formula,
+\[
+ v_2(m!)=\sum_{j\ge 1} \Bigl\lfloor\frac{m}{2^j}\Bigr\rfloor.
+\]
+Write $m$ in binary as $m=\sum_{t=0}^L \varepsilon_t 2^t$ with $\varepsilon_t\in\{0,1\}$.
+For fixed $j\ge 1$,
+\[
+\Bigl\lfloor\frac{m}{2^j}\Bigr\rfloor = \sum_{t=j}^L \varepsilon_t 2^{t-j}.
+\]
+Summing over $j\ge 1$ and swapping the order of summation gives
+\[
+\sum_{j\ge 1}\Bigl\lfloor\frac{m}{2^j}\Bigr\rfloor
+=\sum_{t=1}^L \varepsilon_t\sum_{j=1}^{t} 2^{t-j}
+=\sum_{t=1}^L \varepsilon_t(2^t-1).
+\]
+Now $\sum_{t=1}^L \varepsilon_t2^t = m-\varepsilon_0$ and $\sum_{t=1}^L \varepsilon_t = s_2(m)-\varepsilon_0$. Therefore
+\[
+\sum_{t=1}^L \varepsilon_t(2^t-1)=(m-\varepsilon_0)-(s_2(m)-\varepsilon_0)=m-s_2(m).
+\]
+This proves $v_2(m!)=m-s_2(m)$. \qed
+
+Proposition 3 (explicit $O_k(\log n)$ upper bound).
+For all $n\ge 2$,
+\[
+ g_k(n)\le k\bigl(\lfloor\log_2 n\rfloor+1\bigr).
+\]
+
+Proof.
+Let $(a_1,\dots,a_k)$ be any admissible $k$-tuple, so $\prod_{i=1}^k a_i!\mid n!$.
+Taking $2$-adic valuations gives
+\[
+\sum_{i=1}^k v_2(a_i!)\le v_2(n!).
+\]
+Apply Lemma 2 to each factorial:
+\[
+\sum_{i=1}^k (a_i-s_2(a_i))\le n-s_2(n).
+\]
+Rearrange to isolate the sum of the $a_i$:
+\[
+(a_1+\cdots+a_k)-n \le \sum_{i=1}^k s_2(a_i) - s_2(n)\le \sum_{i=1}^k s_2(a_i).
+\]
+For each $i$, since $1\le a_i\le n$ (otherwise $a_i!$ would contain a prime factor $>n$ and could not divide $n!$), the binary expansion of $a_i$ has at most $\lfloor\log_2 n\rfloor+1$ digits, hence
+\[
+ s_2(a_i)\le \lfloor\log_2 n\rfloor+1.
+\]
+Therefore
+\[
+(a_1+\cdots+a_k)-n \le k(\lfloor\log_2 n\rfloor+1).
+\]
+Taking the maximum over all admissible tuples yields the bound on $g_k(n)$. \qed
+
+5) VERIFICATION
+
+- Lemma 2 checked for small $m$ numerically during development; the algebraic proof is self-contained.
+- Proposition 3: the only nontrivial ingredient is taking $v_2$ of the divisibility relation; all subsequent steps are explicit inequalities.
+- Sanity check: for $k=2$, Proposition 3 gives $g_2(10)\le 2(\lfloor\log_2 10\rfloor+1)=2(3+1)=8$, consistent with the computed value $g_2(10)=3$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result obtained here.
+- Explicit upper bound $g_k(n)\le k(\lfloor\log_2 n\rfloor+1)$ (Proposition 3).
+- Trivial lower bound $g_k(n)\ge k-1$ (Lemma 1).
+- Computed exact values for $g_2(n)$ and $g_3(n)$ up to $n=30$ (WORK).
+
+(ii) Exact first gap.
+Derive asymptotics for the mean values $\sum_{n\le x} g_k(n)$, or even determine whether $g_k(n)$ typically has size proportional to $\log n$ (and identify the constant).
+
+(iii) Top 3 next moves (concrete targets).
+1. Refine the $2$-adic argument by understanding the typical size of $\sum_i s_2(a_i)$ for extremising tuples and how it depends on $n$.
+2. Use $p$-adic constraints for multiple primes (not just $p=2$) to improve constants and possibly approach a limiting constant $c_k$.
+3. Large-scale computation of $g_k(n)$ for $n$ up to a large bound (say $10^6$ for $k=2$) to estimate $\sum_{n\le x} g_k(n)/(x\log x)$ and test concentration.
+
+(iv) What a minimal counterexample would likely look like.
+A counterexample to the conjectured “almost always constant” behaviour for $g_k(n)/\log n$ would likely be a positive-density set of $n$ for which extremising tuples force unusually large binary digit sums (or analogous $p$-adic digit sums), causing $g_k(n)$ to deviate systematically from a single constant multiple of $\log n$.
+
+

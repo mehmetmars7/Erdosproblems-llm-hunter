@@ -1,0 +1,143 @@
+% Erdős Problems 10--15 : solution attempts following PROMPT_STRATEGY.MD
+% NOTE: Most of these are open problems; I record rigorous partial results, computations, and explicit gaps.
+
+% Erdős Problem #10
+% URL: https://www.erdosproblems.com/10
+
+1) \textbf{FORMAL RESTATEMENT}
+
+Fix $k\in\mathbb{N}$. For an integer $n\ge 1$ say that $n$ is \emph{$k$-representable} if there exist
+\begin{itemize}
+\item a prime $p$, and
+\item an integer $t$ with $0\le t\le k$, and
+\item exponents $e_1,\dots,e_t\in\mathbb{Z}_{\ge 0}$
+\end{itemize}
+with
+\[
+ n = p + \sum_{i=1}^t 2^{e_i}.
+\]
+(Repeated exponents are allowed a priori.)
+
+Question: Does there exist an absolute $k$ such that every integer $n\ge 2$ is $k$-representable?
+(If one literally includes $n=1$, then $1$ is not $k$-representable for any $k$ because $p\ge 2$ and the sum of powers of $2$ is nonnegative.)
+
+Stress points/edge cases:
+\begin{itemize}
+\item parity: even $n$ force the power-of-two part to be odd when $p$ is odd;
+\item the meaning of ``powers of $2$'': allowing repetition vs requiring distinct powers;
+\item whether ``every integer'' means all $n\ge 1$ or all sufficiently large $n$.
+\end{itemize}
+
+2) \textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+From the problem statement: Erd\H{o}s called this ``probably unattackable''; Erd\H{o}s--Graham suggest no such $k$ exists; Gallagher proved that for any $\varepsilon>0$ there is $k(\varepsilon)$ so that the set of $k(\varepsilon)$-representable integers has lower density $\ge 1-\varepsilon$; Granville--Soundararajan conjecture that $3$ powers of $2$ suffice for all odd integers (hence $4$ for all even), while a specific even integer $1117175146$ is stated to be not representable as ``prime + at most $3$ powers of $2$''.
+
+(Integrity note: I do \emph{not} use any results beyond what is stated above, except for elementary identities and computations I reproduce.)
+
+3) \textbf{ATTACK PLAN}
+
+\emph{Proof track (existence of a fixed $k$):}
+\begin{itemize}
+\item Reformulate as: for each $n$ there exists a prime in the set $\{n-m: \text{$m$ has binary weight}\le k\}$.
+\item Try to show for fixed $k$ the set of ``admissible shifts'' $m$ is large enough and ``equidistributed'' enough to always hit a prime (this is the kind of input supplied by Hardy--Littlewood type conjectures).
+\end{itemize}
+
+\emph{Disproof track (no fixed $k$):}
+\begin{itemize}
+\item For each fixed $k$, attempt to build infinitely many integers $n$ such that $n-m$ is composite for every $m$ of binary weight $\le k$; natural approaches are covering congruences and forcing many small prime divisors.
+\item Search computationally for counterexamples for small $k$ to see what structural obstructions arise.
+\end{itemize}
+
+4) \textbf{WORK}
+
+\textbf{Lemma 10.1 (binary-weight reformulation).}
+Let $m\ge 0$ be an integer. Then the following are equivalent:
+\begin{enumerate}
+\item[(a)] $m$ can be written as a sum of at most $k$ powers of $2$ (allowing repetition), i.e. $m=\sum_{i=1}^t 2^{e_i}$ for some $t\le k$;
+\item[(b)] the number of $1$'s in the binary expansion of $m$ (the Hamming weight, denoted $\mathrm{wt}_2(m)$) satisfies $\mathrm{wt}_2(m)\le k$.
+\end{enumerate}
+Consequently, an integer $n\ge 1$ is $k$-representable (prime + at most $k$ powers of $2$) if and only if there exists an integer $m\ge 0$ with $\mathrm{wt}_2(m)\le k$ such that $n-m$ is prime.
+
+\textbf{Proof.}
+($\Rightarrow$) Assume (a): $m=\sum_{i=1}^t 2^{e_i}$ with $t\le k$.
+If two exponents coincide, say $2^e+2^e$, replace this pair by a single term $2^{e+1}$. This operation preserves the value of the sum and reduces the number of terms by $1$.
+Iterating finitely many times (because the number of terms decreases each time a collision is removed) yields a representation
+\[
+ m=\sum_{j=1}^{t'} 2^{f_j}
+\]
+with $t'\le t$ and all $f_j$ distinct.
+But a sum of distinct powers of $2$ is exactly a binary expansion, and binary expansions are unique; hence $t'$ equals the number of $1$'s in the binary expansion of $m$, i.e. $t'=\mathrm{wt}_2(m)$. Therefore $\mathrm{wt}_2(m)=t'\le t\le k$.
+
+($\Leftarrow$) Assume (b): $\mathrm{wt}_2(m)\le k$.
+Write the binary expansion $m=\sum_{j\in J} 2^j$ where $J$ is the set of bit positions with digit $1$. Then $|J|=\mathrm{wt}_2(m)\le k$, so $m$ is a sum of at most $k$ (distinct) powers of $2$, proving (a).
+
+The ``consequently'' statement follows by taking $m=n-p$. \qed
+
+\textbf{Lemma 10.2 (parity reduction for even targets).}
+Let $n\ge 2$ be even and suppose
+\[
+ n = p + \sum_{i=1}^t 2^{e_i}
+\]
+with $p$ an \emph{odd} prime and $t\le k$.
+Then after carrying as in Lemma~10.1 the power-of-two sum can be written uniquely as
+\[
+ \sum_{i=1}^t 2^{e_i} = 1 + m,
+\]
+where $m$ is even and $\mathrm{wt}_2(m)\le k-1$.
+Equivalently, $n-1 = p + m$ with $m$ even and $\mathrm{wt}_2(m)\le k-1$.
+
+\textbf{Proof.}
+Since $n$ is even and $p$ is odd, the power-of-two sum $S:=\sum_{i=1}^t 2^{e_i}=n-p$ must be odd.
+By Lemma~10.1, $S$ has a unique representation as a sum of distinct powers of $2$ (its binary expansion) using exactly $\mathrm{wt}_2(S)$ terms. Because $S$ is odd, the least significant bit of $S$ equals $1$, so $2^0=1$ occurs in this binary expansion. Write
+\[
+ S = 1 + m,
+\]
+where $m:=S-1$ is even.
+In binary, subtracting $1$ from an odd number removes the $2^0$ term and does not change any higher bits, so $\mathrm{wt}_2(m)=\mathrm{wt}_2(S)-1$.
+Also $\mathrm{wt}_2(S)\le t\le k$ by Lemma~10.1, hence $\mathrm{wt}_2(m)\le k-1$.
+Finally $n-1 = (p+S)-1 = p+m$. \qed
+
+\textbf{FAST REALITY CHECK / COMPUTATION.}
+I ran a brute-force computation using the reformulation in Lemma~10.1.
+For a given bound $N$ and $k$, define $R_k(N)$ as the set of integers $n$ with $2\le n\le N$ that are $k$-representable.
+
+\begin{itemize}
+\item For $k=3$ and $N=1{,}000{,}000$: every $n\in\{2,3,\dots,1{,}000{,}000\}$ is $3$-representable (no exceptions found).
+\item For $k=2$ and $N=1{,}000{,}000$: there are exactly $27{,}959$ exceptions (integers not representable as prime + at most $2$ powers of $2$). The first few exceptions are
+\[906,960,1200,1208,1212,1244,1272,\dots\]
+and there are also many exceptions close to $1{,}000{,}000$.
+\item I also verified the specific even integer mentioned in the problem text:
+\[n_0=1117175146\]
+is \emph{not} representable as a prime plus at most $3$ powers of $2$, by checking all $m\le n_0$ with $\mathrm{wt}_2(m)\le 3$ (there are $4877$ such $m$) and performing deterministic trial-division primality tests on each candidate $n_0-m$.
+\end{itemize}
+
+5) \textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma~10.1: the only subtlety is whether repetition of powers of $2$ matters. The carry operation shows any representation with repetition reduces to a representation with distinct powers and no more terms, so the ``at most $k$'' condition is equivalent to a Hamming-weight bound.
+\item Lemma~10.2: checked the parity logic explicitly. If $p=2$ (even prime), then $n-p$ is even and the conclusion about a forced $1$ term fails; this is why the lemma assumes $p$ odd.
+\item Computation: for the $k=3$ check up to $10^6$, the algorithm marked all numbers of the form $p+m$ where $p$ is prime and $m$ has binary weight $\le 3$; then it scanned for unmarked integers. For the $n_0$ verification, trial division up to $\lfloor\sqrt{n_0}\rfloor$ is rigorous.
+\end{itemize}
+
+6) \textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: Lemma~10.1 gives an exact reformulation in terms of binary Hamming weight, and Lemma~10.2 reduces the even case with odd prime to a forced ``$+1$'' decomposition. Computationally, every $2\le n\le 10^6$ is representable with $k=3$, while $n_0=1117175146$ is rigorously verified to fail for $k=3$.
+
+(ii) First gap (crisp): Prove either
+\begin{quote}
+$\exists k\ \forall n\ge 2\ \exists\text{ prime }p: \mathrm{wt}_2(n-p)\le k$
+\end{quote}
+or its negation (for every fixed $k$, construct infinitely many $n$ such that $n-m$ is composite for all $m$ with $\mathrm{wt}_2(m)\le k$).
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item For fixed small $k$ (especially $k=3$), do a targeted modular ``covering congruence'' search: find a set of moduli $q_i$ and residue classes forcing $n-m$ to be divisible by some prime for every low-weight $m$.
+\item Extend computation for $k=3$ beyond $10^6$ using a segmented sieve + marking approach (still feasible into the tens/hundreds of millions) to locate more counterexamples and detect patterns in their residues.
+\item Try to prove that any counterexample for $k=3$ must be even and must lie in specific congruence classes (using Lemma~10.2 and analyzing $n-1-p$ as a sum of two even powers of $2$).
+\end{enumerate}
+
+(iv) Minimal counterexample structure: For fixed $k$, a minimal counterexample $n$ would satisfy: for every $m$ with $\mathrm{wt}_2(m)\le k$, the number $n-m$ is composite (or $<2$). For $k=3$ and even $n$, Lemma~10.2 suggests focusing on $n$ such that $n-1-m'$ is composite for all even $m'$ of weight $\le 2$, i.e. all $m'$ of the form $0,2^a,2^a+2^b$ with $a,b\ge 1$.
+
+

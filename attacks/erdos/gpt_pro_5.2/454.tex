@@ -1,0 +1,111 @@
+% Erdos Problem #454
+
+\textbf{FORMAL RESTATEMENT}
+
+Let $p_k$ denote the $k$th prime (so $p_1=2,p_2=3,\dots$). For each integer $n\ge 2$ define
+\[
+f(n):=\min_{1\le i<n}\big(p_{n+i}+p_{n-i}\big).
+\]
+The question is whether
+\[
+\limsup_{n\to\infty}\big(f(n)-2p_n\big)=\infty.
+\]
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+Only what is stated in the problem text is used: Pomerance (1979) proved the $\limsup$ is at least $2$.
+No other external results are imported here.
+
+\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Rewrite $f(n)-2p_n$ in terms of asymmetry of cumulative prime gaps around index $n$.
+\item Prove structural lemmas (parity, easy bounds) that constrain possible behavior.
+\item FAST REALITY CHECK: compute $f(n)-2p_n$ for $n$ up to a few thousand and record extremes.
+\end{itemize}
+
+\textbf{WORK}
+
+\emph{Fast reality check (exact computation).}
+Using exact primes and a direct $O(n^2)$ scan for $n\le N$, I found:
+\begin{itemize}
+\item For $2\le n\le 200$, the maximum of $f(n)-2p_n$ is $12$ (at $n=189$) and the minimum is $-36$ (at $n=198$).
+\item For $2\le n\le 2000$, the maximum is $26$ and the minimum is $-208$.
+\item For $2\le n\le 5000$, the maximum is $32$ and the minimum is $-294$.
+\item For $2\le n\le 20000$, the maximum is $58$ (achieved already with $i=1$) and the minimum is $-614$.
+\end{itemize}
+These computations do not decide the $\limsup$ question but confirm the quantity takes both positive and negative values and grows (slowly) in this range.
+
+\medskip
+
+\textbf{Lemma 454.1 (parity for $n\ge 3$).}
+For every $n\ge 3$, $f(n)$ is even. Consequently $f(n)-2p_n$ is an even integer.
+
+\emph{Proof.}
+For $n\ge 3$ consider two specific indices:
+\begin{align*}
+S_{n-1}&:=p_{n+(n-1)}+p_{n-(n-1)}=p_{2n-1}+p_1=p_{2n-1}+2,\\
+S_{n-2}&:=p_{n+(n-2)}+p_{n-(n-2)}=p_{2n-2}+p_2=p_{2n-2}+3.
+\end{align*}
+The number $S_{n-1}$ is odd (odd prime $p_{2n-1}$ plus $2$), while $S_{n-2}$ is even (odd prime $p_{2n-2}$ plus $3$).
+Since consecutive odd primes differ by at least $2$, we have $p_{2n-1}\ge p_{2n-2}+2$, hence
+\[
+S_{n-1}=p_{2n-1}+2\ge (p_{2n-2}+2)+2=p_{2n-2}+4>p_{2n-2}+3=S_{n-2}.
+\]
+Therefore, among the candidates in the minimum defining $f(n)$, the odd candidate $S_{n-1}$ is strictly larger than the even candidate $S_{n-2}$. Hence the minimum is attained at some $i\le n-2$, for which both primes $p_{n+i},p_{n-i}$ are odd, so $p_{n+i}+p_{n-i}$ is even. Thus $f(n)$ is even.
+Since $p_n$ is odd for $n\ge 2$, $2p_n$ is even, so $f(n)-2p_n$ is even.
+\qed
+
+\medskip
+
+\textbf{Lemma 454.2 (gap-difference upper bound from the $i=1$ term).}
+For every $n\ge 2$,
+\[
+ f(n)\le p_{n+1}+p_{n-1},
+\]
+and hence
+\[
+ f(n)-2p_n\le (p_{n+1}-p_n)-(p_n-p_{n-1}).
+\]
+
+\emph{Proof.}
+Since $i=1$ is allowed in the defining minimum, we have
+\[
+ f(n)=\min_{1\le i<n}(p_{n+i}+p_{n-i})\le p_{n+1}+p_{n-1}.
+\]
+Subtracting $2p_n$ gives
+\[
+ f(n)-2p_n\le (p_{n+1}+p_{n-1})-2p_n=(p_{n+1}-p_n)-(p_n-p_{n-1}).
+\]
+\qed
+
+\medskip
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 454.1 carefully handles the only parity-odd candidate in the minimum (the one involving $p_1=2$) by comparing it to an explicit even candidate.
+\item Lemma 454.2 uses only that $i=1$ is included in the minimum; no other assumptions.
+\item The computations are consistent with Lemma 454.1: for $n\ge 3$ all observed values of $f(n)-2p_n$ are even.
+\end{itemize}
+
+\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} For $n\ge 3$, $f(n)-2p_n$ is always even (Lemma 454.1). Also $f(n)-2p_n$ is bounded above by the local prime-gap difference $(p_{n+1}-p_n)-(p_n-p_{n-1})$ (Lemma 454.2), and exact computations up to $n=20000$ show the quantity attains values as large as $58$ and as small as $-614$ in that range.
+
+(ii) \emph{First gap (crisp).} Prove that there exist arbitrarily large $n$ such that for \emph{all} $1\le i<n$,
+\[
+p_{n+i}+p_{n-i}\ge 2p_n + T
+\]
+for a given large threshold $T$ (equivalently $f(n)-2p_n\ge T$), or else construct $n$ showing a uniform upper bound.
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Try to relate $f(n)$ to a ``convexity'' property of the prime sequence in index space: show that if cumulative gaps to the right dominate cumulative gaps to the left for all $i$, then $f(n)-2p_n$ is large.
+\item Computation: push the brute force to $n\le 10^5$ (with optimization) and record the growth rate of $\max_{m\le n}(f(m)-2p_m)$.
+\item Attempt a disproof strategy: look for a plausible mechanism forcing some $i$ to make $p_{n+i}+p_{n-i}\le 2p_n+C$ uniformly (e.g. by pairing a large forward gap with a smaller backward cumulative gap).
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.} A minimal counterexample to the conjecture $\limsup(f(n)-2p_n)=\infty$ would be a constant $C$ such that for all large $n$ there exists some $1\le i<n$ with $p_{n+i}+p_{n-i}\le 2p_n+C$; such an $i$ would witness a strong asymmetry between prime gaps to the right and left of index $n$.
+
+

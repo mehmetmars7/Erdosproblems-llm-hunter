@@ -1,0 +1,110 @@
+%Erdos problem 517
+\noindent\textbf{FORMAL RESTATEMENT}
+
+Let $(n_k)_{k\ge 1}$ be a strictly increasing sequence of nonnegative integers and let $(a_k)_{k\ge 1}$ be nonzero complex numbers such that the power series
+\[
+f(z)=\sum_{k=1}^{\infty} a_k z^{n_k}
+\]
+converges for all $z\in\mathbb{C}$ (so $f$ is entire). Assume the gap condition
+\[
+\frac{n_k}{k}\to\infty\quad\text{as }k\to\infty.
+\]
+Question: Must it follow that $f$ assumes every complex value infinitely often (i.e., for every $w\in\mathbb{C}$, the equation $f(z)=w$ has infinitely many solutions in $\mathbb{C}$)?
+
+Edge cases: $f$ is transcendental because infinitely many terms are present. By classical Picard theory, there is at most one value $w$ that can fail to be assumed infinitely often; the conjecture asks that there is no such exceptional value.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+The problem statement records: Fej\'er proved that if $\sum 1/n_k<\infty$ then $f$ assumes every value at least once; Biernacki proved under the same hypothesis every value is assumed infinitely often. P\'olya proved that if $f$ has finite order then, assuming $\limsup (n_{k+1}-n_k)=\infty$, $f$ assumes every value infinitely often.
+
+\medskip
+\noindent\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Proof-track idea: show that the gap condition prevents $f$ from having an exceptional value $w$ with only finitely many preimages, by ruling out representations $f-w = P e^g$.
+\item Disproof-track idea: attempt to explicitly construct a lacunary entire function with $n_k/k\to\infty$ that omits a value or has only finitely many preimages for some value (i.e., build $f-w=P e^g$ with lacunary Maclaurin support).
+\end{itemize}
+I did not complete either track.
+
+\medskip
+\noindent\textbf{WORK}
+
+\noindent\textbf{Fast reality check (the gap condition forces unbounded successive gaps).}
+A quick check shows $n_k/k\to\infty$ implies $n_{k+1}-n_k$ cannot be bounded.
+
+\noindent\textbf{Additional computational sanity check (toy lacunary series).}
+Consider the lacunary entire function $f(z)=\sum_{k\ge 1} \frac{z^{2^k}}{(2^k)!}$ (here $n_k=2^k$, so $n_k/k\to\infty$). Truncating at $k=4$ gives
+\[
+P(z)=\frac{z^2}{2!}+\frac{z^4}{4!}+\frac{z^8}{8!}+\frac{z^{16}}{16!}.
+\]
+Using \texttt{numpy.roots} on the degree-$16$ coefficient array, I obtained:
+\begin{itemize}
+\item degree $16$; $16$ roots in total; $2$ roots at $0$ (numerically $|z|<10^{-8}$, consistent with the factor $z^2$);
+\item smallest nonzero root modulus $\approx 3.3422052103$ (approximately at $\pm 3.3422052103\, i$);
+\item largest root modulus $\approx 12.2987828606$.
+\end{itemize}
+This does not resolve the conjecture; it only checks that a representative lacunary pattern under the hypothesis behaves nontrivially in small truncations.
+
+
+\medskip
+\noindent\textbf{Lemma 1 (unbounded successive gaps).}
+If $n_k/k\to\infty$ as $k\to\infty$, then
+\[
+\limsup_{k\to\infty} (n_{k+1}-n_k)=\infty.
+\]
+
+\textit{Proof.}
+Suppose for contradiction that $n_{k+1}-n_k\le D$ for all $k$ for some fixed $D$. Then by telescoping,
+\[
+n_k \le n_1 + D(k-1) \le (n_1+D)k.
+\]
+Dividing by $k$ gives $n_k/k\le n_1+D$, contradicting $n_k/k\to\infty$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (finite preimages imply an exponential-polynomial factorisation).}
+Let $F$ be a nonconstant entire function and $w\in\mathbb{C}$. If the equation $F(z)=w$ has only finitely many solutions in $\mathbb{C}$ (counted without multiplicity), then there exist a nonzero polynomial $P$ and an entire function $g$ such that
+\[
+F(z)-w = P(z) e^{g(z)}.
+\]
+
+\textit{Proof.}
+Let $G(z):=F(z)-w$. By assumption, $G$ is an entire function with only finitely many zeros (counted with multiplicity). Let those zeros be $\zeta_1,\dots,\zeta_m$ with multiplicities $m_1,\dots,m_m$.
+Define the polynomial
+\[
+P(z):=\prod_{j=1}^m (z-\zeta_j)^{m_j}.
+\]
+Then $H(z):=G(z)/P(z)$ is entire and has no zeros: all zeros of $G$ have been divided out with the correct multiplicity. Since $H$ is holomorphic and nonvanishing on the simply connected domain $\mathbb{C}$, it admits an entire logarithm: define
+\[
+ g(z):=\int_0^z \frac{H'(\zeta)}{H(\zeta)}\,d\zeta.
+\]
+Because $H'/H$ is entire (holomorphic with no poles) and $\mathbb{C}$ is simply connected, the integral is path-independent and yields an entire function $g$ with $g'(z)=H'(z)/H(z)$. Then $(e^{-g}H)'=0$ (differentiate to check), so $H(z)=C e^{g(z)}$ for some constant $C\neq 0$. Absorbing $C$ into $P$ (replace $P$ by $CP$) gives $G=P e^{g}$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 2 is a standard factorisation for entire functions with finitely many zeros; I verified the logarithm construction carefully: $H$ nonvanishing on simply connected $\mathbb{C}$ implies $H'/H$ entire and integrable path-independently.
+\item Neither lemma resolves whether such a factorisation can be compatible with lacunary Maclaurin support $\{n_k\}$ and the condition $n_k/k\to\infty$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: The gap condition $n_k/k\to\infty$ forces $\limsup (n_{k+1}-n_k)=\infty$ (Lemma 1). If $f$ had a value $w$ that is assumed only finitely often, then $f-w$ must factor as $P e^{g}$ with $P$ a polynomial and $g$ entire (Lemma 2).
+
+(ii) First gap (crisp): Show (or refute) that an entire lacunary series with $n_k/k\to\infty$ cannot admit a decomposition $f-w=P e^{g}$ for any $w\in\mathbb{C}$, where $P$ is a polynomial and $g$ is entire.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item Coefficient-obstruction attempt: derive necessary algebraic/differential recurrences for Maclaurin coefficients of $P e^{g}$ and prove these recurrences force the support to have $n_k=O(k)$ (or at least violate $n_k/k\to\infty$).
+\item Computational search for structured candidates: attempt to explicitly construct (via solving for coefficients) a nonvanishing entire function with sparse support $\{n_k\}$, starting from a desired lacunary series and taking a convergent logarithm $g=\log f$.
+\item Use growth/order: combine Lemma 1 (unbounded gaps) with value-distribution theorems that rule out exceptional values for functions with sufficiently sparse exponents unless the order is finite (where P\'olya's result applies).
+\end{enumerate}
+
+(iv) Minimal counterexample structure (if the conjecture is false): would be an entire $f(z)=\sum a_k z^{n_k}$ with $n_k/k\to\infty$ for which some value $w$ has only finitely many preimages, hence $f-w=P e^{g}$; such a counterexample would amount to a nonvanishing entire function (up to a polynomial factor) whose Maclaurin series has Fabry gaps.
+

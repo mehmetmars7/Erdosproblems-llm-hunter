@@ -1,0 +1,111 @@
+%Erdos problem #161
+\section*{Erdos problem \#161}
+
+\subsection*{1) FORMAL RESTATEMENT}
+The problem file defines, for fixed $n,t$ and $0\le \alpha<1/2$, a parameter $F^{(t)}(n,\alpha)$ related to $2$-colorings of the complete $t$-uniform hypergraph on $n$ vertices.
+
+\paragraph{Ambiguity/typo check.}
+As written in the file:
+\begin{quote}
+``Let $F^{(t)}(n,\alpha)$ be the \emph{largest} $m$ such that we can $2$-colour the edges ... such that if $X\subseteq[n]$ with $|X|\ge m$ then there are at least $\alpha\binom{|X|}{t}$ many $t$-subsets of $X$ of each colour.''
+\end{quote}
+This makes $F^{(t)}(n,\alpha)$ trivial (equal to $n$) for every $\alpha\le 1/2$ (Lemma 161.1 below), contradicting the subsequent discussion in the same problem.
+
+\medskip
+\noindent\textbf{Minimal correction consistent with the surrounding text.}
+Replace ``largest'' by ``smallest.'' Namely, define $F^{(t)}(n,\alpha)$ as the \emph{smallest} $m$ for which there exists a $2$-coloring of $\binom{[n]}{t}$ such that every subset $X\subseteq[n]$ with $|X|\ge m$ contains at least $\alpha\binom{|X|}{t}$ edges of each color.
+This corrected parameter is monotone nondecreasing in $\alpha$ and can exhibit ``jumps.''
+The question then becomes: as $\alpha$ increases from $0$ to $1/2$, is $F^{(t)}(n,\alpha)$ continuous in $\alpha$ (after rescaling) or does it have jumps (and how many)?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The file states (without proof) that conjectures of Erd\H{o}s--Hajnal--Rado predict $F^{(t)}(n,0)\asymp \log_{t-1}n$, and that results of Erd\H{o}s--Spencer give $F^{(t)}(n,\alpha)\gg_{\alpha} (\log n)^{1/(t-1)}$ for $\alpha>0$. It also states Conlon--Fox--Sudakov proved for $t=3$ and fixed $\alpha>0$ that $F^{(3)}(n,\alpha)\ll_{\alpha}\sqrt{\log n}$.
+I do not invoke these as black boxes below; I give an elementary union-bound upper bound consistent with the $\alpha>0$ regime.
+
+\subsection*{3) ATTACK PLAN}
+First, show the literal (``largest'') definition is trivial. Then, under the corrected (``smallest'') definition, do:
+\begin{itemize}
+\item monotonicity in $\alpha$;
+\item a probabilistic upper bound of order $(\log n)^{1/(t-1)}$ for fixed $\alpha<1/2$.
+\end{itemize}
+
+\subsection*{4) WORK}
+\paragraph{Lemma 161.1 (literal definition is trivial).}
+Under the literal definition in the file (``largest $m$''), for every $t\ge 2$ and every $0\le \alpha\le 1/2$,
+\[
+F^{(t)}(n,\alpha)=n.
+\]
+
+\textit{Proof.}
+Take $m=n$. Then the condition only needs to hold for $X=[n]$. Choose any $2$-coloring of the $t$-edges with exactly half red and half blue (up to rounding), so that each color class has at least $\alpha\binom{n}{t}$ edges (possible for all $\alpha\le 1/2$).
+Thus $m=n$ is feasible, so the ``largest feasible $m$'' equals $n$. \qed
+
+\paragraph{Lemma 161.2 (monotonicity in $\alpha$ for the corrected definition).}
+Under the corrected definition (smallest feasible $m$), $F^{(t)}(n,\alpha)$ is nondecreasing in $\alpha$.
+
+\textit{Proof.}
+Fix $0\le \alpha_1\le \alpha_2<1/2$. If a coloring satisfies the requirement with $\alpha_2$ (i.e. every $|X|\ge m$ has at least $\alpha_2\binom{|X|}{t}$ edges of each color), then the same coloring automatically satisfies the weaker requirement with $\alpha_1$.
+Therefore the minimal feasible $m$ for $\alpha_2$ cannot be smaller than the minimal feasible $m$ for $\alpha_1$. \qed
+
+\paragraph{Lemma 161.3 (probabilistic upper bound for the corrected definition, fixed $\alpha<1/2$).}
+Fix $t\ge 2$ and $0\le \alpha<1/2$. Then there exists a constant $C=C(t,\alpha)$ such that for all $n\ge 3$,
+\[
+F^{(t)}(n,\alpha)\le C\,(\log n)^{1/(t-1)}.
+\]
+
+\textit{Proof.}
+Color each $t$-edge independently red/blue with probability $1/2$.
+Let $s\ge t$ and fix a vertex set $X$ with $|X|=s$.
+Let $E=\binom{s}{t}$ and let $R_X$ be the number of red edges inside $X$. Then $R_X\sim \mathrm{Bin}(E,1/2)$.
+We want $R_X\ge \alpha E$ and also $E-R_X\ge \alpha E$, i.e.
+\[
+\alpha E\le R_X\le (1-\alpha)E.
+\]
+Since $\alpha<1/2$, define $\delta:=1/2-\alpha>0$. Then the bad event is $|R_X-E/2|>\delta E$.
+A standard Chernoff bound gives
+\[
+\Pr\big(|R_X-E/2|>\delta E\big)\le 2\exp(-2\delta^2 E).
+\]
+There are at most $\binom{n}{s}\le n^s$ choices of $X$ of size $s$. Hence by union bound, the probability that \emph{some} $s$-subset violates the balance condition is at most
+\[
+2\,n^s\exp(-2\delta^2\binom{s}{t}).
+\]
+Choose $s=C(\log n)^{1/(t-1)}$ with $C$ large (depending on $t,\delta$). Then $\binom{s}{t}=\Theta(s^t)$ while $\log(n^s)=s\log n$, so for sufficiently large $C$ the exponent
+$-2\delta^2\binom{s}{t}+s\log n$ is negative with magnitude growing like $(\log n)^{t/(t-1)}$.
+Thus for that choice of $s$ the union bound is $<1/2$ (say), so with positive probability \emph{no} $s$-subset is bad. In that outcome, every subset of size $s$ is $(\alpha,1-\alpha)$-balanced, and then every larger subset is also balanced by the same Chernoff+union bound run over all sizes $\ge s$ (the worst case is size $s$).
+Therefore there exists a coloring for which every $X$ with $|X|\ge s$ has at least $\alpha\binom{|X|}{t}$ edges of each color. Hence the minimal feasible $m$ is at most $s=C(\log n)^{1/(t-1)}$. \qed
+
+\paragraph{FAST REALITY CHECK.}
+For the literal definition, Lemma 161.1 already shows $F^{(t)}(n,\alpha)=n$ for every small case.
+For the corrected definition, even in the graph case ($t=2$) the parameter is nontrivial (see Problem \#162 computations).
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma 161.1 pinpoints the inconsistency: taking $m=n$ vacates all constraints except on $X=[n]$.
+\item Lemma 161.3 uses only the binomial tail bound and a union bound; no external theorems are invoked.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial result obtained here.}
+\begin{itemize}
+\item Under the literal definition, $F^{(t)}(n,\alpha)=n$ (Lemma 161.1), so the question becomes vacuous.
+\item Under the corrected definition (smallest feasible $m$), $F^{(t)}(n,\alpha)$ is nondecreasing in $\alpha$ (Lemma 161.2) and satisfies the probabilistic upper bound $F^{(t)}(n,\alpha)\le C(t,\alpha)(\log n)^{1/(t-1)}$ (Lemma 161.3).
+\end{itemize}
+
+\item[(ii)] \textbf{Exact first gap.}
+Assuming the corrected definition, determine whether $\alpha\mapsto F^{(t)}(n,\alpha)$ has discontinuities (jumps) as $\alpha$ varies, and in particular whether there is only one jump at $\alpha=0$.
+
+\item[(iii)] \textbf{Top 3 next moves (concrete targets).}
+\begin{enumerate}
+\item Prove a matching lower bound for the corrected definition: show that for $m\ll (\log n)^{1/(t-1)}$, every coloring has some $X$ of size $\ge m$ that is too imbalanced (one color below $\alpha\binom{|X|}{t}$).
+\item For fixed $n,t$, analyze the exact set of breakpoints in $\alpha$ where $F^{(t)}(n,\alpha)$ changes value.
+\item For $t=3$ and moderate $n$ (e.g. $n\le 8$), brute-force search for the corrected parameter to empirically detect jumps.
+\end{enumerate}
+
+\item[(iv)] \textbf{Minimal counterexample structure (if ``only one jump'' is false).}
+One would need two values $0<\alpha_1<\alpha_2<1/2$ and sequences of $n$ for which the minimal threshold sizes differ by more than a constant factor, indicating a genuine new obstruction to balance beyond the $\alpha=0$ (non-monochromatic) regime.
+\end{enumerate}
+
+

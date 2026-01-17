@@ -1,0 +1,174 @@
+% Erdos Problem #1104
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+A (simple) graph is \emph{triangle-free} if it has no $3$-cycle.
+Let $f(n)$ be the maximum possible chromatic number among all triangle-free graphs on $n$ vertices:
+\[f(n):=\max\{\chi(G): |V(G)|=n,\ G\ \text{triangle-free}\}.
+\]
+Similarly, let $g(m)$ be the maximum possible chromatic number among all triangle-free graphs with $m$ edges:
+\[g(m):=\max\{\chi(G): |E(G)|=m,\ G\ \text{triangle-free}\}.
+\]
+Question: estimate $f(n)$ (and $g(m)$).
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK (from the problem file only).}
+The text records that bounds for the Ramsey number $R(3,k)$ imply $f(n)\asymp (n/\log n)^{1/2}$ and gives the best known constant-factor bounds
+\[(1-o(1))(n/\log n)^{1/2}\le f(n)\le (2+o(1))(n/\log n)^{1/2}.
+\]
+It also records bounds for $g(m)$: an upper bound $g(m)\le (3^{5/3}+o(1))(m/(\log m)^2)^{1/3}$ and a lower bound $g(m)\gg (m/(\log m)^2)^{1/3}$.
+I do not reprove these deep results.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item Provide a fully rigorous (but weaker) construction showing $f(n)\to\infty$ using the Mycielski construction.
+\item Prove (elementary) structural lemmas about Mycielski graphs: triangle-freeness, chromatic number increment, and explicit vertex counts under iteration.
+\item Reality check: compute small instances of Mycielski graphs and verify triangle-freeness for small parameters.
+\end{itemize}
+
+\medskip
+\noindent\textbf{WORK.}
+
+\medskip
+\noindent\textbf{Definition (Mycielski construction).}
+Given a graph $G=(V,E)$ with $V=\{v_1,\dots,v_n\}$, define $\mu(G)$ to be the graph with vertex set
+\[V(\mu(G)):=V\ \cup\ \{u_1,\dots,u_n\}\ \cup\ \{w\}
+\]
+and edges:
+\begin{itemize}
+\item all original edges $v_iv_j\in E$ remain,
+\item for each original edge $v_iv_j\in E$, add edges $u_iv_j$ and $u_jv_i$,
+\item connect $w$ to every $u_i$.
+\end{itemize}
+(No edges are added among the $u_i$.)
+
+\medskip
+\noindent\textbf{Lemma 1 (Mycielski preserves triangle-freeness).}
+If $G$ is triangle-free, then $\mu(G)$ is triangle-free.
+
+\noindent\emph{Proof.}
+Suppose for contradiction that $\mu(G)$ contains a triangle.
+If the triangle uses $w$, then it would have the form $w-u_i-x$ with $x$ adjacent to both $w$ and $u_i$.
+But $w$ is adjacent only to $u$-vertices, and there are no edges among $u$-vertices, so no triangle can contain $w$.
+
+Thus any triangle lies in $V\cup\{u_1,\dots,u_n\}$.
+There are no edges among the $u_i$, so the triangle contains at most one $u$-vertex.
+
+If it contains no $u$-vertex, then it is a triangle entirely in $V$, contradicting that $G$ is triangle-free.
+So the triangle contains exactly one $u$-vertex, say $u_i$, and two original vertices $v_j,v_k$.
+Edges $u_i v_j$ and $u_i v_k$ exist in $\mu(G)$ only if $v_i v_j\in E(G)$ and $v_i v_k\in E(G)$.
+The third edge $v_jv_k$ must also be in $E(G)$ (it is an edge among original vertices).
+Therefore $v_i,v_j,v_k$ form a triangle in $G$, again a contradiction.
+Hence $\mu(G)$ is triangle-free. \qed
+
+\medskip
+\noindent\textbf{Lemma 2 (Mycielski increases chromatic number by $1$).}
+For every graph $G$,
+\[\chi(\mu(G))=\chi(G)+1.
+\]
+
+\noindent\emph{Proof.}
+Let $k:=\chi(G)$.
+
+\emph{Upper bound $\chi(\mu(G))\le k+1$.}
+Fix a proper $k$-coloring $c:V\to\{1,\dots,k\}$ of $G$.
+Color each $v_i$ with $c(v_i)$, color each $u_i$ with $c(v_i)$, and color $w$ with a new color $k+1$.
+Edges among the $v_i$ are properly colored by assumption.
+There are no $u_i u_j$ edges.
+If $u_i v_j$ is an edge in $\mu(G)$, then $v_i v_j$ was an edge of $G$, so $c(v_i)\ne c(v_j)$; hence $u_i$ and $v_j$ get different colors.
+Finally, $w$ has color $k+1$ different from every $u_i$.
+Thus this is a proper $(k+1)$-coloring of $\mu(G)$, so $\chi(\mu(G))\le k+1$.
+
+\emph{Lower bound $\chi(\mu(G))\ge k+1$.}
+Suppose for contradiction that $\mu(G)$ has a proper $k$-coloring $c$ with colors $\{1,\dots,k\}$.
+Let $\alpha:=c(w)$ be the color of $w$.
+Because $w$ is adjacent to every $u_i$, we have $c(u_i)\ne \alpha$ for all $i$.
+Let
+\[X:=\{v_i\in V: c(v_i)=\alpha\}
+\]
+be the set of original vertices that share $w$'s color.
+Since $c$ is proper and edges among $V$ in $\mu(G)$ are exactly the edges of $G$, the set $X$ is an independent set in $G$.
+
+Define a new coloring $\tilde c$ of the original vertex set $V$ by
+\[\tilde c(v_i):=\begin{cases}
+ c(u_i), & v_i\in X,\\
+ c(v_i), & v_i\notin X.
+\end{cases}
+\]
+This coloring uses only colors in $\{1,\dots,k\}\setminus\{\alpha\}$, because if $v_i\in X$ then $\tilde c(v_i)=c(u_i)\ne\alpha$ and if $v_i\notin X$ then $c(v_i)\ne\alpha$ by definition.
+Hence $\tilde c$ uses at most $k-1$ colors.
+We check that $\tilde c$ is proper on every edge $v_iv_j\in E(G)$.
+
+If neither endpoint lies in $X$, then $\tilde c(v_i)=c(v_i)$ and $\tilde c(v_j)=c(v_j)$, and $c(v_i)\ne c(v_j)$ because $c$ is proper.
+If exactly one endpoint lies in $X$, say $v_i\in X$ and $v_j\notin X$, then $\tilde c(v_i)=c(u_i)$ and $\tilde c(v_j)=c(v_j)$.
+Because $v_iv_j\in E(G)$, the edge $u_i v_j$ is present in $\mu(G)$, so properness of $c$ gives $c(u_i)\ne c(v_j)$.
+Therefore $\tilde c(v_i)\ne \tilde c(v_j)$.
+If both endpoints lie in $X$, then there is no edge $v_iv_j$ because $X$ is independent.
+Thus $\tilde c$ is a proper coloring of $G$ using at most $k-1$ colors, contradicting $\chi(G)=k$.
+This contradiction shows that $\chi(\mu(G))\ge k+1$.
+
+Combining the two bounds yields $\chi(\mu(G))=k+1$. \qed
+
+\medskip
+\noindent\textbf{Lemma 3 (iterating Mycielski from $C_5$ gives an explicit lower bound for $f(n)$).}
+Let $M_3:=C_5$ and define $M_{k+1}:=\mu(M_k)$ for $k\ge 3$.
+Then for all $k\ge 3$:
+\begin{itemize}
+\item $M_k$ is triangle-free,
+\item $\chi(M_k)=k$,
+\item $|V(M_k)|=3\cdot 2^{k-2}-1$.
+\end{itemize}
+Consequently, for all $n\ge 5$,
+\[f(n)\ge 2+\Bigl\lfloor \log_2\Bigl(\frac{n+1}{3}\Bigr)\Bigr\rfloor.
+\]
+
+\noindent\emph{Proof.}
+We argue by induction on $k$.
+For $k=3$, $M_3=C_5$ is triangle-free and $3$-chromatic, and $|V(M_3)|=5=3\cdot 2^{1}-1$.
+Assume the claims for $M_k$.
+Then $M_{k+1}=\mu(M_k)$ is triangle-free by Lemma 1 and has chromatic number $\chi(M_k)+1=k+1$ by Lemma 2.
+Also, by construction $|V(\mu(G))|=2|V(G)|+1$, so $n_{k+1}:=|V(M_{k+1})|$ satisfies the recurrence $n_{k+1}=2n_k+1$ with $n_3=5$.
+Solving gives $n_k=3\cdot 2^{k-2}-1$.
+
+For the bound on $f(n)$: if $n\ge n_k$, we can take $M_k$ and (if needed) add isolated vertices to reach exactly $n$ vertices; adding isolated vertices does not create triangles and does not decrease chromatic number.
+Thus $f(n)\ge \chi(M_k)=k$ whenever $n\ge n_k$.
+The inequality $n\ge 3\cdot 2^{k-2}-1$ is equivalent to $2^{k-2}\le (n+1)/3$, i.e.
+$k\le 2+\log_2((n+1)/3)$.
+Taking the largest integer $k$ satisfying this yields the displayed lower bound. \qed
+
+\medskip
+\noindent\textbf{FAST REALITY CHECK (small Mycielski graphs).}
+I generated the standard Mycielski graphs $M_k$ for $k=3,4,5,6,7$ (starting from $C_5$) and counted triangles.
+The results were:
+\[
+\begin{array}{c|c|c}
+ k & |V(M_k)| & \#\text{triangles in }M_k\\\hline
+ 3 & 5 & 0\\
+ 4 & 11 & 0\\
+ 5 & 23 & 0\\
+ 6 & 47 & 0\\
+ 7 & 95 & 0
+\end{array}
+\]
+This matches Lemma 1 and the vertex-count formula in Lemma 3.
+
+\medskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item Lemma 1: enumerated all possible triangle placements and reduced to a triangle in $G$.
+\item Lemma 2: the recoloring argument relies crucially on the fact that $X=\{v_i:c(v_i)=c(w)\}$ is independent in $G$ (because $c$ is a proper coloring on $V$).
+\item Lemma 3: checked the recurrence $|V(\mu(G))|=2|V(G)|+1$ and solved it explicitly.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL: \textbf{UNRESOLVED}.}
+(i) \emph{Strongest proved partial result here.} I proved from scratch that the Mycielski construction preserves triangle-freeness (Lemma 1) and increases chromatic number by $1$ (Lemma 2). Iterating from $C_5$ gives explicit triangle-free graphs with chromatic number $k$ on $3\cdot 2^{k-2}-1$ vertices, hence $f(n)\ge 2+\lfloor\log_2((n+1)/3)\rfloor$ (Lemma 3).
+
+(ii) \emph{First gap (crisp).} I did not provide a self-contained derivation of the correct order of growth $f(n)\asymp \sqrt{n/\log n}$ (or any nontrivial upper bound of that form); the missing inputs are the deep Ramsey/independence-number estimates cited in the problem text.
+
+(iii) \emph{Top 3 next moves.}
+1. Work out in detail the implication ``$R(3,k)\asymp k^2/\log k$ $\Rightarrow$ $f(n)\asymp \sqrt{n/\log n}$'' in both directions, clearly isolating which Ramsey bounds are used where.
+2. For $g(m)$, combine explicit constructions (e.g. sparse high-chromatic triangle-free graphs) with edge bounds to obtain elementary lower bounds, then compare to the $(m/(\log m)^2)^{1/3}$ scale cited.
+3. Perform small-$n$ computations for triangle-free graphs (e.g. via known catalogues) to sanity-check $f(n)$ for $n\le 20$ and see the onset of growth.
+
+(iv) \emph{Minimal counterexample structure.} A counterexample to the quoted asymptotic scale would require a triangle-free graph on $n$ vertices whose chromatic number deviates substantially from the Ramsey-predicted regime, i.e. either an unexpectedly large chromatic number without creating large independent sets, or an unexpectedly small chromatic number despite the absence of large independent sets; both scenarios are governed by extremal behavior of triangle-free graphs and Ramsey theory.

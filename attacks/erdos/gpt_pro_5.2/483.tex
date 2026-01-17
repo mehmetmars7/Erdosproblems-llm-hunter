@@ -1,0 +1,152 @@
+% Erdos Problem #483
+% URL: https://www.erdosproblems.com/483
+
+\subsection*{FORMAL RESTATEMENT}
+Fix an integer $k\ge 1$. A \emph{$k$-colouring} of $\{1,2,\dots,N\}$ is a map
+\[\chi:\{1,2,\dots,N\}\to\{1,2,\dots,k\}.\]
+A \emph{monochromatic Schur triple} (for $\chi$) is a triple of integers $(a,b,c)$ with
+\[1\le a,b,c\le N,\qquad a+b=c,\qquad \chi(a)=\chi(b)=\chi(c).\]
+Define $f(k)$ to be the \emph{minimal} $N$ such that \emph{every} $k$-colouring of $\{1,\dots,N\}$ contains a monochromatic Schur triple.
+Equivalently, letting
+\[S(k):=f(k)-1,\]
+$S(k)$ is the \emph{maximum} $N$ for which there exists a $k$-colouring of $\{1,\dots,N\}$ with \emph{no} monochromatic solution to $a+b=c$.
+
+The problem asks for estimates on $f(k)$ as $k\to\infty$, and in particular whether there exists a constant $c>0$ such that
+\[f(k) < c^k\quad\text{for all }k.\]
+
+Edge cases: for $k=1$, $f(1)=2$ (since $1+1=2$). For general $k$, $f(k)$ is finite (for instance, the problem statement quotes an explicit factorial upper bound).
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The statement itself identifies $f(k)$ as the Schur numbers, gives known exact values $f(1)=2,f(2)=5,f(3)=14,f(4)=45,f(5)=161$, and records the best-known asymptotic bounds
+\[(380)^{k/5}-O(1)\le f(k)\le \lfloor (e-\tfrac{1}{24})k!\rfloor-1,\]
+with attributions in the problem text. Per the integrity rule for this project, I do \emph{not} import any additional external results beyond what is stated in the problem file.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track:}
+\begin{itemize}
+\item Produce an explicit recursive colouring to give an unconditional exponential \emph{lower} bound of the form $f(k)\ge c_0^k$.
+\item Relate sum-free colour classes to multicolour triangle Ramsey numbers to get an unconditional \emph{upper} bound in terms of $R(3;k)$.
+\end{itemize}
+\textbf{Disproof track:}
+\begin{itemize}
+\item Try to falsify the conjectured exponential \emph{upper} bound by deriving a superexponential lower bound. (No such argument is known in the problem statement; this is expected to be hard.)
+\end{itemize}
+I proceed with the explicit lower bound and the Ramsey reduction, then stop (the exponential upper bound question remains open here).
+
+\subsection*{WORK}
+\paragraph{FAST REALITY CHECK (small $k$ by computation).}
+I wrote a brute-force backtracking search over $k$-colourings avoiding monochromatic Schur triples $a+b=c$ to verify the smallest cases.
+The search confirms exactly:
+\[
+ f(1)=2,\qquad f(2)=5,\qquad f(3)=14.
+\]
+(These match the values quoted in the problem statement.)
+
+\paragraph{Lemma 1 (Schur recursion via base-$3$ splitting).}
+Let $k\ge 1$ and suppose there exists a $k$-colouring $\chi$ of $\{1,2,\dots,N\}$ with no monochromatic solution to $a+b=c$.
+Then there exists a $(k+1)$-colouring $\widetilde\chi$ of $\{1,2,\dots,3N+1\}$ with no monochromatic solution to $a+b=c$.
+
+\paragraph{Proof.}
+Define $\widetilde\chi:\{1,\dots,3N+1\}\to\{1,\dots,k+1\}$ by
+\[
+\widetilde\chi(m)=
+\begin{cases}
+ k+1, & m\equiv 1\pmod 3,\\
+ \chi(m/3), & m\equiv 0\pmod 3,\\
+ \chi((m+1)/3), & m\equiv 2\pmod 3.
+\end{cases}
+\]
+(These formulas make sense because if $m\equiv 0\pmod 3$ then $m/3\in\{1,\dots,N\}$, and if $m\equiv 2\pmod 3$ then $m=3t-1$ with $t=(m+1)/3\in\{1,\dots,N\}$.)
+
+We must show there is no monochromatic triple $(a,b,c)$ with $a+b=c$ under $\widetilde\chi$.
+Assume for contradiction that such a monochromatic triple exists, and write the common colour as $r\in\{1,\dots,k+1\}$.
+
+\emph{Case 1: $r=k+1$.}
+Then $a\equiv b\equiv c\equiv 1\pmod 3$ by the definition of $\widetilde\chi$.
+But then $a+b\equiv 1+1\equiv 2\pmod 3$, contradicting $a+b=c\equiv 1\pmod 3$.
+So no monochromatic Schur triple can lie entirely in colour $k+1$.
+
+\emph{Case 2: $r\in\{1,\dots,k\}$.}
+Then each of $a,b,c$ is \emph{not} $\equiv 1\pmod 3$, so each is congruent to $0$ or $2$ modulo $3$.
+Consider possible residue patterns modulo $3$:
+\begin{itemize}
+\item If $a\equiv b\equiv 0\pmod 3$, then $c\equiv 0\pmod 3$ and we may write $a=3a',b=3b',c=3c'$ with $1\le a',b',c'\le N$ and $a'+b'=c'$.
+Moreover $\widetilde\chi(a)=\chi(a')$, $\widetilde\chi(b)=\chi(b')$, $\widetilde\chi(c)=\chi(c')$, so $\chi(a')=\chi(b')=\chi(c')=r$ gives a monochromatic Schur triple for $\chi$, contradiction.
+\item If $a\equiv b\equiv 2\pmod 3$, then $a+b\equiv 2+2\equiv 1\pmod 3$, forcing $c\equiv 1\pmod 3$, which would imply $\widetilde\chi(c)=k+1\ne r$; impossible.
+\item Therefore (up to swapping $a$ and $b$) we must have $a\equiv 0\pmod 3$ and $b\equiv 2\pmod 3$. Then $c=a+b\equiv 2\pmod 3$.
+Write $a=3a'$ with $1\le a'\le N$, and write $b=3b'-1$ and $c=3c'-1$ with $b'=(b+1)/3$, $c'=(c+1)/3$ in $\{1,\dots,N\}$.
+Then
+\[3a' + (3b'-1) = 3c'-1 \implies a'+b'=c'.\]
+By definition of $\widetilde\chi$, we have $\widetilde\chi(a)=\chi(a')$, $\widetilde\chi(b)=\chi(b')$, $\widetilde\chi(c)=\chi(c')$.
+Thus $\widetilde\chi(a)=\widetilde\chi(b)=\widetilde\chi(c)=r$ implies $\chi(a')=\chi(b')=\chi(c')=r$, producing a monochromatic Schur triple for $\chi$, contradiction.
+\end{itemize}
+All residue cases lead to contradiction, so $\widetilde\chi$ has no monochromatic Schur triple.
+\qed
+
+\paragraph{Corollary 2 (explicit exponential lower bound).}
+For all $k\ge 1$,
+\[S(k)\ge \frac{3^k-1}{2}\qquad\text{and hence}\qquad f(k)\ge \frac{3^k+1}{2}.
+\]
+
+\paragraph{Proof.}
+For $k=1$, the set $\{1\}$ (i.e. $N=1$) has a $1$-colouring with no solution to $a+b=c$ inside $\{1\}$, so $S(1)\ge 1=(3^1-1)/2$.
+Apply Lemma~1 inductively: if $S(k)\ge N$ then there is a $k$-colouring of $\{1,\dots,N\}$ with no monochromatic Schur triple, hence Lemma~1 yields a $(k+1)$-colouring of $\{1,\dots,3N+1\}$ with no monochromatic Schur triple, so $S(k+1)\ge 3N+1$.
+Taking $N=(3^k-1)/2$ gives $S(k+1)\ge 3(3^k-1)/2 +1=(3^{k+1}-1)/2$.
+Thus $S(k)\ge (3^k-1)/2$ for all $k$, and $f(k)=S(k)+1\ge (3^k+1)/2$.
+\qed
+
+\paragraph{Lemma 3 (Ramsey reduction: $f(k)\le R(3;k)-1$).}
+Let $R(3;k)$ denote the multicolour triangle Ramsey number: the smallest integer $R$ such that every $k$-edge-colouring of $K_R$ contains a monochromatic triangle.
+Then
+\[f(k) \le R(3;k)-1\quad\text{for all }k\ge 1.
+\]
+
+\paragraph{Proof.}
+Fix $N\ge 1$ and suppose (for contradiction) that there exists a $k$-colouring $\chi$ of $\{1,\dots,N\}$ with no monochromatic solution to $a+b=c$.
+Consider the complete graph on vertex set $V=\{0,1,\dots,N\}$ (so it has $N+1$ vertices).
+Define a $k$-edge-colouring $\varphi$ of this graph by colouring each edge $\{i,j\}$, $i<j$, with
+\[\varphi(\{i,j\}) := \chi(j-i)\in\{1,\dots,k\}.
+\]
+Now suppose there were a monochromatic triangle with vertices $0\le x<y<z\le N$ and all three edges colour $r$.
+Then the edge colours give
+\[\chi(y-x)=\chi(z-y)=\chi(z-x)=r.
+\]
+Let $a=y-x$, $b=z-y$, $c=z-x$. Then $a,b,c\in\{1,\dots,N\}$ and $a+b=c$.
+Moreover $\chi(a)=\chi(b)=\chi(c)=r$, so $(a,b,c)$ is a monochromatic Schur triple for $\chi$, contradiction.
+Therefore $\varphi$ is a $k$-edge-colouring of $K_{N+1}$ with no monochromatic triangle, implying by definition of $R(3;k)$ that $N+1 < R(3;k)$.
+Equivalently, $N \le R(3;k)-2$.
+Since $S(k)=f(k)-1$ is the \emph{maximum} such $N$, we conclude $S(k)\le R(3;k)-2$, hence $f(k)=S(k)+1\le R(3;k)-1$.
+\qed
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~1: checked residue-class cases modulo $3$ exhaustively; the only nontrivial mixed-residue case reduces exactly to a Schur triple in the original colouring.
+\item Corollary~2: base case uses $S(1)=1$ (since $f(1)=2$); recurrence $N\mapsto 3N+1$ solves to $(3^k-1)/2$.
+\item Lemma~3: the triangle-to-Schur-triple correspondence is exact because $z-x=(y-x)+(z-y)$.
+\item Computational sanity check agrees with known $f(1),f(2),f(3)$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.} Explicit construction gives
+\[f(k)\ge \frac{3^k+1}{2}\quad\text{for all }k\ge 1,\]
+and the Ramsey reduction gives
+\[f(k)\le R(3;k)-1\quad\text{for all }k\ge 1.\]
+Also verified by brute force that $f(1)=2,f(2)=5,f(3)=14$.
+
+(ii) \textbf{First gap (crisp).} Prove or disprove:
+\[\exists c>0\ \forall k\ge 1:\ f(k) < c^k.\]
+My work above provides no mechanism to convert the Ramsey/factorial-type upper bounds into an exponential bound, nor to force a superexponential lower bound.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Try to prove a submultiplicative-type inequality for Schur numbers, e.g. $f(k+\ell)\le C\,f(k)f(\ell)$ for an absolute $C$, which would imply at most exponential growth.
+\item Improve the chain $f(k)\le R(3;k)-1$ by deriving explicit exponential upper bounds for $R(3;k)$ (or by a direct argument avoiding Ramsey numbers).
+\item Computational: search for structure in extremal $k$-colourings for $k=4,5$ to guess a general construction that might yield matching upper bounds.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure.} If the exponential upper bound is false, then one would need a sequence $k_j\to\infty$ such that every $k_j$-colouring-free interval length satisfies $f(k_j)\ge \exp(\omega(k_j))$ (superexponential growth). Any such counterexample would have to evade known factorial/Ramsey-based upper bounds by showing those bounds are far from sharp for Schur triples.
+
+\bigskip
+

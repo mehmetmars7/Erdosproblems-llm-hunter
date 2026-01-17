@@ -1,0 +1,113 @@
+% Attempt for Erdos Problem #89
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+Let $A\subset\mathbb R^2$ be a set of $n$ distinct points.
+Let
+\[D(A):=\big|\{|x-y|: x,y\in A,\ x\ne y\}\big|\]
+be the number of distinct Euclidean distances determined by unordered pairs of points of $A$.
+
+Question.
+Is it true that for all $n$ and all $|A|=n$ one has
+\[D(A)\ \gg\ \frac{n}{\sqrt{\log n}}?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the statement only:
+- Guth--Katz proved $D(A)\gg n/\log n$.
+I do not re-prove that deep result here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Use the standard energy/Cauchy--Schwarz reduction: distinct distances are large if no distance occurs too many times.
+2. Bound the number of repeated distances via incidence geometry (point-circle incidences); the full problem uses sophisticated polynomial methods.
+
+Disproof track ideas:
+1. Try to build configurations with very few distinct distances; the integer grid is the classical near-extremizer.
+
+Chosen path in this attempt: provide a fully proved warm-up bound $D(A)\gg \sqrt n$ using a K\H{o}v\'ari--S\'os--Tur\'an argument for repeated distances at a fixed radius.
+
+4) WORK
+Lemma 1 (K\H{o}v\'ari--S\'os--Tur\'an for $K_{2,3}$-free bipartite graphs; a usable form).
+Let $B$ be a bipartite graph with left part $L$ and right part $R$, where $|L|=|R|=n$.
+Assume $B$ contains no copy of $K_{2,3}$ with the two-vertex side in $L$ and the three-vertex side in $R$ (equivalently, any two vertices in $L$ have at most $2$ common neighbors in $R$).
+Then
+\[e(B)\le 2n^{3/2}+2n.\]
+
+Proof.
+Let the degrees of left vertices be $d(\ell)$ for $\ell\in L$.
+Count length-2 paths $\ell-r-\ell'$ with $\ell\ne \ell'$ and $r\in R$.
+For a fixed $r\in R$, the number of unordered pairs of distinct neighbors of $r$ in $L$ is $\binom{d(r)}{2}$, so the total number of such 2-paths equals
+\[P:=\sum_{r\in R}\binom{d(r)}{2}.\tag{1}\]
+On the other hand, for each unordered pair $\{\ell,\ell'\}\subseteq L$, the number of common neighbors in $R$ is at most $2$ by the $K_{2,3}$-free assumption.
+Thus each pair $\{\ell,\ell'\}$ contributes at most $2$ to $P$, so
+\[P\le 2\binom{n}{2} < n^2.\tag{2}\]
+
+Now relate $P$ to the total edge count $e=e(B)$.
+By convexity (or Cauchy--Schwarz), $\sum_{r\in R} d(r)^2 \ge e^2/n$ since $\sum_{r} d(r)=e$.
+Also $\binom{d}{2}=\frac{d^2-d}{2}$, so
+\[P=\sum_{r}\binom{d(r)}{2}=\frac12\sum_r d(r)^2 - \frac12\sum_r d(r)\ge \frac12\cdot \frac{e^2}{n}-\frac12 e.\tag{3}\]
+Combine (2) and (3):
+\[\frac{e^2}{2n}-\frac{e}{2} \le n^2.\]
+Multiply by $2n$:
+\[e^2 - en \le 2n^3.\]
+Complete the square: $(e-\tfrac{n}{2})^2 \le 2n^3 + \tfrac{n^2}{4} \le (2n^{3/2}+n)^2$ for $n\ge 1$.
+Thus $e-\tfrac{n}{2}\le 2n^{3/2}+n$, i.e. $e\le 2n^{3/2}+\tfrac{3n}{2}<2n^{3/2}+2n$.
+\qed
+
+Lemma 2 (Warm-up distinct-distance bound $D(A)\gg \sqrt n$).
+For any set $A$ of $n$ points in $\mathbb R^2$,
+\[D(A)\ \ge\ c\,\sqrt n\]
+for an absolute constant $c>0$.
+
+Proof.
+For a distance value $r>0$, let $m_r$ be the number of unordered pairs $\{x,y\}\subset A$ with $|x-y|=r$.
+Then
+\[\sum_r m_r = \binom{n}{2}.\tag{4}\]
+It suffices to show that every $m_r\ll n^{3/2}$, because then
+\[\binom{n}{2}=\sum_r m_r \le D(A)\cdot \max_r m_r \ll D(A)\,n^{3/2},\]
+giving $D(A)\gg n^2/n^{3/2}=\sqrt n$.
+
+Fix $r>0$. Build a bipartite graph $B_r$ with left part $L=A$ (centers) and right part $R=A$ (points), and draw an edge from $x\in L$ to $y\in R$ iff $|x-y|=r$.
+Then $e(B_r)=2m_r$ (each unordered pair contributes two directed edges).
+
+Key geometric fact: any two circles in the plane intersect in at most $2$ points.
+Thus for two distinct centers $x\ne x'$, the circles of radius $r$ around $x$ and $x'$ have at most two intersection points, meaning $x$ and $x'$ have at most $2$ common neighbors in $R$.
+Equivalently, $B_r$ is $K_{2,3}$-free in the sense of Lemma 1.
+Therefore Lemma 1 gives
+\[2m_r=e(B_r)\le 2n^{3/2}+2n,\]
+so $m_r\le n^{3/2}+n$ for every $r$.
+Substitute into (4) to conclude $D(A)\ge \binom{n}{2}/(n^{3/2}+n)\gg \sqrt n$. \qed
+
+FAST REALITY CHECK
+The desired bound is $D(A)\gg n/\sqrt{\log n}$, much stronger than the $\Omega(\sqrt n)$ bound proved here.
+The $\Omega(\sqrt n)$ bound matches what one would get from the ``easy'' $O(n^{3/2})$ unit-distance bound; improving beyond that requires deep incidence geometry.
+
+5) VERIFICATION
+- Lemma 1: the only structural assumption used is ``any two left vertices have at most 2 common neighbors,'' which is exactly the $K_{2,3}$-free condition.
+- Lemma 2: the geometric input ``two circles meet in at most 2 points'' is correct, and the translation to the bipartite graph $B_r$ is explicit.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved the warm-up bound $D(A)\gg \sqrt n$ for all $n$-point sets in the plane (Lemma 2).
+
+(ii) First gap:
+Bound the number of repeated distances more sharply than $O(n^{3/2})$ per distance, or control the \emph{sum} of squared multiplicities $\sum_r m_r^2$ well enough to upgrade Cauchy--Schwarz to $n/\sqrt{\log n}$.
+
+(iii) Top 3 next moves (concrete):
+1. Use the Cauchy--Schwarz framework $D(A)\ge \binom{n}{2}^2 / \sum_r m_r^2$ and attempt to bound $\sum_r m_r^2$ via incidence bounds between points and circles.
+2. Specialize to structured candidate extremizers (integer grids) and understand their distance multiplicities; attempt to prove the $n/\sqrt{\log n}$ upper behavior for grids (number theory of sums of two squares).
+3. Explore whether stronger forbidden-subgraph conditions (e.g. no three collinear, no four concyclic) allow sharper incidence bounds as a stepping stone (cf. Problem \#98).
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A family of point sets $A_n$ with $|A_n|=n$ such that the number of distinct distances $D(A_n)$ is $o\!\left(n/\sqrt{\log n}\right)$,
+meaning that many distances are repeated with unusually high multiplicity across $\Theta(n^2)$ pairs.
+

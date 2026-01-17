@@ -1,0 +1,80 @@
+% Erdos Problem #1054
+
+\paragraph{FORMAL RESTATEMENT.}
+For each integer $n\ge 1$, define $f(n)$ to be the minimal integer $m\ge 1$ such that there exists some $k\ge 1$ with
+\[
+n = d_1(m)+d_2(m)+\cdots + d_k(m),
+\]
+where $1=d_1(m)<d_2(m)<\cdots<d_{\tau(m)}(m)=m$ are the positive divisors of $m$ in increasing order.
+(Thus the right-hand side is the sum of the $k$ smallest divisors of $m$.)
+The problem text notes that $f(2)$ and $f(5)$ are undefined (no such $m$).
+Questions:
+\begin{itemize}
+\item Is $f(n)=o(n)$ as $n\to\infty$?
+\item If not, is $f(n)=o(n)$ for almost all $n$, and is $\limsup_{n\to\infty} f(n)/n=\infty$?
+\end{itemize}
+
+\paragraph{QUICK LITERATURE/CONTEXT CHECK.}
+I did not use external sources. I treat as given the statement in the problem text that Tao disproved $f(n)=o(n)$ and proved an upper-density bound for $\{n:f(n)\le \delta n\}$.
+
+\paragraph{ATTACK PLAN.}
+\emph{Proof-track:} derive structural constraints on sums of smallest divisors, and simple families where $f(n)$ is provably small (e.g. Lemma 2 below).
+\emph{Disproof-track:} use the stated Tao density bound to formally negate $f(n)=o(n)$; then investigate (computationally) whether $f(n)/n$ appears unbounded.
+Best path: (a) prove basic lemmas about the smallest divisors of $m$; (b) infer from Tao's result that $f(n)\neq o(n)$; (c) report computed small cases and record ratios.
+
+\paragraph{WORK.}
+\textbf{Lemma 1 (lower bound on the $k$ smallest divisors).}
+Let $d_1(m)<d_2(m)<\cdots$ be the increasing divisors of $m$.
+Then for each $i\ge 1$ one has $d_i(m)\ge i$, and consequently
+\[
+d_1(m)+\cdots + d_k(m)\ \ge\ 1+2+\cdots + k = \frac{k(k+1)}{2}.
+\]
+In particular, if $n=d_1(m)+\cdots+d_k(m)$ then $k\le \frac{-1+\sqrt{1+8n}}{2}$.
+
+\emph{Proof.}
+Since $d_i(m)$ is the $i$th smallest \emph{positive integer} dividing $m$, and there are only $i-1$ positive integers strictly less than $i$, it is impossible to have $d_i(m)\le i-1$.
+Thus $d_i(m)\ge i$ for each $i$.
+Summing gives the inequality.
+Solving $k(k+1)/2\le n$ for $k$ gives the explicit bound.
+\hfill$\square$
+
+\textbf{Lemma 2 (exact evaluation when $n-1$ is prime).}
+If $n-1$ is prime, then $f(n)=n-1$.
+
+\emph{Proof.}
+Let $p=n-1$ be prime. Taking $m=p$, the divisors are $1$ and $p$, so the sum of the two smallest divisors equals $1+p=n$, showing $f(n)\le p$.
+Conversely, if $m<p$ then every divisor of $m$ is at most $m<p$, so any sum of the $k$ smallest divisors is at most $1+m < 1+p=n$.
+Therefore no $m<p$ works, so the minimum is $f(n)=p=n-1$.
+\hfill$\square$
+
+\textbf{Disproof of the strong claim $f(n)=o(n)$ using the stated Tao bound.}
+The problem text states: for every $\delta>0$, the \emph{upper density} of the set
+$A_\delta:=\{n: f(n)\le \delta n\}$ is $\ll \delta^2$.
+Fix $\delta\in(0,1)$ small enough that this upper density is $<1$.
+If $f(n)=o(n)$ were true, then there would exist $N$ such that for all $n\ge N$ we have $f(n)\le \delta n$, meaning $A_\delta$ is cofinite and hence has upper density $1$, contradiction.
+Therefore $f(n)\ne o(n)$.
+
+\textbf{FAST REALITY CHECK (computation).}
+I computed $f(n)$ by scanning $m$ upward and recording all partial sums of the divisor list of $m$.
+Up to $n\le 1000$ the only undefined values were $n=2$ and $n=5$.
+Among $n\le 1000$, the largest observed ratio was
+\begin{verbatim}
+max f(n)/n = 3714/631 ≈ 5.885895..., achieved at n=631.
+\end{verbatim}
+For additional context, among $n\le 200$ the largest observed ratio was
+\begin{verbatim}
+max f(n)/n = 965/199 ≈ 4.849246..., achieved at n=199.
+\end{verbatim}
+
+\paragraph{VERIFICATION.}
+Lemma 1: for $m=12$ the divisors are $1,2,3,4,6,12$, so $(d_1,d_2,d_3,d_4)=(1,2,3,4)$ indeed satisfies $d_i=i$ for $i\le 4$ and the partial sums satisfy the lower bound.
+Lemma 2: for $n=30$ ($n-1=29$ prime), Lemma 2 predicts $f(30)=29$, matching the computation.
+The density argument only uses the logical implication “$f(n)=o(n)$ $\Rightarrow$ for fixed small $\delta$, all sufficiently large $n$ lie in $A_\delta$”, which is correct by definition of $o(n)$.
+
+\paragraph{FINAL: UNRESOLVED.}
+(i) \emph{Strongest proved partial result here.} Using the statement in the problem text attributed to Tao, one can rigorously conclude $f(n)\neq o(n)$. Independently, Lemma 1 bounds the witness length by $k\ll \sqrt{n}$, and Lemma 2 gives an infinite family with $f(p+1)=p$ for primes $p$.
+(ii) \emph{First gap.} Decide whether $\limsup_{n\to\infty} f(n)/n=\infty$ (or construct an explicit infinite family with $f(n)$ growing faster than $n$).
+(iii) \emph{Top 3 next moves.} (1) Try to force any representation of $n$ to use large $k$ by choosing $n$ that cannot be represented with small $k$ (e.g. not of the form $1+$prime, and excluding feasible patterns for $k=3,4$), and then lower-bound the necessary $m$. (2) Extend computation to find record values of $f(n)/n$ and inspect the minimizing $m$ (factorization and divisor pattern) to guess a general obstruction. (3) Attempt to prove a general inequality of the form $f(n)\ge c\,n$ on a set of $n$ of positive lower density, or to show $f(n)\le n^{1+\varepsilon}$ for all large $n$ (either direction would clarify the second question).
+(iv) \emph{What a minimal counterexample would look like.} To refute $\limsup f(n)/n=\infty$, one would need a universal constant $C$ with $f(n)\le Cn$ for all large $n$; a minimal counterexample to that would be an $n$ for which \emph{every} $m\le Cn$ has the property that no initial divisor-sum equals $n$.
+
+

@@ -1,0 +1,105 @@
+% Attempt for Erdos Problem #90
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+Given a set $A\subset\mathbb R^2$ of $n$ distinct points, let
+\[U(A):=\big|\{\{x,y\}\subset A:\ |x-y|=1\}\big|\]
+be the number of unordered unit-distance pairs in $A$.
+
+Question.
+Is it true that
+\[U(A)\ \le\ n^{1+O(1/\log\log n)}\]
+for every $n$ and every $A$ of size $n$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+The statement says:
+- easy bound $U(A)=O(n^{3/2})$,
+- best known $U(A)=O(n^{4/3})$ (SST),
+and conjectured $n^{1+o(1)}$.
+I will prove the easy $O(n^{3/2})$ bound from scratch.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Use incidence bounds between points and circles to upper bound the number of unit distances.
+2. Improve beyond $n^{4/3}$ requires Euclidean-specific tools (per statement); that is out of reach here.
+
+Disproof track ideas:
+1. Construct point sets with many unit distances; lattice points give $\Omega(n)$.
+
+Chosen path in this attempt: (i) prove the classical $O(n^{3/2})$ bound via a K\H{o}v\'ari--S\'os--Tur\'an argument, and (ii) give an explicit $\Omega(n)$ construction from the integer grid.
+
+4) WORK
+Lemma 1 (An $O(n^{3/2})$ upper bound for unit distances).
+For every set $A\subset\mathbb R^2$ of $n$ points,
+\[U(A)\le n^{3/2}+n.\]
+
+Proof.
+Build a bipartite graph $B$ with left part $L=A$ (centers) and right part $R=A$ (points), and connect $x\in L$ to $y\in R$ iff $|x-y|=1$.
+Then each unordered unit-distance pair $\{x,y\}$ contributes two directed edges $(x,y)$ and $(y,x)$, so
+\[e(B)=2U(A).\tag{1}\]
+
+Two circles in the plane intersect in at most two points.
+Therefore, for two distinct centers $x\ne x'$, the unit circles around them have at most two common points, meaning $x$ and $x'$ have at most two common neighbors in $R$.
+Equivalently, $B$ is $K_{2,3}$-free with the two-vertex side in $L$.
+
+We now bound $e(B)$ directly.
+Let $d(r)$ be the degree of a right vertex $r\in R$.
+Count length-2 paths $\ell-r-\ell'$ with $\ell\ne \ell'$ and $r\in R$:
+\[P:=\sum_{r\in R}\binom{d(r)}{2}.\]
+For a fixed unordered pair $\{\ell,\ell'\}\subseteq L$, the number of common neighbors of $\ell$ and $\ell'$ in $R$ is at most $2$ (else we would have three points lying on the intersection of two unit circles).
+Thus $P\le 2\binom{n}{2}<n^2$.
+
+On the other hand,
+\[P=\sum_{r}\binom{d(r)}{2}=\frac12\sum_r d(r)^2-\frac12\sum_r d(r)\ge \frac12\cdot\frac{e(B)^2}{n}-\frac12 e(B)\]
+by Cauchy--Schwarz ($\sum_r d(r)^2\ge e(B)^2/n$) and $\sum_r d(r)=e(B)$.
+Hence
+\[\frac{e(B)^2}{2n}-\frac{e(B)}{2}\le n^2.\]
+Solving this quadratic inequality gives $e(B)\le 2n^{3/2}+2n$ (for instance, $(e(B)-n/2)^2\le 2n^3+n^2/4\le (2n^{3/2}+n)^2$).
+Combine with (1) to get $U(A)=e(B)/2\le n^{3/2}+n$. \qed
+
+Lemma 2 (Grid lower bound $\Omega(n)$).
+Let $m\ge 2$ and let $A$ be the $m\times m$ integer grid
+\[A:=\{(i,j): i,j\in\{1,2,\dots,m\}\},\]
+so $|A|=n=m^2$.
+Then
+\[U(A)=2m(m-1)=2n-2\sqrt n.\]
+
+Proof.
+Unit distances in the integer grid occur exactly between horizontally adjacent points and vertically adjacent points.
+There are $m$ rows, each with $m-1$ horizontal unit edges, giving $m(m-1)$ pairs.
+There are $m$ columns, each with $m-1$ vertical unit edges, giving another $m(m-1)$ pairs.
+No other pairs are at Euclidean distance $1$ since the squared distance between two distinct integer lattice points is an integer and equals $1$ only for these axis-adjacent pairs.
+Thus $U(A)=2m(m-1)=2m^2-2m=2n-2\sqrt n$. \qed
+
+FAST REALITY CHECK
+Lemma 1 matches the ``easy'' $O(n^{3/2})$ bound stated in the problem text.
+Lemma 2 shows $U(A)=\Theta(n)$ is achievable, so any upper bound of the form $n^{1+o(1)}$ would be asymptotically tight up to subpolynomial factors.
+
+5) VERIFICATION
+- Lemma 1 reduces unit distances to incidences between points and unit circles and uses only the geometric fact ``two circles meet in at most 2 points'' plus KST.
+- Lemma 2 counts unit edges explicitly and checks there are no diagonal unit distances in the integer grid.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved the classical easy bound $U(A)\le n^{3/2}+n$ (Lemma 1) and the grid construction with $U(A)=2n-2\sqrt n$ (Lemma 2).
+
+(ii) First gap:
+Improve the exponent $3/2$ toward $1+o(1)$, i.e. exploit Euclidean-specific structure beyond the circle intersection bound.
+
+(iii) Top 3 next moves (concrete):
+1. Replace the $K_{2,3}$-free extremal argument by a stronger incidence theorem (Szemer\'{e}di--Trotter) for point-circle incidences to reach exponents below $3/2$.
+2. Identify which step in the SST84 proof uses Euclidean geometry in an essential way and see whether it can be pushed below $4/3$.
+3. Explore additional restrictions (e.g. convex position, no three collinear) that yield better bounds (see Problem \#96 and \#92).
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A family of point sets $A_n$ with $|A_n|=n$ such that $U(A_n)\ge n^{1+\delta}$ for some fixed $\delta>0$,
+which would disprove the conjectured $n^{1+o(1)}$ upper bound.

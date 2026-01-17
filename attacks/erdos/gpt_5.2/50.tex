@@ -1,0 +1,144 @@
+% Attempt for Erdos Problem #50
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $\phi(n)$ is Euler's totient function: $\phi(n)=|\{1\le k\le n:\gcd(k,n)=1\}|$.
+- For a set $S\subset\mathbb N$, its (natural) density is
+\[d(S):=\lim_{N\to\infty}\frac{|S\cap\{1,\dots,N\}|}{N},\]
+provided the limit exists.
+
+Given (Schoenberg): for each $c\in[0,1]$, the density
+\[f(c):=d\big(\{n\in\mathbb N:\phi(n)<cn\}\big)\]
+exists.
+
+Question.
+Is it true that there does not exist any $x\in(0,1)$ such that the derivative $f'(x)$ exists and $f'(x)>0$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Schoenberg proved existence of the densities $f(c)$ for all $c\in[0,1]$.
+- Erd\H{o}s proved the distribution function $f$ is purely singular.
+I do not re-derive these results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Understand the ``random variable'' $X(n):=\phi(n)/n=\prod_{p\mid n}(1-1/p)$ (prime-factor model) and try to show that
+   the pushforward density measure is singular.
+2. Strengthen singularity to the pointwise statement ``no positive finite derivative anywhere'' by showing that at every $x$,
+   the increment $f(x+h)-f(x)$ is $o(h)$ as $h\downarrow 0$.
+3. Try to isolate a Cantor-type structure in the set of possible values of $\phi(n)/n$ and relate it to the distribution.
+
+Disproof track ideas:
+1. Search numerically for an $x$ where finite differences suggest a stable positive slope.
+2. If found, attempt to turn that into a rigorous lower bound $f(x+h)-f(x)\ge c_0h$ along a sequence $h\to 0$.
+
+Chosen path in this attempt: prove two clean structural lemmas about $\phi(n)/n$ and the sets $\{n:\phi(n)<cn\}$, and run a finite-$N$ sanity check.
+
+4) WORK
+Lemma 1 (Prime-divisor formula and monotonicity under divisibility).
+For every $n\ge 1$,
+\[\frac{\phi(n)}{n}=\prod_{p\mid n}\left(1-\frac1p\right),\]
+where the product is over distinct primes dividing $n$. In particular, if $m\mid n$ then
+\[\frac{\phi(n)}{n}\le \frac{\phi(m)}{m}.\]
+
+Proof.
+Write the prime factorization $n=\prod_{i=1}^r p_i^{k_i}$ with distinct primes $p_i$.
+It is standard (and follows from multiplicativity of $\phi$ and $\phi(p^k)=p^k-p^{k-1}$) that
+\[\phi(n)=\prod_{i=1}^r \phi(p_i^{k_i})=\prod_{i=1}^r\big(p_i^{k_i}-p_i^{k_i-1}\big)=\prod_{i=1}^r p_i^{k_i}\left(1-\frac1{p_i}\right).\]
+Dividing by $n=\prod_{i=1}^r p_i^{k_i}$ gives the claimed formula.
+
+If $m\mid n$, then every prime dividing $m$ also divides $n$, so the set of primes in the product for $\phi(m)/m$
+is a subset of the primes in the product for $\phi(n)/n$. Since each factor $(1-1/p)\in(0,1)$, adding more factors can only decrease the product.
+Thus $\phi(n)/n\le \phi(m)/m$. \qed
+
+Lemma 2 (Euler: $\sum_{p}1/p$ diverges).
+The sum of reciprocals of the primes diverges:
+\[\sum_{p\ \mathrm{prime}}\frac1p=+\infty.\]
+
+Proof.
+Let $H_N:=\sum_{n=1}^N \frac1n$ be the $N$th harmonic sum, which satisfies $H_N\to\infty$ as $N\to\infty$.
+Consider the Euler product over primes $\le N$:
+\[\prod_{p\le N}\left(1+\frac1p+\frac1{p^2}+\cdots\right)=\prod_{p\le N}\frac1{1-1/p}.\]
+Expanding the product on the left produces a term $1/n$ for every integer $n$ whose prime factors are all $\le N$.
+In particular, every $1\le n\le N$ has all prime factors $\le N$, so all terms $1/n$ for $n\le N$ appear in the expansion with coefficient $1$.
+Therefore
+\[H_N=\sum_{n=1}^N\frac1n \le \prod_{p\le N}\frac1{1-1/p}.\]
+Taking logarithms gives
+\[\log H_N \le \sum_{p\le N} -\log\left(1-\frac1p\right).\]
+Using the inequality $-\log(1-x)\le x+x^2+x^3+\cdots=\frac{x}{1-x}$ valid for $0<x<1$, with $x=1/p$, yields
+\[-\log\left(1-\frac1p\right)\le \frac{1/p}{1-1/p}=\frac1{p-1}\le \frac2p\qquad(p\ge 2).\]
+Hence
+\[\log H_N \le 2\sum_{p\le N}\frac1p.\]
+Since $\log H_N\to\infty$, the right-hand side must also tend to $\infty$, which forces $\sum_{p\le N}1/p\to\infty$.
+This proves divergence of $\sum_p 1/p$. \qed
+
+Lemma 3 (For every $c>0$, the set $\{n:\phi(n)<cn\}$ has positive lower density).
+Fix $c\in(0,1)$. Then there exists a squarefree integer $m\ge 1$ such that:
+1. $\phi(m)<cm$, and
+2. every multiple of $m$ lies in $\{n:\phi(n)<cn\}$.
+In particular, the (lower) asymptotic density of $\{n:\phi(n)<cn\}$ is at least $1/m$.
+
+Proof.
+By Lemma 2, the partial sums $\sum_{p\le y}1/p$ can be made arbitrarily large. Choose $y$ such that
+\[\sum_{p\le y}\frac1p > \log\left(\frac1c\right).\]
+Let $m:=\prod_{p\le y} p$ (squarefree by construction). Then by Lemma 1,
+\[\frac{\phi(m)}{m}=\prod_{p\le y}\left(1-\frac1p\right).\]
+Using $\log(1-u)\le -u$ for $u\in(0,1)$ and exponentiating gives
+\[\prod_{p\le y}\left(1-\frac1p\right)\le \exp\left(-\sum_{p\le y}\frac1p\right) < \exp\left(-\log\left(\frac1c\right)\right)=c.\]
+Thus $\phi(m)/m < c$, i.e. $\phi(m)<cm$.
+
+Now let $n$ be any multiple of $m$. Then $m\mid n$, so by Lemma 1,
+\[\frac{\phi(n)}{n}\le \frac{\phi(m)}{m}<c,\]
+equivalently $\phi(n)<cn$. Hence every multiple of $m$ lies in the desired set.
+The set of multiples of $m$ has natural density $1/m$, so the lower density of $\{n:\phi(n)<cn\}$ is at least $1/m$. \qed
+
+FAST REALITY CHECK (local computation; finite $N$).
+I computed $\phi(n)/n$ for $1\le n\le 300{,}000$ and approximated
+\[f_N(c):=\frac1N\left|\left\{1\le n\le N:\frac{\phi(n)}{n}<c\right\}\right|.\]
+Sample values:
+\[
+\begin{array}{c|c}
+c & f_{300000}(c)\\\hline
+0.25 & 0.011453\\
+0.35 & 0.178160\\
+0.50 & 0.511133\\
+0.70 & 0.678287\\
+0.90 & 0.786890
+\end{array}
+\]
+Finite-difference slopes (with $h=0.01$) suggested strong variation near $c=0.5$, but this is only exploratory and not stable evidence about $f'(x)$.
+
+5) VERIFICATION
+- Lemma 1: the formula for $\phi(n)$ and the prime-divisor product are standard and the monotonicity under divisibility follows directly.
+- Lemma 2: the key inequality is $H_N \le \prod_{p\le N}(1-1/p)^{-1}$, justified because every $n\le N$ uses primes $\le N$.
+  The bound $-\log(1-1/p)\le 2/p$ for $p\ge 2$ is valid.
+- Lemma 3: the only nontrivial input is Lemma 2 and $\log(1-u)\le -u$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved structural facts about the sets $\{n:\phi(n)<cn\}$:
+the ratio $\phi(n)/n$ depends only on the prime divisors of $n$ and is monotone under divisibility (Lemma 1),
+and for every $c>0$ the set $\{n:\phi(n)<cn\}$ contains a full arithmetic progression of multiples of some $m$ and hence has positive lower density (Lemma 3).
+
+(ii) First gap:
+Show (or refute) that for this particular distribution function $f$, there is no point $x$ where the derivative exists and is positive.
+I do not know how to upgrade ``purely singular'' (as stated in the problem text) to this pointwise derivative exclusion.
+
+(iii) Top 3 next moves (concrete):
+1. Reconstruct Schoenberg's proof of existence of $f(c)$ and track any quantitative estimates on $f(x+h)-f(x)$.
+2. Translate Erd\H{o}s' ``purely singular'' claim into a precise measure-theoretic statement for the limiting distribution of $\phi(n)/n$, then check whether it implies absence of points with positive finite derivative.
+3. Use computation to look for candidate $x$ with stable positive slopes at shrinking $h$ (e.g. $h=10^{-2},10^{-3},10^{-4}$) and, if any appear, attempt to prove a matching lower bound on the density of $n$ with $\phi(n)/n\in[x,x+h]$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A point $x$ and a sequence $h_k\downarrow 0$ such that the set of $n$ with $\phi(n)/n\in[x,x+h_k)$ has density at least $c_0h_k$ for some fixed $c_0>0$,
+creating a genuinely linear growth in $f$ near $x$.
+

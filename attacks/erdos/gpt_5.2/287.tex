@@ -1,0 +1,94 @@
+% Attempt for Erdos Problem #287
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $k\ge 2$ and let $1<n_1<\cdots<n_k$ be integers such that
+\[1=\sum_{i=1}^k \frac1{n_i}.\]
+Conjecture: necessarily $\max_{1\le i\le k-1}(n_{i+1}-n_i)\ge 3$.
+Equivalently, there is no solution in which every gap $n_{i+1}-n_i$ is $1$ or $2$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement says the weaker bound “$\ge 2$” (no consecutive denominators) is known (Erd\H{o}s 1932), and that the conjecture would follow from a strong prime-pair statement. I re-prove the $\ge 2$ bound here by an elementary prime-modulus obstruction and verify the $k=3$ case completely.
+
+3) ATTACK PLAN
+Proof track:
+1. Re-prove the “no consecutive integers” statement using a modular obstruction from a large prime in the interval.
+2. Classify solutions for small $k$ (especially $k=3$) to see how gaps behave.
+3. Try to force a large gap by isolating a large prime dividing the common denominator of the sum of reciprocals.
+
+Disproof track:
+1. Search computationally for a counterexample with all gaps $\le 2$ for small $k$ and bounded denominators.
+
+Chosen path: rigorous partial results + finite computational search for small $k$.
+
+4) WORK
+Lemma 1 (No sum of reciprocals of consecutive integers equals $1$).
+Let $a\ge 1$ and $b\ge a+1$. Then
+\[\sum_{n=a}^{b}\frac1n \ne 1.\]
+In particular, in any solution $1=\sum_{i=1}^k 1/n_i$ with distinct denominators, we have $\max(n_{i+1}-n_i)\ge 2$.
+
+Proof.
+If $a=1$ then $\sum_{n=1}^{b}1/n>1$, so it cannot equal $1$.
+Assume $a\ge 2$ and set $m=b$.
+
+If $a>m/2$ then every denominator in $[a,m]$ is at least $a$, so
+\[\sum_{n=a}^{m}\frac1n \le \frac{m-a+1}{a} \le \frac{\lfloor m/2\rfloor}{\lfloor m/2\rfloor+1}<1,\]
+so the sum cannot equal $1$.
+
+If instead $a\le m/2$, let $p$ be a prime with $m/2<p\le m$ (Bertrand’s postulate).
+Then $p\in[a,m]$, and $p$ is the only integer in $[a,m]$ divisible by $p$ (since $2p>m$).
+Let $L=\mathrm{lcm}(a,a+1,\dots,m)$. Consider the numerator
+\[A=\sum_{n=a}^{m}\frac{L}{n}\in\mathbb{Z},\qquad \sum_{n=a}^{m}\frac1n=\frac{A}{L}.\]
+Modulo $p$, for $n\ne p$ we have $p\nmid n$ but $p\mid L$, hence $L/n\equiv 0\pmod p$.
+For $n=p$, the term $L/p$ is \emph{not} divisible by $p$ because $p$ appears to the first power in $L$ (no multiple of $p^2$ occurs in $[a,m]$ since $p^2>m$ when $p>m/2\ge 2$).
+Therefore
+\[A\equiv \frac{L}{p}\not\equiv 0\pmod p.\]
+So $p\nmid A$ while $p\mid L$, hence $A/L$ is not an integer. In particular it cannot equal $1$.
+\qed
+
+Lemma 2 ($k=3$ case: unique solution and gap $3$ occurs).
+If $1<n_1<n_2<n_3$ and $\frac1{n_1}+\frac1{n_2}+\frac1{n_3}=1$, then $(n_1,n_2,n_3)=(2,3,6)$.
+In particular $\max(n_{i+1}-n_i)=3$ for $k=3$.
+
+Proof.
+Since $n_1\ge 2$, we have $1/n_1\le 1/2$.
+If $n_1\ge 3$ then $\frac1{n_1}+\frac1{n_2}+\frac1{n_3}\le 1/3+1/4+1/5<1$, contradiction.
+Hence $n_1=2$.
+
+Then $\frac1{n_2}+\frac1{n_3}=1-\frac12=\frac12$.
+Rearrange:
+\[\frac1{n_2}+\frac1{n_3}=\frac12 \iff 2(n_2+n_3)=n_2n_3 \iff (n_2-2)(n_3-2)=4.\]
+Since $n_2<n_3$ and $n_2\ge 3$, the only factorization of $4$ with positive integers $(n_2-2)<(n_3-2)$ is $(1,4)$,
+giving $(n_2,n_3)=(3,6)$. \qed
+
+FAST REALITY CHECK (computation).
+I brute-forced solutions with “all gaps $\le 2$” for $k=3,\dots,8$ and denominators $\le 80$ and found none.
+(Program output: for each $k=3,\dots,8$, “solutions with max gap $\le 2$ and max denominator $\le 80$: 0”.)
+
+5) VERIFICATION
+- Lemma 1’s modular argument isolates a large prime $p$ that appears in exactly one denominator; the conclusion is that the sum cannot be an integer.
+- Lemma 2 is an exact algebraic classification using the standard transformation to a factorization.
+- The computational check does not prove the conjecture, but it is consistent with it.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+The weaker bound $\max(n_{i+1}-n_i)\ge 2$ holds (Lemma 1), and the conjecture holds for $k=3$ with the unique solution $(2,3,6)$ (Lemma 2).
+
+(ii) First gap:
+Rule out solutions for general $k$ in which every gap is $1$ or $2$ (i.e. prove $\max(n_{i+1}-n_i)\ge 3$ for all $k\ge 2$).
+
+(iii) Top 3 next moves:
+1. Develop a refined prime-modulus obstruction: identify a prime $p$ that must appear with a small coefficient in the numerator when clearing denominators unless a gap $\ge 3$ exists.
+2. Implement a larger-scale search for “max gap $\le 2$” solutions (larger $k$ and larger maximum denominator) to see what the smallest hypothetical counterexample would have to look like.
+3. Explore structural reductions suggested by the statement: relate tight-gap decompositions to special prime configurations (e.g. primes $p$ with $(p+1)/2$ prime) and attempt to make that implication explicit.
+
+(iv) Minimal counterexample structure (if the conjecture were false):
+A smallest $k$ and a sequence $1<n_1<\cdots<n_k$ with $\sum 1/n_i=1$ and all gaps in $\{1,2\}$; computationally none exist for $k\le 8$ with $n_k\le 80$, so any counterexample must be larger in both parameters.
+

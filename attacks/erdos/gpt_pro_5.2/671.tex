@@ -1,0 +1,224 @@
+% Erdos Problem #671
+
+1) FORMAL RESTATEMENT
+
+Fix, for each integer $n\ge 1$, a list of pairwise distinct nodes
+\[
+ a_1^n,\dots,a_n^n\in[-1,1].
+\]
+For each $n$ and each $1\le i\le n$, let $p_i^n\in\mathbb R[x]$ denote the unique polynomial of degree at most $n-1$ such that
+\[
+ p_i^n(a_i^n)=1,\qquad p_i^n(a_{i'}^n)=0\ \ (1\le i'\le n,\ i'\ne i).
+\]
+For each function $f:[-1,1]\to\mathbb R$ define the (degree $\le n-1$) Lagrange interpolation polynomial
+\[
+ (\mathcal L^n f)(x)=\sum_{i=1}^n f(a_i^n)\,p_i^n(x).
+\]
+Define the Lebesgue function
+\[
+ \Lambda_n(x):=\sum_{i=1}^n |p_i^n(x)|\qquad(x\in[-1,1]).
+\]
+Question (Q1): Does there exist a choice of nodes $\{a_i^n\}$ such that for every continuous $f\in C([-1,1])$ there exists a point $x\in[-1,1]$ (depending on $f$) with
+\[
+ \limsup_{n\to\infty} \Lambda_n(x)=\infty\quad\text{and}\quad (\mathcal L^n f)(x)\to f(x)\ \text{as }n\to\infty?
+\]
+Question (Q2): Does there exist a choice of nodes $\{a_i^n\}$ such that
+\[
+ \limsup_{n\to\infty}\Lambda_n(x)=\infty\quad\text{for every }x\in[-1,1],
+\]
+and yet for every continuous $f\in C([-1,1])$ there exists some $x\in[-1,1]$ (depending on $f$) with $(\mathcal L^n f)(x)\to f(x)$?
+
+Edge cases/conventions: $\mathcal L^n f$ is well-defined for any $f$ by only using the values $f(a_i^n)$. For $n=1$ we have $p_1^1\equiv 1$ and $\Lambda_1\equiv 1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+As stated in the problem text:
+- Bernstein (1931) proved that for any choice of nodes there exists $x_0\in[-1,1]$ with $\limsup_{n\to\infty}\Lambda_n(x_0)=\infty$.
+- Erd\H{o}s--V\'{e}rtesi (1980) proved that for any choice of nodes there exists a continuous $f$ such that $\limsup_{n\to\infty}|(\mathcal L^n f)(x)|=\infty$ for almost all $x\in[-1,1]$.
+
+I do not use any other external results here.
+
+3) ATTACK PLAN
+
+Proof-oriented ideas:
+- Relate $\Lambda_n(x)$ to the operator norm of the evaluation functional $f\mapsto (\mathcal L^n f)(x)$ and use functional-analytic tools (uniform boundedness) to produce divergence examples at fixed $x$.
+- Use polynomial approximation: since $\mathcal L^n$ reproduces polynomials of degree $\le n-1$, the interpolation error at $x$ is controlled by $(1+\Lambda_n(x))$ times the best uniform approximation error $E_{n-1}(f)$.
+
+Disproof-oriented ideas:
+- Try to show that for any node choice and for any set $S\subset[-1,1]$ on which $\limsup\Lambda_n(x)=\infty$, there exists continuous $f$ such that $\mathcal L^n f(x)$ fails to converge for all $x\in S$ (this would negate (Q1) or (Q2) depending on $S$).
+
+I do not complete either track.
+
+4) WORK
+
+FAST REALITY CHECK (small $n$, explicit computations)
+
+For two standard node choices, I computed $\Lambda_n(x)$ via barycentric Lagrange evaluation.
+
+- Equispaced nodes: $a_i^n=-1+2(i-1)/(n-1)$.
+- Chebyshev nodes (first kind): $a_i^n=\cos\bigl(\pi(2i-1)/(2n)\bigr)$.
+
+Selected numerical values (approximate):
+\[
+\begin{array}{c|cc|cc}
+ n & \Lambda_n(0)\ \text{(equispaced)} & \sup_{x\in[-1,1]}\Lambda_n(x)\ \text{(grid)} & \Lambda_n(0)\ \text{(Chebyshev)} & \sup_x\Lambda_n(x)\ \text{(grid)}\\\hline
+ 4 & 1.25 & 1.63 & 1.414 & 1.848\\
+ 8 & 1.488 & 6.93 & 1.848 & 2.287\\
+ 12 & 1.624 & 51.21 & 2.104 & 2.545\\
+ 16 & 1.718 & 512.35 & 2.287 & 2.728
+\end{array}
+\]
+For Chebyshev nodes at $x=0$, restricting to even $n$ gives slow growth: $\Lambda_{10}(0)\approx1.99$, $\Lambda_{20}(0)\approx2.43$, $\Lambda_{40}(0)\approx2.87$, $\Lambda_{80}(0)\approx3.31$, $\Lambda_{160}(0)\approx3.75$.
+
+These sanity checks confirm that $\Lambda_n(x)$ can diverge very fast (equispaced) or slowly (Chebyshev) while still having $\limsup\Lambda_n(x)=\infty$.
+
+Lemma 671.1 (partition of unity and reproduction)
+
+For each $n$ we have
+\[
+ \sum_{i=1}^n p_i^n(x)\equiv 1\quad\text{as polynomials in }x.
+\]
+Moreover, for every polynomial $q\in\mathbb R[x]$ with $\deg q\le n-1$ we have
+\[
+ \mathcal L^n q\equiv q.
+\]
+
+Proof.
+Define $r(x):=\sum_{i=1}^n p_i^n(x)-1$. Then $\deg r\le n-1$ and for each node $a_j^n$ we have
+\[
+ r(a_j^n)=\sum_{i=1}^n p_i^n(a_j^n)-1 = 1-1=0,
+\]
+because $p_j^n(a_j^n)=1$ and $p_i^n(a_j^n)=0$ for $i\ne j$. Thus $r$ has $n$ distinct zeros and degree at most $n-1$, forcing $r\equiv 0$.
+
+For the reproduction statement, fix $q$ with $\deg q\le n-1$ and define
+\[
+ s(x):=q(x)-\sum_{i=1}^n q(a_i^n)p_i^n(x)=q(x)-(\mathcal L^n q)(x).
+\]
+Then $\deg s\le n-1$. For each $j$,
+\[
+ s(a_j^n)=q(a_j^n)-\sum_{i=1}^n q(a_i^n)p_i^n(a_j^n)=q(a_j^n)-q(a_j^n)=0.
+\]
+So $s$ has $n$ distinct zeros and degree at most $n-1$, hence $s\equiv 0$ and $\mathcal L^n q\equiv q$.
+
+
+Lemma 671.2 (operator norm identity)
+
+Fix $n\ge 1$ and $x\in[-1,1]$. Define the bounded linear functional
+\[
+T_{n,x}:C([-1,1])\to\mathbb R,\qquad T_{n,x}(f):=(\mathcal L^n f)(x).
+\]
+Then
+\[
+ |T_{n,x}(f)|\le \Lambda_n(x)\,\|f\|_\infty\quad\text{for all }f\in C([-1,1]),
+\]
+and the operator norm satisfies
+\[
+ \|T_{n,x}\|=\sup_{\|f\|_\infty\le 1}|T_{n,x}(f)|=\Lambda_n(x).
+\]
+
+Proof.
+From the definition,
+\[
+T_{n,x}(f)=\sum_{i=1}^n f(a_i^n)p_i^n(x).
+\]
+Taking absolute values and using $|f(a_i^n)|\le\|f\|_\infty$ gives
+\[
+|T_{n,x}(f)|\le \sum_{i=1}^n |f(a_i^n)|\,|p_i^n(x)|\le \|f\|_\infty\sum_{i=1}^n |p_i^n(x)|=\Lambda_n(x)\|f\|_\infty.
+\]
+So $\|T_{n,x}\|\le\Lambda_n(x)$.
+
+For the reverse inequality, define a function $g$ on the finite node set by
+\[
+ g(a_i^n):=\begin{cases}
+ 1,& p_i^n(x)\ge 0,\\
+ -1,& p_i^n(x)<0.
+\end{cases}
+\]
+Then $|g(a_i^n)|=1$ for all $i$. Since the node set is finite, we can extend these prescribed values to a continuous function $f\in C([-1,1])$ with $\|f\|_\infty\le 1$ (for instance: sort the nodes in increasing order and define $f$ piecewise linearly so that $f$ takes the value $g(a_i^n)$ at each node; this produces a continuous $f$ with values in $[-1,1]$).
+
+For this $f$, we have
+\[
+T_{n,x}(f)=\sum_{i=1}^n f(a_i^n)p_i^n(x)=\sum_{i=1}^n \operatorname{sgn}(p_i^n(x))\,p_i^n(x)=\sum_{i=1}^n |p_i^n(x)|=\Lambda_n(x).
+\]
+Hence $\|T_{n,x}\|\ge \Lambda_n(x)$. Combining with the upper bound yields $\|T_{n,x}\|=\Lambda_n(x)$.
+
+
+Lemma 671.3 (error bound via best polynomial approximation)
+
+For $f\in C([-1,1])$ define the best uniform approximation error by degree $\le n-1$ polynomials:
+\[
+E_{n-1}(f):=\inf\{\|f-q\|_\infty: q\in\mathbb R[x],\ \deg q\le n-1\}.
+\]
+Then for every $x\in[-1,1]$,
+\[
+ |(\mathcal L^n f)(x)-f(x)|\le (1+\Lambda_n(x))\,E_{n-1}(f).
+\]
+
+Proof.
+Fix any polynomial $q$ with $\deg q\le n-1$. By Lemma 671.1, $\mathcal L^n q=q$. Thus
+\[
+(\mathcal L^n f)(x)-f(x)=(\mathcal L^n (f-q))(x)-(f-q)(x).
+\]
+Taking absolute values and applying the triangle inequality,
+\[
+ |(\mathcal L^n f)(x)-f(x)|\le |(\mathcal L^n (f-q))(x)|+|(f-q)(x)|.
+\]
+By Lemma 671.2 (the bound $|T_{n,x}(h)|\le\Lambda_n(x)\|h\|_\infty$ applied to $h=f-q$),
+\[
+ |(\mathcal L^n (f-q))(x)|\le\Lambda_n(x)\,\|f-q\|_\infty.
+\]
+Also $|(f-q)(x)|\le\|f-q\|_\infty$. Therefore
+\[
+ |(\mathcal L^n f)(x)-f(x)|\le (\Lambda_n(x)+1)\,\|f-q\|_\infty.
+\]
+Taking the infimum over all such $q$ gives the claimed inequality.
+
+
+Proposition 671.4 (uniform boundedness at a fixed point)
+
+Fix a point $x\in[-1,1]$. If $\sup_n \Lambda_n(x)=\infty$, then there exists $f\in C([-1,1])$ such that
+\[
+ \sup_n |(\mathcal L^n f)(x)|=\infty.
+\]
+In particular, $(\mathcal L^n f)(x)$ does not converge.
+
+Proof.
+By Lemma 671.2, $\|T_{n,x}\|=\Lambda_n(x)$. Thus $\sup_n\|T_{n,x}\|=\infty$. The Banach space $C([-1,1])$ is complete under $\|\cdot\|_\infty$, and $\{T_{n,x}\}$ is a family of bounded linear functionals on it. By the Uniform Boundedness Principle (Banach--Steinhaus theorem), if $\sup_n\|T_{n,x}\|=\infty$ then there exists $f\in C([-1,1])$ with $\sup_n |T_{n,x}(f)|=\infty$. This is exactly the displayed statement.
+
+
+5) VERIFICATION
+
+- Lemma 671.1: checked that the argument uses only (i) degree bound $\le n-1$, (ii) $n$ distinct nodes. No hidden assumptions.
+- Lemma 671.2: the only nontrivial step is extending prescribed values on finitely many points to a continuous function with sup-norm $\le 1$. The explicit piecewise-linear construction works because $[-1,1]$ is an interval and the node set is finite.
+- Lemma 671.3: uses only Lemma 671.1 and the bound from Lemma 671.2.
+- Proposition 671.4: assumes the Uniform Boundedness Principle; this is a standard theorem of functional analysis. If one wishes to avoid it, one could reproduce its proof, but I did not.
+
+Boundary cases: for $n=1$, $\Lambda_1(x)=1$ and all inequalities are trivially valid.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result:
+
+For any node choice and any $f\in C([-1,1])$,
+\[
+ |(\mathcal L^n f)(x)-f(x)|\le (1+\Lambda_n(x))E_{n-1}(f)\quad\text{for every }x\in[-1,1].
+\]
+Also, for each fixed $x$, if $\sup_n\Lambda_n(x)=\infty$ then there exists $f\in C([-1,1])$ such that $(\mathcal L^n f)(x)$ is unbounded (hence diverges) at that same $x$.
+
+(ii) First gap (crisp):
+
+Given an arbitrary continuous $f$, must there exist a point $x$ with $\limsup_n\Lambda_n(x)=\infty$ such that nevertheless $(\mathcal L^n f)(x)\to f(x)$? I do not have a method to force convergence at a point where $\Lambda_n(x)$ is unbounded.
+
+(iii) Top 3 next moves:
+
+1. Attempt a Baire-category argument on $C([-1,1])$ for fixed nodes, studying the set of $f$ for which $\mathcal L^n f(x)$ converges at a given $x$ versus the growth rate of $\Lambda_n(x)$.
+2. For candidate nodes (e.g. Chebyshev-type), try to quantify pointwise growth of $\Lambda_n(x)$ and relate it to typical decay rates of $E_{n-1}(f)$ via explicit modulus of continuity estimates.
+3. Computationally: for concrete node systems, numerically approximate the set of $x$ where $\Lambda_n(x)$ is "small" infinitely often, and test pointwise convergence for slowly-approximable continuous functions.
+
+(iv) Minimal counterexample structure:
+
+To refute (Q1) for a given node system, one would want a continuous $f$ such that for every $x$ with $\limsup_n\Lambda_n(x)=\infty$, the sequence $(\mathcal L^n f)(x)$ fails to converge (ideally is unbounded). Proposition 671.4 produces, for each fixed $x$, some $f_x$ with divergence at that $x$, but I do not know how to construct a single $f$ that forces divergence simultaneously on the full (possibly large) set of divergence points.
+
+

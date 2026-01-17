@@ -1,0 +1,97 @@
+% Attempt for Erdos Problem #61
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not needed
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $H$ is a fixed finite graph.
+- A graph $G$ \emph{contains $H$ as an induced subgraph} if there exists an injective map $\varphi:V(H)\to V(G)$ such that
+  $uv\in E(H)$ iff $\varphi(u)\varphi(v)\in E(G)$ (edges and non-edges both preserved).
+- $\omega(G)$ is the clique number of $G$ and $\alpha(G)$ is the independence number of $G$.
+
+Conjecture (Erd\H{o}s--Hajnal).
+For every fixed graph $H$, does there exist $c(H)>0$ such that every $n$-vertex graph $G$ with no induced copy of $H$
+satisfies
+\[\max(\omega(G),\alpha(G))\ge n^{c(H)}?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Erd\H{o}s--Hajnal proved $\max(\omega(G),\alpha(G))\ge \exp(c_H\sqrt{\log n})$ for induced-$H$-free graphs.
+- BNSS23 improved this to $\exp(c_H\sqrt{\log n\log\log n})$.
+I do not re-derive these results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Prove the conjecture for special graphs $H$ (paths, stars, small graphs) by structural decomposition of induced-$H$-free graphs.
+2. For general $H$, attempt to find a large ``homogeneous'' (clique/independent) set via iterative splitting, using the forbidden induced pattern.
+3. Explore whether the known $\exp(\sqrt{\log n})$ bound can be upgraded to a polynomial bound for some nontrivial families of $H$.
+
+Disproof track ideas:
+1. Attempt to construct induced-$H$-free graphs with both $\omega(G)$ and $\alpha(G)$ as small as possible (Ramsey-type constructions).
+2. If one can make both $\omega,\alpha$ smaller than any power $n^c$, that would refute the conjecture for that $H$.
+
+Chosen path in this attempt: give a fully proved special-case verification for $H=P_3$ (the 3-vertex path), illustrating the mechanism and yielding an explicit exponent $c(H)=1/2$.
+
+4) WORK
+Let $P_3$ denote the path on three vertices (two edges in a chain).
+
+Lemma 1 (Induced-$P_3$-free graphs are disjoint unions of cliques).
+Let $G$ be a finite graph with no induced subgraph isomorphic to $P_3$.
+Then every connected component of $G$ is a clique, i.e. $G$ is a disjoint union of complete graphs.
+
+Proof.
+Let $C$ be a connected component of $G$.
+Suppose for contradiction that $C$ is not a clique. Then there exist two vertices $x,y\in V(C)$ that are not adjacent.
+Since $C$ is connected, there is a path from $x$ to $y$; choose such a path of minimal length:
+\[x=v_0,v_1,\dots,v_\ell=y,\qquad \ell\ge 2.\]
+By minimality, $v_0$ is not adjacent to $v_2$ (otherwise $v_0,v_2,\dots,v_\ell$ would be a shorter $x$--$y$ path).
+Also $v_0$ is adjacent to $v_1$ and $v_1$ is adjacent to $v_2$ by definition of a path.
+Therefore the induced subgraph on $\{v_0,v_1,v_2\}$ has edges $v_0v_1$ and $v_1v_2$ but not $v_0v_2$, i.e. it is an induced $P_3$.
+This contradicts the hypothesis. Hence every connected component is a clique. \qed
+
+Lemma 2 (Erd\H{o}s--Hajnal holds for $H=P_3$ with exponent $1/2$).
+If $G$ is an $n$-vertex graph with no induced $P_3$, then
+\[\max(\omega(G),\alpha(G))\ge \sqrt{n}.\]
+
+Proof.
+By Lemma 1, $G$ is a disjoint union of cliques with vertex-partition sizes $s_1,\dots,s_t$ where $\sum_{i=1}^t s_i=n$.
+Then $\omega(G)=\max_i s_i$.
+Also one can form an independent set by picking one vertex from each clique, so $\alpha(G)\ge t$.
+Let $M:=\max_i s_i$. Then $n=\sum s_i \le t\cdot M$, hence $t\ge n/M$.
+Therefore
+\[\max(\omega(G),\alpha(G))\ \ge\ \max(M,n/M)\ \ge\ \sqrt{n},\]
+since for any $M>0$ one has $\max(M,n/M)\ge \sqrt n$ (e.g. by AM--GM).
+\qed
+
+FAST REALITY CHECK (tightness for $H=P_3$).
+Take $n=t^2$ and let $G$ be the disjoint union of $t$ cliques each of size $t$.
+Then $G$ is induced-$P_3$-free, and $\omega(G)=t$ while $\alpha(G)=t$.
+Thus $\max(\omega(G),\alpha(G))=\sqrt n$, showing Lemma 2 is tight (up to rounding) and giving the sharp exponent $c(P_3)=1/2$.
+
+5) VERIFICATION
+- Lemma 1: the key step is that a shortest path $v_0v_1v_2\dots$ forces $v_0$ nonadjacent to $v_2$, yielding an induced $P_3$.
+- Lemma 2: uses only the clique-decomposition from Lemma 1 and a clean pigeonhole bound $n\le t\cdot \max s_i$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+The Erd\H{o}s--Hajnal conclusion holds for $H=P_3$ with the explicit exponent $c(P_3)=1/2$ (Lemmas 1--2), and this exponent is best possible for $P_3$.
+
+(ii) First gap:
+Extend beyond the $P_3$ case to a general graph $H$, where induced-$H$-free graphs need not have such a rigid structural decomposition.
+
+(iii) Top 3 next moves (concrete):
+1. Prove the conjecture for the next simplest forbidden induced subgraphs (e.g. $P_4$, $C_5$, small stars), seeking structural decompositions analogous to Lemma 1.
+2. For a fixed $H$, attempt an explicit recursive argument that either finds a large homogeneous set or splits $V(G)$ into large parts with controlled edge densities, iterating to get a polynomial bound.
+3. Identify candidate extremal constructions for a given $H$ (graphs with small $\omega$ and $\alpha$) and check whether they necessarily contain induced copies of $H$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+For some fixed $H$, a family of induced-$H$-free graphs $G_n$ with $|V(G_n)|=n\to\infty$ such that
+$\omega(G_n)$ and $\alpha(G_n)$ are both $n^{o(1)}$ (subpolynomial), contradicting the existence of any $c(H)>0$.
+

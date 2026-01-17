@@ -1,0 +1,125 @@
+% Attempt for Erdos Problem #44
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $S\subset\mathbb Z$ is Sidon if all sums $s_1+s_2$ with $s_1\le s_2$ in $S$ are distinct.
+
+Question.
+Given $N\ge 1$, a Sidon set $A\subset\{1,\dots,N\}$, and $\varepsilon>0$, does there exist $M\ge N$ and
+$B\subset\{N+1,\dots,M\}$ such that:
+1. $A\cup B$ is Sidon, and
+2. $|A\cup B|\ge (1-\varepsilon)\sqrt M$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session. I only note that the problem text connects this to problems [329] and [707]
+and cites Guy's collection; I do not use any external results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Try to build $B$ greedily inside $\{N+1,\dots,M\}$ while maintaining Sidon. Since $M$ can depend on $A$ and $\varepsilon$,
+   one can afford to take $M$ extremely large and try to reach density $(1-\varepsilon)\sqrt M$.
+2. Reformulate the Sidon constraint for $A\cup B$ in terms of disjointness between certain difference sets, and attempt to show
+   that the forbidden-difference set coming from $A$ does not prevent constructing a near-optimal Sidon set later.
+3. Try a probabilistic method: pick $B$ of near-optimal size and estimate probability that it creates any collision with $A$.
+
+Disproof track ideas:
+1. Search for ``rigid'' Sidon sets $A$ with very large difference sets that might force any extension past $N$ to be sparse.
+2. Look for local obstructions: forced collisions between $A+A$ and $A+B$ when $B$ sits just above $N$.
+
+Chosen path in this attempt: prove a few unconditional extension lemmas (sparse extension and clean separation tricks), and test greedy extension on a small example.
+
+4) WORK
+Lemma 1 (One-step extension far to the right).
+Let $A\subset\{1,\dots,N\}$ be Sidon, and let $x$ be an integer with $x>2N$. Then $A\cup\{x\}$ is Sidon.
+
+Proof.
+All sums of two elements from $A$ lie in $\{2,3,\dots,2N\}$.
+All sums involving $x$ are of the form $x+a$ ($a\in A$) or $x+x$, and these are all $>2N$ since $x>2N$ and $a\ge 1$.
+Thus no sum involving $x$ can equal a sum from $A+A$.
+Within the new sums involving $x$, we have $x+a=x+a'$ implies $a=a'$, and $x+x=x+a$ implies $x=a$, impossible since $x>N\ge a$.
+Therefore all 2-sums in $A\cup\{x\}$ are distinct aside from swapping the order, i.e. $A\cup\{x\}$ is Sidon. \qed
+
+Lemma 2 (Sparse infinite extension by rapidly growing elements).
+Let $A\subset\{1,\dots,N\}$ be Sidon. Define a sequence $(x_k)_{k\ge 1}$ by choosing $x_1>2N$ and
+\[x_{k+1}>2x_k\quad\text{for all }k\ge 1.\]
+Then $A\cup\{x_k:k\ge 1\}$ is Sidon.
+
+Proof.
+Let $S:=A\cup\{x_k:k\ge 1\}$.
+We must show: if $u+v=u'+v'$ with $u\le v$ and $u'\le v'$ in $S$, then $\{u,v\}=\{u',v'\}$.
+
+If all four elements lie in $A$, this holds because $A$ is Sidon.
+If at least one of $v,v'$ is some $x_k$, compare the sizes of the sums.
+Fix $k$. Any sum involving $x_k$ is at least $x_k+1$ and at most $x_k+x_k=2x_k$.
+Any sum involving only elements $\le x_{k-1}$ is at most $2x_{k-1}<x_k$ by the growth condition.
+Therefore, if a sum uses $x_k$, then it cannot equal a sum using only smaller elements.
+
+So in any equality $u+v=u'+v'$, the largest element among $\{u,v,u',v'\}$ must appear on both sides.
+Let that largest element be $x_k$. Cancel it from both sides: we get $x_k+t=x_k+t'$ for some $t,t'\in S$, hence $t=t'$.
+This forces the pairs to agree. \qed
+
+Lemma 3 (A clean sufficient condition for adding a whole block $B$).
+Let $A\subset\{1,\dots,N\}$ be Sidon, and let $B\subset\{2N+1,\dots,M\}$ be Sidon.
+Assume additionally that
+\[(A-A)\cap(B-B)=\{0\}.\]
+Then $A\cup B$ is Sidon.
+
+Proof.
+Sums in $A+A$ lie in $\{2,\dots,2N\}$.
+Since $\min(B)\ge 2N+1$, any sum in $A+B$ is at least $1+(2N+1)=2N+2$, and any sum in $B+B$ is at least $2(2N+1)=4N+2$.
+Hence there are no collisions between $A+A$, $A+B$, and $B+B$ by range separation.
+
+It remains to show that sums in $A+B$ are unique. Suppose $a+b=a'+b'$ with $a,a'\in A$ and $b,b'\in B$.
+Then $a-a'=b'-b$ lies in both $A-A$ and $B-B$, hence equals $0$ by hypothesis. Thus $a=a'$ and $b=b'$.
+So cross sums are unique, and $A\cup B$ is Sidon. \qed
+
+FAST REALITY CHECK (local computation; one example).
+Take $N=20$ and the Sidon set $A=\{1,2,4,8,13\}\subset[1,20]$.
+I greedily extended $A$ by scanning $x=N+1,N+2,\dots,M$ and adding $x$ whenever Sidon-ness is preserved.
+Results:
+\[
+\begin{array}{c|c|c}
+M & |A\cup B| & |A\cup B|/\sqrt M \\\hline
+40 & 7 & 1.11\\
+100 & 11 & 1.10\\
+200 & 14 & 0.99\\
+400 & 18 & 0.90
+\end{array}
+\]
+This shows that for this particular $A$, it is possible (at least for moderate $M$) to extend using only elements $>N$
+and stay within a constant factor of $\sqrt M$. This is not evidence for the $(1-\varepsilon)$ asymptotic claim for arbitrary $A$.
+
+5) VERIFICATION
+- Lemma 1: uses strict range separation ($x>2N$) to prevent collisions with $A+A$.
+- Lemma 2: the ``largest element cancels'' argument is valid because the growth condition forces sum ranges of different scales to be disjoint.
+- Lemma 3: checks both range separation and the cross-sum uniqueness reduced to disjointness of difference sets.
+- Computation: greedy procedure checks sums explicitly; the ratio $>1$ for small $M$ is possible because $f(M)$ can exceed $\sqrt M$ at small $M$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Any Sidon $A\subset[1,N]$ can be extended to an infinite Sidon set (Lemma 2), and if one can find a Sidon block
+$B\subset[2N+1,M]$ with $(A-A)\cap(B-B)=\{0\}$, then $A\cup B$ is Sidon (Lemma 3).
+
+(ii) First gap:
+Produce, for arbitrary given $A\subset[1,N]$ and $\varepsilon>0$, a large $B\subset[N+1,M]$ with $|A\cup B|\ge (1-\varepsilon)\sqrt M$.
+The obstacle is constructing $B$ so that it both is Sidon and avoids creating cross-sum collisions with $A$ at near-optimal density.
+
+(iii) Top 3 next moves (concrete):
+1. Quantify the forbidden-difference set $F:=A-A$ and attempt a probabilistic construction of a large Sidon $B\subset[2N+1,M]$
+   conditioned on $(B-B)\cap F=\{0\}$; estimate how large $|B|$ can be in terms of $M$ and $|F|$.
+2. Explore whether a greedy extension algorithm can be analyzed: show that after extending to size $k$, the number of forbidden next elements
+   is $O(k^2)$, which might still permit $k\approx (1-\varepsilon)\sqrt M$ if one has enough slack.
+3. Search for explicit ``worst-case'' Sidon sets $A$ whose difference sets maximize obstructions, and test greedy/probabilistic extensions computationally for those.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A family of Sidon sets $A_N\subset[1,N]$ with $N\to\infty$ such that any Sidon extension using only elements $>N$ must have
+size $o(\sqrt M)$ in $[1,M]$, i.e. the initial differences in $A_N$ force pervasive cross-sum collisions that cannot be repaired by taking $M$ large.
+

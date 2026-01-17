@@ -1,0 +1,111 @@
+% Erdos problem #125
+% Attempt for Erdos Problem #125
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? YES (used for small-case checks)
+
+1) FORMAL RESTATEMENT
+
+Define
+\[
+A:=\Big\{\sum_{i\ge 0} \varepsilon_i 3^i : \varepsilon_i\in\{0,1\}\text{ finitely supported}\Big\},\qquad
+B:=\Big\{\sum_{i\ge 0} \varepsilon_i 4^i : \varepsilon_i\in\{0,1\}\text{ finitely supported}\Big\},
+\]
+and let
+\[
+C:=A+B:=\{a+b: a\in A,\ b\in B\} \subset \mathbb{N}_0.
+\]
+For $X\ge 1$, write
+\[
+C(X):=|C\cap [0,X]|,\qquad \delta(X):=\frac{C(X)}{X+1}.
+\]
+The (natural) density $d(C)$, if it exists, is $\lim_{X\to\infty} \delta(X)$.
+The lower density is $\underline d(C)=\liminf_{X\to\infty} \delta(X)$.
+
+**Question.** Is $\underline d(C)>0$? (Equivalently, does $C$ have positive density in the usual informal sense?)
+
+**Ambiguity in the stated generalization.** The text writes a condition
+$\sum_{i=1}^k \log_{n_k}(2)>1$ and then gives a counterexample $(n_1,n_2,n_3)=(3,9,81)$.
+But $\sum_{i=1}^3 \log_{81}(2)<1$, so that counterexample would not contradict the literal condition.
+The standard-looking correction is $\sum_{i=1}^k \log_{n_i}(2)>1$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- The problem asks whether $A+B$ has positive density.
+- Hasler and Melfi show (as stated) that the lower density of $C$ is at most $1015/1458\approx 0.69616$.
+- Hasler and Melfi also show (as stated) that $\limsup_{x\to\infty} \log|C\cap[1,x]|/\log x \ge 0.9777$.
+
+3) ATTACK PLAN
+
+- Understand the growth rates of $A$ and $B$ and how they interact in the sumset.
+- Try simple combinatorial covering heuristics (block decompositions by digit-length) and look for obstructions.
+- Do computations of $\delta(X)$ for moderate $X$ to get a feel for possible limits and fluctuations.
+
+4) WORK
+
+Lemma 4.1 (Exact counts on digit-length blocks).
+For each integer $m\ge 0$,
+\[
+|A\cap [0,3^m)| = 2^m.
+\]
+Similarly, for each $n\ge 0$,
+\[
+|B\cap [0,4^n)| = 2^n.
+\]
+
+*Proof.* Every $a\in A\cap [0,3^m)$ has a base-3 expansion using only digits 0/1 in positions $0,\dots,m-1$.
+There are exactly $2^m$ choices of those digits, and they produce distinct integers in $[0,3^m)$.
+The base-4 statement is identical. \qed
+
+Lemma 4.2 (Power-law growth of $A$ and $B$).
+Let $\alpha:=\log_3 2$ and $\beta:=\log_4 2=1/2$.
+Then there are absolute constants $c_1,c_2>0$ such that for all $X\ge 1$,
+\[
+ c_1 X^\alpha \le |A\cap [0,X]| \le c_2 X^\alpha,
+\qquad
+ c_1 X^\beta \le |B\cap [0,X]| \le c_2 X^\beta.
+\]
+
+*Proof.* Choose $m$ with $3^m\le X<3^{m+1}$. Then by Lemma 4.1,
+$2^m\le |A\cap[0,X]|\le 2^{m+1}$.
+Since $m=\lfloor \log_3 X\rfloor$, this gives $|A\cap[0,X]|=\Theta(2^{\log_3 X})=\Theta(X^{\log_3 2})$.
+The same argument with base 4 gives the $B$ bound. \qed
+
+FAST REALITY CHECK (computation).
+I computed $\delta(X)=|C\cap[0,X]|/(X+1)$ for several $X$ by generating $A\cap[0,X]$ and $B\cap[0,X]$ and forming all sums $\le X$.
+Results:
+- $X=100$: $\delta(X)\approx 0.9802$.
+- $X=1000$: $\delta(X)\approx 0.8571$.
+- $X=10000$: $\delta(X)\approx 0.9267$.
+- $X=100000$: $\delta(X)\approx 0.8616$.
+- $X=1000000$: $\delta(X)\approx 0.8736$.
+These values suggest large fluctuations but do not settle whether $\underline d(C)>0$.
+
+5) VERIFICATION
+
+- Lemmas 4.1 and 4.2 are exact/elementary and rely only on the digit definitions.
+- The density computations are consistent with the fact that $A$ and $B$ are sparse individually (zero density) but their sumset may be much denser.
+- The cited upper bound on lower density (Hasler--Melfi) indicates that even if $\underline d(C)>0$, the density cannot be arbitrarily close to 1 (as stated in the problem file).
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+- Exact digit-block counts for $A$ and $B$ (Lemma 4.1) and their power-law growth (Lemma 4.2).
+- Numerical evidence up to $X=10^6$ shows $\delta(X)$ around $0.86$--$0.93$ at the sampled points, but with substantial fluctuation.
+
+(ii) Exact first gap:
+- Prove (or disprove) that $\underline d(C)>0$.
+
+(iii) Top 3 next moves:
+1. Work at matched scales $3^m\approx 4^n$: analyze $A\cap[0,3^m)$ and $B\cap[0,4^n)$ as "digit-cubes" and attempt to show $A_m+B_n$ covers a positive proportion of an interval.
+2. Study $C$ modulo $3^m$ and $4^n$ and use CRT-type decompositions to transfer modular covering to interval covering.
+3. Try to construct (or rule out) infinitely many long gaps in $C$ using digit constraints and carry arguments in mixed bases.
+
+(iv) What a minimal counterexample would likely look like:
+- A proof of $\underline d(C)=0$ would likely produce a sequence of scales $X_j\to\infty$ where $C\cap[0,X_j]$ misses a positive proportion of integers, coming from systematic digit-carry obstructions between base 3 and base 4 expansions.
+
+

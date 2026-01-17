@@ -1,0 +1,786 @@
+## 1) FORMAL RESTATEMENT
+
+**Conventions.** All graphs are finite, simple, undirected.
+For graphs (A,B), the (two–color) Ramsey number (R(A,B)) is the least integer (N) such that for every red/blue coloring of the edges of the complete graph (K_N), there is either a red copy of (A) or a blue copy of (B). Equivalently: for every graph (F) on (N) vertices, either (F) contains (A) or (\overline{F}) contains (B).
+
+**Asymptotic notation.** For functions of an integer parameter (n), (f(n)\ll g(n)) means: (\exists C>0) (allowed to depend on the fixed graph (G) but **not** on (n) or on the choice of the varying graph(s)) such that (f(n)\le C g(n)) for all relevant (n).
+
+**Given.** A fixed graph (G) satisfying:
+
+1. (**Tree condition**) (\exists C_T>0) such that for every (n\ge1) and every tree (T) on (n) vertices,
+   [
+   R(G,T)\le C_T, n.
+   ]
+2. (**Clique condition**) (\exists C_K>0) such that for every (n\ge1),
+   [
+   R(G,K_n)\le C_K, n^2.
+   ]
+
+**Question.** Does it follow that:
+
+3. (**Size-linear conclusion**) (\exists C>0) such that for every graph (H) with no isolated vertices and with (m=e(H)\ge1),
+   [
+   R(G,H)\le C, m , ?
+   ]
+
+This is exactly the property that (G) is **Ramsey size-linear** (also phrased as (R(G,F)=O(e(F))) for every graph (F) with no isolated vertices).
+
+## 2) QUICK LITERATURE/CONTEXT CHECK  (web-browsed)
+
+* The problem appears as Erdős Problem #568 and is marked **open** on the erdosproblems.com collection (last edit shown Dec 28, 2025).
+* “Ramsey size-linear” graphs were introduced by Erdős–Faudree–Rousseau–Schelp; a modern reference is Bradač–Gishboliner–Sudakov (SIAM J. Discrete Math., 2024), which restates the definition (R(H,F)=O(e(F))) for all (F) with no isolated vertices.
+* Known partial results include:
+
+  * If (H) is connected and (e(H)-v(H)\le 1), then (R(H,K_n)=O(n^2)) (EFRS), and there are various “size-linear” classes; conversely, graphs with (q\ge 2p-2) edges on (p) vertices are not size-linear.
+  * Bradač–Gishboliner–Sudakov prove that every subdivision of (K_4) on at least 6 vertices is Ramsey size-linear and discuss the long-standing open case (K_4^*) (one edge subdivided once).
+* The same paper explicitly notes that Erdős et al. asked whether every graph (H) with **2-density** (m_2(H)\le 2) is Ramsey size-linear, and says this is “still out of reach.”
+
+So the web sources agree this problem (or a closely equivalent strengthening) is currently unsolved in the literature.
+
+## 3) ATTACK PLAN
+
+### Proof-track ideas
+
+1. **Reduce the hypotheses to a structural sparsity condition on (G)** via known lower bounds for (R(G,K_n)) in terms of the 2-density (m_2(G)). Then try to prove size-linearity for all such sparse graphs (G) by embedding/induction on (e(H)).
+2. **Inductive embedding on (H)** (à la Sidorenko’s proof for triangles) using that “no red (G)” forces some combinatorial expansion property of the blue graph, and that the quadratic clique bound gives strong control over large independent sets in red.
+
+### Disproof/construction ideas
+
+1. Look for a graph (G) with (R(G,K_n)=O(n^2)) but suspected **not** size-linear, e.g. the smallest “critical” graphs at the (m_2=2) threshold (such as (K_{3,3}), (Q_3), etc.), and try to construct a family (H_m) (often bipartite, since cliques are already controlled) for which (R(G,H_m)) grows faster than (m).
+2. Use probabilistic/algebraic constructions (norm graphs, pseudorandom graphs) to build a red graph that is (G)-free while its complement avoids some (m)-edge target (H_m).
+
+**Choice.** The only fully rigorous progress I can complete here is the **reduction**: show the tree condition is redundant and the quadratic clique condition forces (m_2(G)\le 2). Beyond that, the required global size-linearity implication is exactly the “out of reach” step flagged in current references.
+
+## 4) WORK
+
+### Lemma 1. The “tree condition” is automatic for every fixed (G).
+
+> **Lemma 1.** Let (G) be any fixed graph with (g=v(G)). Then for every (n\ge1) and every tree (T) on (n) vertices,
+> [
+> R(G,T)\ \le\ (g-1)(n-1)+1.
+> ]
+> In particular, (R(G,T)\ll n) for all trees (T) on (n) vertices.
+
+**Proof.**
+
+1. (**Monotonicity in the first argument**) If (G\subseteq G') as a (not-necessarily-induced) subgraph, then (R(G,T)\le R(G',T)).
+   Reason: any red/blue coloring that forces a red copy of (G') also forces a red copy of its subgraph (G).
+2. Take (G'=K_g). Since (K_g) contains every graph on (g) vertices as a subgraph, in particular it contains (G), hence (R(G,T)\le R(K_g,T)).
+3. By Chvátal’s theorem (tree–clique Ramsey), for every tree (T) on (n) vertices,
+   [
+   R(K_g,T)=(g-1)(n-1)+1.
+   ]
+4. Combine steps 2–3 to obtain the stated bound. ∎
+
+So hypothesis (1) in the problem statement places **no additional restriction** on a fixed finite graph (G); the substance is hypothesis (2).
+
+---
+
+### Lemma 2. The quadratic clique bound forces 2-density (m_2(G)\le 2).
+
+We use the standard 2-density:
+[
+m_2(G)\ :=\ \max\left{\frac{e(J)-1}{v(J)-2}\ :\ J\subseteq G,\ v(J)\ge 3\right}.
+]
+This definition appears verbatim in Bradač–Gishboliner–Sudakov.
+
+Bradač–Gishboliner–Sudakov also cite Spencer’s general lower bound:
+[
+R(H,K_n)=\Omega(\tilde{n}^{,m_2(H)})
+]
+for every fixed graph (H), where (\Omega(\tilde{\cdot})) means “(\ge)” up to a polylogarithmic factor.
+
+> **Lemma 2.** If a fixed graph (G) satisfies (R(G,K_n)\le C_K n^2) for all (n), then (m_2(G)\le 2). Equivalently, every subgraph (J\subseteq G) with (v(J)\ge3) satisfies
+> [
+> e(J)\le 2v(J)-3.
+> ]
+
+**Proof.**
+Assume for contradiction that (m_2(G)>2). Then there exists a subgraph (J\subseteq G) with (v(J)\ge3) such that
+[
+\frac{e(J)-1}{v(J)-2} = m_2(J) \ \ge\ m_2(G)\ >\ 2.
+]
+In particular (m_2(J)>2).
+
+Apply Spencer’s lower bound to (H=J):
+[
+R(J,K_n)\ =\ \Omega!\big(\tilde{n}^{,m_2(J)}\big),
+]
+so there exist constants (c>0) and (L>0) (depending on (J), hence on (G)) such that for all sufficiently large (n),
+[
+R(J,K_n)\ \ge\ c,\frac{n^{m_2(J)}}{(\log n)^L}.
+]
+Since (m_2(J)>2), write (m_2(J)=2+\varepsilon) with (\varepsilon>0). Then
+[
+\frac{n^{m_2(J)}}{(\log n)^L} = \frac{n^{2+\varepsilon}}{(\log n)^L}
+= n^2\cdot \frac{n^{\varepsilon}}{(\log n)^L}.
+]
+As (n\to\infty), (\frac{n^{\varepsilon}}{(\log n)^L}\to\infty). Hence for all sufficiently large (n),
+[
+R(J,K_n)\ >\ C_K n^2.
+]
+
+Now use monotonicity in the first argument: since (J\subseteq G), any red copy of (G) contains a red copy of (J), so forcing a red (J) is “easier” than forcing a red (G); equivalently
+[
+R(J,K_n)\ \le\ R(G,K_n).
+]
+But the hypothesis gives (R(G,K_n)\le C_K n^2) for all (n), contradiction for large (n).
+
+Therefore (m_2(G)\le 2).
+
+Finally, (m_2(G)\le2) means for every (J\subseteq G) with (v(J)\ge3),
+[
+\frac{e(J)-1}{v(J)-2}\le 2
+\quad\Longrightarrow\quad
+e(J)-1 \le 2(v(J)-2)
+\quad\Longrightarrow\quad
+e(J)\le 2v(J)-3.
+]
+∎
+
+---
+
+### Lemma 3. The “(2v-3)” subgraph condition is equivalent to (m_2(G)\le 2).
+
+> **Lemma 3.** For a graph (G), the following are equivalent:
+>
+> 1. (m_2(G)\le 2).
+> 2. Every subgraph (J\subseteq G) with (v(J)\ge3) satisfies (e(J)\le 2v(J)-3).
+
+**Proof.**
+
+* (1)(\Rightarrow)(2) was shown at the end of Lemma 2.
+* (2)(\Rightarrow)(1): If (e(J)\le 2v(J)-3) for every (J) with (v(J)\ge3), then for every such (J),
+  [
+  \frac{e(J)-1}{v(J)-2}
+  \le \frac{(2v(J)-3)-1}{v(J)-2}
+  = \frac{2v(J)-4}{v(J)-2} = 2.
+  ]
+  Taking the maximum over all (J\subseteq G) with (v(J)\ge3) gives (m_2(G)\le2).
+  ∎
+
+---
+
+### Where this leaves the original problem
+
+From Lemma 1, assumption (1) is automatic for fixed (G).
+From Lemma 2, assumption (2) forces (m_2(G)\le2), equivalently the “(2v-3) edges in every subgraph” sparsity condition.
+
+But exactly this threshold condition (m_2(H)\le2) is highlighted in current literature as the central open barrier: Erdős et al. asked if every graph (H) with (m_2(H)\le2) is Ramsey size-linear, and Bradač–Gishboliner–Sudakov state this is still out of reach.
+Related Erdős-problems pages also discuss the closely related formulation “every (k)-vertex subgraph has at most (2k-3) edges (\Rightarrow) size-linear?” as open.
+
+At this point, completing either a full proof or an explicit counterexample would require resolving (or bypassing) that open barrier.
+
+## 5) VERIFICATION
+
+### Check Lemma 1
+
+* Monotonicity (R(G,T)\le R(K_g,T)) is correct because a red (K_g) contains any (g)-vertex graph as a (non-induced) subgraph.
+* Chvátal’s formula (R(K_g,T)=(g-1)(n-1)+1) is a standard theorem; the lemma uses it only as an upper bound, so even weaker versions suffice.
+
+### Check Lemma 2
+
+* The only nontrivial input is Spencer’s lower bound in terms of (m_2), stated in the SIAM paper.
+* The asymptotic comparison is rigorous: if (m_2(J)=2+\varepsilon), then (n^{2+\varepsilon}/(\log n)^L) eventually dominates any constant multiple of (n^2).
+* Monotonicity (R(J,K_n)\le R(G,K_n)) for (J\subseteq G) is correct (forcing a red copy of the larger graph forces a red copy of the smaller).
+
+### Quantifier check
+
+* Lemma 2 shows: ((\exists C_K)(\forall n)\ R(G,K_n)\le C_K n^2 \Rightarrow m_2(G)\le 2). This is uniform in (n) and uses “for all sufficiently large (n)” only inside the contradiction.
+
+No hidden dependence on (n) or (H) was introduced.
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+The hypothesis “(R(G,T_n)\ll n) for every tree (T_n)” is redundant for fixed (G) (Lemma 1). Moreover, the hypothesis “(R(G,K_n)\ll n^2)” forces the structural sparsity condition (m_2(G)\le 2), equivalently (e(J)\le 2v(J)-3) for every subgraph (J\subseteq G) with (v(J)\ge 3) (Lemmas 2–3).
+
+(ii) **Exact first gap (single crisp statement) preventing completion.**
+Show (or refute) that **every** graph (G) with (m_2(G)\le 2) (and in particular every graph with (R(G,K_n)=O(n^2))) is Ramsey size-linear, i.e. satisfies (R(G,H)=O(e(H))) for all graphs (H) with no isolated vertices. This is explicitly identified in current literature as “still out of reach.”
+
+(iii) **Top 3 next moves (specific, lemma-level).**
+
+1. Prove size-linearity for the “critical” (m_2=2) examples (e.g. (K_{3,3}), (Q_3), and other sparse graphs with (e=2v-3) subgraphs), since these sit exactly at the threshold and are repeatedly singled out.
+2. Develop a Sidorenko-style embedding/induction scheme where the quadratic bound (R(G,K_n)=O(n^2)) is used to control large independent sets in red (i.e., large blue cliques), and combine with dependent random choice to embed arbitrary (m)-edge (H) into blue.
+3. On the disproof side: attempt to construct a fixed (G) with (m_2(G)=2) and (R(G,K_n)=O(n^2)) but for which (R(G,H_m)) grows superlinearly with (m), likely with (H_m) bipartite/dense (to avoid being “caught” by the clique test).
+
+(iv) **What a minimal counterexample would likely look like (structure/parameters).**
+
+* It would almost certainly have **(m_2(G)=2) exactly**, because if (m_2(G)>2) then (R(G,K_n)) is superquadratic by Spencer, contradicting the hypothesis (Lemma 2).
+* It would be “critical” under subgraphs: every proper subgraph (J\subsetneq G) should have (m_2(J)<2) or otherwise be already known/forced size-linear, while (G) itself fails size-linearity.
+* The witness family (H_m) would likely be **bipartite and fairly dense** (large (m) but (\omega(H_m)=2)), since the clique condition already rules out using (H_m=K_n) to break linearity.
+
+What you quoted is basically the “research front” around Erdős #568 once you reduce away the tree hypothesis and translate (R(G,K_n)=O(n^2)) into a structural sparsity condition (m_2(G)\le 2). Bradač–Gishboliner–Sudakov explicitly say the (m_2\le2)→size-linear step is “still out of reach,” and they also point to a handful of *specific* “critical” graphs people have focused on.
+
+Below I’m going to (i) make your three “next moves” genuinely lemma-level (so you could start proving things), and (ii) sharpen the “minimal counterexample” picture using closure/obstruction results that are actually in the literature.
+
+---
+
+## A. Make the targets “lemma-level” precise
+
+### A0. Work with the standard equivalent formulation
+
+Balister’s paper uses the equivalent definition
+[
+\text{(G) is size-linear} \iff \exists C_G:\ \forall H,\ R(G,H)\le C_G e(H)+v(H).
+]
+Then for graphs (H) with **no isolated vertices**, (v(H)\le 2e(H)), so this implies (R(G,H)\le (C_G+2)e(H)), i.e. (R(G,H)=O(e(H))).
+
+So in “lemma form,” your end-goal can be stated as:
+
+> **Goal.** Prove (\exists C=C(G)) such that for every graph (H),
+> [
+> R(G,H)\le C\bigl(e(H)+v(H)\bigr).
+> ]
+
+(That formulation is often easier in inductive arguments, because deleting a vertex reduces (v(H)) by 1 but can reduce (e(H)) by only (\deg(v)).)
+
+---
+
+## B. Next move #1, made concrete: attack the “critical (m_2=2)” test graphs
+
+There is an *explicit* “subproblem list” in the folklore: graphs like the cube (Q_3), (K_{3,3}), and a certain 5-vertex graph (H_5) (in some sources) are singled out as key cases. One page states exactly:
+
+> “Problem. For a graph (G), where (G) is (Q_3), (K_{3,3}) or (H_5) … is it true that (r(G,H)\le cn) for any graph (H) with (n) edges?”
+
+Also, Erdős is recorded as asking specifically about (G=K_{3,3}).
+
+### B1. A clean lemma target for (K_{3,3})
+
+> **Lemma target (K_{3,3}).** Prove: (\exists C) such that for every graph (H) with no isolated vertices,
+> [
+> R(K_{3,3},H)\le C,e(H).
+> ]
+
+A *meaningful intermediate* lemma that would already be nontrivial progress is:
+
+> **Intermediate target.** Prove the above only for **bipartite** (H).
+
+Why? Because in the (K_4^*) (one-subdivision of (K_4)) case, Bradač–Gishboliner–Sudakov cannot prove full size-linearity, but they *do* prove it for all bipartite (F):
+[
+R(K_4^*,F)=O(e(F))\quad\text{for all bipartite (F) with no isolated vertices.}
+]
+
+So “bipartite targets first” is not just a heuristic; it matches current best-known partial successes.
+
+### B2. A clean lemma target for (Q_3)
+
+Similarly:
+
+> **Lemma target (cube).** Prove: (\exists C) such that for every (H) with no isolated vertices,
+> [
+> R(Q_3,H)\le C,e(H).
+> ]
+
+This is plausibly harder than it looks because (Q_3) sits on a long-standing extremal barrier: Erdős–Simonovits proved
+[
+\mathrm{ex}(n,Q_3)=O(n^{8/5}),
+]
+and (as of Janzer’s 2022/2024 discussion) that’s still the best known upper bound; any improvement is considered major.
+So any proof route that *needs* (\mathrm{ex}(n,Q_3)=O(n^{3/2})) is dead on arrival. This forces genuinely new ideas beyond the known “(\mathrm{ex}(n,G)=O(n^{3/2})\Rightarrow) size-linear” mechanism.
+
+### B3. Why these are the right “critical” tests
+
+Balister records the very useful sufficient condition:
+
+> If (G) is bipartite and (\mathrm{ext}(G,n)=O(n^{3/2})) then (G) is Ramsey size-linear.
+
+So to get beyond the already-covered territory, you must confront graphs with (\mathrm{ex}(n,G)) **strictly bigger** than (n^{3/2}). (K_{3,3}) and (Q_3) are canonical such examples (their best known extremal exponents exceed (3/2)).
+
+That is exactly why they are natural “threshold” benchmarks for #568.
+
+---
+
+## C. Next move #2, made concrete: a Sidorenko-style induction + DRC blueprint
+
+This is the most “standardizable” path, and you can break it into explicit lemmas.
+
+### C1. First lemma you *will* need (and can prove from (R(G,K_n)=O(n^2)))
+
+If (R(G,K_n)\le C_K n^2), then every (G)-free graph has large independent sets:
+
+> **Lemma (independence in (G)-free graphs).**
+> Suppose (R(G,K_n)\le C_K n^2) for all (n). Then for every (N\ge1), every (G)-free graph (R) on (N) vertices satisfies
+> [
+> \alpha(R)\ \ge\ \left\lfloor \sqrt{\frac{N}{C_K}}\right\rfloor.
+> ]
+
+**Proof.** Let (n=\lfloor \sqrt{N/C_K}\rfloor). Then (N\ge C_K n^2\ge R(G,K_n)). Consider the 2-coloring where edges of (R) are red and non-edges are blue. Red contains no (G), so blue must contain a (K_n), which is an independent set of size (n) in (R). ∎
+
+In the Ramsey setting: if there is **no red (G)** on (N) vertices, then the blue graph contains a clique of size (\Omega(\sqrt N)).
+
+### C2. Second lemma you need: “few high-degree vertices” in an (m)-edge target
+
+This is purely about (H):
+
+> **Lemma (high-degree vertices are few).**
+> Let (H) be a graph with (m=e(H)). For any threshold (D\ge 1),
+> [
+> |{v\in V(H):\deg_H(v)>D}|\ \le\ \frac{2m}{D}.
+> ]
+> In particular, taking (D=\lceil \sqrt m\rceil), there are at most (2\sqrt m) vertices of degree (>\sqrt m).
+
+**Proof.** Sum of degrees is (2m). If (t) vertices have degree (>D), then (2m\ge t(D+1)), so (t\le 2m/(D+1)\le 2m/D). ∎
+
+This is the standard “split into a small dense core and a large sparse remainder” decomposition.
+
+### C3. What the induction *wants* to do, and the exact sticking lemma
+
+A Sidorenko-style induction usually does:
+
+* pick a vertex (v) of minimum degree (\delta=\delta(H)),
+* assume you already embedded (H-v) in blue,
+* now you need a new blue vertex adjacent to the already-embedded images of (N_H(v)).
+
+So the key host-graph lemma you need is of the form:
+
+> **Key Host Lemma (typical form).**
+> In every red/blue coloring of (K_N) with no red (G), the blue graph contains a set (U) such that **every** subset (S\subseteq U) of size (\le t) has a large common neighborhood in blue.
+
+That is exactly the kind of statement that dependent random choice (DRC) is designed to produce from **edge density** conditions.
+
+### C4. Why DRC alone doesn’t close the problem (the precise parameter mismatch)
+
+For (G=K_{3,3}) or (Q_3), extremal theory allows the red graph to have (N^{5/3}) or (N^{8/5}) edges, respectively, so blue can be missing about (N^{5/3}) or (N^{8/5}) edges. When (N) is only linear in (m), this is still **(o(N^2))** missing edges, so blue is very dense—but the missing edges might be arranged adversarially.
+
+A *naïve* min-degree intersection bound works only if you need to intersect neighborhoods of size (\le t) where (t\cdot(\text{missing-edge-density})<1). For (K_{3,3}), the missing-edge density is about (N^{-1/3}), so this only gives you intersection guarantees for (t \ll N^{1/3}). But an arbitrary (m)-edge graph (H) can have degeneracy (\Theta(\sqrt m)=\Theta(\sqrt N)), much larger than (N^{1/3}).
+
+So, if you pursue this path, you want a lemma that *uses the special forbidden structure* (no red (G)) to get **much stronger common-neighborhood structure** than what mere edge density gives.
+
+That “extra structure beyond density” is the real missing piece—precisely consistent with BGS calling the (m_2\le2) conjecture “out of reach.”
+
+---
+
+## D. Next move #3, made concrete: what a counterexample would have to do
+
+### D1. Hard necessary conditions for a counterexample (G)
+
+Two very strong “filters” from the known theory (as summarized by Balister) are:
+
+1. **If (e(G)\ge 2v(G)-2) then (G) is not size-linear.**
+   So any counterexample *under your hypotheses* (which imply (m_2(G)\le2)) must live strictly below that easy obstruction.
+2. **If (G) is bipartite with (\mathrm{ex}(n,G)=O(n^{3/2})), then (G) *is* size-linear.**
+   So any bipartite counterexample must have (\mathrm{ex}(n,G)) genuinely larger than (n^{3/2}) (again steering you toward (K_{3,3})-type or cube-type behavior).
+
+### D2. Why (m_2(G)=2) is “forced”
+
+As already noted earlier (and also emphasized by BGS), the general Spencer lower bound relates growth of (R(G,K_n)) to (m_2(G)), and the condition (R(G,K_n)=O(n^2)) forces (m_2(G)\le2). BGS explicitly frame the conjecture “every graph with (m_2\le2) is size-linear” as a central open question.
+
+So if you’re trying to *disprove* #568, you are essentially forced to find a graph (G) with:
+
+* (m_2(G)=2) (tight),
+* (R(G,K_n)=O(n^2)) (given),
+* but (G) fails size-linearity.
+
+No known explicit example like this is currently advertised in the mainstream sources we pulled up.
+
+### D3. What the witness family (H_m) would probably look like
+
+To make (R(G,H_m)) superlinear in (m), you need (for infinitely many (m)) a coloring of (K_N) with (N) much larger than (m) such that:
+
+* red is (G)-free, **and**
+* blue is (H_m)-free.
+
+Given that (R(G,K_n)=O(n^2)), blue is forced to contain cliques of size (\Omega(\sqrt N)) whenever red is (G)-free (Lemma C1). So if you want blue to avoid (H_m), it’s natural to take (H_m) **bipartite** (or at least low-clique-number), so that the forced blue clique doesn’t automatically embed (H_m). This matches your bullet point and also matches how partial results for (K_4^*) were obtained (bipartite targets first).
+
+So a plausible disproof program is:
+
+> Construct a family (H_m) of bipartite graphs (no isolated vertices, (e(H_m)=m)) such that for some (G)-free red graph (R) on (N\gg m) vertices, the complement (\overline{R}) avoids (H_m).
+
+To do this systematically you’d likely need:
+
+* an explicit extremal-type construction of a (G)-free graph (R) with very “structured” complement (not just random),
+* and an (H_m) tailored to the complement’s forbidden pattern.
+
+This is why pseudorandom/algebraic constructions and “structured complements” are natural in the disproof track.
+
+---
+
+## E. “Minimal counterexample” constraints you can actually justify from known closure results
+
+If you search for a **minimal** (under subgraphs) counterexample to size-linearity, Wigderson’s 2024 note shows such minimal non-size-linear graphs exist in abundance in general (nonconstructively), and highlights that (K_4) is the classical minimal example.
+But for your *restricted class* with (m_2=2), we can still list constraints that are genuinely justified by known sufficient conditions.
+
+### E1. It cannot be “too subdivided”
+
+Balister proves that many subdivisions are size-linear; in particular:
+
+* adding sufficiently long paths between vertices of a size-linear graph preserves size-linearity (his Corollary 2), and
+* if every cycle contains at least four consecutive degree-2 vertices, then the graph is size-linear (his Corollary 3).
+
+So a minimal counterexample cannot have long runs of degree-2 vertices along cycles. Informally: it must be “locally dense” in the sense that degree-2 vertices can’t dominate cyclic structure.
+
+### E2. It must escape the (\mathrm{ex}(n,G)=O(n^{3/2})) sufficient condition
+
+Again by Balister’s Property 4, any bipartite graph (G) with Turán/extermal number (O(n^{3/2})) is size-linear.
+So a bipartite minimal counterexample must have extremal exponent (>3/2). The cube (Q_3) is a canonical example where the best known upper bound is (O(n^{8/5})).
+
+### E3. It will likely be one of the “explicitly asked” frontier graphs
+
+This isn’t a theorem, but it’s an evidence-based heuristic supported by the fact that the folklore “specific” problem list *already* focuses on (Q_3) and (K_{3,3}) as key cases.
+
+---
+
+## Bottom line: how to turn your bullets into a concrete research checklist
+
+If I had to turn (1)–(3) into the **most actionable** lemma list (each one checkable / attackable), it would be:
+
+1. **(Critical graphs)** Prove (R(K_{3,3},H)=O(e(H)+v(H))) for all (H).
+   Start with the weaker lemma “for all bipartite (H)” (mirroring the known (K_4^*) progress).
+2. **(Common-neighborhood structure)** In any (K_{3,3})-free red graph (R) on (N) vertices, prove that the blue graph (\overline{R}) contains a large set (U) with strong common-neighborhood expansion for sets of size up to (t=t(N)) where (t) is *significantly larger* than (N^{1/3}). This is the “missing lemma” a DRC+induction approach would hinge on.
+3. **(Disproof track)** Try to explicitly build a (K_{3,3})-free (or (Q_3)-free) red graph whose complement is “structured sparse” in a way that avoids some carefully designed bipartite (H_m) with (m) edges. This would need to beat the brute fact that blue always contains a clique of size (\Omega(\sqrt N)) when red is (G)-free (from (R(G,K_n)=O(n^2))). (I gave the exact lemma above.)
+
+Below is a completely explicit “DRC lemma with parameters” (in exactly the form people actually use), plus the quantitative inequality you run into when you try to make a greedy/degeneracy embedding work at Ramsey‑linear scale for (G=K_{3,3}) or (G=Q_3).
+
+I’ll keep the logic **fully explicit**: (i) what DRC gives you, (ii) what a degeneracy/induction embedding needs, (iii) what the *best available* “blue density” is when red is (K_{3,3})-free or (Q_3)-free, and then (iv) the *single inequality* that fails.
+
+---
+
+## 1) A fully explicit DRC lemma (with all parameters)
+
+A standard, very explicit version is Fox–Sudakov’s “basic lemma”:
+
+> **Lemma (Dependent Random Choice; Fox–Sudakov Lemma 2.1).**
+> Let (G=(V,E)) be a graph on (|V|=n) vertices with **average degree** (d=\frac{2|E|}{n}).
+> Let (a,m,r) be positive integers.
+> If there exists a positive integer (t) such that
+> [
+> \frac{d^{,t}}{n^{t-1}}-\binom{n}{r}\left(\frac{m}{n}\right)^{t}\ \ge\ a,
+> ]
+> then (G) contains a vertex subset (U\subseteq V) with (|U|\ge a) such that **every** (r)-subset of (U) has at least (m) **common neighbors** in (G).
+
+### Proof (short, complete, no gaps)
+
+Choose a random multiset (T) of (t) vertices from (V), uniformly with repetition. Let
+[
+A ;=; N(T);=;\bigcap_{x\in T} N(x)
+]
+be the common neighborhood of (T), and set (X=|A|).
+
+**Step 1: lower bound (\mathbb E[X]).**
+For each (v\in V), the probability (v\in A) equals ((\deg(v)/n)^t) (all (t) random choices must land in (N(v))). Hence
+[
+\mathbb E[X] ;=;\sum_{v\in V}\left(\frac{\deg(v)}{n}\right)^t.
+]
+By convexity of (z\mapsto z^t) and Jensen,
+[
+\mathbb E[X]\ \ge\ n\left(\frac{1}{n}\sum_{v\in V}\frac{\deg(v)}{n}\right)^t
+;=; n\left(\frac{d}{n}\right)^t
+;=;\frac{d^t}{n^{t-1}}.
+]
+
+**Step 2: upper bound the expected number of “bad” (r)-sets inside (A).**
+Call an (r)-set (S\subseteq V) **bad** if it has fewer than (m) common neighbors, i.e. (|N(S)|<m).
+Let (Y) be the number of bad (r)-sets (S) that are contained in (A).
+
+Fix a bad (S). For (S\subseteq A), we need (T\subseteq N(S)). Since (|N(S)|<m),
+[
+\Pr(S\subseteq A);=;\Pr(T\subseteq N(S));\le;\left(\frac{m}{n}\right)^t.
+]
+There are at most (\binom{n}{r}) choices for (S), so by linearity of expectation
+[
+\mathbb E[Y]\ \le\ \binom{n}{r}\left(\frac{m}{n}\right)^t.
+]
+
+**Step 3: delete one vertex from each bad (r)-set.**
+By linearity,
+[
+\mathbb E[X-Y]\ \ge\ \frac{d^t}{n^{t-1}}-\binom{n}{r}\left(\frac{m}{n}\right)^t\ \ge\ a.
+]
+So for some outcome of (T), we have (X-Y\ge a). Start with (A); for each bad (r)-set (S\subseteq A), delete one vertex of (S). This removes all bad (r)-sets, and deletes at most (Y) vertices, leaving a set (U\subseteq A) with
+[
+|U|\ \ge\ X-Y\ \ge\ a
+]
+and with **no** bad (r)-set, i.e. every (r)-subset of (U) has (\ge m) common neighbors. ∎
+
+That’s the “parameter machine” you plug into.
+
+---
+
+## 2) The standard embedding lemma you pair with DRC
+
+Fox–Sudakov also record the canonical embedding lemma (for bipartite targets):
+
+> **Lemma (Embedding from common neighborhoods; Fox–Sudakov Lemma 3.2).**
+> Let (H=(A\cup B,F)) be bipartite with (|A|=a), (|B|=b), and every vertex of (B) has degree (\le r).
+> If a graph (G) contains a set (U) with (|U|=a) such that every (r)-subset of (U) has at least (a+b) common neighbors in (G), then (H\subseteq G).
+
+The proof is a clean greedy embedding: embed (A) injectively into (U), then embed vertices of (B) one by one using the guaranteed common neighborhood size (a+b) to avoid collisions.
+
+This is exactly the “DRC + greedy induction” template you referred to.
+
+---
+
+## 3) What an inductive/degeneracy embedding needs for *arbitrary* (m)-edge (H)
+
+To see the real quantitative obstacle, it’s enough to look at **worst‑case** (H) among graphs with (m) edges and no isolated vertices.
+
+### 3.1 Degeneracy / backward degree can be (\Theta(\sqrt m))
+
+Define the **degeneracy** (\mathrm{dg}(H)) as the smallest (k) such that (H) has an ordering (v_1,\dots,v_h) where each (v_i) has at most (k) neighbors among ({v_1,\dots,v_{i-1}}). That (k) is exactly the “maximum backward degree” in a best embedding order.
+
+> **Lemma (degeneracy bound).**
+> If (e(H)=m), then
+> [
+> \mathrm{dg}(H)\ \le\ \left\lfloor\frac{\sqrt{1+8m}-1}{2}\right\rfloor\ <\ \sqrt{2m}.
+> ]
+
+**Proof.** Let (k=\mathrm{dg}(H)). Then (H) contains a nonempty subgraph (H') with minimum degree (\delta(H')=k) (standard property: take a subgraph of minimum order among subgraphs with maximum minimum degree). Then (v(H')\ge k+1), and
+[
+e(H')\ \ge\ \frac{k,v(H')}{2}\ \ge\ \frac{k(k+1)}{2}.
+]
+Since (e(H')\le e(H)=m), we have (m\ge k(k+1)/2), hence (k < \sqrt{2m}). ∎
+
+This is *tight in order*: take (H=K_{s,s}) (complete bipartite), then (m=s^2) and (\mathrm{dg}(H)=s=\sqrt m).
+
+### 3.2 The vertex count is also linear in (m)
+
+If (H) has no isolated vertices, then (v(H)\le 2m) (each vertex contributes degree at least 1, so (2m=\sum \deg \ge v(H))).
+
+So in the **hard regime**, you should imagine targets (H) with
+[
+v(H)\asymp m,\qquad \mathrm{dg}(H)\asymp \sqrt m,
+]
+e.g. (H=K_{\lfloor\sqrt m\rfloor,\lfloor\sqrt m\rfloor}) plus isolated edges if you want to hit (v(H)) close to (2m).
+
+---
+
+## 4) What you can guarantee about the blue graph when red avoids (K_{3,3}) or (Q_3)
+
+In a 2‑coloring of (K_N), write (R) for the red graph and (B) for the blue graph (so (B=\overline{R})).
+
+If you assume **no red copy of (G)**, then automatically
+[
+e(R)\ \le\ \mathrm{ex}(N,G),
+]
+so
+[
+e(B)\ =\binom{N}{2}-e(R)\ \ge\ \binom{N}{2}-\mathrm{ex}(N,G).
+]
+Equivalently, if (p) is the blue edge density,
+[
+p\ :=\ \frac{2e(B)}{N(N-1)}\ \ge\ 1-\frac{2,\mathrm{ex}(N,G)}{N(N-1)}.
+]
+
+### 4.1 For (G=K_{3,3})
+
+Kővári–Sós–Turán gives, for fixed (s\le t),
+[
+\mathrm{ex}(N,K_{s,t}) = O_t!\left(N^{2-1/s}\right).
+]
+In particular, with (s=t=3),
+[
+\mathrm{ex}(N,K_{3,3}) = O!\left(N^{5/3}\right).
+]
+Hence for some constant (C>0),
+[
+p \ \ge\ 1 - C N^{-1/3}.
+]
+So the “missing blue density” is
+[
+\varepsilon\ :=\ 1-p\ =\Theta(N^{-1/3})\quad\text{(at best, from extremal theory alone)}.
+]
+
+### 4.2 For (G=Q_3)
+
+Janzer–Sudakov (2024) explicitly states that Erdős–Simonovits proved
+[
+\mathrm{ex}(N,Q_3)=O!\left(N^{8/5}\right),
+]
+and that this is *still the best known upper bound* as of that paper.
+Thus for some constant (C'>0),
+[
+p\ \ge\ 1 - C' N^{-2/5},
+]
+so
+[
+\varepsilon:=1-p=\Theta(N^{-2/5}).
+]
+
+---
+
+## 5) The “single inequality” barrier for a DRC + degeneracy embedding at linear Ramsey scale
+
+Now suppose you want **Ramsey size‑linearity**:
+[
+R(G,H)\ \le\ C_G\cdot m
+]
+for all (H) with (m) edges and no isolated vertices. In the usual attempt, you set
+[
+N := C_G, m
+]
+and try to prove: every red/blue coloring of (K_N) with no red (G) forces a blue (H).
+
+For the hard targets (H), you must handle (H) with
+[
+v(H)\asymp m\asymp N,\qquad \mathrm{dg}(H)\asymp \sqrt m\asymp \sqrt N.
+]
+
+### 5.1 What “common neighborhood expansion up to (t)” has to look like
+
+A degeneracy‑greedy embedding needs a statement of the following type:
+
+> (**Needed host property, schematic**)
+> There exists a large set (U\subseteq V(B)) with (|U|\asymp N) such that for every subset (S\subseteq U) with (|S|\le t), the common blue neighborhood (N_B(S)) is still **linear in (N)** (at least (\asymp N)).
+
+And to embed *all* (m)-edge graphs at linear scale, you need this up to
+[
+t\ \gtrsim\ \mathrm{dg}(H)\ \asymp\ \sqrt N.
+]
+
+So the relevant (t) you’re asking for is not “a bit bigger than (N^{1/3})”; it’s essentially (t \sim N^{1/2}).
+
+### 5.2 What DRC (and even “density heuristics”) naturally give you
+
+If the blue graph has edge density (p=1-\varepsilon), then the “density‑only” heuristic for a common neighborhood of a (t)-set is:
+[
+|N_B(S)| \approx p^{t},N.
+]
+(And DRC is precisely a mechanism for *finding a large (U)* where many small subsets behave in this dense‑graph way.)
+
+Now, for (p=1-\varepsilon) with small (\varepsilon), we have the clean inequality
+[
+(1-\varepsilon)^t \le e^{-\varepsilon t}
+\quad\text{(since }\ln(1-\varepsilon)\le -\varepsilon\text{)}.
+]
+So
+[
+p^{t} N ;\le; e^{-\varepsilon t},N.
+]
+
+If you want the common neighborhood to stay **linear** in (N), i.e.
+[
+|N_B(S)| \ge \alpha N \quad\text{for some fixed }\alpha>0,
+]
+then (even in the *best‑case density model*) you need
+[
+p^t N \gtrsim \alpha N
+\quad\Longrightarrow\quad
+p^t \gtrsim \alpha
+\quad\Longrightarrow\quad
+e^{-\varepsilon t}\gtrsim \alpha
+\quad\Longrightarrow\quad
+\varepsilon t \lesssim \log(1/\alpha).
+]
+
+**This is the single inequality:**
+[
+\boxed{\ \varepsilon,t\ =\ O(1)\ }\qquad\text{(to keep (t)-wise common neighborhoods linear in (N)).}
+]
+
+### 5.3 Plug in the (t) you actually need: (t\asymp \sqrt N)
+
+To embed the worst‑case (m)-edge graphs at linear Ramsey scale you need
+[
+t \asymp \sqrt N.
+]
+So the inequality becomes
+[
+\boxed{\ \varepsilon,\sqrt N\ =\ O(1)\ }.
+]
+
+Equivalently,
+[
+\varepsilon \ =\ O(N^{-1/2}),
+]
+i.e. the blue graph must miss only (O(N^{3/2})) edges:
+[
+e(R)=\binom{N}{2}-e(B)\ =\Theta(\varepsilon N^2)\ =\ O(N^{3/2}).
+]
+
+This is exactly the “(3/2)-exponent threshold” that keeps coming up in Balister‑type criteria.
+
+### 5.4 Why (K_{3,3}) and (Q_3) miss this threshold (quantitatively)
+
+* For **(K_{3,3})**, extremal theory only forces (\varepsilon=\Theta(N^{-1/3})).
+  Then
+  [
+  \varepsilon\sqrt N \asymp N^{-1/3}\cdot N^{1/2}=N^{1/6}\to\infty.
+  ]
+  So (p^{\sqrt N} \le e^{-\Theta(N^{1/6})}), and “density‑type” common neighborhoods for (\sqrt N)-sets are astronomically sublinear.
+
+* For **(Q_3)**, you only get (\varepsilon=\Theta(N^{-2/5})).
+  Then
+  [
+  \varepsilon\sqrt N \asymp N^{-2/5}\cdot N^{1/2}=N^{1/10}\to\infty.
+  ]
+
+So **in both cases**, the inequality (\varepsilon\sqrt N=O(1)) fails badly.
+
+---
+
+## 6) How this looks if you literally plug into the DRC lemma (not just heuristics)
+
+Let me show the same barrier directly from Lemma 2.1, in the cleanest “you can’t even start” way.
+
+Suppose you want to use Lemma 2.1 on the blue graph (B) (on (n=N) vertices) to produce a set (U) of size
+[
+a = \Theta(N)
+]
+(because you need to embed graphs with (v(H)=\Theta(N))).
+
+Lemma 2.1 requires
+[
+\frac{d_B^{,t}}{N^{t-1}}-\binom{N}{r}\left(\frac{m}{N}\right)^{t}\ \ge\ a.
+]
+Since the second term is **nonnegative**, a necessary condition is
+[
+\frac{d_B^{,t}}{N^{t-1}} \ \ge\ a.
+]
+Write (d_B = p(N-1)\sim pN). Then
+[
+\frac{d_B^{,t}}{N^{t-1}}
+;\le;
+\frac{(pN)^{t}}{N^{t-1}}
+;=;
+p^{t}N.
+]
+So a necessary condition for getting (|U|\ge a=\alpha N) is
+[
+p^{t}N \ge \alpha N
+\quad\Longrightarrow\quad
+p^{t}\ge \alpha
+\quad\Longrightarrow\quad
+\varepsilon t = O(1),
+]
+the same “single inequality” again.
+
+Now if your intended application needs (t) to be the maximum backward degree, i.e. (t\asymp \sqrt N), then you again demand (\varepsilon\sqrt N=O(1)). But for (K_{3,3}) or (Q_3) your best available (\varepsilon) is (N^{-1/3}) or (N^{-2/5}), and the inequality fails.
+
+---
+
+## 7) What quantitative strengthening you would need (stated cleanly)
+
+To make a **DRC + degeneracy/induction** scheme prove
+[
+R(K_{3,3},H)\le C,e(H)
+\quad\text{or}\quad
+R(Q_3,H)\le C,e(H)
+]
+for *all* (H), you would need a structural replacement for “blue has density (1-\varepsilon)” that effectively behaves as if
+[
+\varepsilon \ \lesssim\ N^{-1/2}
+]
+**on the special subset (U)** and **for the relevant (t)-wise intersections**.
+
+Concretely, you’d need something like:
+
+> (**Missing lemma you’d need, quantitatively**)
+> In every (K_{3,3})-free (resp. (Q_3)-free) red graph (R) on (N) vertices, the blue complement (B=\overline{R}) contains a set (U) with (|U|\ge cN) such that for every (S\subseteq U) with (|S|\le c'\sqrt N),
+> [
+> |N_B(S)\cap U|\ \ge\ c''N.
+> ]
+
+This would push the “common neighborhood threshold” from the natural (t\sim N^{1/3}) (resp. (N^{2/5})) up to the necessary (t\sim N^{1/2}).
+
+Equivalently, it would be saying: **inside some linear‑sized (U)**, the red graph has *effective* maximum degree (\ll \sqrt N) (or some far stronger pseudorandom “union of neighborhoods” control) even though its global extremal exponent allows average red degrees (N^{2/3}) or (N^{3/5}).
+
+That is exactly the quantitative gap your “common‑neighborhood structure” bullet was pointing at—now reduced to the single inequality
+[
+\boxed{\ (1-p)\cdot \sqrt N = O(1)\ }
+]
+that has to hold in some form for the induction to cover worst‑case (m)-edge graphs.
+
+---

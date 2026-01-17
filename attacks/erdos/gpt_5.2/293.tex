@@ -1,0 +1,88 @@
+% Attempt for Erdos Problem #293
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For a fixed $k\ge 1$, consider solutions in positive integers
+\[1=\sum_{i=1}^k \frac1{n_i},\qquad 1\le n_1<\cdots<n_k.\]
+As written, for $k\ge 2$ the integer $n_i=1$ can never occur (since $1=1/1$ already), so the literal definition would give $v(k)=1$ for all $k\ge 2$, contradicting the discussion in the statement.
+Minimal correction consistent with standard “Egyptian fraction” conventions: restrict to $n_i\ge 2$ and define
+\[v(k)=\min\{m\ge 2:\ m\ \text{does not occur among the }n_i\text{ in any length-}k\text{ decomposition of }1\}.\]
+
+Problem: estimate the growth rate of $v(k)$ as $k\to\infty$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement itself reports substantial known bounds and gives an explicit upper bound via a bound on $n_k$ (largest denominator). I do not verify those literature bounds; I prove basic structural facts and compute exact values for small $k$.
+
+3) ATTACK PLAN
+Proof track:
+1. Build explicit infinite families of length-$k$ decompositions (Sylvester-type) to understand the scale of denominators.
+2. For small $k$, classify all decompositions and determine $v(k)$ exactly.
+3. Seek general lower bounds by counting/entropy: how many distinct denominators can appear among all decompositions of length $k$.
+
+Disproof track:
+1. If a conjectured growth rate is proposed (e.g. doubly exponential), look for constructions forcing many small denominators to appear, delaying the first missing value.
+
+Chosen path: prove a clean construction, pin down $v(3)$ exactly, and compute $v(4),v(5)$ by exhaustive search.
+
+4) WORK
+Lemma 1 (Unique 3-term decomposition; $v(3)=4$).
+With $n_1<n_2<n_3$ and $n_i\ge 2$, the only solution to
+\[\frac1{n_1}+\frac1{n_2}+\frac1{n_3}=1\]
+is $(n_1,n_2,n_3)=(2,3,6)$. Consequently, $v(3)=4$.
+
+Proof.
+This is Lemma 2 from the work on Problem \#287: $n_1$ must be $2$, and then $(n_2-2)(n_3-2)=4$ forces $(n_2,n_3)=(3,6)$.
+Thus the only denominators that appear in a 3-term decomposition are $\{2,3,6\}$, so the smallest missing integer $\ge 2$ is $4$. \qed
+
+Lemma 2 (Sylvester-type constructions give length-$k$ decompositions for all $k$).
+Define $u_1=1$ and $u_{t+1}=u_t(u_t+1)$ for $t\ge 1$. Then for every $k\ge 2$,
+\[1=\sum_{t=1}^{k-1}\frac{1}{u_t+1}+\frac{1}{u_k},\]
+and the denominators are strictly increasing.
+
+Proof.
+We prove by induction on $k$.
+For $k=2$, $u_1=1$, $u_2=2$, so $1=\frac1{u_1+1}+\frac1{u_2}=\frac12+\frac12$ (not strictly increasing, but it is the correct identity).
+For $k=3$, the identity gives $1=\frac12+\frac13+\frac16$ with denominators $2<3<6$.
+
+Assume for some $k\ge 2$ that
+\[1=\sum_{t=1}^{k-1}\frac{1}{u_t+1}+\frac1{u_k}.\]
+Use the splitting identity $\frac1{u_k}=\frac1{u_k+1}+\frac1{u_k(u_k+1)}$ and note $u_{k+1}=u_k(u_k+1)$ by definition.
+Substituting yields
+\[1=\sum_{t=1}^{k-1}\frac{1}{u_t+1}+\frac1{u_k+1}+\frac1{u_{k+1}}=\sum_{t=1}^{k}\frac{1}{u_t+1}+\frac1{u_{k+1}},\]
+which is the $k+1$ case.
+For $k\ge 3$, the sequence satisfies $u_{t+1}=u_t(u_t+1)>u_t+1$, so denominators $u_t+1$ and $u_{k}$ are strictly increasing. \qed
+
+FAST REALITY CHECK (computation).
+Using exhaustive search (backtracking over increasing denominators), I found:
+- For $k=4$, there are exactly $6$ solutions:
+$(2,3,7,42)$, $(2,3,8,24)$, $(2,3,9,18)$, $(2,3,10,15)$, $(2,4,5,20)$, $(2,4,6,12)$.
+The denominators appearing among these solutions miss $11$ first, so $v(4)=11$ (under the corrected definition).
+- For $k=5$, the exhaustive search found $72$ solutions (max denominator $1806$); among integers $2\le m\le 24$, the first missing denominator is $17$, so $v(5)=17$.
+
+5) VERIFICATION
+- Lemma 1 is a complete classification for $k=3$.
+- Lemma 2 gives an explicit family of length-$k$ decompositions (the Sylvester/Sylvester-like sequence).
+- The computed values for $v(4),v(5)$ are based on finite exhaustive search; I did not supply a theoretical bound on the maximum denominator needed for completeness beyond the search range used (though empirically max denominators were $42$ and $1806$ respectively, matching $u_4$ and $u_5$).
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+$v(3)=4$ exactly (Lemma 1), and there is an explicit family of length-$k$ decompositions for every $k$ with rapidly growing denominators (Lemma 2). Computation gives $v(4)=11$ and $v(5)=17$ for the corrected definition $v(k)\ge 2$.
+
+(ii) First gap:
+Prove meaningful asymptotics for $v(k)$ as $k\to\infty$ (e.g. show $v(k)$ grows at least exponentially/superexponentially), rather than only determining small $k$ values.
+
+(iii) Top 3 next moves:
+1. Prove a general upper bound on the maximum possible denominator $n_k$ in any length-$k$ decomposition (as claimed in the statement) and use it to make computations of $v(k)$ rigorous for larger $k$.
+2. Prove lower bounds on $v(k)$ by showing that, for $m$ up to some scale, one can always force $m$ to appear in some decomposition (or conversely show many $m$ cannot appear).
+3. Model the set of possible denominators via density/entropy arguments on the space of length-$k$ decompositions and quantify how many integers can appear as denominators.
+
+(iv) Minimal counterexample structure (if a strong lower bound conjecture were false):
+A sequence of $k$ for which many small integers appear as denominators in some length-$k$ decomposition, pushing the first missing integer $v(k)$ much smaller than conjectured growth (e.g. polynomial or merely exponential in $k$).
+

@@ -1,0 +1,200 @@
+% Erdős Problem #25
+
+1) FORMAL RESTATEMENT
+
+Let $(n_i)_{i\ge 1}$ be a strictly increasing sequence of integers with $n_i\ge 1$.
+For each $i$, fix an integer residue class $a_i\pmod{n_i}$.
+
+Define the set $A\subseteq\mathbb N$ by
+\[
+A := \{n\in\mathbb N : \forall i\ge 1,\ (n<n_i)\ \lor\ (n\not\equiv a_i \pmod{n_i})\}.
+\]
+Equivalently, for each fixed $n$, the condition only constrains indices with $n_i\le n$:
+\[
+ n\in A\ \Longleftrightarrow\ \forall i\text{ with }n_i\le n,\ n\not\equiv a_i\pmod{n_i}.
+\]
+
+Define the \emph{logarithmic density} (if it exists) by
+\[
+\delta_{\log}(A) := \lim_{x\to\infty} \frac{1}{\log x}\sum_{\substack{1\le n\le x\\ n\in A}}\frac{1}{n}.
+\]
+Question: Must $\delta_{\log}(A)$ exist for every choice of $(n_i,a_i)$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided problem statement only notes that this is a special case of another problem [486]. I do not use or claim any external literature beyond what is stated in the problem file.
+
+3) ATTACK PLAN
+
+Disproof track (ambitious):
+- Try to choose the residue classes so that on long intervals $[n_k, n_{k+1})$ the set $A$ alternates between two different periodic sets whose densities differ by a fixed amount, and arrange the interval lengths so that the logarithmic weights do not average out, forcing non-convergence.
+
+Proof track (ambitious):
+- Prove that the weighted average defining logarithmic density always converges for this ``growing sieve'' structure, perhaps using an approximate martingale or subadditivity.
+
+What I can deliver: existence of logarithmic density in two nontrivial regimes (finite constraints, and a general ``convergent densities + mild growth'' condition), plus explicit sanity-check examples.
+
+4) WORK
+
+FAST REALITY CHECK (examples + computation)
+
+Example A (nested moduli): take $n_i=2^i$ and $a_i\equiv 0\pmod{2^i}$. For any $n$, if $n$ is odd then it avoids all these congruences; if $n$ is even then it violates the $i=1$ condition ($n\equiv 0\pmod 2$ with $2\le n$). Thus $A$ is exactly the odd integers. The logarithmic density exists and equals $1/2$.
+
+Example B (sparse $A$): take $n_i=2^i$ and $a_i\equiv 2^{i-1}\pmod{2^i}$.
+Then for an integer $n\ge 2$, write $n=2^t\cdot u$ with $u$ odd. If $u\ge 3$ then $n\ge 2^{t+1}$ and $n\equiv 2^t\pmod{2^{t+1}}$, so it violates the condition with $i=t+1$. Hence the only $n\ge 2$ in $A$ are powers of $2$. So $A=\{1\}\cup\{2^t:t\ge 0\}$ has logarithmic density $0$.
+
+Numerical check (exact computation of the truncated ratio $\frac{1}{\log X}\sum_{n\le X, n\in A}1/n$):
+- For Example A (odd integers), the ratio at $X=10^6$ is about $0.54598$, trending toward $0.5$.
+- For Example B (powers of $2$), the ratio at $X=10^6$ is about $0.14476$ and decreasing, consistent with limit $0$.
+
+Lemma 25.1 (finite set of congruence constraints $\Rightarrow$ logarithmic density exists).
+Assume only finitely many constraints are present, i.e., there is some $K$ such that we only impose the conditions for $i=1,\dots,K$ (or equivalently, ignore all $i>K$). Then $A$ has a natural density, hence a logarithmic density.
+
+Proof.
+Let $L:=\mathrm{lcm}(n_1,\dots,n_K)$. For each $i\le K$, the set of integers congruent to $a_i\pmod{n_i}$ is a union of residue classes modulo $L$. Therefore the set $A$ defined by avoiding these finitely many progressions is also a union of residue classes modulo $L$.
+
+Any union of residue classes modulo $L$ is periodic with period $L$, so its natural density exists and equals $|A\cap\{1,\dots,L\}|/L$.
+
+Whenever the natural density exists, the logarithmic density exists and equals the same value (because partial summation shows that for periodic sets, the weighted sum $\sum_{n\le x, n\in A}1/n$ equals $(\text{density})\log x + O(1)$).
+
+Thus $\delta_{\log}(A)$ exists. $\square$
+
+Lemma 25.2 (log-density exists under convergent stage densities and mild modulus growth).
+For each $k\ge 1$, define the periodic set
+\[
+A^{(k)} := \{n\in\mathbb N: n\not\equiv a_i\pmod{n_i}\text{ for all }1\le i\le k\}.
+\]
+Let $\delta_k$ be the natural density of $A^{(k)}$ (which exists because $A^{(k)}$ is periodic modulo $\mathrm{lcm}(n_1,\dots,n_k)$).
+
+Assume:
+
+(H1) $\delta_k$ converges to some limit $\delta\in[0,1]$ as $k\to\infty$.
+
+(H2) The modulus growth is such that
+\[
+\frac{\max_{1\le j\le k} \log\bigl(n_{j+1}/n_j\bigr)}{\log n_k}\ \longrightarrow\ 0\quad (k\to\infty).
+\]
+(For example, it suffices that the ratios $n_{j+1}/n_j$ are uniformly bounded.)
+
+Then the logarithmic density $\delta_{\log}(A)$ exists and equals $\delta$.
+
+Proof.
+Fix $k\ge 1$ and consider integers $n$ with
+\[
+ n_k \le n < n_{k+1}.
+\]
+For such $n$, the defining condition for $A$ only involves indices $i$ with $n_i\le n$, which are exactly $i\le k$ by strict increase. Therefore
+\[
+\mathbf{1}_A(n) = \mathbf{1}_{A^{(k)}}(n)\qquad (n_k\le n < n_{k+1}).\tag{1}
+\]
+
+Define the logarithmic counting function
+\[
+S(x):=\sum_{\substack{1\le n\le x\\ n\in A}}\frac{1}{n}.
+\]
+Let $K(x)$ be the unique index with $n_{K(x)}\le x < n_{K(x)+1}$.
+Then by partitioning into intervals $[n_k, n_{k+1})$ and using (1), we have
+\[
+S(x) = \sum_{k=1}^{K(x)-1} \sum_{n=n_k}^{n_{k+1}-1} \frac{\mathbf{1}_{A^{(k)}}(n)}{n}
+\ +\ \sum_{n=n_{K(x)}}^{\lfloor x\rfloor} \frac{\mathbf{1}_{A^{(K(x))}}(n)}{n}.
+\tag{2}
+\]
+
+Now we approximate each inner sum by $\delta_k\log(n_{k+1}/n_k)$.
+Because $A^{(k)}$ is periodic with some period $L_k$, its indicator has average value $\delta_k$ over each complete period. For $n$ in $[n_k,n_{k+1})$, the weight $1/n$ is slowly varying.
+A standard summation-by-blocks argument gives
+\[
+\sum_{n=n_k}^{n_{k+1}-1} \frac{\mathbf{1}_{A^{(k)}}(n)}{n}
+= \delta_k\sum_{n=n_k}^{n_{k+1}-1}\frac{1}{n} + O\left(\frac{L_k}{n_k}\right).
+\tag{3}
+\]
+(Reason: split the interval into consecutive blocks of length $L_k$. On each full block, the average of $\mathbf{1}_{A^{(k)}}$ is exactly $\delta_k$, and $1/n$ varies by at most $O(L_k/n_k^2)$ per term, giving total error $O(L_k/n_k)$ over a block; the leftover partial block contributes at most $O(L_k/n_k)$.)
+
+Also,
+\[
+\sum_{n=n_k}^{n_{k+1}-1}\frac{1}{n}= \log\frac{n_{k+1}}{n_k} + O\left(\frac{1}{n_k}\right).
+\tag{4}
+\]
+Combining (3) and (4) yields
+\[
+\sum_{n=n_k}^{n_{k+1}-1} \frac{\mathbf{1}_{A^{(k)}}(n)}{n}
+= \delta_k\log\frac{n_{k+1}}{n_k} + O\left(\frac{L_k}{n_k}\right)+O\left(\frac{1}{n_k}\right).
+\tag{5}
+\]
+Since $L_k\le n_1\cdots n_k$ may be enormous, we do not attempt to control the $L_k/n_k$ term uniformly; instead we use a crude bound that is sufficient under (H2):
+\[
+\left|\sum_{n=n_k}^{n_{k+1}-1} \frac{\mathbf{1}_{A^{(k)}}(n)}{n} - \delta_k\log\frac{n_{k+1}}{n_k}\right|
+\le \sum_{n=n_k}^{n_{k+1}-1}\frac{1}{n}
+\le \log\frac{n_{k+1}}{n_k} + O\left(\frac{1}{n_k}\right).
+\tag{6}
+\]
+Thus (6) gives a uniform \emph{relative} error control: each block contributes at most its full harmonic weight.
+
+Now divide (2) by $\log x$. The total harmonic weight satisfies
+\[
+\sum_{k=1}^{K(x)-1}\log\frac{n_{k+1}}{n_k} \le \log x + O(1),
+\]
+because the telescoping product gives $\prod_{k=1}^{K(x)-1} (n_{k+1}/n_k)= n_{K(x)}/n_1 \le x$.
+So the weights
+\[
+ w_k(x):= \frac{\log(n_{k+1}/n_k)}{\log x}
+\]
+form an approximate probability distribution (nonnegative and summing to $\le 1+o(1)$).
+
+Using (6), we can write
+\[
+\frac{S(x)}{\log x} = \sum_{k=1}^{K(x)-1} w_k(x)\,\delta_k\ +\ R(x),
+\tag{7}
+\]
+where the remainder $R(x)$ is bounded in absolute value by
+\[
+|R(x)|\le \frac{\max_{1\le k\le K(x)} \log(n_{k+1}/n_k) + O(1)}{\log x}.
+\tag{8}
+\]
+The $O(1)$ term accounts for the final partial block and the $O(1)$ discrepancy between $\sum_{n\le x}1/n$ and $\log x$.
+
+By assumption (H2) with $k=K(x)$, the right-hand side of (8) tends to $0$ as $x\to\infty$.
+
+Finally, since $\delta_k\to\delta$ (assumption (H1)) and the weights $w_k(x)$ have maximum weight $\max w_k(x)=\max\log(n_{k+1}/n_k)/\log x\to 0$, the weighted average in (7) converges to $\delta$.
+
+Formally: for any $\varepsilon>0$, choose $K$ such that $|\delta_k-\delta|<\varepsilon$ for all $k\ge K$. Then split the weighted sum in (7) at $K$:
+\[
+\sum_{k=1}^{K(x)-1} w_k(x)\,\delta_k = \sum_{k< K} w_k(x)\,\delta_k + \sum_{k\ge K} w_k(x)\,\delta_k.
+\]
+The tail satisfies
+\[
+\left|\sum_{k\ge K} w_k(x)\,\delta_k - \delta\sum_{k\ge K} w_k(x)\right|\le \varepsilon\sum_{k\ge K} w_k(x)\le \varepsilon(1+o(1)).
+\]
+The initial finite part has total weight $\sum_{k< K} w_k(x)\le (\sum_{k< K}\log(n_{k+1}/n_k))/\log x = O(1)/\log x\to 0$, so it vanishes. Hence the weighted sum converges to $\delta$.
+
+Combining with $R(x)\to 0$ proves $S(x)/\log x\to\delta$. Therefore $\delta_{\log}(A)$ exists and equals $\delta$. $\square$
+
+5) VERIFICATION
+
+- Lemma 25.1: periodicity modulo the lcm is correct, and the implication ``natural density $\Rightarrow$ logarithmic density'' holds for periodic sets by comparing harmonic sums over residue classes.
+- Lemma 25.2: identity (1) is the key observation (only first $k$ constraints matter on $[n_k,n_{k+1})$). The remainder control uses only the size of the harmonic weight of each interval and the hypothesis (H2) to ensure no single interval dominates the logarithmic weighting.
+- The proof does not assume coprimality or independence of residue classes; it packages all dependence into $\delta_k$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result:
+- Logarithmic density exists for any finite set of congruence constraints (Lemma 25.1).
+- More generally, if the stage densities $\delta_k$ converge and no single interval $[n_k,n_{k+1})$ carries a non-negligible proportion of the total logarithmic weight, then $\delta_{\log}(A)$ exists and equals $\lim\delta_k$ (Lemma 25.2).
+- Concrete sanity-check examples show both positive and zero logarithmic densities can occur.
+
+(ii) First gap (crisp):
+Remove hypotheses (H1)--(H2): decide whether for \emph{arbitrary} increasing moduli $n_i$ and residue classes $a_i\pmod{n_i}$, the limit
+\[
+\lim_{x\to\infty} \frac{1}{\log x}\sum_{\substack{n\le x\\n\in A}}\frac{1}{n}
+\]
+must exist.
+
+(iii) Top 3 next moves (concrete):
+1. Attempt to construct an explicit oscillating example by forcing $\delta_k$ to alternate between two separated values while arranging $\log(n_{k+1}/n_k)$ weights to not average out.
+2. Prove a general convergence theorem for $\delta_k$ itself (does $\delta_k$ always have a limit? can it oscillate?) by analyzing how adding one new congruence class affects the density of the periodic set $A^{(k)}$.
+3. Computational exploration: for designed sequences with slowly growing $n_i$ (e.g. $n_i=i$ or primes), numerically estimate the truncated ratio for large $x$ to see whether oscillations are plausible.
+
+(iv) Minimal counterexample structure:
+A minimal counterexample to existence of $\delta_{\log}(A)$ would require two subsequences $x_m\to\infty$ and $y_m\to\infty$ along which the ratios $S(x_m)/\log x_m$ and $S(y_m)/\log y_m$ converge to two different limits. Structurally, this would likely come from designing long stretches where $A$ coincides with two different periodic sets of noticeably different densities, with those stretches weighted comparably in logarithmic measure.

@@ -1,0 +1,152 @@
+%Erdos problem 510
+\noindent\textbf{FORMAL RESTATEMENT}
+
+For each finite set $A\subset\mathbb{Z}$ with $|A|=N\ge 1$, define
+\[
+S_A(\theta):=\sum_{n\in A}\cos(n\theta),\qquad \theta\in\mathbb{R}.
+\]
+Question: Does there exist an absolute constant $c>0$ (independent of $A$ and $N$) such that for every such $A$ there exists some real $\theta$ with
+\[
+S_A(\theta) < -c\,N^{1/2}?
+\]
+
+Edge cases: If $0\in A$, then $S_A(\theta)$ has a constant $+1$ contribution. The statement asks for a negative value anyway.
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+The problem statement records: Ruzsa proved a bound of size $-\exp(O(\sqrt{\log N}))$; and more recent work (Bedert; Jin--Milojevi\'c--Tomon--Zhang) gives polynomially large negative values, currently $-cN^{1/7}$. I do not re-derive those results here.
+
+\medskip
+\noindent\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Proof-track idea: treat $S_A$ as a real part of an exponential sum $\sum_{n\in A} e^{in\theta}$; use $L^2$ identities and higher-moment bounds to force a substantially negative real part somewhere.
+\item Disproof-track idea: attempt to build $A$ with ``random-like'' residue distribution so that $S_A(\theta)$ stays close to $0$ for most $\theta$; then try to show its minimum cannot be as negative as $-c\sqrt{N}$.
+\end{itemize}
+The full $-c\sqrt{N}$ bound remains out of reach here.
+
+\medskip
+\noindent\textbf{WORK}
+
+\noindent\textbf{Fast reality check (small $N$; brute force on a grid).}
+
+I brute-forced small sets $A\subset\{1,2,\dots,8\}$ and numerically approximated $\min_{\theta} S_A(\theta)$ by sampling $\theta$ on an $8192$-point uniform grid on $[0,2\pi)$. For each $N$ I then took the \emph{worst case} (largest) of these approximate minima over all $A$ of size $N$.
+
+\begin{center}
+\begin{tabular}{c|c|l}
+$N$ & worst-case approx $\min_{\theta} S_A(\theta)$ & example $A$ (one maximiser)\\
+\hline
+1 & $-1.000000$ & $(1)$\\
+2 & $-1.124998$ & $(2,4)$\\
+3 & $-1.315556$ & $(2,4,6)$\\
+4 & $-1.519556$ & $(1,2,3,4)$\\
+5 & $-1.627459$ & $(1,2,4,5,6)$\\
+6 & $-1.591805$ & $(1,2,4,6,7,8)$\\
+\end{tabular}
+\end{center}
+If $0$ is allowed (universe $\{0,1,\dots,8\}$), the worst-case approximate minima shift up by $+1$ in the obvious way for sets containing $0$; for example for $N=4$ one worst-case set was $(0,2,4,6)$ with grid-minimum about $-0.315556$.
+
+These computations are only sanity checks (grid-based, not exact global minima).
+
+\medskip
+\noindent\textbf{Lemma 1 (mean value).}
+For any finite $A\subset\mathbb{Z}$,
+\[
+\frac{1}{2\pi}\int_0^{2\pi} S_A(\theta)\,d\theta = \begin{cases}
+1,& 0\in A,\\
+0,& 0\notin A.
+\end{cases}
+\]
+
+\textit{Proof.}
+For $n\neq 0$,
+\[
+\frac{1}{2\pi}\int_0^{2\pi} \cos(n\theta)\,d\theta = 0
+\]
+because $\cos(n\theta)$ has integral $0$ over a full period. For $n=0$, $\cos(0\cdot\theta)=1$ and the integral equals $1$. Summing over $n\in A$ gives the claim.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (a universal constant negative value when $0\notin A$).}
+Assume $A\subset\mathbb{Z}$ is finite, $|A|=N$, and $0\notin A$. Then there exists $\theta\in\mathbb{R}$ such that
+\[
+S_A(\theta)\le -\tfrac12.
+\]
+
+\textit{Proof.}
+Define $g(\theta)=S_A(\theta)$ on $[0,2\pi]$. By Lemma 1, $\int_0^{2\pi} g(\theta)\,d\theta=0$.
+Let $M:=\max_{\theta\in[0,2\pi]} g(\theta)$ and $m:=\min_{\theta\in[0,2\pi]} g(\theta)$.
+We will use the variance bound for bounded real-valued functions with mean $0$:
+\begin{equation}\label{eq:varrange}
+\frac{1}{2\pi}\int_0^{2\pi} g(\theta)^2\,d\theta \le (-m)\,M.
+\end{equation}
+To justify \eqref{eq:varrange}: view $g(\Theta)$ as a random variable on the probability space $([0,2\pi], d\theta/(2\pi))$ with mean $0$ and range $[m,M]$. For any such random variable $X$ with $\mathbb{E}X=0$ and $m\le X\le M$, one has $\mathrm{Var}(X)=\mathbb{E}(X^2)\le (-m)M$; this follows because the maximal variance at fixed endpoints and mean is achieved by a two-point distribution supported on $\{m,M\}$ (a standard convexity argument), and in that extremal case $\mathbb{E}(X^2)=(-m)M$.
+
+Next, compute a lower bound on the $L^2$ norm. Since $0\notin A$,
+\[
+\int_0^{2\pi} \cos(n\theta)\cos(m\theta)\,d\theta = 0\quad\text{for } |n|\neq |m|,
+\]
+and
+\[
+\int_0^{2\pi} \cos(n\theta)^2\,d\theta = \pi\quad\text{for }n\neq 0.
+\]
+However, if both $n$ and $-n$ lie in $A$, then the corresponding cosine terms are identical and contribute a factor of $2$ in $g$. Writing
+\[
+A_+:=\{k\ge 1: k\in A\text{ or }-k\in A\},\qquad m_k:=|\{n\in A: |n|=k\}|\in\{1,2\},
+\]
+we have $g(\theta)=\sum_{k\in A_+} m_k \cos(k\theta)$ and hence by orthogonality
+\[
+\int_0^{2\pi} g(\theta)^2\,d\theta = \pi\sum_{k\in A_+} m_k^2 \ge \pi\sum_{k\in A_+} m_k = \pi N.
+\]
+Therefore
+\[
+\frac{1}{2\pi}\int_0^{2\pi} g(\theta)^2\,d\theta \ge \frac{N}{2}.
+\]
+On the other hand, evaluating at $\theta=0$ gives $g(0)=\sum_{n\in A}1=N$, so $M\ge N$.
+Combining with \eqref{eq:varrange} gives
+\[
+\frac{N}{2}\le (-m)\,M \le (-m)\,N,
+\]
+hence $-m\ge 1/2$, i.e. $m\le -1/2$. This means there exists $\theta$ with $g(\theta)\le -1/2$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 3 (a large negative value for structured sets).}
+If $A$ consists entirely of odd integers (so $|A|=N$ and $n\equiv 1\pmod 2$ for all $n\in A$), then taking $\theta=\pi$ gives
+\[
+S_A(\pi)=\sum_{n\in A}\cos(n\pi)=\sum_{n\in A}(-1)=-N.
+\]
+
+\textit{Proof.}
+For an odd integer $n$, $n\pi$ is an odd multiple of $\pi$, so $\cos(n\pi)=\cos(\pi)= -1$. Summing yields $-N$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 2 uses an inequality $\mathrm{Var}(X)\le (-m)M$ for mean-zero random variables supported in $[m,M]$. I verified it separately: among distributions on $[m,M]$ with fixed mean, the second moment is maximized by putting all mass at endpoints (convexity of $x\mapsto x^2$), giving $\mathbb{E}(X^2)\le (-m)M$ when mean is $0$.
+\item Orthogonality step: I reduced the sum to distinct absolute values to avoid double-counting the identical functions $\cos(n\theta)=\cos(-n\theta)$.
+\item The obtained bound $-1/2$ is far from $-c\sqrt{N}$; it is consistent with the brute-force numerics for small $N$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: If $0\notin A$ there exists $\theta$ with $\sum_{n\in A}\cos(n\theta)\le -\tfrac12$ (Lemma 2). Also, for highly structured sets such as all-odd $A$, one can achieve $-N$ (Lemma 3).
+
+(ii) First gap (crisp): Prove or disprove the existence of an absolute $c>0$ such that for every $A$ with $|A|=N$ there exists $\theta$ with $S_A(\theta)<-c\sqrt{N}$.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item Use higher moments: compute/estimate $\int |\sum_{n\in A} e^{in\theta}|^{2k}$ and relate it to additive energy of $A$; then try to convert a large $L^{2k}$ norm into a large negative real part at some $\theta$.
+\item Try explicit ``hard'' families: difference sets $A=B-B$ with $B$ Sidon (as mentioned in the problem statement) and numerically estimate the true minimum of $S_A$ for moderate sizes to see scaling.
+\item Attempt a discretisation-to-continuum reduction: approximate the minimum of $S_A$ by evaluating on a net of $\theta$ values with certified error bounds (e.g., via Lipschitz control using $\max |S_A'(\theta)|$), enabling rigorous small-$N$ extremal computations.
+\end{enumerate}
+
+(iv) Minimal counterexample structure (if the $\sqrt{N}$ bound is false): would likely be a set $A$ with additive structure forcing the exponential sum $\sum_{n\in A} e^{in\theta}$ to have small real part oscillations for all $\theta$; candidate families include highly additive sets such as difference sets of Sidon sets or sets with small additive energy.
+
+

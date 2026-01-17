@@ -1,0 +1,122 @@
+% Erdos Problem #610
+% Solutions/partial progress file (auto-generated)
+
+1) FORMAL RESTATEMENT
+
+Let $G=(V,E)$ be a finite simple graph with $n:=|V|$.
+A \emph{clique} is a set of vertices inducing a complete subgraph.
+A clique is \emph{maximal} if it is not properly contained in any other clique.
+Define the \emph{clique transversal number} $\tau(G)$ to be the minimum size of a vertex set $T\subseteq V$ such that
+\[
+\forall \text{ maximal cliques }C\subseteq V,\quad T\cap C\neq\emptyset.
+\]
+Problem: estimate $\tau(G)$ in terms of $n$. In particular, ask whether for every $n$-vertex graph
+\[
+\tau(G) \le n - \omega(n)\sqrt n\quad \text{for some }\omega(n)\to\infty,
+\]
+or even
+\[
+\tau(G) \le n - c\sqrt{n\log n}\quad \text{for some absolute }c>0.
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+No web lookups performed. Using only what is stated in the problem file.
+The file reports (Erd\H{o}s--Gallai--Tuza) that
+\[
+\tau(G)\le n-\sqrt{2n}+O(1).
+\]
+It also records a heuristic connection: if $f(n)$ is the largest $k$ such that every triangle-free $n$-vertex graph has an independent set of size $k$, then one expects $\tau(G)\le n-f(n)$.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Relate $\tau(G)$ to vertex covers in triangle-free graphs (where maximal cliques are edges/isolated vertices).
+- Use independent sets to build clique transversals by taking complements.
+- Search for extremal graphs where $\tau(G)$ is large: these must have many maximal cliques that are hard to hit simultaneously.
+
+Disproof ideas for stronger bounds:
+- Try to construct graphs where $\tau(G)$ is close to $n$ but still below the known $n-\Theta(\sqrt n)$ bound.
+
+4) WORK
+
+(FAST REALITY CHECK)
+Basic examples:
+- Complete graph $K_n$: maximal clique is $V$, so $\tau(K_n)=1$.
+- Empty graph on $n$ vertices: every vertex is an isolated maximal clique of size $1$, so $\tau(G)=n$.
+- Triangle-free nonempty graphs sit between these extremes and are directly linked to vertex cover/independent set size (Lemma 610.2).
+
+Lemma 610.1 (independent set complement gives a clique transversal when there are no isolated vertices).
+Let $G$ be a graph with no isolated vertices, and let $\alpha(G)$ be its independence number.
+Then
+\[
+\tau(G)\le n-\alpha(G).
+\]
+
+Proof.
+Let $I\subseteq V$ be a maximum independent set, so $|I|=\alpha(G)$.
+Set $T:=V\setminus I$, so $|T|=n-\alpha(G)$.
+Let $C$ be any maximal clique of $G$.
+Since $G$ has no isolated vertices, every maximal clique has size at least $2$ (a size-1 clique would be an isolated vertex).
+But $I$ is independent, so it contains no clique of size $2$.
+Therefore $C$ cannot be contained in $I$, hence $C\cap T\neq\emptyset$.
+So $T$ hits every maximal clique, and $\tau(G)\le|T|=n-\alpha(G)$.
+\qed
+
+Lemma 610.2 (triangle-free case: exact formula via vertex cover).
+Let $G$ be triangle-free on $n$ vertices. Let $\mathrm{iso}(G)$ be the number of isolated vertices.
+Then
+\[
+\tau(G)=n-\alpha(G)+\mathrm{iso}(G).
+\]
+
+Proof.
+In a triangle-free graph, every clique has size at most $2$.
+Hence the maximal cliques are exactly:
+- all edges (each edge is a maximal clique because there is no triangle to extend it), and
+- all isolated vertices (each forms a maximal clique of size $1$).
+Thus a clique transversal $T$ is precisely a set of vertices that:
+(a) meets every edge (i.e. is a vertex cover), and
+(b) contains every isolated vertex.
+Let $\tau_{\mathrm{VC}}(G)$ denote the minimum vertex cover size.
+Then
+\[
+\tau(G)=\tau_{\mathrm{VC}}(G)+\mathrm{iso}(G).
+\]
+In any graph, a set $S\subseteq V$ is a vertex cover iff $V\setminus S$ is an independent set.
+Therefore $\tau_{\mathrm{VC}}(G)=n-\alpha(G)$.
+Substituting yields $\tau(G)=n-\alpha(G)+\mathrm{iso}(G)$.
+\qed
+
+(FAST REALITY CHECK via computation.)
+For $n=6,7,8$, I generated 200 random triangle-free graphs (by rejection sampling) and computed both sides; in all cases $\tau(G)=n-\alpha(G)+\mathrm{iso}(G)$ held exactly (as predicted by Lemma 610.2).
+
+5) VERIFICATION
+
+- Lemma 610.1: key point is that maximal cliques of size 1 are exactly isolated vertices, so excluding isolated vertices is necessary.
+- Lemma 610.2: verified the classification of maximal cliques in triangle-free graphs: any edge is maximal since no third vertex can join it to form a triangle; any isolated vertex forms a maximal clique.
+- Quantifier check: Lemma 610.2 gives an exact identity, not just an inequality.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result:
+An exact reduction for triangle-free graphs: $\tau(G)=n-\alpha(G)+\mathrm{iso}(G)$ (Lemma 610.2), and a general bound $\tau(G)\le n-\alpha(G)$ for graphs without isolated vertices (Lemma 610.1).
+
+(ii) First gap (crisp statement):
+Prove (or disprove) an improvement of the form
+\[
+\tau(G)\le n-c\sqrt{n\log n}
+\]
+for some absolute $c>0$ for all $n$-vertex graphs $G$ (or even the weaker $n-\omega(n)\sqrt n$ with $\omega(n)\to\infty$).
+
+(iii) Top 3 next moves:
+1. Reduce the problem to triangle-free graphs (as suggested in the statement) by proving a lemma that extremisers for $\tau(G)$ can be assumed to be triangle-free up to deleting $o(\sqrt n)$ vertices.
+2. Improve lower bounds on $\alpha(G)$ in triangle-free graphs (or prove they imply stronger bounds on $\tau(G)$ beyond the current $n-\Theta(\sqrt n)$ range).
+3. Computationally search for graphs on $n\le 12$ with unusually large $\tau(G)$ relative to $n$ and analyse their structure (distribution and overlap of maximal cliques).
+
+(iv) Minimal counterexample structure (if the stronger inequality is false):
+A counterexample to $\tau(G)\le n-c\sqrt{n\log n}$ would likely be a graph with no isolated vertices and with $\alpha(G)=O(\sqrt{n\log n})$ (so that Lemma 610.1 cannot beat $n-O(\sqrt{n\log n})$), and with many maximal cliques overlapping in a way that prevents a smaller transversal than $n-\Theta(\sqrt n)$.
+
+

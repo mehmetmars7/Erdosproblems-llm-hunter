@@ -1,0 +1,84 @@
+% Attempt for Erdos Problem #288
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $I=[a,b]\subset\mathbb{N}$ be a finite interval ($1\le a\le b$) and define its harmonic sum
+\[S(I)=\sum_{n=a}^{b}\frac1n.\]
+Question: Are there only finitely many pairs of intervals $(I_1,I_2)$ such that $S(I_1)+S(I_2)\in\mathbb{N}$?
+This is open even in the special case $I_2$ is a singleton interval.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The problem statement gives one example with integer value $1$ and says finiteness is open even when $|I_2|=1$.
+
+3) ATTACK PLAN
+Proof track:
+1. Use $p$-adic/prime denominator obstructions: large primes can appear in the common denominator with coefficient $1$ and block integrality.
+2. Reduce to bounding the possible maximum endpoints via such obstructions.
+3. In the singleton case, exploit that $S(I_1)+1/m\in\mathbb{Z}$ forces strong divisibility constraints on $m$ relative to the reduced denominator of $S(I_1)$.
+
+Disproof track:
+1. Search for infinite parametric families of interval pairs solving $S(I_1)+S(I_2)\in\mathbb{Z}$ by telescoping or controlled cancellation.
+
+Chosen path: derive clean necessary conditions and perform a brute-force search for small endpoints.
+
+4) WORK
+Lemma 1 (Large-prime obstruction).
+Let $I_1,I_2\subset\mathbb{N}$ be intervals and set
+\[T=S(I_1)+S(I_2).\]
+Let $p$ be a prime such that $p>2$ and $p$ appears in the sums with coefficient $c\in\{1,2\}$ (i.e. $1/p$ occurs once if $p$ lies in exactly one interval, twice if $p$ lies in both intervals).
+Assume moreover that $p$ is larger than half of the maximum endpoint among $I_1$ and $I_2$, so that no denominator in either interval is a multiple of $p$ other than $p$ itself.
+Then $T\notin\mathbb{Z}$.
+
+Proof.
+Let $M$ be the maximum endpoint of $I_1$ and $I_2$, and assume $p>M/2$.
+Let $L=\mathrm{lcm}(1,2,\dots,M)$ and write $T=A/L$ with
+\[A=\sum_{n\in I_1}\frac{L}{n}+\sum_{n\in I_2}\frac{L}{n}\in\mathbb{Z}.\]
+Since $p\le M$, we have $p\mid L$.
+Because $p>M/2$, the only integer in $\{1,\dots,M\}$ divisible by $p$ is $p$ itself; hence for every denominator $n\ne p$ occurring in $T$, we have $p\nmid n$ and therefore $L/n\equiv 0\pmod p$.
+The term(s) with $n=p$ contribute $c\cdot L/p$ to $A$ modulo $p$.
+But $p\nmid (L/p)$ (since $p$ occurs to the first power in $L$ when $p>M/2$), so
+\[A\equiv c\cdot\frac{L}{p}\not\equiv 0\pmod p\qquad(\text{because }p\nmid c\text{ for }c=1,2\text{ and }p>2).\]
+Thus $p\nmid A$ while $p\mid L$, so $A/L$ is not an integer. \qed
+
+Lemma 2 (Singleton second interval forces divisibility).
+Let $I=[a,b]$ and write $S(I)=A/B$ in lowest terms with $A,B\in\mathbb{Z}$, $\gcd(A,B)=1$.
+If for some $m\in\mathbb{N}$ the value $S(I)+\frac1m$ is an integer, then $m\mid B$.
+
+Proof.
+If $S(I)+1/m=t\in\mathbb{Z}$, then
+\[\frac1m=t-\frac{A}{B}=\frac{tB-A}{B}.\]
+Cross-multiplying gives $B=m(tB-A)$, hence $m\mid B$. \qed
+
+FAST REALITY CHECK (computation).
+I brute-forced all interval pairs with endpoints $\le 500$ and found exactly the following $7$ unordered pairs with integer sum:
+\[((2,2),(2,2))\to 1,\ ((2,3),(6,6))\to 1,\ ((3,6),(20,20))\to 1,\]
+\[((1,1),(1,1))\to 2,\ ((1,2),(2,2))\to 2,\ ((1,3),(6,6))\to 2,\ ((1,2),(1,2))\to 3.\]
+In particular the example $[3,6]$ and $[20,20]$ giving $1$ appears, and no other examples occur with endpoints $\le 500$.
+
+5) VERIFICATION
+- Lemma 1 is conditional: it does not guarantee existence of such a prime $p$ in the union of intervals, but it gives a strong obstruction whenever a large prime \emph{does} appear as a denominator.
+- Lemma 2 gives a clean restriction in the $|I_2|=1$ case but does not bound $B$ effectively in terms of $a,b$.
+- The computation is exhaustive only up to endpoint $500$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+If a prime $p>2$ larger than half the overall maximum endpoint appears in the denominators of $S(I_1)+S(I_2)$ with coefficient $1$ or $2$, then the sum cannot be an integer (Lemma 1). In the singleton case $S([a,b])+1/m\in\mathbb{Z}$ forces $m\mid \mathrm{den}(S([a,b]))$ (Lemma 2). Exhaustive search up to endpoint $500$ finds only $7$ solutions (listed above).
+
+(ii) First gap:
+Prove a global finiteness statement: show there are only finitely many pairs of intervals with $S(I_1)+S(I_2)\in\mathbb{Z}$, even when one interval is a singleton.
+
+(iii) Top 3 next moves:
+1. Strengthen Lemma 1 into a bound on the maximum endpoint $M$ by proving that some prime $p>M/2$ must occur in $I_1\cup I_2$ in any nontrivial solution (or show that avoiding all such primes forces very short/special intervals).
+2. For the singleton case, study the reduced denominator of $S([a,b])=H_b-H_{a-1}$ and show it has a large prime factor not dividing any plausible $m$.
+3. Extend computation further (endpoints $\gg 500$) with hashing on exact rational values to see if any new examples exist; if none appear for a long range, attempt to turn the observed obstructions into a proof.
+
+(iv) Minimal counterexample structure (if finiteness were false):
+An infinite family of interval pairs with growing maximum endpoint $M$ that nonetheless avoid the Lemma 1 obstruction by ensuring no prime $p>M/2$ lies in either interval, while still arranging delicate rational cancellation so that $S(I_1)+S(I_2)$ lands exactly in $\mathbb{Z}$.
+

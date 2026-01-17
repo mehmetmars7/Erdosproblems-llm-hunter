@@ -1,0 +1,141 @@
+% Erdos Problem #725
+
+1) FORMAL RESTATEMENT
+
+Fix integers $n\ge 1$ and $1\le k\le n$.
+A \emph{$k\times n$ Latin rectangle} is a $k\times n$ array with entries in $[n]=\{0,1,\dots,n-1\}$ such that:
+
+(a) Each row is a permutation of $[n]$.
+
+(b) Each column has all entries distinct (so no symbol repeats within a column).
+
+Let $R(k,n)$ denote the number of $k\times n$ Latin rectangles.
+
+Problem: Give an asymptotic formula for $R(k,n)$ as $n\to\infty$ (with $k$ potentially depending on $n$).
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records:
+
+- Erd\H{o}s--Kaplansky proved
+  \[R(k,n) \sim e^{-\binom{k}{2}}(n!)^k\]
+  when $k=o((\log n)^{3/2-\varepsilon})$.
+- Yamamoto extended this to $k\le n^{1/3-o(1)}$.
+
+I do not use any further literature.
+
+3) ATTACK PLAN
+
+Proof track ideas:
+- View a $k\times n$ Latin rectangle as $k$ permutations with a columnwise distinctness constraint; use inclusion--exclusion / Poisson approximation on pairwise collisions.
+
+Disproof track ideas:
+- For large $k$, try to show deviation from $e^{-\binom{k}{2}}(n!)^k$ by proving a structural obstruction or different exponential term.
+
+I will rigorously handle the case $k=2$ (exact count and asymptotic) and provide computational sanity checks for small $(k,n)$.
+
+4) WORK
+
+\textbf{FAST REALITY CHECK.}
+
+A brute-force enumeration over permutations confirms:
+
+- $R(2,3)=12$, $R(2,4)=216$, $R(2,5)=5280$, $R(2,6)=190800$.
+- $R(3,3)=12$, $R(3,4)=576$, $R(3,5)=66240$.
+
+These are consistent with the heuristic $R(k,n)\approx e^{-\binom{k}{2}}(n!)^k$ for small $k$.
+
+\medskip
+
+\textbf{Lemma 1 (exact formula for $2\times n$ Latin rectangles).}
+For all $n\ge 1$,
+\[
+R(2,n) = n!\,D_n,
+\]
+where $D_n$ is the number of derangements of $[n]$ (permutations with no fixed points).
+
+\emph{Proof.}
+A $2\times n$ Latin rectangle consists of two permutations $\sigma,\tau\in S_n$ written as rows.
+The column condition says that for each column index $j\in[n]$ we have $\sigma(j)\ne \tau(j)$.
+
+Fix the first row $\sigma$. Define the relative permutation $\pi := \sigma^{-1}\circ\tau$.
+Then for each $j$,
+\[
+\tau(j)=\sigma(\pi(j)).
+\]
+In particular, $\tau(j)=\sigma(j)$ if and only if $\pi(j)=j$.
+Thus the column condition $\tau(j)\ne\sigma(j)$ for all $j$ is equivalent to $\pi$ having no fixed points, i.e. $\pi$ is a derangement.
+
+For a fixed $\sigma$, the map $\tau\mapsto \sigma^{-1}\circ\tau$ is a bijection from $S_n$ to $S_n$, so the number of $\tau$ producing a Latin rectangle with first row $\sigma$ equals $D_n$.
+Since there are $n!$ choices of $\sigma$, we get $R(2,n)=n!\,D_n$.
+\qed
+
+\medskip
+
+\textbf{Lemma 2 (inclusion--exclusion for derangements and asymptotic).}
+For every $n\ge 1$,
+\[
+D_n = n!\sum_{i=0}^n \frac{(-1)^i}{i!}.
+\]
+Moreover,
+\[
+\left|D_n - \frac{n!}{e}\right| < \frac{1}{n+1}.
+\]
+In particular, $D_n\sim n!/e$ as $n\to\infty$.
+
+\emph{Proof.}
+Let $A_j$ be the set of permutations $\pi\in S_n$ with $\pi(j)=j$ (a fixed point at $j$).
+Then $D_n = |S_n\setminus\bigcup_{j=1}^n A_j|$.
+By inclusion--exclusion,
+\[
+D_n = \sum_{i=0}^n (-1)^i\sum_{1\le j_1<\cdots<j_i\le n} |A_{j_1}\cap\cdots\cap A_{j_i}|.
+\]
+If we force $i$ specified points to be fixed, the remaining $n-i$ points can be permuted arbitrarily, so
+$|A_{j_1}\cap\cdots\cap A_{j_i}|=(n-i)!$.
+There are $\binom{n}{i}$ ways to choose the fixed set, hence
+\[
+D_n = \sum_{i=0}^n (-1)^i\binom{n}{i}(n-i)! = \sum_{i=0}^n (-1)^i\frac{n!}{i!} = n!\sum_{i=0}^n \frac{(-1)^i}{i!}.
+\]
+
+For the error term, use the series $e^{-1}=\sum_{i=0}^{\infty}(-1)^i/i!$.
+The tail after $n$ terms is an alternating series with decreasing term magnitudes $1/(i!)$, so
+\[
+\left|\sum_{i=n+1}^{\infty} \frac{(-1)^i}{i!}\right| < \frac{1}{(n+1)!}.
+\]
+Multiplying by $n!$ gives
+\[
+\left|D_n - \frac{n!}{e}\right| < \frac{n!}{(n+1)!} = \frac{1}{n+1}.
+\]
+This implies $D_n\sim n!/e$.
+\qed
+
+\medskip
+
+\textbf{Corollary (asymptotic for $2\times n$).}
+From Lemmas 1--2,
+\[
+R(2,n)=n!\,D_n \sim \frac{(n!)^2}{e} = e^{-\binom{2}{2}}(n!)^2.
+\]
+
+5) VERIFICATION
+
+- Lemma 1 is an exact bijective reformulation of the column condition for $k=2$.
+- Lemma 2 is a standard inclusion--exclusion calculation; the numerical bound follows from the alternating-series remainder estimate.
+- The brute-force counts listed in the FAST REALITY CHECK match $R(2,n)=n!D_n$ exactly for $n\le 7$.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: The exact formula $R(2,n)=n!D_n$ and hence the asymptotic $R(2,n)\sim e^{-1}(n!)^2$ (Lemmas 1--2). Additionally, brute-force enumeration for small $k,n$ supports the general heuristic $R(k,n)\approx e^{-\binom{k}{2}}(n!)^k$.
+
+(ii) First gap (crisp): Prove an asymptotic formula for $R(k,n)$ for general $k=k(n)$ beyond the regimes already stated in the problem (e.g. for $k$ as large as a fixed power of $n$), or exhibit a different main term.
+
+(iii) Top 3 next moves:
+  1. Prove the analogue of Lemma 2 for fixed $k\ge 3$: show that the number of columnwise collisions among $k$ random permutations is asymptotically Poisson with mean $\binom{k}{2}$, giving $R(k,n)\sim e^{-\binom{k}{2}}(n!)^k$.
+  2. For growing $k$, develop sharp counting bounds for the number of perfect matchings in the step-by-step construction (each new row is a permutation avoiding $k-1$ forbidden symbols per column).
+  3. Compute $R(k,n)$ exactly for the largest feasible small parameters to test where the heuristic breaks.
+
+(iv) Minimal counterexample structure: A failure of the heuristic would likely occur for $k=k(n)$ large enough that dependencies between collision events are no longer negligible (e.g. $k$ comparable to a power of $n$); a minimal counterexample would be the smallest $(k,n)$ where $R(k,n)/(n!)^k$ deviates from $e^{-\binom{k}{2}}$ by a non-vanishing proportion.
+
+

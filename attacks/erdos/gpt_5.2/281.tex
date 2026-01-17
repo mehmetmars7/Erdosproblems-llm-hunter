@@ -1,0 +1,86 @@
+% Attempt for Erdos Problem #281
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), lightly used for a numeric check
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $n_1<n_2<\cdots$ be integers with $n_i\ge 2$.
+For a choice of residues $(a_i)_{i\ge 1}$ with $a_i\in\{0,\dots,n_i-1\}$, define for each $k\ge 1$ the uncovered set
+\[U_k(a)=\{m\in\mathbb{Z}: m\not\equiv a_i\!\!\!\pmod{n_i}\ \text{for all }1\le i\le k\}.\]
+This set is periodic modulo $L_k=\mathrm{lcm}(n_1,\dots,n_k)$, hence has a natural density $\mathbf{d}(U_k(a))$.
+Define also the infinite uncovered set $U_\infty(a)=\bigcap_{k\ge 1}U_k(a)$; the hypothesis assumes $\mathbf{d}(U_\infty(a))=0$ for every choice $a$.
+
+Question: Does $\mathbf{d}(U_\infty(a))=0$ for all residue choices $a$ imply the following uniform finite approximation property?
+For every $\epsilon>0$ there exists $k$ such that for every $a$, $\mathbf{d}(U_k(a))<\epsilon$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only record what the statement itself claims:
+the hypothesis implies $\sum 1/n_i=\infty$; and if the $n_i$ are pairwise coprime then $\sum 1/n_i=\infty$ is sufficient for the hypothesis. I prove the pairwise coprime claim and in that case the uniform conclusion holds with an explicit formula.
+
+3) ATTACK PLAN
+Proof track:
+1. Understand $U_k(a)$ as a subset of $\mathbb{Z}/L_k\mathbb{Z}$ and compute its density by counting residues.
+2. In the pairwise coprime case, use CRT to compute $\mathbf{d}(U_k(a))$ exactly and show uniformity.
+3. For general $(n_i)$, try compactness/Dini-type arguments on the space of residue choices; identify where density of $\bigcap_k U_k(a)$ fails to be continuous from above.
+
+Disproof track:
+1. Try to build $(n_i)$ where each individual residue choice eventually covers density $1$, but the rate depends strongly on the choice, preventing a uniform $k(\epsilon)$.
+
+Chosen path: complete solution in the pairwise coprime case; general case remains open.
+
+4) WORK
+Lemma 1 (Pairwise coprime density formula).
+Assume $\gcd(n_i,n_j)=1$ for all $i\ne j$. Then for every choice of residues $a$ and every $k\ge 1$,
+\[\mathbf{d}(U_k(a))=\prod_{i=1}^k\Bigl(1-\frac{1}{n_i}\Bigr).\]
+In particular, $\mathbf{d}(U_k(a))$ is independent of the residues $a_1,\dots,a_k$.
+
+Proof.
+Let $L_k=\prod_{i=1}^k n_i$ (pairwise coprime).
+By periodicity, $\mathbf{d}(U_k(a))$ equals the proportion of residues $x\bmod L_k$ that avoid all congruences $x\equiv a_i\pmod{n_i}$.
+For each fixed $i$, there are exactly $n_i-1$ residues modulo $n_i$ that avoid $a_i$.
+By CRT, choices modulo the $n_i$ combine independently, so the number of residues modulo $L_k$ that avoid all $k$ congruences is $\prod_{i=1}^k (n_i-1)$.
+Divide by $L_k=\prod_i n_i$ to get the stated product. \qed
+
+Lemma 2 (Uniformity in the pairwise coprime case).
+Under the same pairwise coprime assumption, if $\sum_{i\ge 1}\frac1{n_i}=\infty$ then for every $\epsilon>0$
+there exists $k$ such that for \emph{every} residue choice $a$,
+\[\mathbf{d}(U_k(a))<\epsilon.\]
+
+Proof.
+By Lemma 1, $\mathbf{d}(U_k(a))=\prod_{i=1}^k(1-1/n_i)$ for all $a$.
+Using $\log(1-x)\le -x$ for $x\in(0,1)$,
+\[\log\Bigl(\prod_{i=1}^k(1-\tfrac1{n_i})\Bigr)=\sum_{i=1}^k \log(1-\tfrac1{n_i})\le -\sum_{i=1}^k \frac1{n_i}.\]
+Since $\sum 1/n_i=\infty$, the right-hand side tends to $-\infty$, so the product tends to $0$.
+Thus choose $k$ with $\prod_{i=1}^k(1-1/n_i)<\epsilon$; this $k$ works uniformly in $a$. \qed
+
+FAST REALITY CHECK (computation).
+For $n_i$ equal to the first $10$ primes, the product in Lemma 1 equals:
+after $1$ prime: $1/2\approx 0.5$; after $2$ primes: $1/3\approx 0.333$; after $3$ primes: $4/15\approx 0.2667$;
+after $5$ primes: $16/77\approx 0.2078$; after $10$ primes: $442368/2800733\approx 0.1579$.
+This illustrates the decay (slowly) toward $0$ when $\sum 1/n_i$ diverges.
+
+5) VERIFICATION
+- Lemma 1 uses CRT; the key is that avoiding $a_i$ modulo each $n_i$ is counted independently when moduli are coprime.
+- Lemma 2’s inequality $\log(1-x)\le -x$ is standard and makes the divergence of $\sum 1/n_i$ force the product to $0$.
+- This does not address the general non-coprime case, where overlaps between congruences can be forced.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+If the $n_i$ are pairwise coprime and $\sum 1/n_i=\infty$, then the hypothesis holds and the desired uniform finite approximation holds (Lemmas 1–2), with an explicit formula for the uncovered density after $k$ congruences.
+
+(ii) First gap:
+Remove the pairwise coprime hypothesis: prove (or disprove) that “$\mathbf{d}(U_\infty(a))=0$ for all residue choices $a$” implies the uniform statement “$\sup_a \mathbf{d}(U_k(a))\to 0$”.
+
+(iii) Top 3 next moves:
+1. Formalize the space of residue choices $a\in\prod_i(\mathbb{Z}/n_i\mathbb{Z})$ and study continuity/compactness arguments for $a\mapsto \mathbf{d}(U_k(a))$ and the limit $k\to\infty$.
+2. Search for a counterexample sequence $(n_i)$ with many shared prime factors, where one can choose early residues to make $U_k(a)$ large for arbitrarily large $k$ while still forcing $\mathbf{d}(U_\infty(a))=0$ for each fixed $a$.
+3. Attempt to prove a general inequality bounding $\sup_a \mathbf{d}(U_k(a))$ in terms of $\sum_{i>k}1/n_i$ (or a refined “independence” measure).
+
+(iv) Minimal counterexample structure (if the implication were false):
+A sequence $(n_i)$ with heavy multiplicative overlap (many shared primes) so that for each fixed residue choice $a$ the infinite family eventually covers density $1$, but for every $k$ one can choose residues on the first $k$ moduli to leave uncovered density bounded below by some $\epsilon_0>0$.
+

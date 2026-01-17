@@ -1,0 +1,118 @@
+% ============================================================
+% erdos_solutions.tex  (DROP-IN CONTENT)
+% Generated following PROMPT_STRATEGY.MD
+% Tools/Constraints: Web browsing YES, Computation YES
+% ============================================================
+
+% ------------------------------------------------------------
+% Erdos problem 183
+% ------------------------------------------------------------
+\section*{Erd\H{o}s problem 183}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $R(3;k)$ denote the smallest integer $n$ such that every $k$-edge-colouring of the complete
+graph $K_n$ contains a monochromatic triangle $K_3$.
+The problem asks to determine (or decide finiteness of)
+\[
+\lim_{k\to\infty} R(3;k)^{1/k}.
+\]
+Equivalently: does there exist an absolute constant $C$ with $R(3;k)\le C^k$ for all large $k$?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+I do not claim results beyond what is stated in the problem text. The statement records:
+(i) a pigeonhole recursion $R(3;k)\le 2+k(R(3;k-1)-1)$ implying $R(3;k)\le \lceil e\,k!\rceil$,
+(ii) exponential lower bounds via Schur numbers and later improvements.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof track.} Prove the recursion and solve it explicitly to get the factorial upper bound.
+\textbf{Disproof/construction track.} Give an explicit $k$-colouring of $K_{2^k}$ with no monochromatic
+triangle, yielding an exponential lower bound.
+
+\subsection*{4) WORK}
+
+\paragraph{Lemma 4.1 (Pigeonhole recursion).}
+For all integers $k\ge 2$,
+\[
+R(3;k)\le 2+k\bigl(R(3;k-1)-1\bigr).
+\]
+\textit{Proof.}
+Let $n=2+k(R(3;k-1)-1)$ and colour $E(K_n)$ with $k$ colours.
+Fix a vertex $v$. Among the $n-1$ edges incident to $v$, some colour (call it colour $1$) appears on at least
+\[
+\left\lceil \frac{n-1}{k}\right\rceil
+=\left\lceil \frac{1+k(R(3;k-1)-1)}{k}\right\rceil
+=\left\lceil (R(3;k-1)-1)+\frac1k\right\rceil
+=R(3;k-1)
+\]
+edges. Let $U$ be the set of neighbours joined to $v$ in colour $1$, so $|U|\ge R(3;k-1)$.
+
+If there is an edge of colour $1$ inside $U$, say $xy$, then $vxy$ is a monochromatic triangle of colour $1$.
+Otherwise, \emph{no} edge inside $U$ has colour $1$, so the complete graph on $U$ is coloured using only the remaining
+$k-1$ colours. By the definition of $R(3;k-1)$, $K_U$ then contains a monochromatic triangle in one of those $k-1$ colours.
+Either way, a monochromatic triangle exists in $K_n$. Hence $R(3;k)\le n$. \hfill$\square$
+
+\paragraph{Lemma 4.2 (Explicit solution of the recursion).}
+Define $b_k$ by $b_1=2$ and $b_k=k\,b_{k-1}+1$ for $k\ge 2$. Then
+\[
+b_k=\sum_{i=0}^k \frac{k!}{i!}.
+\]
+In particular,
+\[
+R(3;k)\le b_k+1 \le \lceil e\,k!\rceil.
+\]
+\textit{Proof.}
+Divide the recurrence by $k!$:
+\[
+\frac{b_k}{k!}=\frac{b_{k-1}}{(k-1)!}+\frac{1}{k!}.
+\]
+Iterating from $1$ to $k$ gives
+\[
+\frac{b_k}{k!}=\frac{b_1}{1!}+\sum_{j=2}^k \frac{1}{j!}=2+\sum_{j=2}^k \frac{1}{j!}=\sum_{i=0}^k\frac1{i!}.
+\]
+Multiplying by $k!$ gives $b_k=\sum_{i=0}^k k!/i!$.
+
+Now $e=\sum_{i=0}^\infty 1/i!$, so
+\[
+e\,k!=\sum_{i=0}^k\frac{k!}{i!}+\sum_{i=k+1}^\infty \frac{k!}{i!}=b_k+\text{(tail)}.
+\]
+For $i\ge k+1$, $\frac{k!}{i!}=\frac{1}{(k+1)(k+2)\cdots i}$, hence the tail is $<\sum_{t\ge 1}(k+1)^{-t}=1/k<1$.
+Therefore $b_k=\lfloor e\,k!\rfloor$, so $b_k+1\le \lceil e\,k!\rceil$ and by Lemma 4.1,
+$R(3;k)\le b_k+1$. \hfill$\square$
+
+\paragraph{Lemma 4.3 (Binary-string lower bound).}
+For every $k\ge 1$,
+\[
+R(3;k)\ge 2^k+1.
+\]
+\textit{Proof.}
+Let $V=\{0,1\}^k$ with $|V|=2^k$. For distinct $u,v\in V$, let $c(u,v)$ be the first coordinate $i\in\{1,\dots,k\}$
+where $u_i\ne v_i$. This defines a $k$-edge-colouring of $K_{2^k}$.
+
+Fix a colour $i$. Consider any triangle $u,v,w$. If $c(u,v)=i$, then $u$ and $v$ agree on coordinates $1,\dots,i-1$
+and differ at $i$. For $c(v,w)$ also to be $i$, $v$ and $w$ must agree on $1,\dots,i-1$ and differ at $i$ as well, so
+$u_i=w_i$; thus $u$ and $w$ \emph{do not} differ at coordinate $i$, and hence $c(u,w)\ne i$. Therefore no triangle is monochromatic.
+So $K_{2^k}$ admits a $k$-colouring with no monochromatic triangle, implying $R(3;k)>2^k$. \hfill$\square$
+
+\subsection*{5) VERIFICATION}
+Recursion check: the key step is that if the neighbour-set $U$ has no internal colour-$1$ edges, its induced colouring uses only
+$k-1$ colours, so the definition of $R(3;k-1)$ applies.
+Binary construction check: for fixed $i$, each colour-$i$ class is a disjoint union of complete bipartite graphs (hence triangle-free).
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial results here.}
+We proved $2^k+1\le R(3;k)\le \lceil e\,k!\rceil$.
+
+(ii) \textbf{First gap.}
+Show an absolute $C$ with $R(3;k)\le C^k$ for all large $k$ (or else prove $\lim R(3;k)^{1/k}=\infty$).
+
+(iii) \textbf{Top 3 next moves.}
+1. Prove a structural theorem: any partition of $E(K_n)$ into $k$ triangle-free graphs forces $n\le C^k$.
+2. Improve lower bounds by explicit high-$k$ triangle-free edge partitions (algebraic constructions).
+3. Computational search for improved small-$k$ behaviour might suggest a correct growth model.
+
+(iv) \textbf{Minimal counterexample structure (to finiteness).}
+A family with $R(3;k)\ge \exp(\omega(k))$ (e.g. $\asymp k!$) would force $R(3;k)^{1/k}\to\infty$; one would expect
+near-extremal colour classes to resemble balanced blow-ups of sparse triangle-free graphs.
+

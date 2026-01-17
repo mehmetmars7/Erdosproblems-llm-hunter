@@ -1,0 +1,119 @@
+% Erdos Problem #609
+% Solutions/partial progress file (auto-generated)
+
+1) FORMAL RESTATEMENT
+
+For $n\in\mathbb N$, let $f(n)$ be the least integer $m$ such that for every edge-colouring
+\[
+\chi:E(K_{2^n+1})\to\{1,2,\dots,n\}
+\]
+there exists a monochromatic odd cycle in $K_{2^n+1}$ of length at most $m$.
+Equivalently, for each colouring $\chi$ define $h(\chi)$ to be the minimum length of a monochromatic odd cycle (or $+\infty$ if none exists). Then
+\[
+f(n)=\max_{\chi} h(\chi).
+\]
+Problem: estimate the growth of $f(n)$ as $n\to\infty$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+No web lookups performed. Using only what is stated in the problem file.
+- The file states: the edges of $K_{2^n}$ can be $n$-coloured to avoid odd cycles of any length.
+- It is stated that for large $n$ one can avoid monochromatic $C_5$ and $C_7$.
+- It is stated (with references) that $f(n)\to\infty$ (Day--Johnson) and that known quantitative bounds include
+  $f(n)\ge 2^{c\sqrt{\log n}}$ and an upper bound $f(n)\ll n^{3/2}2^{n/2}$.
+I do not reproduce those literature proofs here.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Prove explicit colourings of $K_{2^n}$ that are odd-cycle-free in each colour class (this gives a sharp obstruction showing why $2^n+1$ vertices matter).
+- For small $n$, compute $f(n)$ exactly by brute force.
+
+Disproof/construction ideas for larger lower bounds:
+- Start from the known odd-cycle-free $n$-colouring of $K_{2^n}$ and add one extra vertex; try to colour its incident edges so that each colour class remains high odd-girth (this is how one might push $f(n)$ upwards).
+
+4) WORK
+
+Lemma 609.1 (explicit $n$-colouring of $K_{2^n}$ with no monochromatic odd cycle).
+Label the vertices of $K_{2^n}$ by binary vectors $v\in\{0,1\}^n$.
+For distinct vertices $u\neq v$, let $i=i(u,v)$ be the least index in $\{1,\dots,n\}$ for which $u_i\neq v_i$, and colour the edge $uv$ with colour $i$.
+Then for each colour $i$, the colour-$i$ subgraph is bipartite. In particular, it contains no odd cycle.
+
+Proof.
+Fix $i\in\{1,\dots,n\}$.
+Consider all binary vectors grouped by their prefix of length $i-1$:
+for each prefix $p\in\{0,1\}^{i-1}$, let
+\[
+V_p := \{ v\in\{0,1\}^n : (v_1,\dots,v_{i-1})=p\}.
+\]
+If an edge $uv$ has colour $i$, then by definition $u$ and $v$ agree in coordinates $1,\dots,i-1$ and differ in coordinate $i$.
+Thus, within each block $V_p$, the colour-$i$ edges are exactly those between the two parts
+\[
+V_{p,0}:=\{v\in V_p: v_i=0\},\qquad V_{p,1}:=\{v\in V_p: v_i=1\}.
+\]
+There are no colour-$i$ edges inside $V_{p,0}$ or inside $V_{p,1}$.
+Hence the colour-$i$ subgraph is a disjoint union (over prefixes $p$) of complete bipartite graphs between $V_{p,0}$ and $V_{p,1}$.
+Therefore the colour-$i$ subgraph is bipartite, so it contains no odd cycle.
+\qed
+
+Lemma 609.2 (exact small values: $f(1)=3$ and $f(2)=5$).
+We have $f(1)=3$ and $f(2)=5$.
+
+Proof.
+Case $n=1$.
+We colour the edges of $K_{2^1+1}=K_3$ with one colour. The unique cycle is a triangle of length $3$, so every colouring has a monochromatic odd cycle of length $3$ and $f(1)=3$.
+
+Case $n=2$.
+Here $K_{2^2+1}=K_5$ with edges coloured red/blue.
+First, show $f(2)\le 5$.
+Assume for contradiction that there is a 2-colouring with no monochromatic odd cycle.
+Then both the red and blue graphs are bipartite.
+Let $(X,\bar X)$ be a bipartition of the red graph.
+All edges within $X$ and within $\bar X$ are therefore blue.
+Since $|X|+|\bar X|=5$, one of $X,\bar X$ has size at least $3$, so the blue graph contains a triangle, a monochromatic odd cycle.
+Contradiction.
+Thus every 2-colouring of $K_5$ has a monochromatic odd cycle; since the largest possible odd cycle in $K_5$ has length $5$, we get $f(2)\le 5$.
+
+Second, show $f(2)\ge 5$ by an explicit colouring with no monochromatic triangle.
+Take a 5-cycle $C_5$ on vertices $0,1,2,3,4$ and colour its edges red; colour all remaining edges blue.
+The complement of a 5-cycle in $K_5$ is again a 5-cycle, so the blue edges also form a $C_5$.
+Therefore neither colour contains a triangle, but each colour contains an odd cycle of length $5$.
+So for this colouring, the shortest monochromatic odd cycle has length $5$, giving $f(2)\ge 5$.
+Combining yields $f(2)=5$.
+\qed
+
+(FAST REALITY CHECK via brute force for $n=2$.)
+I exhaustively checked all $2^{10}=1024$ red/blue colourings of $K_5$.
+For each colouring I computed the minimum monochromatic odd-cycle length.
+Exact distribution:
+- $1012$ colourings have minimum monochromatic odd-cycle length $3$.
+- $12$ colourings have minimum monochromatic odd-cycle length $5$.
+Thus $\max h(\chi)=5$, confirming $f(2)=5$.
+One example extremiser (edges in each colour):
+Red: $(0,3),(0,4),(1,2),(1,4),(2,3)$; Blue is the complementary 5 edges.
+
+5) VERIFICATION
+
+- Lemma 609.1: checked that in colour $i$ there are no edges between vertices with different $(i-1)$-prefix, and within a fixed prefix all edges go between $v_i=0$ and $v_i=1$, so bipartite.
+- Lemma 609.2: the bipartite argument uses only that $K_5$ has 5 vertices, so one bipartition side has size $\ge 3$, giving a blue triangle.
+- Brute force: the search space size $2^{10}=1024$ is small enough to be exhaustive; the reported counts are exact.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result:
+An explicit $n$-colouring of $K_{2^n}$ in which each colour class is bipartite (hence contains no odd cycle) (Lemma 609.1), and exact values $f(1)=3$, $f(2)=5$ (Lemma 609.2, also verified by exhaustive computation).
+
+(ii) First gap (crisp statement):
+Determine the correct order of growth of $f(n)$ as $n\to\infty$ (even deciding whether $f(n)$ is polynomial, exponential in a power of $n$, etc.).
+
+(iii) Top 3 next moves:
+1. Compute $f(3)$ (or at least lower/upper bounds) by formulating the avoidance of monochromatic odd cycles up to length $L$ as a SAT/ILP instance and searching.
+2. Try to extend the construction in Lemma 609.1 to $K_{2^n+1}$ while controlling odd girth in each colour class (e.g. by a careful rule for colouring edges incident to the extra vertex).
+3. Prove structural lemmas for an $n$-edge-coloured $K_{2^n+1}$: show that some colour class must have a dense subgraph in which bipartiteness is impossible without creating a short odd cycle.
+
+(iv) Minimal counterexample structure (for large lower bounds):
+A colouring witnessing large $f(n)$ would have every colour class \emph{nearly bipartite} with very large odd girth (no short odd cycles), and would likely resemble a recursive/entropy-style partition of the vertex set refining the bipartitions simultaneously across colours.
+
+

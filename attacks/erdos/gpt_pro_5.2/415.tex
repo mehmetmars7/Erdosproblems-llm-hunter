@@ -1,0 +1,112 @@
+% Erdos Problem #415
+
+\subsection*{FORMAL RESTATEMENT}
+Let $\varphi$ be Euler's totient function.
+For integers $m\ge0$ and $k\ge1$, consider the length-$k$ block
+$$(\varphi(m+1),\varphi(m+2),\dots,\varphi(m+k)).$$
+An \emph{ordering pattern} of length $k$ means a permutation $\pi\in S_k$ giving the relative order of these $k$ numbers by size.
+Because the definition in the problem file says ``the $k!$ possible ordering patterns'', the natural strict interpretation is:
+\begin{quote}
+we only count a block if the $k$ totients are pairwise distinct, and then the pattern is the unique permutation that sorts them increasingly.
+\end{quote}
+Define $F(n)$ as the largest $k$ such that \emph{every} permutation in $S_k$ occurs as the strict ordering pattern of some block with $m+k\le n$.
+
+Questions asked in the problem file:
+\begin{enumerate}
+  \item Is $F(n)=(c+o(1))\log\log\log n$ for some constant $c$?
+  \item Is the first pattern which fails to appear always the monotone decreasing pattern
+  $$\varphi(m+1)>\varphi(m+2)>\cdots>\varphi(m+k)?$$
+  \item If one allows equality in patterns, is the ``natural'' ordering mimicking $\varphi(1),\dots,\varphi(k)$ the most likely to appear?
+\end{enumerate}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file states that Erd\H{o}s (1936) proved $F(n)\asymp\log\log\log n$ (and similarly for other ``decent'' functions), but it asks for the constant and finer pattern questions.
+Per the integrity rule, I do not use any results beyond what is explicitly stated there; in particular, I do not assert the asymptotic with proof here.
+
+\subsection*{ATTACK PLAN}
+We can at least:
+\begin{itemize}
+  \item Clarify the ambiguity about ties (strict vs weak patterns).
+  \item Prove small-k lower bounds by explicit examples (fully verified).
+  \item Compute $F(n)$ for moderate $n$ and identify which length-4 patterns are missing up to large $n$ as a sanity check.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 415.1 ($\varphi(n)$ is even for $n>2$).}
+For every integer $n>2$, $\varphi(n)$ is even.
+
+\textit{Proof.}
+For $n>2$, the reduced residue classes modulo $n$ come in pairs $\{a,n-a\}$.
+If $\gcd(a,n)=1$, then $\gcd(n-a,n)=1$ as well.
+Also $a\not\equiv n-a\pmod n$ unless $2a\equiv0\pmod n$, which would force $a=n/2$ and then $\gcd(a,n)\ne1$.
+Hence the reduced residues pair off into 2-element sets, so their number $\varphi(n)$ is even.
+\hfill$\square$
+
+\textbf{Lemma 415.2 (All $2!$ and $3!$ strict patterns occur by explicit examples).}
+We have:
+\begin{itemize}
+  \item For $k=2$, both patterns occur with $m+k\le 6$.
+  \item For $k=3$, all $6$ patterns occur with $m+k\le 315$.
+\end{itemize}
+In particular, $F(6)\ge2$ and $F(315)\ge3$.
+
+\textit{Proof.}
+For $k=2$:
+\begin{itemize}
+  \item Increasing pattern: $m=1$ gives $(\varphi(2),\varphi(3))=(1,2)$.
+  \item Decreasing pattern: $m=4$ gives $(\varphi(5),\varphi(6))=(4,2)$.
+\end{itemize}
+So both strict patterns appear with $m+2\le6$.
+
+For $k=3$, the six permutations of indices $\{0,1,2\}$ are realized by the following explicit blocks (each line lists $m$ and then the three totients):
+\begin{center}
+\begin{tabular}{r|c|c}
+pattern & $(m+1,m+2,m+3)$ & $(\varphi(m+1),\varphi(m+2),\varphi(m+3))$ \\
+\hline
+$(0,1,2)$ & $(105,106,107)$ & $(48,52,106)$ \\
+$(0,2,1)$ & $(6,7,8)$ & $(2,6,4)$ \\
+$(1,0,2)$ & $(5,6,7)$ & $(4,2,6)$ \\
+$(1,2,0)$ & $(13,14,15)$ & $(12,6,8)$ \\
+$(2,0,1)$ & $(16,17,18)$ & $(8,16,6)$ \\
+$(2,1,0)$ & $(313,314,315)$ & $(312,156,144)$ \\
+\end{tabular}
+\end{center}
+Each line is checked by direct totient computation and the displayed inequalities are strict (all entries are distinct).
+The largest endpoint shown is $315$, so all $3!$ strict patterns appear with $m+3\le315$.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (exact computations).}
+Using a totient sieve, I computed $F(n)$ under the strict-pattern convention for several $n$:
+\begin{itemize}
+  \item $F(100)=2$, $F(300)=2$.
+  \item $F(1000)=3$, and $F(n)=3$ for each of $n=3000,10000,30000,100000$.
+  \item For $n=10^6$ and even $n=5\cdot 10^6$, not all $24$ strict patterns of length $4$ appear; exactly $18$ of the $24$ patterns were observed up to those bounds.
+  The $6$ missing length-$4$ patterns (as permutations of indices $0,1,2,3$ sorted increasingly by totient) were:
+  $$
+  (0,1,3,2),(0,3,1,2),(1,0,3,2),(2,3,0,1),(3,0,2,1),(3,2,0,1).
+  $$
+\end{itemize}
+These finite computations are consistent with very slow growth of $F(n)$, but do not address the asymptotic constant or the eventual appearance of all length-$4$ patterns.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+  \item \emph{Ambiguity about equality.} The strict-pattern definition is the only one matching ``$k!$ patterns'' literally. Allowing equality would change the counting problem (weak order types). The problem file itself notes that the final ``most likely'' question only makes sense if equality is allowed.
+  \item Lemma 415.2 was verified by explicit totient values; each block has distinct entries, so the pattern is well-defined.
+  \item The computations for $F(n)$ were done by scanning all blocks of length $k\le6$ (with distinctness required) and checking which permutations appear.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: under the strict-pattern interpretation, $F(6)\ge2$ and $F(315)\ge3$ via explicit verified blocks (Lemma 415.2). Computation shows $F(n)=3$ for all tested $n$ up to $5\cdot 10^6$, and only $18$ of $24$ strict length-$4$ patterns appear up to that range.
+
+(ii) First gap: prove any nontrivial asymptotic information beyond what is stated in the problem file, e.g. determine whether $F(n)$ eventually reaches $4$ (i.e. all $24$ patterns appear) and, more generally, establish $F(n)=(c+o(1))\log\log\log n$ with an explicit constant $c$.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+  \item For $k=4$, target the first missing pattern (e.g. $(0,1,3,2)$) and attempt a constructive Chinese-remainder-type construction of an $m$ forcing $\varphi(m+i)$ into that order.
+  \item Systematically search for length-$4$ patterns using heuristics based on forced small prime divisors of $m+i$ to control $\varphi(m+i)/(m+i)$.
+  \item Clarify and formalize the ``patterns with equality'' variant and compute the analogous $F_{\le}(n)$ for small $n$ to see which weak order types appear first.
+\end{enumerate}
+
+(iv) Minimal counterexample structure: for the strict version, the first failure at length $k$ would be a specific permutation $\pi\in S_k$ such that no block $(\varphi(m+1),...,\varphi(m+k))$ with $m+k\le n$ and distinct entries realizes $\pi$; for the ``equality allowed'' version, a minimal missing weak order type would similarly be absent.

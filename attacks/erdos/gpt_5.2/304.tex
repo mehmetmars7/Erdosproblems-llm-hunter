@@ -1,0 +1,92 @@
+% Attempt for Erdos Problem #304
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For integers $1\le a<b$, define $N(a,b)$ to be the minimal $k$ such that there exist integers
+\[1<n_1<\cdots<n_k\]
+with
+\[\frac{a}{b}=\sum_{i=1}^k \frac1{n_i}.\tag{$\ast$}\]
+Define the “worst case” for denominator $b$ as
+\[N(b)=\max_{1\le a<b} N(a,b).\]
+Question: estimate $N(b)$, and in particular is $N(b)\ll \log\log b$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The problem statement lists claimed bounds due to Erd\H{o}s and Vose and mentions connections to other problems and formalisation in Lean; I do not verify those results here.
+
+3) ATTACK PLAN
+Proof track:
+1. Prove a universal constructive upper bound for $N(a,b)$ via the classical greedy Egyptian fraction algorithm.
+2. Prove basic necessary conditions on any solution (e.g. prime divisors of $b$ must appear in some $n_i$).
+3. Compute exact values of $N(b)$ for small $b$ as a sanity check.
+
+Disproof track:
+1. Attempt to find families of $b$ with unusually large $N(b)$ by forcing many distinct prime constraints.
+
+Chosen path: establish elementary bounds + small-$b$ computation.
+
+4) WORK
+Lemma 1 (Greedy algorithm terminates; length $\le a$).
+Let $a/b\in(0,1)\cap\mathbb{Q}$ with $\gcd(a,b)=1$.
+Define $a_0=a,b_0=b$ and for $j\ge 0$:
+let $n_{j+1}=\left\lceil \frac{b_j}{a_j}\right\rceil$ and set
+\[\frac{a_{j+1}}{b_{j+1}}=\frac{a_j}{b_j}-\frac1{n_{j+1}}.\]
+Then $a_j$ strictly decreases until it reaches $0$, so the process stops in at most $a$ steps and yields an Egyptian fraction decomposition
+\[\frac{a}{b}=\frac1{n_1}+\cdots+\frac1{n_k}\]
+with $k\le a$ and $2\le n_1<\cdots<n_k$.
+
+Proof.
+By definition, $n_{j+1}-1< b_j/a_j\le n_{j+1}$, so
+\[0\le \frac{a_j}{b_j}-\frac1{n_{j+1}}< \frac{a_j}{b_j}-\frac1{b_j/a_j+1}=\frac{a_j^2}{b_j(a_j+b_j)}<\frac{a_j}{b_j}.\]
+Thus the remainder is a positive rational smaller than $a_j/b_j$ unless it is $0$.
+Compute the next numerator explicitly:
+\[\frac{a_{j+1}}{b_{j+1}}=\frac{a_j}{b_j}-\frac1{n_{j+1}}=\frac{a_j n_{j+1}-b_j}{b_j n_{j+1}}.\]
+Since $n_{j+1}=\lceil b_j/a_j\rceil$, we have $0\le a_j n_{j+1}-b_j< a_j$, so $0\le a_{j+1}<a_j$.
+Therefore the numerator decreases by at least $1$ each step until it hits $0$, so after at most $a$ steps the process terminates.
+Standard properties of the greedy algorithm give $n_{j+1}\ge b_j/a_j> b_{j-1}/a_{j-1}\ge n_j$, and in fact strict increase holds as long as the remainder is nonzero.
+\qed
+
+Corollary 2 (A trivial universal bound).
+For all $1\le a<b$, $N(a,b)\le a$ and hence $N(b)\le b-1$.
+
+Lemma 3 (Prime divisor obstruction).
+Let $a/b$ be in lowest terms and suppose $(\ast)$ holds with integers $1<n_1<\cdots<n_k$.
+If $p$ is a prime dividing $b$, then $p$ divides at least one of the denominators $n_i$.
+
+Proof.
+Assume for contradiction that $p\nmid n_i$ for all $i$.
+Let $L=\mathrm{lcm}(n_1,\dots,n_k)$. Then $p\nmid L$.
+The sum in $(\ast)$ equals an integer divided by $L$, hence in lowest terms has denominator not divisible by $p$.
+But $a/b$ in lowest terms has denominator divisible by $p$, contradiction. \qed
+
+FAST REALITY CHECK (computation).
+Using a bounded exhaustive search for $b\le 12$, I found:
+\[N(2)=1,\ N(3)=2,\ N(4)=2,\ N(5)=3,\ N(6)=2,\ N(7)=3,\ N(8)=3,\ N(9)=3,\ N(10)=3,\ N(11)=4,\ N(12)=3.\]
+For example, the worst cases for $b=11$ are $a\in\{8,9,10\}$, each requiring $4$ terms in the search range.
+
+5) VERIFICATION
+- Lemma 1 is a fully explicit constructive algorithm; the key inequality is $0\le a_j n_{j+1}-b_j<a_j$.
+- Lemma 3 is a clean denominator-divisibility obstruction and uses only “if $p\nmid L$ then rationals with denominator dividing $L$ cannot reduce to denominator divisible by $p$”.
+- The computation uses a cutoff on denominators; for $b\le 12$ it found decompositions within the cutoff, consistent with Lemma 1’s guarantee of existence.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Every $a/b$ has an Egyptian fraction decomposition with strictly increasing denominators of length $\le a$ (Lemma 1), giving $N(b)\le b-1$; and any solution must include denominators divisible by each prime dividing $b$ (Lemma 3). Exact values for $b\le 12$ are listed in the reality check.
+
+(ii) First gap:
+Prove (or disprove) the conjectured upper bound $N(b)\ll \log\log b$ for the worst-case denominator $b$.
+
+(iii) Top 3 next moves:
+1. Improve the greedy-algorithm bound by proving that for “most” steps the numerator drops by more than $1$, yielding sublinear (in $b$) worst-case length.
+2. Use Lemma 3 plus additional structure (e.g. squarefree kernel of denominators) to force many distinct primes in the $n_i$ and relate that to the term count.
+3. Compute $N(b)$ for larger $b$ with guaranteed completeness (using a provable denominator cutoff) to test whether $N(b)$ behaves like $\log\log b$ in practice.
+
+(iv) Minimal counterexample structure (if $N(b)\ll\log\log b$ were false):
+A sequence of denominators $b_j\to\infty$ and numerators $a_j$ such that every Egyptian fraction decomposition of $a_j/b_j$ with distinct denominators requires $\gg \log\log b_j$ terms, likely driven by forcing many independent prime/divisibility constraints across the denominators.
+

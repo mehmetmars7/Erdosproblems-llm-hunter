@@ -1,0 +1,84 @@
+% Attempt for Erdos Problem #295
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For $N\ge 1$, define $k(N)$ to be the smallest integer $k$ such that there exist integers
+\[N\le n_1<n_2<\cdots<n_k\]
+with
+\[1=\sum_{i=1}^k \frac1{n_i}.\]
+Question: Is it true that
+\[\lim_{N\to\infty}\bigl(k(N)-(e-1)N\bigr)=+\infty?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement claims known bounds $-c<k(N)-(e-1)N\ll N/\log N$ for some absolute $c>0$.
+I do not verify those bounds here; I provide elementary lower bounds and numerical checks for the harmonic-sum heuristic.
+
+3) ATTACK PLAN
+Proof track:
+1. Lower bound: among all $k$-tuples with $n_i\ge N$, the sum $\sum 1/n_i$ is maximized by the consecutive choice $N,N+1,\dots,N+k-1$; use this to bound $k(N)$ below by a harmonic threshold $k_0(N)$.
+2. Approximate that threshold via integrals to explain the $(e-1)N$ heuristic.
+3. For the conjectured divergence, identify why exact representability might force $k(N)$ above the harmonic threshold by an amount growing with $N$.
+
+Disproof track:
+1. Try to build explicit constructions with $k(N)=(e-1)N+O(1)$ for infinitely many $N$; that would contradict the conjectured limit $+\infty$.
+
+Chosen path: prove the harmonic-threshold lower bound and quantify it; constructing near-optimal exact decompositions is the hard part.
+
+4) WORK
+Lemma 1 (Harmonic-threshold lower bound).
+Let
+\[k_0(N)=\min\Bigl\{k\ge 1:\ \sum_{j=0}^{k-1}\frac{1}{N+j}\ge 1\Bigr\}.\]
+Then $k(N)\ge k_0(N)$ for every $N\ge 1$.
+
+Proof.
+Fix $N$ and $k$. Among all choices of distinct integers $N\le n_1<\cdots<n_k$, the sum $\sum_{i=1}^k 1/n_i$
+is maximized when the denominators are as small as possible, i.e. $n_i=N+i-1$.
+Therefore, if $\sum_{j=0}^{k-1}1/(N+j)<1$, then every $k$-term sum with denominators $\ge N$ is $<1$, so no exact equality is possible.
+Hence the minimal $k(N)$ must satisfy $\sum_{j=0}^{k(N)-1}1/(N+j)\ge 1$, i.e. $k(N)\ge k_0(N)$. \qed
+
+Lemma 2 (Integral approximation for $k_0(N)$).
+For $N\ge 2$ and $k\ge 1$,
+\[\log\Bigl(1+\frac{k}{N}\Bigr)\le \sum_{j=0}^{k-1}\frac{1}{N+j}\le \log\Bigl(\frac{N+k-1}{N-1}\Bigr).\]
+In particular, $k_0(N)=(e-1)N+O(1)$.
+
+Proof.
+The function $x\mapsto 1/x$ is decreasing. Hence
+\[\int_{N}^{N+k}\frac{dx}{x}\le \sum_{j=0}^{k-1}\frac{1}{N+j}\le \int_{N-1}^{N+k-1}\frac{dx}{x}\quad(N\ge 2).\]
+Evaluate the integrals to get the stated logarithms.
+The left inequality shows that if $\sum_{j=0}^{k-1}1/(N+j)\ge 1$ then $\log(1+k/N)\ge 1$, hence $k\ge (e-1)N$.
+Conversely, taking $k=\lceil (e-1)N\rceil +C$ with fixed $C$ and using the right inequality shows the harmonic sum exceeds $1$ for all sufficiently large $N$.
+Thus $k_0(N)=(e-1)N+O(1)$. \qed
+
+FAST REALITY CHECK (computation).
+Computed $k_0(N)$ and $k_0(N)-(e-1)N$:
+\[N=10:\ k_0=17,\ k_0-(e-1)N\approx -0.183;\quad N=100:\ k_0=171,\ \approx -0.828;\]
+\[N=1000:\ k_0=1718,\ \approx -0.282.\]
+These values are consistent with Lemma 2’s $O(1)$ fluctuation for the \emph{harmonic threshold} $k_0(N)$.
+
+5) VERIFICATION
+- Lemma 1 is purely monotonicity of $1/n$ and does not use any number theory.
+- Lemma 2 is a standard integral comparison; the $O(1)$ statement is qualitative but follows from the logarithmic bounds.
+- The computation concerns $k_0(N)$, not $k(N)$; the gap between $k(N)$ and $k_0(N)$ is exactly where the conjecture lives.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+$k(N)$ is bounded below by the harmonic threshold $k_0(N)$ (Lemma 1), and $k_0(N)=(e-1)N+O(1)$ (Lemma 2). Numerically, $k_0(N)-(e-1)N$ stays small for $N$ up to $1000$.
+
+(ii) First gap:
+Control the \emph{exact representability} constraint: prove that any exact Egyptian fraction representation of $1$ using denominators $\ge N$ must use \emph{more} than $k_0(N)+C$ terms for any fixed $C$, and in fact that $k(N)-(e-1)N\to\infty$.
+
+(iii) Top 3 next moves:
+1. Study constructive upper bounds for $k(N)$ by taking many consecutive reciprocals from $N$ onward and representing the remaining small rational as a sum of unit fractions with denominators $\ge$ the current maximum.
+2. Look for an obstruction forcing extra terms beyond the harmonic threshold (e.g. denominators in a minimal solution must be unusually “well-spaced” for exactness).
+3. Compute actual $k(N)$ for small $N$ (exactly or with tight bounds) to estimate $k(N)-k_0(N)$ and see whether it grows.
+
+(iv) Minimal counterexample structure (if the conjectured limit were false):
+An infinite sequence of $N$ for which one can represent $1$ with denominators $\ge N$ using $k(N)=(e-1)N+O(1)$ terms, i.e. solutions whose term count tracks the harmonic threshold to within a bounded error.
+

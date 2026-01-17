@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MVZPMS7X5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6MVZPMS7X5');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erdos Problems - Problem Hunting with LLMs (beta)</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                tags: 'ams',
+                macros: {
+                    'R': '{\\mathbb{R}}',
+                    'C': '{\\mathbb{C}}',
+                    'N': '{\\mathbb{N}}',
+                    'Z': '{\\mathbb{Z}}',
+                    'Q': '{\\mathbb{Q}}'
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Erdos Problems</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="erdos.html" class="active">Erdos Problems</a>
+            <a href="mo.html">MathOverflow</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="description">
+            <p>
+                Problems from Paul Erdos, one of the most prolific mathematicians in history.
+                For official problem statements and comments, see
+                <a href="https://www.erdosproblems.com/">erdosproblems.com</a>.
+                For the collaborative database, see
+                <a href="https://teorth.github.io/erdosproblems/">Terry Tao's Erdos Problems project</a>.
+            </p>
+        </section>
+
+        <section class="filters">
+            <label for="filter-attacks">
+                <input type="checkbox" id="filter-attacks" checked>
+                Only show problems with LLM attempts
+            </label>
+            <label for="search">
+                Search: <input type="text" id="search" placeholder="Problem number...">
+            </label>
+        </section>
+
+        <section class="problems-list">
+            <table id="erdos-table">
+                <thead>
+                    <tr>
+                        <th>Problem #</th>
+                        <th id="claim-header" style="cursor: pointer;" title="Click to sort by status">LLM Claim ⇅</th>
+                        <th>Models</th>
+                        <th>Links</th>
+                    </tr>
+                </thead>
+                <tbody id="erdos-tbody">
+                    <tr><td colspan="4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="contribute-cta">
+            <h3>Contribute</h3>
+            <p>
+                Have an LLM attempt to share for an Erdos problem?
+                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank">Contributing Guidelines</a>
+                to submit your contribution.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter">GitHub Repository</a> |
+            <a href="about.html">About</a> |
+            <a href="LICENSE">Apache License 2.0</a>
+        </p>
+    </footer>
+
+    <script src="data/erdos_data.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tbody = document.getElementById('erdos-tbody');
+            const filterCheckbox = document.getElementById('filter-attacks');
+            const searchInput = document.getElementById('search');
+            const claimHeader = document.getElementById('claim-header');
+            let sortByStatus = 0; // 0 = by number, 1 = status A-Z, -1 = status Z-A
+            
+            // Helper to determine overall status
+            const getOverallStatus = (attacks) => {
+                if (!attacks || attacks.length === 0) return 'zzz-none'; // Sort last
+                const statuses = attacks.map(a => {
+                    const status = a.status || 'unknown';
+                    return status === 'unknown' ? 'unresolved' : status.toLowerCase();
+                });
+                if (statuses.includes('solved')) return 'solved';
+                if (statuses.includes('partial')) return 'partial';
+                return 'unresolved';
+            };
+
+            function renderTable() {
+                if (typeof erdosProblems === 'undefined') {
+                    tbody.innerHTML = '<tr><td colspan="4">Error loading data</td></tr>';
+                    return;
+                }
+
+                const filterAttacks = filterCheckbox.checked;
+                const searchTerm = searchInput.value.trim();
+
+                let problems = Object.values(erdosProblems);
+
+                // Sort by problem number or status
+                if (sortByStatus !== 0) {
+                    problems.sort((a, b) => {
+                        const statusA = getOverallStatus(a.attacks);
+                        const statusB = getOverallStatus(b.attacks);
+                        return sortByStatus * statusA.localeCompare(statusB);
+                    });
+                } else {
+                    problems.sort((a, b) => parseInt(a.number) - parseInt(b.number));
+                }
+
+                // Filter
+                if (filterAttacks) {
+                    problems = problems.filter(p => p.attacks && p.attacks.length > 0);
+                }
+                if (searchTerm) {
+                    problems = problems.filter(p => p.number.includes(searchTerm));
+                }
+
+                if (problems.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No problems found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = problems.map(p => {
+                    // Shorten model names and limit to 2, prioritizing GPT Pro
+                    const shortenModel = (name) => {
+                        if (name.toLowerCase().includes('gpt pro')) return 'GPT Pro';
+                        if (name.toLowerCase().includes('gpt 5.2') || name.toLowerCase().includes('gpt_5.2')) return 'GPT 5.2';
+                        if (name.toLowerCase().includes('codex')) return 'Codex';
+                        if (name.toLowerCase().includes('claude') || name.toLowerCase().includes('opus')) return 'Opus 4.5';
+                        if (name.toLowerCase().includes('gemini')) return 'Gemini';
+                        return name.split(' ').slice(0, 2).join(' ');
+                    };
+                    let uniqueModels = [...new Set(p.attacks.map(a => shortenModel(a.model)))];
+                    // Prioritize GPT Pro - if present, put it first
+                    if (uniqueModels.includes('GPT Pro')) {
+                        uniqueModels = ['GPT Pro', ...uniqueModels.filter(m => m !== 'GPT Pro')];
+                    }
+                    const models = uniqueModels.slice(0, 2).join(', ') || '-';
+
+                    // Determine overall status with priority: solved > partial > unresolved
+                    const determineStatus = (attacks) => {
+                        const statuses = attacks.map(a => {
+                            const status = a.status || 'unknown';
+                            return status === 'unknown' ? 'unresolved' : status.toLowerCase();
+                        });
+                        
+                        if (statuses.includes('solved')) return 'Solved';
+                        if (statuses.includes('partial')) return 'Partial';
+                        return 'Unresolved';
+                    };
+                    
+                    const status = determineStatus(p.attacks);
+                    const statusClass = status === 'Solved' ? 'table-status-solved' :
+                                       status === 'Partial' ? 'table-status-partial' :
+                                       'table-status-unresolved';
+
+                    return `
+                        <tr>
+                            <td><a href="problem.html?type=erdos&id=${p.number}">#${p.number}</a></td>
+                            <td class="${statusClass}">${status}</td>
+                            <td>${models}</td>
+                            <td>
+                                <a href="${p.problem_url}" target="_blank">erdosproblems.com</a> |
+                                <a href="${p.database_url}" target="_blank">database</a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Use debounce from app.js for search input
+            const debouncedRender = window.ProblemHunting.debounce(renderTable, 200);
+
+            filterCheckbox.addEventListener('change', renderTable);
+            searchInput.addEventListener('input', debouncedRender);
+            claimHeader.addEventListener('click', () => {
+                // Cycle: default (0) -> A-Z (1) -> Z-A (-1) -> default (0)
+                if (sortByStatus === 0) {
+                    sortByStatus = 1;
+                } else if (sortByStatus === 1) {
+                    sortByStatus = -1;
+                } else {
+                    sortByStatus = 0;
+                }
+                renderTable();
+            });
+            renderTable();
+        });
+    </script>
+</body>
+</html>

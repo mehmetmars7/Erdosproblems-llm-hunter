@@ -1,0 +1,100 @@
+% Attempt for Erdos Problem #92
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+For a finite set $A\subset\mathbb R^2$ and a point $x\in A$, define
+\[g_A(x):=\max_{r>0}\big|\{y\in A\setminus\{x\}: |x-y|=r\}\big|,\]
+the maximum number of other points at a common distance from $x$.
+Define
+\[f(n):=\max\left\{t:\ \exists A\subset\mathbb R^2,\ |A|=n,\ \text{and } g_A(x)\ge t \text{ for all }x\in A\right\}.\]
+
+Question.
+Is it true that $f(n)\le n^{o(1)}$ (or even $f(n)<n^{O(1/\log\log n)}$)?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+I only use the ``trivial'' $f(n)\ll n^{1/2}$ claim from the statement and re-prove it below.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. For upper bounds, translate the condition ``each $x$ has many equidistant neighbors'' into a point-circle incidence problem and apply extremal graph bounds.
+2. For lower bounds, build structured configurations (lattices, circular constructions) where each point has many equidistant neighbors.
+
+Disproof track ideas:
+1. If one could construct $A$ with $g_A(x)\ge n^\delta$ for some fixed $\delta>0$ for all $x$, that would refute $n^{o(1)}$.
+
+Chosen path in this attempt: prove the clean $O(\sqrt n)$ upper bound via a K\H{o}v\'ari--S\'os--Tur\'an argument, and provide a simple universal lower bound.
+
+4) WORK
+Lemma 1 (Trivial upper bound $f(n)=O(\sqrt n)$).
+For all $n\ge 1$,
+\[f(n)\le 2\sqrt n+2.\]
+
+Proof.
+Let $A$ be a set of $n$ points witnessing $f(n)$, so that $g_A(x)\ge f(n)$ for all $x\in A$.
+For each $x\in A$, choose a radius $r_x>0$ such that
+\[\big|\{y\in A\setminus\{x\}: |x-y|=r_x\}\big| \ge f(n).\]
+Consider a bipartite graph $B$ with left part $L=A$ (centers) and right part $R=A$ (points), and put an edge from $x\in L$ to $y\in R$ iff $|x-y|=r_x$.
+Then every left vertex has degree at least $f(n)$, so
+\[e(B)\ge n f(n).\tag{1}\]
+
+Geometric input: two circles intersect in at most two points.
+For distinct centers $x\ne x'$, the circles with radii $r_x$ and $r_{x'}$ (centered at $x$ and $x'$) intersect in at most two points.
+Thus $x$ and $x'$ have at most two common neighbors in $R$.
+Equivalently, $B$ is $K_{2,3}$-free with the 2-vertex side in $L$.
+
+We now bound $e(B)$ directly.
+Let $d(r)$ be the degree of a right vertex $r\in R$.
+Count length-2 paths $\ell-r-\ell'$ with $\ell\ne \ell'$ and $r\in R$:
+\[P:=\sum_{r\in R}\binom{d(r)}{2}.\]
+For a fixed unordered pair $\{\ell,\ell'\}\subseteq L$, the two circles (centered at $\ell$ and $\ell'$ with radii $r_\ell$ and $r_{\ell'}$) intersect in at most two points,
+so $\ell,\ell'$ have at most $2$ common neighbors in $R$.
+Thus $P\le 2\binom{n}{2}<n^2$.
+
+Also,
+\[P=\frac12\sum_r d(r)^2-\frac12\sum_r d(r)\ge \frac12\cdot\frac{e(B)^2}{n}-\frac12 e(B)\]
+by Cauchy--Schwarz and $\sum_r d(r)=e(B)$.
+Therefore $\frac{e(B)^2}{2n}-\frac{e(B)}{2}\le n^2$, which implies $e(B)\le 2n^{3/2}+2n$.
+Combine with (1) to obtain
+\[n f(n)\le 2n^{3/2}+2n,\]
+so $f(n)\le 2\sqrt n+2$. \qed
+
+Lemma 2 (A simple lower bound $f(n)\ge 2$ for $n\ge 3$).
+For every $n\ge 3$, one has $f(n)\ge 2$.
+
+Proof.
+Let $A$ be the vertex set of a regular $n$-gon.
+For each vertex $x\in A$, its two adjacent vertices are at the common distance equal to the side length.
+Thus $g_A(x)\ge 2$ for all $x$, so $f(n)\ge 2$ by definition. \qed
+
+FAST REALITY CHECK
+Lemma 1 matches the ``trivial'' bound $f(n)\ll n^{1/2}$ mentioned in the problem text, with an explicit constant.
+The problem asks whether one can improve this all the way to $n^{o(1)}$, which is far beyond this elementary argument.
+
+5) VERIFICATION
+- Lemma 1 uses only the circle intersection fact and the KST extremal bound for $K_{2,3}$-free bipartite graphs.
+- Lemma 2 uses a concrete configuration (regular polygon) and checks $g_A(x)\ge 2$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved the explicit upper bound $f(n)\le 2\sqrt n+2$ (Lemma 1) and a universal lower bound $f(n)\ge 2$ for $n\ge 3$ (Lemma 2).
+
+(ii) First gap:
+Improve the upper bound from $\Theta(\sqrt n)$ to $n^{o(1)}$ (or find a construction with $f(n)\ge n^\delta$ for some fixed $\delta>0$).
+
+(iii) Top 3 next moves (concrete):
+1. Replace the crude $K_{2,3}$-free extremal bound with sharper point-circle incidence theorems to push the exponent below $1/2$.
+2. Explore whether additional structure forced by the ``for every $x$'' condition can yield stronger global constraints than pairwise circle intersections.
+3. Try to explicitly construct sets where each point is a center of a circle containing many other points (e.g. lattice-based constructions) and quantify $g_A(x)$.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A family of point sets $A_n$ with $|A_n|=n$ and $g_{A_n}(x)\ge n^\delta$ for all $x\in A_n$ for some fixed $\delta>0$,
+showing that $f(n)$ is polynomially large and disproving $f(n)\le n^{o(1)}$.

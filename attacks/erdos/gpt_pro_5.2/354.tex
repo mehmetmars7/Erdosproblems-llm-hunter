@@ -1,0 +1,497 @@
+## 1) FORMAL RESTATEMENT
+
+Fix the convention (\mathbb N={0,1,2,\dots}) and (\mathbb Z_{\ge 0}={0,1,2,\dots}), (\mathbb Z_{>0}={1,2,3,\dots}).
+
+For (\alpha,\beta\in\mathbb R_{>0}), define two integer sequences
+[
+a_s:=\big\lfloor 2^s\alpha\big\rfloor,\qquad b_t:=\big\lfloor 2^t\beta\big\rfloor\qquad (s,t\in\mathbb N).
+]
+Let (M(\alpha,\beta)) be the **multiset** consisting of all (a_s) (each once) and all (b_t) (each once); i.e. duplicates are allowed if (a_s=b_t) for some (s,t).
+
+Define the **finite subset–sum set**
+[
+P(\alpha,\beta):=\left{\sum_{s\in S} a_s +\sum_{t\in T} b_t ;:; S,T\subset \mathbb N \text{ finite}\right}\subseteq \mathbb Z_{\ge 0}.
+]
+We say (M(\alpha,\beta)) is **complete** if there exists (N_0\in\mathbb Z_{\ge 0}) such that
+[
+\forall n\in\mathbb Z_{\ge 0}\ (n\ge N_0\implies n\in P(\alpha,\beta)).
+]
+
+The Erdős problem asks:
+
+> (**Main question**) If (\alpha,\beta>0) and (\alpha/\beta\notin\mathbb Q), must (M(\alpha,\beta)) be complete?
+
+And a variant:
+
+> (**Variant**) Replace the base (2) by some fixed (\gamma\in(1,2)), i.e. (a_s=\lfloor \gamma^s\alpha\rfloor), (b_t=\lfloor \gamma^t\beta\rfloor). Is the analogous multiset complete under (\alpha/\beta) irrational?
+
+There is no theorem statement in your prompt (it is posed as a question), so the “literal statement” consistent with standard conventions is:
+
+[
+(\star)\qquad \forall \alpha,\beta\in\mathbb R_{>0}\ \big(\alpha/\beta\notin\mathbb Q \implies M(\alpha,\beta)\ \text{is complete}\big).
+]
+
+My job is to either prove ((\star)) or give a counterexample ((\alpha,\beta)) with (\alpha/\beta) irrational for which (M(\alpha,\beta)) is not complete.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK (web-browsed)
+
+The Erdős Problems page for #354 presents this as open and summarizes known results and counterexamples in structured cases.  In particular:
+
+* Hegyvári proved completeness when one parameter is dyadic rational and the other is not (as you quoted).
+* Hegyvári also gave explicit non-complete families when (\beta=2^k\alpha) (ratio a power of 2), and later work extends non-completeness in those power-of-two ratio regimes for some (\alpha\in(1,2)) and large (k).
+* The site still lists the general irrational-ratio case as open as of its last edit (Dec 1, 2025).
+
+So there is no “known final answer” to ((\star)) in the standard references cited by the page.
+
+---
+
+## 3) ATTACK PLAN
+
+I ran both tracks.
+
+### Proof-track ideas
+
+1. **Residue + multiples strategy (works in a dyadic-rational special case):**
+   If one sequence contains all multiples of some integer (m), and the other sequence supplies all residue classes mod (m), then all large integers are representable. This is exactly how Hegyvári’s dyadic-rational case works, and I can prove it cleanly.
+
+2. **Interval-building (“coin condition”) strategy:**
+   Try to order the multiset so that each new term is (\le 1+) (sum of previous terms), which inductively forces long consecutive intervals in the subset-sum set. The difficulty in the floor–doubling case is that the “(+1)” errors can accumulate and break the standard Σ-sequence arguments that work for ceilings.
+
+3. **Digital/2-adic strategy:**
+   Use the identity (a_{s+1}=2a_s+\varepsilon_s) with (\varepsilon_s\in{0,1}) and attempt to control carries across the two sequences via the irrational ratio. I did not succeed in pushing this to a gap-free proof.
+
+### Disproof-track ideas
+
+1. **Modulus obstruction:**
+   Force all representable sums to lie in a proper subset of residues mod (m) (e.g. all even), which would imply infinitely many missing integers. This requires constructing (\alpha,\beta) whose entire floor-doubling sequences have constrained residues; I explored this and proved a rigidity lemma showing that the “all divisible by (m)” obstruction cannot be arranged nontrivially for (m>1) unless one parameter is an integer multiple of (m), which then doesn’t automatically block completeness.
+
+2. **Approximate power-of-two synchronization:**
+   Try to make (\beta) extremely close to (2^k\alpha) infinitely often to inherit the known (\beta=2^k\alpha) incompleteness. I could not turn “approximate” synchronization into an infinite obstruction.
+
+3. **Low-complexity binary expansions / subshift restriction:**
+   Choose (\alpha,\beta) with very restricted binary expansions so that residues of (\lfloor 2^s\alpha\rfloor) and (\lfloor 2^t\beta\rfloor) avoid certain patterns, potentially preventing completeness. I can describe a plausible shape of such a counterexample, but I cannot yet certify incompleteness rigorously.
+
+The only fully successful, gap-free line I obtained is the dyadic-rational special case (Hegyvári’s theorem). That does not settle ((\star)).
+
+---
+
+## 4) WORK
+
+### 4.1 A rigidity lemma I tried to use for counterexamples
+
+This shows a simple modulus obstruction (all terms divisible by (m)) cannot happen with an irrational parameter.
+
+**Lemma 1.** Let (m\in\mathbb Z_{\ge 2}) and (x\in\mathbb R). If
+[
+m\mid \lfloor 2^n x\rfloor \quad\text{for all }n\in\mathbb N,
+]
+then (x\in m\mathbb Z).
+
+**Proof.** Write (\lfloor 2^n x\rfloor = m k_n) with (k_n\in\mathbb Z). Then
+[
+mk_n \le 2^n x < mk_n +1.
+]
+Divide by (m):
+[
+k_n \le 2^n(x/m) < k_n + 1/m,
+]
+so the fractional part satisfies
+[
+{2^n(x/m)} < 1/m \quad \forall n.
+]
+Because (m\ge 2), we have (1/m\le 1/2). If ({2^n y}<1/2) for all (n), then the first binary digit of the fractional part of each shift is (0), forcing all binary digits of the fractional part of (y) to be (0); hence (y\in\mathbb Z). Applying this to (y=x/m), we get (x/m\in\mathbb Z), i.e. (x\in m\mathbb Z). ∎
+
+This killed one simple route to a counterexample: trying to make both sequences (or one sequence) entirely multiples of some (m>1).
+
+---
+
+### 4.2 A fully proved partial theorem (Hegyvári’s dyadic-rational case)
+
+This is one of the results summarized on the Erdős Problems page.  I give a complete proof.
+
+**Theorem 2 (Dyadic–nondyadic completeness).**
+Let (\alpha,\beta\in\mathbb R_{>0}). Suppose (\alpha) is a dyadic rational and (\beta) is **not** a dyadic rational (i.e. (2^n\beta\notin\mathbb Z) for all (n\in\mathbb N)). Then (M(\alpha,\beta)) is complete.
+
+In particular, if (\alpha/\beta) is irrational and (\alpha) is dyadic rational, then (M(\alpha,\beta)) is complete.
+
+**Proof.**
+
+**Step 1: reduce to the case (\alpha=m\in\mathbb Z_{>0}).**
+Write (\alpha=m/2^n) with (m\in\mathbb Z_{>0}), (n\in\mathbb N). Then for every (j\in\mathbb N),
+[
+\left\lfloor 2^{n+j}\alpha\right\rfloor=\left\lfloor 2^{n+j}\frac{m}{2^n}\right\rfloor=\lfloor 2^j m\rfloor=m2^j.
+]
+Thus the multiset ({\lfloor 2^s\alpha\rfloor:s\in\mathbb N}) contains the infinite subsequence
+[
+m,2m,4m,8m,\dots
+]
+(possibly plus some extra smaller terms from the indices (s<n)). Adding extra terms can only increase the subset-sum set (P(\alpha,\beta)), so it suffices to prove completeness assuming (\alpha=m\in\mathbb Z_{>0}) and (a_s=m2^s).
+
+So fix (m:=\alpha\in\mathbb Z_{>0}) and define
+[
+a_s=m2^s,\qquad b_t=\lfloor 2^t\beta\rfloor.
+]
+
+**Step 2: the (\alpha)-sequence generates all multiples of (m).**
+Let
+[
+A:={m2^s:s\in\mathbb N}.
+]
+For every (q\in\mathbb Z_{\ge 0}), write (q=\sum_{s\in S}2^s) (binary expansion). Then
+[
+mq=\sum_{s\in S} m2^s
+]
+is a finite subset sum of (A). Conversely any finite subset sum of (A) is of the form (m\cdot(\text{integer})). Therefore
+[
+P(A)=m\mathbb Z_{\ge 0}.
+]
+
+**Step 3: residues modulo (m) supplied by the (\beta)-sequence.**
+We prove:
+
+> (**Claim**) For every prime (p\mid m), there exist infinitely many (t\in\mathbb N) such that (p\nmid b_t).
+
+*Proof of Claim.* Suppose, for contradiction, that for some prime (p\mid m), there exists (T) such that (p\mid b_t) for all (t\ge T). Choose any (t\ge T). Then (b_t=\lfloor 2^t\beta\rfloor=pr) for some integer (r). Write
+[
+2^t\beta = pr + \varepsilon,\qquad \varepsilon\in(0,1),
+]
+where (\varepsilon={2^t\beta}) is the fractional part. Because (\beta) is **not** dyadic rational, (2^t\beta\notin\mathbb Z), hence (\varepsilon\neq 0), so indeed (\varepsilon\in(0,1)).
+
+Choose (u\in\mathbb N) so that (1\le 2^u\varepsilon <2) (e.g. (u=\lceil -\log_2\varepsilon\rceil)). Then
+[
+b_{t+u}=\left\lfloor 2^{t+u}\beta\right\rfloor
+=\left\lfloor 2^u(pr+\varepsilon)\right\rfloor
+=2^u pr+\lfloor 2^u\varepsilon\rfloor
+=2^u pr+1.
+]
+In particular, (b_{t+u}\equiv 1\pmod p), so (p\nmid b_{t+u}), contradicting the assumption (p\mid b_{t'}) for all (t'\ge T). Thus the claim holds. ∎
+
+Now let
+[
+R:={,r\in{0,1,\dots,m-1}:\ b_t\equiv r\pmod m\ \text{for infinitely many }t,}.
+]
+By the claim and pigeonhole: for each prime (p\mid m), among infinitely many (t) with (p\nmid b_t), at least one residue class modulo (m) occurs infinitely often; call it (r_p\in R). Then (p\nmid r_p). Hence no prime divisor of (m) divides every element of (R), so
+[
+\gcd(m,;R)=1.
+]
+
+**Step 4: every residue class mod (m) is achieved by a finite sum of (b_t)’s.**
+Let (r_1,\dots,r_k) be the distinct elements of (R). Choose for each (i) infinitely many indices (t) with (b_t\equiv r_i\pmod m). Consider the set of integers ({r_1,\dots,r_k,m}), whose gcd is (1). A standard consequence of the Frobenius coin theorem/general numerical semigroup theory is:
+
+> For every residue class (c\in{0,1,\dots,m-1}), there exist nonnegative integers (u_1,\dots,u_k) and (v) such that
+> [
+> c+vm=\sum_{i=1}^k u_i r_i.
+> ]
+> In particular (\sum_{i=1}^k u_i r_i\equiv c\pmod m).
+
+(Proof sketch: since (\gcd(r_1,\dots,r_k,m)=1), the semigroup (\langle r_1,\dots,r_k,m\rangle\subset\mathbb Z_{\ge 0}) is cofinite, so for each (c) choose a sufficiently large (L\equiv c\pmod m) in that semigroup.)
+
+Fix such a representation for each residue class (c). For each (i), pick (u_i) **distinct** indices (t) with (b_t\equiv r_i\pmod m) (possible since each (r_i) occurs infinitely often). Let (B_c) be the sum of all these chosen (b_t)’s. Then
+[
+B_c\equiv \sum_{i=1}^k u_i r_i \equiv c\pmod m.
+]
+
+Thus, for each residue (c), we have produced a *fixed* finite sum (B_c\in P(\beta)) with (B_c\equiv c\pmod m).
+
+**Step 5: represent all sufficiently large integers.**
+Let
+[
+N_0:=\max_{0\le c<m} B_c.
+]
+Take any integer (N\ge N_0). Let (c:=N\bmod m). Then (B_c\le N) and (N-B_c\equiv 0\pmod m), so (N-B_c= m q) for some (q\in\mathbb Z_{\ge 0}). By Step 2, (mq\in P(A)), i.e. (mq) is representable as a finite subset sum of the (a_s=m2^s). Therefore
+[
+N = (N-B_c)+B_c \in P(A)+P(\beta)\subseteq P(\alpha,\beta).
+]
+This holds for all (N\ge N_0), so (M(\alpha,\beta)) is complete. ∎
+
+This completes a full, gap-free proof of a nontrivial infinite family of cases.
+
+---
+
+### 4.3 Where the proof-track genuinely stalls for the irrational-ratio general case
+
+Theorem 2 crucially uses that the (\alpha)-sequence contains the *exact* dyadic multiples (m2^s), hence generates **all** multiples of (m). When (\alpha) is not dyadic rational, the tail (\lfloor 2^{s}\alpha\rfloor) is not a pure (m2^s) sequence and does not give an obvious “all multiples of (m)” subgroup of (\mathbb Z). Without such a large structured subgroup, the residue-class bootstrapping (Step 5) has no clean starting point.
+
+On the other hand, modulus-only obstructions (like forcing all terms divisible by (m)) seem rigid (Lemma 1), so producing a counterexample by a straightforward congruence class restriction also did not succeed.
+
+---
+
+## 5) VERIFICATION
+
+### Checking Theorem 2 carefully
+
+* **Use of “(\beta) not dyadic rational”:**
+  Needed exactly to ensure ({2^t\beta}\neq 0) for every (t), hence (\varepsilon\in(0,1)) in the key claim. If (\beta) were dyadic, eventually (\varepsilon=0), and the construction (b_{t+u}=2^upr+1) fails. Good.
+
+* **Distinctness constraint:**
+  We are allowed to use each (b_t) at most once. Because each residue (r_i\in R) occurs infinitely often among the (b_t), we can select (u_i) distinct indices to realize coefficient (u_i). No reuse needed. Good.
+
+* **Nonnegativity:**
+  We require (N-B_c\ge 0), which is why we chose (N_0\ge \max B_c). Good.
+
+* **Reduction from dyadic (\alpha=m/2^n) to integer (m):**
+  We used that ({\lfloor 2^s(m/2^n)\rfloor}) contains ({m2^j:j\ge 0}) as a subsequence. Completeness is monotone under adding terms, so proving completeness with just the subsequence suffices. Good.
+
+### Checking Lemma 1
+
+* The implication “({2^n y}<1/2\ \forall n\Rightarrow y\in\mathbb Z)” is standard from binary expansions: if (y\in[0,1)) and binary expansion is (0.d_1d_2\dots), then ({2^n y}) begins with digit (d_{n+1}). The condition ({2^n y}<1/2) forces (d_{n+1}=0) for all (n), hence (y=0). Shifting by integer part gives (y\in\mathbb Z). Good.
+
+So the partial theorem is internally consistent.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+I proved (with full details) **Theorem 2**: if one parameter is dyadic rational and the other is not dyadic rational, then the multiset ({\lfloor 2^s\alpha\rfloor}\cup{\lfloor 2^t\beta\rfloor}) is complete.
+
+(ii) **Exact first gap (crisp statement I could not prove).**
+I could not prove nor disprove the core new case:
+[
+\alpha,\beta\in\mathbb R_{>0}\ \text{both not dyadic rational and }\alpha/\beta\notin\mathbb Q \quad\Longrightarrow\quad M(\alpha,\beta)\text{ is complete.}
+]
+Equivalently: extending the “multiples + residues” method beyond dyadic-rational (\alpha) fails because I cannot exhibit any structured infinite subgroup (like (m\mathbb Z)) contained in the subset-sum set of ({\lfloor 2^s\alpha\rfloor}) when (\alpha) is non-dyadic, while simultaneously controlling residues from the other sequence.
+
+(iii) **Top 3 next moves (concrete).**
+
+1. **Find a substitute for “all multiples of (m)” when (\alpha) is non-dyadic.**
+   Prove a lemma of the form: there exists (m=m(\alpha)) such that (P({\lfloor 2^s\alpha\rfloor})) contains all sufficiently large multiples of (m). Even an “eventually all multiples of (m)” statement would resurrect the residue bootstrapping from Theorem 2.
+2. **Establish a strong residue-surjectivity property for one sequence mod (m).**
+   For fixed (m), prove that ({\lfloor 2^t\beta\rfloor\bmod m}) hits a generating set of (\mathbb Z_m) infinitely often for all non-dyadic (\beta), and quantify it enough to pick bounded “witness sums” (B_c).
+3. **Counterexample construction via low-complexity binary subshifts.**
+   Attempt to build (\alpha,\beta) whose binary expansions lie in a shift-invariant subshift that forces the residues of (\lfloor 2^s\alpha\rfloor) and (\lfloor 2^t\beta\rfloor) to lie in a proper subset of (\mathbb Z_m), and then prove that even after subset-summing, some residue class is unattainable (yielding infinitely many missing integers).
+
+(iv) **What a minimal counterexample would likely look like (structure/parameters).**
+A plausible “minimal” counterexample (if one exists) would need:
+
+* (\alpha,\beta) both non-dyadic (otherwise Theorem 2 covers it),
+* (\alpha/\beta) irrational but with **highly structured** binary expansions (e.g. belonging to a low-entropy subshift) so that the residues of (\lfloor 2^s\alpha\rfloor) and (\lfloor 2^t\beta\rfloor) are constrained,
+* likely (\beta/\alpha) extremely close to an integer power of (2) infinitely often (to mimic the known (\beta=2^k\alpha) non-complete families) but not equal, in order to preserve irrationality while maintaining repeated “near-alignment” obstructions.
+
+At present I cannot certify such a construction, nor prove it impossible, so the general irrational-ratio case remains open in my analysis, consistent with the current status on the Erdős Problems page.
+
+You’re basically asking: “Can you make those ‘next moves’ fully concrete and check what is *actually true* vs wishful?” Here’s what I can do rigorously right now:
+
+* I can **turn (iii).2 into a clean, fully proved lemma** (it’s stronger than what you wrote: subset–sums hit *every* residue mod (m), for *any* (m), for any non‑dyadic parameter).
+* I can **formalize (iii).3** via an explicit finite‑automaton / subshift construction that forces (\lfloor 2^t\beta\rfloor\bmod m) to stay in a proper subset forever (so any proof that relies on “equidistribution of single terms mod (m) for all (\beta)” is dead on arrival).
+* I can **rephrase (iii).1 into a precise “bootstrapping lemma”** showing exactly what you’d need from one parameter to finish completeness; and I can point to a couple of “hard obstruction points” that explain why (iii).1 is the real bottleneck.
+
+Below I’ll do those three things with full proofs where claimed.
+
+---
+
+# 1) A fully rigorous version of (iii).2
+
+Let (\beta>0) and define (b_t:=\lfloor 2^t\beta\rfloor).
+
+Call (\beta) **dyadic rational** if (\beta=p/2^n) for integers (p,n); equivalently, (2^t\beta\in\mathbb Z) for all large enough (t). Otherwise call (\beta) **non‑dyadic**.
+
+## Lemma 2.1 (prime-avoidance for floors under doubling)
+
+If (\beta) is non‑dyadic, then for every prime (p) there are infinitely many (t\in\mathbb N) such that
+[
+p\nmid \lfloor 2^t\beta\rfloor.
+]
+
+**Proof.** Suppose for contradiction that for some prime (p) there is a (T) such that (p\mid b_t) for all (t\ge T). Fix (t\ge T). Write
+[
+2^t\beta = b_t + \varepsilon,\qquad \varepsilon:={2^t\beta}\in(0,1),
+]
+where (\varepsilon\neq 0) because (\beta) is non‑dyadic, hence (2^t\beta\notin\mathbb Z). Since (p\mid b_t), we can write (b_t=pq).
+
+Choose (u\in\mathbb N) such that (1\le 2^u\varepsilon<2) (e.g. (u=\lceil -\log_2\varepsilon\rceil)). Then
+[
+b_{t+u}=\lfloor 2^{t+u}\beta\rfloor
+=\lfloor 2^u(pq+\varepsilon)\rfloor
+=2^u pq + \lfloor 2^u\varepsilon\rfloor
+=2^u pq + 1.
+]
+Thus (b_{t+u}\equiv 1\pmod p), contradicting the assumption (p\mid b_{t+u}) for all large indices. ∎
+
+So: for non‑dyadic (\beta), *no prime can divide (b_t) eventually*.
+
+---
+
+## Lemma 2.2 (subset–sum surjectivity mod (m))
+
+Fix an integer (m\ge 2). If (\beta) is non‑dyadic, then for every residue class (c\in\mathbb Z/m\mathbb Z) there exists a finite set (T\subset\mathbb N) such that
+[
+\sum_{t\in T}\lfloor 2^t\beta\rfloor \equiv c \pmod m.
+]
+
+Equivalently: the subset–sum set (P(\beta):={\sum_{t\in T} b_t: T\subset\mathbb N\text{ finite}}) maps **onto** (\mathbb Z/m\mathbb Z).
+
+**Proof.** Consider the set (R\subset{0,1,\dots,m-1}) of residues that occur infinitely often:
+[
+R:={r:\ b_t\equiv r\pmod m\text{ for infinitely many }t}.
+]
+We claim (\gcd(m,R)=1). Let (p) be any prime divisor of (m). By Lemma 2.1 there are infinitely many (t) with (p\nmid b_t); among these infinitely many indices, by pigeonhole at least one residue (r_p\in{0,\dots,m-1}) occurs infinitely often. Then (r_p\in R) and (p\nmid r_p). Therefore no prime divisor (p\mid m) divides every element of (R), hence (\gcd(m,R)=1).
+
+Now list (R={r_1,\dots,r_k}). The numerical semigroup
+[
+S:=\left{\sum_{i=1}^k u_i r_i:\ u_i\in\mathbb Z_{\ge0}\right}
+]
+has (\gcd(r_1,\dots,r_k)=1) (since (\gcd(m,R)=1) implies (\gcd(R)=1)). A standard fact about numerical semigroups is: if (\gcd(r_1,\dots,r_k)=1), then (S) is **cofinite** in (\mathbb Z_{\ge0}), i.e. there exists (F) such that every integer (N\ge F) lies in (S).
+
+Fix the target residue (c\pmod m). Choose (N\ge F) with (N\equiv c\pmod m). Then (N\in S), so (N=\sum_{i=1}^k u_i r_i) with (u_i\ge 0). For each (i), since (r_i\in R), we can choose (u_i) **distinct** indices (t) such that (b_t\equiv r_i\pmod m). Let (T) be the union of all chosen indices. Then
+[
+\sum_{t\in T} b_t \equiv \sum_{i=1}^k u_i r_i = N \equiv c \pmod m.
+]
+That is exactly what we needed. ∎
+
+**Takeaway.** For the floor–doubling sequence from a single non‑dyadic parameter, *subset sums are automatically surjective modulo every modulus (m).*
+This is “move (iii).2” in a very strong form.
+
+---
+
+# 2) A rigorous version of (iii).3: “binary subshift” constructions really exist
+
+Your “low‑complexity binary expansions” intuition is completely on point, and we can formalize it cleanly.
+
+For simplicity take (\beta\in(0,1)) (integer parts just add a harmless periodic term modulo (m)). Write the binary expansion
+[
+\beta = 0.d_1d_2d_3\ldots\quad (d_i\in{0,1}).
+]
+Then
+[
+b_t=\lfloor 2^t\beta\rfloor
+]
+is exactly the integer whose base‑2 digits are the first (t) bits (d_1\ldots d_t). In particular,
+[
+b_{t+1}=2b_t+d_{t+1}.
+]
+Reducing mod (m), if we define (x_t:=b_t\bmod m), then
+[
+x_{t+1}\equiv 2x_t + d_{t+1}\pmod m.
+]
+
+This is a deterministic finite automaton: vertices (x\in\mathbb Z_m) and from each vertex you have two outgoing edges
+[
+x \xrightarrow{0} 2x,\qquad x\xrightarrow{1} 2x+1 \quad(\bmod m).
+]
+
+## Lemma 3.1 (subshift/automaton forcing lemma)
+
+Fix (m\ge 2). Let (U\subseteq\mathbb Z_m) be nonempty and satisfy:
+
+> for every (x\in U), **at least one** of (2x\bmod m) or ((2x+1)\bmod m) lies in (U).
+
+Then there exists (\beta\in(0,1)) such that for all (t\ge 0),
+[
+\lfloor 2^t\beta\rfloor \bmod m \in U.
+]
+Moreover, (\beta) can be chosen non‑dyadic (i.e. binary digits not eventually all (0)).
+
+**Proof.** Build the binary digits inductively, producing a path (x_0,x_1,x_2,\dots) in the directed graph that stays in (U).
+
+Start at (x_0=0\in\mathbb Z_m). (This corresponds to (b_0=\lfloor \beta\rfloor=0) for (\beta\in(0,1)).) If (0\notin U), pick instead some starting state (x_0\in U) and then later adjust by adding a suitable integer to (\beta); I’ll keep (0\in U) for the cleanest statement, but the general case is a minor tweak.
+
+Given (x_t\in U), by the hypothesis at least one of (2x_t) or (2x_t+1) (mod (m)) lies in (U). Choose (d_{t+1}\in{0,1}) accordingly and set
+[
+x_{t+1}\equiv 2x_t + d_{t+1}\pmod m.
+]
+This produces an infinite digit sequence (d_1,d_2,\dots). Define (\beta:=\sum_{i\ge1} d_i2^{-i}\in[0,1]). Then by the recurrence (b_{t+1}=2b_t+d_{t+1}), we have (b_t\bmod m=x_t\in U) for all (t).
+
+To ensure (\beta) is non‑dyadic, just ensure the digit sequence is not eventually all (0). Because we have choice at infinitely many steps whenever both transitions stay inside (U), we can force infinitely many (1)’s unless (U) is a very degenerate “only 0-transition allowed forever” set. If that degeneracy occurs, then the only (\beta) produced is dyadic; so to guarantee non‑dyadic it suffices to choose (U) that contains at least one vertex with a (1)-edge staying inside (U) and revisit it infinitely often (easy to arrange in examples). ∎
+
+### Concrete example (shows “single-term residue surjectivity” fails badly)
+
+Take (m=3) and (U={0,1}\subset\mathbb Z_3).
+
+Check the closure property:
+
+* from (0): (2\cdot0=0\in U), (2\cdot0+1=1\in U),
+* from (1): (2\cdot1=2\notin U), but (2\cdot1+1=0\in U).
+
+So the lemma applies and yields a (non‑dyadic) (\beta) such that
+[
+\lfloor 2^t\beta\rfloor \not\equiv 2\pmod 3\quad\forall t.
+]
+
+**Moral for the problem:** any strategy that tries to prove completeness by claiming something like “for every non‑dyadic (\beta), the values (\lfloor 2^t\beta\rfloor) hit all residues mod (m) infinitely often” is *false*. You must use **subset sums**, not single terms—which is exactly why Lemma 2.2 is the right tool.
+
+---
+
+# 3) Making (iii).1 maximally concrete: what you’d need to finish
+
+Let (A(\alpha):={\lfloor 2^s\alpha\rfloor:s\in\mathbb N}) and (B(\beta):={\lfloor 2^t\beta\rfloor:t\in\mathbb N}). Let (P(\alpha)) and (P(\beta)) be their subset–sum sets.
+
+Here is the precise “bootstrapping” implication that underlies your move (iii).1.
+
+## Lemma 4.1 (multiples + residues ⇒ completeness)
+
+Fix (\alpha,\beta>0). Suppose there exists an integer (m\ge 1) and an (N_1) such that:
+
+1. (**multiples from (\alpha)**) every multiple of (m) beyond (N_1) lies in (P(\alpha)); i.e.
+   [
+   \exists N_1\ \forall q\in\mathbb Z_{\ge0}\ (mq\ge N_1 \Rightarrow mq\in P(\alpha)).
+   ]
+2. (**residues from (\beta)**) for every residue class (c\pmod m), there exists some (r_c\in P(\beta)) with (r_c\equiv c\pmod m).
+
+Then (P(\alpha)+P(\beta)) is cofinite in (\mathbb Z_{\ge0}), i.e. the multiset union is complete.
+
+**Proof.** Let (r_c) be as in (2), and set (R_{\max}:=\max_{c} r_c). Let (N_0:=N_1+R_{\max}).
+
+Take any integer (N\ge N_0). Let (c\equiv N\pmod m). Then (N-r_c\equiv 0\pmod m) and (N-r_c\ge N_1). By (1), (N-r_c\in P(\alpha)). Also (r_c\in P(\beta)). Hence
+[
+N=(N-r_c)+r_c\in P(\alpha)+P(\beta).
+]
+So all integers (\ge N_0) are representable. ∎
+
+Now combine this with Lemma 2.2:
+
+* If (\beta) is non‑dyadic, then condition (2) holds for **every** modulus (m).
+* So the entire original problem reduces (in this bootstrapping framework) to finding **one** modulus (m) for which condition (1) holds for either (\alpha) or (\beta).
+
+This is why (iii).1 is the true “hard core.”
+
+### Why (iii).1 is genuinely nontrivial
+
+For a single floor–doubling sequence (a_s=\lfloor 2^s\alpha\rfloor), the naive “Brown coin condition”
+[
+a_{s+1}\le 1+\sum_{i\le s}a_i
+]
+typically fails *and can fail by a growing amount*, because
+[
+\sum_{i=0}^{s-1}\lfloor 2^i\alpha\rfloor
+=(2^s-1)\alpha-\sum_{i=0}^{s-1}{2^i\alpha},
+]
+so the gap (a_s-\sum_{i<s}a_i) involves (\sum_{i<s}{2^i\alpha}), which can grow like (s). This kills the simplest “interval by induction” arguments.
+
+So a proof of (iii).1 would likely need a **modular cancellation mechanism** (choose subsets whose fractional-part contributions cancel mod (m)), not a direct interval‑growth argument.
+
+---
+
+# 4) Refining (iv): what a “minimal counterexample” would really have to accomplish
+
+If a counterexample exists with (\alpha/\beta) irrational, it must defeat Lemma 4.1 for *every* modulus (m), because Lemma 2.2 shows residues are never a problem as soon as one parameter is non‑dyadic.
+
+So a counterexample must ensure:
+
+* For every (m), neither (P(\alpha)) nor (P(\beta)) contains **all sufficiently large multiples of (m)**.
+
+That is much stronger than “single terms have constrained residues,” and it forces the obstruction to be about **growth/coverage of subset sums** rather than simple mod‑(m) orbit avoidance.
+
+Your “subshift / low-entropy digits” idea is plausible because it can constrain the entire structure of the subset-sum set, not just residues. But the bar is high: you’d need to show that even after allowing arbitrary subset sums of two such structured sequences, infinitely many integers are missing (or at least one infinite arithmetic progression is missed).
+
+That’s exactly the sort of “structured Cantor-like subset sum set” phenomenon Hegyvári’s 1994 result hints at (continuum many pairs with no infinite AP in the sumset), but turning that into a *specific explicit irrational-ratio pair* is hard.
+
+---
+
+# Summary: what is now “done,” what remains “hard”
+
+* ✅ **(iii).2 can be made completely rigorous** and is in fact *stronger* than stated: for non‑dyadic (\beta), subset sums hit every residue mod every (m) (Lemma 2.2).
+
+* ✅ **(iii).3 can be made completely rigorous**: you can explicitly construct non‑dyadic (\beta) whose *single-term* residues (\lfloor 2^t\beta\rfloor\bmod m) avoid large sets forever (Lemma 3.1). So any approach relying on single-term equidistribution “for all (\beta)” will fail.
+
+* ❌ **(iii).1 is the genuine bottleneck**. The clean, precise target is:
+  find (m) such that (P(\alpha)) (or (P(\beta))) eventually contains all multiples of (m). If you can prove that for one parameter, Lemma 4.1 + Lemma 2.2 essentially finishes the Erdős–Graham completeness question for all non‑dyadic partners.
+
+If you want, I can next try to push (iii).1 in one of two concrete directions (without asking you questions):
+
+1. try to prove a **weaker but nontrivial “eventually all multiples” statement** under some explicit digit/Diophantine condition on (\alpha) (e.g. normality-type, or a mixing condition on the dyadic orbit), or
+2. try to build a **fully explicit structured (\alpha,\beta)** (e.g. automatic sequences like Thue–Morse/Sturmian) and test via computation what the subset-sum set looks like, in search of a candidate obstruction that might be upgradeable to a proof.

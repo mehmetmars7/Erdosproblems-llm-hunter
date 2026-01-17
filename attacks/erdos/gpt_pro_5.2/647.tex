@@ -1,0 +1,131 @@
+% Erdos Problem #647
+% URL: https://www.erdosproblems.com/647
+
+FORMAL RESTATEMENT
+Let $\tau(m)$ denote the number of positive divisors of the integer $m$.
+Define
+\[
+M(n):=\max_{1\le m<n}\bigl(m+\tau(m)\bigr).
+\]
+The question asks:
+
+\medskip
+\noindent Does there exist an integer $n>24$ such that
+\[
+M(n)\le n+2\ ?
+\]
+
+The problem file notes that $n=24$ satisfies $M(24)\le 26$.
+
+QUICK LITERATURE/CONTEXT CHECK
+No external sources are used.
+The problem file states that such a condition relates to Schinzel's hypothesis $H$,
+and that it is unknown whether there is any $n>24$ satisfying it.
+
+ATTACK PLAN
+Rewrite the inequality in equivalent forms that isolate what must happen to the
+divisor function near $n$.
+Then do exhaustive computation for a reasonably large search range to look for
+candidates.
+
+WORK
+\textbf{Lemma 1 (only the top half of $m$ matters).}
+For any $n\ge1$,
+\[
+\max_{1\le m\le \lfloor n/2\rfloor}\bigl(m+\tau(m)\bigr) \le n.
+\]
+Consequently, the condition $M(n)\le n+2$ is equivalent to
+\[
+\max_{\lfloor n/2\rfloor < m < n}\bigl(m+\tau(m)\bigr) \le n+2.
+\]
+
+\emph{Proof.}
+For every $m\ge1$ we have the trivial bound $\tau(m)\le m$ (each divisor is at
+least $1$, so there can be at most $m$ of them).
+Thus $m+\tau(m)\le 2m$.
+If $m\le \lfloor n/2\rfloor$, then $2m\le n$, so $m+\tau(m)\le n$.
+Taking the maximum over $m\le \lfloor n/2\rfloor$ gives the first inequality.
+The second statement follows because the maximum over all $m<n$ is then attained
+among $m>n/2$.
+\hfill $\square$
+
+\medskip
+\textbf{Lemma 2 (translation into pointwise divisor bounds near $n$).}
+For an integer $n\ge2$, the inequality $M(n)\le n+2$ holds if and only if
+for every integer $j$ with $1\le j\le n-1$,
+\[
+\tau(n-j) \le j+2.
+\]
+
+\emph{Proof.}
+Write the condition $M(n)\le n+2$ as
+$m+\tau(m)\le n+2$ for every integer $1\le m<n$.
+Substitute $m=n-j$ (so $j=n-m$ runs over $1,2,\dots,n-1$).
+The inequality becomes
+$(n-j)+\tau(n-j)\le n+2$, i.e., $\tau(n-j)\le j+2$.
+This is a reversible change of variables, hence an equivalence.
+\hfill $\square$
+
+\medskip
+\textbf{Lemma 3 (computed small cases and a $2\cdot 10^6$ search).}
+Let $C$ be the set of integers $n$ such that $M(n)\le n+2$.
+The following statements were verified by explicit computation.
+\begin{itemize}
+\item For $n\le 200$, the values in $C$ are
+\[
+C\cap[1,200]=\{2,3,4,5,6,8,10,12,24\}.
+\]
+\item For all $n$ with $25\le n\le 2{,}000{,}000$, \emph{no} such $n$ belongs to $C$.
+Equivalently, there is no $n>24$ with $M(n)\le n+2$ in this range.
+\item In the same computation up to $2{,}000{,}000$, the maximum observed value of
+$M(n)-n$ was $287$, attained at $n=1{,}441{,}441$.
+\end{itemize}
+
+\emph{Proof.}
+This is a direct computation.
+I computed $\tau(m)$ for all $m\le 2{,}000{,}000$ via a smallest-prime-factor
+sieve, then computed the prefix maxima
+$M(n)=\max_{m<n}(m+\tau(m))$ incrementally.
+For each $n$ I tested whether $M(n)\le n+2$.
+The above sets and extrema are exactly what the program printed.
+\hfill $\square$
+
+VERIFICATION
+\textbf{Sanity check at $n=24$.}
+The computation reports $M(24)=26$, so $M(24)=24+2$, matching the problem file.
+
+\textbf{Interpreting the condition using Lemma 2.}
+If $M(n)\le n+2$ then in particular $\tau(n-1)\le 3$ and $\tau(n-2)\le 4$.
+Thus $n-1$ must be prime or a prime square, and $n-2$ must have at most four
+positive divisors (prime, prime square, $pq$ with $p\neq q$, or a prime cube).
+More generally, $n$ would have to sit after a long stretch of integers with very
+small divisor counts.
+
+FINAL
+**UNRESOLVED**
+(i) Strongest proved partial results in this write-up: reductions in Lemma 1 and
+Lemma 2, and explicit computation (Lemma 3) showing that there is no example
+$n>24$ up to $2{,}000{,}000$.
+
+(ii) First gap (crisp): either (a) exhibit an explicit $n>24$ with
+$\max_{m<n}(m+\tau(m))\le n+2$, or (b) prove that no such $n$ exists.
+
+(iii) Top 3 next moves:
+1. Push the computation substantially further using a memory-efficient sieve
+(e.g., array-based SPF/\tau, segmented methods) to see whether candidates ever
+reappear.
+2. Use Lemma 2 to constrain the shape of a candidate $n$ (e.g., $n-1$ prime or
+prime square, $n-2$ having $\le4$ divisors, etc.) and perform a targeted search
+over such $n$.
+3. Try to prove a general obstruction: show that for all sufficiently large $n$
+there exists some $m\in(n/2,n)$ with $m+\tau(m)\ge n+3$, i.e.,
+$\tau(m)\ge n+3-m$ for some $m$ close enough to $n$.
+
+(iv) Minimal counterexample structure:
+If an example $n>24$ exists, the smallest such $n$ must satisfy the chain of
+inequalities from Lemma 2:
+$\tau(n-1)\le 3$, $\tau(n-2)\le 4$, $\tau(n-3)\le 5$, ..., with the constraints
+becoming stricter as $m$ approaches $n$.
+So a minimal example would likely have $n-1$ prime (or a rare prime square), and
+many of $n-2,n-3,\dots$ being primes or products of few primes, with no earlier
+$m<n$ having an unusually large value of $m+\tau(m)$ compared to $n+2$.

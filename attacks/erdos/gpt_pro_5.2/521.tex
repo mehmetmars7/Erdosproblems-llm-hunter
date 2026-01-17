@@ -1,0 +1,139 @@
+% Erdos Problem #521
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Let $(\epsilon_k)_{k\ge 0}$ be independent random variables with
+\[\mathbb P(\epsilon_k=1)=\mathbb P(\epsilon_k=-1)=\tfrac12.
+\]
+For each $n\ge 0$ define the random degree-$n$ polynomial
+\[f_n(z)=\sum_{k=0}^n \epsilon_k z^k.
+\]
+Let $R_n$ be the number of real roots of $f_n$ (counted with multiplicity).
+Question: Is it true that, with probability $1$,
+\[\lim_{n\to\infty} \frac{R_n}{\log n} = \frac{2}{\pi}\ ?\]
+(Here $\log$ is the natural logarithm; the limit is interpreted for integers $n\to\infty$.)
+
+\bigskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem statement reports that Erd\H{o}s and Offord showed the number of real roots of a random degree $n$ polynomial with $\pm 1$ coefficients is $(\tfrac{2}{\pi}+o(1))\log n$. It also reports that Do proved an almost sure law for the number of real roots in $[-1,1]$, namely $R_n[-1,1]/\log n\to 1/\pi$ almost surely (for the $\pm 1$ model).
+
+\bigskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{itemize}
+\item \emph{Proof track idea 1:} Show $R_n$ concentrates sharply around its mean and then upgrade to an almost sure limit via Borel--Cantelli (requires tail bounds and some quasi-independence across $n$).
+\item \emph{Proof track idea 2:} Express $R_n$ via Kac--Rice type integrals for real zeros, then prove a strong law by analyzing fluctuations.
+\item \emph{Disproof track:} Look for a mechanism creating infinitely many exceptional $n$ with unusually many real zeros (e.g. frequent near-factorizations or many sign changes), preventing convergence of $R_n/\log n$.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{WORK.}
+
+\medskip
+\noindent\textbf{Fast reality check (brute force small $n$; numerical root-finding).}
+For small $n$ we enumerated all $2^{n+1}$ sign choices and counted real roots numerically (counting a root as real if $|\Im r|<10^{-8}$). We also counted roots in the closed unit disk (for connection with Problem~522).
+\begin{verbatim}
+{'n': 4, 'num_polynomials': 32, 'avg_real': 1.25, 'avg_in': 2.375, 'min_real': 0, 'max_real': 2, 'min_in': 1, 'max_in': 4}
+{'n': 6, 'num_polynomials': 128, 'avg_real': 1.5, 'avg_in': 3.25, 'min_real': 0, 'max_real': 2, 'min_in': 1, 'max_in': 6}
+{'n': 8, 'num_polynomials': 512, 'avg_real': 1.609375, 'avg_in': 4.3984375, 'min_real': 0, 'max_real': 4, 'min_in': 1, 'max_in': 8}
+{'n': 10, 'num_polynomials': 2048, 'avg_real': 1.7265625, 'avg_in': 5.09375, 'min_real': 0, 'max_real': 4, 'min_in': 1, 'max_in': 10}
+\end{verbatim}
+A larger-$n$ Monte Carlo with 200 samples (same numerical criterion) gave:
+\begin{verbatim}
+{'n': 20, 'samples': 200, 'avg_real': 2.14, 'min_real': 0, 'max_real': 4, 'avg_in': 10.17, 'min_in': 5, 'max_in': 15}
+{'n': 50, 'samples': 200, 'avg_real': 2.71, 'min_real': 0, 'max_real': 6, 'avg_in': 25.145, 'min_in': 18, 'max_in': 32}
+{'n': 100, 'samples': 200, 'avg_real': 3.23, 'min_real': 0, 'max_real': 8, 'avg_in': 49.77, 'min_in': 38, 'max_in': 64}
+\end{verbatim}
+These are sanity checks only; numerical root-finding can misclassify roots extremely near the real axis.
+
+\medskip
+\noindent\textbf{Lemma 521.1 (root modulus annulus for Littlewood polynomials).}
+Fix $n\ge 0$ and any choice of coefficients $\epsilon_0,\dots,\epsilon_n\in\{-1,1\}$. Let
+\[P(z)=\sum_{k=0}^n \epsilon_k z^k.
+\]
+Then every complex root $z$ of $P$ satisfies
+\[\tfrac12\le |z|\le 2.
+\]
+
+\noindent\textbf{Proof.}
+Write $P(z)=\epsilon_n z^n + \epsilon_{n-1}z^{n-1}+\cdots+\epsilon_0$ with $\epsilon_n\ne 0$.
+Cauchy's root bound states that every root $z$ satisfies
+\[|z|\le 1+\max_{0\le k\le n-1} \Big|\frac{\epsilon_k}{\epsilon_n}\Big|.
+\]
+Here $|\epsilon_k/\epsilon_n|=1$, so $|z|\le 2$.
+
+For the lower bound, consider the reciprocal polynomial
+\[Q(w)=w^n P(1/w)=\epsilon_0 w^n + \epsilon_1 w^{n-1}+\cdots+\epsilon_n.
+\]
+If $z\ne 0$ is a root of $P$, then $w=1/z$ is a root of $Q$. Applying the same Cauchy bound to $Q$ (now the leading coefficient is $\epsilon_0\ne 0$ and all other coefficients also have modulus $1$) yields $|w|\le 2$. Thus $|z|=|1/w|\ge 1/2$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 521.2 (exact probability of a root at $\pm 1$).}
+For each $n\ge 0$,
+\begin{align*}
+\mathbb P\big(f_n(1)=0\big)
+&=\begin{cases}
+0,& n\ \text{even},\\
+2^{-(n+1)}\binom{n+1}{(n+1)/2},& n\ \text{odd},
+\end{cases}\\
+\mathbb P\big(f_n(-1)=0\big)
+&=\begin{cases}
+0,& n\ \text{even},\\
+2^{-(n+1)}\binom{n+1}{(n+1)/2},& n\ \text{odd}.
+\end{cases}
+\end{align*}
+
+\noindent\textbf{Proof.}
+We have $f_n(1)=\sum_{k=0}^n \epsilon_k$. This sum equals $0$ exactly when there are equally many $+1$ and $-1$ among the $n+1$ coefficients. If $n$ is even then $n+1$ is odd, so equality is impossible and the probability is $0$. If $n$ is odd then $n+1$ is even and the number of sign choices with exactly $(n+1)/2$ plus signs is $\binom{n+1}{(n+1)/2}$. Dividing by the total $2^{n+1}$ sign choices gives the stated probability.
+
+For $-1$, observe $f_n(-1)=\sum_{k=0}^n \epsilon_k(-1)^k$. Define $\epsilon_k' = \epsilon_k(-1)^k$. Then $(\epsilon_k')_{0\le k\le n}$ are still independent uniform random signs, so $f_n(-1)$ has the same distribution as $\sum_{k=0}^n \epsilon_k'$, and the same counting argument applies.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 521.3 (reciprocal symmetry of real-root location in expectation).}
+Let $N_n(a,b)$ denote the number of real roots of $f_n$ in an interval $(a,b)$, counted with multiplicity. Then
+\[\mathbb E\,N_n(0,1)=\mathbb E\,N_n(1,\infty)
+\quad\text{and}\quad
+\mathbb E\,N_n(-1,0)=\mathbb E\,N_n(-\infty,-1).
+\]
+
+\noindent\textbf{Proof.}
+Define the reversed polynomial
+\[f_n^*(z)=z^n f_n(1/z)=\sum_{k=0}^n \epsilon_k z^{n-k}.
+\]
+The coefficient vector of $f_n^*$ is $(\epsilon_n,\dots,\epsilon_0)$, which has the same distribution as $(\epsilon_0,\dots,\epsilon_n)$ because the $\epsilon_k$ are i.i.d.
+Hence $f_n^*$ has the same distribution as $f_n$.
+
+If $x\ne 0$ is a real root of $f_n$, then $1/x$ is a real root of $f_n^*$, with the same multiplicity. Therefore the number of roots of $f_n$ in $(0,1)$ equals the number of roots of $f_n^*$ in $(1,\infty)$. Taking expectations and using equality in distribution gives
+\[\mathbb E\,N_n(0,1)=\mathbb E\,N_n^*(1,\infty)=\mathbb E\,N_n(1,\infty).
+\]
+The negative interval identity is identical.
+\hfill$\square$
+
+\bigskip
+\noindent\textbf{VERIFICATION.}
+\begin{itemize}
+\item Lemma~521.1: Cauchy's bound applies to any polynomial with nonzero leading coefficient; here leading and constant coefficients are $\pm 1$, so reciprocal polynomial is well-defined and has nonzero leading coefficient.
+\item Lemma~521.2: We explicitly handled the parity obstruction. The argument for $-1$ uses the bijection $\epsilon_k\mapsto\epsilon_k(-1)^k$; independence and uniformity are preserved.
+\item Lemma~521.3: The only edge case is the root $0$, but $f_n(0)=\epsilon_0\ne 0$, so there is no root at $0$.
+\end{itemize}
+
+\bigskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:}
+Deterministic root localization $\tfrac12\le |z|\le 2$ for every realization (Lemma~521.1), and exact formulas for the probabilities of having a real root at $\pm 1$ (Lemma~521.2). Also, a reciprocal symmetry identity in expectation for the distribution of real roots across $(0,1)$ vs $(1,\infty)$ (Lemma~521.3).
+
+(ii) \emph{First gap (crisp):}
+Prove almost sure convergence of $R_n/\log n$ to a constant (and identify it as $2/\pi$), i.e. show that fluctuations of $R_n$ around its typical size are $o(\log n)$ almost surely.
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Establish a tail bound of the form $\mathbb P(|R_n-\mathbb E R_n|\ge t)\le \exp(-c t^2/\log n)$ (or similar) for $t$ up to $\asymp \log n$, sufficient for Borel--Cantelli.
+\item Show approximate independence (or mixing) for the increments $R_{n+\Delta}-R_n$ on a sparse subsequence (e.g. dyadic $n$) to control almost sure behavior.
+\item Computation: push exact enumeration of $\mathbb E R_n$ for all polynomials up to the largest feasible $n$ (e.g. $n\approx 16$) using Sturm sequences (exact real-root counting) to reduce numerical uncertainty.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:}
+A counterexample would likely require infinitely many $n$ where $R_n$ deviates from $(2/\pi)\log n$ by a positive proportion of $\log n$; concretely, one would need a mechanism producing (with positive probability) unusually many near-repeated sign patterns causing extra real zeros, and such events must recur infinitely often.
+
+

@@ -1,0 +1,64 @@
+\section{MO 55423: Constructing non-torsion points on elliptic curves of rank $>1$}
+
+\subsection*{1) Formal restatement}
+The literal text is a \emph{request for a construction}, not a proposition with a truth value. 
+
+\paragraph{Minimal corrected statement (algorithmic existence).}
+Fix a Weierstrass model of an elliptic curve $E/\mathbb{Q}$. Assume $\operatorname{rank}E(\mathbb{Q})\ge 1$ (in particular, $\ge 2$ as in the post). Then there exists a deterministic algorithm which, given the coefficients of $E$, outputs a rational point $P\in E(\mathbb{Q})$ of infinite order.
+
+\subsection*{2) Quick literature/context check}
+The post contrasts the explicit \emph{analytic} construction in analytic rank $1$ (Gross--Zagier/Heegner points) with the lack of a uniform explicit construction in rank $\ge 2$. The post also mentions the Mazur--Swinnerton-Dyer idea using ramification points of modular parametrizations and trace-to-$\mathbb{Q}$. 
+
+For the \emph{algorithmic} corrected statement, one may use classical results describing torsion points on elliptic curves over $\mathbb{Q}$, e.g.\ Nagell--Lutz (torsion points on a minimal integral model have integral coordinates and satisfy a divisibility condition), which yields a finite computation of $E(\mathbb{Q})_{\mathrm{tors}}$; then search for any rational point not in that finite set.
+
+\subsection*{3) Attack plan}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Proof strategy:} Give an explicit enumeration of rational points by increasing height; prove it finds a point if one exists. Separately compute the torsion subgroup by a finite search (Nagell--Lutz). Output the first point not in torsion.
+\item \textbf{Disproof strategy:} Not applicable for the corrected statement: it is a straightforward computability/termination claim assuming existence of a non-torsion point.
+\end{itemize}
+
+\subsection*{4) Work}
+
+\begin{theorem}[Deterministic construction of a non-torsion point given positive rank]
+Let $E/\mathbb{Q}$ be an elliptic curve given by an integral Weierstrass equation, and assume $\mathrm{rank}\,E(\mathbb{Q})\ge 1$. Then there is a deterministic algorithm which outputs a point $P\in E(\mathbb{Q})$ of infinite order.
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 0: Reduce to a minimal integral model.}
+Compute a global minimal Weierstrass equation for $E$. (Any standard algorithm for minimal models suffices; we only need that a minimal integral model exists.)
+
+\textbf{Step 1: Compute $E(\mathbb{Q})_{\mathrm{tors}}$ by a finite search.}
+By the Nagell--Lutz theorem for elliptic curves over $\mathbb{Q}$: if $E$ is given by a \emph{minimal} integral Weierstrass equation and $P=(x,y)\in E(\mathbb{Q})$ is a torsion point, then $x,y\in\mathbb{Z}$ and either $y=0$ or $y^2$ divides the discriminant $\Delta$ of the minimal model. Hence there are only finitely many possibilities for $y$ (namely integers with $y=0$ or $y^2\mid \Delta$), and for each such $y$ there are finitely many integer $x$ satisfying the Weierstrass equation. Enumerating all such integer pairs $(x,y)$ and checking the curve equation yields a finite list; Nagell--Lutz guarantees this list is \emph{exactly} $E(\mathbb{Q})_{\mathrm{tors}}$.
+
+\textbf{Step 2: Enumerate all rational points and stop when a non-torsion point is found.}
+Any rational point $P\in E(\mathbb{Q})$ on a (short) Weierstrass model can be written uniquely as
+\[
+P=\left(\frac{u}{v^2},\frac{w}{v^3}\right)
+\quad\text{with }u,v,w\in\mathbb{Z},\ v\ge 1,\ \gcd(u,v)=\gcd(w,v)=1.
+\]
+Define a naive height bound $H(u,v,w)=\max\{|u|,|w|,v\}$. For $B=1,2,3,\dots$ do:
+\begin{enumerate}[label=\arabic*.]
+\item Enumerate all triples $(u,v,w)\in\mathbb{Z}\times\mathbb{Z}_{\ge 1}\times\mathbb{Z}$ with $H(u,v,w)\le B$ and $\gcd(u,v)=\gcd(w,v)=1$.
+\item For each such triple, check whether $\left(\frac{u}{v^2},\frac{w}{v^3}\right)$ satisfies the Weierstrass equation. If so, let $P$ be that point.
+\item Check whether $P\in E(\mathbb{Q})_{\mathrm{tors}}$ (membership in a finite list). If $P\notin E(\mathbb{Q})_{\mathrm{tors}}$, output $P$ and halt.
+\end{enumerate}
+
+\textbf{Correctness and termination.}
+The procedure in Step~2 enumerates \emph{all} rational points on $E$ because every $P\in E(\mathbb{Q})$ has a representation $(u,v,w)$ of finite height, so it will eventually appear when $B$ is large enough. Since $\mathrm{rank}\,E(\mathbb{Q})\ge 1$, there exists at least one point $P_\infty\in E(\mathbb{Q})$ of infinite order, hence $P_\infty\notin E(\mathbb{Q})_{\mathrm{tors}}$. Therefore, when $B$ reaches the finite bound $H(P_\infty)$, Step~2 will find some non-torsion point and halt.
+
+Thus the algorithm halts and outputs a point of infinite order.
+\end{proof}
+
+\subsection*{Phase 1 check: tiny example}
+Consider $E: y^2=x^3-2$ over $\mathbb{Q}$. Then $(3,5)\in E(\mathbb{Q})$ since $25=27-2$. The discriminant is $\Delta=-16(4\cdot 0^3+27(-2)^2)=-1728$. By Nagell--Lutz, a torsion point must have integer coordinates and satisfy $y=0$ or $y^2\mid 1728$. Here $y^2=25\nmid 1728$, so $(3,5)$ is non-torsion (hence infinite order). The algorithm above finds $(3,5)$ quickly by enumerating small $(u,v,w)$.
+
+\subsection*{5) Verification}
+\begin{itemize}[leftmargin=*]
+\item \textbf{Edge case: rank $0$.} If $\mathrm{rank}\,E(\mathbb{Q})=0$, Step~2 may never find a non-torsion point and will not halt. This is consistent: the theorem assumes $\mathrm{rank}\ge 1$.
+\item \textbf{Torsion computation.} Correctness hinges on Nagell--Lutz for a minimal model; once used, torsion is a finite explicit set.
+\item \textbf{Enumeration completeness.} Every rational point has finite height in the chosen parametrization, so the brute-force enumeration is exhaustive.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{PROOF.}
+

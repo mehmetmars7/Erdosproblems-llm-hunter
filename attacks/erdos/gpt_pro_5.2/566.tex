@@ -1,0 +1,311 @@
+## 1) FORMAL RESTATEMENT
+
+### Conventions
+
+* All graphs are **finite, simple, undirected** (no loops or multiple edges).
+* For a graph (X), write (v(X)=|V(X)|) and (e(X)=|E(X)|).
+* A “subgraph on (k) vertices” means: choose a subset (S\subseteq V(G)) with (|S|=k), and take **any** subgraph whose vertex set is (S) (equivalently: any graph (J\subseteq G[S])). Then (v(J)=k) and (e(J)\le e(G[S])).
+
+### Ramsey number
+
+For graphs (G,H), the (two–color) Ramsey number (R(G,H)) is the least integer (N) such that every red/blue coloring of the edges of (K_N) contains either:
+
+* a red (not necessarily induced) copy of (G), or
+* a blue (not necessarily induced) copy of (H).
+
+Equivalently: for every graph (X) on (N) vertices, either (X) contains (G) as a (not necessarily induced) subgraph, or (\overline{X}) contains (H) as a subgraph.
+
+### The sparsity hypothesis on (G)
+
+The literal condition “every subgraph on (k) vertices has at most (2k-3) edges” is **nonsensical for (k=1)** because it would demand (0\le -1). Standard convention in this area is that such inequalities are intended for (k\ge 2).
+
+So the **minimal corrected statement** is:
+
+> (\forall k\in\mathbb{Z}) with (2\le k\le v(G)), every subgraph (J\subseteq G) with (v(J)=k) satisfies
+> [
+> e(J)\le 2k-3.
+> ]
+
+### “Ramsey size-linear”
+
+“(R(G,H)\ll m)” means: there exists a constant (C_G>0) (depending only on (G)) such that for **every** graph (H) with
+
+* (e(H)=m), and
+* no isolated vertices (i.e. every vertex has degree (\ge 1), hence (v(H)\le 2m) and (m\ge 1)),
+
+we have
+[
+R(G,H)\le C_G,m.
+]
+
+### Problem
+
+Assuming the corrected sparsity hypothesis on (G) (for all (k\ge 2)), decide whether:
+
+> (**Claim**) Every such graph (G) is Ramsey size-linear, i.e.
+> [
+> \exists C_G>0\ \forall H\text{ with no isolates}:\ R(G,H)\le C_G,e(H).
+> ]
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+Web check shows that this question is explicitly recorded as **open** in recent work.
+
+* Bradač–Gishboliner–Sudakov (SIAM DM 2024; author PDF) state that Erdős et al. asked whether **every** graph (H) with (m_2(H)\le 2) is Ramsey size-linear, and that this “seem[s] to be still out of reach.” ([ETH Zurich Math People][1])
+  They also highlight the specific unresolved case (K_4^*) (subdivide one edge of (K_4) once) and say they cannot answer it, though they prove a partial result for bipartite (F): (R(K_4^*,F)=O(e(F))). ([ETH Zurich Math People][1])
+  They prove that every subdivision of (K_4) on at least 6 vertices is Ramsey size-linear. ([ETH Zurich Math People][1])
+
+* Wigderson (arXiv v2, May 2025) repeats the definition of Ramsey size-linear and notes (K_4) is not Ramsey size-linear. 
+  He also cites the known sufficient condition that if (e(G)>2v(G)-2) then (G) is not Ramsey size-linear. 
+
+So: as of 2024–2025 literature, the **general claim** you ask for is not resolved, and even the specific graph (K_4^*) remains a key open instance. ([ETH Zurich Math People][1])
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof-track ideas
+
+1. **Exploit the “2-density” condition.**
+   The inequality (e(J)\le 2v(J)-3) is equivalent to (m_2(G)\le 2) (definition below). One might try to prove a general embedding/DRC lemma: in any (G)-free red graph on (N=O(m)) vertices, the blue graph must contain any (H) with (m) edges.
+
+2. **Reduce to biconnected/components.**
+   There are known decompositions for Ramsey numbers along biconnected components (Bradač–Gishboliner–Sudakov record such a corollary). One might hope to reduce to a finite list of “2-connected obstructions,” ideally down to the (K_4^*)-type cases.
+
+3. **Handle extremal obstructions (Ramsey–Turán viewpoint).**
+   For (H=K_n), (R(G,K_n)) is controlled by the largest (G)-free graphs with small independence number. For size-linearity it would suffice to show (R(G,K_n)=O(n^2)) for all (m_2(G)\le 2) and then extend from cliques to all (H) by a general “(H\subseteq K_{2m})” bootstrapping plus structural arguments.
+
+### Disproof-track ideas
+
+1. **Attack (K_4^*).**
+   If one can show (R(K_4^*,K_n)=\omega(n^2)), then taking (H=K_n) (with (e(H)=\Theta(n^2))) would immediately refute size-linearity for a (G) satisfying your local (2k-3) bound.
+
+2. **Construct (H) sparse but Ramsey-hard against a candidate (G).**
+   Find a family (H_m) with (e(H_m)=m) but such that one can 2-color (K_{c m}) avoiding both a red (G) and a blue (H_m) for every fixed (c). This would require designing “(H_m)-free” blue graphs of density close to 1 while keeping red (G)-free.
+
+**Best path to try first:** check whether the problem is already solved (it isn’t, per sources), and then see whether we can either (i) prove size-linearity for the key open case (K_4^*) or (ii) build a counterexample already for (K_4^*). If neither succeeds, we will have to stop at UNRESOLVED.
+
+---
+
+## 4) WORK
+
+### 4.1 Clarifying the sparsity condition: equivalence to (m_2(G)\le 2)
+
+Define the **2-density** of a graph (F) by
+[
+m_2(F):=\max\left{\frac{e(J)-1}{v(J)-2}:\ J\subseteq F,\ v(J)\ge 3\right},
+]
+as in Bradač–Gishboliner–Sudakov.
+
+**Lemma 4.1.** For a graph (G), the following are equivalent:
+
+1. For every subgraph (J\subseteq G) with (v(J)=k\ge 2), (e(J)\le 2k-3).
+2. (m_2(G)\le 2).
+
+*Proof.*
+(1)(\Rightarrow)(2): Let (J\subseteq G) with (v(J)\ge 3). Then (e(J)\le 2v(J)-3), so
+[
+\frac{e(J)-1}{v(J)-2}\le \frac{(2v(J)-3)-1}{v(J)-2}=\frac{2v(J)-4}{v(J)-2}=2.
+]
+Taking the maximum over all such (J) gives (m_2(G)\le 2).
+
+(2)(\Rightarrow)(1): Let (J\subseteq G) with (v(J)=k\ge 3). Then
+[
+\frac{e(J)-1}{k-2}\le m_2(G)\le 2
+\quad\Rightarrow\quad
+e(J)-1\le 2(k-2)
+\quad\Rightarrow\quad
+e(J)\le 2k-3.
+]
+For (k=2), any simple graph has at most one edge, and (1=2\cdot 2-3), so the inequality holds as well. ∎
+
+So your hypothesis on (G) is exactly (m_2(G)\le 2).
+
+This aligns with the statement in Bradač–Gishboliner–Sudakov that Erdős et al. asked whether every graph (H) with (m_2(H)\le 2) is Ramsey size-linear. ([ETH Zurich Math People][1])
+
+---
+
+### 4.2 A fully proved partial result: forests are Ramsey size-linear
+
+This is a standard and fully provable special case.
+
+**Lemma 4.2.** If (G) is a forest, then (G) is Ramsey size-linear: there exists (C_G) such that for every (H) with no isolated vertices,
+[
+R(G,H)\le C_G,e(H).
+]
+
+*Proof.*
+Let (G) be a forest. Then (G) is a subgraph of some tree (T) on (t:=v(G)) vertices (take any spanning tree of each component and connect components by adding edges; the resulting tree has at most (t) vertices; if it uses fewer, add isolated vertices and then connect—details omitted because we can simply take a tree (T) on exactly (t) vertices that contains (G) as a subgraph; such a tree always exists by taking a tree spanning (t) labeled vertices and embedding (G) by mapping components into disjoint subtrees).
+
+Monotonicity of Ramsey numbers in the first argument: if (G\subseteq T), then
+[
+R(G,H)\le R(T,H)
+]
+because any red copy of (T) contains a red copy of (G).
+
+Now let (H) be a graph with no isolated vertices and (m:=e(H)). Then (v(H)\le 2m). Hence (H) is a subgraph of the complete graph (K_{2m}). Monotonicity in the second argument gives
+[
+R(T,H)\le R(T,K_{2m}).
+]
+
+Chvátal’s theorem (1977) states that for every tree (T) on (t) vertices and every (n\ge 1),
+[
+R(T,K_n) = (t-1)(n-1)+1.
+]
+(See also the statement quoted in Wigderson’s note. )
+
+Applying this with (n=2m), we get
+[
+R(T,K_{2m})=(t-1)(2m-1)+1 \le (t-1)(2m)+1 = 2(t-1)m+1.
+]
+
+Putting everything together:
+[
+R(G,H)\le R(T,H)\le R(T,K_{2m})\le 2(t-1)m+1.
+]
+Thus (C_G:=2(t-1)+1) works (or simply (C_G:=2(t-1)+2) to absorb the “(+1)” uniformly for (m\ge 1)). ∎
+
+This matches the folklore lemma quoted by Wigderson. 
+
+---
+
+### 4.3 What remains: the main claim is not resolved by known results, and the obstruction (K_4^*)
+
+From the literature check, the central open question is exactly:
+
+> Are all graphs (G) with (m_2(G)\le 2) Ramsey size-linear?
+
+Bradač–Gishboliner–Sudakov explicitly state this remains out of reach and single out (K_4^*) as an unresolved test case. ([ETH Zurich Math People][1])
+
+Moreover, they prove:
+
+* (R(K_4^*,F)=O(e(F))) for every bipartite (F) with no isolates, ([ETH Zurich Math People][1])
+* every subdivision of (K_4) on at least 6 vertices is Ramsey size-linear, ([ETH Zurich Math People][1])
+  but they do **not** settle whether (K_4^*) is Ramsey size-linear against arbitrary (possibly non-bipartite) (H). ([ETH Zurich Math People][1])
+
+At this point, any complete proof of the posed claim would, in particular, have to prove that (K_4^*) is Ramsey size-linear; and any counterexample would likely be found among graphs with (m_2=2), with (K_4^*) being the smallest prominent candidate. The current sources provide neither.
+
+I attempted the two natural next steps (proof/disproof tracks) in a self-contained way:
+
+* **Proof attempt idea:** use the condition (m_2(G)\le 2) to force structural constraints on (G)-free red graphs strong enough to embed an arbitrary (m)-edge (H) in blue when (N=O(m)).
+  **Failure point:** I could not produce a correct general embedding lemma of the form “every (G)-free graph on (N) vertices has complement containing every (m)-edge (H)” with (N=O(m)), even in the first open case (G=K_4^*). This is consistent with the state-of-the-art statement that the question is still open. ([ETH Zurich Math People][1])
+
+* **Disproof attempt idea:** exhibit a specific (G) with (m_2(G)\le 2) (ideally (K_4^*)) and construct graphs (H_m) with (e(H_m)=m) such that (R(G,H_m)) grows superlinearly in (m).
+  **Failure point:** I did not find (and the cited sources do not provide) any explicit family (H_m) proving superlinear growth for any (G) satisfying your hypothesis. In particular, proving (R(K_4^*,K_n)=\omega(n^2)) (which would disprove size-linearity for (K_4^*)) appears to be exactly what is currently open. ([ETH Zurich Math People][1])
+
+So no complete proof or counterexample emerged.
+
+---
+
+## 5) VERIFICATION
+
+### Quantifier/edge-case checks
+
+* The corrected sparsity condition must be stated for (k\ge 2); otherwise (k=1) breaks it. I explicitly fixed this in the restatement.
+* Since (H) has no isolated vertices, (m=e(H)\ge 1) and (v(H)\le 2m), which makes the “(H\subseteq K_{2m})” step in Lemma 4.2 valid.
+
+### Internal consistency
+
+* Lemma 4.1 is purely algebraic and checks out.
+* Lemma 4.2 relies on: (i) monotonicity of Ramsey numbers under taking subgraphs, and (ii) Chvátal’s exact tree–clique Ramsey number, both standard and directly invoked in the cited note. 
+
+### Adversarial attempts
+
+* Could Lemma 4.2 fail because (H) might have more than (2m) vertices? No: “no isolated vertices” forces (2m=\sum \deg(v)\ge v(H)).
+* Does size-linearity for forests depend on any unverified conjecture? No; it is a direct consequence of Chvátal’s theorem.
+
+### Main goal
+
+* I do not have a proof of the full claim, nor an explicit counterexample family. This matches the web-verified status that the general question and the (K_4^*) case are open. ([ETH Zurich Math People][1])
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* If (G) is a **forest**, then (G) is Ramsey size-linear: (R(G,H)\le 2(v(G)-1)e(H)+1) for all (H) with no isolated vertices (Lemma 4.2, proved above).
+* The hypothesis “every (k)-vertex subgraph has (\le 2k-3) edges” is exactly the condition (m_2(G)\le 2) (Lemma 4.1, proved above).
+
+(ii) **Exact first gap (crisp statement I could not prove).**
+
+* I could not prove (nor disprove) the following specific instance:
+  [
+  \exists C>0\ \forall H\text{ with no isolates}:\ R(K_4^*,H)\le C,e(H),
+  ]
+  where (K_4^*) is (K_4) with one edge subdivided once. This is explicitly identified as open in the recent literature. ([ETH Zurich Math People][1])
+
+(iii) **Top 3 next moves.**
+
+1. **Resolve (K_4^*):** either show (R(K_4^*,K_n)=O(n^2)) (and then extend beyond cliques), or construct (K_4^*)-free graphs with independence (<n) on (\omega(n^2)) vertices to get (R(K_4^*,K_n)=\omega(n^2)). This is the central bottleneck highlighted by Bradač–Gishboliner–Sudakov. ([ETH Zurich Math People][1])
+2. **Ramsey–Turán approach:** study extremal density/structure of (G)-free graphs with bounded independence number when (m_2(G)=2), aiming to force a large “blue-embeddable” structure with (N=O(m)).
+3. **Embedding lemma for arbitrary (H):** develop a general method (likely combining dependent random choice with a decomposition of (H) into a dense core + sparse attachments) that works in any host graph of size (O(e(H))) under the constraint “red avoids (G)” for (m_2(G)\le 2).
+
+(iv) **What a minimal counterexample would likely look like (structural guess, not a proof).**
+If the claim is false, a minimal counterexample (G) (minimal under taking subgraphs) would likely satisfy:
+
+* (m_2(G)=2) and be “edge-tight” (many subgraphs meeting (e=2v-3)),
+* 2-connected (otherwise one could reduce to blocks),
+* and plausibly contain a small “(K_4)-subdivision core,” with (K_4^*) being the smallest such candidate singled out in the literature. ([ETH Zurich Math People][1])
+
+[1]: https://people.math.ethz.ch/~sudakovb/ramsey-size-linear-graphs.pdf "On Ramsey Size-Linear Graphs and Related Questions | SIAM Journal on Discrete Mathematics | Vol. 38, No. 1 | Society for Industrial and Applied Mathematics"
+
+Your “([ETH Zurich Math People][1])” is pointing at the **Bradač–Gishboliner–Sudakov** paper whose PDF is hosted on an ETH Zürich page (Sudakov’s site). Here is the clean bibliographic identification, plus the exact places in the paper that justify the two claims you attached that footnote to.
+
+## What ([1]) should be
+
+**[1]** D. Bradač, L. Gishboliner, B. Sudakov, *On Ramsey size-linear graphs and related questions*, **SIAM Journal on Discrete Mathematics** 38(1) (2024), 225–242. DOI: 10.1137/22M1481713. ([ETH Zurich Math People][1])
+
+If you want an arXiv identifier as well: the preprint version is arXiv:2202.10388. ([arXiv][2])
+
+### Why this is the right citation for your “central bottleneck” sentence
+
+In their introduction they explicitly say:
+
+* the general question “every (H) with (m_2(H)\le 2) is Ramsey size-linear” is still out of reach, and
+* they single out (K_4^*) (their notation (K_4^*) / (K_4^\ast)) as a specific asked-open case, and
+* they state they cannot answer it affirmatively, but prove it at least when (F) is bipartite.
+
+All of that is in the block around their Theorem 3. ([ETH Zurich Math People][1])
+
+So your line
+
+> “This is the central bottleneck highlighted by Bradač–Gishboliner–Sudakov.”
+
+is accurately supported by that passage. ([ETH Zurich Math People][1])
+
+---
+
+## A second reference you may want to cite alongside ([1])
+
+Balister already stated the “subdivide one edge once” question very explicitly in 2001:
+
+**[2]** P. N. Balister, *A note on Ramsey size-linear graphs* (2001). 
+
+He writes (paraphrasing): it is an open question whether (K_4) with one edge subdivided just once is Ramsey size-linear, and he labels this as “Question 1.” 
+
+This is also where the “minimal counterexample” heuristics you wrote down line up nicely with Balister’s own structural questions: he asks whether adding a 2-edge path between two vertices preserves size-linearity (Question 2) and then discusses graphs with **no cut vertex** and **minimum degree at least 3** as potential obstructions (Question 3). 
+
+That supports your “2-connected / tight” guess theme much more directly than the Bradač–Gishboliner–Sudakov paper does.
+
+---
+
+## If you want the actual URLs for your footnote list
+
+(Per your bracket style, here they are in a code block so they’re easy to paste.)
+
+```text
+[1] https://people.math.ethz.ch/~sudakovb/ramsey-size-linear-graphs.pdf
+    (SIAM J. Discrete Math. 38(1), 2024; DOI 10.1137/22M1481713)
+
+[2] https://www.memphis.edu/msci/people/pbalistr/ramsl.pdf
+```
+
+If you want, I can also format ([1]) and ([2]) as BibTeX entries (journal + arXiv + DOI) in your exact style.
+
+[1]: https://people.math.ethz.ch/~sudakovb/ramsey-size-linear-graphs.pdf "On Ramsey Size-Linear Graphs and Related Questions | SIAM Journal on Discrete Mathematics | Vol. 38, No. 1 | Society for Industrial and Applied Mathematics"
+[2]: https://arxiv.org/pdf/2202.10388?utm_source=chatgpt.com "On Ramsey size-linear graphs and related questions"

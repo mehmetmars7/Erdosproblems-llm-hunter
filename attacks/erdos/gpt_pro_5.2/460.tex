@@ -1,0 +1,113 @@
+% Erdos Problem #460
+% Solution
+
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+Fix an integer $n\ge 1$. Define a sequence $(a_k)_{k\ge 0}$ by
+\[a_0:=n,\qquad a_1:=1,\]
+and for each integer $k\ge 2$, define $a_k$ to be the least integer $>a_{k-1}$ such that
+\[\gcd(n-a_k,\,n-a_i)=1\quad\text{for all }1\le i<k.
+\]
+Because $a_k$ may exceed $n$, the differences $n-a_k$ may be negative; throughout I interpret $\gcd(x,y):=\gcd(|x|,|y|)$.
+
+Define (when the sequence is infinite)
+\[S(n):=\sum_{k\ge 1} \frac1{a_k}.
+\]
+Main question: does $S(n)\to\infty$ as $n\to\infty$?
+
+The problem also asks about restricted subseries, e.g. summing only those indices $k$ for which $n-a_k$ is divisible by some prime $\le a_k$, or the complementary set of indices.
+
+\textbf{Edge case:} for $n=2$ the construction produces $a_1=1,a_2=2,a_3=3$ and then stops (no further $a_k$ exist), because the condition forces $|n-a_k|=1$ once $n-a_2=0$ appears. For $n\ge 3$, $a_k\neq n$ for all $k\ge 1$ (since $\gcd(n-n,n-1)=n-1>1$), so this obstruction does not occur.
+
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+The extracted statement mentions work of Eggleton--Erd\H{o}s--Selfridge proving (for $k$ large enough depending on $n$) a bound of the shape $a_k<k^{2+o(1)}$ and conjecturing $a_k\ll k\log k$. I do not use those bounds here.
+
+\noindent\textbf{3) ATTACK PLAN}
+
+\begin{itemize}
+\item Reformulate the condition in terms of the differences $b_k:=n-a_k$: the set $\{b_k:k\ge 1\}$ is constructed greedily to be pairwise coprime.
+\item View the greedy choice of $a_k$ as a sieve condition modulo primes already appearing in $b_1,\dots,b_{k-1}$.
+\item For the divergence question, one would like uniform upper bounds on $a_k$ (e.g. $a_k\ll k\log k$) for long initial segments as $n\to\infty$, because then $\sum 1/a_k$ behaves like a harmonic/logarithmic sum.
+\end{itemize}
+
+\noindent\textbf{4) WORK}
+
+\textbf{Fast reality check (computations).}
+
+For several small $n$ I computed the first terms and partial sums.  Below are $a_1,\dots,a_{10}$ and the partial sum $\sum_{k=1}^{50}1/a_k$:
+\begin{itemize}
+\item $n=3$: $a_1..a_{10}=[1,2,4,6,8,10,14,16,20,22]$, $a_{50}=226$, partial sum $\approx 2.8471$.
+\item $n=4$: $[1,2,3,5,9,11,15,17,21,23]$, $a_{50}=227$, partial sum $\approx 2.9199$.
+\item $n=10$: $[1,2,3,5,9,11,21,23,27,29]$, $a_{50}=233$, partial sum $\approx 2.8240$.
+\item $n=100$: $[1,2,3,5,11,17,21,27,29,33]$, $a_{50}=333$, partial sum $\approx 2.6587$.
+\end{itemize}
+These computations do not show clear growth of $\sum_{k\le 50}1/a_k$ with $n$.
+
+\medskip
+\noindent\textbf{Lemma 460.1 (pairwise coprimality and disjoint prime supports).}
+For $n\ge 1$, define $b_k:=n-a_k$ for $k\ge 1$.  Then $\gcd(b_i,b_j)=1$ for all distinct $i,j\ge 1$. In particular, if a prime $p$ divides $b_i$ and $b_j$ with $i\neq j$, then $p=1$ (impossible); i.e. the sets of prime divisors of the $b_k$ are pairwise disjoint.
+
+\textit{Proof.}
+By definition of $a_k$, for each $k\ge 2$ we have $\gcd(n-a_k,n-a_i)=1$ for all $1\le i<k$, i.e. $\gcd(b_k,b_i)=1$ for $i<k$. This implies pairwise coprimality of the entire family $(b_k)_{k\ge 1}$. The final statement about prime divisors is immediate: if a prime $p$ divides both $b_i$ and $b_j$, then $p\mid \gcd(b_i,b_j)=1$, contradiction. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 460.2 (sieve reformulation via forbidden congruence classes).}
+Fix $n\ge 3$ and suppose $a_1,\dots,a_{k-1}$ have been constructed. Let
+\[\mathcal P_{k-1}:=\{\text{primes }p: p\mid (n-a_i)\text{ for some }1\le i\le k-1\}.
+\]
+Then an integer $A>a_{k-1}$ satisfies
+\[\gcd(n-A,\,n-a_i)=1\ \forall 1\le i\le k-1\]
+if and only if
+\[A\not\equiv n\pmod p\quad\text{for every }p\in\mathcal P_{k-1}.
+\]
+
+\textit{Proof.}
+($\Rightarrow$) If $\gcd(n-A,n-a_i)=1$ for all $i\le k-1$ and $p\in\mathcal P_{k-1}$, then there exists some $i\le k-1$ with $p\mid (n-a_i)$. If also $A\equiv n\pmod p$, then $p\mid (n-A)$, hence $p\mid\gcd(n-A,n-a_i)$, contradiction. Therefore $A\not\equiv n\pmod p$ for all $p\in\mathcal P_{k-1}$.
+
+($\Leftarrow$) Conversely, assume $A\not\equiv n\pmod p$ for all $p\in\mathcal P_{k-1}$. Fix any $i\le k-1$ and any prime $p$ dividing $(n-a_i)$. Then $p\in\mathcal P_{k-1}$, so $A\not\equiv n\pmod p$, i.e. $p\nmid(n-A)$. Thus no prime divisor of $(n-a_i)$ divides $(n-A)$, so $\gcd(n-A,n-a_i)=1$. Since $i$ was arbitrary, the gcd condition holds for all $1\le i\le k-1$. \hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 460.3 (existence of infinitely many admissible $A$; crude gap bound).}
+Fix $n\ge 3$ and a finite set of primes $\mathcal P$. Let $M:=\prod_{p\in\mathcal P} p$ (with $M=1$ if $\mathcal P=\varnothing$). Then there are infinitely many integers $A$ such that $A\not\equiv n\pmod p$ for all $p\in\mathcal P$; for example, every integer $A\equiv n+1\pmod M$ is admissible. In particular, the greedy sequence $(a_k)$ is infinite for every $n\ge 3$, and furthermore
+\[a_k-a_{k-1}\le M_{k-1}:=\prod_{p\in\mathcal P_{k-1}} p\quad\text{for all }k\ge 2.
+\]
+
+\textit{Proof.}
+If $A\equiv n+1\pmod M$, then for every $p\in\mathcal P$ we have $A\equiv n+1\not\equiv n\pmod p$, so $A$ avoids the forbidden residue class $n\pmod p$. Hence all such $A$ are admissible, and there are infinitely many (an arithmetic progression).
+
+Apply this with $\mathcal P=\mathcal P_{k-1}$ from Lemma~460.2. Then admissible integers occur in each residue class $n+1\pmod {M_{k-1}}$. Therefore, among the integers
+\[a_{k-1}+1,\ a_{k-1}+2,\ \dots,\ a_{k-1}+M_{k-1}\]
+there must exist at least one admissible value (because these $M_{k-1}$ consecutive integers meet every residue class modulo $M_{k-1}$ exactly once). The greedy definition of $a_k$ then ensures $a_k\le a_{k-1}+M_{k-1}$, i.e. $a_k-a_{k-1}\le M_{k-1}$. \hfill$\square$
+
+\medskip
+\noindent\textbf{5) VERIFICATION}
+
+\begin{itemize}
+\item Edge case $n=2$ indeed terminates because $n-a_2=0$ is allowed only when $n-1=1$, and thereafter $\gcd(n-a_k,0)=|n-a_k|$ forces $|n-a_k|=1$.
+\item For $n\ge 3$, $a_k\neq n$ for all $k\ge 1$ because $\gcd(n-n,n-1)=n-1>1$.
+\item Lemma~460.3: checked that the argument ``a block of length $M$ hits every residue class mod $M$'' is correct and does not assume more than elementary modular arithmetic.
+\item Computations were cross-checked by a brute-force gcd implementation using $\gcd(|\cdot|,|\cdot|)$.
+\end{itemize}
+
+\noindent\textbf{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} The construction is equivalent to a greedy sieve avoiding a single residue class modulo each prime that has appeared so far (Lemma~460.2), and admissible choices always exist with a crude gap bound $a_k-a_{k-1}\le \prod_{p\in\mathcal P_{k-1}}p$ (Lemma~460.3). Computations for small $n$ show the partial sums $\sum_{k\le 50}1/a_k$ are around $2.5$--$2.9$ with no clear growth.
+
+(ii) \emph{First gap (crisp):} Prove a uniform bound of the form
+\[a_k\ \ll\ k\log k\quad\text{for all }k\le k_0(n)\text{ with }k_0(n)\to\infty\text{ as }n\to\infty,
+\]
+or any other estimate strong enough to force $S(n)=\sum_{k\ge 1}1/a_k\to\infty$.
+
+(iii) \emph{Top 3 next moves:}
+\begin{enumerate}
+\item Analyze how quickly the prime set $\mathcal P_k$ grows with $k$ for typical $n$, and whether one can show $\prod_{p\in\mathcal P_k}(1-1/p)$ stays bounded away from $0$ for long ranges of $k$.
+\item Prove lower bounds on the density of admissible $A$ (those avoiding $n\pmod p$ for $p\in\mathcal P_k$) in intervals near $a_k$, to get upper bounds on $a_{k+1}-a_k$ better than $\prod p$.
+\item Extend computations for growing $n$ to larger $k$ (e.g. $k\approx 10^3$) and measure whether $a_k$ behaves more like $k^2$ or $k\log k$ on long initial segments.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure:} If $S(n)$ does \emph{not} tend to $\infty$, then there would exist a sequence $n_j\to\infty$ such that the greedy sieve very quickly accumulates primes making admissible residues extremely sparse, forcing $a_k$ to grow at least quadratically (or faster) early enough that $\sum 1/a_k$ stays bounded. A ``minimal'' such example would have many of the early differences $n-a_k$ equal to primes (so that each step introduces a new prime constraint as efficiently as possible).
+
+

@@ -1,0 +1,161 @@
+% Erdos problem 990
+
+1) FORMAL RESTATEMENT
+
+Let
+  f(x)=\sum_{j=0}^d a_j x^j
+be a complex polynomial of degree d with a_0\ne 0 and a_d\ne 0.
+Let n be the number of nonzero coefficients a_j (so 2<=n<=d+1).
+Define
+
+  M := \frac{\sum_{j=0}^d |a_j|}{\sqrt{|a_0 a_d|}}.
+
+Let z_1,...,z_d be the roots of f (counted with multiplicity), and write
+  z_i = r_i e^{i \theta_i} with \theta_i \in [0,2\pi).
+
+Conjectured discrepancy bound:
+For every interval I\subset[0,2\pi],
+
+  \Big| #{i: \theta_i \in I} - \frac{|I|}{2\pi} d \Big| \ll \sqrt{n \log M},
+
+where the implied constant is absolute (independent of d,n,M) and |I| is the length of I.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem file states that Erd\H{o}s--Turan proved the same inequality with n replaced by
+the degree d (i.e. discrepancy \ll \sqrt{d \log M}). The question is whether one can replace
+d by the number n of nonzero coefficients, i.e. obtain a sparsity-sensitive bound.
+No further resolution is stated in the problem file.
+
+3) ATTACK PLAN
+
+Two complementary routes:
+(A) Special cases: prove the inequality for very sparse polynomials (binomials, trinomials,
+    etc.) and see how n and M enter.
+(B) Disproof attempt: try to build a polynomial with small n and moderate M whose roots have
+    angles highly concentrated in a short arc, forcing discrepancy \gg d.
+
+In this writeup I prove two elementary lemmas (one about M itself, one fully resolving the
+binomial case n=2), and I report small numerical sanity checks for random sparse polynomials.
+
+4) WORK
+
+FAST REALITY CHECK (small computations)
+
+I sampled random sparse polynomials with a_0=a_d=1, and the remaining (n-2) coefficients
+chosen as small random nonzero integers at random intermediate exponents. For each polynomial
+I computed its roots numerically, then computed the exact angular discrepancy
+  max_{interval I} |#{\theta_i\in I} - (|I|/(2\pi))d|.
+I also computed the ratio discrepancy / sqrt(n log M).
+
+Exact outputs for degrees 20,30 and n=3,4 (5 trials each; fixed random seed 0):
+
+\begin{verbatim}
+--- d=20, n=3 (a0=ad=1, other coeffs random integers) ---
+trial 0: M=5.000000, disc=1.000000, disc/sqrt(n log M)=0.455
+trial 1: M=4.000000, disc=0.745607, disc/sqrt(n log M)=0.366
+trial 2: M=3.000000, disc=0.666667, disc/sqrt(n log M)=0.367
+trial 3: M=5.000000, disc=2.000000, disc/sqrt(n log M)=0.910
+trial 4: M=3.000000, disc=0.642143, disc/sqrt(n log M)=0.354
+
+--- d=20, n=4 (a0=ad=1, other coeffs random integers) ---
+trial 0: M=7.000000, disc=1.000000, disc/sqrt(n log M)=0.358
+trial 1: M=6.000000, disc=1.000000, disc/sqrt(n log M)=0.374
+trial 2: M=6.000000, disc=2.000000, disc/sqrt(n log M)=0.747
+trial 3: M=5.000000, disc=0.887882, disc/sqrt(n log M)=0.350
+trial 4: M=7.000000, disc=1.602152, disc/sqrt(n log M)=0.574
+
+--- d=30, n=3 (a0=ad=1, other coeffs random integers) ---
+trial 0: M=5.000000, disc=0.828288, disc/sqrt(n log M)=0.377
+trial 1: M=5.000000, disc=0.942166, disc/sqrt(n log M)=0.429
+trial 2: M=5.000000, disc=1.000000, disc/sqrt(n log M)=0.455
+trial 3: M=4.000000, disc=1.000000, disc/sqrt(n log M)=0.490
+trial 4: M=4.000000, disc=1.000000, disc/sqrt(n log M)=0.490
+
+--- d=30, n=4 (a0=ad=1, other coeffs random integers) ---
+trial 0: M=6.000000, disc=1.000000, disc/sqrt(n log M)=0.374
+trial 1: M=8.000000, disc=1.333281, disc/sqrt(n log M)=0.462
+trial 2: M=8.000000, disc=1.326786, disc/sqrt(n log M)=0.460
+trial 3: M=5.000000, disc=1.260708, disc/sqrt(n log M)=0.497
+trial 4: M=7.000000, disc=0.958378, disc/sqrt(n log M)=0.344
+\end{verbatim}
+
+These experiments are not evidence either way (degrees are tiny and roots are numeric), but
+at least they do not immediately contradict the conjectured scale \sqrt{n\log M}.
+
+Lemma 990.1 (basic properties of M)
+
+(i) Scale invariance: For any nonzero complex constant c, if g(x)=c f(x) then M(g)=M(f).
+(ii) Lower bound: M\ge 2.
+
+Proof.
+(i) If g_j=c a_j then \sum |g_j|=|c|\sum|a_j| and \sqrt{|g_0 g_d|}=|c|\sqrt{|a_0 a_d|}, so the
+ratio M is unchanged.
+(ii) Since a_0 and a_d are among the coefficients, \sum_{j=0}^d |a_j| \ge |a_0|+|a_d|.
+By AM-GM, |a_0|+|a_d| \ge 2\sqrt{|a_0 a_d|}. Dividing by \sqrt{|a_0 a_d|} gives M\ge 2.
+\qed
+
+Lemma 990.2 (binomial case n=2)
+
+Assume f(x)=a_0+a_d x^d with a_0 a_d \ne 0 (so n=2). Then for every interval I\subset[0,2\pi],
+
+  \Big| #{i: \theta_i \in I} - \frac{|I|}{2\pi} d \Big| \le 1.
+
+In particular, the conjectured inequality holds for n=2 with implied constant 1.
+
+Proof.
+The roots satisfy x^d = -a_0/a_d. Write -a_0/a_d = R e^{i\phi} with R>0 and \phi\in[0,2\pi).
+Then the d roots are
+  z_m = R^{1/d} exp(i(\phi+2\pi m)/d),  m=0,1,...,d-1.
+Thus the arguments are an arithmetic progression modulo 2\pi with step 2\pi/d; equivalently,
+there is exactly one root in each half-open arc of length 2\pi/d.
+
+Fix an interval I of length L=|I|. The expected number under uniform distribution is d L/(2\pi).
+Because the points are equally spaced with spacing 2\pi/d, the actual count differs from the
+expected count by at most 1 (a standard lattice-point-in-interval fact on the circle).
+Concretely: if we identify angles with residues m/d in [0,1), then counting \theta_m in I is
+counting integers m in an interval of length d L/(2\pi), which differs from its length by <1.
+Hence the discrepancy is <=1.
+
+Now compute M. Here \sum |a_j|=|a_0|+|a_d| and n=2. By Lemma 990.1(ii), M>=2, so
+sqrt{n log M} = sqrt{2 log M} >= sqrt{2 log 2} > 1.
+Therefore
+  discrepancy <=1 <= sqrt{2 log M} = sqrt{n log M},
+which is the claimed inequality with implied constant 1.
+\qed
+
+5) VERIFICATION
+
+- Lemma 990.2 uses only the explicit root formula for a binomial; multiplicities do not occur
+  because x^d=constant has d distinct solutions when the constant is nonzero.
+- The AM-GM step in Lemma 990.1(ii) is exact.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here:
+    - Full proof of the conjectured inequality for n=2 (binomials), with discrepancy <=1.
+    - Structural facts: M is scale-invariant and M>=2 always.
+    - Small numerical sanity checks for random sparse polynomials show discrepancy often of
+      size O(1) when coefficients are tiny, consistent with \sqrt{n\log M}.
+
+(ii) First gap (crisp statement):
+    Prove that in the Erd\H{o}s--Turan method controlling angular discrepancy, the quantity d
+    can be replaced (up to absolute constants) by the number n of nonzero coefficients.
+    Equivalently, find a Fourier-analytic bound on the relevant trigonometric sums in terms
+    of n and M only.
+
+(iii) Top 3 next moves (concrete):
+    1. Work out the Erd\H{o}s--Turan proof line-by-line and locate the precise point where the
+       degree d appears; attempt to replace that step by a sparsity-sensitive estimate.
+    2. Study the trinomial family f(x)=a_0+a_m x^m + a_d x^d: attempt to prove the bound with
+       n=3 or produce a family where angles are highly non-uniform while M stays moderate.
+    3. Search systematically (computationally) for sparse polynomials with small n and small
+       M but large angular discrepancy, to guide either a proof strategy or a disproof.
+
+(iv) Minimal counterexample structure:
+    A family of polynomials with fixed small n (say n=3 or 4), with M growing at most
+    moderately (e.g. log M = O(log d)), but whose root arguments concentrate in an arc of
+    length o(1), forcing discrepancy \gg d, contradicting O(\sqrt{n\log M}).
+

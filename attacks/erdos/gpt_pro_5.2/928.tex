@@ -1,0 +1,108 @@
+% Erdos Problem #928
+
+1) FORMAL RESTATEMENT
+
+For an integer n\ge 1, let P(n) denote the largest prime divisor of n (and set P(1):=1).
+Fix real parameters \alpha,\beta\in(0,1).
+Define the set
+\[ S_{\alpha,\beta} := \{n\in\mathbb N: P(n) < n^{\alpha}\ \text{and}\ P(n+1) < (n+1)^{\beta}\}. \]
+The question asks whether the (natural/asymptotic) density
+\[ d(S_{\alpha,\beta}) := \lim_{N\to\infty} \frac{1}{N}\, |\{n\le N: n\in S_{\alpha,\beta}\}| \]
+exists for every \alpha,\beta\in(0,1).
+
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement itself records:
+- Dickman: the density of {n: P(n)<n^\alpha} exists and equals \rho(1/\alpha), where \rho is the Dickman function.
+- Ter\"{a}v\"{a}inen: the logarithmic density of S_{\alpha,\beta} exists and equals \rho(1/\alpha)\rho(1/\beta).
+- Wang: assuming the Elliott–Halberstam conjecture for friable integers, the (natural) density equals \rho(1/\alpha)\rho(1/\beta).
+
+I do not use or assert any additional external results beyond what is stated in the problem file.
+
+
+3) ATTACK PLAN
+
+Proof-track ideas (show density exists):
+- Strengthen methods that prove logarithmic density to obtain ordinary asymptotic density, requiring uniformity in short intervals.
+- Develop a “distribution of smooth numbers in arithmetic progressions” input strong enough to decouple n and n+1.
+
+Disproof-track ideas (show density might fail to exist):
+- Try to force oscillation by finding ranges of N where smoothness of n and n+1 have noticeably different correlation than in other ranges.
+
+Best path here: I cannot prove density existence (it is deep). I instead prove elementary structural lemmas about the conditions and perform computational sanity checks.
+
+
+4) WORK
+
+Lemma 928.1 (largest prime factor of n(n+1)).
+For every integer n\ge 1,
+\[ P(n(n+1)) = \max\{P(n), P(n+1)\}. \]
+
+Proof.
+We have \gcd(n,n+1)=1.
+Therefore the multisets of prime divisors of n and of n+1 are disjoint.
+Hence the prime divisors of n(n+1) are exactly the union of prime divisors of n and of n+1.
+The largest prime divisor of the union is the maximum of the largest prime divisor of each factor, i.e.
+P(n(n+1))=\max\{P(n),P(n+1)\}. \qed
+
+Corollary 928.1a.
+If n\in S_{\alpha,\beta}, then
+\[ P(n(n+1)) < \max\{n^{\alpha}, (n+1)^{\beta}\} < (n+1)^{\max\{\alpha,\beta\}}. \]
+
+Proof.
+The first inequality is immediate from Lemma 928.1 and the defining inequalities in S_{\alpha,\beta}.
+The second inequality uses n^{\alpha}<(n+1)^{\alpha}\le (n+1)^{\max\{\alpha,\beta\}} and similarly for (n+1)^{\beta}. \qed
+
+Lemma 928.2 (smoothness forces many prime factors).
+Let \alpha\in(0,1) and let n\ge 2.
+If P(n) < n^{\alpha}, then the total number of prime factors of n counted with multiplicity satisfies
+\[ \Omega(n) \ge \left\lceil \frac{1}{\alpha} \right\rceil. \]
+
+Proof.
+Write the prime factorization n=\prod_{i=1}^t p_i^{e_i}.
+Then \Omega(n)=\sum_{i=1}^t e_i.
+The hypothesis P(n)<n^{\alpha} means each prime p_i dividing n satisfies p_i < n^{\alpha}.
+Therefore,
+\[
+ n = \prod_{i=1}^t p_i^{e_i} \le \prod_{i=1}^t (n^{\alpha})^{e_i} = (n^{\alpha})^{\Omega(n)} = n^{\alpha\Omega(n)}.
+\]
+Since n\ge 2, taking logarithms (or comparing exponents) yields 1 \le \alpha\Omega(n), i.e. \Omega(n)\ge 1/\alpha.
+Because \Omega(n) is an integer, \Omega(n)\ge \lceil 1/\alpha\rceil. \qed
+
+FAST REALITY CHECK (numerical sanity for one parameter choice).
+Take \alpha=\beta=1/2.
+I computed exact frequencies up to N=2\cdot 10^5, 10^6, and 5\cdot 10^6 using a sieve for largest prime factors:
+- Up to N=200000:
+  proportion of n with P(n)<n^{1/2} was 0.2660226602;
+  proportion of n with P(n+1)<(n+1)^{1/2} was 0.2660276603;
+  proportion satisfying both was 0.0591705917.
+- Up to N=10^6:
+  proportion of n with P(n)<n^{1/2} was 0.2681712682 (same for n+1 by shift);
+  proportion satisfying both was 0.0631020631.
+- Up to N=5\cdot 10^6:
+  proportion of n with P(n)<n^{1/2} was 0.2708224;
+  proportion satisfying both was 0.066325.
+
+These finite-N proportions do not prove the existence of a limiting density; they only serve as a sanity check that the set is nonempty and that convergence (if true) may be slow.
+
+
+5) VERIFICATION
+
+- Lemma 928.1: Verified that \gcd(n,n+1)=1 is the only input; disjointness of prime factors implies the “max” formula.
+- Lemma 928.2: Verified that the inequality n\le n^{\alpha\Omega(n)} is valid because each prime factor is at most n^{\alpha}; the conclusion uses n\ge 2 to avoid logarithm issues.
+- Computational check: Verified that the sieve-based computation agrees with hand checks for small n (e.g. n=8 has P(8)=2<\sqrt8; n=11 has P(11)=11>\sqrt{11}).
+
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest proved partial result: The joint condition forces strong structural constraints such as P(n(n+1))< (n+1)^{\max\{\alpha,\beta\}} (Corollary 928.1a) and (for n\ge 2) \Omega(n)\ge \lceil 1/\alpha\rceil, \Omega(n+1)\ge \lceil 1/\beta\rceil (Lemma 928.2 applied to n and n+1).
+(ii) First gap (crisp): Prove that the limit defining the natural density of S_{\alpha,\beta} exists for all \alpha,\beta\in(0,1), without extra hypotheses.
+(iii) Top 3 next moves:
+  1. Identify what quantitative strengthening of Ter\"{a}v\"{a}inen’s logarithmic-density argument would upgrade to natural density; isolate the needed uniform error term in counting smooth numbers in intervals of length \asymp N.
+  2. Prove (or conditionally assume) a distribution statement for friable integers in arithmetic progressions strong enough to treat n and n+1 as asymptotically independent at the level of natural density.
+  3. Perform larger-scale computations for several (\alpha,\beta) to look for oscillation patterns or to estimate convergence rates, and attempt to conjecture secondary terms.
+(iv) Minimal counterexample structure: A failure of density would require oscillations in \#\{n\le N: n\in S_{\alpha,\beta}\} of size comparable to N along different subsequences of N, i.e. a systematic non-uniformity in the correlation of “n is n^\alpha-smooth” and “n+1 is (n+1)^\beta-smooth”.
+
+

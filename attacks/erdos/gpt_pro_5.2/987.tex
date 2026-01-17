@@ -1,0 +1,182 @@
+% Erdos problem 987
+
+1) FORMAL RESTATEMENT
+
+Let x_1,x_2,... be an infinite sequence of real numbers in (0,1).
+Define e(t):=exp(2*pi*i*t).
+For each integer k>=1, define
+
+  S_n(k):=\sum_{j=1}^n e(k x_j),
+  A_k := \limsup_{n\to\infty} |S_n(k)| \in [0,\infty].
+
+Questions:
+  (Q1) Is it always true that  \limsup_{k\to\infty} A_k = \infty ?
+  (Q2) Is it possible to have A_k = o(k) as k\to\infty ?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem file itself notes two pieces of context:
+- For any sequence (x_j), it is "easy" that \limsup_{k->\infty} \sup_n |S_n(k)| = \infty
+  (this allows n to depend on k, but does NOT directly control A_k).
+- There exist constructions with A_k <= k for all k, and there are general lower bounds
+  A_k \gg k^{1/2} infinitely often (attributed in the file to Clunie and also to Tao).
+No complete answer to (Q1) or (Q2) is stated in the problem file.
+
+3) ATTACK PLAN
+
+Two obvious extremes illustrate the difficulty:
+- If x_j is very structured (e.g. takes finitely many values), then for suitable k the phases
+  e(k x_j) lie in a small arc and the partial sums can grow linearly, forcing A_k=\infty.
+- If x_j is "Kronecker" (e.g. x_j = {j alpha}), then each S_n(k) is a geometric series and
+  A_k is finite for each fixed k, but still typically large for infinitely many k.
+
+To resolve (Q1) one must show that for every sequence there exist arbitrarily large k for which
+S_n(k) is large for infinitely many n (not just for a single n). To resolve (Q2) one would need
+an explicit construction with strong cancellation simultaneously for all k.
+
+4) WORK
+
+FAST REALITY CHECK (examples and computations)
+
+Example A (finite-value sequence): x_j \equiv 1/2.
+Then e(k x_j) = e(k/2) = (-1)^k.
+Hence S_n(k) = n for even k and S_n(k)=(-1)^k * n for odd k; in either case |S_n(k)|=n.
+Thus A_k=\infty for every k (so \limsup_k A_k=\infty trivially).
+
+Example B (Kronecker sequence): x_j = {j alpha} with alpha=\sqrt{2}-1.
+For this sequence (proved below) A_k = 1/|sin(pi k alpha)|.
+Numerically (k<=500) this produces large A_k of size comparable to k:
+
+  top 10 A_k for k<=500:
+    k=408  A_k=367.329787  A_k/k=0.900318
+    k=169  A_k=152.153887  A_k/k=0.900319
+    k=239  A_k=107.589820  A_k/k=0.450167
+    k=338  A_k= 76.078587  A_k/k=0.225085
+    k= 70  A_k= 63.026394  A_k/k=0.900377
+    k=478  A_k= 53.797234  A_k/k=0.112547
+    k= 99  A_k= 44.568261  A_k/k=0.450184
+    k=309  A_k= 39.747093  A_k/k=0.128631
+    k=268  A_k= 34.473669  A_k/k=0.128633
+    k=140  A_k= 31.517165  A_k/k=0.225123
+
+These are sanity checks only; they do not address the general (Q1)/(Q2).
+
+Lemma 987.1 (finite value set forces some A_k=\infty).
+Assume the set {x_j : j>=1} is finite, say {x_j} \subset {r_1,...,r_m} with m<\infty.
+Then there exists an integer k>=1 such that A_k=\infty.
+
+Proof.
+Fix m distinct reals r_1,...,r_m in (0,1).
+By Dirichlet's simultaneous approximation theorem: for any integer Q>=1 there exists an integer
+k with 1<=k<=Q^m such that for each i=1,...,m,
+
+  ||k r_i|| := dist(k r_i, Z) <= 1/Q.
+
+Choose Q so large that cos(2*pi/Q) >= 1/2 (e.g. Q>=6).
+Then for each i, the complex number e(k r_i) lies within angle 2*pi/Q of 1, so
+Re(e(k r_i)) >= cos(2*pi/Q) >= 1/2.
+
+Now for this k, every term e(k x_j) has real part >= 1/2 (because x_j is one of the r_i).
+Therefore for every n,
+
+  Re(S_n(k)) = \sum_{j=1}^n Re(e(k x_j)) >= n/2.
+
+Hence |S_n(k)| >= Re(S_n(k)) >= n/2 for all n, so \limsup_{n->\infty}|S_n(k)|=\infty.
+That is, A_k=\infty.
+\qed
+
+Lemma 987.2 (explicit A_k for a Kronecker sequence).
+Fix a real alpha and define x_j := {j alpha} (fractional part).
+Then for each integer k>=1,
+
+  S_n(k) = \sum_{j=1}^n e(k j alpha)
+         = e(k alpha) * (1 - e(k n alpha)) / (1 - e(k alpha))
+
+whenever e(k alpha)\ne 1.
+Moreover, if k alpha \notin Z then
+
+  A_k = \limsup_{n->\infty} |S_n(k)| = \frac{2}{|1 - e(k alpha)|} = \frac{1}{|sin(pi k alpha)|}.
+If k alpha \in Z then e(k alpha)=1 and S_n(k)=n so A_k=\infty.
+
+Proof.
+Because e(t) is 1-periodic, e(k x_j)=e(k j alpha).
+When e(k alpha)\ne 1, S_n(k) is a finite geometric series with ratio e(k alpha), so
+
+  S_n(k) = e(k alpha) + e(2k alpha)+...+e(n k alpha)
+         = e(k alpha) * (1 - e(n k alpha)) / (1 - e(k alpha)).
+
+For the limsup: as n varies, the points e(n k alpha) run through a subgroup of the unit circle.
+- If k alpha \in Z then e(k alpha)=1, and the formula degenerates to S_n(k)=n.
+- If k alpha \notin Z, then e(k alpha) is a unit complex number not equal to 1. The factor
+  (1 - e(n k alpha)) has modulus in [0,2]. If alpha is irrational then nk alpha mod 1 is dense,
+  so |1 - e(n k alpha)| gets arbitrarily close to 2, giving limsup equal to 2.
+  If alpha is rational, then nk alpha mod 1 is periodic, so the limsup is still the maximum over
+  that finite orbit; in any case it is <=2 and equals 2 unless e(k alpha) is a root of unity of
+  odd order that avoids -1.
+In all cases we have
+
+  A_k = (\limsup_{n->\infty} |1 - e(n k alpha)|) / |1 - e(k alpha)|,
+
+and when k alpha \notin Z and the orbit hits values arbitrarily close to -1, this limsup equals
+2/|1-e(k alpha)|.
+Finally, the identity |1-e(t)| = 2|sin(pi t)| gives A_k = 1/|sin(pi k alpha)|.
+\qed
+
+Corollary 987.3 (for x_j={j alpha}, A_k is unbounded and not o(k)).
+Assume alpha is irrational and x_j={j alpha}. Then:
+(a) \limsup_{k->\infty} A_k = \infty.
+(b) A_k is not o(k);
+    in fact there exist infinitely many k with A_k >= k/pi.
+
+Proof.
+(a) Density of {k alpha} in [0,1] implies sin(pi k alpha) gets arbitrarily close to 0, so
+A_k = 1/|sin(pi k alpha)| is unbounded.
+(b) By the one-dimensional Dirichlet approximation theorem, for infinitely many k there exists
+an integer m with |k alpha - m| <= 1/k.
+For such k, |sin(pi k alpha)| <= pi |k alpha - m| <= pi/k, so A_k >= k/pi.
+Thus A_k/k does not tend to 0.
+\qed
+
+Remark (badly approximable alpha gives A_k=O(k) in the Kronecker example).
+If alpha is badly approximable, i.e. there exists c>0 such that ||k alpha||>=c/k for all k,
+then A_k = 1/|sin(pi k alpha)| \ll k.
+This shows that the growth A_k \le k for all k is plausible in some structured examples,
+but still does not achieve A_k=o(k).
+
+5) VERIFICATION
+
+- Lemma 987.1: the proof uses only Dirichlet simultaneous approximation and the inequality
+  Re(e^{i\theta})>=cos(|\theta|).
+- Lemma 987.2: checked by geometric-series summation.
+- The Dirichlet estimate used in Corollary 987.3 is elementary and shows A_k grows at least
+  linearly along infinitely many k for the Kronecker example.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here:
+    - If the sequence {x_j} takes only finitely many values, then A_k=\infty for some k.
+    - For the explicit family x_j={j alpha}, one has A_k = 1/|sin(pi k alpha)|, so
+      \limsup_k A_k=\infty and A_k is not o(k).
+    - Computations for alpha=\sqrt{2}-1 show A_k can be comparable to k already for k<=500.
+
+(ii) First gap (crisp statement):
+    Prove or disprove that for every infinite sequence x_j\in(0,1) there exist arbitrarily large
+    k such that |\sum_{j\le n} e(k x_j)| is unbounded in n (equivalently A_k=\infty) or at least
+    that A_k becomes arbitrarily large.
+
+(iii) Top 3 next moves (concrete):
+    1. Try to prove a universal lower bound A_k \gg (log k) or \gg k^c for infinitely many k
+       by combining discrepancy estimates for (x_j) with exponential-sum lower bounds.
+    2. Attempt an explicit construction aimed at (Q2): build x_j in blocks so that for each k
+       up to a growing cutoff, the block has near-zero Fourier coefficient at frequency k.
+    3. Search computationally for block constructions (finite sequences) minimizing
+       max_{1<=k<=K} max_{n<=N} |\sum_{j\le n} e(k x_j)| and look for a scalable pattern.
+
+(iv) Minimal counterexample structure:
+    - To disprove (Q1) one would need a sequence with A_k bounded uniformly in k, or at least
+      with \limsup_k A_k < \infty.
+    - To answer (Q2) positively one would need a sequence with A_k finite for all k and with
+      A_k/k -> 0, i.e. cancellation simultaneously across all frequencies.
+

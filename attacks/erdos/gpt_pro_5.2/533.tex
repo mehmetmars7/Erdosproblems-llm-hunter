@@ -1,0 +1,96 @@
+% Erdos Problem #533
+% URL: https://www.erdosproblems.com/533
+
+Let $\delta>0$. If $n$ is sufficiently large and $G$ is a graph on $n$ vertices with no $K_5$ and at least $\delta n^2$ edges then $G$ contains a set of $\gg_\delta n$ vertices containing no triangle. A problem of Erd\H{o}s, Hajnal, Simonovits, S\'{o}s, and Szemer\'{e}di, who could prove this is true for $\delta>1/16$, and could further prove it for $\delta>0$ if we replace $K_5$ with $K_4$. They further observed that it fails for $\delta =1/4$ if we replace $K_5$ with $K_7$: by a construction of Erd\H{o}s and Rogers \cite{ErRo62} (see [620] ) there exists some constant $c>0$ such that, for all large $n$, there is a graph on $n$ vertices which contains no $K_4$ and every set of at least $n^{1-c}$ vertices contains a triangle. If we take two vertex disjoint copies of this graph and add all edges between the two copies then this yields a graph on $2n$ vertices with $\geq n^2$ edges, which contains no $K_7$, yet every set of at least $2n^{1-c}$ vertices contains a triangle. See also [579] and the entry in the graphs problem collection . References [ErRo62] Erd\H{o}s, P. and Rogers, C. A., The construction of certain graphs . Canadian J. Math. (1962), 702-707.
+
+%Erdos problem 533
+
+\subsection*{FORMAL RESTATEMENT}
+Fix $\delta>0$. The claim is that there exists a constant $c(\delta)>0$ and an integer $n_0(\delta)$ such that for every $n\ge n_0(\delta)$, every simple graph $G=(V,E)$ on $|V|=n$ vertices satisfying
+\[
+K_5\nsubseteq G\quad\text{and}\quad |E|\ge \delta n^2,
+\]
+contains a vertex subset $U\subseteq V$ with $|U|\ge c(\delta)n$ such that the induced subgraph $G[U]$ is triangle-free (contains no $K_3$).
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem statement says the claim was proved for $\delta>1/16$ by Erd\H{o}s--Hajnal--Simonovits--S\'{o}s--Szemer\'{e}di and that the analogous statement with ``no $K_5$'' replaced by ``no $K_4$'' holds for every $\delta>0$. Per the integrity rule I do not use any additional literature.
+
+\subsection*{ATTACK PLAN}
+\emph{Proof-track ideas.} Use local structure forced by forbidding cliques:
+\begin{itemize}
+\item In a $K_4$-free graph, every vertex neighbourhood is triangle-free, giving an immediate linear triangle-free subset.
+\item In a $K_5$-free graph, every \emph{common neighbourhood of an edge} is triangle-free (Lemma~\ref{lem:533-codeg}), so it suffices to find an edge with large codegree. Relating codegrees to global density is the hard part.
+\end{itemize}
+\emph{Disproof-track ideas.} Try to adapt Erd\H{o}s--Rogers type constructions (as in the statement for $K_7$) to $K_5$; or computationally search for dense $K_5$-free graphs with very small largest triangle-free induced subgraph.
+
+\subsection*{WORK}
+\begin{lemma}[Common neighbourhood of an edge is triangle-free]\label{lem:533-codeg}
+If $G$ is $K_5$-free and $uv\in E(G)$, then the induced subgraph on the common neighbourhood
+\[
+N(u)\cap N(v):=\{w\in V:\ uw\in E,\ vw\in E\}
+\]
+contains no triangle.
+\end{lemma}
+\begin{proof}
+Suppose for contradiction that there exist distinct vertices $x,y,z\in N(u)\cap N(v)$ that form a triangle, i.e. $xy,yz,zx\in E(G)$. By definition, each of $x,y,z$ is adjacent to both $u$ and $v$, and also $uv\in E(G)$. Therefore the five vertices $\{u,v,x,y,z\}$ span all $\binom{5}{2}$ edges, forming a $K_5$, contradicting that $G$ is $K_5$-free.
+\end{proof}
+
+\begin{lemma}[The $K_4$-free variant is easy]\label{lem:533-K4}
+Let $\delta>0$ and let $G$ be a $K_4$-free graph on $n$ vertices with at least $\delta n^2$ edges. Then $G$ contains a triangle-free induced subgraph on at least $2\delta n$ vertices.
+\end{lemma}
+\begin{proof}
+The average degree is $2|E|/n\ge 2\delta n$, so there exists $v$ with degree $d(v)\ge 2\delta n$. Let $U:=N(v)$. If $G[U]$ contained a triangle on $x,y,z\in U$, then $\{v,x,y,z\}$ would span a $K_4$ (since $v$ is adjacent to each of $x,y,z$), contradicting $K_4$-freeness. Hence $G[U]$ is triangle-free and $|U|=d(v)\ge 2\delta n$.
+\end{proof}
+
+\begin{lemma}[Reduction to finding a large codegree]\label{lem:533-reduction}
+If $G$ is $K_5$-free and contains an edge $uv$ with $|N(u)\cap N(v)|\ge t$, then $G$ contains a triangle-free induced subgraph on at least $t$ vertices.
+\end{lemma}
+\begin{proof}
+Take $U:=N(u)\cap N(v)$. By Lemma~\ref{lem:533-codeg}, $G[U]$ is triangle-free. Hence $U$ is a triangle-free vertex subset of size at least $t$.
+\end{proof}
+
+\paragraph{FAST REALITY CHECK (small-$n$ computational sanity).}
+To sanity-check that large triangle-free subsets can occur at fairly high edge density, I generated \emph{examples} of dense $K_5$-free graphs by a greedy process: start with the empty graph on $n$ vertices, add edges in random order whenever the added edge does not create a $K_5$. For each such graph I computed the \emph{exact} size of the largest triangle-free induced subgraph by brute force over all vertex subsets (feasible for $n\le 18$). The table shows sample outcomes for three seeds.
+
+\[
+\begin{tabular}{cccccc}
+ \hline
+$n$ & seed & edges $m$ & $m/n^2$ & max triangle-free subset & ratio\\ \hline
+12 & 0 & 47 & 0.3264 & 7 & 0.583\\
+12 & 1 & 53 & 0.3681 & 7 & 0.583\\
+12 & 2 & 50 & 0.3472 & 7 & 0.583\\
+14 & 0 & 64 & 0.3265 & 7 & 0.500\\
+14 & 1 & 66 & 0.3367 & 8 & 0.571\\
+14 & 2 & 63 & 0.3214 & 7 & 0.500\\
+16 & 0 & 86 & 0.3359 & 8 & 0.500\\
+16 & 1 & 89 & 0.3477 & 8 & 0.500\\
+16 & 2 & 79 & 0.3086 & 7 & 0.438\\
+18 & 0 & 104 & 0.3210 & 9 & 0.500\\
+18 & 1 & 104 & 0.3210 & 9 & 0.500\\
+18 & 2 & 105 & 0.3241 & 9 & 0.500\\
+\hline
+\end{tabular}
+\]
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~\ref{lem:533-codeg}: explicitly checked that a triangle inside the common neighbourhood of an edge, together with that edge, forms a $K_5$.
+\item Lemma~\ref{lem:533-K4}: verified that in a $K_4$-free graph, every neighbourhood is triangle-free.
+\item Computation: brute force for $n\le 18$ checks \emph{all} subsets, so the reported ``max triangle-free subset sizes'' are exact for those sampled graphs (the sampling is not exhaustive over all $K_5$-free graphs).
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{**UNRESOLVED**}
+
+(i) \emph{Strongest proved partial result.} In any $K_5$-free graph, the common neighbourhood of any edge is triangle-free (Lemma~\ref{lem:533-codeg}), so the problem reduces to finding an edge with linear codegree (Lemma~\ref{lem:533-reduction}). Also, the $K_4$-free analogue is proved by a simple averaging argument (Lemma~\ref{lem:533-K4}).
+
+(ii) \emph{First gap (crisp statement).} Show that for every fixed $\delta>0$ there exists $c(\delta)>0$ such that any $n$-vertex $K_5$-free graph with at least $\delta n^2$ edges contains an edge of codegree at least $c(\delta)n$ (or otherwise directly produces a triangle-free induced subgraph on $c(\delta)n$ vertices).
+
+(iii) \emph{Top 3 next moves.}
+1. Prove a dichotomy: either $G$ has an edge with linear codegree, or $G$ has ``few'' triangles; then show ``few triangles'' implies a linear-size triangle-free induced subgraph by a covering argument.
+2. Use stability around the Tur\'an extremal structure for $K_5$-free graphs (complete $4$-partite graphs) to force two large parts whose union induces a triangle-free subgraph.
+3. Computationally: for moderate $n$ (say $n\le 30$), use SAT/ILP to search for dense $K_5$-free graphs that minimize the largest triangle-free induced subgraph; look for extremal patterns.
+
+(iv) \emph{Minimal counterexample structure.} A minimal counterexample at density $\delta$ would be a dense $K_5$-free graph in which \emph{every} linear-size vertex subset spans a triangle; equivalently, all induced subgraphs on $\ge c n$ vertices contain $K_3$ while still globally avoiding $K_5$. Such a graph would have no edge of linear codegree (else Lemma~\ref{lem:533-codeg} gives a large triangle-free set) and would likely have a highly pseudorandom neighbourhood structure constrained by $K_5$-freeness.
+
+

@@ -1,0 +1,83 @@
+% Erdos Problem #663
+% URL: https://www.erdosproblems.com/663
+
+Let $k\geq 2$ and $q(n,k)$ denote the least prime which does not divide $\prod_{1\leq i\leq k}(n+i)$. Is it true that, if $k$ is fixed and $n$ is sufficiently large, we have\[q(n,k)<(1+o(1))\log n?\] A problem of Erd\H{o}s and Pomerance. The bound $q(n,k)<(1+o(1))k\log n$ is easy. It may be true this improved bound holds even up to $k=o(\log n)$. A heuristic argument in favour of this is provided by Tao in the comments. See also [457] .
+
+% Solution to Erdos Problem #663
+
+1) FORMAL RESTATEMENT
+Fix integers $k\ge 2$ and $n\ge 1$. Define
+\[
+Q(n,k):=\prod_{i=1}^k (n+i).
+\]
+Let $q(n,k)$ be the least prime $p$ such that $p\nmid Q(n,k)$.
+Question: for each fixed $k$, is it true that as $n\to\infty$,
+\[
+q(n,k) < (1+o(1))\log n\ ?
+
+Here $\log$ is the natural logarithm, and the $o(1)$ is with $k$ fixed.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The erdosproblems.com page for #663 lists this as OPEN as of December 2025. I do not assume any external results beyond elementary number theory.
+
+3) ATTACK PLAN
+Proof-track ideas:
+- If all primes up to some threshold $X$ divide $Q(n,k)$, then $Q(n,k)$ is divisible by the primorial $\prod_{p\le X} p$. Comparing sizes could force $X\ll k\log n$; improving the constant $k$ down to $1$ is the heart of the problem.
+
+Disproof-track ideas:
+- Try to choose $n$ so that $n+1,\ldots,n+k$ collectively hit $0$ modulo every prime up to about $(1+\varepsilon)\log n$; then $q(n,k)$ would exceed $(1+\varepsilon)\log n$. This resembles a covering-congruences problem constrained to $k$ consecutive residues.
+
+I only prove basic structural facts and give computational sanity checks.
+
+4) WORK
+
+Lemma 1 (small primes always divide when $p\le k$).
+If $p$ is a prime with $p\le k$, then $p\mid Q(n,k)$. Consequently, $q(n,k)>k$.
+
+Proof.
+Consider the residues of $n+1,n+2,\ldots,n+k$ modulo $p$.
+Because $k\ge p$, this list contains a complete set of residues modulo $p$ (possibly with repetitions), hence one of the numbers is congruent to $0\pmod p$.
+Therefore $p$ divides at least one factor of $Q(n,k)$, so $p\mid Q(n,k)$. Since every prime $\le k$ divides $Q(n,k)$, the least prime not dividing it must exceed $k$. $\square$
+
+Lemma 2 (monotonicity in $k$).
+For fixed $n$, the function $k\mapsto q(n,k)$ is nondecreasing: if $k_1\le k_2$ then $q(n,k_1)\le q(n,k_2)$.
+
+Proof.
+If $k_1\le k_2$ then $Q(n,k_2)=Q(n,k_1)\cdot\prod_{i=k_1+1}^{k_2}(n+i)$, so every prime divisor of $Q(n,k_1)$ is also a prime divisor of $Q(n,k_2)$.
+Equivalently, the set of primes not dividing $Q(n,k_2)$ contains the set of primes not dividing $Q(n,k_1)$. Taking the least prime in these sets gives $q(n,k_1)\le q(n,k_2)$. $\square$
+
+Lemma 3 (existence of a trivial upper bound).
+For every $n,k$, there exists a prime $p>n+k$, and any such $p$ satisfies $p\nmid Q(n,k)$. In particular, $q(n,k)\le p$ for the least prime $p>n+k$.
+
+Proof.
+By Euclid's theorem, there are infinitely many primes, so there exists at least one prime $p>n+k$; let $p$ be the least such prime.
+Then each factor $(n+i)$ of $Q(n,k)$ satisfies $1\le n+i < p$, hence none is divisible by $p$. Therefore $p\nmid Q(n,k)$, so by minimality of $q(n,k)$ among primes not dividing $Q(n,k)$, we have $q(n,k)\le p$. $\square$
+
+FAST REALITY CHECK (exact computation for small ranges).
+I computed $q(n,k)$ by checking primes $p$ in increasing order and testing whether any of $n+1,\ldots,n+k$ is $0\pmod p$ (equivalently, whether $(-n)\bmod p\in\{1,\ldots,k\}$).
+Maxima over $1\le n\le N$ for a few $(k,N)$:
+- $k=2$, $N=100$: $\max_{1\le n\le N} q(n,k) = 11$ (attained at $n=13$).
+- $k=2$, $N=1000$: $\max_{1\le n\le N} q(n,k) = 19$ (attained at $n=713$).
+- $k=2$, $N=10000$: $\max_{1\le n\le N} q(n,k) = 19$ (attained at $n=713$).
+- $k=3$, $N=100$: $\max_{1\le n\le N} q(n,k) = 13$ (attained at $n=19$).
+- $k=3$, $N=1000$: $\max_{1\le n\le N} q(n,k) = 19$ (attained at $n=439$).
+- $k=3$, $N=10000$: $\max_{1\le n\le N} q(n,k) = 23$ (attained at $n=2923$).
+- $k=5$, $N=100$: $\max_{1\le n\le N} q(n,k) = 17$ (attained at $n=9$).
+- $k=5$, $N=1000$: $\max_{1\le n\le N} q(n,k) = 31$ (attained at $n=985$).
+- $k=5$, $N=10000$: $\max_{1\le n\le N} q(n,k) = 37$ (attained at $n=1766$).
+These data are consistent with $q(n,k)$ typically being of size comparable to $\log n$ for these ranges, but they do not test the asymptotic question.
+
+5) VERIFICATION
+- Lemma 1: the key point is that among $k\ge p$ consecutive integers there is a multiple of $p$; this follows because the residues modulo $p$ cycle with period $p$.
+- Lemma 2: uses only divisibility monotonicity $Q(n,k_1)\mid Q(n,k_2)$ for $k_1\le k_2$.
+- Lemma 3: uses only the infinitude of primes; the divisibility check is immediate since all factors are strictly less than $p$.
+
+6) FINAL: **UNRESOLVED**
+(i) Strongest proved partial result: basic structure $q(n,k)>k$ (Lemma 1), monotonicity in $k$ (Lemma 2), and the trivial existence bound $q(n,k)\le$ (least prime $>n+k$) (Lemma 3).
+(ii) First gap (crisp): prove an upper bound $q(n,k)\le (1+o(1))\log n$ for fixed $k$ (or produce infinitely many $n$ for which $q(n,k)\ge (1+\varepsilon)\log n$ for some $\varepsilon>0$).
+(iii) Top 3 next moves (concrete):
+  1. Try to show that for most primes $p\le (1+\varepsilon)\log n$, the event ``$p\nmid Q(n,k)$'' has positive density in $n$ and then amplify to guarantee existence of some such $p$ for every large $n$.
+  2. Attempt a sieve/covering argument: if $q(n,k)$ were large, then $n$ must satisfy a system of congruences $n\equiv -i_p\pmod p$ for each prime $p\le q(n,k)$; quantify how large such a system can be when only $k$ residues are allowed per modulus.
+  3. Computation: for small fixed $k$ (start with $k=2$), search for record values of $q(n,k)$ and examine the residue pattern of $n$ modulo small primes to guess extremal constructions.
+(iv) Minimal counterexample structure (if the conjecture is true): a hypothetical large-$q$ example would require that for each prime $p\le (1+\varepsilon)\log n$, the interval $\{n+1,\ldots,n+k\}$ hits a multiple of $p$, i.e. $n$ lies in one of $k$ residue classes modulo $p$. Such an $n$ would be a solution to a constrained covering system over primes up to $(1+\varepsilon)\log n$, suggesting CRT-type rigidity and very sparse possibilities.
+

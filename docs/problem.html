@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MVZPMS7X5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6MVZPMS7X5');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem - Problem Hunting with LLMs (beta)</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                tags: 'ams',
+                macros: {
+                    'H': ['{\\text{H}}', 0],
+                    'R': '{\\mathbb{R}}',
+                    'C': '{\\mathbb{C}}',
+                    'N': '{\\mathbb{N}}',
+                    'Z': '{\\mathbb{Z}}',
+                    'Q': '{\\mathbb{Q}}',
+                    'F': '{\\mathbb{F}}',
+                    'Bbb': ['{\\mathbb{#1}}', 1],
+                    'normp': ['{\\|#1\\|_{#2}}', 2],
+                    'norm': ['{\\|#1\\|}', 1],
+                    'abs': ['{|#1|}', 1],
+                    'ceil': ['{\\lceil#1\\rceil}', 1],
+                    'floor': ['{\\lfloor#1\\rfloor}', 1],
+                    'inner': ['{\\langle#1,#2\\rangle}', 2],
+                    'set': ['{\\{#1\\}}', 1],
+                    'qed': '{\\square}',
+                    'eps': '{\\varepsilon}',
+                    'ol': ['{\\overline{#1}}', 1],
+                    'ul': ['{\\underline{#1}}', 1],
+                    'wh': ['{\\widehat{#1}}', 1],
+                    'wt': ['{\\widetilde{#1}}', 1]
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <h1 id="page-title">Problem</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="erdos.html">Erdos Problems</a>
+            <a href="mo.html">MathOverflow</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="problem-header">
+            <div id="problem-meta">
+                <!-- Filled by JS -->
+            </div>
+        </section>
+
+        <section class="problem-statement">
+            <h2>Problem Statement</h2>
+            <div id="problem-links" class="external-links">
+                <!-- Filled by JS - links to external sources -->
+            </div>
+        </section>
+
+        <section class="llm-attempts" id="llm-attempts-section">
+            <h2>LLM Claims</h2>
+            <div id="attempts-container">
+            </div>
+        </section>
+
+        <section class="contribute-cta">
+            <h3>Contribute</h3>
+            <p>
+                Have an LLM attempt to share for this problem?
+                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank">Contributing Guidelines</a>
+                to submit your contribution.
+            </p>
+        </section>
+
+        <section class="navigation">
+            <a href="#" id="prev-problem" class="nav-btn">&larr; Previous</a>
+            <a href="#" id="next-problem" class="nav-btn">Next &rarr;</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter">GitHub Repository</a> |
+            <a href="about.html">About</a> |
+            <a href="LICENSE">Apache License 2.0</a>
+        </p>
+    </footer>
+
+    <script src="data/erdos_data.js"></script>
+    <script src="data/mo_data.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const params = new URLSearchParams(window.location.search);
+            const type = params.get('type');
+            const id = params.get('id');
+
+            if (!type || !id) {
+                document.getElementById('problem-meta').innerHTML = '<p>Error: Missing problem type or ID. Please use ?type=erdos&id=X or ?type=mo&id=X</p>';
+                return;
+            }
+
+            let problem, allProblems, problemNumbers;
+
+            if (type === 'erdos') {
+                if (typeof erdosProblems === 'undefined') {
+                    document.getElementById('problem-meta').innerHTML = '<p>Error loading Erdos data</p>';
+                    return;
+                }
+                problem = erdosProblems[id];
+                allProblems = erdosProblems;
+                problemNumbers = Object.keys(erdosProblems).map(n => parseInt(n)).sort((a, b) => a - b);
+            } else if (type === 'mo') {
+                if (typeof moProblems === 'undefined') {
+                    document.getElementById('problem-meta').innerHTML = '<p>Error loading MO data</p>';
+                    return;
+                }
+                problem = moProblems[id];
+                allProblems = moProblems;
+                problemNumbers = Object.keys(moProblems).map(n => parseInt(n)).sort((a, b) => a - b);
+            } else {
+                document.getElementById('problem-meta').innerHTML = '<p>Unknown problem type</p>';
+                return;
+            }
+
+            if (!problem) {
+                document.getElementById('problem-meta').innerHTML = '<p>Problem not found</p>';
+                return;
+            }
+
+            // Update page title
+            if (type === 'erdos') {
+                document.getElementById('page-title').textContent = `Erdos Problem #${id}`;
+                document.title = `Erdos Problem #${id} - Problem Hunting with LLMs`;
+            } else {
+                // Decode HTML entities in title
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = problem.title || `MO Question ${id}`;
+                const decodedTitle = tempDiv.textContent || tempDiv.innerText || `MO Question ${id}`;
+                document.getElementById('page-title').textContent = decodedTitle;
+                document.title = `${decodedTitle} - Problem Hunting with LLMs`;
+            }
+
+            // Problem meta
+            const metaDiv = document.getElementById('problem-meta');
+            
+            // Determine overall status: prioritize "solved" > "partial" > "unresolved"
+            const determineOverallStatus = (attacks) => {
+                if (!attacks || attacks.length === 0) return 'None';
+                
+                const statuses = attacks.map(a => {
+                    const status = a.status || 'unknown';
+                    return status === 'unknown' ? 'unresolved' : status.toLowerCase();
+                });
+                
+                // Priority: solved > partial > unresolved
+                if (statuses.includes('solved')) return 'Solved';
+                if (statuses.includes('partial')) return 'Partial';
+                return 'Unresolved';
+            };
+            
+            if (type === 'erdos') {
+                const overallStatus = determineOverallStatus(problem.attacks);
+                metaDiv.innerHTML = `
+                    <p><strong>Problem Number:</strong> ${problem.number}</p>
+                    <p><strong>LLM Claims:</strong> ${overallStatus}</p>
+                `;
+            } else {
+                const overallStatus = determineOverallStatus(problem.attacks);
+                metaDiv.innerHTML = `
+                    <p><strong>Question ID:</strong> ${problem.id}</p>
+                    <p><strong>Score:</strong> ${problem.score}</p>
+                    <p><strong>LLM Claims:</strong> ${overallStatus}</p>
+                `;
+            }
+
+            // External links (problem statements are on external sites only)
+            const linksDiv = document.getElementById('problem-links');
+            if (type === 'erdos') {
+                linksDiv.innerHTML = `
+                    <p>For the full problem statement and comments, see:</p>
+                    <ul>
+                        <li><a href="${problem.problem_url}" target="_blank"><strong>View on erdosproblems.com</strong></a></li>
+                        <li><a href="${problem.database_url}" target="_blank">Erdos Problems Database (Terry Tao)</a></li>
+                    </ul>
+                `;
+            } else {
+                linksDiv.innerHTML = `
+                    <p>For the full problem statement, see:</p>
+                    <ul>
+                        <li><a href="${problem.link}" target="_blank"><strong>View on MathOverflow</strong></a></li>
+                    </ul>
+                `;
+            }
+
+            // LLM attempts
+            const attemptsDiv = document.getElementById('attempts-container');
+            const attemptsSection = document.getElementById('llm-attempts-section');
+            if (problem.attacks && problem.attacks.length > 0) {
+                attemptsDiv.innerHTML = problem.attacks.map((attack, idx) => {
+                    const statusClass = attack.status === 'solved' ? 'status-solved' :
+                                       attack.status === 'partial' ? 'status-partial' :
+                                       attack.status === 'unresolved' ? 'status-unresolved' : '';
+                    const statusLabel = attack.status ? attack.status.toUpperCase() : 'UNKNOWN';
+                    
+                    // Format date if available
+                    const datePosted = attack.date_posted ? 
+                        `<div class="attack-date">Posted: ${attack.date_posted}</div>` : '';
+
+                    return `
+                        <div class="attempt">
+                            <div class="attempt-header">
+                                <h3>Attempt ${idx + 1}: ${attack.model}</h3>
+                                <span class="status-badge ${statusClass}">${statusLabel}</span>
+                            </div>
+                            ${datePosted}
+                            <div class="attempt-content tex-content">
+                                ${formatTeX(attack.raw)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                // Hide the entire LLM attempts section when there are no attempts
+                attemptsSection.style.display = 'none';
+            }
+
+            // Navigation
+            const currentIdx = problemNumbers.indexOf(parseInt(id));
+            const prevBtn = document.getElementById('prev-problem');
+            const nextBtn = document.getElementById('next-problem');
+
+            if (currentIdx > 0) {
+                prevBtn.href = `problem.html?type=${type}&id=${problemNumbers[currentIdx - 1]}`;
+            } else {
+                prevBtn.style.visibility = 'hidden';
+            }
+
+            if (currentIdx < problemNumbers.length - 1) {
+                nextBtn.href = `problem.html?type=${type}&id=${problemNumbers[currentIdx + 1]}`;
+            } else {
+                nextBtn.style.visibility = 'hidden';
+            }
+
+            // Trigger MathJax typesetting after a short delay to ensure DOM is ready
+            if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+                // Clear any previous math and re-typeset
+                MathJax.typesetPromise().then(() => {
+                    // Typeset complete
+                }).catch((err) => {
+                    console.warn('MathJax typeset error:', err);
+                });
+            }
+        });
+
+        function formatTeX(text) {
+            if (!text) return '';
+
+            function normalizeBlockquotes(input) {
+                const lines = input.split('\n');
+                const out = [];
+                let inQuote = false;
+
+                for (const line of lines) {
+                    const match = line.match(/^\s*>\s?(.*)$/);
+                    if (match) {
+                        if (!inQuote) {
+                            out.push('\\begin{quote}');
+                            inQuote = true;
+                        }
+                        out.push(match[1]);
+                    } else {
+                        if (inQuote) {
+                            out.push('\\end{quote}');
+                            inQuote = false;
+                        }
+                        out.push(line);
+                    }
+                }
+
+                if (inQuote) {
+                    out.push('\\end{quote}');
+                }
+
+                return out.join('\n');
+            }
+
+            text = normalizeBlockquotes(text);
+
+            // First, convert alternate LaTeX delimiters to MathJax-compatible ones
+            // Convert display math lines: only lines that contain just [ or ]
+            text = text.replace(/(^|\n)[ \t]*\[(?=\n|$)/g, '$1\\[');
+            text = text.replace(/(^|\n)[ \t]*\](?=\n|$)/g, '$1\\]');
+
+            // Convert inline math (...) to \(...\) with a balanced parser (handles nested parentheses).
+            function convertInlineMath(input) {
+                const inlineStart = '\\(';
+                const inlineEnd = '\\)';
+                const displayStart = '\\[';
+                const displayEnd = '\\]';
+                const verbatimStart = '\\begin{verbatim}';
+                const verbatimEnd = '\\end{verbatim}';
+                const mathCommandRe = /\\[a-zA-Z]+/;
+
+                function isMathSegment(segment) {
+                    const hasCommand = mathCommandRe.test(segment);
+                    const hasMathOps = /[_^=<>+\-*/]/.test(segment) || /\d/.test(segment);
+                    let cleaned = segment;
+                    cleaned = cleaned.replace(/\\[a-zA-Z]+\s*\{[^{}]*\}/g, '');
+                    cleaned = cleaned.replace(/\\[a-zA-Z]+/g, '');
+                    cleaned = cleaned.replace(/[{}]/g, '');
+                    const hasWord = /[A-Za-z]{2,}/.test(cleaned);
+                    return (hasCommand || hasMathOps) && !hasWord;
+                }
+                let out = '';
+                let i = 0;
+
+                while (i < input.length) {
+                    if (input.slice(i, i + verbatimStart.length) === verbatimStart) {
+                        const endIdx = input.indexOf(verbatimEnd, i + verbatimStart.length);
+                        if (endIdx !== -1) {
+                            out += input.slice(i, endIdx + verbatimEnd.length);
+                            i = endIdx + verbatimEnd.length;
+                            continue;
+                        }
+                    }
+                    if (input.slice(i, i + displayStart.length) === displayStart) {
+                        const endIdx = input.indexOf(displayEnd, i + displayStart.length);
+                        if (endIdx !== -1) {
+                            out += input.slice(i, endIdx + displayEnd.length);
+                            i = endIdx + displayEnd.length;
+                            continue;
+                        }
+                    }
+                    if (input.slice(i, i + inlineStart.length) === inlineStart) {
+                        const endIdx = input.indexOf(inlineEnd, i + inlineStart.length);
+                        if (endIdx !== -1) {
+                            out += input.slice(i, endIdx + inlineEnd.length);
+                            i = endIdx + inlineEnd.length;
+                            continue;
+                        }
+                    }
+
+                    const ch = input[i];
+                    if (ch === '(' && (i === 0 || input[i - 1] !== '\\')) {
+                        let depth = 1;
+                        let j = i + 1;
+
+                        while (j < input.length) {
+                            const c = input[j];
+                            if (c === '(' && input[j - 1] !== '\\') {
+                                depth += 1;
+                            } else if (c === ')' && input[j - 1] !== '\\') {
+                                depth -= 1;
+                                if (depth === 0) {
+                                    const segment = input.slice(i + 1, j);
+                                    if (isMathSegment(segment)) {
+                                        out += '\\(' + segment + '\\)';
+                                    } else {
+                                        out += '(' + convertInlineMath(segment) + ')';
+                                    }
+                                    i = j + 1;
+                                    break;
+                                }
+                            }
+                            j += 1;
+                        }
+
+                        if (depth === 0) {
+                            continue;
+                        }
+                    }
+
+                    out += ch;
+                    i += 1;
+                }
+
+                return out;
+            }
+
+            text = convertInlineMath(text);
+            
+            // Convert LaTeX environments to HTML before escaping
+            // This must happen before HTML escaping
+            
+            // Convert \begin{center}...\end{center} to <div style="text-align: center;">...</div>
+            text = text.replace(/\\begin\{center\}([\s\S]*?)\\end\{center\}/g, '<div style="text-align: center;">$1</div>');
+            
+            // Convert \begin{itemize}...\end{itemize} to <ul>...</ul>
+            text = text.replace(/\\begin\{itemize\}(?:\[.*?\])?([\s\S]*?)\\end\{itemize\}/g, function(match, content) {
+                // Extract \item entries
+                let items = content.split(/\\item\s+/).filter(item => item.trim());
+                let listItems = items.map(item => '<li>' + item.trim() + '</li>').join('');
+                return '<ul>' + listItems + '</ul>';
+            });
+            
+            // Convert \begin{enumerate}...\end{enumerate} to <ol>...</ol>
+            text = text.replace(/\\begin\{enumerate\}(?:\[.*?\])?([\s\S]*?)\\end\{enumerate\}/g, function(match, content) {
+                // Extract \item entries
+                let items = content.split(/\\item\s+/).filter(item => item.trim());
+                let listItems = items.map(item => '<li>' + item.trim() + '</li>').join('');
+                return '<ol>' + listItems + '</ol>';
+            });
+            
+            // Convert \begin{quote}...\end{quote} to <blockquote>...</blockquote>
+            text = text.replace(/\\begin\{quote\}([\s\S]*?)\\end\{quote\}/g, '<blockquote>$1</blockquote>');
+            
+            // Convert \begin{verbatim}...\end{verbatim} to <pre>...</pre>
+            text = text.replace(/\\begin\{verbatim\}([\s\S]*?)\\end\{verbatim\}/g, '<pre>$1</pre>');
+            
+            // Convert theorem-like environments (theorem, lemma, definition, proof, etc.)
+            text = text.replace(/\\begin\{theorem\}(\[.*?\])?([\s\S]*?)\\end\{theorem\}/g, '<div class="theorem"><strong>Theorem$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{lemma\}(\[.*?\])?([\s\S]*?)\\end\{lemma\}/g, '<div class="lemma"><strong>Lemma$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{proposition\}(\[.*?\])?([\s\S]*?)\\end\{proposition\}/g, '<div class="proposition"><strong>Proposition$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{corollary\}(\[.*?\])?([\s\S]*?)\\end\{corollary\}/g, '<div class="corollary"><strong>Corollary$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{remark\}(\[.*?\])?([\s\S]*?)\\end\{remark\}/g, '<div class="remark"><strong>Remark$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{definition\}(\[.*?\])?([\s\S]*?)\\end\{definition\}/g, '<div class="definition"><strong>Definition$1:</strong> $2</div>');
+            text = text.replace(/\\begin\{proof\}(\[.*?\])?([\s\S]*?)\\end\{proof\}/g, '<div class="proof"><em>Proof$1:</em> $2 ∎</div>');
+            
+            // Convert psmallmatrix to regular pmatrix (MathJax will handle it)
+            text = text.replace(/\\begin\{psmallmatrix\}/g, '\\begin{pmatrix}');
+            text = text.replace(/\\end\{psmallmatrix\}/g, '\\end{pmatrix}');
+            
+            // Handle LaTeX text formatting commands BEFORE HTML escaping
+            // \emph{...} → <em>...</em>
+            text = text.replace(/\\emph\{([^}]+)\}/g, '<em>$1</em>');
+            // \textbf{...} → <strong>...</strong>
+            text = text.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
+            // \textit{...} → <em>...</em>
+            text = text.replace(/\\textit\{([^}]+)\}/g, '<em>$1</em>');
+            
+            // Remove LaTeX reference commands
+            text = text.replace(/\\label\{[^}]+\}/g, '');
+            text = text.replace(/\\ref\{[^}]+\}/g, '');
+            text = text.replace(/\\eqref\{[^}]+\}/g, '');
+            
+            // Remove LaTeX spacing and formatting commands
+            text = text.replace(/\\medskip/g, '');
+            text = text.replace(/\\noindent/g, '');
+            text = text.replace(/\\bigskip/g, '');
+            text = text.replace(/\\smallskip/g, '');
+            
+            // Replace delimiter sizing commands with \left and \right equivalents
+            // These work better in MathJax than the explicit sizing commands
+            text = text.replace(/\\[Bb]igg?l\s*([(\[{|])/g, '\\left$1');
+            text = text.replace(/\\[Bb]igg?r\s*([)\]}|])/g, '\\right$1');
+            text = text.replace(/\\[Bb]igg?l\s*\\\{/g, '\\left\\{');
+            text = text.replace(/\\[Bb]igg?r\s*\\\}/g, '\\right\\}');
+            // Remove any remaining standalone sizing commands
+            text = text.replace(/\\[Bb]igg?[lr]/g, '');
+
+            // Handle \cite{...} - convert to [ref] format
+            text = text.replace(/\\cite\{([^}]+)\}/g, '[$1]');
+
+            // Handle \url{...} - convert to clickable link
+            text = text.replace(/\\url\{([^}]+)\}/g, '<a href="$1" target="_blank">$1</a>');
+
+            // Handle \href{url}{text}
+            text = text.replace(/\\href\{([^}]+)\}\{([^}]+)\}/g, '<a href="$1" target="_blank">$2</a>');
+
+            // Replace LaTeX quotes with proper HTML entities
+            text = text.replace(/``/g, '"');
+            text = text.replace(/''/g, '"');
+
+            // Replace ~ (non-breaking space) with &nbsp; for proper rendering
+            text = text.replace(/([a-zA-Z0-9])~([a-zA-Z0-9])/g, '$1&nbsp;$2');
+
+            // Handle common LaTeX accents
+            text = text.replace(/\\'\{?e\}?/g, 'é');
+            text = text.replace(/\\'\{?a\}?/g, 'á');
+            text = text.replace(/\\'\{?o\}?/g, 'ó');
+            text = text.replace(/\\'\{?u\}?/g, 'ú');
+            text = text.replace(/\\'\{?i\}?/g, 'í');
+            text = text.replace(/\\"\{?o\}?/g, 'ö');
+            text = text.replace(/\\"\{?u\}?/g, 'ü');
+            text = text.replace(/\\"\{?a\}?/g, 'ä');
+            text = text.replace(/\\`\{?e\}?/g, 'è');
+            text = text.replace(/\\`\{?a\}?/g, 'à');
+            text = text.replace(/\\H\{o\}/g, 'ő');
+            text = text.replace(/Erd\\H\{o\}s/g, 'Erdős');
+            text = text.replace(/Szemer\\'edi/g, 'Szemerédi');
+            text = text.replace(/Dieudonn\\'e/g, 'Dieudonné');
+            text = text.replace(/G\\"ohde/g, 'Göhde');
+            text = text.replace(/Akad\\'emiai/g, 'Akadémiai');
+            text = text.replace(/Kiad\\'o/g, 'Kiadó');
+            text = text.replace(/Th\\'eorie/g, 'Théorie');
+            
+            // Convert LaTeX sectioning commands to HTML headings
+            text = text.replace(/\\section\*?\{([^}]+)\}/g, '<h2>$1</h2>');
+            text = text.replace(/\\subsection\*?\{([^}]+)\}/g, '<h3>$1</h3>');
+            text = text.replace(/\\subsubsection\*?\{([^}]+)\}/g, '<h4>$1</h4>');
+            text = text.replace(/\\paragraph\{([^}]+)\}/g, '<h5>$1</h5>');
+
+            // Escape HTML but preserve LaTeX
+            let formatted = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Restore LaTeX delimiters
+            formatted = formatted
+                .replace(/\\\[/g, '\\[')
+                .replace(/\\\]/g, '\\]')
+                .replace(/\\\(/g, '\\(')
+                .replace(/\\\)/g, '\\)');
+            
+            // Restore the HTML tags we created from LaTeX environments
+            formatted = formatted
+                .replace(/&lt;div style="text-align: center;"&gt;/g, '<div style="text-align: center;">')
+                .replace(/&lt;\/div&gt;/g, '</div>')
+                .replace(/&lt;ul&gt;/g, '<ul>')
+                .replace(/&lt;\/ul&gt;/g, '</ul>')
+                .replace(/&lt;ol&gt;/g, '<ol>')
+                .replace(/&lt;\/ol&gt;/g, '</ol>')
+                .replace(/&lt;li&gt;/g, '<li>')
+                .replace(/&lt;\/li&gt;/g, '</li>')
+                .replace(/&lt;blockquote&gt;/g, '<blockquote>')
+                .replace(/&lt;\/blockquote&gt;/g, '</blockquote>')
+                .replace(/&lt;pre&gt;/g, '<pre>')
+                .replace(/&lt;\/pre&gt;/g, '</pre>')
+                .replace(/&lt;div class="theorem"&gt;/g, '<div class="theorem">')
+                .replace(/&lt;div class="lemma"&gt;/g, '<div class="lemma">')
+                .replace(/&lt;div class="proposition"&gt;/g, '<div class="proposition">')
+                .replace(/&lt;div class="corollary"&gt;/g, '<div class="corollary">')
+                .replace(/&lt;div class="remark"&gt;/g, '<div class="remark">')
+                .replace(/&lt;div class="definition"&gt;/g, '<div class="definition">')
+                .replace(/&lt;div class="proof"&gt;/g, '<div class="proof">')
+                .replace(/&lt;\/div&gt;/g, '</div>')
+                .replace(/&lt;h2&gt;/g, '<h2>')
+                .replace(/&lt;\/h2&gt;/g, '</h2>')
+                .replace(/&lt;h3&gt;/g, '<h3>')
+                .replace(/&lt;\/h3&gt;/g, '</h3>')
+                .replace(/&lt;h4&gt;/g, '<h4>')
+                .replace(/&lt;\/h4&gt;/g, '</h4>')
+                .replace(/&lt;h5&gt;/g, '<h5>')
+                .replace(/&lt;\/h5&gt;/g, '</h5>')
+                .replace(/&lt;strong&gt;/g, '<strong>')
+                .replace(/&lt;\/strong&gt;/g, '</strong>')
+                .replace(/&lt;em&gt;/g, '<em>')
+                .replace(/&lt;\/em&gt;/g, '</em>')
+                .replace(/&lt;a href="/g, '<a href="')
+                .replace(/&lt;\/a&gt;/g, '</a>')
+                .replace(/" target="_blank"&gt;/g, '" target="_blank">');
+
+            // Convert line breaks to HTML
+            formatted = formatted.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+
+            // Wrap in paragraphs
+            formatted = '<p>' + formatted + '</p>';
+
+            return formatted;
+        }
+    </script>
+</body>
+</html>

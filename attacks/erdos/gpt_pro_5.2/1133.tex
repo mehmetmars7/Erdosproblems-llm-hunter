@@ -1,0 +1,129 @@
+% Erdos Problem #1133
+
+\subsection*{FORMAL RESTATEMENT}
+Fix $C>0$.
+Question: does there exist $\epsilon>0$ such that for all sufficiently large integers $n$ the following holds?
+For every choice of nodes $x_1,\dots,x_n\in[-1,1]$, there exist target values $y_1,\dots,y_n\in[-1,1]$ such that:
+for every real polynomial $P$ of degree
+\[
+\deg P = m < (1+\epsilon)n
+\]
+that satisfies
+\[
+\lvert\{1\le i\le n: P(x_i)=y_i\}\rvert\ge (1-\epsilon)n,
+\]
+one has
+\[
+\max_{x\in[-1,1]} |P(x)|>C.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I only record context explicitly stated in the problem file.
+The file states Erd\H{o}s proved a related result: for any $C>0$ there exists $\epsilon>0$ such that for large $n$ and $m=\lfloor(1+\epsilon)n\rfloor$, for any $x_1,\dots,x_m\in[-1,1]$ there is a polynomial $P$ of degree $n$ with $|P(x_i)|\le 1$ at those $m$ points but $\max_{[-1,1]}|P|>C$.
+It also states Erd\H{o}s could not prove the conjectured statement even for $m=n$.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track ideas.}
+\begin{itemize}
+\item Reduce to a statement about interpolation operators and Lebesgue constants: large Lebesgue constants allow choosing $y_i\in\{\pm 1\}$ forcing large sup norm for the interpolant.
+\item Try to ``robustify'' the exact interpolation forcing to handle matching only $(1-\epsilon)n$ points: show that any polynomial matching many prescribed signs must have large sup due to oscillation constraints.
+\end{itemize}
+\textbf{Disproof track ideas.}
+\begin{itemize}
+\item Attempt to show that for some configurations of points, any assignment $y_i\in[-1,1]$ can be matched on most points by a degree $<(1+\epsilon)n$ polynomial with controlled sup norm.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 1133.1 (explicit interpolation formula for degree $\le n-1$).}
+Let $x_1,\dots,x_n$ be distinct points in $\mathbb{R}$ and let $y_1,\dots,y_n\in\mathbb{R}$.
+Define Lagrange polynomials $l_k$ from these nodes.
+Then the polynomial
+\[
+P(x):=\sum_{k=1}^n y_k\,l_k(x)
+\]
+has degree at most $n-1$ and satisfies $P(x_i)=y_i$ for every $1\le i\le n$.
+Moreover, it is the unique polynomial of degree at most $n-1$ with these interpolation values.
+
+\emph{Proof.}
+Each $l_k$ has degree $n-1$, so $P$ has degree at most $n-1$.
+At a node $x_i$, we have $l_k(x_i)=\delta_{ki}$, hence
+\[
+P(x_i)=\sum_{k=1}^n y_k\delta_{ki}=y_i.
+\]
+For uniqueness, suppose $Q$ is another polynomial of degree at most $n-1$ with $Q(x_i)=y_i$ for all $i$.
+Then $R:=P-Q$ has degree at most $n-1$ and has $n$ distinct roots $x_1,\dots,x_n$, so $R\equiv 0$.
+Therefore $P\equiv Q$.
+\qed
+
+\textbf{Lemma 1133.2 (forcing large sup norm via the Lebesgue constant).}
+Let $x_1,\dots,x_n\in[-1,1]$ be distinct nodes and let
+\[
+\Lambda:=\max_{x\in[-1,1]}\sum_{k=1}^n |l_k(x)|
+\]
+be the Lebesgue constant associated to these nodes.
+Choose $x^*\in[-1,1]$ where the maximum is attained and define
+\[
+ y_k:=\begin{cases}
+ \phantom{-}1,& l_k(x^*)\ge 0,\\
+ -1,& l_k(x^*)<0.
+ \end{cases}
+\]
+Let $P$ be the degree $\le n-1$ interpolant through $(x_k,y_k)$ given by Lemma 1133.1.
+Then
+\[
+P(x^*)=\sum_{k=1}^n |l_k(x^*)|=\Lambda,
+\]
+and hence $\max_{x\in[-1,1]}|P(x)|\ge \Lambda$.
+
+\emph{Proof.}
+By construction, $y_k=\operatorname{sign}(l_k(x^*))$ (with the convention $\operatorname{sign}(0)=1$).
+Therefore $y_k l_k(x^*)=|l_k(x^*)|$ for every $k$, and Lemma 1133.1 gives
+\[
+P(x^*)=\sum_{k=1}^n y_k l_k(x^*)=\sum_{k=1}^n |l_k(x^*)|=\Lambda.
+\]
+Taking absolute values and the maximum over $x$ yields $\max_{[-1,1]}|P|\ge |P(x^*)|=\Lambda$.
+\qed
+
+\textbf{Interpretation.}
+Lemma 1133.2 shows a weaker (but relevant) forcing statement: for \emph{exact} interpolation by degree $\le n-1$ polynomials (the case $\epsilon=0$ and $m=n-1$), one can always choose $y_k\in\{\pm 1\}$ so that any polynomial matching all $n$ constraints (necessarily the interpolant) must have sup norm at least $\Lambda$.
+Since the problem file states $\Lambda\gg\log n$ for every node set (Faber), this forcing exceeds any fixed $C$ for sufficiently large $n$.
+What remains open in the posed problem is robustness: allowing degree up to $(1+\epsilon)n$ and allowing the polynomial to ignore $\epsilon n$ constraints.
+
+\textbf{FAST REALITY CHECK (numerical illustration).}
+For $n=5$ equally spaced nodes $[-1,-0.5,0,0.5,1]$, the above construction gives:
+\begin{verbatim}
+nodes [-1.  -0.5  0.   0.5  1. ]
+Lambda approx 2.20782438320626 at x* -0.7919
+y_k [ 1.  1. -1.  1. -1.]
+P sup approx 2.20782438320626 attained near -0.7919
+P(x*) 2.20782438320626
+\end{verbatim}
+This empirically confirms Lemma 1133.2 in a concrete case.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 1133.1 is standard and gap-free: interpolation property and uniqueness via $n$ roots.
+\item Lemma 1133.2 depends on existence of a maximizer $x^*$, which holds because $x\mapsto \sum_k|l_k(x)|$ is continuous on compact $[-1,1]$.
+\item The leap from Lemma 1133.2 to the conjectured statement is nontrivial because the conjecture permits dropping $\epsilon n$ constraints and increasing degree to $(1+\epsilon)n$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+For any node set $x_1,\dots,x_n$, one can choose $y_k\in\{\pm 1\}$ so that the unique interpolant of degree $\le n-1$ has $\max_{[-1,1]}|P|\ge \Lambda(x_1,\dots,x_n)$ (Lemma 1133.2).
+
+(ii) \textbf{First gap (crisp).}
+Upgrade the exact-interpolation forcing (degree $n-1$ and matching all $n$ points) to the robust regime of the problem: degree $<(1+\epsilon)n$ and matching at least $(1-\epsilon)n$ points.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Prove a robustness lemma: if a degree $m$ polynomial matches a sign pattern on many nodes, then its sup norm is bounded below in terms of a ``restricted'' Lebesgue constant for those nodes.
+\item Use quantitative bounds on how many alternations/oscillations a degree $m$ polynomial with bounded sup norm can have on $[-1,1]$, and choose $y_i$ to force more oscillation than allowed.
+\item Try probabilistic constructions for $y_i\in\{\pm 1\}$ and prove that with positive probability any degree-$m$ polynomial matching $>(1-\epsilon)n$ points must have large sup norm.
+\end{itemize}
+
+(iv) \textbf{Minimal counterexample structure.}
+A counterexample for a given $C$ would be a sequence of node sets $x^{(n)}_1,\dots,x^{(n)}_n$ such that for every assignment $y_i\in[-1,1]$ there exists a polynomial of degree $<(1+\epsilon)n$ matching $>(1-\epsilon)n$ constraints while keeping $\max_{[-1,1]}|P|\le C$.
+
+

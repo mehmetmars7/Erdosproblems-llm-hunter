@@ -1,0 +1,208 @@
+% Erdos Problem #321
+% URL: https://www.erdosproblems.com/321
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $N\ge 1$.
+
+For a set $A\subseteq\{1,2,\dots,N\}$ define
+\[
+\sigma_A: \mathcal P(A)\to\mathbb Q,\qquad \sigma_A(S):=\sum_{n\in S}\frac1n,
+\]
+where $\mathcal P(A)$ is the power set.
+
+We say that $A$ is \emph{reciprocal-subset-sum distinct} if $\sigma_A$ is injective, i.e.
+\[
+S\neq T\ \Longrightarrow\ \sum_{n\in S}\frac1n\neq\sum_{n\in T}\frac1n.
+\]
+Let
+\[
+R(N):=\max\bigl\{|A|:\ A\subseteq\{1,\dots,N\}\text{ and $A$ is reciprocal-subset-sum distinct}\bigr\}.
+\]
+
+Problem: determine the order of magnitude of $R(N)$ as $N\to\infty$.
+
+Edge cases.
+$A=\emptyset$ always works, so $R(N)\ge 0$. For $N=1$, $A=\{1\}$ works so $R(1)=1$.
+
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+I do not use any external results beyond what is explicitly stated in the problem text.
+The statement records bounds of Bleicher and Erd\H{o}s:
+\[
+\frac{N}{\log N}\prod_{i=3}^k\log_i N\ \le\ R(N)\ \le\ \frac{1}{\log 2}\,\log_r N\left(\frac{N}{\log N}\prod_{i=3}^r\log_i N\right),
+\]
+valid for any $k\ge 4$ with $\log_k N\ge k$ and any $r\ge 1$ with $\log_{2r}N\ge 1$.
+(In these bounds $\log_i$ denotes the $i$-fold iterated logarithm.)
+I do not re-prove these bounds here.
+
+
+3) ATTACK PLAN
+
+Give fully proved (but much weaker) structural statements:
+
+(1) A clean sufficient condition on $A$ (a ``superincreasing'' condition for reciprocals) that guarantees injectivity.
+
+(2) An explicit construction $A\subseteq\{1,\dots,N\}$ giving a rigorous lower bound $R(N)\ge \lfloor\log_2 N\rfloor+1$.
+
+(3) A general denominator-counting upper bound of the form $2^{|A|}\le \mathrm{lcm}(A)\,H_N+1$, where $H_N$ is the harmonic number.
+
+Also, do a brute-force reality check for small $N$.
+
+
+4) WORK
+
+PHASE 1: FAST REALITY CHECK (exact brute force for $N\le 20$)
+
+I exhaustively searched all subsets $A\subseteq\{1,\dots,N\}$ for $N\le 20$ and computed $R(N)$ exactly.
+The values found are:
+\[
+\begin{array}{c|cccccccccc}
+N & 1&2&3&4&5&6&7&8&9&10\\\hline
+R(N) & 1&2&3&4&5&5&6&7&8&9
+\end{array}
+\qquad
+\begin{array}{c|cccccccccc}
+N & 11&12&13&14&15&16&17&18&19&20\\\hline
+R(N) & 10&10&11&12&12&13&14&14&15&15
+\end{array}
+\]
+One optimal set for $N=20$ is
+\[
+A=\{1,2,3,4,5,7,8,9,10,11,13,14,16,17,19\},\qquad |A|=15.
+\]
+
+(These values are only a sanity check and do not indicate the true asymptotic size.)
+
+
+Lemma 321.1 (superincreasing reciprocals $\Rightarrow$ all subset sums distinct).
+
+Let $A=\{a_1<a_2<\cdots<a_m\}$ be a set of positive integers. Suppose that for every $1\le i\le m$ we have
+\[
+\frac{1}{a_i} > \sum_{j=i+1}^m \frac{1}{a_j}.
+\]
+Then the subset sums $\sum_{n\in S} \frac{1}{n}$ for $S\subseteq A$ are all distinct.
+
+Proof.
+Assume for contradiction that there exist distinct subsets $S,T\subseteq A$ with
+\[\sum_{n\in S}\frac1n=\sum_{n\in T}\frac1n.\]
+Let $i$ be the smallest index such that $a_i\in S\triangle T$ (symmetric difference).
+Without loss of generality, $a_i\in S\setminus T$.
+Then
+\[
+0 = \sum_{n\in S}\frac1n-\sum_{n\in T}\frac1n
+= \frac{1}{a_i} + \sum_{j>i,\ a_j\in S\setminus T}\frac{1}{a_j} - \sum_{j>i,\ a_j\in T\setminus S}\frac{1}{a_j}.
+\]
+Rearranging gives
+\[
+\frac{1}{a_i}
+= \sum_{j>i,\ a_j\in T\setminus S}\frac{1}{a_j} - \sum_{j>i,\ a_j\in S\setminus T}\frac{1}{a_j}
+\le \sum_{j>i}\frac{1}{a_j}.
+\]
+This contradicts the assumed strict inequality $\frac1{a_i} > \sum_{j>i}\frac1{a_j}$.
+Therefore no such $S,T$ exist, and all subset sums are distinct. \qed
+
+
+Lemma 321.2 (explicit construction: powers of $2$).
+
+Let $m\ge 1$ and $A_m:=\{1,2,4,\dots,2^{m-1}\}$. Then $A_m$ is reciprocal-subset-sum distinct.
+Consequently, for every $N\ge 1$,
+\[
+R(N)\ge \bigl\lfloor \log_2 N\bigr\rfloor+1.
+\]
+
+Proof.
+Write $A_m=\{a_1<\cdots<a_m\}$ with $a_i=2^{i-1}$. For $1\le i\le m$,
+\[
+\sum_{j=i+1}^m \frac{1}{a_j} = \sum_{t=1}^{m-i} \frac{1}{2^{i-1+t}} = \frac{1}{2^{i}}\sum_{t=0}^{m-i-1}\frac{1}{2^{t}}
+=\frac{1}{2^{i}}\cdot\frac{1-(1/2)^{m-i}}{1-1/2}
+=\frac{1}{2^{i-1}}\left(1-\frac{1}{2^{m-i}}\right)
+<\frac{1}{2^{i-1}}=\frac{1}{a_i}.
+\]
+So $A_m$ satisfies the hypothesis of Lemma 321.1 and is reciprocal-subset-sum distinct.
+
+If $2^{m-1}\le N$, then $A_m\subseteq\{1,\dots,N\}$, hence $R(N)\ge m$.
+The largest such $m$ is $m=\lfloor\log_2 N\rfloor+1$. \qed
+
+
+Lemma 321.3 (a denominator-counting upper bound).
+
+Let $A\subseteq\{1,\dots,N\}$ be reciprocal-subset-sum distinct. Let $L:=\mathrm{lcm}(A)$ and let $H_N:=\sum_{n=1}^N \frac{1}{n}$.
+Then
+\[
+2^{|A|}\le L\,H_N+1.
+\]
+
+Proof.
+For any subset $S\subseteq A$, write
+\[
+\sigma_A(S)=\sum_{n\in S}\frac1n.
+\]
+Multiplying by $L$ gives
+\[
+L\sigma_A(S)=\sum_{n\in S}\frac{L}{n}.
+\]
+Because $L$ is a common multiple of all $n\in A$, each term $\frac{L}{n}$ is an integer, hence $L\sigma_A(S)$ is an integer.
+Also $\sigma_A(S)\ge 0$ and
+\[
+\sigma_A(S)\le \sum_{n\in A}\frac1n\le \sum_{n=1}^N\frac1n=H_N.
+\]
+Therefore
+\[
+0\le L\sigma_A(S)\le L H_N.
+\]
+Thus $L\sigma_A(S)$ takes values in the integer set $\{0,1,2,\dots,\lfloor L H_N\rfloor\}$, which has size at most $L H_N+1$.
+Since $A$ is reciprocal-subset-sum distinct, $\sigma_A$ is injective on $\mathcal P(A)$, so the $2^{|A|}$ values of $\sigma_A(S)$ are all distinct, and hence the $2^{|A|}$ integers $L\sigma_A(S)$ are all distinct.
+So
+\[
+2^{|A|} \le L H_N+1.
+\]
+\qed
+
+
+5) VERIFICATION
+
+-- Lemma 321.1: the choice of the minimal index $i$ where $S$ and $T$ differ is valid since $A$ is finite and ordered.
+The strict inequality hypothesis is used exactly once to contradict $\frac{1}{a_i}\le\sum_{j>i}1/a_j$.
+
+-- Lemma 321.2: the tail-sum computation is a finite geometric series; the strict inequality holds because $1-2^{-(m-i)}<1$.
+
+-- Lemma 321.3: all subset sums are rationals with denominator dividing $L$; multiplying by $L$ indeed gives integers.
+The range bound uses $A\subseteq\{1,\dots,N\}$.
+
+-- Small-$N$ computation: checked internally by exhaustive enumeration; the pattern $R(6)=5$ is consistent with the collision
+$\frac12+\frac13+\frac16=1$ (so one cannot simultaneously include $\{1,2,3,6\}$).
+
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result obtained here.
+
+* A clean sufficient condition (Lemma 321.1) and a concrete construction (Lemma 321.2) give
+\[
+R(N)\ge \lfloor\log_2 N\rfloor+1.
+\]
+* A general denominator-counting inequality (Lemma 321.3) gives
+\[
+2^{R(N)}\le \mathrm{lcm}(1,2,\dots,N)\,H_N+1
+\]
+(and hence an explicit, albeit weak, upper bound $R(N)=O(N\log N)$ using $\mathrm{lcm}(1,\dots,N)\le N!$).
+
+(ii) Exact first gap.
+
+Bridge the gap between the elementary bound $R(N)\ge c\log N$ proved here and the much larger bounds recorded in the problem statement (on the scale $N/\log N$ times iterated logs). In particular, I did not produce a construction achieving $R(N)\gg N/\log N$.
+
+(iii) Top 3 next moves (concrete targets).
+
+1. Reproduce (from scratch) the Bleicher--Erd\H{o}s lower-bound construction: give an explicit family $A\subseteq\{1,\dots,N\}$ of size $\gg N/\log N$ whose reciprocal subset sums are distinct.
+2. Strengthen Lemma 321.3 by inserting a sharper estimate for the number of attainable numerators $L\sigma_A(S)$ (not just the crude interval bound), e.g. via spacing/Diophantine constraints.
+3. Improve the small-$N$ search to $N\approx 40$--$50$ and look for a stable pattern (e.g. whether ``exclude exactly multiples of 6'' continues), which might suggest a constructive schema.
+
+(iv) What a minimal counterexample would likely look like.
+
+Any counterexample to a conjectured lower bound of the form $R(N)\gg N/\log N$ would have to show that every reciprocal-subset-sum-distinct set $A\subseteq\{1,\dots,N\}$ is forced to omit a positive fraction of integers in a structured way (e.g. by unavoidable Egyptian-fraction-type identities creating collisions among subset sums). The brute-force optimum sets up to $N=20$ already omit specific composite numbers (e.g. $6,12,15,18,20$), suggesting that ``local'' rational identities constrain membership.
+
+

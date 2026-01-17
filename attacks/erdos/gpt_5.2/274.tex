@@ -1,0 +1,105 @@
+% Attempt for Erdos Problem #274
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Let $G$ be a group. An \emph{exact covering} (or \emph{partition}) of $G$ by cosets is a finite family of left cosets
+\[a_1G_1,\dots,a_kG_k\qquad (G_i\le G,\ a_i\in G)\]
+such that these cosets are pairwise disjoint and their union is $G$.
+
+The \emph{Herzog--Sch\"onheim conjecture} (as stated here) is:
+if the indices $[G:G_i]$ are all distinct, then $\{a_iG_i\}_{i=1}^k$ cannot form a partition of $G$.
+
+The original question in the first sentence can be read as asking whether such a partition can exist with cosets
+of different cardinalities $|a_iG_i|=|G_i|$ (in the finite case this is equivalent to having different indices).
+We exclude the trivial $k=1$ case.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. I only record what the problem statement itself claims:
+the conjecture is proved when all $G_i$ are subnormal, hence in particular for abelian groups; and it is verified
+for all groups of size $<1440$. I have not checked these results here.
+
+3) ATTACK PLAN
+Proof track:
+1. For finite cyclic groups (equivalently exact covers of $\mathbb{Z}/N\mathbb{Z}$ by congruence classes), use roots of unity to force repetition of the largest index.
+2. Try to extend the same character-sum argument to abelian groups via 1-dimensional characters.
+3. For general finite groups, attempt a representation-theoretic version: apply an irreducible character to the coset partition and isolate the largest index.
+
+Disproof track:
+1. Search for small finite-group counterexamples by brute force over subgroup lattices (if any exist, the smallest one would be very informative).
+2. Try semidirect products where subgroups fail to be subnormal, aiming to engineer a partition with distinct indices.
+
+Chosen path: prove clean necessary conditions and a complete proof for cyclic groups; no general counterexample found.
+
+4) WORK
+Lemma 1 (Counting constraint in the finite case).
+Let $G$ be a \emph{finite} group and suppose
+\[G=\bigsqcup_{i=1}^k a_iG_i\]
+is a disjoint union of left cosets of subgroups $G_i\le G$. Then
+\[\sum_{i=1}^k \frac{1}{[G:G_i]}=1.\]
+
+Proof.
+Each coset $a_iG_i$ has cardinality $|G_i|$. Disjointness gives
+\[|G|=\sum_{i=1}^k |a_iG_i|=\sum_{i=1}^k |G_i|.\]
+Divide both sides by $|G|$ and use $|G_i|/|G|=1/[G:G_i]$. \qed
+
+Proposition 2 (Herzog--Sch\"onheim for finite cyclic groups).
+Let $G=\mathbb{Z}/N\mathbb{Z}$ be a finite cyclic group. Suppose $G$ is partitioned into finitely many cosets of subgroups,
+equivalently into congruence classes
+\[G=\bigsqcup_{i=1}^k \{x\in \mathbb{Z}/N\mathbb{Z}: x\equiv a_i \!\!\!\pmod{d_i}\}\]
+where each $d_i\mid N$ and the coset has index $d_i=[G:G_i]$. Then the largest index occurs at least twice.
+In particular, the indices cannot be pairwise distinct.
+
+Proof.
+Let $m=\max_i d_i$. Since each $d_i\mid N$, also $m\mid N$.
+Let $\zeta$ be a primitive $m$th root of unity, so $\zeta^m=1$ and $\zeta\ne 1$. Then $\zeta^N=1$ and hence
+\[\sum_{x=0}^{N-1}\zeta^x=0.\tag{$\ast$}\]
+
+Write each congruence class in $\{0,1,\dots,N-1\}$ representatives. For a fixed modulus $d\mid N$ and residue $a$,
+the corresponding set in $\{0,\dots,N-1\}$ is $\{a+td:0\le t\le N/d-1\}$ and
+\[\sum_{\substack{0\le x\le N-1\\ x\equiv a\!\!\!\!\pmod d}}\zeta^x
+=\sum_{t=0}^{N/d-1}\zeta^{a+td}
+=\zeta^a\sum_{t=0}^{N/d-1}(\zeta^d)^t.\tag{$\ast\ast$}\]
+
+If $d<m$ then $\zeta^d\ne 1$ (since $\zeta$ has exact order $m$ and $0<d<m$), while $(\zeta^d)^{N/d}=\zeta^N=1$.
+Therefore the geometric series in $(\ast\ast)$ sums to $0$, so every congruence class with modulus $d<m$ contributes $0$
+to the sum $(\ast)$.
+
+If $d=m$ then $\zeta^d=\zeta^m=1$, so $(\ast\ast)$ equals $\zeta^a\cdot (N/m)$.
+Using that the congruence classes partition $\{0,\dots,N-1\}$, we can rewrite $(\ast)$ as
+\[0=\sum_{x=0}^{N-1}\zeta^x=\sum_{i=1}^k \sum_{\substack{0\le x\le N-1\\ x\equiv a_i\!\!\!\!\pmod {d_i}}}\zeta^x
+=\frac{N}{m}\sum_{i:\, d_i=m}\zeta^{a_i}.\]
+Since $N/m\ne 0$, we get $\sum_{i:\, d_i=m}\zeta^{a_i}=0$.
+If there were exactly one index with $d_i=m$, this sum would be a single nonzero complex number $\zeta^{a_i}$, contradiction.
+Hence at least two of the $d_i$ equal $m$. \qed
+
+FAST REALITY CHECK (computation).
+I brute-forced cyclic groups $\mathbb{Z}/n\mathbb{Z}$ for $2\le n\le 80$ and found no partition into cosets of subgroups with pairwise distinct indices.
+(Program output: “No partitions with distinct indices found for cyclic groups $\\mathbb{Z}/n\\mathbb{Z}$, $n\\le 80$”.)
+
+5) VERIFICATION
+- Lemma 1 uses only finiteness and disjointness; no normality assumptions are needed.
+- In Proposition 2, the key points are: $m\mid N$ so $\zeta^N=1$; for $d<m$ we have $\zeta^d\ne 1$; and each coset sum is a full geometric progression.
+- Edge cases: $k=1$ is excluded; if a coset has index $1$ it is all of $G$ and cannot be disjoint from others.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+For finite cyclic groups $\mathbb{Z}/N\mathbb{Z}$, any coset partition forces the largest index to repeat (Proposition 2). In any finite group partition, the indices satisfy $\sum_i 1/[G:G_i]=1$ (Lemma 1).
+
+(ii) First gap:
+Extend the “largest index repeats” argument from cyclic (or abelian) groups to \emph{all} finite groups, i.e. show that any partition $G=\bigsqcup a_iG_i$ forces two indices $[G:G_i]$ to be equal.
+
+(iii) Top 3 next moves:
+1. Try a representation-theoretic analogue of Proposition 2: evaluate $\sum_{g\in G}\chi(g)$ for a suitable irreducible character $\chi$ and decompose it over the coset partition.
+2. Reduce to finite quotients: if an infinite group counterexample existed, look for a finite quotient inheriting a coset partition with distinct indices.
+3. Implement a targeted search for small non-abelian groups by enumerating subgroup cosets and testing partitions (beyond the cyclic sanity check).
+
+(iv) Minimal counterexample structure (if the conjecture were false):
+A smallest finite counterexample would be a non-abelian group (since abelian is claimed settled) of order at least $1440$ (per the statement), with a coset partition in which all subgroup indices are distinct and (likely) none of the subgroups are subnormal.
+

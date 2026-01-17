@@ -1,0 +1,109 @@
+% Erdos Problem #847
+% URL: https://www.erdosproblems.com/847
+
+Let $A\subset \mathbb{N}$ be an infinite set for which there exists some $\epsilon>0$ such that in any subset of $A$ of size $n$ there is a subset of size at least $\epsilon n$ which contains no three-term arithmetic progression. Is it true that $A$ is the union of a finite number of sets which contain no three-term arithmetic progression? A problem of Erd\H{o}s, Ne\v{s}et\v{r}il, and R\"{o}dl. See also [774] and [846] .
+
+1) “FORMAL RESTATEMENT”
+
+Fix an infinite set $A\subset\mathbb{N}$. Assume:
+
+$\exists\,\epsilon>0$ such that $\forall n\in\mathbb{N}_{\ge 1}$ and $\forall S\subset A$ with $|S|=n$, there exists $T\subset S$ with
+\[
+|T|\ge \epsilon n
+\]
+and $T$ contains \emph{no three-term arithmetic progression} (3AP), i.e. there do not exist \emph{distinct} $x,y,z\in T$ with $x+z=2y$.
+
+Question: Does it follow that there exists $m\ge 1$ and a covering
+\[
+A = A_1\cup\cdots\cup A_m
+\]
+with each $A_i$ containing no 3AP?
+
+Conventions/edge cases:
+- “Subset of size $n$” means $n$-element subset.
+- For $n\le 2$ the 3AP-free condition is automatic.
+- The hypothesis forces $0<\epsilon\le 1$.
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+The problem statement provides no theorems to use directly, only cross-references. In this write-up I do not invoke external literature beyond what is explicitly stated in the problem text.
+
+3) “ATTACK PLAN”
+
+Proof-track ideas:
+- Interpret 3APs as edges of a $3$-uniform hypergraph $\mathcal{H}_{\mathrm{3AP}}(A)$ on vertex set $A$. The hypothesis says every induced subhypergraph on $n$ vertices has an independent set of size $\ge \epsilon n$. Try to show bounded chromatic number.
+- Try to exploit arithmetic structure: perhaps the hereditary large-independent-set condition forces strong regularity that implies finite coloring.
+
+Disproof/construction ideas:
+- Try to construct an infinite $A$ by pasting together finite blocks $B_j$ with growing chromatic number in the 3AP-hypergraph, while maintaining a uniform lower bound $\alpha(S)\ge \epsilon|S|$ on independent sets in all induced subhypergraphs.
+
+Best current path in this write-up: record structural consequences and what can already be proved (notably an $O(\log n)$ decomposition for finite subsets), and run small-case computations on intervals as a sanity check.
+
+4) “WORK”
+
+FAST REALITY CHECK (small $n$):
+- If $A$ contains a 3-term arithmetic progression $\{x,y,z\}$, then for $n=3$ that subset has largest 3AP-free subset of size $2$, so the hypothesis forces $3\epsilon\le 2$, i.e. $\epsilon\le 2/3$.
+
+\textbf{Lemma 847.1 (Finite union $\Rightarrow$ hereditary linear 3AP-free subset).}
+If $A=\bigcup_{i=1}^m A_i$ where each $A_i$ is 3AP-free, then the hypothesis holds with $\epsilon=1/m$.
+
+\emph{Proof.}
+Let $S\subset A$ be any $n$-element subset. Then $S=\bigcup_{i=1}^m (S\cap A_i)$. By pigeonhole, some $i$ satisfies $|S\cap A_i|\ge n/m$. Taking $T:=S\cap A_i$ gives a 3AP-free subset of size at least $(1/m)n$. \qed
+
+\textbf{Lemma 847.2 (Logarithmic coloring bound for finite subsets).}
+Assume the hypothesis with parameter $\epsilon>0$. Then for every finite $S\subset A$ with $|S|=n\ge 1$, there exists a partition
+\[
+S = S_1\cup\cdots\cup S_t
+\]
+with each $S_j$ 3AP-free and
+\[
+ t \le 1+\left\lceil \frac{\log n}{\log(1/(1-\epsilon))}\right\rceil.
+\]
+
+\emph{Proof.}
+This is the same greedy-removal argument as in Lemma 846.3, using the hypothesis to remove at each step a 3AP-free subset of size at least an $\epsilon$-fraction of the remaining set. Each removal step shrinks the remainder by a factor at most $(1-\epsilon)$, so after $t$ steps the remainder has size at most $(1-\epsilon)^t n$. Taking $t$ minimal with $(1-\epsilon)^t n<1$ yields an empty remainder and the stated bound on $t$. \qed
+
+\textbf{Lemma 847.3 (A universal upper bound on 3AP-free density inside a consecutive block).}
+Let $m\ge 1$ and let $I=\{a,a+1,\dots,a+m-1\}$ be $m$ consecutive integers. Then any 3AP-free subset $T\subset I$ satisfies
+\[
+|T|\le \left\lceil \frac{2m}{3}\right\rceil.
+\]
+
+\emph{Proof.}
+Partition $I$ into disjoint blocks of three consecutive integers:
+\[
+\{a,a+1,a+2\},\ \{a+3,a+4,a+5\},\ \dots
+\]
+and possibly one final block of size $1$ or $2$ (if $m\not\equiv 0\pmod 3$). In each full block of three consecutive integers, at most two elements of $T$ can lie in the block, because three consecutive integers form a 3-term arithmetic progression with common difference $1$.
+
+If $m=3q+r$ with $r\in\{0,1,2\}$, there are $q$ full blocks and one leftover block of size $r$. Therefore $|T|\le 2q+r=\lceil 2m/3\rceil$. \qed
+
+FAST REALITY CHECK (explicit computation on $\{1,2,\dots,m\}$):
+Using brute force enumeration for $m\le 22$, the maximum size $f(m)$ of a 3AP-free subset of $\{1,2,\dots,m\}$ is:
+\[
+\begin{array}{c|cccccccccccccccccccccc}
+ m & 1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16&17&18&19&20&21&22\\\hline
+ f(m) & 1&2&2&3&4&4&4&4&5&5&6&6&7&8&8&8&8&8&8&9&9&9
+\end{array}
+\]
+In particular, inside a length-$m$ arithmetic progression, one cannot always extract more than about $f(m)/m$ fraction of points without creating a 3AP (for these small $m$).
+
+5) “VERIFICATION”
+
+- Lemma 847.2 is a direct specialization of Lemma 846.3 and uses only the given hypothesis.
+- Lemma 847.3 is valid because a 3AP-free set must in particular avoid the 3APs with difference $1$.
+- The computed table is a finite exhaustive check for $m\le 22$; it is only sanity evidence and does not by itself imply asymptotic bounds.
+- As in Problem 846, Lemma 847.2 gives only $O_\epsilon(\log n)$ parts for an $n$-element subset, not a uniform finite bound for all of $A$.
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest fully proved partial result: Any finite union of 3AP-free sets satisfies the hypothesis with $\epsilon=1/m$ (Lemma 847.1). Under the hypothesis, every finite $n$-element subset of $A$ can be partitioned into $O_\epsilon(\log n)$ 3AP-free subsets (Lemma 847.2). Also, any 3AP-free subset of a block of $m$ consecutive integers has size at most $\lceil 2m/3\rceil$ (Lemma 847.3).
+(ii) First gap (crisp): Prove (or disprove) that the hereditary linear independent-set condition for the 3AP hypergraph on $A$ implies a \\emph{uniform} bound $m=m(\epsilon)$ such that $A$ can be covered by $m$ 3AP-free sets.
+(iii) Top 3 next moves:
+  1. Attempt a finite counterexample scheme: find finite sets $B_j\subset\mathbb{N}$ with $\alpha(H[B_j])\ge \epsilon|B_j|$ for all induced subhypergraphs but with chromatic number $\chi(H[B_j])\to\infty$, where $H$ is the 3AP hypergraph; then paste blocks far apart to form an infinite counterexample.
+  2. Seek a “\,$\chi$-boundedness\,” theorem for the 3AP hypergraph in terms of the hereditary independence ratio (an arithmetic analogue of graph parameters like the Hall ratio).
+  3. Extend computations: for structured finite sets (intervals, unions of arithmetic progressions, random sets) empirically estimate the ratio between maximum 3AP-free subset size and the minimum number of 3AP-free parts needed.
+(iv) Minimal counterexample structure: An infinite set $A\subset\mathbb{N}$ that decomposes into finite blocks $B_j$ (well-separated so cross-block 3APs are controlled) with chromatic number in the 3AP hypergraph growing with $j$, while still enforcing a uniform lower bound $\alpha(S)\ge \epsilon|S|$ for every finite $S\subset A$.
+
+

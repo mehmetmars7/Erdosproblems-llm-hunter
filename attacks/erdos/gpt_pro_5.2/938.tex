@@ -1,0 +1,78 @@
+% Erdos Problem #938
+
+1) FORMAL RESTATEMENT
+
+Let \(A=\{n_1<n_2<\cdots\}\) be the increasing sequence of powerful (squarefull) numbers, i.e. positive integers \(m\) such that for every prime \(p\mid m\) we have \(p^2\mid m\).
+
+Question (main): Are there only finitely many indices \(k\) such that the three consecutive terms \(n_k,n_{k+1},n_{k+2}\) form a 3-term arithmetic progression, i.e.
+\[n_{k+1}-n_k = n_{k+2}-n_{k+1}?\]
+
+Related conjecture (stated): There is no triple of powerful numbers of the form \(n,n+1,n+2\).
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement reports only Erd\H{o}s's conjectural remark about \(n,n+1,n+2\). I do not use any external results.
+
+3) ATTACK PLAN
+
+- Use a structural description of powerful numbers to (i) count them and (ii) generate them for computation.
+- Compute the initial segment of \(A\) and check for arithmetic-progression triples among consecutive terms.
+
+4) WORK
+
+Fast reality check (explicit computation).
+Using the standard parametrisation of powerful numbers and enumerating all powerful numbers \(\le 10^6\):
+- There are 2027 powerful numbers \(\le 10^6\).
+- There are 3 instances where \(n_k,n_{k+1},n_{k+2}\) are in arithmetic progression:
+  \[(1728,1764,1800)\ (\text{common difference }36),\]
+  \[(6912,7056,7200)\ (\text{common difference }144),\]
+  \[(729000,729316,729632)\ (\text{common difference }316).\]
+- There are no triples \(n,n+1,n+2\) of powerful numbers with \(n+2\le 10^6\).
+
+Lemma 938.1 (Powerful numbers are \(a^2 b^3\) with \(b\) squarefree).
+A positive integer \(m\) is powerful if and only if it can be written in the form
+\[m=a^2 b^3\]
+for some integers \(a\ge 1\) and squarefree \(b\ge 1\).
+
+Proof.
+(\(\Rightarrow\)) Let \(m=\prod_p p^{e_p}\) with all \(e_p\ge 2\). For each prime \(p\), write \(e_p\) as \(e_p=2u_p+3v_p\) where \(v_p\in\{0,1\}\):
+- If \(e_p\) is even, take \(v_p=0\) and \(u_p=e_p/2\).
+- If \(e_p\) is odd, then \(e_p\ge 3\); take \(v_p=1\) and \(u_p=(e_p-3)/2\).
+Define
+\[a:=\prod_p p^{u_p},\qquad b:=\prod_{p:\,v_p=1} p.
+\]
+Then \(b\) is squarefree by construction (each such prime occurs to exponent 1), and
+\[a^2 b^3 = \prod_p p^{2u_p} \prod_{p:\,v_p=1} p^{3} = \prod_p p^{2u_p+3v_p} = \prod_p p^{e_p}=m.
+\]
+
+(\(\Leftarrow\)) Conversely, if \(m=a^2 b^3\) with \(b\) squarefree, then for any prime \(p\mid m\), either \(p\mid a\) (so \(p^2\mid a^2\mid m\)) or \(p\mid b\) (so \(p^3\mid b^3\mid m\), hence again \(p^2\mid m\)). Thus every prime divisor of \(m\) divides it to exponent at least 2, i.e. \(m\) is powerful.
+QED.
+
+Lemma 938.2 (Crude counting bound).
+Let \(N(X)\) be the number of powerful integers \(m\le X\). Then \(N(X)=O(X^{1/2})\).
+
+Proof.
+By Lemma 938.1, every powerful \(m\le X\) can be written as \(m=a^2 b^3\) with \(b\) squarefree and \(b^3\le X\), hence \(b\le X^{1/3}\).
+For fixed \(b\), the condition \(a^2 b^3\le X\) implies \(a\le \sqrt{X/b^3}=X^{1/2} b^{-3/2}\). Therefore
+\[N(X) \le \sum_{\substack{b\le X^{1/3}\\ b\ \mathrm{squarefree}}} \Big\lfloor X^{1/2} b^{-3/2}\Big\rfloor
+\le X^{1/2} \sum_{\substack{b\ge 1\\ b\ \mathrm{squarefree}}} b^{-3/2}.
+\]
+The series \(\sum_{b\ge 1} b^{-3/2}\) converges (p-series with exponent \(3/2>1\)), and the restriction to squarefree \(b\) only decreases the sum. Hence the sum is bounded by a constant independent of \(X\), giving \(N(X)\ll X^{1/2}\). QED.
+
+5) VERIFICATION
+
+- Lemma 938.1: For odd \(e_p\ge2\), we used \(e_p\ge3\) to make \((e_p-3)/2\ge0\), which holds.
+- Computation: the three displayed triples were extracted by scanning the sorted list of powerful numbers \(\le 10^6\) and checking consecutive triples. This validates existence of such triples at least up to this bound.
+
+6) FINAL
+
+UNRESOLVED
+(i) Strongest proved partial result: Powerful numbers admit the \(a^2b^3\) description (Lemma 938.1) and satisfy the crude count \(N(X)=O(X^{1/2})\) (Lemma 938.2). Computationally, there are at least three arithmetic-progression triples among consecutive powerful numbers up to \(10^6\), including \((1728,1764,1800)\).
+(ii) First gap: Prove either that the set \(\{k: n_k,n_{k+1},n_{k+2}\ \text{is an AP}\}\) is finite, or construct an infinite family of such indices while controlling the ``consecutive in the powerful sequence'' condition.
+(iii) Top 3 next moves:
+  1. Search for parametrised families of AP triples of powerful numbers and test whether the ``no other powerful numbers in between'' property persists.
+  2. Develop local density/gap estimates for powerful numbers in intervals \([x,x+\Delta]\) to bound when a given AP triple can be consecutive.
+  3. Extend brute-force computation to larger bounds and record the gap patterns around candidate AP triples.
+(iv) Minimal counterexample structure: If there are infinitely many such AP triples of consecutive powerful numbers, one expects a structured family \((a_k, a_k+d_k, a_k+2d_k)\) of powerful numbers with unusually large gaps to exclude intermediate powerful values; understanding how powerful numbers cluster in residue classes modulo large squares/cubes may be essential.
+
+

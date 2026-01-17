@@ -1,0 +1,123 @@
+% Erdos problem #126
+% Attempt for Erdos Problem #126
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? YES (used for small-case checks)
+
+1) FORMAL RESTATEMENT
+
+For a finite set $A\subset \mathbb{N}$ with $|A|=n$, define
+\[
+P(A):=\prod_{\substack{a,b\in A\\ a\neq b}} (a+b).
+\]
+Let $\omega(m)$ denote the number of *distinct* prime factors of $m$.
+Define
+\[
+f(n):=\min_{\substack{A\subset\mathbb{N}\\ |A|=n}} \omega(P(A)).
+\]
+(Equivalently, $f(n)$ is the maximal integer such that every $n$-element set $A$ makes $P(A)$ have at least $f(n)$ distinct prime factors.)
+
+Given the bounds quoted in the text, one knows $\log n \ll f(n) \ll n/\log n$.
+
+**Question.** Is it true that
+\[
+\lim_{n\to\infty} \frac{f(n)}{\log n} = \infty\ ?
+\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- Erdos and Turan (1934) proved $\log n\ll f(n)\ll n/\log n$.
+- The problem asks whether $f(n)/\log n\to\infty$.
+
+3) ATTACK PLAN
+
+- Prove structural properties of $f(n)$ (monotonicity, small-$n$ exact values).
+- Attempt to force many primes by considering congruence constraints on sums $a+b$.
+- Use small computational experiments to guess behavior.
+
+4) WORK
+
+Lemma 4.1 (Monotonicity).
+The function $f(n)$ is nondecreasing: $f(n+1)\ge f(n)$ for all $n\ge 1$.
+
+*Proof.* Let $A$ be any set of size $n+1$ and let $B\subset A$ be any $n$-element subset.
+Then $P(B)$ divides $P(A)$ because $P(B)$ is the subproduct of $P(A)$ over pairs inside $B$.
+Therefore $\omega(P(A))\ge \omega(P(B))$.
+Since this holds for every $B$ of size $n$, and by definition every $n$-element set satisfies $\omega(P(B))\ge f(n)$, we obtain $\omega(P(A))\ge f(n)$ for every $A$ of size $n+1$.
+Taking the minimum over $A$ shows $f(n+1)\ge f(n)$. \qed
+
+Lemma 4.2 (Exact value $f(3)=2$).
+For every set $A=\{a,b,c\}$ of three distinct positive integers,
+$\omega(P(A))\ge 2$.
+Moreover, equality occurs (e.g. for $A=\{1,3,5\}$), so $f(3)=2$.
+
+*Proof.* Write the three pairwise sums as
+\[x=a+b,\quad y=a+c,\quad z=b+c,\]
+so $P(A)$ is (up to squares) the product $xyz$.
+Suppose for contradiction that $\omega(xyz)=1$, i.e. $x,y,z$ are all powers of a single prime $p$.
+Then $p$ divides each of $x,y,z$, hence $x\equiv y\equiv z\equiv 0\pmod p$.
+Subtracting gives $b-c=x-y\equiv 0\pmod p$, and similarly $a-c\equiv 0\pmod p$; thus $a\equiv b\equiv c\pmod p$.
+Then $x=a+b\equiv 2a\pmod p$, so $2a\equiv 0\pmod p$.
+If $p$ is odd, then $a\equiv 0\pmod p$, hence $p\mid a,b,c$.
+Dividing $a,b,c$ by $p$ yields a smaller triple with the same property; iterating gives an impossible infinite descent in positive integers.
+Therefore $p=2$.
+But if $x,y,z$ are powers of 2, then in particular they are all even, so $a,b,c$ must all have the same parity.
+If all are odd, then each sum is congruent to $2\pmod 4$, so each of $x,y,z$ has 2-adic valuation exactly 1, forcing $x=y=z=2$, which would imply $a=b=c=1$, contradicting distinctness.
+Hence all of $a,b,c$ are even, so dividing by 2 gives a smaller triple with the same property, again yielding infinite descent.
+Thus $\omega(xyz)\ge 2$ always.
+The example $A=\{1,3,5\}$ has sums $4,6,8$ with prime set $\{2,3\}$, so $\omega(P(A))=2$ and $f(3)=2$. \qed
+
+Corollary 4.3.
+$f(4)=2$.
+
+*Proof.* By Lemma 4.1 and Lemma 4.2, $f(4)\ge f(3)=2$.
+On the other hand, the explicit set $A=\{1,5,7,11\}$ has all pairwise sums in $\{6,8,12,16,18\}$, hence every pairwise sum has prime factors only from $\{2,3\}$.
+Therefore $\omega(P(A))\le 2$, so $f(4)\le 2$. \qed
+
+Lemma 4.4 (A simple upper bound).
+For all $n\ge 2$,
+\[
+f(n) \le \pi(2n),
+\]
+where $\pi(x)$ is the number of primes $\le x$.
+
+*Proof.* Take $A=\{1,2,\dots,n\}$. Then every factor $(a+b)$ lies in $[3,2n]$, so every prime divisor of $P(A)$ is $\le 2n$.
+Hence $\omega(P(A))\le \pi(2n)$ for this particular $A$, and therefore the minimum $f(n)$ is also $\le \pi(2n)$. \qed
+
+FAST REALITY CHECK (computation, heuristic only).
+Searching over sets $A\subset\{1,\dots,30\}$ found:
+- For $n=2$, minimum $\omega(P(A))$ is 1, achieved by $\{1,2\}$.
+- For $n=3$, minimum is 2, achieved by $\{1,2,7\}$.
+- For $n=4$, minimum is 2, achieved by $\{1,5,7,11\}$.
+- For $n=5$, the minimum within this search window was 3 (example $\{1,2,7,11,25\}$).
+This does not determine $f(5)$ globally, but is consistent with growth beyond 2.
+
+5) VERIFICATION
+
+- Lemma 4.1 is a clean divisibility argument: restricting to an $n$-subset only removes factors, so primes cannot be lost when passing from subset to superset.
+- Lemma 4.2 carefully rules out the "single prime" case by congruences and infinite descent.
+- Corollary 4.3 uses both the monotonicity and an explicit example, so it is rigorous.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+- $f(n)$ is nondecreasing (Lemma 4.1).
+- Exact small values: $f(2)=1$, $f(3)=2$ (Lemma 4.2), and $f(4)=2$ (Corollary 4.3).
+- A simple universal upper bound $f(n)\le \pi(2n)$ (Lemma 4.4).
+
+(ii) Exact first gap:
+- Prove a super-logarithmic lower bound: show that for every $n$-element set $A$, the product of pairwise sums must contain more than $C\log n$ distinct primes for any fixed $C$ as $n\to\infty$.
+
+(iii) Top 3 next moves:
+1. Develop a structural theorem for sets $A$ whose pairwise sums have prime factors restricted to a small set $P$; show such $A$ must be small.
+2. Use sieve/graph methods: color edges of $K_n$ by a prime divisor of $a_i+a_j$ and bound the number of colors needed.
+3. Attempt a "many moduli" argument: for many primes $p$, show there must exist at least one pair sum divisible by $p$ with a new prime, forcing $\omega(P(A))$ large.
+
+(iv) What a minimal counterexample would likely look like:
+- A large set $A$ for which all pairwise sums $a+b$ are composed only of primes from a set $P$ with $|P|\asymp \log n$, implying strong congruence alignment of $A$ modulo many primes simultaneously.
+
+

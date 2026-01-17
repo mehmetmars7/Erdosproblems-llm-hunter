@@ -1,0 +1,282 @@
+\section{Problem 202861: 3-colorings of the unit distance graph of $\mathbb R^3$}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+\paragraph{Conventions.}
+$\mathbb R^3$ is Euclidean $3$-space with the usual distance $|x-y|$.  
+The \emph{unit distance graph} $\Gamma$ of $\mathbb R^3$ is the (simple, undirected) graph with vertex set $V(\Gamma)=\mathbb R^3$ and edge set
+\[
+E(\Gamma)=\bigl\{\{x,y\}\subset \mathbb R^3 : |x-y|=1 \bigr\}.
+\]
+A \emph{triangle} in $\Gamma$ means a $3$-clique; equivalently, an unordered triple $\{x,y,z\}$ of distinct points with $|x-y|=|y-z|=|z-x|=1$ (a unit equilateral triangle).
+
+A \emph{$3$-coloring} is a map $c:\mathbb R^3\to\{1,2,3\}$.  
+A unit equilateral triangle $\{x,y,z\}$ is \emph{rainbow} if the set $\{c(x),c(y),c(z)\}$ has size $3$.
+
+\paragraph{Pinned rhombus.}
+Fix reals $\alpha,\beta>0$ such that
+\[
+\alpha^2+\beta^2=1
+\quad\text{and}\quad
+\alpha\notin\overline{\mathbb Q}\ \text{(i.e.\ $\alpha$ is transcendental)}.
+\]
+Define
+\[
+A=(\alpha,0,0),\quad B=(0,\beta,0),\quad C=(-\alpha,0,0),\quad D=(0,-\beta,0).
+\]
+Then $AB=BC=CD=DA=1$.
+
+\paragraph{Question (explicit quantifiers).}
+Does there exist a $3$-coloring $c:\mathbb R^3\to\{1,2,3\}$ such that
+\begin{enumerate}[label=(\roman*)]
+\item $c(A)=c(B)=1$, $c(C)=2$, and $c(D)=3$, and
+\item for every unit equilateral triangle $\{x,y,z\}\subset\mathbb R^3$, the colors are not all distinct:
+\[
+\forall x,y,z\in\mathbb R^3,\ 
+\bigl(|x-y|=|y-z|=|z-x|=1\bigr)\ \Rightarrow\ |\{c(x),c(y),c(z)\}|\le 2.
+\]
+\end{enumerate}
+
+\paragraph{Stress points / edge cases.}
+\begin{itemize}
+\item No measurability/regularity of $c$ is assumed; nonconstructive set-theoretic colorings are allowed.
+\item The condition is \emph{local} (only on unit equilateral triangles) but the domain is uncountable.
+\item The pinned rhombus uses all three colors and already contains edges with color pairs $(1,2),(2,3),(3,1)$ along its sides.
+\end{itemize}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK (web available)}
+The attached MO post notes that analogous constructions exist in $\mathbb R^2$ (plane) but do not obviously extend to $\mathbb R^3$.  
+The same post records that the motivation problem was later posted separately and (largely) resolved in a paper, while the present $3$-coloring question remained open (as of the post's update).
+
+I did not find a publicly documented complete solution to the exact pinned-rhombus extension problem in the attached material. (This section is intentionally kept brief; the goal here is to \emph{solve or refute}, not to survey.)
+
+\subsection*{3) ATTACK PLAN}
+
+\paragraph{Proof-track (constructive) candidates.}
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+\item \textbf{Compactness + local extension scheme.}  Because the constraint is local (forbidden patterns on finite triangles), if one can show every finite configuration extends, then a global coloring follows by compactness (Tychonoff/de~Bruijn--Erd\H{o}s style). This reduces existence to a local extension lemma.
+\item \textbf{Algebraic/nonmeasurable colorings.}  Try to exploit a Hamel basis of $\mathbb R^3$ over $\mathbb Q$ and define $c$ via a homomorphism to $\mathbb Z/3\mathbb Z$ tuned so that unit equilateral triangles cannot realize all three colors. (Hard: the unit-distance condition is not linear.)
+\item \textbf{Geometric ``two colors locally'' construction.}  Try to arrange that around every point of color $i$, the unit sphere is colored using only colors $\{i,j\}$ in a way compatible across space, while still forcing the pinned rhombus.
+\end{enumerate}
+
+\paragraph{Disproof-track (finite obstruction) candidates.}
+\begin{enumerate}[label=\textbf{D\arabic*.}]
+\item \textbf{Find a finite unit-distance configuration forcing a contradiction.}  Since the constraints are local and finitary, nonexistence would imply existence of a finite uncolorable subconfiguration. Search for a small set of points built from the rhombus via equilateral-triangle completions that forces a point to avoid all three colors.
+\item \textbf{Exploit special geometry.}  In the special case $\alpha=\beta$ (a square), there exists a point at unit distance from all four vertices, which immediately yields a contradiction. Try to generalize: find a point simultaneously completing equilateral triangles on three differently-colored edges.
+\item \textbf{Computation-aided search for a small obstruction.}  Use a fixed numerical transcendental $\alpha$ (e.g.\ $\alpha=\sin(1)$) and numerically generate candidate constraint graphs (points from sphere intersections) to hunt for a forced contradiction, then attempt to algebraicize it.
+\end{enumerate}
+
+\paragraph{Chosen path.}
+I can give a complete \emph{disproof} of a natural special case (the square case), plus a rigorous compactness reduction showing any disproof of the stated problem must manifest as a finite obstruction. I did not succeed (here) in producing either a full construction or a finite obstruction for the transcendental-diagonal rhombus case.
+
+\subsection*{4) WORK}
+
+\begin{lemma}[Finite-obstruction principle for this coloring constraint]\label{lem:finite-obstruction}
+Let $X$ be any set and let $\Omega=\{1,2,3\}^X$ be the set of all $3$-colorings of $X$.  
+Suppose we are given a family $\mathcal C$ of constraints, each constraint depending on only finitely many points of $X$, such that:
+\begin{quote}
+for every finite subfamily $\mathcal C_0\subset\mathcal C$, there exists $c\in\Omega$ satisfying all constraints in $\mathcal C_0$.
+\end{quote}
+Then there exists $c\in\Omega$ satisfying \emph{all} constraints in $\mathcal C$.
+
+In particular, in the present problem: if for every finite set $S\subset\mathbb R^3$ containing $A,B,C,D$ there exists a coloring of $S$ satisfying the pinned colors and forbidding rainbow unit equilateral triangles \emph{inside $S$}, then there exists a global coloring $c:\mathbb R^3\to\{1,2,3\}$ satisfying the pinned colors and forbidding rainbow unit equilateral triangles in all of $\mathbb R^3$.
+Equivalently: if no global coloring exists, then some finite configuration already witnesses failure.
+\end{lemma}
+
+\begin{proof}
+Give $\{1,2,3\}$ the discrete topology; it is finite, hence compact.  
+Equip $\Omega=\{1,2,3\}^X$ with the product topology; by Tychonoff's theorem, $\Omega$ is compact.
+
+Each finitary constraint $K\in\mathcal C$ depends on finitely many points $x_1,\dots,x_m\in X$; thus it defines a subset
+\[
+F_K=\{c\in\Omega : \text{$c$ satisfies $K$}\}.
+\]
+Because $K$ depends on finitely many coordinates, $F_K$ is a union of cylinder sets determined by those finitely many coordinates. In the product of discrete spaces, any cylinder set is both open and closed; hence $F_K$ is closed in $\Omega$.
+
+The hypothesis says that the family of closed sets $\{F_K : K\in\mathcal C\}$ has the \emph{finite intersection property}:
+every finite intersection $\bigcap_{K\in\mathcal C_0}F_K$ is nonempty.  
+By compactness, the full intersection $\bigcap_{K\in\mathcal C}F_K$ is nonempty. Any $c$ in this intersection satisfies all constraints in $\mathcal C$.
+
+For the ``in particular'' statement: take $X=\mathbb R^3$ and let $\mathcal C$ consist of:
+\begin{itemize}
+\item the four point constraints $c(A)=1$, $c(B)=1$, $c(C)=2$, $c(D)=3$; and
+\item for each unit equilateral triangle $\{x,y,z\}$ in $\mathbb R^3$, the constraint ``$\{c(x),c(y),c(z)\}$ is not all three colors''.
+\end{itemize}
+Each constraint is finitary (depends on at most $3$ points). The same compactness argument applies.
+\end{proof}
+
+\begin{lemma}[Square obstruction]\label{lem:square-obstruction}
+Assume $\alpha=\beta=2^{-1/2}$, so $(A,B,C,D)$ is a square with unit side length.
+There is \emph{no} coloring $c:\mathbb R^3\to\{1,2,3\}$ satisfying
+\[
+c(A)=c(B)=1,\quad c(C)=2,\quad c(D)=3,
+\]
+and forbidding rainbow unit equilateral triangles.
+\end{lemma}
+
+\begin{proof}
+Let $\alpha=\beta=2^{-1/2}$ and define
+\[
+A=(\alpha,0,0),\ B=(0,\alpha,0),\ C=(-\alpha,0,0),\ D=(0,-\alpha,0).
+\]
+Define
+\[
+E=(0,0,\alpha).
+\]
+We verify that $E$ has unit distance to each of $A,B,C,D$.
+
+First, $|E-B|^2=(0-0)^2+(0-\alpha)^2+(\alpha-0)^2=\alpha^2+\alpha^2=1$, so $|E-B|=1$.  
+Similarly $|E-D|^2=(0-0)^2+(0+\alpha)^2+(\alpha-0)^2=\alpha^2+\alpha^2=1$, so $|E-D|=1$.  
+Also $|E-A|^2=(0-\alpha)^2+0^2+(\alpha-0)^2=\alpha^2+\alpha^2=1$, so $|E-A|=1$, and likewise $|E-C|=1$.
+
+Now note that $BC=CD=DA=1$ (these are sides of the square). Hence
+\[
+|B-C|=|B-E|=|C-E|=1,
+\]
+so $\{B,C,E\}$ is a unit equilateral triangle.  
+Likewise $\{C,D,E\}$ and $\{D,A,E\}$ are unit equilateral triangles.
+
+Apply the ``no rainbow triangle'' rule to each:
+\begin{itemize}
+\item In triangle $\{B,C,E\}$, the colors of $B,C$ are $1,2$. If $c(E)=3$, then $\{B,C,E\}$ would be rainbow. Hence $c(E)\neq 3$.
+\item In triangle $\{C,D,E\}$, the colors of $C,D$ are $2,3$. If $c(E)=1$, then $\{C,D,E\}$ would be rainbow. Hence $c(E)\neq 1$.
+\item In triangle $\{D,A,E\}$, the colors of $D,A$ are $3,1$. If $c(E)=2$, then $\{D,A,E\}$ would be rainbow. Hence $c(E)\neq 2$.
+\end{itemize}
+Thus $c(E)\notin\{1,2,3\}$, impossible. Contradiction.
+\end{proof}
+
+\begin{lemma}[No common unit-distance point for all four rhombus vertices unless square]\label{lem:only-square-has-apex}
+With $A,B,C,D$ as in the formal restatement (unit rhombus with $A=(\alpha,0,0)$, $B=(0,\beta,0)$, $C=(-\alpha,0,0)$, $D=(0,-\beta,0)$ and $\alpha,\beta>0$),
+there exists $E\in\mathbb R^3$ such that
+\[
+|E-A|=|E-B|=|E-C|=|E-D|=1
+\]
+if and only if $\alpha=\beta$ (i.e.\ the rhombus is a square).
+\end{lemma}
+
+\begin{proof}
+($\Rightarrow$) Suppose such an $E=(x,y,z)$ exists.  
+From $|E-A|^2=|E-C|^2$ we get
+\[
+(x-\alpha)^2+y^2+z^2=(x+\alpha)^2+y^2+z^2
+\quad\Rightarrow\quad
+(x-\alpha)^2=(x+\alpha)^2.
+\]
+Expanding gives $x^2-2\alpha x+\alpha^2=x^2+2\alpha x+\alpha^2$, hence $x=0$ (since $\alpha>0$).
+
+Similarly $|E-B|^2=|E-D|^2$ implies
+\[
+x^2+(y-\beta)^2+z^2 = x^2+(y+\beta)^2+z^2
+\quad\Rightarrow\quad
+(y-\beta)^2=(y+\beta)^2,
+\]
+hence $y=0$ (since $\beta>0$).
+
+Thus $E=(0,0,z)$. Now $|E-A|=1$ gives $\alpha^2+z^2=1$, so $z^2=1-\alpha^2=\beta^2$.  
+Also $|E-B|=1$ gives $\beta^2+z^2=1$, so $z^2=1-\beta^2=\alpha^2$.  
+Therefore $\alpha^2=\beta^2$, and since $\alpha,\beta>0$ we conclude $\alpha=\beta$.
+
+($\Leftarrow$) If $\alpha=\beta=2^{-1/2}$, Lemma~\ref{lem:square-obstruction} exhibited $E=(0,0,\alpha)$ with the required property.
+\end{proof}
+
+\begin{lemma}[A forced-color point above the $(B,C,D)$-triple when $\alpha\ge \tfrac12$]\label{lem:BCD-point}
+Let $\alpha,\beta>0$ satisfy $\alpha^2+\beta^2=1$, and keep $A,B,C,D$ as above.
+Assume $\alpha\ge \tfrac12$. Define
+\[
+x_0=\frac{\beta^2-\alpha^2}{2\alpha}=\frac{1-2\alpha^2}{2\alpha},\qquad
+z_0=\frac{\sqrt{4\alpha^2-1}}{2\alpha}.
+\]
+Then the two points
+\[
+P^{\pm}=(x_0,0,\pm z_0)
+\]
+satisfy $|P^{\pm}-B|=|P^{\pm}-C|=|P^{\pm}-D|=1$.
+
+Moreover, in any $3$-coloring $c$ satisfying $c(B)=1$, $c(C)=2$, $c(D)=3$ and forbidding rainbow unit equilateral triangles, one must have
+\[
+c(P^+)=c(P^-)=2.
+\]
+\end{lemma}
+
+\begin{proof}
+We first solve the distance equations. Let $P=(x,y,z)$ and impose:
+\[
+|P-B|^2 = x^2+(y-\beta)^2+z^2 =1,\tag{1}
+\]
+\[
+|P-C|^2 = (x+\alpha)^2+y^2+z^2 =1,\tag{2}
+\]
+\[
+|P-D|^2 = x^2+(y+\beta)^2+z^2 =1.\tag{3}
+\]
+Subtract (1) from (3): $(y+\beta)^2-(y-\beta)^2=0$, i.e.\ $4\beta y=0$. Since $\beta>0$, we get $y=0$.
+
+With $y=0$, equation (1) becomes $x^2+\beta^2+z^2=1$, i.e.\ $x^2+z^2=\alpha^2$ (using $\beta^2=1-\alpha^2$).  
+Now subtract (1) from (2) (still with $y=0$):
+\[
+(x+\alpha)^2 - x^2 - \beta^2=0
+\quad\Rightarrow\quad
+2\alpha x +\alpha^2-\beta^2=0
+\quad\Rightarrow\quad
+x=\frac{\beta^2-\alpha^2}{2\alpha}.
+\]
+Then
+\[
+z^2=\alpha^2-x^2
+=\alpha^2-\frac{(\beta^2-\alpha^2)^2}{4\alpha^2}
+=\frac{4\alpha^4-(1-2\alpha^2)^2}{4\alpha^2}
+=\frac{4\alpha^2-1}{4\alpha^2}.
+\]
+Thus real solutions exist iff $4\alpha^2-1\ge 0$, i.e.\ $\alpha\ge \tfrac12$; then $z=\pm z_0$ and $x=x_0$, giving precisely $P^\pm$.
+
+For the coloring claim: because $BC=1$ and $|P^\pm-B|=|P^\pm-C|=1$, the triple $\{B,C,P^\pm\}$ is a unit equilateral triangle.  
+If $c(P^\pm)=3$, then $\{B,C,P^\pm\}$ would be rainbow with colors $1,2,3$, forbidden. Hence $c(P^\pm)\neq 3$.
+
+Similarly, $CD=1$ and $|P^\pm-C|=|P^\pm-D|=1$ implies $\{C,D,P^\pm\}$ is a unit equilateral triangle.  
+If $c(P^\pm)=1$, then $\{C,D,P^\pm\}$ would be rainbow with colors $2,3,1$, forbidden. Hence $c(P^\pm)\neq 1$.
+
+Therefore $c(P^\pm)$ can only be $2$.
+\end{proof}
+
+\subsection*{5) VERIFICATION}
+
+\paragraph{Quantifier check.}
+All constraints are local (triangles) plus four pinned values. Lemma~\ref{lem:finite-obstruction} correctly reduces global existence to the finite-intersection property in the compact space $\{1,2,3\}^{\mathbb R^3}$.
+
+\paragraph{Square obstruction sanity.}
+In Lemma~\ref{lem:square-obstruction}, each triangle used is genuinely equilateral of side $1$, and each forbids a different color for $E$; the conclusion is immediate.
+
+\paragraph{Geometry sanity for Lemma~\ref{lem:BCD-point}.}
+The computation explicitly solves the three sphere equations and shows the solutions are real exactly when $\alpha\ge 1/2$. The forced-color argument only used the two equilateral triangles $(B,C,P^\pm)$ and $(C,D,P^\pm)$, so no hidden assumptions.
+
+\paragraph{Boundary cases.}
+If $\alpha=1/2$, then $z_0=0$ and $P^+=P^-=(x_0,0,0)$ is a planar point; the forcing argument still applies.
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED.}
+
+\paragraph{Strongest fully proved partial results.}
+\begin{itemize}
+\item If the rhombus is a square ($\alpha=\beta=2^{-1/2}$), then the required extension does not exist (Lemma~\ref{lem:square-obstruction}).
+\item If $\alpha\ge \tfrac12$ then there exist explicit points $P^\pm$ at distance $1$ from $B,C,D$ and their colors are forced to be $2$ in any putative solution (Lemma~\ref{lem:BCD-point}).
+\item If a global coloring does \emph{not} exist, then some finite unit-distance configuration already obstructs it (Lemma~\ref{lem:finite-obstruction}).
+\end{itemize}
+
+\paragraph{Exact first gap.}
+Produce either:
+\begin{enumerate}[label=(\alph*)]
+\item a finite obstruction configuration extending the pinned rhombus (to prove nonexistence), or
+\item an extension scheme guaranteeing satisfiability of all finite subconfigurations (to prove existence),
+\end{enumerate}
+for the transcendental-diagonal rhombus case.
+
+\paragraph{Top 3 next moves.}
+\begin{enumerate}[label=\arabic*.]
+\item Use Lemma~\ref{lem:finite-obstruction} to justify a \emph{finite} computer search: generate points by iterated ``equilateral completion'' of existing unit edges and try SAT/backtracking for color constraints.
+\item Analyze the induced constraints on unit spheres around edges of different colors: an edge $(i,j)$ forbids color $k$ on the equilateral-completion circle; study intersections of these circles for the pinned rhombus.
+\item Attempt a nonmeasurable construction via a transfinite extension: well-order $\mathbb R^3$ and extend coloring while maintaining local constraints; try to prove no obstruction arises from transcendence of $\alpha$.
+\end{enumerate}
+
+\paragraph{What a minimal counterexample would likely look like.}
+By Lemma~\ref{lem:finite-obstruction}, it would be a \emph{finite} set of points containing $A,B,C,D$ together with a finite list of unit equilateral triangles among them such that the induced constraint satisfaction problem has no solution.

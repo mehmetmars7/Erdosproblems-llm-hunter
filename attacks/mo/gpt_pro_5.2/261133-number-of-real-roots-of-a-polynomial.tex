@@ -1,0 +1,237 @@
+\section{Problem 261133: counting real roots---Sturm vs argument principle}
+
+\subsection*{1) FORMAL RESTATEMENT}
+\paragraph{Literal issue / misstatement.}
+As written, the formula ``answer is $W(b)-W(a)$'' has the wrong sign. For instance, with $P(x)=x$, $a=-1$, $b=1$, the Sturm sequence is $(x,1)$, giving $W(-1)=1$, $W(1)=0$, so $W(b)-W(a)=-1$ while there is $1$ real root in $(-1,1)$.
+
+\paragraph{Minimal corrected statement (Sturm).}
+Let $P\in\RR[x]$ with $\gcd(P,P')=1$ and let $a<b$ with $P(a)P(b)\neq 0$.
+Let $(P_0,\dots,P_m)$ be the Sturm sequence defined by:
+\[
+P_0=P,\quad P_1=P',\quad P_{k-1}=Q_kP_k-P_{k+1}\ \text{ with }\ \deg P_{k+1}<\deg P_k,\ P_{k+1}=-\mathrm{rem}(P_{k-1},P_k),
+\]
+ending with $P_m\neq 0$ constant and $P_{m+1}=0$.
+For $c\in\RR$, define $W(c)$ to be the number of sign changes in the finite sequence $(P_0(c),P_1(c),\dots,P_m(c))$ after removing any zeros.
+Define the one-sided endpoint values
+\[
+W(a^+)\coloneqq \lim_{\epsilon\downarrow 0} W(a+\epsilon),\qquad W(b^-)\coloneqq \lim_{\epsilon\downarrow 0} W(b-\epsilon),
+\]
+(which exist because $W$ is locally constant away from roots of the $P_i$).
+\begin{quote}
+\textbf{(Sturm)} The number $N_{(a,b)}$ of real roots of $P$ in $(a,b)$ equals $W(a^+)-W(b^-)$.
+\end{quote}
+Under the extra assumption that none of $P_0,\dots,P_m$ vanishes at $a$ or $b$, this reduces to $N_{(a,b)}=W(a)-W(b)$.
+
+\paragraph{Complex-analytic root count (argument principle).}
+Let $\epsilon>0$ be smaller than the minimum of $|\Im(\alpha)|$ over all non-real roots $\alpha$ of $P$ and smaller than the distances from $a$ and $b$ to real roots.
+Let $R_\epsilon$ be the rectangle with vertices $a\pm i\epsilon$ and $b\pm i\epsilon$ (positively oriented boundary $\partial R_\epsilon$).
+Then $P$ has no zeros on $\partial R_\epsilon$ and the argument principle gives
+\[
+\frac{1}{2\pi i}\int_{\partial R_\epsilon}\frac{P'(z)}{P(z)}\,dz \ =\ \#\{\text{zeros of $P$ in $R_\epsilon$ counted with multiplicity}\}.
+\]
+Since $\gcd(P,P')=1$, all zeros are simple, and by the choice of $\epsilon$ the zeros in $R_\epsilon$ are precisely the real roots in $(a,b)$.
+
+\paragraph{Corrected proposition to prove (connection).}
+\begin{quote}
+\textbf{(C$_{261133}$)} For $P,a,b$ as above, the Sturm count and the argument-principle count coincide:
+\[
+W(a^+)-W(b^-)\ =\ \frac{1}{2\pi i}\int_{\partial R_\epsilon}\frac{P'(z)}{P(z)}\,dz
+\]
+for all sufficiently small $\epsilon>0$.
+\end{quote}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK (browsing YES)}
+The MO question \href{https://mathoverflow.net/questions/261133/number-of-real-roots-of-a-polynomial}{261133} asks explicitly about connections between Sturm's theorem and the contour integral method.
+No answer is posted there as of January 2026.
+The argument principle is a standard complex-analytic tool; Sturm's theorem is a standard real-algebraic tool.
+A classical bridge between them is via the \emph{Cauchy index} of the real rational function $P'/P$; however, below we give a self-contained proof of Sturm's theorem and then connect it to the contour integral by the argument principle.
+
+\subsection*{3) ATTACK PLAN}
+\paragraph{Proof-track (best path).}
+\begin{enumerate}[label=(P\arabic*)]
+\item Prove the corrected Sturm theorem $N_{(a,b)}=W(a^+)-W(b^-)$ using only the defining properties of the Sturm sequence (no gaps).
+\item Prove the argument-principle formula for the same $N_{(a,b)}$ by choosing $\epsilon$ small so that the rectangle isolates the real roots in $(a,b)$.
+\item Conclude the desired connection (C$_{261133}$) by showing both sides equal the same integer $N_{(a,b)}$.
+\end{enumerate}
+
+\paragraph{Disproof-track.}
+The literal formula $W(b)-W(a)$ is false; we give a concrete counterexample ($P(x)=x$) already in the formal restatement.
+
+\subsection*{4) WORK}
+\subsubsection*{4.1. Basic properties of the Sturm sequence}
+Throughout, $P\in\RR[x]$ and $\gcd(P,P')=1$; $(P_0,\dots,P_m)$ is the Sturm sequence.
+
+\begin{lemma}[Coprimality of successive terms]\label{lem:coprime}
+For each $k=0,1,\dots,m-1$, $\gcd(P_k,P_{k+1})=1$ in $\RR[x]$.
+\end{lemma}
+\begin{proof}
+We prove by induction on $k$.
+For $k=0$, $\gcd(P_0,P_1)=\gcd(P,P')=1$ by hypothesis.
+Assume $\gcd(P_{k-1},P_k)=1$ for some $k\ge 1$.
+By construction, $P_{k+1}=-\mathrm{rem}(P_{k-1},P_k)$, so there is a polynomial $Q_k$ with
+\[
+P_{k-1}=Q_kP_k-P_{k+1}.
+\]
+Let $D$ be a common divisor of $P_k$ and $P_{k+1}$. Then $D$ divides the right-hand side, hence divides $P_{k-1}$.
+Thus $D$ divides $\gcd(P_{k-1},P_k)=1$, so $D$ is a nonzero constant. Hence $\gcd(P_k,P_{k+1})=1$.
+\end{proof}
+
+\begin{lemma}[Sign relation at roots of $P_k$ for $k\ge 1$]\label{lem:signrelation}
+Fix $k\in\{1,2,\dots,m-1\}$ and let $r\in\RR$ satisfy $P_k(r)=0$.
+Then $P_{k-1}(r)\neq 0$, $P_{k+1}(r)\neq 0$, and $P_{k-1}(r)=-P_{k+1}(r)$, in particular $P_{k-1}(r)$ and $P_{k+1}(r)$ have opposite signs.
+\end{lemma}
+\begin{proof}
+The defining relation $P_{k-1}=Q_kP_k-P_{k+1}$ implies, upon evaluation at $r$ with $P_k(r)=0$, that
+\[
+P_{k-1}(r)=-P_{k+1}(r).
+\]
+If $P_{k-1}(r)=0$ then $r$ is a common root of $P_{k-1}$ and $P_k$, contradicting Lemma~\ref{lem:coprime} for the pair $(P_{k-1},P_k)$. Hence $P_{k-1}(r)\neq 0$ and therefore also $P_{k+1}(r)\neq 0$.
+The equation $P_{k-1}(r)=-P_{k+1}(r)$ then forces opposite signs.
+\end{proof}
+
+\subsubsection*{4.2. The sign-variation function and its jumps}
+For $x\in\RR$, define $W(x)$ to be the number of sign changes in $(P_0(x),\dots,P_m(x))$ after deleting zeros.
+
+\begin{lemma}[Local constancy away from roots]\label{lem:localconst}
+If $x_0\in\RR$ is not a root of any $P_k$, then $W$ is constant on some neighborhood of $x_0$.
+\end{lemma}
+\begin{proof}
+If $P_k(x_0)\neq 0$ for all $k$, continuity of each $P_k$ implies there is $\delta>0$ such that $P_k(x)$ keeps the same sign for all $|x-x_0|<\delta$ and all $k$.
+Then the pattern of signs in the sequence is constant on $(x_0-\delta,x_0+\delta)$, hence so is the number of sign changes $W$.
+\end{proof}
+
+\begin{lemma}[No jump at roots of $P_k$ for $k\ge 1$]\label{lem:nojump_kge1}
+Let $k\in\{1,2,\dots,m-1\}$ and let $r$ be a real root of $P_k$.
+Then the one-sided limits $W(r^-)=\lim_{\epsilon\downarrow 0}W(r-\epsilon)$ and $W(r^+)=\lim_{\epsilon\downarrow 0}W(r+\epsilon)$ exist and satisfy $W(r^-)=W(r^+)$.
+\end{lemma}
+\begin{proof}
+By Lemma~\ref{lem:signrelation}, $P_{k-1}(r)$ and $P_{k+1}(r)$ are nonzero with opposite signs.
+By continuity, for sufficiently small $\epsilon>0$ the signs of $P_{k-1}(r\pm\epsilon)$ and $P_{k+1}(r\pm\epsilon)$ equal the signs of $P_{k-1}(r)$ and $P_{k+1}(r)$, hence remain opposite on both sides.
+
+For small $\epsilon>0$, all $P_j(r\pm\epsilon)$ with $j\neq k$ are nonzero (otherwise we would have a common root of $P_k$ with some $P_j$, and in particular with a neighbor, contradicting Lemma~\ref{lem:coprime}). Thus the only possible change in the sign-pattern of the whole sequence when passing from $r-\epsilon$ to $r+\epsilon$ is the sign of $P_k$ itself.
+
+Consider the contribution to $W$ coming from the adjacent pairs $(P_{k-1},P_k)$ and $(P_k,P_{k+1})$.
+Let $s_{-}$ be the sign of $P_k(r-\epsilon)$ and $s_{+}$ the sign of $P_k(r+\epsilon)$ (each is $\pm 1$, possibly equal if $r$ is a root of even multiplicity of $P_k$).
+Let $u$ be the sign of $P_{k-1}$ near $r$ and $v$ the sign of $P_{k+1}$ near $r$; then $u=-v$.
+For either choice of $s\in\{\pm 1\}$, exactly one of the equalities $s=u$ and $s=v$ holds, because $u\neq v$.
+Therefore, for $x$ on either side of $r$, among the two adjacent comparisons
+\[
+\text{``$P_{k-1}(x)$ vs $P_k(x)$''},\qquad \text{``$P_k(x)$ vs $P_{k+1}(x)$''}
+\]
+exactly one is a sign change and the other is not.
+Hence the \emph{total} number of sign changes contributed by these two adjacencies is $1$ on each side, regardless of whether $s_{-}=s_{+}$ or $s_{-}=-s_{+}$.
+
+All other adjacencies in the sequence involve only $P_j$ with $j\neq k$ and thus have the same sign-change status on both sides (by continuity and nonvanishing). Consequently $W(r^-)=W(r^+)$.
+\end{proof}
+
+\begin{lemma}[Unit jump at roots of $P_0=P$]\label{lem:jump_rootP}
+Let $r\in(a,b)$ be a real root of $P_0=P$. Then $W(r^-)=W(r^+)+1$.
+\end{lemma}
+\begin{proof}
+Since $\gcd(P,P')=1$, $r$ is a simple root of $P$ and $P'(r)=P_1(r)\neq 0$.
+Hence $P_1$ has constant sign in a neighborhood of $r$.
+Because $r$ is a simple root, $P_0=P$ changes sign when crossing $r$.
+
+For sufficiently small $\epsilon>0$, none of $P_1(r\pm\epsilon),\dots,P_m(r\pm\epsilon)$ is zero (otherwise $r$ would be a common root of $P_0$ with some later $P_j$, in particular with $P_1$, contradicting coprimality).
+Therefore, the only sign in the sequence that changes between $r-\epsilon$ and $r+\epsilon$ is the sign of $P_0$.
+Thus the only adjacency in the sequence whose sign-change status can differ between sides is the first pair $(P_0,P_1)$.
+
+Let $s$ be the sign of $P_1$ near $r$.
+Because $P_0$ changes sign across $r$, exactly one of $P_0(r-\epsilon)$ and $P_0(r+\epsilon)$ has sign equal to $s$ and the other has sign $-s$.
+Hence among the two sides, exactly one has a sign change between $(P_0,P_1)$ and the other does not.
+On the left side $r-\epsilon$, the sign of $P_0$ equals $-s$ (since the derivative $P_1(r)=s|P_1(r)|$ dictates the direction of crossing), and on the right side it equals $s$.
+Consequently, $(P_0,P_1)$ contributes $1$ sign change on the left and $0$ on the right.
+All other adjacencies are unchanged because the corresponding signs are unchanged.
+Therefore $W(r^-)=W(r^+)+1$.
+\end{proof}
+
+\subsubsection*{4.3. Sturm theorem}
+\begin{theorem}[Sturm, corrected]\label{thm:sturm}
+Let $P\in\RR[x]$ satisfy $\gcd(P,P')=1$, and let $a<b$ with $P(a)P(b)\neq 0$.
+Let $(P_0,\dots,P_m)$ be the Sturm sequence and define $W(a^+),W(b^-)$ as above.
+Then the number $N_{(a,b)}$ of real roots of $P$ in $(a,b)$ equals $W(a^+)-W(b^-)$.
+\end{theorem}
+\begin{proof}
+Because $\gcd(P,P')=1$, all real roots of $P$ are simple and hence isolated.
+Let $r_1<\cdots<r_N$ be the (finite) list of real roots of $P$ in $(a,b)$.
+
+By Lemma~\ref{lem:localconst}, $W$ is locally constant on $(a,b)$ away from roots of the polynomials $P_k$.
+By Lemma~\ref{lem:nojump_kge1}, crossing any root of $P_k$ for $k\ge 1$ does not change the one-sided value of $W$.
+By Lemma~\ref{lem:jump_rootP}, crossing each root $r_j$ of $P_0$ decreases $W$ by exactly $1$:
+\[
+W(r_j^-)=W(r_j^+)+1.
+\]
+Fix $\epsilon>0$ small enough that the intervals $(r_j-\epsilon,r_j+\epsilon)$ are pairwise disjoint and contained in $(a,b)$ and contain no other roots of any $P_k$ besides the root $r_j$ of $P_0$ at the center.
+Then, moving from $a+\epsilon$ to $b-\epsilon$ along the real line, the only times $W$ changes are when we cross one of the $r_j$, and each such crossing decreases $W$ by $1$.
+Therefore
+\[
+W(a^+)-W(b^-)=N,
+\]
+which equals the number of real roots of $P$ in $(a,b)$.
+\end{proof}
+
+\subsubsection*{4.4. Connection to the contour integral}
+\begin{theorem}[Argument principle for the strip around $[a,b]$]\label{thm:argumentprinciple_strip}
+With $P,a,b$ as in Theorem~\ref{thm:sturm}, choose $\epsilon>0$ such that:
+(i) $P$ has no zeros on the lines $\Im z=\pm\epsilon$ with $\Re z\in[a,b]$, and
+(ii) $P$ has no zeros on the vertical segments $\Re z=a$ or $\Re z=b$ with $|\Im z|\le \epsilon$.
+Let $R_\epsilon$ be the rectangle with vertices $a\pm i\epsilon$, $b\pm i\epsilon$.
+Then
+\[
+\frac{1}{2\pi i}\int_{\partial R_\epsilon}\frac{P'(z)}{P(z)}\,dz
+\]
+equals the number of zeros of $P$ in $R_\epsilon$ counted with multiplicity.
+If $\epsilon$ is small enough to avoid any non-real roots of $P$ (possible since $P$ has finitely many roots), this number equals $N_{(a,b)}$.
+\end{theorem}
+\begin{proof}
+The function $P$ is entire, so $P'/P$ is meromorphic with simple poles at the zeros of $P$, each with residue equal to the multiplicity of the zero.
+Under assumptions (i)--(ii), $P$ has no zeros on $\partial R_\epsilon$, so $P'/P$ is meromorphic on an open neighborhood of the closed region bounded by $\partial R_\epsilon$ and holomorphic on $\partial R_\epsilon$ itself.
+By the residue theorem,
+\[
+\int_{\partial R_\epsilon}\frac{P'(z)}{P(z)}\,dz = 2\pi i\sum_{\alpha\in R_\epsilon\cap Z(P)} \mathrm{ord}_\alpha(P),
+\]
+where the sum ranges over zeros $\alpha$ of $P$ inside $R_\epsilon$ and $\mathrm{ord}_\alpha(P)$ is their multiplicity.
+Dividing by $2\pi i$ gives the stated count.
+
+Finally, $P$ has finitely many non-real roots, each at some positive distance from the real axis; choosing $\epsilon$ smaller than the minimum of these distances ensures that $R_\epsilon$ contains no non-real roots, so its zeros are exactly the real roots in $(a,b)$. Since $\gcd(P,P')=1$, these are simple, and the multiplicity count equals the usual count $N_{(a,b)}$.
+\end{proof}
+
+\subsubsection*{4.5. The promised connection}
+\begin{theorem}[Connection (C$_{261133}$)]\label{thm:connection}
+For $P,a,b$ as above and $\epsilon>0$ as in Theorem~\ref{thm:argumentprinciple_strip}, one has
+\[
+W(a^+)-W(b^-)=\frac{1}{2\pi i}\int_{\partial R_\epsilon}\frac{P'(z)}{P(z)}\,dz.
+\]
+\end{theorem}
+\begin{proof}
+By Theorem~\ref{thm:sturm}, the left-hand side equals $N_{(a,b)}$.
+By Theorem~\ref{thm:argumentprinciple_strip} (choosing $\epsilon$ small enough), the right-hand side also equals $N_{(a,b)}$.
+Therefore the two expressions are equal.
+\end{proof}
+
+\subsubsection*{4.6. Phase 1 reality check (computation)}
+For sanity, we tested random quintic polynomials with simple roots on $[-3,3]$ using a Sturm implementation and numerical root finding. In each test, the counts agreed.
+Examples (interval $(-3,3)$):
+\begin{itemize}
+\item $P(x)=-x^5-3x^4-2x^3-4x^2+5$: Sturm count $3$, numerical count $3$.
+\item $P(x)=2x^5+x^4-4x^3-3$: Sturm count $3$, numerical count $3$.
+\item $P(x)=3x^5+5x^3-4x^2+5x+1$: Sturm count $1$, numerical count $1$.
+\end{itemize}
+
+\subsection*{5) VERIFICATION}
+\paragraph{Adversarial verification checklist.}
+\begin{itemize}
+\item \textbf{Quantifiers:} We fixed $P\in\RR[x]$ with $\gcd(P,P')=1$ and $a<b$ with $P(a)P(b)\neq 0$. The root count is on $(a,b)$.
+\item \textbf{Endpoint issues:} We defined $W(a^+),W(b^-)$ to handle the possibility that some $P_k$ vanishes at endpoints; this makes the statement robust.
+\item \textbf{Jumps at $k\ge 1$:} Lemma~\ref{lem:nojump_kge1} carefully treats both odd/even multiplicity of a root of $P_k$; it does not assume $P_k$ changes sign.
+\item \textbf{Jump at root of $P$:} Lemma~\ref{lem:jump_rootP} uses only that $P$ has simple roots and $P_1$ nonzero there.
+\item \textbf{Complex analysis step:} The residue theorem requires $P$ nonzero on the contour; we explicitly required this and justified we can choose $\epsilon$ small enough.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{PROOF}
+
+\paragraph{Clean theorem statement.}
+Under the hypotheses of Theorem~\ref{thm:sturm}, the number of real roots of $P$ in $(a,b)$ equals $W(a^+)-W(b^-)$, and this equals the argument-principle contour integral count around a thin rectangle surrounding $[a,b]$ (Theorem~\ref{thm:connection}). \qedhere
+
+% ======================================================================

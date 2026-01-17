@@ -1,0 +1,184 @@
+% Solutions for Erdős problems 573--579
+% Generated: 2026-01-16
+% Source problems file: 573-579.tex
+
+% Erdos Problem #573
+
+1) FORMAL RESTATEMENT
+
+Let $C_\ell$ denote the cycle graph on $\ell$ vertices (a simple cycle of length $\ell$).  
+For a finite family $\mathcal{F}$ of graphs, $\mathrm{ex}(n;\mathcal{F})$ is the maximum number of edges in a simple undirected graph $G$ on $n$ vertices such that $G$ contains no subgraph isomorphic to any $F\in\mathcal{F}$.
+
+The question is:
+\[
+\text{Is it true that }\frac{\mathrm{ex}(n;\{C_3,C_4\})}{(n/2)^{3/2}}\to 1\text{ as }n\to\infty? 
+\]
+Equivalently: for every $\varepsilon>0$ does there exist $n_0(\varepsilon)$ such that for all $n\ge n_0$,
+\[
+(1-\varepsilon)(n/2)^{3/2}\le \mathrm{ex}(n;\{C_3,C_4\})\le (1+\varepsilon)(n/2)^{3/2}?
+\]
+
+Edge cases: for $n<3$ the constraint ``no $C_3$'' is vacuous; for $n<4$ the constraint ``no $C_4$'' is vacuous.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement (from the source file) records:
+- Erd\H{o}s--Simonovits proved $\mathrm{ex}(n;\{C_4,C_5\})=(n/2)^{3/2}+O(n)$.
+- K\"ov\'ari--S\'os--Tur\'an (1954) proved that forbidding $C_4$ together with \emph{all} odd cycles gives extremal number $\sim (n/2)^{3/2}$.
+
+The Erd\H{o}s Problems website still lists #573 as open as of the access date shown there (2026-01-16). \hfill(website snapshot) 
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Try to strengthen the standard $C_4$-free upper bound by exploiting triangle-freeness (girth $\ge5$).  One hopes to force ``almost bipartite'' structure and compare to the Zarankiewicz extremal for $C_4$.
+- Use counting of 2-paths / codegrees plus additional constraints coming from no triangles to improve the leading constant.
+
+Disproof/construction-track ideas:
+- Start from a near-extremal $C_4$-free graph (which may contain many triangles) and try to locally modify to destroy triangles while losing only $o(n^{3/2})$ edges; if successful with a net gain in density over known bipartite constructions, this would refute the conjectured constant.
+- Search small $n$ for ``unusually dense'' $(C_3,C_4)$-free graphs to guess extremal structures.
+
+I pursue the counting upper bounds and the classical finite-geometry lower bound; neither closes the constant gap.
+
+4) WORK
+
+\textbf{FAST REALITY CHECK (exact brute force for $n\le 7$).}  
+By exhaustive enumeration of all labeled graphs on $n\le 7$ vertices, the exact values are:
+\[
+\mathrm{ex}(2;\{C_3,C_4\})=1,\ \mathrm{ex}(3;\{C_3,C_4\})=2,\ \mathrm{ex}(4;\{C_3,C_4\})=3,\ \mathrm{ex}(5;\{C_3,C_4\})=5,\ \mathrm{ex}(6;\{C_3,C_4\})=6,\ \mathrm{ex}(7;\{C_3,C_4\})=8.
+\]
+(Also $\mathrm{ex}(1;\{C_3,C_4\})=0$.)
+
+\medskip
+\textbf{Lemma 573.1 (codegree constraint for $C_4$-free graphs).}
+If $G$ is $C_4$-free, then any two distinct vertices $x,y\in V(G)$ have at most one common neighbor:
+\[
+|N(x)\cap N(y)|\le 1.
+\]
+\emph{Proof.}
+Assume for contradiction that $x$ and $y$ have two distinct common neighbors $u\ne v$. Then the edges $xu,xv,yu,yv$ are all present. The subgraph on $\{x,y,u,v\}$ contains the 4-cycle
+\[
+ x-u-y-v-x,
+\]
+which is a copy of $C_4$, contradicting that $G$ is $C_4$-free. \qed
+
+\medskip
+\textbf{Lemma 573.2 (2-path counting for $(C_3,C_4)$-free graphs).}
+Let $G$ be a graph on $n$ vertices with no $C_3$ and no $C_4$, and let $m=e(G)$. Then
+\[
+\sum_{v\in V(G)} \binom{d(v)}{2}\le \binom{n}{2}-m.
+\]
+In particular,
+\[
+\sum_{v\in V(G)} d(v)^2 \le n(n-1).
+\]
+\emph{Proof.}
+Fix a vertex $v$. Because $G$ is triangle-free, the neighborhood $N(v)$ is an independent set: if two neighbors $x,y\in N(v)$ were adjacent, then $vxy$ would be a triangle.
+Hence each unordered pair $\{x,y\}\subseteq N(v)$ is a \emph{non-edge} of $G$.
+
+Now consider the sum $\sum_v \binom{d(v)}{2}$. Each term counts unordered pairs $\{x,y\}$ together with a witness vertex $v$ such that $x,y\in N(v)$, i.e., $v$ is a common neighbor of $x$ and $y$.
+By Lemma~573.1 (applied because $G$ is $C_4$-free), any fixed unordered pair $\{x,y\}$ has at most one common neighbor. Therefore, each non-edge $\{x,y\}$ can contribute to $\sum_v \binom{d(v)}{2}$ for at most one vertex $v$.
+Since the number of non-edges is $\binom{n}{2}-m$, we obtain
+\[
+\sum_{v} \binom{d(v)}{2} \le \binom{n}{2}-m.
+\]
+Finally, using $\binom{d}{2}=\tfrac12(d^2-d)$ and $\sum_v d(v)=2m$,
+\[
+\sum_v \binom{d(v)}{2}=\frac12\sum_v(d(v)^2-d(v))=\frac12\sum_v d(v)^2 - m.
+\]
+So $\frac12\sum_v d(v)^2 - m \le \binom{n}{2}-m$, i.e.
+$\sum_v d(v)^2\le n(n-1)$.
+\qed
+
+\medskip
+\textbf{Corollary 573.3 (a clean $n^{3/2}$ upper bound for $(C_3,C_4)$-free graphs).}
+If $G$ is $(C_3,C_4)$-free on $n$ vertices with $m$ edges, then
+\[
+m\le \frac{n}{2}\sqrt{n-1}.
+\]
+\emph{Proof.}
+By Cauchy--Schwarz,
+\[
+(2m)^2=\Big(\sum_v d(v)\Big)^2 \le n\sum_v d(v)^2.
+\]
+Using Lemma~573.2 gives $\sum_v d(v)^2\le n(n-1)$, hence
+$4m^2\le n\cdot n(n-1)=n^2(n-1)$.
+Taking square roots yields $m\le \tfrac{n}{2}\sqrt{n-1}$.
+\qed
+
+\medskip
+\textbf{Lemma 573.4 (finite-geometry lower bound matching $(n/2)^{3/2}$ on an infinite sequence).}
+Let $q$ be a prime power, and let $\Pi$ be a projective plane of order $q$.
+Let $G_q$ be the incidence graph of $\Pi$ (bipartite between points and lines, with an edge for incidence).
+Then $G_q$ is $(C_3,C_4)$-free and has
+\[
+|V(G_q)|=2(q^2+q+1),\qquad e(G_q)=(q+1)(q^2+q+1).
+\]
+Consequently, writing $n=|V(G_q)|$, we have
+\[
+ e(G_q)=(1+o(1))(n/2)^{3/2} \quad\text{as }q\to\infty.
+\]
+\emph{Proof.}
+A projective plane of order $q$ has $q^2+q+1$ points and the same number of lines, with each point incident to $q+1$ lines and each line incident to $q+1$ points.
+Thus the incidence graph has $2(q^2+q+1)$ vertices and
+$e=(q^2+q+1)(q+1)$ edges.
+
+The incidence graph is bipartite, so it contains no odd cycle; in particular it is $C_3$-free.
+To see it is $C_4$-free, suppose there were a 4-cycle
+\[
+P_1-L_1-P_2-L_2-P_1
+\]
+with $P_i$ points and $L_i$ lines. Then both $L_1$ and $L_2$ are lines incident with both points $P_1$ and $P_2$.
+But in a projective plane, two distinct points determine a \emph{unique} line. Hence $L_1=L_2$, contradicting that a 4-cycle has distinct vertices.
+Therefore $G_q$ is $(C_3,C_4)$-free.
+
+Finally, with $n=2(q^2+q+1)$,
+\[
+(n/2)^{3/2}=(q^2+q+1)^{3/2}.
+\]
+And
+$e(G_q)=(q+1)(q^2+q+1)=(q^2+q+1)^{3/2}\cdot \frac{q+1}{\sqrt{q^2+q+1}}$.
+The ratio $(q+1)/\sqrt{q^2+q+1}\to 1$ as $q\to\infty$, so $e(G_q)=(1+o(1))(n/2)^{3/2}$.
+\qed
+
+\medskip
+\textbf{Summary of proved bounds.}
+Combining Corollary~573.3 and Lemma~573.4 gives
+\[
+(1+o(1))(n/2)^{3/2}\ \le\ \mathrm{ex}(n;\{C_3,C_4\})\ \le\ \frac{n}{2}\sqrt{n-1}\ =\ \Big(\frac12+o(1)\Big)n^{3/2}.
+\]
+The conjecture asks whether the upper bound can be improved to match the lower bound constant $2^{-3/2}$.
+
+5) VERIFICATION
+
+- Lemma~573.1: checked that two common neighbors $u,v$ indeed force a $C_4$ subgraph even if $xy$ is an edge (a chord does not matter for subgraph containment).
+- Lemma~573.2: the key points are (i) triangle-free $\Rightarrow N(v)$ independent, and (ii) $C_4$-free $\Rightarrow$ each non-edge has at most one common neighbor (Lemma~573.1). Both were used explicitly.
+- Corollary~573.3: Cauchy--Schwarz applied to degree sequence is standard and all inequalities are one-directional as written.
+- Lemma~573.4: verified that projective-plane incidence graphs are bipartite and $C_4$-free via uniqueness of the line through two points.
+- Small $n$ sanity check: the bound $m\le \frac{n}{2}\sqrt{n-1}$ gives for $n=7$ that $m\le \frac72\sqrt6\approx 8.57$, consistent with the exact optimum $8$.
+
+6) FINAL
+
+\textbf{UNRESOLVED}
+
+(i) Strongest fully proved partial result:  
+For infinitely many $n=2(q^2+q+1)$ (prime powers $q$),
+\[\mathrm{ex}(n;\{C_3,C_4\})\ge (1+o(1))(n/2)^{3/2},\]
+and for all $n$,
+\[\mathrm{ex}(n;\{C_3,C_4\})\le \frac{n}{2}\sqrt{n-1}=(\tfrac12+o(1))n^{3/2}.
+\]
+
+(ii) First gap (crisp):  
+Prove or disprove that every $(C_3,C_4)$-free graph on $n$ vertices has at most $(1+o(1))(n/2)^{3/2}$ edges.
+
+(iii) Top 3 next moves (concrete):
+1. Prove a \emph{stability} statement: if $e(G)\ge (1+\varepsilon)(n/2)^{3/2}$ then $G$ contains a structural ``certificate'' that can be turned into a $C_3$ or $C_4$.
+2. Attempt an upper bound sharpening by exploiting the stronger adjacent-pair codegree constraint $uv\in E\Rightarrow N(u)\cap N(v)=\emptyset$ together with Lemma~573.1.
+3. Computation: exact optimization for $n=8,9,10$ via ILP/backtracking to guess extremal constructions and test whether the constant seems closer to $2^{-3/2}$ or larger.
+
+(iv) Minimal counterexample structure:  
+A disproof would require an infinite sequence of $(C_3,C_4)$-free graphs $G_n$ with
+$e(G_n)\ge (1+\varepsilon)(n/2)^{3/2}$ for some fixed $\varepsilon>0$.
+Such graphs must still satisfy the rigid codegree constraint $|N(x)\cap N(y)|\le 1$; therefore they would likely look like a near-biregular incidence-type graph, but with additional edges arranged to create many $C_5$'s while avoiding all $C_3$ and $C_4$.
+
+

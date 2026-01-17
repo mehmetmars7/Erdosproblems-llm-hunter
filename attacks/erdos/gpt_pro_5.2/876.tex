@@ -1,0 +1,127 @@
+% Erdos Problem #876
+
+\noindent\textbf{FORMAL RESTATEMENT.}
+Let $A=\{a_1<a_2<\cdots\}\subset\mathbb N$ be infinite.
+The problem defines $A$ to be \emph{sum-free} if there are no solutions to
+\[
+ a=b_1+\cdots+b_r
+\]
+with $r\ge 2$ and $b_1<\cdots<b_r<a$ all in $A$.
+Equivalently:
+\[
+\forall j\ge 2,\qquad a_j\notin \Big\{\sum_{i\in I} a_i: \emptyset\neq I\subset\{1,\dots,j-1\}\Big\}.
+\]
+
+Question: how small can gaps $a_{n+1}-a_n$ be? In particular, does there exist such an infinite $A$ for which
+\[
+ a_{n+1}-a_n < n
+\]
+holds (presumably for all sufficiently large $n$; the statement in the problem text does not specify whether this is required for all $n$, eventually, or infinitely often).
+
+\medskip
+\noindent\textbf{QUICK LITERATURE/CONTEXT CHECK.}
+The problem text itself states (without proofs) several results and constructions:
+\begin{itemize}
+\item Erd\H{o}s proved every such sum-free set has density zero.
+\item Deshouillers--Erd\H{o}s--Melfi constructed a sum-free set with $a_n\sim n^{3+o(1)}$.
+\item Erd\H{o}s reports that Graham proved existence of a sequence with $a_{n+1}-a_n<n^{1+o(1)}$.
+\item \L uczak--Schoen proved $|A\cap[1,N]|\ll (N\log N)^{1/2}$ and constructed examples with $|B\cap[1,N]|\gg N^{1/2}/(\log N)^{1/2+o(1)}$.
+\end{itemize}
+I do not use any additional literature beyond what is explicitly in the problem text.
+
+\medskip
+\noindent\textbf{ATTACK PLAN.}
+\begin{enumerate}
+\item \emph{Construction track:} build explicit infinite sequences avoiding all subset-sum hits; try to tune growth to make gaps small.
+\item \emph{Lower-bound track:} show that many integers are forbidden once a prefix is chosen, forcing large gaps.
+\item \emph{Reality check:} compute greedy examples and brute-force short prefixes under gap constraints.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{WORK.}
+
+\noindent\textbf{Lemma 1 (superincreasing sequences are sum-free in this sense).}
+Suppose $A=\{a_1<a_2<\cdots\}\subset\mathbb N$ satisfies
+\[
+ a_{m} > \sum_{i=1}^{m-1} a_i\qquad\text{for all }m\ge 2.
+\]
+Then $A$ is sum-free in the sense of the problem (no element is a sum of distinct smaller elements).
+
+\noindent\emph{Proof.}
+Fix $m\ge 2$ and consider any sum of distinct elements of $\{a_1,\dots,a_{m-1}\}$. Its value is at most $\sum_{i=1}^{m-1} a_i$, which is strictly less than $a_m$ by hypothesis. Therefore $a_m$ cannot be represented as such a sum.
+Since this holds for every $m$, no element of $A$ is a sum of distinct smaller elements, which is exactly the defining property.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 2 (the greedy algorithm from $1$ gives powers of $2$).}
+Define a greedy sequence by $a_1=1$ and, for $m\ge 1$, let $a_{m+1}$ be the smallest integer $>a_m$ that is not representable as a sum of distinct elements from $\{a_1,\dots,a_m\}$.
+Then $a_m=2^{m-1}$ for all $m\ge 1$.
+
+\noindent\emph{Proof.}
+We prove by induction that after choosing $\{1,2,4,\dots,2^{m-1}\}$, the set of subset sums of these elements is exactly $\{0,1,2,\dots,2^{m}-1\}$.
+
+Base $m=1$: subset sums of $\{1\}$ are $\{0,1\}$.
+
+Inductive step: assume subset sums of $\{1,2,4,\dots,2^{m-1}\}$ equal $\{0,1,\dots,2^m-1\}$. Adding $2^m$ produces new sums of the form $2^m+s$ with $s\in\{0,1,\dots,2^m-1\}$, i.e. exactly $\{2^m,2^m+1,\dots,2^{m+1}-1\}$. Together with the old sums, this is $\{0,1,\dots,2^{m+1}-1\}$.
+
+Therefore the smallest positive integer not representable after $m$ steps is $2^m$, so the greedy rule forces $a_{m+1}=2^m$. This proves $a_m=2^{m-1}$ for all $m$.
+\hfill$\square$
+
+\medskip
+\noindent\textbf{A tiny explicit obstruction to very small gaps (finite check).}
+If a sum-free set contains $2,3,4$, then it cannot contain $5,6,$ or $7$, because
+\[
+5=2+3,\qquad 6=2+4,\qquad 7=3+4,
+\]
+and in each case the right-hand side uses distinct smaller elements.
+Hence the next element after $4$ must be at least $8$, forcing a gap $\ge 4$ at that point.
+
+\medskip
+\noindent\textbf{VERIFICATION (FAST REALITY CHECK).}
+I computed a few canonical examples.
+\begin{itemize}
+\item Greedy from $1$ gives powers of $2$ (Lemma~2):
+\begin{verbatim}
+1,2,4,8,16,32,64,128,...
+\end{verbatim}
+Gaps are $1,2,4,8,\dots$ (exponential), so certainly not $<n$.
+
+\item Greedy from $3$ (same greedy rule but starting at $3$) begins:
+\begin{verbatim}
+3,4,5,6,16,17,49,50,148,149,445,446,...
+\end{verbatim}
+with gaps
+\begin{verbatim}
+1,1,1,10,1,32,1,98,1,296,1,890,...
+\end{verbatim}
+so the inequality $a_{n+1}-a_n<n$ fails already at the fourth gap ($10>4$).
+
+\item Exhaustive backtracking for the gap condition $a_{i+1}-a_i<i$ for $i\ge 2$ shows:
+\begin{itemize}
+\item starting with $a_1=2$, one cannot even construct a length-$4$ prefix satisfying both the sum-free condition and the gap condition (the only length-$3$ prefix is $2,3,4$, after which $5,6$ are forbidden as above);
+\item starting with $a_1=3$, the longest possible prefix is $3,4,5,6$ (length $4$), since the next allowed element is $\ge 16$.
+\end{itemize}
+These are finite sanity checks only; they do not resolve the asymptotic question.
+\end{itemize}
+
+\medskip
+\noindent\textbf{FINAL.} \textbf{UNRESOLVED}.
+
+\noindent(i) \emph{Strongest proved partial result here.}
+Lemma~1 gives a large explicit family of valid sequences (superincreasing), and Lemma~2 completely describes the greedy sequence starting from $1$.
+The small obstruction after $\{2,3,4\}$ shows why extremely small gaps are difficult.
+
+\noindent(ii) \emph{First gap (crisp).}
+Either construct an infinite sum-free sequence (in the problem's sense) with $a_{n+1}-a_n<n$ eventually, or prove that no such sequence exists.
+
+\noindent(iii) \emph{Top 3 next moves (concrete).}
+\begin{enumerate}
+\item Develop a quantitative ``forbidden-sumset'' lower bound: given a prefix $\{a_1,\dots,a_m\}$, lower bound the number of distinct subset sums (of size $\ge 2$) in an interval just above $a_m$, to force a lower bound on $a_{m+1}-a_m$.
+\item Run a targeted computer search for long prefixes with constraints like $a_{n+1}-a_n\le n$ (or $\le n-1$) using branch-and-bound and memoization on subset-sum sets, to see whether the constraint survives to, say, $n=50$.
+\item Attempt structured constructions (block constructions, base-$B$ digit restrictions, or ``sparse + dense blocks'') designed to create many collisions among subset sums while preventing any subset sum from landing back in $A$.
+\end{enumerate}
+
+\noindent(iv) \emph{Minimal counterexample structure.}
+A positive example for $a_{n+1}-a_n<n$ would need a mechanism that keeps each new $a_{m+1}$ outside the set of all subset sums of the prefix, while still allowing $a_{m+1}$ to lie within a window of length $\approx m$ above $a_m$. This suggests that the subset sums of the prefix must have exceptionally high collision density so that the forbidden set near $a_m$ is sparse.
+
+

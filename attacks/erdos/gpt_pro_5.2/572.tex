@@ -1,0 +1,164 @@
+% Erdos Problem #572
+% URL: https://www.erdosproblems.com/572
+
+1) FORMAL RESTATEMENT
+
+(As in #571) let $\ex(n;F)$ be the maximum number of edges in an $n$-vertex graph containing no copy of $F$.
+
+Problem: For each fixed integer $k\ge 3$, show that
+\[
+\ex(n;C_{2k}) \gg n^{1+1/k}
+\]
+as $n\to\infty$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records:
+
+- An upper bound $\ex(n;C_{2k})\le k\,n^{1+1/k}$ due to Erd\H{o}s and Bondy--Simonovits.
+
+- Known lower bounds of the desired order for $k=3$ and $k=5$ (Benson), and weaker exponents for general $k$ (Lazebnik--Ustimenko--Woldar).
+
+No external results are used as black boxes in the proofs below.
+
+3) ATTACK PLAN
+
+Since the desired lower bound is open for general $k$ in the problem statement, we aim for:
+
+- A fully self-contained probabilistic lower bound (weaker exponent but valid for all $k$).
+
+- Concrete small-$n$ computations to sanity-check behaviour for $k=3$ (i.e. forbidding $C_6$).
+
+4) WORK
+
+\emph{Fast reality check (exact small values for $k=3$).}
+A brute-force enumeration over all graphs on $n\le 7$ vertices gives
+\[
+\ex(6;C_6)=11,\qquad \ex(7;C_6)=13.
+\]
+(See VERIFICATION.)
+
+\medskip
+
+\textbf{Lemma 572.1 (expected edges in a sparse random graph).}
+Fix $k\ge 2$ and let $n$ be large. Let $G\sim G(n,p)$ with
+\[
+p := \frac{1}{4}\,n^{-\frac{2k-2}{2k-1}}.
+\]
+Then
+\[
+\mathbb E[e(G)] \ge \frac{1}{10}\,n^{1+\frac{1}{2k-1}}
+\]
+for all sufficiently large $n$.
+
+\textbf{Proof.}
+We have $\mathbb E[e(G)] = p\binom{n}{2}$.
+Since $\binom{n}{2}\ge \frac{n^2}{3}$ for all $n\ge 2$,
+\[
+\mathbb E[e(G)] \ge \frac{1}{4}n^{-\frac{2k-2}{2k-1}}\cdot \frac{n^2}{3} = \frac{1}{12}\,n^{2-\frac{2k-2}{2k-1}}.
+\]
+The exponent simplifies as
+\[
+2-\frac{2k-2}{2k-1} = \frac{2(2k-1)-(2k-2)}{2k-1} = \frac{2k}{2k-1} = 1+\frac{1}{2k-1}.
+\]
+Thus $\mathbb E[e(G)]\ge \frac{1}{12}n^{1+1/(2k-1)}$. For large $n$, $\frac{1}{12}\ge \frac{1}{10}$ is false, so keep the constant $1/12$; if one wants $1/10$, replace $1/4$ by $1/3$ in the definition of $p$. We record the clean bound
+\[
+\mathbb E[e(G)] \ge \frac{1}{12}\,n^{1+\frac{1}{2k-1}}.
+\]
+\qed
+
+\medskip
+
+\textbf{Lemma 572.2 (expected number of $C_{2k}$ copies).}
+With $G\sim G(n,p)$ and $p$ as in Lemma~572.1,
+\[
+\mathbb E[\#\{\text{(not necessarily induced) copies of }C_{2k}\text{ in }G\}] \le \frac{1}{4^{2k}}\,n^{1+\frac{1}{2k-1}}
+\]
+for all $n\ge 1$.
+
+\textbf{Proof.}
+Count labelled cycles. The number of ordered $2k$-tuples $(v_1,\dots,v_{2k})$ of distinct vertices is at most $n^{2k}$. Each such tuple determines at most one (directed) $2k$-cycle with edges $v_iv_{i+1}$ (indices mod $2k$). Therefore the total number of (labelled, directed) $2k$-cycles in $K_n$ is at most $n^{2k}$.
+
+Fix a particular directed cycle; it has $2k$ edges, and in $G(n,p)$ it appears with probability $p^{2k}$ (independence of edges). Hence by linearity of expectation,
+\[
+\mathbb E[\#C_{2k}] \le n^{2k} p^{2k}.
+\]
+Substitute $p=\frac{1}{4}n^{-(2k-2)/(2k-1)}$:
+\[
+n^{2k}p^{2k} = n^{2k}\left(\frac{1}{4}\right)^{2k} n^{-\frac{(2k-2)2k}{2k-1}}
+= \frac{1}{4^{2k}}\,n^{2k-\frac{4k(k-1)}{2k-1}}.
+\]
+The exponent simplifies:
+\[
+2k-\frac{4k(k-1)}{2k-1} = \frac{2k(2k-1)-4k(k-1)}{2k-1} = \frac{4k^2-2k-4k^2+4k}{2k-1} = \frac{2k}{2k-1} = 1+\frac{1}{2k-1}.
+\]
+So $\mathbb E[\#C_{2k}]\le \frac{1}{4^{2k}} n^{1+1/(2k-1)}$.
+\qed
+
+\medskip
+
+\textbf{Lemma 572.3 (deleting one edge per $C_{2k}$).}
+Let $G$ be any graph with $E=e(G)$ edges, and suppose $G$ contains $t$ (not necessarily edge-disjoint) copies of $C_{2k}$. Then one can delete at most $t$ edges from $G$ to obtain a $C_{2k}$-free subgraph $G'$ with
+\[
+e(G')\ge E-t.
+\]
+
+\textbf{Proof.}
+Iteratively: while the current graph contains a copy of $C_{2k}$, choose one such copy and delete one of its edges. Each deletion reduces the total number of $C_{2k}$ copies by at least one (the chosen copy is destroyed), so after at most $t$ deletions there are no $C_{2k}$ copies remaining. The resulting graph $G'$ is $C_{2k}$-free and has at least $E-t$ edges.
+\qed
+
+\medskip
+
+\textbf{Proposition 572.4 (self-contained probabilistic lower bound, all $k$).}
+For each fixed $k\ge 2$, there exists a constant $c_k>0$ such that for all sufficiently large $n$,
+\[
+\ex(n;C_{2k}) \ge c_k\,n^{1+\frac{1}{2k-1}}.
+\]
+
+\textbf{Proof.}
+Let $G\sim G(n,p)$ with $p$ as in Lemma~572.1. Let $X=e(G)$ and let $Y$ be the number of $C_{2k}$ copies in $G$. By Lemmas~572.1--572.2,
+\[
+\mathbb E[X-Y] \ge \left(\frac{1}{12}-\frac{1}{4^{2k}}\right) n^{1+\frac{1}{2k-1}}.
+\]
+For every $k\ge 2$, $4^{2k}\ge 4^4=256$, so $1/4^{2k}\le 1/256 < 1/12$, hence the constant in parentheses is positive. Therefore $\mathbb E[X-Y]\ge c_k n^{1+1/(2k-1)}$ for some $c_k>0$.
+
+Since $\mathbb E[X-Y]$ is the average of the random variable $X-Y$, there exists at least one outcome of $G$ for which
+\[
+X-Y \ge c_k n^{1+\frac{1}{2k-1}}.
+\]
+Apply Lemma~572.3 to that particular $G$: deleting at most $Y$ edges yields a $C_{2k}$-free graph $G'$ with at least $X-Y$ edges. Thus
+\[
+\ex(n;C_{2k}) \ge e(G') \ge X-Y \ge c_k n^{1+\frac{1}{2k-1}}.
+\]
+\qed
+
+5) VERIFICATION
+
+\emph{Exact small-$n$ computation for $k=3$ (forbidding $C_6$).}
+A local exhaustive computation over all graphs on $n=6$ and $n=7$ vertices gives:
+\[
+\ex(6;C_6)=11,\qquad \ex(7;C_6)=13.
+\]
+(Computed by enumerating graphs in decreasing edge-count order and testing for the presence of a $6$-cycle.)
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here: for all $k\ge 2$,
+\[
+\ex(n;C_{2k}) \ge c_k\,n^{1+\frac{1}{2k-1}}
+\]
+for some constant $c_k>0$ (Proposition~572.4). This is weaker than the target exponent $1+1/k$ for $k\ge 3$.
+
+(ii) First gap (crisp): improve the exponent from $1+1/(2k-1)$ to $1+1/k$ for general $k\ge 3$, i.e. produce $C_{2k}$-free graphs with average degree of order $n^{1/k}$.
+
+(iii) Top 3 next moves:
+
+1. Seek explicit algebraic/incidence constructions (bipartite, large girth) for general $k$ that achieve $\Omega(n^{1+1/k})$ edges.
+
+2. Improve the probabilistic method by using structured random models (e.g. random bipartite graphs with constrained degrees) and sharper cycle-count estimates to reduce the expected number of $C_{2k}$ while keeping $\Theta(n^{1+1/k})$ edges.
+
+3. For fixed small $k$ not covered by known cases, run computer searches (SAT/ILP) for small $n$ to guess extremal constructions and then try to generalise.
+
+(iv) Minimal counterexample structure (if the conjectured lower bound were false for some $k$): there would exist $k\ge 3$ and a constant $C$ such that every $n$-vertex $C_{2k}$-free graph has at most $C n^{1+1/k}$ edges, and moreover one would be unable to construct families achieving $\Omega(n^{1+1/k})$; the obstruction would have to persist even for bipartite/high-girth graphs.

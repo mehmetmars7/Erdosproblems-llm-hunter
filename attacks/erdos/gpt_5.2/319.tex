@@ -1,0 +1,93 @@
+% Attempt for Erdos Problem #319
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For $N\ge 1$, define $M(N)$ to be the maximum size of a set $A\subseteq\{1,\dots,N\}$ for which there exists a sign function
+\[\delta:A\to\{-1,1\}\]
+such that
+\[\sum_{n\in A}\frac{\delta(n)}{n}=0,\tag{$\ast$}\]
+but for every nonempty proper subset $A'\subsetneq A$,
+\[\sum_{n\in A'}\frac{\delta(n)}{n}\ne 0.\tag{$\ast\ast$}\]
+Question: estimate $M(N)$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The problem statement sketches a route to a large lower bound assuming existence of a set $B$ with $\sum_{b\in B}1/b=1$ in a short interval; I do not reprove that existence. I focus on structural lemmas and small-$N$ computation.
+
+3) ATTACK PLAN
+Proof track:
+1. Give a general “lifting lemma”: if $B$ is a minimal Egyptian-fraction representation of $1$, then $A=B\cup\{1\}$ with signs $(+,-)$ satisfies $(\ast)$ and $(\ast\ast)$.
+2. Provide explicit small constructions and verify minimality directly.
+3. Compute $M(N)$ exactly for small $N$ to sanity-check.
+
+Disproof track:
+1. Try to prove an upper bound by showing that minimality $(\ast\ast)$ forces large denominators or forbids dense sets.
+
+Chosen path: establish the lifting lemma + concrete examples + small-$N$ computation.
+
+4) WORK
+Lemma 1 (From minimal Egyptian fraction to a minimal signed zero-sum).
+Let $B$ be a finite set of integers $>1$ such that
+\[\sum_{b\in B}\frac1b=1,\]
+and no proper nonempty subset $B'\subsetneq B$ satisfies $\sum_{b\in B'}1/b=1$.
+Let $A=B\cup\{1\}$ and define $\delta(1)=1$ and $\delta(b)=-1$ for $b\in B$.
+Then $(A,\delta)$ satisfies $(\ast)$ and $(\ast\ast)$.
+
+Proof.
+We have
+\[\sum_{n\in A}\frac{\delta(n)}{n}=1-\sum_{b\in B}\frac1b=0,\]
+so $(\ast)$ holds.
+Now let $A'\subsetneq A$ be nonempty.
+If $1\notin A'$, then all signs in $A'$ are $-1$ and $\sum_{n\in A'}\delta(n)/n<0$, so it is not $0$.
+If $1\in A'$, write $A'=\{1\}\cup B'$ with $B'\subseteq B$.
+Then
+\[\sum_{n\in A'}\frac{\delta(n)}{n}=1-\sum_{b\in B'}\frac1b.\]
+If $B'=B$, then $A'=A$, excluded by assumption.
+If $B'\subsetneq B$, then by hypothesis $\sum_{b\in B'}1/b\ne 1$, so the displayed sum is nonzero.
+Thus $(\ast\ast)$ holds. \qed
+
+Lemma 2 (Explicit example for all $N\ge 6$).
+Let $A=\{1,2,3,6\}$ and define $\delta(1)=1$ and $\delta(n)=-1$ for $n\in\{2,3,6\}$.
+Then $(A,\delta)$ satisfies $(\ast)$ and $(\ast\ast)$.
+
+Proof.
+We compute
+\[\sum_{n\in A}\frac{\delta(n)}{n}=1-\frac12-\frac13-\frac16=0.\]
+Now check proper nonempty subsets $A'\subsetneq A$.
+If $1\notin A'$, the sum is negative, hence nonzero.
+If $1\in A'$, then $A'=\{1\}\cup B'$ with $B'\subsetneq\{2,3,6\}$.
+The possible sums $\sum_{b\in B'}1/b$ are in $\{0,1/2,1/3,1/6,5/6,2/3\}$, none equal to $1$.
+Therefore $1-\sum_{b\in B'}1/b\ne 0$ for all such $B'$, giving $(\ast\ast)$. \qed
+
+FAST REALITY CHECK (computation).
+Exhaustive search for $N\le 12$ (over all $A\subseteq\{1,\dots,N\}$ and all signings $\delta$) gives:
+- $M(N)=0$ for $2\le N\le 5$ (no examples).
+- $M(N)=4$ for $6\le N\le 11$, achieved by $(A,\delta)=(\{1,2,3,6\},(1,-1,-1,-1))$ as in Lemma 2.
+- $M(12)=6$, achieved for example by $A=\{1,2,3,4,6,12\}$ with signs $(1,-1,-1,-1,1,-1)$.
+
+5) VERIFICATION
+- Lemma 1 reduces $(\ast\ast)$ to the minimality of an Egyptian-fraction decomposition of $1$ inside $B$.
+- Lemma 2 checks minimality by an explicit finite enumeration of subset sums.
+- The computation is small-$N$ only; large-$N$ behavior is the core difficulty.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Any minimal Egyptian-fraction decomposition of $1$ yields a minimal signed zero-sum set by adjoining $1$ with opposite sign (Lemma 1). In particular, $\{1,2,3,6\}$ gives a size-$4$ example for all $N\ge 6$ (Lemma 2). Computation shows $M(12)=6$ and lists small-$N$ values.
+
+(ii) First gap:
+Construct large sets $A\subseteq[1,N]$ and signs $\delta$ satisfying $(\ast)$ and the strong minimality condition $(\ast\ast)$, with $|A|$ growing linearly in $N$ (or prove that this is impossible).
+
+(iii) Top 3 next moves:
+1. Search for large \emph{minimal} Egyptian fraction decompositions of $1$ inside short intervals $[cN,N]$, since Lemma 1 would immediately convert these into large $A$.
+2. Prove structural necessary conditions for minimality $(\ast\ast)$ (e.g. constraints on gcds, divisibility patterns, or spacing of denominators) that could yield upper bounds on $M(N)$.
+3. Compute $M(N)$ for larger $N$ with optimized meet-in-the-middle to see whether growth appears linear or much smaller.
+
+(iv) Minimal counterexample structure (if linear growth were false):
+For all large $N$, every signed zero-sum set $A\subseteq[1,N]$ would contain a nontrivial proper zero-sum subconfiguration, preventing $(\ast\ast)$; equivalently, there would be no large minimal Egyptian fraction decompositions of $1$ inside $[1,N]$.
+

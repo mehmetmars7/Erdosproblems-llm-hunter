@@ -1,0 +1,114 @@
+% Erdos Problem #719
+
+1) “FORMAL RESTATEMENT”
+
+Fix $r\ge 2$.
+
+- Let $K_{r+1}^r$ denote the complete $r$-uniform hypergraph on $r+1$ vertices (it has $\binom{r+1}{r}=r+1$ edges).
+- Note that $K_r^r$ is the complete $r$-uniform hypergraph on $r$ vertices, which consists of exactly one $r$-edge.
+
+Let $\mathrm{ex}_r(n;K_{r+1}^r)$ be the maximum number of $r$-edges in an $r$-uniform hypergraph on $n$ vertices containing no copy of $K_{r+1}^r$.
+
+Conjecture (Erd\H{o}s--Sauer, as stated): Every $r$-uniform hypergraph $G$ on $n$ vertices can be written as the union of at most $\mathrm{ex}_r(n;K_{r+1}^r)$ many copies of $K_r^r$ and $K_{r+1}^r$ such that no two copies share a $K_r^r$.
+
+Since $K_r^r$ is a single edge, the condition "no two copies share a $K_r^r$" means simply that the chosen copies are \emph{edge-disjoint}.
+So the conjecture is equivalently about partitioning the edge set of $G$ into edge-disjoint blocks, each block either a single edge or the full set of $r+1$ edges of some $(r+1)$-vertex clique $K_{r+1}^r$.
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+No additional results are stated in the problem text beyond the conjecture itself.
+
+3) “ATTACK PLAN”
+
+- Reformulate the conjecture as a packing statement about edge-disjoint $K_{r+1}^r$ copies, because using a $(r+1)$-clique as one "piece" saves $r$ pieces compared to listing its $r+1$ edges individually.
+- Verify the conjecture for very small $n$ by brute force for $r=2$ and $r=3$.
+
+No general proof or counterexample was found here.
+
+4) “WORK”
+
+\textbf{FAST REALITY CHECK (exact small-$n$ verification).}
+
+I checked the conjecture by exhaustive search for small parameters (by dynamic programming to compute the maximum number of edge-disjoint $K_{r+1}^r$ cliques inside a given hypergraph):
+
+- For $r=2$ (graphs, decomposing into edges and triangles), the conjectured bound uses $\mathrm{ex}_2(n;K_3)=\lfloor n^2/4\rfloor$.
+Exhaustive verification over \emph{all} graphs on $n\le 7$ vertices found \emph{no counterexample}.
+
+- For $r=3$ (3-uniform hypergraphs, decomposing into single 3-edges and tetrahedra $K_4^3$), exhaustive verification over \emph{all} 3-graphs on $n\le 6$ vertices found \emph{no counterexample}.
+
+These checks are only sanity checks; they do not imply the conjecture for large $n$.
+
+\medskip
+\textbf{Lemma 1 (Equivalence to a clique-packing lower bound).}
+Let $G$ be an $r$-uniform hypergraph on $n$ vertices with $e:=|E(G)|$ edges, and write
+\[
+\mathrm{ex}:=\mathrm{ex}_r(n;K_{r+1}^r).
+\]
+The Erd\H{o}s--Sauer conjecture is equivalent to the following statement:
+
+(\*) There exists a collection of edge-disjoint copies of $K_{r+1}^r$ in $G$ of size $t$ satisfying
+\[
+ t \ge \frac{e-\mathrm{ex}}{r}.
+\]
+(When $e\le \mathrm{ex}$ the right side is $\le 0$ and the condition is vacuous.)
+
+\emph{Proof.}
+Suppose first that the conjectured decomposition exists. Let $t$ be the number of $K_{r+1}^r$ pieces used, and let $s$ be the number of single-edge $K_r^r$ pieces used. Since the pieces are edge-disjoint and cover all edges,
+\[
+ e = s + (r+1)t.
+\]
+The total number of pieces is
+\[
+ s+t = e - r t.
+\]
+The conjecture asserts $s+t\le \mathrm{ex}$, so
+\[
+ e - r t \le \mathrm{ex}\quad\Longrightarrow\quad t\ge \frac{e-\mathrm{ex}}{r}.
+\]
+Thus (\*) holds.
+
+Conversely, assume (\*) holds for some edge-disjoint family of $t$ copies of $K_{r+1}^r$.
+Form a decomposition by taking these $t$ cliques as $t$ pieces, and taking every remaining edge (not in any chosen clique) as a singleton $K_r^r$ piece. Let $s:=e-(r+1)t$ be the number of remaining edges. Then the total number of pieces is
+\[
+ s+t = e - r t \le e - r\cdot\frac{e-\mathrm{ex}}{r}=\mathrm{ex},
+\]
+so the conjectured bound holds.
+\qed
+
+\medskip
+\textbf{Lemma 2 (Trivial case: $K_{r+1}^r$-free hypergraphs).}
+If $G$ is $K_{r+1}^r$-free, then $G$ satisfies the Erd\H{o}s--Sauer conclusion.
+
+\emph{Proof.}
+If $G$ is $K_{r+1}^r$-free on $n$ vertices, then by definition $|E(G)|\le \mathrm{ex}_r(n;K_{r+1}^r)=\mathrm{ex}$.
+Decompose $G$ into its $|E(G)|$ individual edges (each is a copy of $K_r^r$). This is an edge-disjoint decomposition using $|E(G)|\le \mathrm{ex}$ pieces, as required.
+\qed
+
+5) “VERIFICATION”
+
+- Lemma 1: algebra checked carefully: replacing $r+1$ singleton pieces by one $K_{r+1}^r$ piece reduces piece count by $r$.
+- Lemma 2: immediate from the definition of $\mathrm{ex}_r$.
+- Computations: verified by exhaustive enumeration for $r=2,n\le 7$ and $r=3,n\le 6$ using DP on the edge-set bitmask.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here: an equivalent packing formulation (Lemma 1), trivial verification for $K_{r+1}^r$-free hypergraphs (Lemma 2), and exhaustive confirmation for small $n$ in the cases $(r,n)=(2,\le 7)$ and $(3,\le 6)$.
+
+(ii) First gap (crisp statement): prove (or disprove) that every $r$-uniform hypergraph $G$ on $n$ vertices contains an edge-disjoint family of $K_{r+1}^r$ copies of size at least
+\[
+\frac{|E(G)|-\mathrm{ex}_r(n;K_{r+1}^r)}{r},
+\]
+as in Lemma 1.
+
+(iii) Top 3 next moves (concrete targets):
+
+1. Prove the conjecture for $r=2$ for all $n$ (graphs), using only Mantel's theorem $\mathrm{ex}_2(n;K_3)=\lfloor n^2/4\rfloor$ plus an explicit procedure that packs enough edge-disjoint triangles whenever $e(G)>\lfloor n^2/4\rfloor$.
+
+2. Establish a robust incremental lemma: if $e(G)$ exceeds $\mathrm{ex}$ by $r\Delta$, then $G$ contains $\Delta$ edge-disjoint $K_{r+1}^r$ cliques.
+
+3. Extend the exhaustive verification for $r=3$ beyond $n=6$ using MILP/branch-and-bound with symmetry reductions, to search for the first potential counterexample size or to discover patterns suggesting an inductive proof.
+
+(iv) Minimal counterexample structure (if the conjecture is false): a hypergraph $G$ whose edge set is very dense but whose copies of $K_{r+1}^r$ overlap so heavily that the maximum number of edge-disjoint $K_{r+1}^r$ is much smaller than $(|E(G)|-\mathrm{ex})/r$. Such a counterexample would likely look like a near-extremal $K_{r+1}^r$-free configuration plus many additional edges that create many cliques but all sharing a small "bottleneck" set of edges.
+

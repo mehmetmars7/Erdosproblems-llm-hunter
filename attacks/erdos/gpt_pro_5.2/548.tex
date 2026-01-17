@@ -1,0 +1,119 @@
+% Erdos Problem #548
+
+The Erd\H{o}s-S\'os conjecture: Let $n\ge k+1$. Every graph on $n$ vertices with at least $\frac{k-1}{2}n+1$ edges contains every tree on $k+1$ vertices.
+
+We can prove that this is true if we instead assume the graph has at least $n(k-1)+1$ edges. This result is easily proved by induction. The conjecture is that the true threshold is $\frac{k-1}{2}n+1$.
+
+Erd\H{o}s and Gallai (1959) made the following conjecture, which if true would imply the Erd\H{o}s-S\'os conjecture. Let $F$ be a forest with $k$ edges and no isolated vertices. Then every graph on $n$ vertices with at least $\frac{k-1}{2}n+1$ edges contains $F$. Erd\H{o}s and Gallai (1959) proved that this is true if $F$ is a forest of $k$ independent edges.
+
+%Erdos problem 548
+1) “FORMAL RESTATEMENT”
+
+Fix integers $n\ge k+1\ge 2$. The Erd\H{o}s--S\'os conjecture asserts:
+
+\quad(ES) Every graph $G$ on $n$ vertices with
+\[
+ e(G)\ \ge\ \frac{k-1}{2}n + 1
+\]
+contains \emph{every} tree $T$ on $k+1$ vertices as a (not necessarily induced) subgraph.
+
+The problem statement also records a provable weaker sufficient condition:
+
+\quad(Weak) If $e(G)\ge n(k-1)+1$, then $G$ contains every tree on $k+1$ vertices.
+
+I will give a complete proof of (Weak), and a few additional easy special cases/checks toward (ES).
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+The statement above is the classical Erd\H{o}s--S\'os conjecture. The file notes:
+- The weaker bound $e(G)\ge n(k-1)+1$ implies the conclusion and is “easily proved by induction”.
+- Erd\H{o}s and Gallai also conjectured an analogous statement for forests; and they proved it when the forest consists of $k$ independent edges.
+
+In what follows I will only use what is stated in the problem file, and prove the weaker bound from scratch.
+
+3) “ATTACK PLAN”
+
+To prove (Weak), it is enough to show that a graph with $e(G)\ge n(k-1)+1$ contains a subgraph of minimum degree at least $k$ on at least $k+1$ vertices, and then show that minimum degree $\ge k$ forces a copy of any tree on $k+1$ vertices by a greedy/inductive embedding.
+
+For sanity, I will also brute-force check the conjectured (ES) condition for a few small $(n,k)$ where exhaustive enumeration is feasible.
+
+4) “WORK”
+
+\textbf{Lemma 1 (Pruning to minimum degree $\ge k$).}
+Let $G$ be a graph on $n$ vertices with $e(G)\ge n(k-1)+1$. Then $G$ has a subgraph $H$ with
+\[
+|V(H)|\ge k+1 \quad\text{and}\quad \delta(H)\ge k.
+\]
+
+\emph{Proof.}
+Starting from $G_0:=G$, iteratively delete a vertex of degree at most $k-1$ (if one exists), together with all incident edges. This produces a sequence of graphs
+\[
+G=G_0 \supseteq G_1 \supseteq \cdots \supseteq G_r
+\]
+where $G_r$ has minimum degree at least $k$ (or is empty).
+
+Each deletion removes at most $k-1$ edges. If $G_r$ has $N$ vertices, then we deleted $n-N$ vertices, so
+\[
+e(G_r)\ \ge\ e(G) - (n-N)(k-1)\ \ge\ n(k-1)+1 - (n-N)(k-1)\ =\ N(k-1)+1.
+\]
+If $N\le k$, then the maximum possible number of edges on $N$ vertices is $\binom{N}{2}$, but for $N\le k$ we have
+\[
+\binom{N}{2} \le \binom{k}{2} = \frac{k(k-1)}{2} < k(k-1)+1 \le N(k-1)+1,
+\]
+which contradicts $e(G_r)\le \binom{N}{2}$.
+Therefore $N\ge k+1$. Since the procedure stops only when no vertex of degree $\le k-1$ remains, we have $\delta(G_r)\ge k$. Taking $H:=G_r$ completes the proof. $\square$
+
+\textbf{Lemma 2 (Minimum degree $\ge k$ contains every $(k+1)$-vertex tree).}
+Let $H$ be a graph with $\delta(H)\ge k$ and $|V(H)|\ge k+1$. Then $H$ contains every tree $T$ on $k+1$ vertices as a subgraph.
+
+\emph{Proof.}
+We prove by induction on $k\ge 1$.
+
+Base case $k=1$: a tree on $2$ vertices is a single edge. Since $\delta(H)\ge 1$, $H$ contains an edge.
+
+Induction step: assume the statement holds for $k-1$, and let $T$ be a tree on $k+1$ vertices. Choose a leaf $\ell$ of $T$, and let $u$ be its unique neighbour. Let $T':=T-\ell$ be the tree obtained by deleting $\ell$; then $T'$ is a tree on $k$ vertices.
+
+Let $H$ be as in the lemma. Since $\delta(H)\ge k$, in particular $\delta(H)\ge k-1$, and $|V(H)|\ge k+1\ge k$. By the induction hypothesis applied to $k-1$ and the tree $T'$ (which has $k$ vertices), there is an embedding $\varphi:V(T')\hookrightarrow V(H)$ such that every edge of $T'$ maps to an edge of $H$.
+
+Let $x:=\varphi(u)$. The vertex $x$ has degree at least $k$ in $H$. In the embedding of $T'$, at most $k-1$ vertices of $H$ are already used (since $|V(T')|=k$). Among the neighbours of $x$, at most $k-1$ can lie in the used vertex set (indeed there are only $k-1$ other used vertices besides $x$ itself). Therefore $x$ has at least one neighbour $y\in V(H)$ not in $\varphi(V(T'))$.
+
+Extend $\varphi$ to $V(T)$ by mapping the deleted leaf $\ell$ to $y$. Then the only new edge of $T$ to check is $u\ell$, which maps to $xy$, an edge of $H$ by construction. Hence $T$ embeds into $H$.
+
+This completes the induction. $\square$
+
+\textbf{Proposition 3 (Proof of the weaker bound).}
+If $G$ is a graph on $n$ vertices with $e(G)\ge n(k-1)+1$, then $G$ contains every tree on $k+1$ vertices.
+
+\emph{Proof.}
+By Lemma 1, $G$ contains a subgraph $H$ with $|V(H)|\ge k+1$ and $\delta(H)\ge k$. By Lemma 2, $H$ contains every tree on $k+1$ vertices, hence so does $G$. $\square$
+
+\textbf{Lemma 4 (The Erd\H{o}s--S\'os bound holds for stars).}
+Let $k\ge 1$. If $G$ is a graph on $n$ vertices with $e(G)\ge \frac{k-1}{2}n+1$, then $G$ contains the star $K_{1,k}$.
+
+\emph{Proof.}
+The average degree of $G$ is $\bar d = 2e(G)/n > k-1$. Hence there exists a vertex of degree at least $\lceil\bar d\rceil\ge k$, which is the centre of a copy of $K_{1,k}$. $\square$
+
+5) “VERIFICATION”
+
+Fast reality check by exhaustive enumeration of graphs for a few small parameters (checking the Erd\H{o}s--S\'os threshold $e(G)\ge \frac{k-1}{2}n+1$):
+- For $(n,k)=(5,3)$ (trees on $4$ vertices; threshold $e\ge 6$) all $386$ graphs with $\ge 6$ edges contain both $P_4$ and $K_{1,3}$.
+- For $(n,k)=(6,3)$ (threshold $e\ge 7$) all $22{,}819$ graphs with $\ge 7$ edges contain both $P_4$ and $K_{1,3}$.
+- For $(n,k)=(6,4)$ (trees on $5$ vertices; threshold $e\ge 10$) all $4{,}944$ graphs with $\ge 10$ edges contain all three trees on $5$ vertices.
+
+These computations do not prove the conjecture but are consistent with it in small cases.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result: Proposition 3 proves the statement with the stronger hypothesis $e(G)\ge n(k-1)+1$. Lemma 4 proves the conjectured threshold for the special case when the tree is the star $K_{1,k}$. Exhaustive checks for small $(n,k)$ (listed in VERIFICATION) confirm the conjectured threshold holds for those cases.
+
+(ii) First gap (crisp): Prove that if $e(G)\ge \frac{k-1}{2}n+1$ then $G$ contains \emph{every} tree on $k+1$ vertices (not just stars), i.e. bridge the factor-of-two gap between $n(k-1)+1$ and $\frac{k-1}{2}n+1$.
+
+(iii) Top 3 next moves:
+1. Inductive reduction on $n$: Show that if $G$ has a vertex of degree $\le \frac{k-1}{2}$ then deleting it preserves the edge threshold and reduces to a smaller instance; hence a minimal counterexample must satisfy $\delta(G)\ge \lfloor\frac{k-1}{2}\rfloor+1$.
+2. Minimum-degree embedding: Prove that graphs satisfying $e(G)\ge \frac{k-1}{2}n+1$ and $\delta(G)\ge \lfloor\frac{k-1}{2}\rfloor+1$ necessarily contain every $(k+1)$-vertex tree, perhaps via a refined greedy embedding that uses only the available degree slack.
+3. Computer-aided search for small counterexamples for fixed $k$: For each small $k$ (say $k\le 6$), enumerate graphs at the threshold and test containment of all $(k+1)$-vertex trees to see whether the conjecture ever fails at small sizes.
+
+(iv) Minimal counterexample structure: A minimal counterexample would consist of a graph $G$ on $n\ge k+1$ vertices with $e(G)=\lceil\frac{k-1}{2}n\rceil+1$ that avoids some specific tree $T$ on $k+1$ vertices; by the inductive reduction in (iii).1, it should have minimum degree at least $\lfloor\frac{k-1}{2}\rfloor+1$.
+

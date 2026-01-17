@@ -1,0 +1,83 @@
+%Erdos problem #167
+\section*{Erdos problem \#167 (Tuza's conjecture)}
+
+\subsection*{1) FORMAL RESTATEMENT}
+For a graph $G$ let:
+\begin{itemize}
+\item $\nu(G)$ be the maximum number of \emph{edge-disjoint} triangles in $G$.
+\item $\tau(G)$ be the minimum number of edges to delete from $G$ to obtain a triangle-free graph.
+\end{itemize}
+Equivalently, $\tau(G)$ is the minimum size of an edge set that intersects every triangle.
+Tuza's conjecture asks whether for all graphs $G$,
+\[
+\tau(G)\le 2\nu(G).
+\]
+The problem file notes this is tight for $K_4$ and $K_5$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The file states Krivelevich proved $\tau(G)\le (2+o(1))\nu(G)$ and that Tuza proved the conjecture for planar graphs. I do not rely on these.
+
+\subsection*{3) ATTACK PLAN}
+Reformulate as a vertex-cover vs matching problem in a $3$-uniform hypergraph (triangles as hyperedges). This immediately gives the easy bound $\tau\le 3\nu$. Then verify tightness examples and brute-check small graphs.
+
+\subsection*{4) WORK}
+\paragraph{Lemma 167.1 (easy $3\nu$ bound via maximal matching).}
+For every graph $G$,
+\[
+\tau(G)\le 3\nu(G).
+\]
+
+\textit{Proof.}
+Form a $3$-uniform hypergraph $\mathcal H$ whose vertex set is $E(G)$ and whose hyperedges are the edge-sets of triangles of $G$.
+Then a matching in $\mathcal H$ is exactly a set of edge-disjoint triangles in $G$, so its maximum size is $\nu(G)$.
+A vertex cover in $\mathcal H$ is a set of edges of $G$ meeting every triangle, so its minimum size is $\tau(G)$.
+
+Let $M$ be a maximum matching in $\mathcal H$ of size $\nu(G)$. Consider the set $C$ of all vertices of $\mathcal H$ that lie in hyperedges of $M$. Since each hyperedge has size $3$, we have $|C|=3\nu(G)$.
+We claim $C$ is a vertex cover: if there were a hyperedge $e$ disjoint from $C$, then $e$ is disjoint from every hyperedge of $M$, so $M\cup\{e\}$ is a larger matching, contradicting maximality of $M$.
+Thus $\tau(G)=\tau(\mathcal H)\le |C|=3\nu(G)$. \qed
+
+\paragraph{Lemma 167.2 (tightness of constant $2$ on $K_4$ and $K_5$).}
+\begin{enumerate}
+\item For $K_4$, $\nu(K_4)=1$ and $\tau(K_4)=2$.
+\item For $K_5$, $\nu(K_5)=2$ and $\tau(K_5)=4$.
+\end{enumerate}
+
+\textit{Proof.}
+For $K_4$: any two triangles share an edge, so $\nu=1$.
+To destroy all triangles, one must make the graph bipartite; the maximum triangle-free graph on $4$ vertices has $4$ edges, so at least $6-4=2$ edges must be removed, and removing a matching of size $2$ suffices. Hence $\tau=2$.
+
+For $K_5$: two edge-disjoint triangles exist, e.g. on vertex sets $\{1,2,3\}$ and $\{1,4,5\}$, so $\nu\ge 2$. Three edge-disjoint triangles would require $9$ distinct edges, but any third triangle would share an edge with one of these two (easy check), so $\nu=2$.
+A triangle-free graph on $5$ vertices has at most $\lfloor 25/4\rfloor=6$ edges (Tur\'{a}n bound for $K_3$), so from $10$ edges we must remove at least $4$. Removing $4$ edges to leave $K_{2,3}$ (which has $6$ edges and is triangle-free) is possible, so $\tau=4$.
+Thus $\tau=2\nu$ in both cases. \qed
+
+\paragraph{FAST REALITY CHECK (brute verification for $n\le 6$).}
+By exhaustive enumeration of all graphs on $n\le 6$ vertices, Tuza's inequality $\tau(G)\le 2\nu(G)$ holds in all cases.
+Moreover, the worst ratio $\tau/\nu$ observed for $n\le 6$ is exactly $2$, attained already by $K_4$.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item Lemma 167.1 uses only the fact that a maximum matching hits all hyperedges via its union of vertices.
+\item Lemma 167.2 checks the extremal values directly and uses only the $K_3$-free edge bound $\lfloor n^2/4\rfloor$ for $n=5$.
+\item Computation: verified by brute force (32768 graphs for $n=6$), with exact optimization of triangle packings and triangle edge-covers.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED}
+
+\begin{enumerate}
+\item[(i)] \textbf{Strongest fully proved partial result obtained here.}
+A universal factor-$3$ bound $\tau(G)\le 3\nu(G)$ (Lemma 167.1), plus exact tightness examples $\tau=2\nu$ for $K_4$ and $K_5$ (Lemma 167.2). Verified by brute force for all graphs on $\le 6$ vertices.
+
+\item[(ii)] \textbf{Exact first gap.}
+Improve the general factor from $3$ to $2$: prove that every graph has an edge set of size at most $2\nu(G)$ meeting every triangle.
+
+\item[(iii)] \textbf{Top 3 next moves (concrete targets).}
+\begin{enumerate}
+\item Strengthen Lemma 167.1 by exploiting structure of triangle hypergraphs that come from graphs (not arbitrary $3$-uniform hypergraphs), e.g. via local degree constraints.
+\item Attempt a decomposition: find a maximum triangle packing, then show the remaining triangles can be hit by at most $\nu(G)$ additional edges using a discharging argument.
+\item Use linear programming relaxation of the triangle edge-cover problem and prove integrality gap $\le 2$ for triangle hypergraphs.
+\end{enumerate}
+
+\item[(iv)] \textbf{Minimal counterexample structure (if the conjecture is false).}
+A counterexample would be a graph $G$ whose triangle hypergraph has vertex cover number strictly larger than twice its matching number. It would need many triangles with substantial overlap so that any small edge set misses some triangle, while still allowing only a small number of edge-disjoint triangles.
+\end{enumerate}

@@ -1,0 +1,129 @@
+% Erdos Problem #802
+%
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+Fix an integer $r\ge 3$. Let $G=(V,E)$ be a finite simple graph with $|V|=n\ge 1$ and average degree
+\[
+ t\;:=\;\frac{2|E|}{n}.
+\]
+Assume $G$ is $K_r$-free (i.e., $G$ contains no subgraph isomorphic to the complete graph on $r$ vertices).
+Let $\alpha(G)$ denote the independence number (largest $|I|$ with $I\subseteq V$ and $E\cap\binom{I}{2}=\emptyset$).
+
+Question: Does there exist a constant $c_r>0$ (depending only on $r$) such that for all $n$ and all $K_r$-free $G$ with average degree $t\ge 2$ one has
+\[
+\alpha(G)\;\ge\; c_r\,\frac{\log t}{t}\,n?
+\]
+(Any fixed choice of logarithm base changes $c_r$ by a constant factor; throughout, $\log$ denotes the natural logarithm.)
+
+Edge cases: if $t<1$ then $\log t<0$ and the displayed lower bound is vacuous, so we restrict to $t\ge 2$.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+The problem text states (without proofs) the following progress: AEKS prove a lower bound $\gg_r \frac{\log\log(t+1)}{t}n$, Shearer improves to $\gg_r \frac{\log t}{\log\log(t+1)\,t}n$, and the conjectured $\gg \frac{\log t}{t}n$ is known for $r=3$ (Ajtai--Koml\'os--Szemer\'edi) and under a stronger local chromatic assumption (Alon). In what follows I do \emph{not} invoke any additional literature statements beyond what is written in the problem text.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof track ideas.}
+\begin{itemize}
+\item Try to generalize the triangle-free ($r=3$) argument that produces a $\log t$ gain from local sparsity (neighborhoods being independent) to general $r$ via an induction on $r$ using that each neighborhood is $K_{r-1}$-free.
+\item Look for an entropy/counting argument that forces many independent sets in $K_r$-free graphs with bounded average degree, then lower bound the maximum independent set.
+\end{itemize}
+
+\emph{Disproof/construction track ideas.}
+\begin{itemize}
+\item Try to build a $K_r$-free graph with average degree $t$ and $\alpha(G)$ smaller than $c\,\frac{\log t}{t}n$, e.g. via a (possibly sparse) high-chromatic $K_r$-free construction with unusually small independent sets.
+\item Examine near-extremal $K_r$-free graphs that are far from $(r-1)$-partite and test whether $\alpha(G)$ can be forced down to $\approx n/t$.
+\end{itemize}
+
+I did not find either a complete proof for general $r$ or an explicit counterexample; the work below records fully proved basic lemmas and sanity checks.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\textbf{Lemma 802.1 (basic bound from average degree).}
+For every graph $G$ on $n$ vertices with average degree $t$,
+\[
+\alpha(G)\;\ge\;\frac{n}{t+1}.
+\]
+
+\emph{Proof.}
+Let $d(v)$ be the degree of $v$. Consider the greedy algorithm that repeatedly selects an arbitrary vertex, adds it to an independent set $I$, and deletes it together with all its neighbors. If at some step we select a vertex of degree $d$, we delete at most $d+1$ vertices. If the selected vertices are $v_1,\dots,v_m$, then
+\[
+ n\;\le\;\sum_{i=1}^m (d(v_i)+1).
+\]
+Since degrees are nonnegative integers and $\sum_{v\in V} d(v)=tn$, we have
+\[
+\sum_{i=1}^m d(v_i)\;\le\;\sum_{v\in V} d(v)\;=\;tn.
+\]
+Therefore
+\[
+ n\;\le\;\sum_{i=1}^m (d(v_i)+1)\;=\;m+\sum_{i=1}^m d(v_i)\;\le\;m+tn.
+\]
+Rearranging gives $m\ge \frac{n}{t+1}$. The set $I$ output by the greedy algorithm has size $|I|=m$ and is independent by construction, so $\alpha(G)\ge |I|\ge n/(t+1)$.
+\qed
+
+\textbf{Lemma 802.2 (subgraph with moderately large minimum degree).}
+Let $G$ be a graph with average degree $t>0$. Then $G$ contains a nonempty induced subgraph $H$ with minimum degree
+\[
+\delta(H)\;\ge\;\frac{t}{2}.
+\]
+
+\emph{Proof.}
+Run the iterative deletion process: while there exists a vertex of current degree $<t/2$, delete such a vertex and all incident edges. Let the degrees at deletion times be $d_1,d_2,\dots,d_s$.
+Each deleted vertex satisfies $d_i<t/2$.
+
+Key observation: every original edge of $G$ is counted \emph{exactly once} among the $d_i$'s, namely at the moment when its first endpoint is deleted (after which the edge is removed and never seen again). Hence
+\[
+|E(G)|\;=\;\sum_{i=1}^s d_i\;<\; s\cdot \frac{t}{2}\;\le\; n\cdot \frac{t}{2}.
+\]
+But $|E(G)|=\frac{tn}{2}$ by the definition of average degree, contradicting the strict inequality above.
+Therefore the deletion process cannot delete all vertices; it must terminate with a nonempty induced subgraph $H$ in which every remaining vertex has degree $\ge t/2$.
+\qed
+
+\textbf{FAST REALITY CHECK (tiny instances by computation).}
+For $n=7$ I exhaustively enumerated all graphs and recorded the minimum possible independence number among $K_r$-free graphs with a fixed number of edges $m$ (hence average degree $t=2m/7$).
+
+\emph{Triangle-free ($r=3$):}
+\[
+\begin{array}{c|ccccccccccccc}
+ m &0&1&2&3&4&5&6&7&8&9&10&11&12\\\hline
+ \min\alpha(G) &7&6&5&4&4&4&3&3&3&3&3&4&4
+\end{array}
+\]
+\emph{$K_4$-free ($r=4$):}
+\[
+\begin{array}{c|ccccccccccccccccc}
+ m &0&1&2&3&4&5&6&7&8&9&10&11&12&13&14&15&16\\\hline
+ \min\alpha(G) &7&6&5&4&4&3&3&3&3&3&3&2&2&2&2&2&3
+\end{array}
+\]
+These small-$n$ data are only a sanity check (the conjecture is asymptotic in $t$ and $n$), but they illustrate that forbidding larger cliques ($r=4$) can allow very small independence number already at moderate edge counts.
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Lemma 802.1: Checked that the greedy deletion counts each selected vertex once and deletes at most $d(v)+1$ vertices at that step; the inequality $\sum_{i=1}^m d(v_i)\le \sum_{v\in V} d(v)$ is immediate because the left sum selects a subset of vertices.
+\item Lemma 802.2: The edge-counting identity $|E(G)|=\sum d_i$ is correct because each edge is incident to exactly one of the deleted vertices at the time that vertex is deleted first.
+\item Computation: Exhaustive enumeration for $n=7$ used direct checks of $K_r$-freeness and brute-force independent-set computation over $2^7$ subsets.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.} \textbf{UNRESOLVED.}
+
+\begin{enumerate}
+\item[(i)] \emph{Strongest proved partial result here:} for every graph of average degree $t$, $\alpha(G)\ge n/(t+1)$ (Lemma 802.1). In addition, every such graph contains a nonempty induced subgraph of minimum degree at least $t/2$ (Lemma 802.2).
+\item[(ii)] \emph{First gap (crisp):} prove (or refute by explicit construction) that for each fixed $r\ge 4$ there exists $c_r>0$ such that every $K_r$-free graph on $n$ vertices of average degree $t$ satisfies $\alpha(G)\ge c_r (\log t/t)n$ for all sufficiently large $t$.
+\item[(iii)] \emph{Top 3 next moves:}
+  \begin{enumerate}
+  \item Prove an induction step: assuming a $\frac{\log t}{t}$-type bound for $K_{r-1}$-free graphs, derive it for $K_r$-free graphs by analyzing neighborhoods $N(v)$ (which are $K_{r-1}$-free) and a randomized selection procedure.
+  \item Try a ``container-style'' counting of independent sets in $K_r$-free graphs with average degree $t$ without invoking external theorems: establish a self-contained lower bound on the number of independent sets of size $\approx (\log t/t)n$.
+  \item Computational exploration for moderate $n$ (say $n\le 12$) using SAT/ILP to minimize $\alpha(G)$ among $K_r$-free graphs with prescribed average degree, to guess extremal structure for potential counterexamples.
+  \end{enumerate}
+\item[(iv)] \emph{What a minimal counterexample would likely look like:} a $K_r$-free graph with average degree $t\to\infty$ and very small independence number, i.e. $\alpha(G)=o((\log t/t)n)$, which would force chromatic number $\chi(G)$ to be at least on the order of $t/\log t$; such a graph would have to be far from $(r-1)$-partite and have neighborhoods that themselves behave like extremal $K_{r-1}$-free graphs.
+\end{enumerate}
+
+

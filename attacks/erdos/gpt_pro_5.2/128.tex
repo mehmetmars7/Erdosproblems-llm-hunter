@@ -1,0 +1,102 @@
+% Erdos problem #128
+% Attempt for Erdos Problem #128
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used; I restrict to what is stated in 123-137.tex)
+% - Computation available (Python)? YES (used for small-case checks)
+
+1) FORMAL RESTATEMENT
+
+Let $G$ be a (simple) graph on $n$ vertices.
+Assume that **every induced subgraph** of $G$ on at least $\lfloor n/2\rfloor$ vertices has more than $n^2/50$ edges.
+
+**Question.** Must $G$ contain a triangle (a copy of $K_3$)?
+
+The text notes that if true, the constant 50 would be best possible, witnessed by a blow-up of $C_5$ or by the Petersen graph.
+It also notes (as a known result) that the statement is true with 50 replaced by 16 (EFRS94).
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+(Restricted to statements explicitly present in 123-137.tex.)
+- The theorem is known to hold with 50 replaced by 16.
+- The constant 50, if achievable, is best possible (blow-up of $C_5$ or Petersen graph).
+
+3) ATTACK PLAN
+
+- Verify the extremal example: balanced blow-up of $C_5$ is triangle-free and has a half-sized induced subgraph with exactly $n^2/50$ edges.
+- Prove general necessary conditions from averaging (random half-subset).
+- The main triangle-forcing statement at 50 appears open here; provide partial bounds and the tightness construction.
+
+4) WORK
+
+Definition (balanced blow-up of $C_5$).
+Let $t\ge 1$ and let $V_1,\dots,V_5$ be disjoint independent sets of size $t$.
+Connect every vertex of $V_i$ to every vertex of $V_{i\pm 1}$ (indices modulo 5), and add no other edges.
+Call the resulting graph $G_{5,t}$.
+It has $n=5t$ vertices.
+
+Lemma 4.1 (Triangle-free).
+$G_{5,t}$ contains no triangle.
+
+*Proof.* Any edge in $G_{5,t}$ goes between two parts $V_i$ and $V_{i\pm 1}$.
+A triangle would use three parts $V_{i_1},V_{i_2},V_{i_3}$ with all three pairwise adjacent in the underlying 5-cycle.
+But $C_5$ has no triangle, so among three vertices of the cycle, at least one pair is nonadjacent; correspondingly, the blow-up has no edge between those two parts.
+Hence no triangle exists. \qed
+
+Lemma 4.2 (A half-subgraph with exactly $n^2/50$ edges).
+Assume $t$ is even so that $n/2=5t/2$ is an integer.
+Then $G_{5,t}$ has an induced subgraph on exactly $n/2$ vertices with exactly $n^2/50$ edges.
+
+*Proof.* Take all $t$ vertices from $V_1$ and all $t$ vertices from $V_3$ (these parts are nonadjacent in the 5-cycle, so there are no edges between them), and take $t/2$ vertices from $V_5$.
+This gives a vertex set $S$ of size $t+t+t/2=5t/2=n/2$.
+Edges inside $S$ occur only between $V_5$ and $V_1$ (since $V_5$ is adjacent to $V_1$, and $V_5$ is not adjacent to $V_3$).
+Thus
+\[
+ e(G[S]) = |S\cap V_5|\cdot |S\cap V_1| = (t/2)\cdot t = t^2/2.
+\]
+Since $n=5t$, we have $n^2/50 = 25t^2/50 = t^2/2$, so indeed $e(G[S])=n^2/50$. \qed
+
+Lemma 4.3 (Averaging over random half-subsets).
+Let $G$ be any graph on $n$ vertices with $m$ edges.
+Then there exists an induced subgraph on $\lfloor n/2\rfloor$ vertices with at most $m/4$ edges.
+
+*Proof.* Choose a uniformly random subset $S$ of vertices of size $\lfloor n/2\rfloor$.
+Each edge of $G$ is present in $G[S]$ exactly when both endpoints are chosen.
+The probability a fixed edge survives is
+\[
+\frac{\binom{\lfloor n/2\rfloor}{2}}{\binom{n}{2}} \le \frac{(n/2)(n/2-1)}{n(n-1)} < \frac14.
+\]
+By linearity of expectation, $\mathbb{E}[e(G[S])] < m/4$, so some choice of $S$ has $e(G[S])\le m/4$. \qed
+
+FAST REALITY CHECK (computation).
+For $G_{5,t}$, I brute-forced the minimum number of edges in an induced subgraph on $n/2$ vertices for small $t$:
+- $t=2$ ($n=10$): minimum is 2, and $n^2/50=2$.
+- $t=4$ ($n=20$): minimum is 8, and $n^2/50=8$.
+This matches Lemma 4.2 and supports the claim that 50 is the correct tight constant for this construction.
+
+5) VERIFICATION
+
+- Lemma 4.1 is immediate from the projection-to-$C_5$ argument.
+- Lemma 4.2 is an explicit construction and the edge count is exact.
+- Lemma 4.3 is a standard expectation argument; the inequality giving $<1/4$ is correct for $n\ge 2$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+- The balanced blow-up of $C_5$ is triangle-free (Lemma 4.1) and has a half-sized induced subgraph with exactly $n^2/50$ edges (Lemma 4.2), showing the constant 50 is tight for this example.
+- Any graph with total edge count $m$ always has a half-subset with at most $m/4$ edges (Lemma 4.3), giving a necessary constraint relating the hypothesis to the global density.
+
+(ii) Exact first gap:
+- Prove or disprove the main statement: does the local condition "every induced subgraph on at least $n/2$ vertices has $>n^2/50$ edges" force a triangle?
+
+(iii) Top 3 next moves:
+1. Attempt to sharpen Lemma 4.3 using triangle-free constraints (e.g. apply Mantel-type bounds to induced subgraphs and optimize).
+2. Analyze extremal triangle-free graphs with constrained "sparse halves"; show that any triangle-free graph must contain a half-subset with at most $n^2/50$ edges.
+3. Compare with the known 16-result: identify which steps lose constant factors and whether they can be pushed to 50.
+
+(iv) What a minimal counterexample would likely look like:
+- A triangle-free graph that is highly pseudorandom at the half-subgraph scale, preventing the selection of a sparse half, and whose structure resembles a blow-up of a small triangle-free graph (like $C_5$) but with all halves slightly denser than $n^2/50$.
+
+

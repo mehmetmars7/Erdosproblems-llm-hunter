@@ -1,0 +1,158 @@
+% Erdős Problem #80
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+Fix a constant $c>0$. For $n\in\mathbb{N}$, define $f_c(n)$ to be the largest integer $m$ with the property:
+
+\emph{For every graph $G$ on $n$ vertices with at least $c n^2$ edges, such that every edge of $G$ lies in at least one triangle, there exists an edge of $G$ contained in at least $m$ distinct triangles.}
+
+Equivalently, for such a graph $G$ define its \emph{book size}
+\[
+\mathrm{bk}(G):=\max_{uv\in E(G)}\bigl|N(u)\cap N(v)\bigr|,
+\]
+(the maximum number of triangles sharing a common edge), and then
+\[
+ f_c(n)=\min\{\mathrm{bk}(G):\ |V(G)|=n,\ |E(G)|\ge c n^2,\ \forall e\in E(G)\ \exists\text{ triangle containing }e\}.
+\]
+The task is to estimate $f_c(n)$ as a function of $n$ (for fixed $c$), and in particular to decide whether $f_c(n)>n^{\varepsilon}$ for some $\varepsilon>0$ or whether $f_c(n)\gg \log n$.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+Per the integrity rule I only use results stated in the problem text: it records that for $c<1/4$ the conjecture $f_c(n)>n^{\varepsilon}$ is false, and that for $c>1/4$ one has $f_c(n)\ge n/6$ (with cited references). It also notes the existence of very poor lower bounds from the regularity lemma. I do not reproduce those deeper results here.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof-track:}
+\begin{itemize}
+\item Relate $\mathrm{bk}(G)$ to degrees and triangle counts via averaging and inequalities.
+\item For $c>1/4$, exploit density to force large common neighbourhoods on some edge.
+\end{itemize}
+\emph{Construction-track (upper bounds):}
+\begin{itemize}
+\item Exhibit dense triangle-rich graphs where every edge lies in triangles but no single edge has too many triangles (to show $f_c(n)$ cannot exceed some function).
+\end{itemize}
+
+Here I give two elementary lemmas that produce explicit (but not sharp) lower bounds, and an explicit tripartite construction giving a linear upper bound. I also include a small-$n$ exhaustive search sanity check.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\textbf{Fast reality check (small $n$ computation).}
+For $n=7$ and $c=1/3$ (so the condition is $|E(G)|\ge \lceil \tfrac{1}{3}n^2\rceil=17$), an exhaustive enumeration over all $2^{\binom{7}{2}}=2^{21}$ graphs shows:
+\begin{itemize}
+\item among graphs with at least $17$ edges and with every edge in at least one triangle, the minimum possible book size is $4$;
+\item one witness graph achieving book size $4$ has $17$ edges:
+\[(0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(1,3),(1,4),(1,5),(1,6),(2,3),(2,4),(2,5),(2,6),(3,4),(3,5),(4,5).\]
+\end{itemize}
+
+\medskip
+\noindent\textbf{Lemma 80.1 (Book size as common neighbourhood; averaging identity).}
+Let $G$ be a graph. For an edge $uv\in E(G)$, the number of triangles containing $uv$ equals $|N(u)\cap N(v)|$. Moreover, if $T(G)$ denotes the number of (unordered) triangles of $G$ and $m=|E(G)|$, then
+\[
+\sum_{uv\in E(G)} |N(u)\cap N(v)| = 3T(G),
+\]
+and hence
+\[
+\mathrm{bk}(G)\ge \frac{3T(G)}{m}.
+\]
+
+\emph{Proof.}
+A vertex $w$ forms a triangle with edge $uv$ iff $w$ is adjacent to both $u$ and $v$, i.e. $w\in N(u)\cap N(v)$. Thus the triangle count on $uv$ is $|N(u)\cap N(v)|$.
+
+Each triangle $\{u,v,w\}$ contributes exactly $1$ to $|N(u)\cap N(v)|$, $|N(u)\cap N(w)|$, and $|N(v)\cap N(w)|$, i.e. it is counted exactly three times in the sum over edges. Therefore the sum equals $3T(G)$. The inequality for $\mathrm{bk}(G)$ follows because the maximum over edges is at least the average over edges. \qed
+
+\medskip
+\noindent\textbf{Lemma 80.2 (Elementary density $\Rightarrow$ a linear-size book when $c>1/4$).}
+Let $G$ be a graph on $n$ vertices with $m$ edges and degree sequence $(d_1,\dots,d_n)$. Then there exists an edge $uv\in E(G)$ with
+\[
+|N(u)\cap N(v)|\ge \frac{4m-n^2}{n}.
+\]
+In particular, if $m\ge c n^2$ with $c>1/4$, then $\mathrm{bk}(G)\ge (4c-1)n$.
+
+\emph{Proof.}
+For an edge $uv\in E(G)$, let $s(uv):=d(u)+d(v)$.
+
+\underline{Step 1: some edge has large endpoint-degree-sum.}
+We compute the average of $s(uv)$ over edges:
+\[
+\frac{1}{m}\sum_{uv\in E(G)} (d(u)+d(v)).
+\]
+Each vertex $x$ contributes $d(x)$ to the sum once for each incident edge, i.e. $d(x)$ is added $d(x)$ times. Hence
+\[
+\sum_{uv\in E(G)} (d(u)+d(v)) = \sum_{x\in V(G)} d(x)^2.
+\]
+By Cauchy--Schwarz,
+\[
+\sum_{x} d(x)^2 \ge \frac{\left(\sum_x d(x)\right)^2}{n} = \frac{(2m)^2}{n} = \frac{4m^2}{n}.
+\]
+Therefore the average endpoint-degree-sum satisfies
+\[
+\frac{1}{m}\sum_{uv\in E(G)} (d(u)+d(v)) \ge \frac{4m}{n}.
+\]
+Hence there exists some edge $uv\in E(G)$ with
+\begin{equation}\label{eq:deg-sum}
+ d(u)+d(v)\ge \frac{4m}{n}.
+\end{equation}
+
+\underline{Step 2: degree-sum forces a large common neighbourhood.}
+For this edge $uv$,
+\[
+|N(u)\cap N(v)| = |N(u)|+|N(v)|-|N(u)\cup N(v)| \ge d(u)+d(v)-n,
+\]
+because $N(u)\cup N(v)\subseteq V(G)$ has size at most $n$.
+Combining with \eqref{eq:deg-sum} gives
+\[
+|N(u)\cap N(v)|\ge \frac{4m}{n}-n = \frac{4m-n^2}{n}.
+\]
+If $m\ge c n^2$, this yields $|N(u)\cap N(v)|\ge (4c-1)n$. Since $\mathrm{bk}(G)$ is the maximum such common-neighbourhood size over edges, the same lower bound holds for $\mathrm{bk}(G)$. \qed
+
+\medskip
+\noindent\textbf{Lemma 80.3 (Simple explicit upper bound via complete tripartite graphs).}
+Let $n$ be divisible by $3$ and let $G$ be the complete tripartite graph with parts of size $n/3,n/3,n/3$. Then:
+\begin{itemize}
+\item $|E(G)|=\frac{1}{3}n^2$;
+\item every edge lies in exactly $n/3$ triangles;
+\item therefore $\mathrm{bk}(G)=n/3$.
+\end{itemize}
+Consequently, for every $c\le 1/3$ and all such $n$ we have $f_c(n)\le n/3$.
+
+\emph{Proof.}
+Let the parts be $A,B,C$ with $|A|=|B|=|C|=n/3$. Edges are exactly the cross edges between distinct parts.
+The total number of edges is
+\[
+|A||B|+|A||C|+|B||C| = 3\cdot \frac{n}{3}\cdot \frac{n}{3}=\frac{1}{3}n^2.
+\]
+An edge between (say) $A$ and $B$ forms a triangle with any choice of a vertex in $C$, and with no other vertices. Thus every $A$--$B$ edge lies in exactly $|C|=n/3$ triangles, and similarly for the other cross edges. Therefore the maximum number of triangles sharing a common edge is $n/3$.
+
+If $c\le 1/3$, then $|E(G)|=n^2/3\ge c n^2$, so $G$ is an admissible example for the minimisation defining $f_c(n)$, giving $f_c(n)\le \mathrm{bk}(G)=n/3$. \qed
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Lemma 80.1 is a direct double count and matches the book definition.
+\item Lemma 80.2: the only nontrivial ingredients are the identity $\sum_{uv\in E}(d(u)+d(v))=\sum_v d(v)^2$, Cauchy--Schwarz, and inclusion--exclusion with the bound $|N(u)\cup N(v)|\le n$.
+\item The $n=7$, $c=1/3$ exhaustive computation yields a minimum book size $4$, which is consistent with Lemma 80.2's lower bound $(4c-1)n=(1/3)\cdot 7\approx 2.33$ (i.e. at least $3$ as an integer bound).
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result:} For any graph with $m\ge c n^2$ edges, there is an edge in at least $(4c-1)n$ triangles (Lemma 80.2), giving $f_c(n)\ge (4c-1)n$ for $c>1/4$. Also, for $c\le 1/3$ there are explicit examples with $\mathrm{bk}(G)=n/3$, so $f_c(n)\le n/3$ (Lemma 80.3). Exhaustive search shows for $(n,c)=(7,1/3)$ one can achieve book size $4$.
+
+(ii) \emph{First gap (crisp):} Determine the correct order of growth of $f_c(n)$ for $c<1/4$ and obtain a meaningful (non-regularity) lower bound tending to infinity (e.g. prove $f_c(n)\gg \log n$) under the ``every edge lies in a triangle'' constraint.
+
+(iii) \emph{Top 3 next moves (concrete):}
+\begin{enumerate}
+\item Strengthen Lemma 80.2 by incorporating the hypothesis ``every edge is in a triangle'' to obtain a lower bound independent of $(4c-1)$ when $c>1/4$ (target: prove $\mathrm{bk}(G)\ge \gamma n$ for an absolute $\gamma>0$).
+\item For $c<1/4$, attempt explicit constructions (or computational searches for moderate $n$) that minimise $\mathrm{bk}(G)$ while keeping all edges in triangles; identify candidate extremal families.
+\item Derive a lower bound on the triangle count $T(G)$ in terms of $m$ \emph{under the additional constraint} that every edge lies in a triangle, then combine with Lemma 80.1 to force a large average common neighbourhood.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure (to $f_c(n)\gg \log n$):} a sequence of graphs $G_n$ with $|E(G_n)|\ge c n^2$, every edge in a triangle, but with $\mathrm{bk}(G_n)=O(\log n)$ (or $n^{o(1)}$). Such graphs would have triangles ``spread out'' so that no single edge has many common neighbours, suggesting a highly pseudorandom local common-neighbour structure together with a global density constraint.
+
+

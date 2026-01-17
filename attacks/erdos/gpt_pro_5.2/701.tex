@@ -1,0 +1,95 @@
+% Erdos Problem #701
+\section*{Erd\H{o}s Problem \#701}
+
+\subsection*{FORMAL RESTATEMENT}
+Let $[n]:=\{1,2,\dots,n\}$.
+A family $\mathcal{F}\subseteq 2^{[n]}$ is a \emph{down-set} (hereditary family) if whenever $A\in\mathcal{F}$ and $B\subseteq A$, then $B\in\mathcal{F}$.
+A subfamily $\mathcal{F}'\subseteq \mathcal{F}$ is \emph{intersecting} if every member of $\mathcal{F}'$ is nonempty and for all distinct $A,B\in\mathcal{F}'$ we have $A\cap B\ne\varnothing$.
+
+Conjecture (Chv\'{a}tal): For every down-set $\mathcal{F}\subseteq 2^{[n]}$ there exists an element $x\in [n]$ such that for every intersecting subfamily $\mathcal{F}'\subseteq\mathcal{F}$,
+\[|\mathcal{F}'|\le |\{A\in\mathcal{F}: x\in A\}|.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem text states Chv\'{a}tal proved the conjecture under a stronger closure condition, and that special cases have been proved (e.g. covering number $2$). A 2022/2023 paper by Frankl--Kupavskii establishes the covering number $2$ case.
+I do not see a claim that the general conjecture is fully resolved as of late 2025.
+
+\subsection*{ATTACK PLAN}
+\begin{itemize}
+\item \textbf{Proof track:} prove the conjecture in elementary special cases by structural decomposition via maximal elements of the down-set.
+\item \textbf{Reality check:} brute-force all down-sets on $[n]$ for small $n$ and verify the conjecture by maximum-clique computation in the intersection graph.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 701.1 (unique maximal set case).}
+Suppose $\mathcal{F}\subseteq 2^{[n]}$ is a down-set with a \emph{unique} maximal element (under inclusion) $M\in\mathcal{F}$. Then the conjecture holds, and in fact for any $x\in M$ and any intersecting $\mathcal{F}'\subseteq\mathcal{F}$ one has
+\[|\mathcal{F}'|\le 2^{|M|-1}=|\{A\in\mathcal{F}: x\in A\}|.
+\]
+
+\emph{Proof.}
+First we show $\mathcal{F}=2^{M}$. Let $A\in\mathcal{F}$. If $A\nsubseteq M$, then $A$ contains some element outside $M$. Any superset $B\supseteq A$ would also contain that element and hence cannot be a subset of $M$. But $M$ is the unique maximal element of $\mathcal{F}$, so $A$ must have a chain of strict supersets in $\mathcal{F}$ ending at $M$, which is impossible if $A\nsubseteq M$. Therefore every $A\in\mathcal{F}$ satisfies $A\subseteq M$. Since $\mathcal{F}$ is a down-set and $M\in\mathcal{F}$, it contains all subsets of $M$, hence $\mathcal{F}=2^{M}$.
+
+Now let $\mathcal{F}'\subseteq 2^{M}$ be intersecting (in particular, all members are nonempty). For each subset $A\subseteq M$ let $\overline{A}:=M\setminus A$.
+The map $A\mapsto \overline{A}$ is a fixed-point-free involution on $2^{M}$, pairing each $A$ with its complement.
+In an intersecting family, one cannot contain both $A$ and $\overline{A}$, because $A\cap \overline{A}=\varnothing$.
+Therefore at most one set from each complementary pair can lie in $\mathcal{F}'$, so
+$|\mathcal{F}'|\le 2^{|M|-1}$.
+Finally, for any fixed $x\in M$, exactly half of the subsets of $M$ contain $x$, so
+$|\{A\subseteq M: x\in A\}|=2^{|M|-1}$.
+This is exactly the required bound. \qed
+
+\medskip
+\textbf{Lemma 701.2 (pairwise disjoint maximal sets case).}
+Let $\mathcal{F}\subseteq 2^{[n]}$ be a down-set, and let $\mathcal{G}$ be the set of maximal elements of $\mathcal{F}$.
+Assume that the members of $\mathcal{G}$ are pairwise disjoint.
+Then the conjecture holds.
+
+\emph{Proof.}
+For each $M\in\mathcal{G}$, let $\mathcal{F}_M:=2^{M}$.
+Because $\mathcal{F}$ is a down-set, every set in $\mathcal{F}$ is a subset of some maximal element, so
+\[\mathcal{F}=\bigcup_{M\in\mathcal{G}} \mathcal{F}_M.
+\]
+Moreover, if $M\ne M'$ are distinct maximal sets, then $M\cap M'=\varnothing$ by hypothesis, hence any $A\subseteq M$ and $B\subseteq M'$ are disjoint.
+Therefore any intersecting subfamily $\mathcal{F}'\subseteq\mathcal{F}$ can involve sets from at most one block $\mathcal{F}_M$: if it contained both some $A\subseteq M$ and some $B\subseteq M'$ with $M\ne M'$, we would have $A\cap B=\varnothing$, contradicting intersecting.
+Thus there is some $M\in\mathcal{G}$ such that $\mathcal{F}'\subseteq 2^{M}$.
+Pick any $x\in M$. Then by Lemma 701.1 applied to the down-set $2^{M}$, we have $|\mathcal{F}'|\le 2^{|M|-1}$.
+On the other hand, within the whole family $\mathcal{F}$, the star at $x$ consists precisely of the subsets of $M$ containing $x$ (no other maximal block contains $x$), so
+$|\{A\in\mathcal{F}: x\in A\}|=2^{|M|-1}$.
+Hence $|\mathcal{F}'|\le |\{A\in\mathcal{F}: x\in A\}|$, proving the conjecture in this case. \qed
+
+\medskip
+\textbf{FAST REALITY CHECK (computation).}
+For $n\le 5$ I enumerated \emph{all} down-sets $\mathcal{F}\subseteq 2^{[n]}$ (equivalently all antichains of maximal elements; there are $3,6,20,168,7581$ of them for $n=1,2,3,4,5$) and for each:
+\begin{itemize}
+\item computed $\alpha(\mathcal{F})=$ the maximum size of an intersecting subfamily (using a maximum-clique algorithm on the intersection graph of nonempty members), and
+\item computed $\max_{x\in[n]} |\{A\in\mathcal{F}: x\in A\}|$.
+\end{itemize}
+In every case for $n\le 5$ I found $\alpha(\mathcal{F})\le \max_x |\{A\in\mathcal{F}: x\in A\}|$, i.e. the conjecture holds for all down-sets on ground sets of size at most $5$.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Definition check: I excluded the empty set from intersecting subfamilies (otherwise the family $\{\varnothing\}$ would create a degenerate obstruction).
+\item Lemma 701.1: checked the argument that unique maximal element forces $\mathcal{F}=2^M$.
+\item Computation: verified enumeration count for antichains on $[5]$ equals $7581$ and ensured the clique search only used nonempty sets.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}
+\item[(i)] Strongest proved partial results here:
+  \begin{itemize}
+  \item Conjecture holds when $\mathcal{F}$ has a unique maximal set (Lemma 701.1).
+  \item Conjecture holds when maximal sets are pairwise disjoint (Lemma 701.2).
+  \item Exhaustive verification for all down-sets on $[n]$ for $n\le 5$.
+  \end{itemize}
+\item[(ii)] First gap: extend the argument beyond these decomposable cases, i.e. handle overlapping maximal sets without additional structural assumptions.
+\item[(iii)] Top 3 next moves:
+  \begin{enumerate}
+  \item Try to prove the conjecture for down-sets with exactly two maximal elements with nontrivial overlap by an explicit injection/compression argument.
+  \item Develop an induction on $n$ using links/deletions: relate $\mathcal{F}$ to the down-sets $\{A\in\mathcal{F}: x\notin A\}$ and $\{A\setminus\{x\}: x\in A\in\mathcal{F}\}$.
+  \item Search for a minimal counterexample by computation for $n=6$ restricted to families with small numbers of maximal elements (since enumerating all down-sets is infeasible at $n=6$).
+  \end{enumerate}
+\item[(iv)] Minimal counterexample structure: a smallest counterexample would likely be a down-set on small $n$ with several overlapping maximal sets arranged so that \emph{every} star is significantly smaller than a carefully constructed intersecting subfamily; overlaps must be rich enough to allow a large intersecting family but balanced enough to keep all stars small.
+\end{enumerate}
+
+

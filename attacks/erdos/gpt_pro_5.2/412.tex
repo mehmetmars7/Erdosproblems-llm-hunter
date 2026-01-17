@@ -1,0 +1,93 @@
+% Erdos Problem #412
+
+\subsection*{FORMAL RESTATEMENT}
+Let $\sigma(n)=\sum_{d\mid n} d$ be the sum-of-divisors function. Define iterates by
+\[
+  \sigma_1(n)=\sigma(n),\qquad \sigma_{k+1}(n)=\sigma(\sigma_k(n))\ (k\ge 1).
+\]
+Question: Is it true that for every pair of integers $m,n\ge2$ there exist indices $i,j\ge1$ such that
+\[
+  \sigma_i(m)=\sigma_j(n)?
+\]
+Equivalently, do all forward orbits under $\sigma$ eventually intersect (and hence coincide thereafter)?
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem file attributes the conjecture to van Wijngaarden (via Erd\H{o}s). It reports that Selfridge had numerical evidence suggesting the answer is ``no'', and that Erd\H{o}s and Graham considered the problem out of reach.
+No additional external results are used here.
+
+\subsection*{ATTACK PLAN}
+Key structural facts:
+\begin{itemize}
+  \item For $n>1$, $\sigma(n)\ge n+1$, so every orbit is strictly increasing and diverges.
+  \item If two orbits ever meet at a value $x$, they are identical from that point on.
+  \item Try to find an invariant (parity, $2$-adic valuation, square/twice-square structure, etc.) that could prevent intersections.
+  \item Run small computations to see how many distinct ``tails'' remain after a bounded number of iterates.
+\end{itemize}
+
+\subsection*{WORK}
+\textbf{Lemma 412.1 (Strict increase of $\sigma$-iterates).}
+For every integer $n\ge2$, we have $\sigma(n)\ge n+1$. Consequently, for every $k\ge1$ the sequence $\sigma_k(n)$ is strictly increasing, hence has no cycles.
+
+\textit{Proof.}
+For $n\ge2$, both $1$ and $n$ are positive divisors of $n$, so
+$$\sigma(n)=\sum_{d\mid n} d \ge 1+n=n+1.$$
+Thus $\sigma(n)>n$ for $n\ge2$.
+Applying this inductively to $\sigma_k(n)$ yields $\sigma_{k+1}(n)=\sigma(\sigma_k(n))>\sigma_k(n)$ for all $k\ge1$.
+\hfill$\square$
+
+\textbf{Lemma 412.2 (Parity characterization).}
+For $n\ge1$, $\sigma(n)$ is odd if and only if $n$ is a perfect square or twice a perfect square.
+
+\textit{Proof.}
+Write the prime factorization $n=\prod_p p^{e_p}$.
+The divisor-sum function is multiplicative, so
+$$\sigma(n)=\prod_p \sigma(p^{e_p}),\qquad \sigma(p^{e})=1+p+p^2+\cdots+p^e.$$
+For an odd prime $p$, each term $p^t$ is odd, hence $\sigma(p^e)$ is odd if and only if it has an odd number of terms, i.e. if and only if $e$ is even.
+For $p=2$, we have $\sigma(2^a)=2^{a+1}-1$, which is always odd.
+Therefore $\sigma(n)$ is odd exactly when every odd-prime exponent $e_p$ is even, i.e. when the odd part of $n$ is a square.
+Writing $n=2^a m$ with $m$ odd, this condition means $m=t^2$ for some $t$.
+If $a$ is even then $n=(2^{a/2}t)^2$ is a square; if $a$ is odd then $n=2(2^{(a-1)/2}t)^2$ is twice a square.
+Conversely, every square or twice-square has square odd part, so yields odd $\sigma(n)$.
+\hfill$\square$
+
+\textbf{Lemma 412.3 (Intersection implies permanent merger).}
+If $\sigma_i(m)=\sigma_j(n)$ for some $i,j\ge1$, then $\sigma_{i+t}(m)=\sigma_{j+t}(n)$ for all $t\ge0$.
+
+\textit{Proof.}
+Apply $\sigma$ to both sides repeatedly: $\sigma(\sigma_i(m))=\sigma(\sigma_j(n))$ gives $\sigma_{i+1}(m)=\sigma_{j+1}(n)$, and iterate.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (exact computations).}
+I computed $\sigma$-iterates for starting values $2\le s\le 500$, taking $10$ iteration steps (i.e. values $s,\sigma(s),\dots,\sigma^{\circ 10}(s)$) and stopping early if a value exceeded $10^{12}$.
+Result:
+\begin{itemize}
+  \item Across all starts, $909$ distinct values were visited within this truncated exploration.
+  \item After $10$ steps (or stopping), there were $123$ distinct terminal values among the $499$ starts.
+  \item Processing starts in increasing order and recording the first time each value appeared, $458$ of the $499$ starts intersected an earlier start's truncated orbit within these $10$ steps. (Example: $\sigma(2)=3$ and $\sigma(3)=4$, so the orbits of $2$ and $3$ meet at $4$.)
+\end{itemize}
+This does not decide the conjecture; it only shows many mergers happen quickly while many distinct tails still remain at this depth.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+  \item Lemma 412.1 uses only the divisors $1$ and $n$; no hidden assumptions.
+  \item Lemma 412.2 was checked by prime-factor parity; the square/twice-square equivalence follows from the parity of the exponent of $2$.
+  \item Since $\sigma_k(n)$ is strictly increasing for $n\ge2$, there are no periodic points, so the dynamical graph consists of disjoint infinite paths with trees feeding into them. The conjecture is exactly that there is only one such infinite path.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: Every orbit $\sigma_k(n)$ for $n\ge2$ is strictly increasing and diverges (Lemma 412.1). Also, $\sigma(n)$ is odd exactly on squares or twice-squares (Lemma 412.2), giving a concrete parity test for steps in any orbit.
+
+(ii) First gap: produce either (a) a rigorous invariant or construction yielding two starting values $m\ne n$ whose $\sigma$-orbits are disjoint, or (b) a proof that every orbit intersects a single universal orbit.
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+  \item Try to build an obstruction using the parity characterization: can one construct an orbit that avoids all squares and twice-squares forever (hence has eventually even values), and another orbit forced to hit infinitely many squares/twice-squares?
+  \item Search for a stronger invariant, e.g. constraints on $v_2(\sigma_k(n))$ or on the set of prime divisors of $\sigma_k(n)$.
+  \item Extend computation: for starts up to (say) $10^5$, iterate until exceeding a larger cap, and estimate the number of distinct tails; look for two tails that remain disjoint for a very long time as candidates for a counterexample.
+\end{enumerate}
+
+(iv) Minimal counterexample structure: two integers $m,n\ge2$ such that the increasing sequences $\{\sigma_k(m)\}_{k\ge1}$ and $\{\sigma_k(n)\}_{k\ge1}$ never coincide; equivalently, their functional graph components contain two distinct infinite forward paths.
+
+

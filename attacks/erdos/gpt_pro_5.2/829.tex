@@ -1,0 +1,140 @@
+% Erdos Problem #829
+% URL: https://www.erdosproblems.com/829
+
+FORMAL RESTATEMENT
+
+Let $A\subset\mathbb{N}_0$ be the set of perfect cubes $\{0^3,1^3,2^3,\dots\}$. Let $1_A$ be its indicator function on $\mathbb{Z}$ (or on $\mathbb{N}_0$), and define the additive convolution
+\[
+(1_A*1_A)(n)=\sum_{m\in\mathbb{Z}} 1_A(m)\,1_A(n-m).
+\]
+Equivalently, for $n\ge 0$, $(1_A*1_A)(n)$ counts the number of ordered pairs $(x,y)\in\mathbb{N}_0^2$ such that
+\[
+ x^3+y^3=n.
+\]
+Question: is it true that for all $n\ge 1$,
+\[
+(1_A*1_A)(n) \ll (\log n)^{O(1)}?
+\]
+I.e. does there exist a constant $C>0$ such that $(1_A*1_A)(n)\le (\log n)^C$ for all sufficiently large $n$?
+(If $A$ is taken as positive cubes $\{1^3,2^3,\dots\}$, the count differs by at most $O(1)$ from allowing $0^3$; this does not affect polylogarithmic bounds.)
+
+QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement records: Mordell proved $\limsup_{n\to\infty} (1_A*1_A)(n)=\infty$.
+It also records lower bounds for infinitely many $n$: Mahler proved $(1_A*1_A)(n)\gg (\log n)^{1/4}$ and Stewart improved to $(\log n)^{11/13}$.
+No upper bounds beyond what is proved below are assumed.
+
+ATTACK PLAN
+
+Proof track:
+(1) Relate representations $x^3+y^3=n$ to factorizations $n=(x+y)(x^2-xy+y^2)$ to get divisor-type upper bounds.
+(2) Try to sharpen using restrictions on the size of $x+y$ and the structure of the discriminant.
+
+Disproof track:
+(1) Attempt to build explicit $n$ with many representations by composing identities or multiplicative structures.
+(2) Use computation to search for unusually large $(1_A*1_A)(n)$.
+
+WORK
+
+Lemma 1 (divisor bound via $x^3+y^3$ factorization).
+For every integer $n\ge 1$,
+\[
+(1_A*1_A)(n) \le 2\,\tau(n),
+\]
+where $\tau(n)$ is the number of positive divisors of $n$.
+
+Proof.
+Let $r(n)=(1_A*1_A)(n)$, the number of ordered pairs $(x,y)\in\mathbb{N}_0^2$ with $x^3+y^3=n$.
+For any such pair,
+\[
+ n=x^3+y^3=(x+y)(x^2-xy+y^2).
+\]
+Define $u=x+y$ and $v=x^2-xy+y^2$.
+Then $u,v\in\mathbb{N}$ and $uv=n$, so $u$ is a positive divisor of $n$.
+
+Fix a divisor $u\mid n$ and set $v=n/u$.
+If there exists a representation with this $u$, then $x,y$ satisfy
+\[
+ x+y=u,\qquad x^2-xy+y^2=v.
+\]
+Using $v=(x+y)^2-3xy=u^2-3xy$, we get
+\[
+ xy=\frac{u^2-v}{3}.
+\]
+Thus $(x,y)$ must be a pair of roots (in $\mathbb{R}$, hence in $\mathbb{Z}$ if they exist as integers) of the quadratic equation
+\[
+ t^2-u t + \frac{u^2-v}{3}=0.
+\]
+A quadratic equation has at most two real roots, and therefore yields at most two ordered integer pairs $(x,y)$.
+Hence, for each divisor $u$ of $n$, there are at most two ordered pairs $(x,y)$ with $x+y=u$ and $x^3+y^3=n$.
+Summing over all $u\mid n$ gives $r(n)\le 2\tau(n)$.
+$\square$
+
+Lemma 2 (size restriction on the divisor $u=x+y$).
+If $n=x^3+y^3$ with $x,y\in\mathbb{N}_0$ and $u=x+y$, then
+\[
+ n^{1/3}\le u \le (4n)^{1/3}.
+\]
+Consequently,
+\[
+(1_A*1_A)(n) \le 2\,\#\bigl\{u\mid n:\ n^{1/3}\le u\le (4n)^{1/3}\bigr\}.
+\]
+
+Proof.
+Let $u=x+y$ and $v=x^2-xy+y^2$ so that $uv=n$.
+We show $\frac{u^2}{4}\le v\le u^2$.
+First, since $xy\ge 0$ we have $v=u^2-3xy\le u^2$.
+Second, by AM--GM, $xy\le \bigl(\frac{x+y}{2}\bigr)^2=\frac{u^2}{4}$, hence
+\[
+ v=u^2-3xy\ge u^2-3\cdot \frac{u^2}{4}=\frac{u^2}{4}.
+\]
+Multiplying by $u>0$ gives
+\[
+ \frac{u^3}{4} \le uv=n \le u^3.
+\]
+Thus $u^3\ge n$ and $u^3\le 4n$, i.e. $n^{1/3}\le u\le (4n)^{1/3}$.
+Finally, Lemma~1 already shows that for each admissible divisor $u$ there are at most two ordered representations, yielding the stated bound.
+$\square$
+
+Fast reality check (computation; exact search).
+We brute-forced $r(n)$ by enumerating cubes $x^3,y^3\le N$ and counting sums $x^3+y^3=n$.
+For each cutoff $N$ we recorded the maximum value of $r(n)$ for $n\le N$:
+\[
+\begin{array}{r|r|l}
+N & \max_{n\le N} r(n) & \text{first $n$ achieving the maximum}\\\hline
+10^6 & 4 & 1729\\
+10^7 & 4 & 1729\\
+10^8 & 6 & 87539319\\
+10^9 & 6 & 87539319
+\end{array}
+\]
+For $N=10^9$, the exact set of $n\le 10^9$ with $r(n)=6$ found by the script was:
+\[
+\{87539319,\ 119824488,\ 143604279,\ 175959000,\ 327763000,\ 700314552,\ 804360375,\ 958595904\}.
+\]
+These small-scale data show unboundedness is not visible at this range; they are only a sanity check.
+
+VERIFICATION
+
+(1) Lemma~1: the only nontrivial point is that for fixed $u=x+y$, the pair $(x,y)$ is determined by $x+y$ and $xy$, hence by a quadratic with at most two solutions. This is correct.
+(2) Lemma~2: the inequalities use only $xy\ge 0$ and $xy\le (x+y)^2/4$; both are valid for $x,y\in\mathbb{N}_0$.
+(3) Edge cases: if $x=0$ then $u=y$ and $n=y^3$, giving $u=n^{1/3}$, consistent with the lower bound.
+
+FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+We proved the unconditional upper bound $(1_A*1_A)(n)\le 2\tau(n)$ (Lemma~1), and the stronger restriction that only divisors $u\mid n$ with $n^{1/3}\le u\le (4n)^{1/3}$ can contribute (Lemma~2).
+
+(ii) First gap (crisp statement).
+Prove or disprove: there exists $C>0$ such that for all sufficiently large $n$, $(1_A*1_A)(n)\le (\log n)^C$.
+
+(iii) Top 3 next moves.
+1. Improve Lemma~2 by bounding the number of divisors of $n$ in the short interval $[n^{1/3},(4n)^{1/3}]$ by a polylogarithm, or show this is impossible.
+2. Use the elliptic curve viewpoint of $x^3+y^3=n$ to relate $r(n)$ to the number of integer points and seek unconditional upper bounds for integral points on this family.
+3. Computation: extend searches for large $r(n)$ using hash tables for $x^3+y^3$ up to larger limits (e.g. $x\le 10^6$) to see empirical growth, and record $n$ with unusually large multiplicity.
+
+(iv) Minimal counterexample structure.
+A counterexample to the polylog upper bound would be an $n$ with extremely many distinct pairs $(x,y)$, i.e. an integer whose corresponding curve $x^3+y^3=n$ has many integer points; heuristically this might arise from $n$ with unusually large arithmetic structure (e.g. related to high-rank curves or compositions of sum-of-two-cubes representations).
+

@@ -1,0 +1,164 @@
+% Solutions for selected Erd\H{o}s problems.
+% Generated 2026-01-16.
+
+% Erdos Problem #730
+% URL: https://www.erdosproblems.com/730
+
+Are there infinitely many pairs of integers $n\neq m$ such that $\binom{2n}{n}$ and $\binom{2m}{m}$ have the same set of prime divisors? A problem of Erd\H{o}s, Graham, Ruzsa, and Straus \cite{EGRS75}, who believed there is 'no doubt' that the answer is yes. For example $(87,88)$ and $(607,608)$. Those $n$ such that there exists some suitable $m>n$ are listed as A129515 in the OEIS. A triple of such $n$ for which $\binom{2n}{n}$ all share the same set of prime divisors is $(10003,10004,10005)$. It is not known whether there are such pairs of the shape $(n,n+k)$ for every $k\geq 1$. References [EGRS75] Erd\H{o}s, P. and Graham, R. L. and Ruzsa, I. Z. and Straus, E. G., On the prime factors of $(\sp{2n}\sb{n})$ . Math. Comp. (1975), 83-92.
+
+%Erdos problem 730
+
+\noindent\textbf{1) FORMAL RESTATEMENT.}
+
+For each integer $n\ge 1$, define the \,\emph{prime divisor set}\,
+\[
+S(n) := \{\,p\text{ prime}: p\mid \binom{2n}{n}\,\}.
+\]
+Question: are there infinitely many pairs of integers $(n,m)$ with $n\neq m$ such that $S(n)=S(m)$?
+
+Conventions/edge cases:
+\begin{itemize}
+\item $\binom{2n}{n}=(2n)!/(n!)^2\in\mathbb Z$ for $n\ge 0$; we restrict to $n\ge 1$.
+\item ``Same set of prime divisors'' means equality of sets $S(n)=S(m)$ (multiplicities ignored).
+\end{itemize}
+Stress points: $S(n)$ always contains all primes in $(n,2n]$ (Lemma~730.1), so equality forces strong constraints relating prime intervals.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK.}
+
+The problem statement itself records examples $(87,88)$ and $(607,608)$ and a triple $(10003,10004,10005)$, and notes the related OEIS entry A129515. I do \emph{not} rely on any additional literature claims beyond what is written above.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN.}
+
+\emph{Proof-track ideas.}
+\begin{itemize}
+\item Use $p$-adic valuations of $\binom{2n}{n}$ to translate membership of $p$ in $S(n)$ into a digit/carry condition (Lemma~730.2 and Corollary~730.3). Try to build infinite families $n\neq m$ with identical carry patterns across all primes $p\le 2\max\{n,m\}$.
+\item Focus on the empirically frequent consecutive collisions $S(n)=S(n+1)$ and analyze the ratio
+$\binom{2(n+1)}{n+1}/\binom{2n}{n} = \frac{2(2n+1)}{n+1}$ to derive necessary/sufficient conditions for equal prime sets.
+\end{itemize}
+\emph{Disproof-track ideas.}
+\begin{itemize}
+\item Try to show $S(n)$ changes infinitely often because of primes in $(n,2n]$; but this does not preclude collisions, and examples suggest collisions exist.
+\end{itemize}
+Best path here: develop exact criteria for $p\mid\binom{2n}{n}$ and document computational ``reality checks''.
+
+\medskip
+\noindent\textbf{4) WORK.}
+
+\noindent\emph{Fast reality check (computation).}
+Using a direct Legendre-formula computation of $v_p\bigl(\binom{2n}{n}\bigr)$ for primes $p\le 2n$:
+\begin{itemize}
+\item Verified the example pair $(87,88)$: both have
+\[
+S(87)=S(88)=\{2,3,5,7,11,13,19,23,31,47,53,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173\}.
+\]
+\item Exhaustive search for $1\le n\le 5000$ found $39$ collisions of prime divisor sets, all of the form $S(n)=S(n+1)$ (consecutive pairs). The first few are
+\[(87,88),(199,200),(237,238),(467,468),(607,608),(967,968),\dots\]
+and the last few in this range are
+\[(4287,4288),(4360,4361),(4479,4480),(4927,4928),(4987,4988).
+\]
+No set occurred with multiplicity $\ge 3$ for $n\le 5000$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Lemma 730.1 (Large primes always divide).}
+Let $n\ge 1$ and let $p$ be a prime with $n<p\le 2n$. Then $p\in S(n)$, and moreover
+\[v_p\!\left(\binom{2n}{n}\right)=1.\]
+
+\noindent\emph{Proof.}
+Write $\binom{2n}{n}=(2n)!/(n!)^2$. Since $p>n$, the factorial $n!$ contains no multiple of $p$, hence $v_p(n!)=0$. Since $p\le 2n<2p$, the factorial $(2n)!$ contains exactly one multiple of $p$ (namely $p$ itself) and no multiple of $p^2$, hence $v_p((2n)!)=1$. Therefore
+\[
+v_p\!\left(\binom{2n}{n}\right)=v_p((2n)!)-2v_p(n!)=1-0=1,
+\]
+so in particular $p$ divides $\binom{2n}{n}$ and $p\in S(n)$. \hfill $\square$
+
+\medskip
+\noindent\textbf{Lemma 730.2 (Legendre valuation formula for $\binom{2n}{n}$).}
+For any integer $n\ge 1$ and any prime $p$,
+\[
+v_p\!\left(\binom{2n}{n}\right)=\sum_{k\ge 1}\Bigl(\Bigl\lfloor\frac{2n}{p^k}\Bigr\rfloor -2\Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor\Bigr).
+\]
+
+\noindent\emph{Proof.}
+First, for any integer $N\ge 1$, we prove Legendre's formula
+\[
+v_p(N!)=\sum_{k\ge 1}\Bigl\lfloor\frac{N}{p^k}\Bigr\rfloor.
+\]
+Indeed, among the integers $1,2,\dots,N$, exactly $\lfloor N/p\rfloor$ are divisible by $p$, exactly $\lfloor N/p^2\rfloor$ are divisible by $p^2$, etc. Each multiple of $p^k$ contributes at least one factor of $p$ to $N!$, and counting these contributions with multiplicity gives precisely the sum above.
+
+Applying Legendre's formula to $N=2n$ and $N=n$ and using $\binom{2n}{n}=(2n)!/(n!)^2$ yields
+\[
+v_p\!\left(\binom{2n}{n}\right)=v_p((2n)!)-2v_p(n!)
+=\sum_{k\ge 1}\Bigl\lfloor\frac{2n}{p^k}\Bigr\rfloor-2\sum_{k\ge 1}\Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor,
+\]
+which is the claimed identity. \hfill $\square$
+
+\medskip
+\noindent\textbf{Corollary 730.3 (Carry criterion via base-$p$ digit sums).}
+Let $s_p(N)$ denote the sum of the base-$p$ digits of a nonnegative integer $N$. Then for $n\ge 1$,
+\[
+v_p\!\left(\binom{2n}{n}\right)=\frac{2s_p(n)-s_p(2n)}{p-1}.
+\]
+In particular, $p\in S(n)$ if and only if adding $n+n$ in base $p$ produces at least one carry.
+
+\noindent\emph{Proof.}
+Write $n$ in base $p$ as $n=\sum_{j\ge 0} a_j p^j$ with $0\le a_j\le p-1$ and only finitely many nonzero digits. Then
+\[
+\Bigl\lfloor \frac{n}{p^k}\Bigr\rfloor = \sum_{j\ge k} a_j p^{j-k}.
+\]
+Summing over $k\ge 1$ gives
+\[
+\sum_{k\ge 1}\Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor
+=\sum_{k\ge 1}\sum_{j\ge k} a_j p^{j-k}
+=\sum_{j\ge 1} a_j \sum_{k=1}^{j} p^{j-k}
+=\sum_{j\ge 1} a_j\,(p^{j-1}+\cdots+p+1).
+\]
+The inner geometric sum equals $(p^j-1)/(p-1)$, so
+\[
+\sum_{k\ge 1}\Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor
+=\frac{1}{p-1}\sum_{j\ge 1} a_j(p^j-1)
+=\frac{1}{p-1}\Bigl(\sum_{j\ge 0} a_j p^j - \sum_{j\ge 0} a_j\Bigr)
+=\frac{n - s_p(n)}{p-1}.
+\]
+By Lemma~730.2,
+\[
+v_p\!\left(\binom{2n}{n}\right)=\sum_{k\ge 1}\Bigl(\Bigl\lfloor\frac{2n}{p^k}\Bigr\rfloor -2\Bigl\lfloor\frac{n}{p^k}\Bigr\rfloor\Bigr)
+=\frac{2n-s_p(2n)}{p-1}-2\frac{n-s_p(n)}{p-1}
+=\frac{2s_p(n)-s_p(2n)}{p-1}.
+\]
+Now, when adding $n+n$ in base $p$, the digit-sum identity
+\[
+s_p(2n)=2s_p(n) - (p-1)\cdot(\#\text{ carries})
+\]
+holds because each carry reduces the digit sum by exactly $p-1$ (a carry replaces a contribution $a+b\ge p$ by $(a+b-p)$ in the current digit and increases the next digit by $1$, net change $-(p-1)$). Therefore $2s_p(n)-s_p(2n)$ is a nonnegative multiple of $p-1$ equal to $(p-1)\cdot(\#\text{ carries})$, proving the stated formula and the carry criterion.
+\hfill $\square$
+
+\medskip
+\noindent\textbf{5) VERIFICATION.}
+
+\begin{itemize}
+\item Lemma~730.1: checked the valuation count carefully: $p\le 2n<2p$ ensures exactly one multiple of $p$ and no multiple of $p^2$ occurs in $(2n)!$.
+\item Lemma~730.2: Legendre's formula proof counts multiples of $p^k$ with multiplicity and uses finite support (since $p^k>2n$ gives zero terms).
+\item Corollary~730.3: the digit-sum computation is a direct evaluation of the floor-sum; the carry effect on digit sum is verified locally per digit.
+\item Computational check: the reported pairs and sets were produced by exact integer floor computations of $v_p$ (no probabilistic primality).
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL.} \textbf{UNRESOLVED}
+
+(i) Strongest proved partial result: exact characterizations of $S(n)$ via valuations (Lemma~730.2) and carries (Corollary~730.3), and the unconditional inclusion $(n,2n]\cap\mathbb P\subseteq S(n)$ with $v_p=1$ (Lemma~730.1). Computation found 39 collisions for $n\le 5000$, all consecutive.
+
+(ii) First gap: prove (or disprove) that there are infinitely many distinct $n\neq m$ with $S(n)=S(m)$ (even the special case $S(n)=S(n+1)$ for infinitely many $n$).
+
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item Analyze the equality condition $S(n)=S(n+1)$ using
+$\binom{2(n+1)}{n+1}=\binom{2n}{n}\cdot \frac{2(2n+1)}{n+1}$, aiming for a clean necessary-and-sufficient condition in terms of carries/valuations for primes dividing $2(2n+1)$ and $n+1$.
+\item Try to construct parametric families of $n$ where, for every prime $p\le 2n+2$, the carry pattern for $n$ and $n+1$ in base $p$ is identical (e.g., impose congruences on $n$ modulo many prime powers and check stability).
+\item Extend the computation to larger ranges with additional statistics (e.g., gap distribution between consecutive collisions, and whether all collisions continue to be consecutive).
+\end{enumerate}
+
+(iv) Minimal counterexample structure (if the answer were ``no''): there would exist $N$ such that for all $n\ge N$ and all $m\neq n$, the sets $S(n)$ are pairwise distinct. In particular, beyond $N$ there would be no consecutive collisions, so each step $n\mapsto n+1$ would introduce or delete at least one prime divisor, despite Lemma~730.1 forcing large blocks of primes in $(n,2n]$.
+
+

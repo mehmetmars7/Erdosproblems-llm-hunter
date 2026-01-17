@@ -1,0 +1,83 @@
+% Attempt for Erdos Problem #289
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+For a finite interval $I=[a,b]\subset\mathbb{N}$ define $S(I)=\sum_{n=a}^{b}1/n$.
+The problem asks: for all sufficiently large integers $k$, do there exist $k$ intervals $I_1,\dots,I_k$ such that:
+- each $I_i$ has length at least $2$ ($|I_i|\ge 2$),
+- the intervals are pairwise disjoint and not adjacent (if $I_i=[a_i,b_i]$ and $I_j=[a_j,b_j]$ with $b_i<a_j$ then $b_i+1<a_j$),
+- and
+\[1=\sum_{i=1}^k S(I_i)?\]
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Browsing is not available. The statement gives an explicit example for $2$ using five disjoint non-adjacent intervals of lengths $\ge 2$.
+
+3) ATTACK PLAN
+Proof track:
+1. Use integral bounds $S([a,b])\approx \log(b/a)$ to design intervals whose contributions add to $1$.
+2. Build an exact identity by starting from an Egyptian fraction expansion of $1$ and grouping denominators into separated blocks of consecutive integers.
+3. Attempt inductive “refinement” moves that replace a unit fraction by a sum over a short interval, increasing the number of intervals.
+
+Disproof track:
+1. Try to show a structural obstruction: disjoint non-adjacent intervals have sums with restricted denominators making $1$ impossible for large $k$.
+
+Chosen path: prove useful analytic bounds and rule out the trivial small-$k$ cases; computationally no solutions found for small search ranges.
+
+4) WORK
+Lemma 1 (Integral bounds for a harmonic interval).
+Let $1\le a\le b$. Then
+\[\int_{a}^{b+1}\frac{dx}{x}\le \sum_{n=a}^{b}\frac1n \le \int_{a-1}^{b}\frac{dx}{x}\quad\text{(for }a\ge 2\text{)}.\]
+Equivalently,
+\[\log\Bigl(\frac{b+1}{a}\Bigr)\le S([a,b])\le \log\Bigl(\frac{b}{a-1}\Bigr)\quad(a\ge 2).\]
+
+Proof.
+The function $x\mapsto 1/x$ is decreasing.
+For the lower bound, for each integer $n\in[a,b]$ we have $\int_{n}^{n+1}\frac{dx}{x}\le 1/n$; summing gives
+\[\int_{a}^{b+1}\frac{dx}{x}\le \sum_{n=a}^{b}\frac1n.\]
+For the upper bound (when $a\ge 2$), we have $1/n\le \int_{n-1}^{n}\frac{dx}{x}$; summing gives
+\[\sum_{n=a}^{b}\frac1n\le \int_{a-1}^{b}\frac{dx}{x}.\]
+Evaluating the integrals gives the logarithmic forms. \qed
+
+Lemma 2 (No single interval of length $\ge 2$ sums to $1$).
+There do not exist integers $1\le a<b$ such that $\sum_{n=a}^{b}1/n=1$.
+Hence there is no solution to the problem for $k=1$.
+
+Proof.
+This is exactly Lemma 1 from Problem \#287’s analysis (reproved here in brief):
+If $a=1$ then the sum is $>1$.
+If $a\ge 2$ and $a>b/2$, then $\sum_{n=a}^{b}1/n\le (b-a+1)/a<1$.
+If $a\le b/2$, choose a prime $p\in(b/2,b]$ (Bertrand). Then $p$ appears exactly once among $a,a+1,\dots,b$,
+and clearing denominators shows the sum is not an integer, hence not $1$. \qed
+
+FAST REALITY CHECK (computation).
+I brute-forced with endpoint bounds:
+- For $k=2$, searching all disjoint non-adjacent interval pairs with endpoints $\le 300$ and lengths $\ge 2$, I found no solutions to $S(I_1)+S(I_2)=1$.
+- For $k=3$, searching all disjoint non-adjacent interval triples with endpoints $\le 120$ and lengths $\ge 2$, I found no solutions to $S(I_1)+S(I_2)+S(I_3)=1$.
+
+5) VERIFICATION
+- Lemma 1 is a standard integral comparison and provides a useful heuristic: $S([a,b])$ is close to $\log(b/a)$ when $a$ is large.
+- Lemma 2 uses a prime modulus obstruction and rules out $k=1$ rigorously.
+- The computations are limited-range searches and do not speak to large $k$ behavior.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Harmonic interval sums satisfy tight logarithmic bounds (Lemma 1), and $k=1$ is impossible under the “length $\ge 2$” restriction (Lemma 2). Small-range brute force finds no solutions for $k=2$ with endpoints $\le 300$ or for $k=3$ with endpoints $\le 120$.
+
+(ii) First gap:
+Construct, for arbitrarily large $k$, a decomposition $1=\sum_{i=1}^k S(I_i)$ into disjoint non-adjacent intervals of length $\ge 2$, or prove such decompositions do not exist.
+
+(iii) Top 3 next moves:
+1. Try to adapt known Egyptian fraction constructions to produce denominators in consecutive \emph{blocks} separated by gaps, then group each block as an interval.
+2. Use Lemma 1 to design approximate solutions via $\sum \log((b_i+1)/a_i)\approx 1$ and then attempt exact correction by local adjustments.
+3. Extend the computational search using heuristic/backtracking methods targeting large $k$ with large denominators (where Lemma 1 suggests flexibility).
+
+(iv) Minimal counterexample structure (if the statement were false):
+Even for very large $k$, every collection of $k$ disjoint non-adjacent intervals of length $\ge 2$ would have total sum either always $<1$ or always $>1$, never hitting $1$; a “minimal” obstruction would likely come from unavoidable prime-denominator effects preventing exact equality.
+

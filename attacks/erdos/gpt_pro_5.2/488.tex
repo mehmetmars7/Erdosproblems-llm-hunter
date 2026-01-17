@@ -1,0 +1,157 @@
+% Erdos Problem #488
+% URL: https://www.erdosproblems.com/488
+
+\subsection*{FORMAL RESTATEMENT}
+Let $A\subseteq\mathbb{N}$ be a \emph{finite} nonempty set, and define
+\[
+B := \{ n\ge 1 : \exists a\in A\ \text{such that } a\mid n\},
+\]
+the set of positive integers divisible by at least one element of $A$.
+For $x\ge 1$ define the counting function
+\[F(x):=|B\cap[1,x]|\quad\text{and the density-initial-segment }\quad d(x):=\frac{F(x)}{x}.
+\]
+The problem asks whether the following inequality always holds:
+\[
+\forall m>n\ge \max(A):\qquad \frac{F(m)}{m} < 2\frac{F(n)}{n}.
+\]
+It also notes that the constant $2$ would be best possible, since for $A=\{a\}$, $n=2a-1$, $m=2a$ makes the ratio approach $2$ from below.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The statement notes that an alternate version (with $a\mid n$ replaced by $a\nmid n$) likely contains a typo and has known counterexamples; the version stated here is the ``multiples'' version.
+Per the project integrity rule, I do not use results not explicitly present in the problem text.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof track:}
+\begin{itemize}
+\item Use the structure of $B$ as a finite union of arithmetic progressions to obtain periodicity modulo $L=\mathrm{lcm}(A)$ and extract asymptotics $d(x)=\delta+O(1/x)$. This proves the inequality for sufficiently large $n$.
+\item Analyze small $n$ relative to $L$ by expressing $F(x)$ exactly in terms of $q=\lfloor x/L\rfloor$ and remainder $r=x\bmod L$.
+\end{itemize}
+\textbf{Disproof track:}
+\begin{itemize}
+\item Search computationally for a counterexample $(A,n,m)$ with small parameters.
+\end{itemize}
+I obtain (a) full proofs in some special regimes and (b) computational evidence for small parameters, but no complete proof or counterexample in general.
+
+\subsection*{WORK}
+\paragraph{Lemma 1 (removing redundant divisors).}
+If $A$ contains two elements $a,b$ with $a\mid b$, then replacing $A$ by $A\setminus\{b\}$ does not change $B$.
+In particular, one may assume without loss of generality that $A$ is \emph{primitive}: no element of $A$ divides another.
+
+\paragraph{Proof.}
+If $a\mid b$, then every multiple of $b$ is automatically a multiple of $a$. Thus
+\[\{n: b\mid n\}\subseteq\{n: a\mid n\}.
+\]
+Therefore the union over $A$ of sets of multiples is unchanged if we remove $b$:
+\[
+\bigcup_{t\in A}\{n: t\mid n\}=\Bigl(\bigcup_{t\in A\setminus\{b\}}\{n: t\mid n\}\Bigr)\cup\{n: b\mid n\}=\bigcup_{t\in A\setminus\{b\}}\{n: t\mid n\}.
+\]
+So $B$ is unchanged.
+\qed
+
+\paragraph{Lemma 2 (single divisor case; constant $2$ is sharp).}
+Let $A=\{a\}$ with $a\ge 1$. Then for every $m>n\ge a$,
+\[\frac{\lfloor m/a\rfloor}{m} < 2\frac{\lfloor n/a\rfloor}{n}.
+\]
+Moreover, taking $n=2a-1$ and $m=2a$ gives
+\[\frac{\lfloor m/a\rfloor/m}{\lfloor n/a\rfloor/n}=\frac{(2/a)}{(1/(2a-1))}=2-\frac{1}{a},\]
+showing the constant $2$ cannot be improved.
+
+\paragraph{Proof.}
+Write $m=qa+r$ and $n=pa+s$ with integers $q,p\ge 1$ and remainders $0\le r,s\le a-1$.
+Then $\lfloor m/a\rfloor=q$ and $\lfloor n/a\rfloor=p$.
+We must show
+\[\frac{q}{qa+r} < 2\frac{p}{pa+s}.
+\]
+Cross-multiplying (all quantities positive) gives the equivalent inequality
+\[(pa+s)q < 2p(qa+r).
+\]
+Expand and cancel the common term $pqa$:
+\[s q < pqa + 2pr.
+\]
+Since $s\le a-1$, we have $sq\le (a-1)q < aq$.
+Since $p\ge 1$, $pqa \ge aq$.
+Thus $sq < pqa\le pqa+2pr$, proving the inequality.
+(Strictness holds because $sq<aq\le pqa$.)
+
+For sharpness, if $n=2a-1$ then $\lfloor n/a\rfloor=1$, while for $m=2a$ we have $\lfloor m/a\rfloor=2$, yielding the stated ratio $2-1/a$.
+\qed
+
+\paragraph{Lemma 3 (periodicity and eventual validity for large $n$).}
+Let $A$ be finite and nonempty, and set $L:=\mathrm{lcm}(A)$.
+Then $B$ is periodic modulo $L$, and if we let
+\[\delta:=\frac{|B\cap[1,L]|}{L}>0,
+\]
+then for every integer $x\ge 1$,
+\[\bigl|d(x)-\delta\bigr|\le \frac{L}{x}.
+\]
+Consequently, for all $n\ge \max(A)$ with $n>\frac{3L}{\delta}$ and all $m>n$, the desired inequality $d(m)<2d(n)$ holds.
+
+\paragraph{Proof.}
+\emph{Periodicity.} If $n\equiv n'\pmod L$ then for every $a\in A$ (with $a\mid L$) we have $n\equiv n'\pmod a$, hence $a\mid n \Leftrightarrow a\mid n'$. Therefore membership in $B$ depends only on residue modulo $L$.
+
+\emph{Density approximation.} Write $x=qL+r$ with $q\ge 0$ and $0\le r<L$.
+Let $b:=|B\cap[1,L]|$ and $b(r):=|B\cap[1,r]|$.
+By periodicity,
+\[F(x)=qb + b(r).
+\]
+Thus
+\[d(x)=\frac{qb+b(r)}{qL+r}.
+\]
+Since $0\le b(r)\le L$ and $0\le r<L$, we can bound
+\[
+\left|\frac{qb+b(r)}{qL+r} - \frac{b}{L}\right|
+= \left|\frac{L b(r) - b r}{L(qL+r)}\right|
+\le \frac{L\cdot L + b\cdot L}{L(qL+r)}
+\le \frac{2L}{x}.
+\]
+A slightly sharper bound is available because $b\le L$, giving
+\[\left|d(x)-\delta\right|\le \frac{L}{x}.
+\]
+(Indeed, $|L b(r) - b r|\le L\max\{b(r),b\}\le L^2$ and $L(qL+r)=Lx$.)
+
+\emph{Eventual inequality.} For $m>n$ we have
+\[d(m)\le \delta + \frac{L}{m} < \delta + \frac{L}{n},\qquad d(n)\ge \delta - \frac{L}{n}.
+\]
+If $n>\frac{3L}{\delta}$ then $\delta - L/n > \delta - \delta/3 = 2\delta/3>0$, and
+\[\delta + \frac{L}{n} < \delta + \frac{\delta}{3} = \frac{4\delta}{3} = 2\cdot\frac{2\delta}{3} \le 2\left(\delta - \frac{L}{n}\right) \le 2 d(n).
+\]
+Therefore $d(m)<2d(n)$ for all $m>n>3L/\delta$.
+\qed
+
+\paragraph{FAST REALITY CHECK (brute-force search for small counterexamples).}
+I searched over all sets $A\subseteq\{2,3,\dots,20\}$ with $|A|\le 5$ and all pairs $m>n\ge \max(A)$ with $m\le 200$.
+No counterexample to $F(m)/m < 2F(n)/n$ was found in this range.
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~2: verified the algebraic reduction and strictness. Also cross-checked against the explicit ``sharpness'' example $n=2a-1,m=2a$.
+\item Lemma~3: verified the periodic decomposition $F(qL+r)=qb+b(r)$ and the inequality chain in the ``eventual'' part; the constant $3L/\delta$ is a sufficient (not claimed optimal) threshold.
+\item Computational search: checked that the brute-force code tests \emph{all} $(A,n,m)$ in the stated finite search box.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+
+(i) \textbf{Strongest proved partial result.}
+\begin{itemize}
+\item If $A=\{a\}$ is a singleton, the inequality holds for all $m>n\ge a$, and the constant $2$ is best possible.
+\item For general finite $A$, writing $L=\mathrm{lcm}(A)$ and $\delta=|B\cap[1,L]|/L$, we have $d(x)=\delta+O(L/x)$ and therefore $d(m)<2d(n)$ holds for all $m>n>3L/\delta$.
+\item Brute-force search found no counterexample for $A\subseteq\{2,\dots,20\}$ with $|A|\le 5$ and $m,n\le 200$.
+\end{itemize}
+
+(ii) \textbf{First gap (crisp).} Prove or disprove the uniform inequality
+\[\forall\,\text{finite }A\subseteq\mathbb{N}\ \forall m>n\ge\max(A):\ \frac{|B\cap[1,m]|}{m}<2\frac{|B\cap[1,n]|}{n},\]
+where $B$ is the set of multiples of elements of $A$.
+My proofs only cover (a) singletons and (b) sufficiently large $n$ depending on $A$.
+
+(iii) \textbf{Top 3 next moves.}
+\begin{enumerate}
+\item Use the exact periodic formula $F(qL+r)=qb+b(r)$ to reduce the inequality to finitely many inequalities in the variables $(q_n,r_n,q_m,r_m)$, perhaps showing the worst case occurs for small $q_n$.
+\item Attempt to prove a monotonicity/convexity statement for the prefix averages of a ``multiples'' periodic set that would force the factor-$2$ bound.
+\item Computational: extend exhaustive search to larger $\max(A)$ and larger $|A|$ (e.g. up to $\max(A)=50$) and record any near-tight examples to guess a general extremal configuration.
+\end{enumerate}
+
+(iv) \textbf{Minimal counterexample structure.} A counterexample would consist of a finite set $A$ and a pair $m>n\ge\max(A)$ where the initial density $d(n)$ is unusually small compared to the eventual density $\delta$ of $B$, while $d(m)$ is already close to $\delta$. Such behaviour would likely require $L=\mathrm{lcm}(A)$ to be large and the set of ``hit'' residues modulo $L$ to be very unevenly distributed among initial segments.
+
+\bigskip
+

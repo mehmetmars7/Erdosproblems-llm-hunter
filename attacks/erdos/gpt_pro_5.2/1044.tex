@@ -1,0 +1,296 @@
+% Erdos Problem #1044
+% URL: https://www.erdosproblems.com/1044
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $n\ge 1$. Let
+\[
+  f(z)=\prod_{i=1}^n (z-z_i)\in\mathbb C[z]
+\]
+be monic of degree $n$ with roots satisfying $|z_i|\le 1$ for all $i$.
+Let
+\[
+  E_f:=\{z\in\mathbb C: |f(z)|<1\}.
+\]
+For each connected component $U$ of $E_f$, let $\partial U$ be its boundary and let
+$\ell(\partial U)$ denote its boundary length (interpreted as arclength when $\partial U$ is a
+rectifiable curve; more generally the $1$-dimensional Hausdorff measure).
+Define
+\[
+  \Lambda(f):=\max\{\ell(\partial U):\ U \text{ is a connected component of }E_f\}.
+\]
+Determine the value of
+\[
+  L_n:=\inf\{\Lambda(f):\ f(z)=\prod_{i=1}^n(z-z_i)\text{ monic},\ |z_i|\le 1\}.
+\]
+Edge cases:
+- For $n=1$, $E_f$ is a disk of radius $1$, so $\Lambda(f)=2\pi$.
+- $E_f$ is bounded for every monic polynomial $f$.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem statement attributes this to Erd\H{o}s--Herzog--Piranian (1958). No further results are stated
+in the provided problem text.
+
+3) ATTACK PLAN
+
+Proof track (aim: determine $L_n$):
+- Identify a candidate extremizer, plausibly a highly symmetric polynomial such as $f(z)=z^n-1$.
+- Compute $\Lambda(z^n-1)$ explicitly.
+- Prove a matching lower bound for all admissible $f$.
+
+Disproof/construction track (aim: refute a natural candidate or squeeze bounds):
+- Produce explicit families of polynomials and compute/estimate their $\Lambda(f)$.
+- Prove general lower bounds on $\Lambda(f)$ using disks contained in components, isoperimetry, and
+  crude bounds on $|f|$ from the root constraints.
+
+4) WORK
+
+FAST REALITY CHECK (small $n$ and one explicit family)
+
+- $n=1$: for $f(z)=z-z_1$ with $|z_1|\le 1$, $E_f$ is the open disk $|z-z_1|<1$.
+  Hence $\Lambda(f)=2\pi$ and therefore $L_1=2\pi$.
+
+- $n=2$: take $f(z)=z^2-1=(z-1)(z+1)$.
+  Then $E_f=\{|z^2-1|<1\}$ has two components, and each component boundary is one lobe of the
+  lemniscate $|z^2-1|=1$.
+  A direct polar computation (Lemma 4.3 below) gives
+  \[
+    \Lambda(z^2-1)=\ell(\text{one lobe})=\frac{\sqrt 2}{2}\,\frac{\Gamma(1/2)\Gamma(1/4)}{\Gamma(3/4)}\approx 3.7081493546.
+  \]
+  In particular $L_2\le 3.7081493546<2\pi$.
+
+(Computational note: I evaluated the Gamma/Beta expression with high precision in Python; see the table
+in Lemma 4.3.)
+
+Lemma 4.1 (Each component of $E_f$ contains at least one root)
+
+Let $U$ be a connected component of $E_f$. Then $U$ contains at least one zero of $f$.
+Consequently, $E_f$ has at most $n$ connected components.
+
+Proof.
+Let $U$ be a component of $E_f=\{ |f|<1\}$. Set $V:=f(U)\subset\mathbb D$ where $\mathbb D=\{w:|w|<1\}$.
+Because $f$ is holomorphic and nonconstant, it is an open map, hence $V$ is open in $\mathbb D$.
+Also, $V$ is connected because $U$ is connected.
+
+We claim that $\partial V$ cannot meet the interior of $\mathbb D$.
+Assume for contradiction that there exists $w_0\in\partial V$ with $|w_0|<1$.
+Then there is a sequence $w_m\in V$ with $w_m\to w_0$.
+For each $m$, pick $z_m\in U$ such that $f(z_m)=w_m$.
+
+Since $f$ is monic of degree $n$, $|f(z)|\to\infty$ as $|z|\to\infty$.
+Therefore the set $\{z:|f(z)|\le 1\}$ is bounded, hence $\overline{U}\subset\{z:|f(z)|\le 1\}$ is bounded.
+By compactness of closed bounded sets in $\mathbb C\cong\mathbb R^2$, $\overline{U}$ is compact,
+so the sequence $(z_m)$ has a convergent subsequence $z_{m_j}\to z\in\overline{U}$.
+By continuity of $f$,
+\[
+  f(z)=\lim_{j\to\infty} f(z_{m_j})=\lim_{j\to\infty} w_{m_j}=w_0.
+\]
+If $z\in U$, then $w_0=f(z)\in V$, contradicting $w_0\in\partial V$.
+Thus $z\in\partial U$.
+
+Now use the defining inequality of $U$:
+- On $U$, $|f|<1$.
+- On the complement of $E_f$, $|f|\ge 1$.
+By continuity of $|f|$, every boundary point $z\in\partial U$ must satisfy $|f(z)|=1$.
+In particular, $|w_0|=|f(z)|=1$, contradicting $|w_0|<1$.
+
+Hence $\partial V\cap \mathbb D=\varnothing$. This means $V$ is both open and (relatively) closed in $\mathbb D$.
+Since $\mathbb D$ is connected and $V\ne\varnothing$, we must have $V=\mathbb D$.
+In particular $0\in V$, so there exists $z\in U$ with $f(z)=0$, i.e. a root of $f$.
+
+Finally, distinct components contain disjoint sets of roots (counted with multiplicity), so there are at most $n$ components.
+$\square$
+
+Lemma 4.2 (A universal disk inside each root component; crude lower bound)
+
+Let $n\ge 1$. Define $r_n>0$ as the unique positive solution to
+\[
+  r(2+r)^{n-1}=1.
+\]
+Then for every admissible $f(z)=\prod_{i=1}^n(z-z_i)$ and every root $z_i$, the Euclidean disk
+$D(z_i,r_n)=\{z:|z-z_i|<r_n\}$ is contained in $E_f$.
+Consequently, for every such $f$,
+\[
+  \Lambda(f)\ge 2\pi r_n,
+\]
+and hence $L_n\ge 2\pi r_n$.
+
+Proof.
+Fix a root $z_i$ and write
+\[
+  f(z)=(z-z_i)\prod_{j\ne i}(z-z_j).
+\]
+Let $r>0$ and consider any $z$ with $|z-z_i|\le r$.
+For each $j\ne i$ we have
+\[
+  |z-z_j|\le |z-z_i|+|z_i-z_j|\le r + (|z_i|+|z_j|)\le r+2,
+\]
+since $|z_i|,|z_j|\le 1$.
+Therefore
+\[
+  |f(z)|\le |z-z_i|\prod_{j\ne i}|z-z_j|\le r\,(2+r)^{n-1}.
+\]
+Choose $r=r_n$ so that $r_n(2+r_n)^{n-1}=1$. Then $|f(z)|\le 1$ for all $z$ with $|z-z_i|\le r_n$.
+Because $f$ is holomorphic and not constant on $D(z_i,r_n)$, and $|f|$ attains a strict value $|f(z_i)|=0<1$
+inside, the maximum modulus principle implies $|f(z)|<1$ for all $|z-z_i|<r_n$.
+Thus $D(z_i,r_n)\subset E_f$.
+
+Let $U$ be the component of $E_f$ containing $z_i$; then $D(z_i,r_n)\subset U$.
+Hence $\operatorname{area}(U)\ge \pi r_n^2$.
+By the planar isoperimetric inequality, $\ell(\partial U)^2\ge 4\pi\,\operatorname{area}(U)$,
+so $\ell(\partial U)\ge 2\pi r_n$.
+Taking the maximum over components gives $\Lambda(f)\ge 2\pi r_n$.
+$\square$
+
+Lemma 4.3 (Explicit computation for $f(z)=z^n-1$)
+
+Let $n\ge 1$ and $f(z)=z^n-1$.
+Then the boundary $|f(z)|=1$ consists of $n$ congruent lobes meeting at $z=0$.
+Each connected component of $E_f=\{|z^n-1|<1\}$ has boundary equal to one lobe, of length
+\[
+  \Lambda(z^n-1)=\frac{2^{1/n}}{n}\,B\!\left(\frac{1}{2n},\frac12\right)
+  =\frac{2^{1/n}}{n}\,\frac{\Gamma\!\left(\frac{1}{2n}\right)\Gamma\!\left(\frac12\right)}{\Gamma\!\left(\frac12+\frac{1}{2n}\right)}.
+\]
+In particular this provides the upper bound $L_n\le \Lambda(z^n-1)$.
+Moreover, as $n\to\infty$,
+\[
+  \Lambda(z^n-1)=2+O\!\left(\frac{\log n}{n}\right),
+\]
+so $\Lambda(z^n-1)\downarrow 2$ numerically.
+
+Proof.
+The boundary is $|z^n-1|=1$, equivalently
+\[
+  |z^n-1|^2=1 \iff z^n\overline{z}^n - z^n - \overline{z}^n +1=1.
+\]
+Write $z=re^{i\theta}$. Then $z^n=r^n e^{in\theta}$ and
+\[
+  |z^n-1|^2=r^{2n}-2r^n\cos(n\theta)+1.
+\]
+Setting this equal to $1$ gives
+\[
+  r^{2n}-2r^n\cos(n\theta)=0 \iff r^n=2\cos(n\theta),
+\]
+with the restriction $\cos(n\theta)\ge 0$ to keep $r\ge 0$.
+Thus on each interval where $\cos(n\theta)\ge 0$ the boundary is given in polar form by
+\[
+  r(\theta)=(2\cos(n\theta))^{1/n}.
+\]
+One lobe is traced by $\theta\in[-\pi/(2n),\pi/(2n)]$.
+
+For a polar curve $r=r(\theta)$, arclength is
+$ds=\sqrt{r(\theta)^2+(r'(\theta))^2}\,d\theta$.
+Compute
+\[
+  r'(\theta)=\frac{1}{n}(2\cos(n\theta))^{1/n-1}\cdot (-2n\sin(n\theta))
+  =-2\sin(n\theta)\,(2\cos(n\theta))^{1/n-1}.
+\]
+Hence
+\begin{align*}
+  r^2+(r')^2
+  &= (2\cos(n\theta))^{2/n} + 4\sin^2(n\theta)\,(2\cos(n\theta))^{2/n-2}\\
+  &= (2\cos(n\theta))^{2/n-2}\bigl((2\cos(n\theta))^2+4\sin^2(n\theta)\bigr)\\
+  &= (2\cos(n\theta))^{2/n-2}\cdot 4(\cos^2(n\theta)+\sin^2(n\theta))\\
+  &=4(2\cos(n\theta))^{2/n-2}.
+\end{align*}
+Therefore
+\[
+  ds=2(2\cos(n\theta))^{1/n-1}\,d\theta.
+\]
+The lobe length is
+\begin{align*}
+  \Lambda(z^n-1)
+  &=\int_{-\pi/(2n)}^{\pi/(2n)} 2(2\cos(n\theta))^{1/n-1}\,d\theta\\
+  &=\frac{4}{n}\int_{0}^{\pi/2} (2\cos u)^{1/n-1}\,du
+  \quad (u=n\theta).
+\end{align*}
+Pulling out $2^{1/n-1}$ gives
+\[
+  \Lambda(z^n-1)=\frac{4}{n}2^{1/n-1}\int_0^{\pi/2} (\cos u)^{1/n-1}\,du.
+\]
+Using the Beta integral
+$\int_0^{\pi/2}\cos^{\alpha-1}u\,du=\tfrac12 B(\tfrac\alpha2,\tfrac12)$ for $\alpha>0$,
+with $\alpha=1/n$, yields
+\[
+  \Lambda(z^n-1)=\frac{4}{n}2^{1/n-1}\cdot\frac12 B\!\left(\frac{1}{2n},\frac12\right)
+  =\frac{2^{1/n}}{n}B\!\left(\frac{1}{2n},\frac12\right).
+\]
+The Gamma-function form follows from $B(x,y)=\Gamma(x)\Gamma(y)/\Gamma(x+y)$.
+
+For the asymptotic: as $x\to 0^+$,
+$\Gamma(x)=\frac{1}{x}+O(1)$ and $\Gamma(x+1/2)=\Gamma(1/2)(1+O(x))$.
+With $x=1/(2n)$ this gives
+$B(1/(2n),1/2)=2n(1+O(1/n))$.
+Also $2^{1/n}=1+O(\log 2/n)$.
+Combining yields $\Lambda(z^n-1)=2+O(\log n/n)$.
+$\square$
+
+Numerical table (from the closed form in Lemma 4.3):
+\[
+\begin{array}{c|c}
+ n & \Lambda(z^n-1)\\\hline
+ 1 & 6.2831853072\\
+ 2 & 3.7081493546\\
+ 3 & 3.0599080741\\
+ 4 & 2.7675051293\\
+ 5 & 2.6013622764\\
+ 6 & 2.4942886983\\
+ 10 & 2.2886060328
+\end{array}
+\]
+
+Also, the crude lower bound from Lemma 4.2 gives (using $r_n(2+r_n)^{n-1}=1$):
+\[
+\begin{array}{c|c}
+ n & 2\pi r_n\\\hline
+ 1 & 6.2831853072\\
+ 2 & 2.6025805691\\
+ 3 & 1.2916308247\\
+ 4 & 0.6717940285\\
+ 5 & 0.3516535247
+\end{array}
+\]
+
+5) VERIFICATION
+
+- Quantifiers: Lemma 4.2 holds for every admissible $f$ and each root $z_i$; no hidden dependence.
+- Boundary/value set logic in Lemma 4.1: the only delicate point is showing that for $z\in\partial U$,
+  necessarily $|f(z)|=1$. This follows from continuity of $|f|$ and the fact that $U\subset\{|f|<1\}$ while
+  $\mathbb C\setminus E_f\subset\{|f|\ge 1\}$.
+- For Lemma 4.3, endpoints $\theta=\pm\pi/(2n)$ give $\cos(n\theta)=0$ hence $r=0$; the arclength integral
+  converges because near $u=\pi/2$ the integrand behaves like $(\cos u)^{1/n-1}$ with exponent $>-1$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- Exact value for $n=1$: $L_1=2\pi$.
+- For general $n$, the explicit family $f(z)=z^n-1$ gives the constructive upper bound
+  \[L_n\le \frac{2^{1/n}}{n}B\!\left(\frac{1}{2n},\frac12\right),\]
+  and Lemma 4.2 gives the universal lower bound $L_n\ge 2\pi r_n$ where $r_n(2+r_n)^{n-1}=1$.
+
+(ii) First gap (crisp statement).
+Prove (or disprove) that for each fixed $n\ge 2$,
+\[
+  L_n = \Lambda(z^n-1)=\frac{2^{1/n}}{n}B\!\left(\frac{1}{2n},\frac12\right).
+\]
+Equivalently: show that every admissible $f$ has some component boundary of length at least
+$\Lambda(z^n-1)$.
+
+(iii) Top 3 next moves.
+1. Prove a sharp lower bound on $\Lambda(f)$ in terms of $n$ using the fact that each component maps
+   onto $\mathbb D$ under $f$ (Lemma 4.1) and try to convert degree information into a perimeter bound.
+2. Search numerically for $n=2,3,4$ over root configurations (e.g. roots on $|z|=1$) to see whether
+   anything beats $z^n-1$; this would guide whether the conjectured extremizer is plausible.
+3. Attempt a variational argument: among polynomials with roots in $\overline{\mathbb D}$, show that moving
+   roots to the unit circle and spreading them symmetrically cannot increase the infimum of $\Lambda$.
+
+(iv) Minimal counterexample structure.
+If $z^n-1$ is not optimal, a counterexample would be a polynomial with roots on/near $|z|=1$ such that
+$E_f$ has $n$ components (to keep the maximum perimeter small), but each component boundary is shorter
+than the corresponding lobe of $|z^n-1|=1$. Such a configuration would likely have boundaries meeting at
+multiple critical points (not just at the origin), indicating a different pinching geometry.
+
+

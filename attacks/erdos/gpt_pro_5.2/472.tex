@@ -1,0 +1,92 @@
+% Erdos Problem #472
+% URL: https://www.erdosproblems.com/472
+
+1) “FORMAL RESTATEMENT”
+
+Let m>=1 and let q_1<...<q_m be primes. We define a (possibly finite) sequence (q_n)_{n>=1} inductively as follows.
+
+For each n>=m, let S_n be the finite set of integers of the form
+
+    q_n + q_i - 1  with  1<=i<=n.
+
+If S_n contains at least one prime, define q_{n+1} to be the smallest prime in S_n. If S_n contains no primes, the construction stops at q_n.
+
+Question: Does there exist some initial finite prime sequence q_1<...<q_m for which this construction never stops (i.e. produces infinitely many primes)?
+
+(Interpretation note: the natural reading is that i ranges over all previously constructed terms 1<=i<=n, not just i<=m.)
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+A quick check of the Erdos Problems page for #472 shows it is listed as OPEN (as of mid-Jan 2026). I do not use any external results beyond the problem statement.
+
+3) “ATTACK PLAN”
+
+Try to prove existence of an infinite run by showing that at each stage n there is always at least one prime among the finitely many candidates q_n+q_i-1. This resembles a finite-shift prime-hitting problem, but the shifts (q_i-1) grow with n.
+
+Try to disprove existence by constructing an unavoidable “dead end”: a prime Q such that Q+q_i-1 is composite for every previous q_i.
+
+In parallel, do computational experiments for small initial sequences to see whether termination happens and what “dead ends” look like.
+
+4) “WORK”
+
+Lemma 472.1 (monotonicity and parity).
+Assume the process has defined q_1,...,q_n with n>=m. Then every candidate q_n+q_i-1 is strictly larger than q_n. Hence, if q_{n+1} exists then q_{n+1} > q_n, so the sequence is strictly increasing. Moreover, if all initial primes are odd (in particular if q_1>=3), then every q_n is odd and every step size q_{n+1}-q_n is even.
+
+Proof.
+Fix i with 1<=i<=n. Since q_i>=2, we have q_n+q_i-1 >= q_n+1 > q_n, so all candidates exceed q_n, and if a prime candidate exists then the minimum prime candidate also exceeds q_n.
+For the parity: if q_i and q_n are odd primes, then q_n+q_i-1 is odd+odd-1 = odd+even = odd. Thus every prime candidate is odd, and by induction every q_{n+1} (when defined) is an odd prime. Then q_{n+1}-q_n is an even difference of odd integers.  QED.
+
+Lemma 472.2 (single-prime start criterion).
+If m=1 and q_1=p is prime, then the construction defines q_2 if and only if 2p-1 is prime; in that case q_2=2p-1.
+
+Proof.
+When n=1, the only available index is i=1, so S_1 consists of the single integer q_1+q_1-1 = 2p-1. If this integer is prime, then by definition q_2 is the smallest prime in S_1, hence equals 2p-1. If it is not prime, then S_1 contains no primes and the process stops at q_1.  QED.
+
+Lemma 472.3 (gaps come from earlier primes).
+Whenever q_{n+1} is defined, there exists some index i<=n such that
+
+    q_{n+1} - q_n + 1 = q_i.
+
+In particular, each “gap plus 1” is itself a prime already present in the sequence.
+
+Proof.
+By definition, q_{n+1} has the form q_n + q_i - 1 for some i<=n. Rearranging gives q_{n+1}-q_n+1 = q_i.  QED.
+
+FAST REALITY CHECK (local computation).
+I implemented the definition exactly as in the formal restatement (i ranges over 1..n). Here are concrete outputs.
+
+(a) Starting from (3,5), the first 50 terms are:
+3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 101, 103, 107, 109, 113, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241.
+
+(b) Brute sampling of initial sequences built from primes < 50:
+- Among all single-prime starts (m=1) with p<50, exactly 4 starts survived to length 200 without stopping: (2), (3), (7), (19).
+- Among all 2-prime starts (m=2) with both primes <50, 19 starts survived to length 200 without stopping.
+(“Survived” means no dead end was encountered within the first 200 generated terms.)
+
+These computations do NOT prove infinitude, but they show the process can persist for hundreds of steps for many starts.
+
+5) “VERIFICATION”
+
+- The monotonicity proof uses only q_i>=2, so it applies even if q_1=2.
+- If q_1=2, Lemma 472.1 does not force all q_n odd at n=1, but after the first step the sequence quickly enters odd primes in experiments.
+- Lemma 472.2 exactly matches computation: e.g. p=5 gives 2p-1=9 composite, so the process stops immediately at length 1.
+
+6) FINAL
+
+UNRESOLVED
+
+(i) Strongest proved partial result:
+The sequence (when defined) is strictly increasing, and for odd starts consists entirely of odd primes with even gaps. Also, for m=1 the process continues iff 2p-1 is prime (Lemma 472.2), and each gap+1 equals a previous prime (Lemma 472.3).
+
+(ii) First gap (crisp statement):
+Prove or disprove: there exists an initial finite prime list q_1<...<q_m such that for every n>=m, at least one of the finitely many integers q_n+q_i-1 (1<=i<=n) is prime.
+
+(iii) Top 3 next moves (concrete):
+1. Try to construct an explicit “dead end” prime Q for a given start by forcing every Q+q_i-1 to have a small prime divisor via congruence conditions (a covering-system style obstruction).
+2. Try to prove a sieve-theoretic lower bound guaranteeing that among the candidate set {q_n+q_i-1} there is a prime for infinitely many n, possibly using that the set of shifts grows with n.
+3. Computationally search for starts that maximize survival length and record the factorization patterns of Q+q_i-1 at the first dead end Q (if any), to guess a structural obstruction.
+
+(iv) Minimal counterexample structure (if the answer is “no”):
+For every start, there exists a terminal index N and a prime Q:=q_N such that for all i<=N, the integer Q+q_i-1 is composite.
+
+

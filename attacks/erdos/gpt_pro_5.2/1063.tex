@@ -1,0 +1,109 @@
+% Erdos Problem #1063
+
+\subsection*{FORMAL RESTATEMENT}
+Fix an integer $k\ge 2$. For each integer $n\ge 2k$ consider the $k$ integers
+\[
+ n,\ n-1,\ \dots,\ n-(k-1).
+\]
+Let $D(n,k)$ be the number of indices $i\in\{0,1,\dots,k-1\}$ such that $(n-i)$ divides $\binom{n}{k}$.
+Define $n_k$ to be the least $n\ge 2k$ for which $D(n,k)=k-1$ (i.e. all but one of these $k$ numbers divide $\binom{n}{k}$).
+The task is to estimate $n_k$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The problem statement records several facts: (1) for $n\ge 2k$ at least one $n-i$ fails to divide $\binom{n}{k}$, (2) $n_2=4,n_3=6,n_4=9,n_5=12$, and (3) an upper bound $n_k\le k!$ for $k\ge 3$ (and a refinement using an lcm). I prove the $k!$ upper bound from scratch below.
+
+\subsection*{ATTACK PLAN}
+Proof-track: prove explicit general upper bounds by exhibiting a concrete $n$ (in terms of $k$) with $D(n,k)=k-1$.
+Computation-track: directly search for $n_k$ for small $k$ to understand size/growth.
+
+\subsection*{WORK}
+\textbf{FAST REALITY CHECK.}
+A direct search over $n\ge 2k$ (using exact integer binomials) gives:
+\begin{verbatim}
+k : n_k (and the unique failing i)
+ 2 : 4    (fails i=0)
+ 3 : 6    (fails i=0)
+ 4 : 9    (fails i=1)
+ 5 : 12   (fails i=2)
+ 6 : 75   (fails i=3)
+ 7 : 30   (fails i=2)
+ 8 : 70   (fails i=6)
+ 9 : 56   (fails i=2)
+10 : 2403 (fails i=3)
+11 : 280  (fails i=5)
+12 : 3465 (fails i=9)
+13 : 210  (fails i=2)
+14 : 793  (fails i=9)
+15 : 4732 (fails i=7)
+\end{verbatim}
+The first four values match the ones stated in the problem text.
+
+\medskip
+\textbf{Lemma 1063.1 (a sufficient condition for $n-i\mid \binom{n}{k}$ when $i\ge 1$).}
+Let $k\ge 2$ and $n\ge k$. If $k!\mid n$, then for every $i\in\{1,2,\dots,k-1\}$ we have
+\[
+(n-i)\ \Big|\ \binom{n}{k}.
+\]
+
+\emph{Proof.}
+For $1\le i\le k-1$,
+\[
+\frac{\binom{n}{k}}{n-i} = \frac{n(n-1)\cdots(n-k+1)}{k!\,(n-i)} = \frac{n\cdot\prod_{\substack{1\le j\le k-1\\ j\ne i}} (n-j)}{k!}.
+\]
+If $k!\mid n$, write $n=k!\,t$ with $t\in\mathbb Z_{\ge 1}$. Then the right-hand side equals
+\[
+ t\cdot\prod_{\substack{1\le j\le k-1\\ j\ne i}} (n-j),
+\]
+which is an integer. Hence $\binom{n}{k}/(n-i)\in\mathbb Z$, i.e. $(n-i)\mid \binom{n}{k}$. \hfill$\square$
+
+\medskip
+\textbf{Lemma 1063.2 ($n=k!$ makes $i=0$ fail).}
+For every $k\ge 2$, with $n:=k!$ we have
+\[
+ n\nmid \binom{n}{k}.
+\]
+
+\emph{Proof.}
+We have
+\[
+\frac{\binom{n}{k}}{n} = \frac{(n-1)(n-2)\cdots (n-k+1)}{k!}.
+\]
+Let $P:=\prod_{j=1}^{k-1} (n-j)$. Reducing modulo $k!=n$ gives
+\[
+P \equiv \prod_{j=1}^{k-1} (-j) = (-1)^{k-1}(k-1)! \pmod{n}.
+\]
+Since $0<(k-1)!<k!=n$, the residue $(-1)^{k-1}(k-1)!$ is nonzero modulo $n$, so $n\nmid P$.
+Therefore $k!=n$ does not divide $P$, and $\binom{n}{k}/n$ is not an integer. Equivalently $n\nmid \binom{n}{k}$. \hfill$\square$
+
+\medskip
+\textbf{Corollary 1063.3 (general upper bound $n_k\le k!$ for $k\ge 3$).}
+For every $k\ge 3$,
+\[
+ n_k \le k!.
+\]
+
+\emph{Proof.}
+Let $n=k!$. Then $n\ge 2k$ for $k\ge 3$.
+By Lemma 1063.1 (since $k!\mid n$), we have $(n-i)\mid \binom{n}{k}$ for every $i=1,2,\dots,k-1$.
+By Lemma 1063.2, $n$ itself (i.e. $i=0$) does not divide $\binom{n}{k}$.
+Thus $D(n,k)=k-1$, so by definition $n_k\le n=k!$. \hfill$\square$
+
+\subsection*{VERIFICATION}
+Lemma 1063.1 explicitly rewrites $\binom{n}{k}/(n-i)$ and uses only the divisibility $k!\mid n$.
+Lemma 1063.2 checks the divisibility failure by a clean congruence modulo $n=k!$; the key point is that $(-1)^{k-1}(k-1)!$ is nonzero modulo $k!$.
+The computed values of $n_k$ for $k\le 15$ were obtained by scanning $n$ upward from $2k$ and checking all $k$ divisibilities.
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result.}
+A fully explicit construction gives $n_k\le k!$ for all $k\ge 3$ (Corollary 1063.3). Exact computation yields $n_2=4,n_3=6,n_4=9,n_5=12$ and additional values listed in the FAST REALITY CHECK up to $k=15$.
+\item[(ii)] \textbf{First gap (crisp).}
+Determine the correct order of growth of $n_k$ as $k\to\infty$ (e.g. polynomial, exponential, factorial) and obtain matching lower bounds.
+\item[(iii)] \textbf{Top 3 next moves.}
+(1) Try to prove the stronger explicit upper bound mentioned in the problem statement, $n_k\le k\cdot \mathrm{lcm}(2,3,\dots,k-1)$, by adapting Lemma 1063.1 to weaker divisibility hypotheses than $k!\mid n$.
+(2) Develop lower bounds on $n_k$ by showing that for $n$ below a certain threshold, at least two of the $k$ numbers $n-i$ must fail to divide $\binom{n}{k}$.
+(3) Extend computations of $n_k$ to larger $k$ to guess the typical size and whether $n_k$ is often much smaller than $k!$.
+\item[(iv)] \textbf{Minimal counterexample structure.}
+A counterexample to an anticipated growth rate (say $n_k\le \exp(Ck)$) would require $k$ for which every $n$ up to that scale has at least two indices $i$ with $(n-i)\nmid \binom{n}{k}$. Such a $k$ might force many small prime-power obstructions simultaneously.
+\end{enumerate}

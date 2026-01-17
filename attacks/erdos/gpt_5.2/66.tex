@@ -1,0 +1,126 @@
+% Attempt for Erdos Problem #66
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- $\mathbb N=\{1,2,3,\dots\}$.
+- For $A\subseteq \mathbb N$, let $1_A:\mathbb Z\to\{0,1\}$ be the indicator function.
+- Convolution is
+\[(1_A*1_A)(n):=\sum_{m\in\mathbb Z} 1_A(m)\,1_A(n-m).\]
+Since $1_A$ is supported on positive integers, this equals the number of ordered pairs $(a,b)\in A^2$ with $a+b=n$.
+Denote this representation function by
+\[r_A(n):=(1_A*1_A)(n).\]
+
+Question.
+Does there exist $A\subseteq\mathbb N$ such that the limit
+\[\lim_{n\to\infty}\frac{r_A(n)}{\log n}\]
+exists and is nonzero?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- Certain ``random'' constructions give $r_A(n)\sim \log n$ for almost all $n$ (allowing an exceptional set of density $0$).
+- Erd\H{o}s believed the answer should be negative when no exceptional set is allowed.
+- Erd\H{o}s--S\'ark\"{o}zy ruled out $|r_A(n)-\log n|/\sqrt{\log n}\to 0$, and Horv\'ath ruled out a stronger uniform bound.
+I do not re-derive these results here.
+
+3) ATTACK PLAN
+Proof track ideas (existence):
+1. Construct a deterministic ``pseudorandom'' set with local densities tuned so that $r_A(n)$ tracks $\log n$ uniformly.
+2. Try to derandomize the known random construction while preserving concentration for \emph{all} $n$.
+
+Disproof track ideas (nonexistence):
+1. Prove that $r_A(n)$ must have unavoidable fluctuations of size comparable to $\sqrt{\log n}$ (or larger), preventing convergence of $r_A(n)/\log n$.
+2. Use second-moment methods: relate variance of $r_A(n)$ over intervals to structural properties of $A$.
+
+Chosen path in this attempt: prove two unconditional lemmas giving necessary growth constraints on $A$ if $r_A(n)\asymp \log n$, and perform a sanity-check simulation showing large fluctuations in a natural random model.
+
+4) WORK
+For $x\ge 1$, write $A(x):=|A\cap\{1,\dots,\lfloor x\rfloor\}|$.
+
+Lemma 1 (Total representations up to $2N$ are bounded by $A(2N)^2$).
+For every $N\ge 1$,
+\[\sum_{n=2}^{2N} r_A(n)\ \le\ A(2N)^2.\]
+
+Proof.
+The sum $\sum_{n=2}^{2N} r_A(n)$ counts the number of ordered pairs $(a,b)\in A^2$ with $a+b\le 2N$:
+each such pair contributes exactly $1$ to $r_A(a+b)$ and hence to the sum.
+If $a+b\le 2N$ and $a,b\in\mathbb N$, then necessarily $a\le 2N$ and $b\le 2N$.
+Therefore every counted pair lies in $(A\cap[1,2N])^2$, whose cardinality is $A(2N)^2$.
+Thus the total number of counted pairs is at most $A(2N)^2$. \qed
+
+Lemma 2 (A necessary growth rate if $r_A(n)/\log n\to L>0$).
+Assume the limit
+\[\lim_{n\to\infty}\frac{r_A(n)}{\log n}=L\]
+exists and satisfies $L>0$.
+Then
+\[A(N)\ \ge\ c\,\sqrt{N\log N}\]
+for all sufficiently large $N$, where $c=\sqrt{L/4}$.
+
+Proof.
+Fix $\varepsilon\in(0,1)$.
+By the assumed limit, there exists $N_0(\varepsilon)$ such that for all $n\ge N_0$,
+\[r_A(n)\ge (L-\varepsilon)\log n.\]
+For $N\ge N_0$, sum this over $n\in\{N,N+1,\dots,2N\}$ to obtain
+\[\sum_{n=N}^{2N} r_A(n)\ \ge\ (L-\varepsilon)\sum_{n=N}^{2N}\log n\ \ge\ (L-\varepsilon)\,N\log N,\]
+since $\log n\ge \log N$ throughout the interval and there are $N+1$ terms.
+Now use Lemma 1:
+\[A(4N)^2\ \ge\ \sum_{n=2}^{4N} r_A(n)\ \ge\ \sum_{n=N}^{2N} r_A(n)\ \ge\ (L-\varepsilon)\,N\log N.\]
+Taking square-roots yields
+\[A(4N)\ \ge\ \sqrt{(L-\varepsilon)\,N\log N}.\]
+Replacing $4N$ by $N$ and absorbing constants gives $A(N)\ge \sqrt{(L-\varepsilon)\,(N/4)\log(N/4)}$ for all large $N$.
+Letting $\varepsilon\downarrow 0$ yields the stated bound with $c=\sqrt{L/4}$ (up to the harmless change $\log(N/4)\sim \log N$). \qed
+
+Lemma 3 (A pointwise upper bound).
+For every $n\ge 2$,
+\[r_A(n)\le A(n-1).\]
+
+Proof.
+By definition,
+\[r_A(n)=\sum_{a\in\mathbb Z} 1_A(a)\,1_A(n-a)=\sum_{a\in A} 1_A(n-a).\]
+If $a\in A$ contributes nontrivially then $n-a\in A\subseteq\mathbb N$, so $a\le n-1$.
+Thus the sum has at most $|A\cap[1,n-1]|=A(n-1)$ nonzero terms, each at most $1$, giving $r_A(n)\le A(n-1)$. \qed
+
+FAST REALITY CHECK (local simulation).
+I simulated a natural random model suggested by the heuristic that
+\[\mathbb E\,r_A(n)\approx \sum_{m=1}^{n-1} p_m p_{n-m}\]
+should scale like $\log n$ if $p_m\approx \sqrt{\log m/m}$.
+
+Experiment: for $N=200{,}000$, include each $n\in\{2,\dots,N\}$ independently with probability
+$p_n=\min\!\big(1,\sqrt{\log n/n}\big)$, and compute $r(n)$ for $n\le 2N$ using only this truncated set.
+In one run, $|A\cap[1,N]|=2835$.
+On $n\in[50{,}000,200{,}000]$, the ratio $r(n)/\log n$ had mean $\approx 2.74$, but ranged from $\approx 0.33$ to $\approx 6.08$.
+This suggests significant fluctuations remain even in a tuned random model, consistent with the difficulty of forcing an actual limit with no exceptional set.
+
+5) VERIFICATION
+- Lemma 1: each representation counted in $\sum_{n\le 2N} r_A(n)$ corresponds to a pair $(a,b)\in A^2$ with $a+b\le 2N$, hence $a,b\le 2N$.
+- Lemma 2: uses only the assumed pointwise lower bound on $r_A(n)$ for $n\in[N,2N]$ and the crude inequality from Lemma 1.
+- Lemma 3: bounds $r_A(n)$ by the number of possible first summands $a\in A$ with $a\le n-1$.
+- Simulation: truncated computation undercounts $r_A(n)$ for $n$ near $2N$ because it ignores elements $>N$, so it is only a heuristic sanity check.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+If $r_A(n)/\log n$ converges to a positive limit $L$, then $A(N)$ must grow at least on the order of $\sqrt{N\log N}$ (Lemma 2),
+and in general $\sum_{n\le 2N} r_A(n)\le A(2N)^2$ (Lemma 1) and $r_A(n)\le A(n-1)$ (Lemma 3).
+
+(ii) First gap:
+Either construct a specific $A$ with $r_A(n)\sim L\log n$ for all $n$, or prove a universal fluctuation lower bound on $r_A(n)$
+showing that $r_A(n)/\log n$ cannot converge to a nonzero limit.
+
+(iii) Top 3 next moves (concrete):
+1. Analyze variance of $r_A(n)$ over intervals $[N,2N]$ in terms of $A$ and prove that it cannot be $o(\log N)$ uniformly, which would obstruct convergence.
+2. Attempt a derandomization: start from a random construction with $r_A(n)\approx \log n$ for almost all $n$ and iteratively fix the exceptional set while controlling global disruption.
+3. Explore structured candidates for $A$ defined by greedy or digit-based rules and compute $r_A(n)$ for large $n$ to see whether $r_A(n)/\log n$ stabilizes.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+If the answer is negative, then for every $A$ the normalized representation function $r_A(n)/\log n$ would exhibit persistent oscillation:
+there would exist an absolute $c_0>0$ and infinitely many $N$ such that
+\[\sup_{n\in[N,2N]}\frac{r_A(n)}{\log n}-\inf_{n\in[N,2N]}\frac{r_A(n)}{\log n}\ge c_0.\]
+

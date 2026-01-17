@@ -1,0 +1,227 @@
+% Erdos problem #420
+
+\subsection*{FORMAL RESTATEMENT}
+\textbf{Definitions.}
+\begin{itemize}
+\item $\tau(n)$ denotes the number of positive divisors of $n\in\mathbb{N}$.
+\item Let $f:\mathbb{N}\to\mathbb{R}$ and define $k_n=\lfloor f(n)\rfloor\in\mathbb{Z}_{\ge 0}$.
+\item For $n\in\mathbb{N}$, define
+\[
+F(f,n)=\frac{\tau\big((n+k_n)!\big)}{\tau(n!)}.
+\]
+\item Throughout, $\log$ denotes the natural logarithm.
+\end{itemize}
+
+\textbf{Questions.}
+\begin{itemize}
+\item[(Q1)] For sufficiently large constants $C>0$, is it true that
+\[
+\lim_{n\to\infty} F\big((\log n)^C,n\big)=\infty?
+\]
+\item[(Q2)] Is the set $\{F(\log n,n): n\in\mathbb{N}, n\ge 3\}$ dense in $(1,\infty)$?
+\item[(Q3)] More generally, if $f(n)\le \log n$ is monotone and $f(n)\to\infty$, is the set $\{F(f,n):n\in\mathbb{N}\}$ dense in $(1,\infty)$?
+\end{itemize}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The extracted problem statement records (without proofs) the following:
+\begin{itemize}
+\item Erd\H{o}s--Graham: it is easy to show $\lim F(n^{1/2},n)=\infty$, and even $n^{1/2-c}$ works for some small $c>0$.
+\item Erd\H{o}s--Graham--Ivi\'{c}--Pomerance (EGIP): $\liminf F(c\log n,n)=1$ for any $c>0$, and $\lim F(n^{4/9},n)=\infty$, with an improvement of $4/9$ possible; also if $f(n)=o((\log n)^2)$ then for almost all $n$, $F(f,n)\sim 1$.
+\item Comments in the statement mention consequences from bounded prime gaps or Cram\'{e}r's conjecture.
+\end{itemize}
+I do not use any of these deep assertions in the proofs below.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof-track ideas.}
+\begin{itemize}
+\item Express $\tau(n!)$ via prime exponents $v_p(n!)$ and compare $v_p((n+k)!)$ to $v_p(n!)$.
+\item Obtain lower bounds for $F(f,n)$ from primes (or prime powers) that appear in $(n+k)!$ but not in $n!$, or whose exponent increases.
+\item For density questions, attempt to ``steer'' the prime factorisation of the block $(n+1)\cdots(n+k)$ to make $F$ approximate a target value.
+\end{itemize}
+\textbf{Disproof-track ideas.}
+\begin{itemize}
+\item Try to construct $n$ for which the block $(n+1)\cdots(n+k)$ contributes very little to divisor-count growth (e.g. unusually smooth blocks), keeping $F$ near $1$.
+\item Look for rigid obstructions to density: for example, if $F(f,n)$ is forced into a sparse subset of rationals for structural reasons.
+\end{itemize}
+
+\subsection*{WORK}
+\subsubsection*{Fast reality check (exact small-$n$ values)}
+For $f(n)=\lfloor\log n\rfloor$ (natural log), exact reduced fractions $F(f,n)$ for $3\le n\le 30$:
+\begin{verbatim}
+ n  k=floor(log n)   F(f,n)
+ 3      1            2
+ 4      1            2
+ 5      1            15/8
+ 6      1            2
+ 7      1            8/5
+ 8      2            45/16
+ 9      2            27/8
+ 10     2            44/15
+ 11     2            44/15
+ 12     2            36/11
+ 13     2            28/11
+ 14     2            56/27
+ 15     2            8/3
+ 16     2            153/56
+ 17     2            153/56
+ 18     2            95/34
+ 19     2            950/459
+ 20     2            400/171
+ 21     3            759/190
+ 22     3            1771/500
+ 23     3            693/250
+ 24     3            3528/1265
+ 25     3            1365/506
+ 26     3            455/132
+ 27     3            675/196
+ 28     3            3240/637
+ 29     3            1920/637
+ 30     3            4096/1215
+\end{verbatim}
+
+For $f(n)=\lfloor(\log n)^2\rfloor$, exact reduced fractions for $3\le n\le 30$:
+\begin{verbatim}
+ n  k=floor((log n)^2)   F(f,n)
+ 3      1                2
+ 4      1                2
+ 5      2                15/4
+ 6      3                16/3
+ 7      3                9/2
+ 8      4                33/4
+ 9      4                99/10
+ 10     5                224/15
+ 11     5                448/45
+ 12     6                204/11
+ 13     6                204/11
+ 14     6                95/6
+ 15     7                500/21
+ 16     7                250/7
+ 17     8                253/8
+ 18     8                616/17
+ 19     8                392/17
+ 20     8                1274/57
+ 21     9                729/19
+ 22     9                243/5
+ 23     9                144/5
+ 24     10               1152/23
+ 25     10               7776/161
+ 26     10               405/11
+ 27     10               405/7
+ 28     11               295488/3185
+ 29     11               2736/49
+ 30     11               3952/45
+\end{verbatim}
+
+For larger $n$, it is convenient to report $\log_{10} F(f,n)$ (approximations):
+\begin{verbatim}
+ n    k1=floor(log n)   log10 F(log n,n)    k2=floor((log n)^2)  log10 F((log n)^2,n)
+ 50        3                 0.5591              15                 2.1923
+ 100       4                 0.7463              21                 2.8538
+ 200       5                 0.5098              28                 3.0839
+ 500       6                 0.7274              38                 3.4558
+ 1000      6                 0.4172              47                 4.2081
+ 2000      7                 0.4973              57                 4.3567
+\end{verbatim}
+
+\subsubsection*{Lemma 420.1 (Divisor-count monotonicity under divisibility)}
+\textbf{Lemma.} If $a,b\in\mathbb{N}$ and $a\mid b$, then $\tau(a)\le \tau(b)$.
+In particular, for every $n\in\mathbb{N}$ and every integer $k\ge 0$,
+\[
+\tau((n+k)!)\ge \tau(n!),\qquad\text{so }F(f,n)\ge 1.
+\]
+
+\textbf{Proof.}
+For any prime $p$, let $v_p(n)$ denote the exponent of $p$ in the prime factorisation of $n$.
+Then
+\[
+\tau(n)=\prod_{p} (v_p(n)+1),
+\]
+where the product is over all primes and all but finitely many factors equal $1$.
+If $a\mid b$, then $v_p(a)\le v_p(b)$ for every prime $p$. Hence $v_p(a)+1\le v_p(b)+1$ for every prime $p$.
+Multiplying these inequalities over all primes gives $\tau(a)\le \tau(b)$.
+
+Since $n!\mid (n+k)!$ for every $k\ge 0$, the first part implies $\tau(n!)\le \tau((n+k)!)$, so $F(f,n)=\tau((n+k_n)!)/\tau(n!)\ge 1$.
+\hfill$\square$
+
+\subsubsection*{Lemma 420.2 (Prime-exponent formula for $n!$)}
+\textbf{Lemma (Legendre-type formula).} For any prime $p$ and any $n\in\mathbb{N}$,
+\[
+v_p(n!)=\sum_{j\ge 1} \Big\lfloor\frac{n}{p^j}\Big\rfloor.
+\]
+Consequently,
+\[
+\tau(n!)=\prod_{p\le n}\big(v_p(n!)+1\big).
+\]
+
+\textbf{Proof.}
+Fix a prime $p$. Each integer $1\le m\le n$ contributes $v_p(m)$ to $v_p(n!)$, so
+\[
+v_p(n!)=\sum_{m=1}^n v_p(m).
+\]
+Now count the same sum by writing $v_p(m)=\sum_{j\ge 1} \mathbf{1}_{p^j\mid m}$.
+Then
+\[
+\sum_{m=1}^n v_p(m)=\sum_{m=1}^n \sum_{j\ge 1} \mathbf{1}_{p^j\mid m}
+=\sum_{j\ge 1} \sum_{m=1}^n \mathbf{1}_{p^j\mid m}.
+\]
+For fixed $j$, the number of multiples of $p^j$ in $\{1,\dots,n\}$ is $\lfloor n/p^j\rfloor$.
+Thus the right-hand side equals $\sum_{j\ge 1}\lfloor n/p^j\rfloor$, proving the formula.
+
+The identity for $\tau(n!)$ is the standard divisor-count formula $\tau(n)=\prod_p (v_p(n)+1)$ applied to $n!$, and only primes $p\le n$ can occur in $n!$.
+\hfill$\square$
+
+\subsubsection*{Lemma 420.3 (A prime-gap lower bound for $F(k,n)$)}
+\textbf{Lemma.} Let $n\in\mathbb{N}$ and let $k\ge 0$ be an integer. Then
+\[
+F(k,n)=\frac{\tau((n+k)!)}{\tau(n!)}\ge 2^{\pi(n+k)-\pi(n)}.
+\]
+
+\textbf{Proof.}
+By Lemma~420.2,
+\[
+\frac{\tau((n+k)!)}{\tau(n!)}=\prod_{p\le n+k} \frac{v_p((n+k)!)+1}{v_p(n!)+1}.
+\]
+Each factor in the product is at least $1$ because $v_p((n+k)!)\ge v_p(n!)$.
+Now consider a prime $p$ with $n<p\le n+k$.
+Then $p$ does not divide $n!$, so $v_p(n!)=0$, while $p$ divides $(n+k)!$ exactly once (since $p\le n+k$), so $v_p((n+k)!)=1$.
+For such primes, the corresponding factor equals $(1+1)/(0+1)=2$.
+Therefore
+\[
+\frac{\tau((n+k)!)}{\tau(n!)}\ge \prod_{n<p\le n+k} 2 = 2^{\#\{p\text{ prime}: n<p\le n+k\}}=2^{\pi(n+k)-\pi(n)}.
+\hfill$\square$
+\]
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~420.1: the prime-exponent argument uses only $v_p(a)\le v_p(b)$ when $a\mid b$; multiplying over all primes is valid because all but finitely many factors are $1$.
+\item Lemma~420.2: the interchange of sums is justified because for each $m$, $v_p(m)$ is finite, and for fixed $n$ there are only finitely many $j$ with $p^j\le n$.
+\item Lemma~420.3: for $p\in(n,n+k]$, indeed $v_p((n+k)!)=1$ since $2p>n+k$ is not required; more simply, $p$ occurs as a factor exactly once in the factorial product $1\cdot2\cdots(n+k)$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result here.}
+Rigorous structural identities and bounds:
+\begin{itemize}
+\item $F(f,n)\ge 1$ for all $n$ and all $f$ (Lemma~420.1).
+\item Exact prime-exponent expression for $\tau(n!)$ (Lemma~420.2).
+\item A general lower bound $F(k,n)\ge 2^{\pi(n+k)-\pi(n)}$ for integer $k\ge 0$ (Lemma~420.3).
+\end{itemize}
+Plus exact computed values of $F(\lfloor\log n\rfloor,n)$ and $F(\lfloor(\log n)^2\rfloor,n)$ for $3\le n\le 30$, and approximate $\log_{10}$ values up to $n=2000$.
+\item[(ii)] \textbf{First gap (crisp).}
+Prove or disprove: for some sufficiently large constant $C>0$,
+\[
+\lim_{n\to\infty} \frac{\tau\big((n+\lfloor(\log n)^C\rfloor)!\big)}{\tau(n!)}=\infty.
+\]
+A direct route would be a lower bound $\pi(n+(\log n)^C)-\pi(n)\to\infty$ (which would imply divergence via Lemma~420.3), but establishing such a bound is nontrivial.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Try to prove a deterministic lower bound on the number of primes in intervals $(n,n+(\log n)^C]$ for large $C$, or find an alternative source of growth in $F$ not requiring many new primes.
+\item Decompose $\log F(f,n)$ into contributions from primes $p\le n+\lfloor f(n)\rfloor$ via Lemma~420.2 and attempt to bound the contribution from mid-sized primes whose factorial exponents increase by $1$ on extending $n!$ to $(n+k)!$.
+\item For the density question, attempt constructive ``steering'': search computationally for $n$ such that the multiset of prime exponents in $(n+1)\cdots(n+k)$ yields a target value of $F$, for various targets, to test plausibility of density.
+\end{itemize}
+\item[(iv)] \textbf{What a minimal counterexample would likely look like.}
+If the divergence in (Q1) fails, a minimal counterexample would be an infinite sequence $n_j$ for which the block $(n_j+1)\cdots(n_j+\lfloor(\log n_j)^C\rfloor)$ introduces too few new prime exponents to make $\tau$ grow, keeping $F((\log n_j)^C,n_j)$ bounded. This would likely correspond to intervals unusually deficient in primes and with many repeated small prime factors (smooth blocks), suppressing the multiplicative increase in the factors $(v_p(\cdot)+1)$.
+\end{enumerate}
+

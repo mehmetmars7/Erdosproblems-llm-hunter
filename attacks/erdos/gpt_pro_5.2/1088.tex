@@ -1,0 +1,114 @@
+% Erdos Problem #1088
+% URL: https://www.erdosproblems.com/1088
+
+\textbf{FORMAL RESTATEMENT}
+
+Fix integers $d\ge 1$ and $n\ge 2$. For a finite set $P\subset \mathbb{R}^d$ of $m$ \emph{distinct} points, write
+\[D(P)=\{\|x-y\| : x,y\in P,\ x\neq y\}\]
+for the set of (Euclidean) distances determined by $P$.
+We say that $Q\subseteq P$ with $|Q|=n$ is \emph{pairwise-distance-distinct} if the $\binom{n}{2}$ distances
+\[\{\|x-y\|: x,y\in Q,\ x\neq y\}
+\]
+are all distinct (equivalently, $|D(Q)|=\binom{n}{2}$).
+Define $f_d(n)$ to be the least integer $m$ such that every $m$-point set $P\subset \mathbb{R}^d$ contains a pairwise-distance-distinct subset $Q$ of size $n$.
+
+Edge cases/conventions:
+\begin{itemize}
+\item $f_d(2)=2$.
+\item For $n\ge 3$, the condition means every triangle (when $n=3$) is scalene, and more generally every two distinct edges in the complete graph on $Q$ have different lengths.
+\end{itemize}
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+I will not use external results beyond what is explicitly stated in the problem text.
+The problem text states: $f_1(n)\asymp n^2$; $f_2(3)=7$ (Erd\H{o}s) and $f_3(3)=9$ (Croft); and results referenced at [503] give $f_d(3)=\frac{d^2}{2}+O(d)$.
+
+\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item (Lower bounds) Construct large point sets in $\mathbb{R}^d$ that globally use fewer than $\binom{n}{2}$ distance values; then no $n$-subset can realize $\binom{n}{2}$ distinct distances.
+\item (Upper bounds / main conjecture) The hard direction is to prove that for fixed $n$ and large $d$, every sufficiently large $m$ (ideally $m=2^{o(d)}$) forces an $n$-point pairwise-distance-distinct subset. I do not currently have a route to that.
+\end{itemize}
+
+\textbf{WORK}
+
+\textbf{Lemma 1088.1 (Distances in a fixed Hamming-weight layer).}
+Fix integers $d\ge 1$ and $s$ with $1\le s\le d$. Let
+\[P_{d,s}:=\{x\in\{0,1\}^d : x \text{ has exactly } s \text{ coordinates equal to }1\}\subset \mathbb{R}^d.
+\]
+Then every distance between two \emph{distinct} points of $P_{d,s}$ has squared value in
+\[\{2,4,\dots,2s\},\]
+and each value $2t$ ($1\le t\le s$) occurs as a squared distance for some pair in $P_{d,s}$. In particular, $P_{d,s}$ determines exactly $s$ distinct (positive) distances.
+
+\emph{Proof.}
+Take distinct $x,y\in P_{d,s}$, and let $A=\{i: x_i=1\}$ and $B=\{i: y_i=1\}$, so $|A|=|B|=s$.
+Then $x-y$ has coordinates in $\{-1,0,1\}$ and
+\[\|x-y\|^2=\sum_{i=1}^d (x_i-y_i)^2 = |\{i: x_i\ne y_i\}| = |A\triangle B|,
+\]
+where $A\triangle B$ is the symmetric difference.
+Now
+\[|A\triangle B| = |A|+|B|-2|A\cap B| = 2s-2|A\cap B|.
+\]
+Since $x\neq y$, we have $|A\cap B|\le s-1$, so $|A\triangle B|\in\{2,4,\dots,2s\}$.
+Conversely, for any $t\in\{1,\dots,s\}$, choose sets $A,B\subset[d]$ of size $s$ with $|A\cap B|=s-t$ (possible because $s-t\in\{0,\dots,s-1\}$ and $d\ge s$). Then the corresponding $x,y\in P_{d,s}$ satisfy $\|x-y\|^2=2t$.
+Thus the set of distinct positive distances is exactly $\{\sqrt{2},\sqrt{4},\dots,\sqrt{2s}\}$.
+\hfill$\square$
+
+\textbf{Proposition 1088.2 (A general polynomial-in-$d$ lower bound for fixed $n$).}
+Fix $n\ge 3$ and set
+\[S:=\binom{n}{2}-1.
+\]
+Assume $d\ge S$. Then
+\[f_d(n)\ \ge\ \binom{d}{S}+1.
+\]
+
+\emph{Proof.}
+Consider the set $P_{d,S}$ from Lemma 1088.1. Its size is $|P_{d,S}|=\binom{d}{S}$.
+By Lemma 1088.1, the total number of distinct distances appearing among all pairs in $P_{d,S}$ is exactly $S$.
+If $Q\subseteq P_{d,S}$ has size $n$, then every distance between two points of $Q$ is also a distance determined by $P_{d,S}$, so
+\[|D(Q)|\le |D(P_{d,S})| = S = \binom{n}{2}-1.
+\]
+But a pairwise-distance-distinct set $Q$ of size $n$ would require $|D(Q)|=\binom{n}{2}$, impossible. Hence $P_{d,S}$ contains no $n$-point pairwise-distance-distinct subset.
+By definition of $f_d(n)$, this implies $f_d(n)>|P_{d,S}|=\binom{d}{S}$, i.e. $f_d(n)\ge \binom{d}{S}+1$.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (local computation).}
+For small parameters, I verified Lemma 1088.1 computationally by enumerating $P_{d,s}$ and computing distinct squared distances.
+For example:
+\begin{verbatim}
+d=5, s=2, |P|=10, distinct squared distances=[2, 4]
+d=6, s=2, |P|=15, distinct squared distances=[2, 4]
+d=6, s=3, |P|=20, distinct squared distances=[2, 4, 6]
+d=8, s=4, |P|=70, distinct squared distances=[2, 4, 6, 8]
+\end{verbatim}
+Also, for $s=2$ the set $P_{d,2}$ has only two distance values, so it cannot contain a scalene triangle; this was verified for $2\le d\le 10$ by brute-force checking all triples.
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 1088.1: the key identity $\|x-y\|^2=|A\triangle B|$ is correct for $0/1$ vectors, and the parity constraints give exactly the even numbers $2,4,\dots,2s$.
+\item Proposition 1088.2: the only required observation is that an $n$-subset cannot realize more distinct distances than exist globally in $P_{d,S}$.
+\item Edge cases: if $d<S$, $P_{d,S}$ is empty; the proposition is stated only for $d\ge S$.
+\end{itemize}
+
+\textbf{FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} For fixed $n\ge 3$ and all $d\ge \binom{n}{2}-1$,
+\[f_d(n)\ge \binom{d}{\binom{n}{2}-1}+1\asymp d^{\binom{n}{2}-1}.
+\]
+This comes from the explicit construction $P_{d,\binom{n}{2}-1}\subset\{0,1\}^d$.
+
+(ii) \emph{First gap (crisp).} Prove any nontrivial \emph{upper bound in $d$} for fixed $n$, e.g. show that for each fixed $n\ge 3$ there exists $m(d)=2^{o(d)}$ such that every $m(d)$-point set in $\mathbb{R}^d$ contains an $n$-point pairwise-distance-distinct subset.
+
+(iii) \emph{Top 3 next moves.}
+\begin{itemize}
+\item Try to model the obstruction as a $4$-uniform hypergraph on the point set whose hyperedges encode repeated distances, and seek a large independent set using structural/geometric bounds on the number of equal-distance quadruples realizable in $\mathbb{R}^d$.
+\item Investigate whether the distance-equality relation $\|a-b\|=\|c-d\|$ being semi-algebraic of bounded complexity yields a polynomial/semi-polynomial Ramsey-type bound specifically forcing a rainbow $K_n$.
+\item Computationally search for best lower-bound constructions for small $(n,d)$ within structured families (e.g. subsets of the Hamming cube, spherical codes, or unions of few distance layers) to guess the right growth in $d$.
+\end{itemize}
+
+(iv) \emph{Minimal counterexample structure.} A counterexample to the conjectured subexponential upper bound would be (for some fixed $n$) a family of point sets $P_d\subset\mathbb{R}^d$ of size $2^{\Omega(d)}$ such that every $n$-subset repeats a distance. Such a family would have to avoid rainbow $K_n$ in the complete graph edge-colored by distances, while simultaneously respecting metric constraints in high dimension.
+
+

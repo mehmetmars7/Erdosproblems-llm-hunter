@@ -1,0 +1,136 @@
+% Attempt for Erdos Problem #128
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- Graphs are finite, simple, undirected.
+- For a graph $G$ and $S\subseteq V(G)$, write $G[S]$ for the induced subgraph and $e(G[S])$ for its number of edges.
+
+Question.
+If $G$ has $n$ vertices and satisfies
+\[\forall S\subseteq V(G)\ \big(|S|\ge \lfloor n/2\rfloor \implies e(G[S])> n^2/50\big),\]
+must $G$ contain a triangle (a $K_3$ subgraph)?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the statement only:
+- The claim is known with $50$ replaced by $16$.
+- The constant $50$ is claimed to be best possible (blow-up of $C_5$ / Petersen).
+I will not use external results beyond standard inequalities I explicitly prove below.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Work by contrapositive: assume $G$ is triangle-free, and try to find a subset $S$ of size $\ge n/2$ with few edges.
+2. Use averaging over random subsets to guarantee an $S$ with edge count near the mean, then combine with global bounds on $e(G)$ (e.g. Tur\'an) to get explicit constants.
+3. To approach the sharp constant $50$, exploit specific structure of near-extremal triangle-free graphs (non-bipartite, like blow-ups of $C_5$).
+
+Disproof track ideas:
+1. Try to construct triangle-free graphs where every half-subset induces many edges, pushing the constant downward; the statement suggests $C_5$ blow-ups reach the threshold $50$.
+
+Chosen path in this attempt: prove (i) the easy constant $16$ via averaging and Tur\'an, and (ii) verify sharpness of $50$ for the balanced blow-up of $C_5$ by an explicit minimization over half-subsets.
+
+4) WORK
+Lemma 1 (Averaging over half-subsets).
+Let $G$ be a graph on $n$ vertices with $m$ edges, and let $S$ be a uniformly random subset of $V(G)$ of size $\lfloor n/2\rfloor$.
+Then
+\[\mathbb E[e(G[S])] = m\cdot \frac{\binom{\lfloor n/2\rfloor}{2}}{\binom{n}{2}} \le \frac{m}{4}.\]
+In particular, there exists some $S$ with $|S|=\lfloor n/2\rfloor$ such that $e(G[S])\le m/4$.
+
+Proof.
+Each edge $uv\in E(G)$ contributes $1$ to $e(G[S])$ exactly when both endpoints are chosen in $S$.
+For a fixed edge, the probability that both endpoints lie in a uniform $t$-subset is $\binom{t}{2}/\binom{n}{2}$ where $t=\lfloor n/2\rfloor$.
+By linearity of expectation,
+\[\mathbb E[e(G[S])] = m\cdot \frac{\binom{t}{2}}{\binom{n}{2}}.\]
+Since $t\le n/2$, we have $\binom{t}{2}/\binom{n}{2}\le (t/n)^2\le 1/4$, giving the inequality.
+The existence of some $S$ with $e(G[S])\le \mathbb E[e(G[S])]$ follows because the average of $e(G[S])$ over all such $S$ equals the expectation. \qed
+
+Lemma 2 (Easy ``16'' version via Tur\'an + averaging).
+If $G$ is triangle-free on $n$ vertices, then there exists $S\subseteq V(G)$ with $|S|=\lfloor n/2\rfloor$ and
+\[e(G[S])\le \frac{n^2}{16}.\]
+Consequently, if every induced subgraph on $\ge \lfloor n/2\rfloor$ vertices has $>n^2/16$ edges, then $G$ must contain a triangle.
+
+Proof.
+If $G$ is triangle-free, then by Tur\'an's theorem (forbidding $K_3$) one has $m=e(G)\le n^2/4$.
+Apply Lemma 1 to obtain a set $S$ of size $\lfloor n/2\rfloor$ with $e(G[S])\le m/4 \le (n^2/4)/4=n^2/16$.
+The final contrapositive statement is immediate. \qed
+
+Lemma 3 (Balanced $C_5$ blow-up achieves the $1/50$ half-density threshold).
+Let $n=5m$ with $m\ge 1$.
+Partition the vertex set into five parts $V_0,\dots,V_4$ each of size $m$, and form the \emph{balanced blow-up of $C_5$}:
+add all edges between $V_i$ and $V_{i+1}$ (indices mod $5$), and no other edges.
+Call this graph $H_{m}$.
+Then:
+1. $H_m$ is triangle-free.
+2. Every subset $S\subseteq V(H_m)$ with $|S|\ge \lceil n/2\rceil=\lceil 5m/2\rceil$ satisfies
+\[e(H_m[S])\ge \frac{n^2}{50}=\frac{m^2}{2}.\]
+3. If $m$ is even, there exists $S$ with $|S|=n/2$ and $e(H_m[S])=n^2/50$.
+
+Proof.
+(1) Any edge of $H_m$ joins two consecutive parts. A triangle would require three pairwise adjacent vertices, hence would require edges between three parts.
+But in $C_5$, no three distinct vertices are pairwise adjacent, so $H_m$ has no triangle.
+
+(2) Let $x_i:=|S\cap V_i|$ for $i\in\{0,1,2,3,4\}$.
+Then $0\le x_i\le m$ and $\sum_{i=0}^4 x_i = |S|\ge \lceil 5m/2\rceil$.
+Since edges exist only between consecutive parts, the induced edge count is
+\[e(H_m[S]) = \sum_{i=0}^4 x_i x_{i+1}\qquad(\text{indices mod }5).\tag{*}\]
+
+We claim that under the constraints $0\le x_i\le m$ and $\sum x_i\ge 5m/2$, one has $\sum x_i x_{i+1}\ge m^2/2$.
+To see this, scale $y_i:=x_i/m\in[0,1]$ and note $\sum y_i\ge 5/2$.
+The function $F(y):=\sum y_i y_{i+1}$ is nondecreasing in each coordinate (all coefficients are nonnegative), so its minimum under $\sum y_i\ge 5/2$ occurs when $\sum y_i=5/2$.
+
+So assume $\sum y_i=5/2$.
+Consider minimizing $F(y)$ over the polytope $\{y\in[0,1]^5:\sum y_i=5/2\}$.
+Fix an index $i$ and write $a=y_i$, $b=y_{i+1}$, $u=y_{i-1}$, $v=y_{i+2}$.
+Holding $u,v$ and the sum $a+b=s$ fixed, the part of $F$ involving $a,b$ is
+\[T(a,b)=au+ab+bv = a(u+s-a) + (s-a)v = -a^2 + a(u+s-v) + sv,\]
+which is a concave quadratic in $a$ (coefficient $-1$).
+Therefore, for fixed $s$ and fixed other coordinates, $T(a,s-a)$ is minimized at an endpoint of the allowed interval for $a$.
+Thus we may adjust $(a,b)$ while keeping $a+b$ fixed to reach a boundary point (one of $a,b$ in $\{0,1\}$) without increasing $F$.
+Iterating over pairs shows there is a minimizer of $F$ with at most one coordinate not in $\{0,1\}$.
+
+But with $\sum y_i=5/2$, any point with at most one fractional coordinate must have exactly two coordinates equal to $1$, two equal to $0$, and one equal to $1/2$.
+A direct check of the cyclic product sum in this case shows:
+- If the two $1$'s are adjacent, then $F\ge 1$.
+- If the $1/2$ is adjacent to both $1$'s, then $F\ge 1$ (two edges each contributing $1/2$).
+- The minimal configuration is when the two $1$'s are at distance $2$ on the cycle and the $1/2$ is adjacent to exactly one of them (e.g. $(1,0,1,0,1/2)$ up to rotation),
+  in which case exactly one edge contributes $1\cdot(1/2)$ and all other edges touch a $0$, so $F=1/2$.
+Hence the minimum of $F$ is $1/2$, proving $\sum y_i y_{i+1}\ge 1/2$ and therefore $\sum x_i x_{i+1}\ge (m^2)(1/2)=m^2/2$.
+Combining with (*) gives $e(H_m[S])\ge m^2/2=n^2/50$.
+
+(3) If $m$ is even, take $x_0=x_2=m$ and $x_4=m/2$ with $x_1=x_3=0$ (i.e. $S$ consists of all vertices in $V_0$ and $V_2$, and half of $V_4$).
+Then $|S|=m+m+m/2=5m/2=n/2$ and (*) gives
+\[e(H_m[S])=x_4x_0=\frac{m}{2}\cdot m=\frac{m^2}{2}=\frac{n^2}{50}.\]
+This shows the lower bound in (2) is tight (at least when $m$ is even). \qed
+
+FAST REALITY CHECK (local computation for small $m$).
+I brute-forced the minimization of $\sum x_i x_{i+1}$ over integer vectors $0\le x_i\le m$ with $\sum x_i\ge \lceil 5m/2\rceil$ for $m\le 6$.
+The minimum achieved equals $m^2/2$ for even $m$ and is larger for odd $m$, consistent with Lemma 3(2)--(3).
+
+5) VERIFICATION
+- Lemma 1 is a standard linearity-of-expectation argument for induced edge counts in uniform random subsets.
+- Lemma 2 uses only Tur\'an's theorem for triangle-free graphs and the averaging lemma.
+- Lemma 3(2) reduces the extremal half-subset question in the $C_5$ blow-up to a 5-variable minimization problem and shows the minimum occurs at a boundary configuration; the explicit configuration in (3) achieves equality for even $m$.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved an elementary version of the statement with constant $16$ (Lemma 2) and verified that the balanced blow-up of $C_5$ is triangle-free yet forces every half-subset to span at least $n^2/50$ edges (Lemma 3), showing $50$ is the natural sharp threshold.
+
+(ii) First gap:
+Close the gap between $1/16$ and $1/50$: show that every triangle-free graph has some induced subgraph on $\ge n/2$ vertices with at most $n^2/50$ edges, or construct a counterexample.
+
+(iii) Top 3 next moves (concrete):
+1. Refine Lemma 1 by choosing non-uniform distributions for $S$ (biased toward low-degree vertices) to push the guaranteed sparse-half edge count below $n^2/16$ for triangle-free graphs.
+2. Analyze near-extremal triangle-free graphs (close to the Tur\'an bound $n^2/4$) and try to prove they must have particularly sparse halves unless they resemble $C_5$-type blow-ups.
+3. Try to prove a stability statement: if every half-subset has many edges, then $G$ must be structurally close to a blow-up of $C_5$ (or Petersen), which is the claimed extremal configuration.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A triangle-free graph $G$ on $n$ vertices such that every induced subgraph on $\ge n/2$ vertices spans strictly more than $n^2/50$ edges,
+yet $G$ is not close in structure to a $C_5$ blow-up; such a graph would disprove the conjectured sharp constant.
+

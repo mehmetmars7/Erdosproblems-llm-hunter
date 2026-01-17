@@ -1,0 +1,179 @@
+% Erdos Problem #714
+
+1) “FORMAL RESTATEMENT”
+
+Fix an integer $r\ge 2$. Let $K_{r,r}$ denote the complete bipartite graph with $r$ vertices in each part.
+
+For each $n\in\mathbb N$, $\mathrm{ex}(n;K_{r,r})$ is the maximum number of edges in a simple graph on $n$ vertices containing no $K_{r,r}$ as a subgraph.
+
+The question asks whether there exists a constant $c_r>0$ (depending only on $r$) such that
+\[
+\mathrm{ex}(n;K_{r,r}) \ge c_r\, n^{2-1/r}
+\qquad\text{for all sufficiently large }n.
+\]
+(Equivalently, $\mathrm{ex}(n;K_{r,r})\gg n^{2-1/r}$.)
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+Only what is explicitly stated in the problem text:
+
+- K\"{o}v\'{a}ri--S\'{o}s--Tur\'{a}n proved the upper bound $\mathrm{ex}(n;K_{r,r})\ll n^{2-1/r}$ for all $r\ge 2$.
+- Brown and independently Erd\H{o}s--R\'{e}nyi--S\'{o}s proved the conjectured lower bound when $r=3$.
+- For $r=2$, $\mathrm{ex}(n;K_{2,2})=(\tfrac12+o(1))n^{3/2}$.
+
+Per integrity rules, I do not use any other external results.
+
+3) “ATTACK PLAN”
+
+Proof track: reproduce the K\"{o}v\'{a}ri--S\'{o}s--Tur\'{a}n upper bound (this is doable by double counting) and search for constructions suggesting the matching lower bound.
+
+Disproof track: attempt to show that any attempted construction of $\Theta(n^{2-1/r})$ edges necessarily creates $K_{r,r}$ when $r\ge 4$ (no such argument found).
+
+I provide a full proof of an explicit KST-type upper bound and a simple linear lower-bound construction; the desired $n^{2-1/r}$ lower bound for general $r$ remains unresolved.
+
+4) “WORK”
+
+\textbf{FAST REALITY CHECK (small exact computations).}
+
+By brute force:
+
+- For $r=2$ (i.e. $K_{2,2}=C_4$),
+\[
+\mathrm{ex}(4;C_4)=4,\ \mathrm{ex}(5;C_4)=6,\ \mathrm{ex}(6;C_4)=7,\ \mathrm{ex}(7;C_4)=9.
+\]
+
+- For $r=3$ (i.e. forbidding $K_{3,3}$),
+\[
+\mathrm{ex}(6;K_{3,3})=12\ (\text{out of }15),\qquad \mathrm{ex}(7;K_{3,3})=16\ (\text{out of }21).
+\]
+
+These are only small-$n$ sanity checks.
+
+\medskip
+\textbf{Lemma 1 (K\"{o}v\'{a}ri--S\'{o}s--Tur\'{a}n type upper bound for $K_{r,r}$, with proof).}
+Let $r\ge 2$ and let $G$ be a $K_{r,r}$-free graph on $n$ vertices with $m$ edges.
+Then
+\[
+ m \le \frac{r}{2}(r-1)^{1/r}\, n^{2-1/r}.
+\]
+(In particular $\mathrm{ex}(n;K_{r,r})\ll_r n^{2-1/r}$.)
+
+\emph{Proof.}
+Let the degrees be $d_1,\dots,d_n$.
+For a vertex $v$, let $N(v)$ denote its neighborhood.
+Consider the set of pairs $(v,S)$ where $v\in V(G)$ and $S\subseteq N(v)$ is an $r$-subset.
+
+Counting this set in two ways:
+
+\underline{(1) Sum over vertices.}
+For each $v$ there are $\binom{d(v)}{r}$ choices of $S\subseteq N(v)$ of size $r$. Hence the total number of pairs is
+\[
+\sum_{i=1}^n \binom{d_i}{r}.
+\]
+
+\underline{(2) Sum over $r$-subsets $S$ of vertices.}
+Fix an $r$-subset $S\subseteq V(G)$. Let $\Gamma(S):=\bigcap_{u\in S} N(u)$ be the common neighborhood of $S$.
+Then $S\subseteq N(v)$ iff $v\in\Gamma(S)$. So the number of vertices $v$ such that $(v,S)$ is counted is exactly $|\Gamma(S)|$.
+
+Because $G$ is $K_{r,r}$-free, we claim that for every $r$-subset $S$,
+\[
+|\Gamma(S)|\le r-1.
+\]
+Indeed, if $|\Gamma(S)|\ge r$, then choosing any $r$ distinct vertices $v_1,\dots,v_r\in\Gamma(S)$ gives a $K_{r,r}$ with bipartition $(S,\{v_1,\dots,v_r\})$, since each $v_j$ is adjacent to every vertex in $S$ by definition of common neighborhood.
+
+Therefore, summing over all $\binom{n}{r}$ choices of $S$ gives
+\[
+\sum_{i=1}^n \binom{d_i}{r} \le (r-1)\binom{n}{r}.
+\]
+
+Now lower bound the left-hand side in terms of $m$.
+For each integer $d\ge r$,
+\[
+\binom{d}{r}=\frac{d(d-1)\cdots(d-r+1)}{r!}\ge \frac{(d-r+1)^r}{r!}.
+\]
+For $d\ge r$, we have $d-r+1\ge d/r$ (since $r(d-r+1)\ge d$ holds for $d\ge r$), hence
+\[
+\binom{d}{r} \ge \frac{1}{r!}\left(\frac{d}{r}\right)^r.
+\]
+For $d<r$, the binomial coefficient is $0$, so the inequality still holds if we interpret the right-hand side as $\frac{1}{r!}(d/r)^r$ (which is nonnegative).
+Thus for all $i$,
+\[
+\binom{d_i}{r}\ge \frac{1}{r!}\left(\frac{d_i}{r}\right)^r.
+\]
+Summing and using convexity of $x\mapsto x^r$ (or power mean inequality),
+\[
+\sum_{i=1}^n \left(\frac{d_i}{r}\right)^r \ge n\left(\frac{\frac1n\sum_i d_i}{r}\right)^r = n\left(\frac{2m/n}{r}\right)^r.
+\]
+Therefore
+\[
+\sum_{i=1}^n \binom{d_i}{r} \ge \frac{1}{r!}\, n\left(\frac{2m}{rn}\right)^r.
+\]
+Combine with the upper bound:
+\[
+\frac{1}{r!}\, n\left(\frac{2m}{rn}\right)^r \le (r-1)\binom{n}{r} \le (r-1)\frac{n^r}{r!}.
+\]
+Cancel $1/r!$ and rearrange:
+\[
+ n\left(\frac{2m}{rn}\right)^r \le (r-1)n^r
+\quad\Longrightarrow\quad
+\left(\frac{2m}{rn}\right)^r \le (r-1)n^{r-1}.
+\]
+Taking $r$th roots gives
+\[
+\frac{2m}{rn} \le (r-1)^{1/r} n^{1-1/r}
+\quad\Longrightarrow\quad
+m \le \frac{r}{2}(r-1)^{1/r} n^{2-1/r}.
+\]
+\qed
+
+\medskip
+\textbf{Lemma 2 (Simple linear lower bound construction).}
+For every $r\ge 2$ and every $n$,
+\[
+\mathrm{ex}(n;K_{r,r}) \ge (r-1)n - O_r(1).
+\]
+More precisely, if $n=q(2r-1)+s$ with $0\le s<2r-1$, then there exists a $K_{r,r}$-free graph on $n$ vertices with
+\[
+q\binom{2r-1}{2}+\binom{s}{2}
+\]
+edges.
+
+\emph{Proof.}
+Take the disjoint union of $q$ copies of the clique $K_{2r-1}$ and one clique $K_s$ on the remaining $s$ vertices.
+Any $K_{r,r}$ subgraph would need $2r$ distinct vertices, and since there are no edges between components, any copy of $K_{r,r}$ would have to lie inside a single clique component.
+But each clique component has size at most $2r-1$, so it cannot contain $K_{r,r}$.
+Thus the graph is $K_{r,r}$-free.
+
+Its number of edges is exactly $q\binom{2r-1}{2}+\binom{s}{2}$.
+Since $\binom{2r-1}{2}=(2r-1)(2r-2)/2=(2r-1)(r-1)$, the leading term is $(r-1)n$ up to an $O_r(1)$ additive error from the leftover clique.
+\qed
+
+5) “VERIFICATION”
+
+- Lemma 1: The key forbidden-configuration implication is correct: $|\Gamma(S)|\ge r$ produces a $K_{r,r}$.
+- The inequality $\binom{d}{r}\ge \frac1{r!}(d/r)^r$ was checked for $d\ge r$ via $d-r+1\ge d/r$; for $d<r$ the left side is $0$ so the bound remains valid.
+- Lemma 2: Disjoint union argument verified: any subgraph requiring edges between two $r$-sets must sit in one component; component size $<2r$ forbids $K_{r,r}$.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here: a complete proof of a KST-type upper bound $\mathrm{ex}(n;K_{r,r})\ll_r n^{2-1/r}$ (Lemma 1) and a simple explicit $K_{r,r}$-free construction with $\Theta_r(n)$ edges (Lemma 2). Small exact values were computed for $r=2$ up to $n=7$ and for $r=3$ up to $n=7$.
+
+(ii) First gap (crisp statement): for each fixed $r\ge 4$, construct (and prove $K_{r,r}$-freeness of) graphs on $n$ vertices with
+\[
+\Omega_r\bigl(n^{2-1/r}\bigr)
+\]
+edges.
+
+(iii) Top 3 next moves (concrete targets):
+
+1. Try to generalize known incidence-type constructions: build bipartite graphs from algebraic relations over finite fields and prove they have no $K_{r,r}$ while having $\gg n^{2-1/r}$ edges.
+
+2. Develop a deletion/alteration method that starts from a pseudorandom dense bipartite graph and removes few edges to destroy all $K_{r,r}$, aiming for exponent $2-1/r$ (the naive random-graph alteration falls short).
+
+3. For fixed small $r\ge 4$ and moderate $n$, use computer search (SAT/MILP) to find candidate dense $K_{r,r}$-free graphs and inspect their structure to guess a general construction.
+
+(iv) Minimal counterexample structure (if the lower bound is false): one would need a proof that every $n$-vertex graph with $\gg n^{2-1/r}$ edges necessarily contains a $K_{r,r}$; equivalently, that the KST upper bound is not just asymptotically tight in exponent but also in the sense that the true extremal growth exponent is strictly smaller than $2-1/r$ for some $r\ge 4$.
+
+

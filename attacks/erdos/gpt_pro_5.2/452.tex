@@ -1,0 +1,116 @@
+% Erdos Problem #452
+
+\textbf{FORMAL RESTATEMENT}
+
+Let $\omega(n)$ denote the number of \emph{distinct} prime divisors of the positive integer $n$.
+Fix a real parameter $x\ge 3$. Define
+\[
+L(x):=\max\Big\{\,\ell\in\mathbb N:\ \exists N\in\mathbb Z\ \text{s.t.}\ x\le N\le 2x-\ell+1\ \text{and}\ \omega(N+j)>\log\log(N+j)\ \forall j\in\{0,\dots,\ell-1\}\Big\}.
+\]
+(So $L(x)$ is the length of the longest interval of consecutive integers contained in $[x,2x]$ on which $\omega(n)>\log\log n$ holds throughout.) The problem asks for the order of magnitude / asymptotics of $L(x)$ as $x\to\infty$.
+
+\textbf{QUICK LITERATURE/CONTEXT CHECK}
+
+Only what is in the problem text is used: Erd\H{o}s (1937) proved that the natural density of integers with $\omega(n)>\log\log n$ is $1/2$. The problem text also states that CRT gives an interval with
+\[
+|I|\ge (1+o(1))\frac{\log x}{(\log\log x)^2}.
+\]
+Per the integrity constraint, I do not import additional results about primes/smooth numbers beyond elementary lemmas proved below.
+
+\textbf{ATTACK PLAN}
+
+\begin{itemize}
+\item Reduce ``consecutive integers all have many distinct prime factors'' to a CRT divisibility construction: enforce $N+j$ divisible by a prescribed modulus $M_j$ with many distinct prime factors.
+\item Isolate the purely CRT part (which is elementary and provable here) from the number-theoretic part (constructing many such $M_j$ with total product $\le x$).
+\item FAST REALITY CHECK: compute $L(x)$ for modest $x$ by sieving $\omega$.
+\end{itemize}
+
+\textbf{WORK}
+
+\emph{Fast reality check (exact computation for small/moderate $x$).}
+By a direct sieve computation of $\omega(n)$ for $n\le 2x$, I found the longest run length $L(x)$ in $[x,2x]$ for several $x$:
+\begin{center}
+\begin{tabular}{r|r|l}
+$x$ & computed $L(x)$ & one maximizing interval $[N,N+L(x)-1]$ \\\hline
+$10^3$ & 29 & $[1332,1360]$\\
+$10^4$ & 8  & $[17013,17020]$\\
+$10^5$ & 12 & $[104660,104671]$\\
+$10^6$ & 23 & $[1039430,1039452]$\\
+\end{tabular}
+\end{center}
+These are sanity checks only; they substantially exceed the very small value of $(\log x)/(\log\log x)^2$ at these $x$.
+
+\medskip
+
+\textbf{Lemma 452.1 (integer threshold inside $[x,2x]$).}
+If $n\in[x,2x]$ and $\omega(n)>\log\log n$, then
+\[
+\omega(n)\ge \big\lfloor \log\log x\big\rfloor+1.
+\]
+
+\emph{Proof.}
+Since $n\ge x$, we have $\log\log n\ge \log\log x$. If $\omega(n)>\log\log n\ge \log\log x$ and $\omega(n)$ is an integer, then $\omega(n)\ge \lfloor \log\log x\rfloor+1$.
+\qed
+
+\medskip
+
+\textbf{Lemma 452.2 (CRT block lemma).}
+Fix integers $L\ge 1$ and $r\ge 1$, and a real $x\ge 3$. Suppose there exist integers $M_0,\dots,M_{L-1}\ge 2$ such that
+\begin{enumerate}
+\item the $M_j$ are pairwise coprime,
+\item $\omega(M_j)\ge r$ for every $j$, and
+\item $M:=\prod_{j=0}^{L-1} M_j\le x-L+2$.
+\end{enumerate}
+Then there exists an integer $N\in[x,2x-L+1]$ such that for every $j\in\{0,\dots,L-1\}$,
+\[
+M_j\mid (N+j),\quad\text{hence}\quad \omega(N+j)\ge r.
+\]
+In particular, if additionally $r>\log\log(2x)$, then $\omega(N+j)>\log\log(N+j)$ for all $j$ (since $N+j\le 2x$), so $L(x)\ge L$.
+
+\emph{Proof.}
+For each $j$ impose the congruence
+\[
+N\equiv -j\pmod{M_j}.
+\]
+Because the $M_j$ are pairwise coprime, CRT yields an integer $a$ (unique modulo $M=\prod_j M_j$) satisfying all these congruences simultaneously.
+Then for that residue class, each $a+j$ is divisible by $M_j$, so $\omega(a+j)\ge \omega(M_j)\ge r$.
+
+We now choose a representative of the class $a\pmod M$ inside $[x,2x-L+1]$. The interval
+\[
+[x, x+M-1]
+\]
+has length $M$ and contains exactly one representative of each residue class modulo $M$. By the size condition $M\le x-L+2$ we have
+\[
+x+M-1\le x+(x-L+2)-1=2x-L+1,
+\]
+so $[x,x+M-1]\subseteq [x,2x-L+1]$. Therefore there exists (indeed, uniquely) an integer $N\in[x,x+M-1]$ with $N\equiv a\pmod M$, and this $N$ lies in $[x,2x-L+1]$.
+For each $j$, since $N\equiv a\pmod{M_j}$ we have $N+j\equiv a+j\equiv 0\pmod{M_j}$, hence $M_j\mid(N+j)$ and $\omega(N+j)\ge r$.
+Finally, if $r>\log\log(2x)$ then for all $j$ we have $N+j\le 2x$, hence $\log\log(N+j)\le \log\log(2x)< r\le \omega(N+j)$.
+\qed
+
+\medskip
+
+\textbf{VERIFICATION}
+
+\begin{itemize}
+\item Lemma 452.1 is purely monotonicity + integrality; no hidden assumptions.
+\item In Lemma 452.2, the extra size condition $M\le x-L+2$ guarantees that $[x,x+M-1]\subseteq[x,2x-L+1]$, so the required residue class modulo $M$ has a representative $N$ with $N+L-1\le 2x$.
+\item The computational sanity checks match the definition of $L(x)$ (longest consecutive run in $[x,2x]$).
+\end{itemize}
+
+\textbf{FINAL.} \textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.} The existence of long intervals is reduced to constructing pairwise coprime $M_0,\dots,M_{L-1}$ with $\omega(M_j)$ large and $\prod_j M_j\le x-L+2$ (Lemma 452.2). This isolates the CRT mechanism cleanly.
+
+(ii) \emph{First gap (crisp).} Construct, for arbitrarily large $x$, explicit pairwise coprime integers $M_0,\dots,M_{L-1}$ with $\omega(M_j)\ge \lceil\log\log(2x)\rceil+1$ and $\prod_j M_j\le x-L+2$ for $L$ as large as $\gg \frac{\log x}{(\log\log x)^2}$ (or even $L\gg (\log x)^k$).
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Attempt a prime-allocation construction inside Lemma 452.2: set $M_j$ to be products of $r\approx\log\log x$ distinct primes, arranged so that all primes used are distinct across all $j$, and then prove (with fully justified prime-counting/size bounds) that one can choose $L\approx \log x/(\log\log x)^2$ while keeping $\prod_j M_j\le x-L+2$.
+\item Explore a ``reuse small primes'' variant: allow the same small prime to divide many $N+j$ when indices are congruent modulo that prime, aiming to reduce the total modulus size.
+\item Computation: for $x$ up to (say) $10^8$, compute empirical $L(x)$ and the factorization pattern of the maximizing runs; use this to guess a plausible true order (e.g. polylog power).
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure.} A minimal counterexample to a conjectured lower bound $L(x)\ge G(x)$ would be an $x$ for which every block of $G(x)$ consecutive integers in $[x,2x]$ contains at least one $n$ with $\omega(n)\le \log\log n$; such an $n$ would likely be either prime, a prime power, or a product of unusually few primes.
+
+

@@ -1,0 +1,181 @@
+% Erdos Problem #902
+
+% Erdos Problem #902
+
+\noindent\textbf{1) FORMAL RESTATEMENT}
+
+A \emph{tournament} on vertex set $V$ is an orientation of the complete graph:
+for every unordered pair $\{u,v\}$ exactly one of $u\to v$ or $v\to u$ holds.
+
+For a vertex $x$ and a set $S\subseteq V\setminus\{x\}$, say that \emph{$x$
+dominates $S$} if $x\to s$ for all $s\in S$.
+
+For $n\ge 1$, let $f(n)$ be the minimum integer $N$ such that there exists a
+tournament on $N$ vertices with the property:
+
+\[ \forall S\subseteq V\ \text{with }|S|=n,\ \exists x\in V\setminus S\ \text{such that }x\text{ dominates }S. \]
+
+Estimate $f(n)$.
+
+\medskip
+\noindent\textbf{2) QUICK LITERATURE/CONTEXT CHECK}
+
+The problem statement records the bounds
+\[2^{n+1}-1\le f(n)\ll n^2 2^n,\qquad\text{and }\qquad n2^n\ll f(n),
+\]
+and exact values $f(1)=3$, $f(2)=7$, $f(3)=19$.
+
+\medskip
+\noindent\textbf{3) ATTACK PLAN}
+
+\begin{itemize}
+\item Prove the lower bound $f(n)\ge 2^{n+1}-1$ by an induction on $n$ using
+inneighborhoods.
+\item Prove an explicit probabilistic upper bound of the form
+$f(n)\le C n^2 2^n$ by union bounding over all $n$-sets in a random tournament.
+\item Brute-force sanity check the exact value $f(2)=7$ by enumerating all
+tournaments up to 6 vertices, and verify an explicit 7-vertex example.
+\end{itemize}
+
+\medskip
+\noindent\textbf{4) WORK}
+
+\textbf{PHASE 1 — FAST REALITY CHECK (computation for $n=2$).}
+
+I brute-forced all tournaments on $N\le 6$ vertices (there are $2^{\binom{N}{2}}$)
+and checked the $n=2$ domination property.
+Result: no tournament on $N\le 6$ vertices has the property for $n=2$.
+I then checked the Paley tournament on 7 vertices (vertices $0,\dots,6$ with
+$i\to j$ iff $j-i\pmod 7$ is a quadratic residue); it \emph{does} satisfy the
+property for $n=2$.
+This matches the stated value $f(2)=7$.
+
+\medskip
+\textbf{Problem-specific lemmas (recursive lower bound and probabilistic upper bound).}
+
+\medskip
+\noindent\textbf{Lemma 902.1 (Indegree recursion and $2^{n+1}-1$ lower bound).}
+Let $T$ be a tournament on $N$ vertices with the property that every $n$-set is
+dominated by some outside vertex. Then there exists a vertex $v$ whose
+inneighborhood $I(v):=\{u\in V: u\to v\}$ induces a tournament with the analogous
+property for $(n-1)$-sets.
+Consequently
+\[ f(n)\ \ge\ 2 f(n-1)+1, \]
+and since $f(1)=3$ this implies
+\[ f(n)\ge 2^{n+1}-1. \]
+
+\emph{Proof.}
+First, in any tournament on $N$ vertices, the average indegree is $(N-1)/2$.
+Hence there exists a vertex $v$ with indegree
+$|I(v)|\ge (N-1)/2$.
+
+We claim the subtournament induced by $I(v)$ has the domination property for
+$(n-1)$-sets. Let $S\subseteq I(v)$ with $|S|=n-1$.
+Consider the $n$-set $S\cup\{v\}$ in $T$.
+By hypothesis, there exists a vertex $x\notin S\cup\{v\}$ that dominates
+$S\cup\{v\}$.
+In particular, $x\to v$, so $x\in I(v)$.
+Also, $x$ dominates all vertices in $S$.
+Thus within the induced tournament on $I(v)$, the vertex $x$ dominates $S$.
+This holds for every $(n-1)$-set $S\subseteq I(v)$.
+
+Therefore $|I(v)|\ge f(n-1)$ whenever $N=f(n)$, implying
+\[(N-1)/2 \ge f(n-1)\quad\Rightarrow\quad N\ge 2f(n-1)+1.
+\]
+With base case $f(1)=3$ (witnessed by the directed 3-cycle), the recurrence solves
+to $f(n)\ge 2^{n+1}-1$ by induction.
+\qed
+
+\medskip
+\noindent\textbf{Lemma 902.2 (Random-tournament upper bound).}
+There is an absolute constant $C$ such that for every $n\ge 1$,
+\[ f(n)\le C\, n^2 2^n. \]
+
+\emph{Proof.}
+Let $N$ be a parameter and take a uniformly random tournament on $[N]$ by
+orienting each edge independently with probability $1/2$.
+Fix an $n$-set $S\subseteq[N]$.
+For a vertex $v\in[N]\setminus S$, the events $\{v\to s\}_{s\in S}$ are independent
+and each has probability $1/2$, so
+\[\mathbb{P}(v\text{ dominates }S)=2^{-n}.
+\]
+Thus
+\[\mathbb{P}(v\text{ does not dominate }S)=1-2^{-n}.
+\]
+Independence over distinct $v\notin S$ gives
+\[
+\mathbb{P}(S\text{ is undominated}) = (1-2^{-n})^{N-n}
+\le \exp\Bigl(-\frac{N-n}{2^n}\Bigr).
+\]
+There are $\binom{N}{n}$ choices of $S$, so by the union bound the probability
+that \emph{some} $n$-set is undominated is at most
+\[
+\binom{N}{n}\exp\Bigl(-\frac{N-n}{2^n}\Bigr).
+\]
+Using $\binom{N}{n}\le (eN/n)^n$, this is at most
+\[
+\left(\frac{eN}{n}\right)^n \exp\Bigl(-\frac{N-n}{2^n}\Bigr).
+\]
+Choose
+\[ N := 10\,n^2 2^n. \]
+Then $N/2^n=10n^2$ and so
+\[
+\exp\Bigl(-\frac{N-n}{2^n}\Bigr) \le \exp(-9n^2).
+\]
+Meanwhile $\log\left( (eN/n)^n\right) = n\log(eN/n) \le n\log(10e\,n2^n)
+\le n(\log(10e)+\log n + n\log 2)\le 2n^2
+\]
+for all $n\ge 2$ (crude bound).
+Hence the union bound probability is at most $\exp(2n^2)\exp(-9n^2)=\exp(-7n^2)<1$.
+Therefore with positive probability the random tournament has the desired
+property, showing $f(n)\le N$ for $n\ge 2$.
+The $n=1$ case holds with $f(1)=3$.
+Absorbing constants gives $f(n)\le Cn^2 2^n$.
+\qed
+
+\medskip
+\noindent\textbf{5) VERIFICATION}
+
+\begin{itemize}
+\item Lemma~902.1: key point is that the vertex $x$ dominating $S\cup\{v\}$ must
+satisfy $x\to v$, hence lies in $I(v)$; no hidden assumption.
+\item Lemma~902.2: independence is valid in the random tournament model.
+Union bound and $\binom{N}{n}\le (eN/n)^n$ are standard.
+The final numeric inequality $n\log(10e\,n2^n)\le 2n^2$ holds for all $n\ge 2$;
+for small $n$ one can check separately.
+\item Computation: brute force for $N\le 6$ and explicit Paley(7) check confirm
+$f(2)=7$.
+\end{itemize}
+
+\medskip
+\noindent\textbf{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+(i) \emph{Strongest proved partial result.}
+A clean recursive argument gives $f(n)\ge 2^{n+1}-1$ (Lemma~902.1).
+A random-tournament union bound gives $f(n)\le C n^2 2^n$ (Lemma~902.2).
+Computationally, $f(2)=7$ is confirmed by exhaustive search up to $N=6$ and a
+7-vertex construction.
+
+(ii) \emph{First gap (crisp).}
+Determine the true order of magnitude of $f(n)$: is it $\Theta(n2^n)$ or
+$\Theta(n^2 2^n)$ (or something else)?
+
+(iii) \emph{Top 3 next moves.}
+\begin{enumerate}
+\item Improve the probabilistic upper bound by sharper counting and/or dependent
+random choice to reduce the $n^2$ factor.
+\item Construct explicit tournaments (instead of random) matching the best known
+upper bounds and analyze their domination coverage.
+\item Computational: for $n=3$, implement heuristic search for tournaments on
+$N<19$ to confirm nonexistence and explore near-extremal structures.
+\end{enumerate}
+
+(iv) \emph{Minimal counterexample structure (if conjectured $\Theta(n2^n)$ is false).}
+If $f(n)$ were significantly larger than $n2^n$, near-extremal tournaments would
+likely exhibit a “covering design” obstruction: many $n$-sets would each require
+specialized dominators, forcing large overlap constraints on outneighborhoods.
+Such a structure might resemble a sparse family of outneighborhoods failing to
+cover $\binom{V}{n}$ efficiently.
+

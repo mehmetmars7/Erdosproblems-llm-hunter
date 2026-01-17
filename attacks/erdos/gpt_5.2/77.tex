@@ -1,0 +1,128 @@
+% Attempt for Erdos Problem #77
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local), not needed
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- For $k\ge 2$, the diagonal Ramsey number $R(k)$ is the least integer $n$ such that every 2-coloring of the edges of $K_n$
+  contains a monochromatic copy of $K_k$.
+Equivalently, $R(k)$ is the least $n$ such that every graph on $n$ vertices contains either a clique of size $k$ or an independent set of size $k$.
+
+Question.
+Does the limit
+\[\lim_{k\to\infty} R(k)^{1/k}\]
+exist? If it exists, determine its value.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+The problem statement lists a long history of upper bounds and notes Erd\H{o}s proved $\sqrt2\le\liminf\le\limsup\le 4$.
+I will prove the classical $\sqrt2$ lower bound on $\liminf$ and the $4$ upper bound on $\limsup$ from scratch below, but I will not address the deeper improvements.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Prove subadditivity-type properties for $\log R(k)$ (if possible) to force existence of $\lim \frac{1}{k}\log R(k)$ by Fekete's lemma.
+2. Improve upper/lower bounds on $\liminf,\limsup$.
+
+Disproof track ideas:
+1. Exhibit oscillation in $R(k)^{1/k}$ by proving different exponential rates along subsequences (no such phenomenon is known).
+
+Chosen path in this attempt: establish two core inequalities with full proofs:
+an exponential lower bound via the probabilistic method and an exponential upper bound via the classic Ramsey recursion.
+
+4) WORK
+Lemma 1 (Probabilistic lower bound: $R(k)$ is at least $\approx 2^{k/2}$).
+For every integer $k\ge 6$,
+\[R(k) > 2^{k/2}.\]
+Consequently,
+\[\liminf_{k\to\infty} R(k)^{1/k} \ge \sqrt{2}.\]
+
+Proof.
+Fix $k\ge 6$ and set $n:=\lfloor 2^{k/2}\rfloor$.
+Consider a random red/blue coloring of the edges of $K_n$ where each edge is independently red with probability $1/2$ and blue with probability $1/2$.
+
+For any fixed set $S$ of $k$ vertices, the probability that $S$ spans a red $K_k$ is $2^{-\binom{k}{2}}$, since all $\binom{k}{2}$ edges must be red.
+Similarly, the probability that $S$ spans a blue $K_k$ is $2^{-\binom{k}{2}}$.
+Thus the probability that $S$ spans a monochromatic $K_k$ (either color) is $2\cdot 2^{-\binom{k}{2}}$.
+
+Let $X$ be the number of monochromatic $K_k$ subgraphs in the random coloring.
+By linearity of expectation,
+\[\mathbb E[X]=\binom{n}{k}\cdot 2\cdot 2^{-\binom{k}{2}}.\]
+Using the crude bound $\binom{n}{k}\le \frac{n^k}{k!}$, we get
+\[\mathbb E[X]\le \frac{n^k}{k!}\cdot 2\cdot 2^{-\binom{k}{2}}.\]
+Since $n\le 2^{k/2}$, this gives
+\[\mathbb E[X]\le \frac{(2^{k/2})^k}{k!}\cdot 2\cdot 2^{-\binom{k}{2}}
+=\frac{2^{k^2/2}}{k!}\cdot 2\cdot 2^{-(k^2-k)/2}
+=\frac{2^{1+k/2}}{k!}.\]
+For $k\ge 6$, one has $k!\ge 720$ and $2^{1+k/2}\le 2^{1+3}=16$, so $\mathbb E[X]\le 16/720<1$.
+Therefore there exists at least one coloring with $X=0$, i.e. with no monochromatic $K_k$.
+This means $R(k)>n\ge 2^{k/2}-1$, and in particular $R(k)>2^{k/2}$ for all $k\ge 6$.
+
+Taking $k$th roots and letting $k\to\infty$ gives $\liminf_{k\to\infty} R(k)^{1/k}\ge \sqrt2$. \qed
+
+Lemma 2 (Classic recursion and exponential upper bound).
+Let $R(s,t)$ denote the off-diagonal Ramsey number (least $n$ such that every 2-coloring of $E(K_n)$ contains a red $K_s$ or a blue $K_t$).
+Then for integers $s,t\ge 2$,
+\[R(s,t)\le R(s-1,t)+R(s,t-1).\]
+Consequently, for $k\ge 2$,
+\[R(k)=R(k,k)\le \binom{2k-2}{k-1} < 4^{k-1},\]
+and hence
+\[\limsup_{k\to\infty} R(k)^{1/k}\le 4.\]
+
+Proof.
+We first prove the recursion. Let
+\[N:=R(s-1,t)+R(s,t-1).\]
+Consider any red/blue coloring of the edges of $K_N$, and fix a vertex $v$.
+Let $R$ be the set of vertices joined to $v$ by a red edge, and $B$ the set joined to $v$ by a blue edge.
+Then $|R|+|B|=N-1$.
+If $|R|\ge R(s-1,t)$, then by definition of $R(s-1,t)$ the induced coloring on $K_R$ contains either a red $K_{s-1}$ or a blue $K_t$.
+In the first case, adding $v$ produces a red $K_s$; in the second case we already have a blue $K_t$.
+Similarly, if $|B|\ge R(s,t-1)$, then inside $B$ there is either a red $K_s$ or a blue $K_{t-1}$; in the second case adding $v$ gives a blue $K_t$.
+
+Since $|R|+|B|=N-1=(R(s-1,t)-1)+(R(s,t-1)-1)+1$, at least one of the inequalities
+$|R|\ge R(s-1,t)$ or $|B|\ge R(s,t-1)$ must hold.
+Thus every coloring of $K_N$ contains a red $K_s$ or a blue $K_t$, proving $R(s,t)\le N$.
+
+Now prove the binomial bound by induction on $s+t$.
+The base cases $R(1,t)=R(s,1)=1$ satisfy $1=\binom{s+t-2}{s-1}$ when one parameter is $1$.
+Assuming $R(s-1,t)\le \binom{s+t-3}{s-2}$ and $R(s,t-1)\le \binom{s+t-3}{s-1}$, the recursion gives
+\[R(s,t)\le \binom{s+t-3}{s-2}+\binom{s+t-3}{s-1}=\binom{s+t-2}{s-1}\]
+by Pascal's identity.
+Setting $s=t=k$ yields $R(k)\le \binom{2k-2}{k-1}$.
+Finally, $\binom{2k-2}{k-1}\le 2^{2k-2}=4^{k-1}$, giving $\limsup R(k)^{1/k}\le 4$. \qed
+
+FAST REALITY CHECK
+For small $k$, one knows exact values only for a few $k$, and brute-force computation grows infeasible quickly.
+The two lemmas above give the classic exponential window
+\[\sqrt2\ \le\ \liminf R(k)^{1/k}\ \le\ \limsup R(k)^{1/k}\ \le\ 4,\]
+matching the statement in the problem text (at a coarse level).
+
+5) VERIFICATION
+- Lemma 1: the expectation bound is explicit and uses only $\binom{n}{k}\le n^k/k!$ and $k!\ge 720$ for $k\ge 6$.
+- Lemma 2: the recursion argument with a pivot vertex is standard; the induction to $\binom{2k-2}{k-1}$ uses only Pascal's identity.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+I proved from scratch the classical exponential bounds
+\[2^{k/2} < R(k) < 4^k\quad\text{(up to constant factors)}\]
+for all large $k$, yielding $\sqrt2\le \liminf R(k)^{1/k}$ and $\limsup R(k)^{1/k}\le 4$ (Lemmas 1--2).
+
+(ii) First gap:
+Prove that $R(k)^{1/k}$ actually converges, i.e. show
+\[\liminf_{k\to\infty} R(k)^{1/k}=\limsup_{k\to\infty} R(k)^{1/k}.\]
+The standard recursion gives upper bounds but does not provide a subadditivity property strong enough to force existence of the limit.
+
+(iii) Top 3 next moves (concrete):
+1. Seek an inequality relating $R(k+\ell)$ to $R(k)$ and $R(\ell)$ that is close enough to multiplicativity/submultiplicativity to imply existence of $\lim \frac{1}{k}\log R(k)$ via an (almost) subadditive lemma.
+2. Improve the exponential upper bound constant (known improvements exist per the problem text) and see whether the methods can also yield structural control that might imply convergence.
+3. Investigate whether the lexicographic/tensor product constructions for lower bounds give any supermultiplicativity properties for the inverse Ramsey function that could translate into convergence information.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A scenario where along two subsequences $k_i$ and $k'_j$, the ratios $\frac{1}{k_i}\log R(k_i)$ and $\frac{1}{k'_j}\log R(k'_j)$ converge to different limits,
+forcing $R(k)^{1/k}$ to oscillate between two distinct constants.
+

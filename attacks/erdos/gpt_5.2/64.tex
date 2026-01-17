@@ -1,0 +1,103 @@
+% Attempt for Erdos Problem #64
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? NO (restricted)
+% - Computation available? YES (local Python), used for small sanity checks
+% GPT 5.2
+
+OUTPUT
+1) FORMAL RESTATEMENT
+Definitions/Conventions.
+- All graphs are finite, simple, undirected.
+- The minimum degree $\delta(G)$ is $\min_{v\in V(G)} d(v)$.
+- A cycle of length $L$ is a sequence of distinct vertices $v_0,\dots,v_{L-1}$ with edges $v_iv_{i+1}$ for $i$ mod $L$.
+
+Question.
+If $G$ is a finite graph with $\delta(G)\ge 3$, must there exist an integer $k\ge 2$ such that $G$ contains a cycle of length $2^k$
+(i.e. a 4-cycle, 8-cycle, 16-cycle, \dots)?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+Web browsing is not available in this session.
+From the problem text only:
+- The stronger conjecture ``for every $r$ there exists $\delta(G)\ge r$ with no $2^k$-cycle'' is false (Liu--Montgomery).
+- For sufficiently large minimum/average degree, much stronger even-cycle-length intervals are forced (Liu--Montgomery).
+I do not re-derive these results here.
+
+3) ATTACK PLAN
+Proof track ideas:
+1. Show that $\delta(G)\ge 3$ forces many even cycles; then try to control their lengths enough to hit a power of two.
+2. Use BFS layering and expansion arguments: high minimum degree typically forces short cycles and many lengths via chords.
+3. Try to reduce to 3-regular graphs (cubic graphs) by taking spanning subgraphs and analyze cycle-length sets in cubic graphs.
+
+Disproof track ideas:
+1. Attempt to construct a cubic graph whose cycle-length set avoids all powers of two; such a graph would refute the conjecture.
+2. Search among known high-girth cubic graphs and check their cycle length spectra computationally.
+
+Chosen path in this attempt: prove two unconditional lemmas about cycles in minimum-degree-$3$ graphs (existence of long cycles and existence of an even cycle), and do small sanity checks.
+
+4) WORK
+Lemma 1 (A longest-path cycle bound).
+Let $G$ be a finite graph with minimum degree $\delta(G)=\delta\ge 2$. Then $G$ contains a cycle of length at least $\delta+1$.
+
+Proof.
+Let $P=v_0v_1\dots v_\ell$ be a longest simple path in $G$ (maximizing $\ell$).
+By maximality, every neighbor of $v_0$ lies on the path $P$ (otherwise we could extend $P$ at $v_0$).
+Since $d(v_0)\ge \delta$, the vertex $v_0$ has at least $\delta$ distinct neighbors among $v_1,\dots,v_\ell$.
+Let $v_i$ be the neighbor of $v_0$ with largest index $i$ along the path. Then $i\ge \delta$.
+The edges $v_0v_1,v_1v_2,\dots,v_{i-1}v_i$ together with $v_iv_0$ form a cycle of length $i+1\ge \delta+1$. \qed
+
+Lemma 2 (Minimum degree $\ge 3$ forces an even cycle).
+Every finite graph $G$ with $\delta(G)\ge 3$ contains an even cycle.
+
+Proof.
+We prove the contrapositive: if $G$ has no even cycle, then $\delta(G)\le 2$.
+
+Claim: If a connected graph $C$ has no even cycle, then $C$ contains at most one cycle.
+Indeed, suppose $C$ contains two distinct cycles. Then there is a subgraph of $C$ consisting of two vertices joined by three internally vertex-disjoint paths (a ``theta graph''):
+take two cycles in the same connected component, and within their union choose two vertices where the cycles meet or are connected by a shortest path; the union contains three internally disjoint paths between these two vertices.
+In a theta graph, the three cycles obtained by pairing the three paths have total parity constraints: among the three cycle lengths, two must have the same parity.
+The symmetric difference (edge-wise XOR) of two cycles of the same parity decomposes into a disjoint union of even cycles.
+Hence a theta graph contains an even cycle, contradicting the assumption. This proves the claim.
+
+Therefore each connected component of $G$ is either a tree (no cycles) or unicyclic (exactly one cycle), and in the unicyclic case the unique cycle must be odd (since there are no even cycles).
+In a tree on $v$ vertices there are exactly $v-1$ edges, and in a unicyclic connected graph on $v$ vertices there are exactly $v$ edges (a tree plus one extra edge).
+Thus in every component, the number of edges is at most the number of vertices. Summing over components gives
+\[e(G)\le |V(G)|.\]
+Hence the average degree is
+\[\frac{1}{|V(G)|}\sum_{v\in V(G)} d(v)=\frac{2e(G)}{|V(G)|}\le 2.\]
+So $\delta(G)\le 2$, proving the contrapositive and thus the lemma. \qed
+
+FAST REALITY CHECK (small cases and one explicit example).
+1. Exhaustive enumeration for $n=6,7$:
+I checked all graphs on $n=6$ and $n=7$ vertices and found that every graph with minimum degree $\ge 3$ contains a 4-cycle.
+So for these $n$ the conjecture holds with $2^k=4$.
+
+2. Petersen graph:
+The Petersen graph is 3-regular and has no 4-cycle (girth $5$), but it does contain an 8-cycle.
+One explicit 8-cycle is
+\[0-5-7-2-3-8-6-1-0\]
+in a standard labeling. This supports the idea that even when 4-cycles are absent, an 8-cycle can still be forced.
+
+5) VERIFICATION
+- Lemma 1: uses only the maximality of a longest path and the minimum degree at one endpoint.
+- Lemma 2: the key structural fact is ``no even cycle $\Rightarrow$ each component is a tree or unicyclic odd cycle'', proven via the theta-graph argument.
+- The sanity check for $n=6,7$ is exhaustive and correct for those $n$, but does not imply anything asymptotic.
+
+6) FINAL
+**UNRESOLVED**
+
+(i) Strongest fully proved partial result:
+Every $\delta(G)\ge 3$ graph contains an even cycle (Lemma 2) and contains some cycle of length at least $4$ (Lemma 1 with $\delta=3$).
+
+(ii) First gap:
+Upgrade ``there exists some even cycle'' to ``there exists an even cycle of length exactly $2^k$'' for some $k\ge 2$.
+Controlling cycle lengths in minimum-degree-$3$ graphs appears to require significantly more structure than Lemma 2 provides.
+
+(iii) Top 3 next moves (concrete):
+1. Analyze cubic graphs of large girth: prove that the cycle length set in any cubic graph must hit a power of two, or else produce a counterexample.
+2. Use expansion/BFS layering in minimum-degree-$3$ graphs to generate many even cycle lengths (via chords or multiple paths) and attempt to show these lengths form a long interval, which must contain a power of two.
+3. Search computationally among known families of 3-regular graphs (cages, Ramanujan graphs) for avoidance of $\{4,8,16,\dots\}$, to guide a potential counterexample construction.
+
+(iv) What a minimal counterexample would likely look like (structure/parameters):
+A 3-regular (or minimum-degree-$3$) graph of large order whose cycle-length spectrum avoids all powers of two; plausibly such a graph would have large girth (to avoid $4$ and $8$ early) and highly constrained cycle structure so that all even cycles have lengths in a residue class pattern excluding $2^k$.
+

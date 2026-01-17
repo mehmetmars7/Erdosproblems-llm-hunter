@@ -1,0 +1,117 @@
+% Erdos Problem #849
+% URL: https://www.erdosproblems.com/849
+
+Is it true that, for every integer $t\geq 1$, there is some integer $a$ such that\[\binom{n}{k}=a\](with $1\leq k\leq n/2$) has exactly $t$ solutions? Erd\H{o}s \cite{Er96b} credits this to himself and Gordon 'many years ago', but it is more commonly known as Singmaster's conjecture . For $t=3$ one could take $a=120$, and for $t=4$ one could take $a=3003$. There are no known examples for $t\geq 5$. Both Erd\H{o}s and Singmaster believed the answer to this question is no, and in fact that there exists an absolute upper bound on the number of solutions. Matom\"{a}ki, Radziwill, Shao, Tao, and Ter\"{a}v\"{a}inen \cite{MRSTT22} have proved that there are always at most two solutions if we restrict $k$ to\[k\geq \exp((\log n)^{2/3+\epsilon}),\]assuming $a$ is sufficiently large depending on $\epsilon>0$. References [Er96b] Erd\"{o}s, Paul, Some problems I presented or planned to present in my short talk . Analytic number theory, Vol. 1 (Allerton Park, IL, 1995) (1996), 333-335. [MRSTT22] Matom\"{a}ki, Kaisa and Radziwi\l\l, Maksym and Shao, Xuancheng and Tao, Terence and Ter\"{a}v\"{a}inen, Joni, Singmaster's conjecture in the interior of {P}ascal's triangle . Q. J. Math. (2022), 1137--1177.
+
+1) “FORMAL RESTATEMENT”
+
+For an integer $a\ge 1$, define
+\[
+N(a):=\#\{(n,k)\in\mathbb{N}^2: n\ge 1,\ 1\le k\le n/2,\ \binom{n}{k}=a\}.
+\]
+(Here $k\le n/2$ is interpreted as an inequality in $\mathbb{R}$, i.e. $k\le \lfloor n/2\rfloor$.)
+
+Question: For every integer $t\ge 1$, does there exist an integer $a$ with $N(a)=t$?
+
+Edge cases:
+- Because of the restriction $k\ge 1$ and $k\le n/2$, we have $\binom{n}{k}\ge 2$ for any admissible pair $(n,k)$. In particular $N(1)=0$.
+- Each $a\ge 2$ has at least the “trivial” solution $(n,k)=(a,1)$ since $\binom{a}{1}=a$ and $1\le a/2$ for $a\ge 2$.
+
+2) “QUICK LITERATURE/CONTEXT CHECK”
+
+The problem statement notes:
+- This is commonly called Singmaster's conjecture.
+- Examples: $N(120)=3$ and $N(3003)=4$.
+- No examples are known for $t\ge 5$.
+- A conditional result in the “interior” range of Pascal's triangle is stated (Matom\"{a}ki--Radziwill--Shao--Tao--Ter\"{a}v\"{a}inen).
+
+In this write-up I do not invoke external literature beyond what is explicitly stated in the problem text.
+
+3) “ATTACK PLAN”
+
+Proof-track ideas:
+- To prove existence for each $t$, one would need a construction of an $a$ that appears in exactly $t$ positions in the left half of Pascal's triangle. This amounts to controlling coincidences of binomial coefficients across different rows.
+
+Disproof-track ideas:
+- Try to show an absolute upper bound on $N(a)$ by proving that the Diophantine equation $\binom{n}{k}=\binom{n'}{k'}$ has limited multiplicity.
+- Use elementary monotonicity to at least bound the search space and to separate “edge” solutions ($k=1$) from interior ones.
+
+Best current path in this write-up: prove monotonicity facts that sharply constrain multiplicities and run a computational reality check for moderate ranges.
+
+4) “WORK”
+
+FAST REALITY CHECK (explicit enumeration in a bounded region):
+I ran a script scanning all pairs $(n,k)$ with $2\le n\le 200000$, $1\le k\le n/2$, but only recording values $a=\binom{n}{k}\le 10^{12}$. In that range the maximum multiplicity observed was $4$, achieved only by $a=3003$, and there were no values with multiplicity $\ge 5$.
+
+A smaller scan ($n\le 5000$, recording $a\le 10^8$) confirms the classical examples:
+\[
+N(2)=1,\quad N(6)=2,\quad N(120)=3,\quad N(3003)=4,
+\]
+with solution lists
+\[
+\begin{aligned}
+\binom{2}{1}&=2,\\
+\binom{6}{1}=\binom{4}{2}&=6,\\
+\binom{120}{1}=\binom{16}{2}=\binom{10}{3}&=120,\\
+\binom{3003}{1}=\binom{78}{2}=\binom{15}{5}=\binom{14}{6}&=3003.
+\end{aligned}
+\]
+
+\textbf{Lemma 849.1 (Strict increase in each row up to the middle).}
+Fix $n\ge 2$. Then the sequence $\binom{n}{1},\binom{n}{2},\dots,\binom{n}{\lfloor n/2\rfloor}$ is strictly increasing.
+
+\emph{Proof.}
+For $1\le k< n/2$, consider the ratio
+\[
+\frac{\binom{n}{k+1}}{\binom{n}{k}}=\frac{n-k}{k+1}.
+\]
+The condition $k< n/2$ implies $n-k>k$, hence $n-k\ge k+1$ (since both sides are integers). Therefore $(n-k)/(k+1)>1$, which gives $\binom{n}{k+1}>\binom{n}{k}$. \qed
+
+\textbf{Lemma 849.2 (Monotonicity in $n$ for fixed $k$).}
+Fix an integer $k\ge 1$. Then the function $n\mapsto \binom{n}{k}$ is strictly increasing for all integers $n\ge k$.
+
+\emph{Proof.}
+For $n\ge k$,
+\[
+\binom{n+1}{k}=\binom{n}{k}+\binom{n}{k-1}.
+\]
+If $k=1$ then $\binom{n+1}{1}=n+1>n=\binom{n}{1}$. If $k\ge 2$, then $\binom{n}{k-1}\ge 1$, hence $\binom{n+1}{k}>\binom{n}{k}$. \qed
+
+\textbf{Lemma 849.3 (For fixed $a$, only finitely many admissible solutions).}
+Fix $a\in\mathbb{N}$. Then there are only finitely many pairs $(n,k)$ with $1\le k\le n/2$ and $\binom{n}{k}=a$. More precisely, any solution with $k\ge 2$ satisfies
+\[
+\binom{n}{2}\le a \quad\Rightarrow\quad n\le \frac{1+\sqrt{1+8a}}{2}.
+\]
+
+\emph{Proof.}
+If $k=1$, the only possible solution is $n=a$, so there is at most one such solution.
+
+Now assume $k\ge 2$. By Lemma 849.1, for fixed $n$ and for all $2\le k\le n/2$ we have
+\[
+\binom{n}{2}\le \binom{n}{k}=a.
+\]
+Since $\binom{n}{2}=n(n-1)/2$, the inequality $n(n-1)/2\le a$ implies $n^2-n-2a\le 0$, whose positive root bound gives
+\[
+n\le \frac{1+\sqrt{1+8a}}{2}.
+\]
+Thus $n$ is bounded in terms of $a$, and there are only finitely many possibilities for $(n,k)$. \qed
+
+5) “VERIFICATION”
+
+- Lemma 849.1: the strict inequality used $k< n/2$, which is exactly the range where we compare consecutive $k$ values on the left side.
+- Lemma 849.2: the Pascal recursion is valid for all integers $n\ge k\ge 1$.
+- Lemma 849.3 correctly separates the $k=1$ “trivial” solution from $k\ge 2$ solutions.
+- The computational scan is only a bounded check and does not resolve the conjecture for all $a$.
+
+6) FINAL
+
+**UNRESOLVED**
+(i) Strongest fully proved partial result: Monotonicity gives strong structural constraints: within each fixed $n$ there is at most one solution in the range $1\le k\le n/2$ (Lemma 849.1), and for each fixed $k$ there is at most one solution in $n$ (Lemma 849.2). For each fixed $a$, all admissible solutions are finite in number and those with $k\ge 2$ satisfy $n\ll \sqrt{a}$ (Lemma 849.3). Computationally, scanning $n\le 200000$ and $a\le 10^{12}$ found no value with $N(a)\ge 5$ and maximum multiplicity $4$ attained by $a=3003$.
+(ii) First gap (crisp): Decide whether $\sup_a N(a)$ is finite, and in particular whether there exists any $a$ with $N(a)\ge 5$ (or, on the constructive side, whether for each $t$ there exists $a$ with $N(a)=t$).
+(iii) Top 3 next moves:
+  1. Study the Diophantine coincidence equation $\binom{n}{k}=\binom{n'}{k'}$ with $2\le k\le n/2$ and $2\le k'\le n'/2$ to control multiplicities, starting with small $k$ (e.g. $k=2,3,4$) where explicit polynomial forms exist.
+  2. Push computation in structured ranges: search systematically for $a$ with many representations among small $k$ (say $k\le 20$) and very large $n$, since small-$k$ forms are more likely to collide.
+  3. Try to prove an upper bound on the number of “interior” representations (e.g. exclude multiple solutions with moderately large $k$ by inequalities), then combine with explicit analysis for small $k$.
+(iv) Minimal counterexample structure (if $N(a)$ is unbounded): A number $a$ that simultaneously equals $\binom{n_i}{k_i}$ for many different pairs $(n_i,k_i)$, likely involving several small $k_i$ (like $k=2$ giving triangular numbers) together with a few medium $k$ values, all constrained to land exactly on the same integer.
+
+

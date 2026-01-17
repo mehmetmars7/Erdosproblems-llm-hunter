@@ -1,0 +1,147 @@
+% Erdos problem #421
+
+\subsection*{FORMAL RESTATEMENT}
+\textbf{Definitions.}
+\begin{itemize}
+\item A strictly increasing sequence $(d_i)_{i\ge 1}$ of positive integers determines a set $D=\{d_1,d_2,\dots\}\subset\mathbb{N}$.
+\item The (natural) density of $D$ is
+\[
+\delta(D)=\lim_{x\to\infty}\frac{\#(D\cap\{1,2,\dots,\lfloor x\rfloor\})}{\lfloor x\rfloor}
+\]
+when this limit exists.
+\item For $1\le u\le v$, define the consecutive product
+\[
+P_{u,v}=\prod_{i=u}^v d_i.
+\]
+\end{itemize}
+
+\textbf{Question.} Does there exist a sequence $1\le d_1<d_2<\cdots$ such that $\delta(\{d_i\})=1$ and all products $P_{u,v}$ are distinct (i.e. the map $(u,v)\mapsto P_{u,v}$ is injective on $\{(u,v):1\le u\le v\}$)?
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The extracted statement records that Selfridge constructed such a sequence with density $>1/e-\varepsilon$ for every $\varepsilon>0$, but the existence of density $1$ remains open.
+
+\subsection*{ATTACK PLAN}
+\textbf{Proof-track ideas (construct a density-$1$ example).}
+\begin{itemize}
+\item Attempt a greedy construction: include integers unless doing so creates a collision among interval products; then estimate the deletion rate.
+\item Encode interval products uniquely using prime-factor ``markers'' that are forced to appear in exactly one interval; the challenge is to do this while keeping density $1$.
+\end{itemize}
+\textbf{Disproof-track ideas.}
+\begin{itemize}
+\item Show that density $1$ forces too many multiplicative relations among consecutive blocks, yielding collisions $P_{u,v}=P_{u',v'}$ by pigeonhole-type counting in the divisor lattice of $\prod_{i\le N} d_i$.
+\item Prove that any such sequence must omit a positive proportion of integers because it must avoid including numbers equal to products of previous consecutive blocks.
+\end{itemize}
+
+\subsection*{WORK}
+\subsubsection*{Fast reality check (finite search in $\{1,\dots,M\}$)}
+For each $M\le 20$, I searched over all subsets $S\subseteq\{1,\dots,M\}$, taking $d_i$ to be the increasing enumeration of $S$, and checked whether all consecutive products are distinct. The maximum size found, together with an example achieving it, is:
+\begin{verbatim}
+M  max|S|  density=max|S|/M  example S (in increasing order)
+ 1    1        1.0000       [1]
+ 2    1        0.5000       [1]
+ 3    2        0.6667       [2, 3]
+ 4    3        0.7500       [2, 3, 4]
+ 5    4        0.8000       [2, 3, 4, 5]
+ 6    4        0.6667       [2, 3, 4, 5]
+ 7    5        0.7143       [2, 3, 4, 5, 7]
+ 8    6        0.7500       [2, 3, 4, 5, 7, 8]
+ 9    7        0.7778       [2, 3, 4, 5, 7, 8, 9]
+10    8        0.8000       [2, 3, 4, 5, 7, 8, 9, 10]
+11    9        0.8182       [2, 3, 4, 5, 7, 8, 9, 10, 11]
+12    9        0.7500       [2, 3, 4, 5, 7, 8, 9, 10, 11]
+13   10        0.7692       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13]
+14   11        0.7857       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14]
+15   12        0.8000       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15]
+16   12        0.7500       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15]
+17   13        0.7647       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 17]
+18   14        0.7778       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 17, 18]
+19   15        0.7895       [2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 15, 17, 18, 19]
+20   16        0.8000       [2, 3, 4, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20]
+\end{verbatim}
+These finite searches show that high density is possible in short initial segments, but also that certain integers (notably $1$ and various composite numbers) must be omitted to avoid collisions.
+
+\subsubsection*{Lemma 421.1 (No term can equal $1$ in a nontrivial sequence)}
+\textbf{Lemma.} Suppose $(d_i)_{i\ge 1}$ has the property that all products $P_{u,v}=\prod_{i=u}^v d_i$ are distinct. If the sequence has at least two terms, then $d_i\ne 1$ for every $i$.
+
+\textbf{Proof.}
+Assume for contradiction that $d_j=1$ for some $j$ and that there exists at least one index $j+1$ (i.e. the sequence has at least two terms and $j$ is not the last term).
+Consider the two intervals $[j+1,j+1]$ and $[j,j+1]$.
+Their products are
+\[
+P_{j+1,j+1}=d_{j+1},\qquad P_{j,j+1}=d_j d_{j+1}=1\cdot d_{j+1}=d_{j+1}.
+\]
+Thus $P_{j+1,j+1}=P_{j,j+1}$, contradicting the assumption that all interval products are distinct.
+Therefore no such $j$ exists; i.e. no term equals $1$.
+\hfill$\square$
+
+\subsubsection*{Lemma 421.2 (Many divisors of the initial total product)}
+\textbf{Lemma.} Suppose $(d_i)$ has distinct interval products. For each $N\ge 1$, let
+\[
+P_N=\prod_{i=1}^N d_i.
+\]
+Then
+\[
+\tau(P_N)\ge \frac{N(N+1)}{2}.
+\]
+
+\textbf{Proof.}
+For each pair $(u,v)$ with $1\le u\le v\le N$, the interval product $P_{u,v}=\prod_{i=u}^v d_i$ divides $P_N$ because
+\[
+P_N=\Big(\prod_{i=1}^{u-1} d_i\Big)\cdot \Big(\prod_{i=u}^v d_i\Big)\cdot \Big(\prod_{i=v+1}^{N} d_i\Big),
+\]
+and the two outer products are integers.
+Hence every $P_{u,v}$ is a positive divisor of $P_N$.
+
+There are exactly $N(N+1)/2$ pairs $(u,v)$ with $1\le u\le v\le N$.
+By hypothesis, the corresponding products $P_{u,v}$ are all distinct. Therefore $P_N$ has at least $N(N+1)/2$ distinct positive divisors, i.e. $\tau(P_N)\ge N(N+1)/2$.
+\hfill$\square$
+
+\subsubsection*{Lemma 421.3 (Density $1$ forces $d_n\sim n$)}
+\textbf{Lemma.} Let $1\le d_1<d_2<\cdots$ be strictly increasing and let $D=\{d_i\}$. If $\delta(D)=1$, then
+\[
+\lim_{n\to\infty} \frac{d_n}{n}=1.
+\]
+
+\textbf{Proof.}
+For each $n$, we have $\#(D\cap\{1,2,\dots,d_n\})=n$ by definition of $d_n$.
+If $\delta(D)=1$, then by the definition of density,
+\[
+\lim_{x\to\infty} \frac{\#(D\cap\{1,2,\dots,\lfloor x\rfloor\})}{\lfloor x\rfloor}=1.
+\]
+Apply this along the subsequence $x=d_n$ (note $d_n\to\infty$): we obtain
+\[
+\lim_{n\to\infty} \frac{\#(D\cap\{1,2,\dots,d_n\})}{d_n}=\lim_{n\to\infty} \frac{n}{d_n}=1.
+\]
+Taking reciprocals yields $d_n/n\to 1$.
+\hfill$\square$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma~421.1 uses only the definition of distinct interval products and checks a concrete collision.
+\item Lemma~421.2: every interval product divides $P_N$ by an explicit factorisation; distinctness gives distinct divisors.
+\item Lemma~421.3: uses density along the subsequence $x=d_n$, which is legitimate since $d_n\to\infty$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED}
+\begin{enumerate}
+\item[(i)] \textbf{Strongest proved partial result here.}
+Necessary constraints on any solution sequence:
+\begin{itemize}
+\item No term can equal $1$ (Lemma~421.1).
+\item The initial product $P_N$ must have at least $N(N+1)/2$ divisors (Lemma~421.2).
+\item Density $1$ would force $d_n/n\to 1$ (Lemma~421.3).
+\end{itemize}
+Additionally, exhaustive search shows that for $M\le 20$ one can select subsets of $\{1,\dots,M\}$ of density about $0.8$ whose increasing enumerations satisfy the distinct-interval-product property.
+\item[(ii)] \textbf{First gap (crisp).}
+Decide whether there exists an infinite increasing sequence $(d_i)$ with $\delta(\{d_i\})=1$ such that all interval products $\prod_{u\le i\le v} d_i$ are distinct.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{itemize}
+\item Develop a quantified ``collision forcing'' lemma: show that if $D\cap\{1,\dots,M\}$ is too large then some collision among interval products must occur. Any such lemma with a bound tending to $1$ as $M\to\infty$ would disprove density $1$.
+\item Explore greedy constructions computationally for large $M$ (e.g. $M=10^4$) to estimate the deletion rate needed to maintain distinct interval products, and look for patterns that might suggest an infinite density-$1$ construction.
+\item Re-express collisions $P_{u,v}=P_{u',v'}$ as multiplicative relations among consecutive blocks and attempt to apply multiplicative-energy or entropy methods to high-density sets.
+\end{itemize}
+\item[(iv)] \textbf{What a minimal counterexample would likely look like.}
+If density $1$ is impossible, a minimal obstruction would likely be that any set $D$ missing only $o(M)$ integers in $\{1,\dots,M\}$ forces the presence of some $d_j$ equal to a product of a previous consecutive block, creating an unavoidable collision between a length-$1$ interval and a longer interval. Such a counterexample would manifest as an explicit collision $\prod_{i=u}^v d_i=\prod_{i=u'}^{v'} d_i$ with $u'<u\le v<v'$ or similar nested structure.
+\end{enumerate}
+

@@ -1,0 +1,87 @@
+% Erdos Problem #1055
+
+\paragraph{FORMAL RESTATEMENT.}
+Define classes of primes recursively as follows.
+A prime $p$ is in \emph{class 1} if every prime divisor of $p+1$ is either $2$ or $3$.
+For $r\ge 2$, a prime $p$ is in \emph{class $r$} if every prime divisor of $p+1$ lies in some class $\le r-1$, and at least one prime divisor of $p+1$ lies in class exactly $r-1$.
+Let $p_r$ denote the least prime in class $r$.
+Questions:
+\begin{itemize}
+\item Are there infinitely many primes in each class $r$?
+\item How does $p_r^{1/r}$ behave as $r\to\infty$?
+\end{itemize}
+
+\paragraph{QUICK LITERATURE/CONTEXT CHECK.}
+I did not use external sources. I only use what is explicitly stated in the problem text, including the initial values $p_r=2,13,37,73,1021$ and the remark that it is easy to prove that the number of primes $\le n$ in class $r$ is at most $n^{o(1)}$.
+
+\paragraph{ATTACK PLAN.}
+\emph{Proof-track:} prove basic structural properties of the recursion (well-definedness, equivalent formulations), and verify initial terms by computation.
+\emph{Disproof-track:} attempt to find a contradiction or a construction giving infinitely many primes in a class, starting with class 1 (primes $p=2^a3^b-1$).
+Best path here: establish problem-specific lemmas and do sanity-check computations; the infinitude questions remain open.
+
+\paragraph{WORK.}
+\textbf{Lemma 1 (well-defined recursion / no cycles).}
+For any odd prime $p$, every prime divisor $q$ of $p+1$ satisfies $q<p$.
+
+\emph{Proof.}
+If $p$ is odd then $p+1$ is an even integer $>2$, hence composite.
+Any prime divisor $q$ of $p+1$ satisfies $q\le (p+1)/2<p$.
+\hfill$\square$
+
+\textbf{Lemma 2 (class 1 primes are of the form $2^a3^b-1$ and are sparse).}
+A prime $p$ is in class 1 if and only if $p+1=2^a3^b$ for some integers $a,b\ge 0$.
+In particular, the number of class 1 primes $\le x$ is at most the number of pairs $(a,b)$ with $2^a3^b\le x+1$, which is $O((\log x)^2)$.
+
+\emph{Proof.}
+If $p$ is in class 1, all prime divisors of $p+1$ are among $\{2,3\}$, hence $p+1=2^a3^b$.
+Conversely, if $p+1=2^a3^b$ then the only prime divisors of $p+1$ are $2$ and $3$, so $p$ is in class 1.
+For the count: if $2^a3^b\le x+1$ then $a\le \log_2(x+1)$ and $b\le \log_3(x+1)$, so the number of possible pairs $(a,b)$ is at most $(1+\lfloor \log_2(x+1)\rfloor)(1+\lfloor \log_3(x+1)\rfloor)=O((\log x)^2)$.
+\hfill$\square$
+
+\textbf{Lemma 3 (equivalent “max-child + 1” rule).}
+Let $\mathrm{cl}(p)$ be defined for primes $p$ by:
+\[
+\mathrm{cl}(p)=
+\begin{cases}
+1, & \text{if every prime divisor of }p+1\text{ lies in }\{2,3\};\\
+1+\max\{\mathrm{cl}(q): q \text{ prime},\ q\mid(p+1)\}, & \text{otherwise}.
+\end{cases}
+\]
+Then $\mathrm{cl}(p)$ agrees with the class index of $p$ in the problem definition.
+
+\emph{Proof.}
+If $p$ is in class 1, the first case holds, giving $\mathrm{cl}(p)=1$.
+If $p$ is not class 1, let $t$ be the maximum class among prime divisors of $p+1$; then by definition $p$ lies in class $t+1$.
+The second case sets $\mathrm{cl}(p)=t+1$.
+Lemma 1 ensures the recursion is well-founded, because for odd $p$ all primes $q\mid(p+1)$ satisfy $q<p$.
+\hfill$\square$
+
+\textbf{FAST REALITY CHECK (computation).}
+Using Lemma 3 and factoring $p+1$ for primes $p\le 10^6$, I obtained:
+\begin{verbatim}
+Counts of primes <= 1e6 by class:
+class 1: 43
+class 2: 3103
+class 3: 25428
+class 4: 31186
+class 5: 14374
+class 6: 3664
+class 7: 620
+class 8: 77
+class 9: 3
+Least prime in each class (found up to class 8):
+p_1=2, p_2=13, p_3=37, p_4=73, p_5=1021, p_6=2917, p_7=15013, p_8=49681.
+\end{verbatim}
+The initial segment $2,13,37,73,1021$ matches the problem text.
+
+\paragraph{VERIFICATION.}
+For $p=13$, $p+1=14$ has prime divisors $2$ and $7$; and $7+1=8$ has only prime divisor $2$, so $7$ is class 1, hence $13$ is class 2.
+For $p=37$, $p+1=38$ has prime divisors $2$ and $19$, and $19+1=20$ has prime divisors $2,5$ with $5$ in class 1, so $19$ is class 2 and thus $37$ is class 3.
+
+\paragraph{FINAL: UNRESOLVED.}
+(i) \emph{Strongest proved partial result here.} The recursion is well-defined (Lemma 1), class 1 primes are exactly $2^a3^b-1$ and are at most $O((\log x)^2)$ up to $x$ (Lemma 2), and the class index is computable via the max-child rule (Lemma 3). Computations confirm the initial least primes $p_r$ up to $r=8$.
+(ii) \emph{First gap.} Prove (or disprove) that class 1 contains infinitely many primes of the form $2^a3^b-1$, and more generally infinitely many primes in each class.
+(iii) \emph{Top 3 next moves.} (1) Sieve the set $\{2^a3^b-1\}$ for local obstructions and look for a plausible infinitude approach for class 1. (2) For general $r$, study “class trees” (iterating $p\mapsto$ prime factors of $p+1$) and attempt CRT-based constructions that force $p+1$ to factor over earlier classes. (3) Extend computations of $p_r$ and class counts to much larger ranges and track $p_r^{1/r}$ empirically.
+(iv) \emph{What a minimal counterexample would look like.} If some class $r$ were finite, then beyond some point every prime $p$ would have at least one prime factor of $p+1$ lying in class $>r-1$, forcing the “class-tree height” of almost all primes to exceed $r$ in a systematic way.
+
+

@@ -1,0 +1,101 @@
+% Erdos Problem #1004
+
+1) FORMAL RESTATEMENT
+
+Fix a real constant c>0. For real x>1 define
+  K(x) := floor( (log x)^c ),
+where log denotes the natural logarithm.
+Question: does there exist X0=X0(c) such that for all x>=X0 there exists an integer n with 1<=n<=x for which the values
+  phi(n+1), phi(n+2), ..., phi(n+K(x))
+are all pairwise distinct?
+
+Edge cases:
+- If K(x)<=1 the condition is vacuous. The interesting regime is x large so K(x)>=2.
+- The statement depends mildly on rounding conventions; using floor is the minimal standard convention.
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+Only what is explicitly stated in the provided problem file:
+- Erdos--Pomerance--Sarkozy (EPS87) proved: if phi(n+k) are all distinct for 1<=k<=K, then
+    K <= n / exp( c1 (log n)^{1/3} )
+  for some absolute constant c1>0.
+
+3) ATTACK PLAN
+
+Proof-track ideas:
+- Try to construct n by congruence conditions (CRT) so that each n+k has a "signature" prime factor that forces phi(n+k) to have a unique prime divisor, implying all phi-values distinct.
+- Probabilistic heuristic: for random n the values phi(n+k) behave roughly like "random even numbers" with many collisions forced by identities like phi(2m)=phi(m) (m odd); try to show there are still collision-free blocks.
+
+Disproof-track ideas:
+- Use forced collisions: in any long interval there are pairs (m,2m) with m odd, giving phi(m)=phi(2m). Try to show such a pair must occur in every length-K window once K is large relative to n.
+
+I record concrete forced-collision lemmas and small computations.
+
+4) WORK
+
+FAST REALITY CHECK (exact computations)
+
+All computations below use natural log and K(x)=floor((log x)^c).
+I precomputed phi(t) by a sieve and searched for the first n<=x such that phi(n+1..n+K) are all distinct.
+
+For x=100,000:
+- c=1.0: K=11, first n found = 111.
+- c=1.5: K=39, first n found = 1358.
+- c=2.0: K=132, no n<=100,000 exists with all K values distinct.
+
+For x=1,000,000:
+- c=1.0: K=13, first n found = 122.
+- c=1.5: K=51, first n found = 4096.
+- c=2.0: K=190, first n found = 900,978.
+- c=2.5: K=709, no n<=1,000,000 exists with all K values distinct.
+- c=3.0: K=2636, no n<=1,000,000 exists with all K values distinct.
+
+Lemma 1004.1 (doubling invariance for odd arguments).
+If m is odd then phi(2m)=phi(m).
+
+Proof.
+If m is odd, gcd(2,m)=1. Euler's totient is multiplicative on coprime inputs, so
+  phi(2m)=phi(2)phi(m).
+Since phi(2)=1, this gives phi(2m)=phi(m).  QED.
+
+Lemma 1004.2 (a forced collision criterion inside a block).
+Let n,K be positive integers. Suppose there exists an odd integer m such that
+  n+1 <= m <= n+K  and  2m <= n+K.
+Then among the values phi(n+1),...,phi(n+K) there is a repeat.
+In fact phi(m)=phi(2m).
+
+In particular:
+- If n is even and K >= n+2, then taking m=n+1 (odd) gives 2m=2n+2 <= n+K, so the block cannot have all distinct phi-values.
+- If n is odd and K >= n+4, then taking m=n+2 (odd) gives 2m=2n+4 <= n+K, so again the block cannot have all distinct phi-values.
+
+Proof.
+By Lemma 1004.1, for any odd m we have phi(2m)=phi(m).
+Under the stated inequalities, both m and 2m lie in {n+1,...,n+K}. Hence the multiset {phi(n+1),...,phi(n+K)} contains phi(m) twice, so the values are not all distinct.
+The two "in particular" statements are immediate substitutions verifying that the required m exists under the stated conditions.  QED.
+
+5) VERIFICATION
+
+- Lemma 1004.1: multiplicativity needs gcd(2,m)=1, which holds exactly when m is odd.
+- Lemma 1004.2: checked that the hypotheses ensure both indices m and 2m are in the same block.
+- Computation: for x=10^5, c=2.0 the search found no block of length K=132 with all distinct phi-values; for x=10^6, c=2.0 a block exists (starting at n=900,978), showing that the "no" at x=10^5 is a small-x phenomenon and not a proof of failure.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result.
+- A rigorous, explicit forced-collision mechanism: if a block {n+1,...,n+K} contains an odd m together with 2m, then the block cannot have all distinct phi-values (Lemma 1004.2).
+- Exact search data for x=10^5 and x=10^6 for several c, including existence for c=2 at x=10^6 but nonexistence at the same x for c=2.5 and c=3.
+
+(ii) First gap (crisp).
+For a fixed c>0, prove that for all sufficiently large x there exists n<=x such that phi(n+1),...,phi(n+floor((log x)^c)) are pairwise distinct.
+
+(iii) Top 3 next moves.
+1. Computation: push the sliding-window distinctness search to larger x for c in {2,2.5,3} to see whether the threshold in c is real or only a small-data artifact.
+2. Construction: attempt a CRT-based construction where each n+k has a large prime-square divisor p_k^2 (or a carefully chosen prime divisor) that forces a prime p_k to divide phi(n+k) but not to divide phi(n+j) for j!=k, implying distinctness.
+3. Obstruction analysis: classify all simple functional identities (like phi(2m)=phi(m) for odd m) that can cause collisions inside short blocks, and show that for K=(log x)^c one can choose n to avoid all such "structured" collision patterns.
+
+(iv) What a minimal counterexample would likely look like.
+If the answer were "no" for some c, there would exist arbitrarily large x such that every n<=x produces at least one collision among phi(n+1..n+K(x)). Any such obstruction would have to be extremely robust, likely forcing a collision from very common multiplicative patterns (doubling, small prime factors, etc.) in every length-(log x)^c window.
+
+

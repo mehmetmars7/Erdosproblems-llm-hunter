@@ -1,0 +1,110 @@
+% Erdos Problem #943
+% URL: https://www.erdosproblems.com/943
+
+Let $A$ be the set of powerful numbers (if $p\mid n$ then $p^2\mid n$). Is it true that\[1_A\ast 1_A(n)=n^{o(1)}\]for every $n$?
+
+\subsection*{FORMAL RESTATEMENT}
+Let $A\subseteq\mathbb{N}$ be the set of powerful positive integers: $m\in A$ iff for every prime $p$, $p\mid m\Rightarrow p^2\mid m$. Let $1_A$ be its indicator function on $\mathbb{Z}$.
+Define the additive convolution
+\[
+(1_A*1_A)(n) := \sum_{m\in\mathbb{Z}} 1_A(m)\,1_A(n-m).
+\]
+Equivalently, for $n\ge 1$,
+\[
+(1_A*1_A)(n)=\#\{(a,b)\in A\times A: a+b=n\}
+\]
+(counting ordered pairs).
+The question asks whether for every $n\to\infty$ we have
+\[
+(1_A*1_A)(n)=n^{o(1)}.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+I do not use external results beyond what is in the problem text (which provides no additional bounds here). Heuristically, since $\#(A\cap[1,N])\asymp N^{1/2}$, the average value of $(1_A*1_A)(n)$ for $n\le 2N$ should be $O(1)$, but the question is about \emph{worst-case} $n$.
+
+\subsection*{ATTACK PLAN}
+\emph{Proof-track ideas.}
+\begin{itemize}
+\item Use the parametrization $m=a^2b^3$ (squarefree $b$) to reduce counting solutions of $a^2b^3+c^2d^3=n$.
+\item Seek a divisor-type upper bound: show that each representation forces a large square divisor of $n$ (or of some related quantity), then apply a divisor bound.
+\item Use average bounds (global counting) as a baseline and try to upgrade to pointwise bounds with additional structure.
+\end{itemize}
+\emph{Disproof-track ideas.}
+\begin{itemize}
+\item Search for $n$ with many representations as sum of two powerful numbers (e.g. via many representations as sum of two squares, since squares are powerful).
+\item If spikes seem large computationally, attempt to build a parametric family producing polynomially many representations.
+\end{itemize}
+
+\subsection*{WORK}
+\paragraph{Fast reality check (explicit computation).}
+I computed $(1_A*1_A)(n)$ for $1\le n\le N$ for $N\in\{10^3,10^4,10^5\}$ by enumerating powerful numbers $\le N$ and counting ordered pairs summing to $n$. Exact maxima observed:
+\begin{itemize}
+\item For $N=10^3$: $\max_{n\le 1000}(1_A*1_A)(n)=12$, attained at $n\in\{657,684,873\}$.
+\item For $N=10^4$: $\max_{n\le 10000}(1_A*1_A)(n)=20$, attained at $n\in\{6156,7884,9225\}$.
+\item For $N=10^5$: $\max_{n\le 100000}(1_A*1_A)(n)=43$, attained at $n=88200$.
+\end{itemize}
+These are sanity checks only.
+
+\paragraph{Lemma 943.1 (counting powerful numbers up to $X$).}
+Let $P(X)=\#(A\cap[1,X])$. Then for all $X\ge 1$,
+\[
+P(X) \le \Big(\sum_{b=1}^{\infty} b^{-3/2}\Big)\, X^{1/2}.
+\]
+
+\emph{Proof.}
+This is exactly Lemma 942.2, since the definition of $A$ is the same.
+\hfill $\Box$
+
+\paragraph{Lemma 943.2 (trivial pointwise upper bound on the convolution).}
+For every integer $n\ge 1$,
+\[
+(1_A*1_A)(n) \le P(n) \le \Big(\sum_{b=1}^{\infty} b^{-3/2}\Big)\, n^{1/2}.
+\]
+
+\emph{Proof.}
+By definition,
+\[
+(1_A*1_A)(n)=\sum_{a\in\mathbb{Z}} 1_A(a)1_A(n-a).
+\]
+All terms vanish unless $1\le a\le n-1$ and $a\in A$, so
+\[
+(1_A*1_A)(n)\le \sum_{a=1}^{n-1}1_A(a)=\#(A\cap[1,n-1])\le P(n).
+\]
+Now apply Lemma 943.1.
+\hfill $\Box$
+
+\paragraph{Proposition 943.3 (bounded average size of the convolution).}
+For every $N\ge 1$,
+\[
+\sum_{n=1}^{2N} (1_A*1_A)(n) = \big(\#(A\cap[1,N])\big)^2 \le \Big(\sum_{b=1}^{\infty} b^{-3/2}\Big)^2 N.
+\]
+In particular, the average of $(1_A*1_A)(n)$ over $1\le n\le 2N$ is $O(1)$.
+
+\emph{Proof.}
+Each ordered pair $(a,b)\in (A\cap[1,N])^2$ contributes exactly once to the sum on the left, namely to $n=a+b\in[2,2N]$. Therefore
+\[
+\sum_{n=1}^{2N} (1_A*1_A)(n)=\#\{(a,b)\in A\times A: 1\le a,b\le N\} = \big(\#(A\cap[1,N])\big)^2.
+\]
+The final inequality is Lemma 943.1.
+\hfill $\Box$
+
+\subsection*{VERIFICATION}
+\begin{itemize}
+\item Lemma 943.2: checked the support of $1_A(n-a)$ forces $1\le a\le n-1$ for $n\ge 2$; for $n=1$ the convolution is $0$ (no positive $a,b$ sum to $1$), consistent with the inequality.
+\item Proposition 943.3: verified the counting identity is exact because each pair contributes to exactly one sum.
+\item Computation sanity: for $n=2$, $(1_A*1_A)(2)=1$ because $2=1+1$ and $1\in A$. This matches the program output.
+\end{itemize}
+
+\subsection*{FINAL}
+**UNRESOLVED**
+(i) Strongest proved partial result: the pointwise bound $(1_A*1_A)(n)\le C\sqrt{n}$ (Lemma 943.2) and the exact average identity $\sum_{n\le 2N}(1_A*1_A)(n)=(\#(A\cap[1,N]))^2=O(N)$ (Proposition 943.3).
+(ii) First gap: improve the worst-case bound from $O(n^{1/2})$ to $n^{o(1)}$ (or find an $n$ giving a superpolynomial-in-$\log n$ lower bound that would disprove the statement).
+(iii) Top 3 next moves:
+\begin{enumerate}
+\item Study the Diophantine equation $a^2b^3+c^2d^3=n$ (with $b,d$ squarefree) via the determinant method / geometry-of-numbers to get pointwise upper bounds on the number of solutions.
+\item Try to relate representations to large square divisors of $n$ or nearby integers and then apply sharp divisor bounds for those square divisors.
+\item Extend computation to larger $n$ and inspect maximizing $n$ (e.g. $n=88200$ for $n\le 10^5$) to see whether large values correlate with special factorization patterns.
+\end{enumerate}
+(iv) Minimal counterexample structure (if the conjecture is false): an integer $n$ with \emph{many} decompositions $n=a+b$ where both $a$ and $b$ have all prime exponents $\ge 2$; heuristically such an $n$ may have many representations as sum of two squares plus additional squarefull perturbations.
+
+

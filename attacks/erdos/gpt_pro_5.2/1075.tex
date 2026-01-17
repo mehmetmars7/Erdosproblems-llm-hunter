@@ -1,0 +1,54 @@
+% Erdos Problem #1075
+
+1) FORMAL RESTATEMENT
+Fix an integer r >= 3.
+Is it true that there exists a constant c_r > r^(-r) with the following property?
+For every eps>0, for all sufficiently large n, every r-uniform hypergraph H on n vertices with at least (1+eps)*(n/r)^r edges contains a subhypergraph on m vertices with at least c_r * m^r edges, where m=m(n) -> infinity as n->infinity.
+(Here "subhypergraph" means: choose a vertex subset U of size m and keep any edges of H that lie entirely in U; in particular, the induced subhypergraph H[U] is allowed.)
+
+2) QUICK LITERATURE/CONTEXT CHECK
+The problem statement notes that Erdős proved the same conclusion with c_r = r^(-r) under the much stronger hypothesis e(H) >= eps * n^r.
+No other external results are assumed here.
+
+3) ATTACK PLAN
+The baseline example is the complete r-partite r-uniform hypergraph with equal parts, which has exactly (n/r)^r edges and whose induced subhypergraphs never exceed density r^(-r) (up to rounding). The question asks whether adding a fixed positive fraction of edges above this baseline forces a density increment to some constant c_r > r^(-r) on a growing subset.
+
+4) WORK
+Lemma 1075.1 (Baseline: the complete r-partite example saturates r^(-r)).
+Let V be partitioned into r parts of sizes n_1,...,n_r (sum n_i = n). Consider the complete r-partite r-uniform hypergraph T with edges consisting of all r-sets that contain exactly one vertex from each part. Then e(T) = n_1*n_2*...*n_r <= (n/r)^r.
+Moreover, for any subset U of vertices with |U|=m, if we write a_i = |U cap part i|, then the number of edges of T contained in U equals a_1*a_2*...*a_r <= (m/r)^r.
+In particular, every m-vertex subhypergraph of T has at most r^(-r) * m^r edges (up to integer rounding).
+Proof. The edge count formula e(T)=product n_i is immediate from the definition. By AM-GM,
+  product n_i <= ((n_1+...+n_r)/r)^r = (n/r)^r.
+For U, the induced edge count is product a_i for the same reason, and AM-GM gives product a_i <= (m/r)^r. QED.
+
+Lemma 1075.2 (Random m-subset averaging lemma).
+Let H be any r-uniform hypergraph on n vertices with e(H) edges. Fix m with 1 <= m <= n. Then there exists a subset U of vertices with |U|=m such that the induced subhypergraph H[U] has at least
+  e(H) * (m/n)^r
+edges.
+Proof. Choose a uniformly random m-subset U of the n vertices. For each edge E of H (an r-set), the probability that E is contained in U is
+  C(n-r, m-r) / C(n, m) = (m/n)*((m-1)/(n-1))*...*((m-r+1)/(n-r+1)) >= (m/n)^r.
+By linearity of expectation,
+  E[ e(H[U]) ] = sum_{E in H} P(E subset U) >= e(H) * (m/n)^r.
+Therefore there exists at least one U with e(H[U]) >= e(H)*(m/n)^r. QED.
+
+Corollary (what the averaging lemma gives under the hypothesis).
+If e(H) >= (1+eps)*(n/r)^r = (1+eps)*r^(-r)*n^r, then for every m we can find U with
+  e(H[U]) >= (1+eps)*r^(-r)*m^r.
+This achieves a density increment over r^(-r), but the increment still depends on eps.
+
+5) VERIFICATION (sanity checks)
+- For r=3 and n=9, the balanced complete 3-partite 3-uniform hypergraph has parts of size 3 and thus exactly 3*3*3 = 27 edges. Since 9^3/27 = 27, this matches density r^(-r)=1/27 at the full vertex set.
+- Lemma 1075.2 is purely probabilistic and does not depend on n being large.
+
+6) FINAL
+UNRESOLVED
+(i) Strongest proved partial result here: the extremal r-partite construction shows that at exactly (n/r)^r edges one cannot force any constant c_r > r^(-r) (Lemma 1075.1). For an r-uniform hypergraph with e(H) >= (1+eps)*(n/r)^r, a random-subset averaging argument guarantees an m-vertex subhypergraph with at least (1+eps)*r^(-r)*m^r edges (Lemma 1075.2 and its corollary), but this does not produce a constant c_r independent of eps.
+(ii) First gap (crisp): Upgrade the corollary from c = (1+eps)*r^(-r) (depending on eps) to a fixed c_r > r^(-r) that works for every eps>0.
+(iii) Top 3 next moves (concrete):
+  1. Try to prove a density-increment lemma: if e(H) >= (1+eps)*r^(-r)*n^r then either H already has an m-subset with density >= r^(-r)+delta (delta depending only on r), or else H is structurally close to an r-partite construction (which might be iterated).
+  2. Search for pseudorandom counterexamples: construct r-uniform hypergraphs with edge density about r^(-r) where every moderately large vertex subset has density close to the global one, potentially preventing a fixed delta increment.
+  3. For r=3, do computer experiments on small n to see how the maximum induced density behaves when e(H) is just above (n/3)^3.
+(iv) Minimal counterexample structure: To refute the statement for a given r, one would need a fixed candidate c_r>r^(-r) and an eps>0, together with arbitrarily large n and r-uniform hypergraphs with at least (1+eps)*(n/r)^r edges but such that every subhypergraph on m=m(n)->infinity vertices has fewer than c_r*m^r edges.
+
+

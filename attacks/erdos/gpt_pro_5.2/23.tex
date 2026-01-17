@@ -1,0 +1,184 @@
+% Erdős Problem #23
+
+1) FORMAL RESTATEMENT
+
+Fix an integer $n\ge 1$. Let $G=(V,E)$ be a simple undirected graph with $|V|=5n$ and containing no triangles (i.e., no $3$-cycle).
+
+Question: Must there exist a subset of edges $F\subseteq E$ with $|F|\le n^2$ such that the graph $(V, E\setminus F)$ is bipartite?
+
+Equivalently: Is the minimum number of edges that must be deleted to make $G$ bipartite always at most $n^2$?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The provided problem statement notes that the balanced blow-up of $C_5$ shows the bound $n^2$ would be best possible, and that the best currently stated constant is $1.064n^2$ (Balogh--Clemen--Lidicky, 2021). I do not use or claim any additional literature beyond what is explicitly stated in the problem file.
+
+3) ATTACK PLAN
+
+Proof track (ambitious):
+- Prove a universal max-cut lower bound for triangle-free graphs on $5n$ vertices that implies a bipartite subgraph with at least $|E|-n^2$ edges.
+
+Disproof track (ambitious):
+- Construct a triangle-free graph on $5n$ vertices with bipartite-deletion number strictly larger than $n^2$.
+
+What I can deliver: a rigorous proof that the $C_5$ blow-up needs $\ge n^2$ deletions (showing sharpness), and a rigorous but weak universal upper bound of $(25/8)n^2$ deletions from first principles.
+
+4) WORK
+
+FAST REALITY CHECK
+
+- For $n=1$: a triangle-free graph on $5$ vertices can be non-bipartite (e.g. $C_5$). Deleting one edge from $C_5$ makes it a path (bipartite). Here $n^2=1$, consistent.
+- For the blow-up construction at $n=2$, the graph has $5n^2=20$ edges; the calculations below show any bipartite subgraph has at most $16$ edges, so at least $4=n^2$ deletions are needed.
+
+Lemma 23.1 (max-cut gives a universal $1/2$-edge bipartite subgraph).
+Let $G=(V,E)$ be any finite graph with $m=|E|$. Then there exists a bipartite subgraph of $G$ with at least $m/2$ edges. Equivalently, one can delete at most $m/2$ edges to make $G$ bipartite.
+
+Proof.
+Choose a uniformly random bipartition $V=X\cup Y$ by independently placing each vertex into $X$ or $Y$ with probability $1/2$.
+
+An edge $uv\in E$ crosses the cut $(X,Y)$ iff exactly one of $u,v$ is in $X$, which has probability $1/2$.
+
+Let $Z$ be the number of crossing edges. Then
+\[
+\mathbb E[Z] = \sum_{uv\in E} \mathbb P(uv\text{ crosses}) = m\cdot \frac12 = \frac{m}{2}.
+\]
+Therefore there exists at least one bipartition with $Z\ge m/2$ crossing edges.
+
+The subgraph consisting of the crossing edges is bipartite (with bipartition $X,Y$) and has at least $m/2$ edges. Deleting the remaining edges yields a bipartite graph after deleting at most $m/2$ edges. $\square$
+
+Lemma 23.2 (Mantel-type bound proved from scratch).
+If $G$ is triangle-free on $N$ vertices, then
+\[
+|E(G)|\le \frac{N^2}{4}.
+\]
+In particular, for $N=5n$,
+\[
+|E(G)|\le \frac{25}{4}n^2.
+\]
+
+Proof.
+Let the degrees be $d_1,\dots,d_N$. Then $\sum_i d_i = 2|E|$.
+
+Because $G$ is triangle-free, for each vertex $v_i$, its neighborhood $N(v_i)$ is an independent set (no edges among neighbors). Hence every edge of $G$ has at most one endpoint in $N(v_i)$, so counting edges between $N(v_i)$ and $V\setminus N(v_i)$ gives at most $|E|$ edges, while the number of such potential edges is $d_i(N-d_i)$.
+
+Formally, every neighbor of $v_i$ can connect only to vertices outside $N(v_i)$ (otherwise it would form a triangle with $v_i$). Thus all $d_i$ neighbors have their incident edges (excluding possible edge to $v_i$ itself) going to the $N-d_i$ outside vertices. In particular, the number of edges leaving $N(v_i)$ is at most $d_i(N-d_i)$, and certainly at least the sum of degrees of vertices in $N(v_i)$ minus twice internal edges of $N(v_i)$, but since $N(v_i)$ has no internal edges, we have
+\[
+\sum_{v_j\in N(v_i)} d_j \le d_i(N-d_i).
+\]
+Now sum this inequality over all $i$:
+\[
+\sum_{i=1}^N \sum_{v_j\in N(v_i)} d_j \le \sum_{i=1}^N d_i(N-d_i)= N\sum_i d_i - \sum_i d_i^2.
+\]
+The left-hand side can be rewritten by swapping sums:
+\[
+\sum_{i=1}^N \sum_{v_j\in N(v_i)} d_j = \sum_{j=1}^N d_j \cdot |\{i: v_j\in N(v_i)\}| = \sum_{j=1}^N d_j^2,
+\]
+because $v_j\in N(v_i)$ iff $v_i$ is adjacent to $v_j$, and there are exactly $d_j$ such $i$.
+
+Thus
+\[
+\sum_{j=1}^N d_j^2 \le N\sum_{i=1}^N d_i - \sum_{i=1}^N d_i^2,
+\]
+so
+\[
+2\sum_{i=1}^N d_i^2 \le N\sum_{i=1}^N d_i.
+\]
+Let $S=\sum_i d_i =2|E|$. Then this inequality becomes
+\[
+2\sum_i d_i^2 \le N S.
+\]
+By Cauchy--Schwarz,
+\[
+\sum_i d_i^2 \ge \frac{1}{N}\left(\sum_i d_i\right)^2 = \frac{S^2}{N}.
+\]
+Combining,
+\[
+2\cdot \frac{S^2}{N} \le 2\sum_i d_i^2 \le N S.
+\]
+Since $S\ge 0$, we may divide by $S$ (if $S=0$ then $|E|=0$ and the claim is trivial) to obtain
+\[
+\frac{2S}{N} \le N \quad\Rightarrow\quad S\le \frac{N^2}{2}.
+\]
+Recalling $S=2|E|$, we get
+\[
+2|E| \le \frac{N^2}{2}\quad\Rightarrow\quad |E|\le \frac{N^2}{4}.
+\]
+This proves the claim. $\square$
+
+Corollary 23.3 (a weak universal deletion bound).
+Every triangle-free graph on $5n$ vertices can be made bipartite by deleting at most
+\[
+\frac{|E|}{2}\le \frac{1}{2}\cdot \frac{25}{4}n^2 = \frac{25}{8}n^2
+\]
+edges.
+
+Proof.
+Combine Lemma 23.1 with Lemma 23.2 for $N=5n$. $\square$
+
+Lemma 23.4 (the $C_5$ blow-up requires $\ge n^2$ deletions).
+Let $H_n$ be the balanced blow-up of the 5-cycle $C_5$: its vertex set is partitioned into five parts $V_1,\dots,V_5$ each of size $n$, and for each $i$ (indices mod $5$) every vertex of $V_i$ is connected to every vertex of $V_{i+1}$; there are no other edges.
+
+Then $H_n$ is triangle-free and any bipartite subgraph of $H_n$ has at most $4n^2$ edges. Since $|E(H_n)|=5n^2$, at least $n^2$ edges must be deleted to make $H_n$ bipartite.
+
+Proof.
+(Triangle-free.) Any triangle would require edges between three distinct parts. But edges exist only between consecutive parts along the 5-cycle, and $C_5$ has no triangles. Formally: if $u\in V_i$ and $v\in V_j$ are adjacent then $j\equiv i\pm 1\pmod 5$. In a triangle, the three indices would all differ by $\pm 1$, forcing a triangle in $C_5$, impossible.
+
+(Edge count.) Each consecutive pair $(V_i,V_{i+1})$ forms a complete bipartite graph $K_{n,n}$, contributing $n^2$ edges, and there are 5 such pairs, so $|E(H_n)|=5n^2$.
+
+(Maximum bipartite subgraph has $\le 4n^2$ edges.) Let $V=X\cup Y$ be any bipartition of the vertex set (not necessarily respecting the $V_i$).
+For each $i$, write
+\[
+ x_i := |V_i\cap X|,\qquad y_i := |V_i\cap Y|=n-x_i.
+\]
+The number of edges of $H_n$ crossing the cut $(X,Y)$ equals the number of edges kept in the bipartite subgraph induced by this cut, because any edge with both endpoints in $X$ or both in $Y$ would violate bipartiteness and must be deleted.
+
+Between $V_i$ and $V_{i+1}$, the crossing edges are exactly
+\[
+ x_i y_{i+1} + y_i x_{i+1} = x_i(n-x_{i+1}) + (n-x_i)x_{i+1}.
+\]
+Thus the total number of crossing edges is
+\[
+F(x_1,\dots,x_5) := \sum_{i=1}^5 \bigl(x_i(n-x_{i+1}) + (n-x_i)x_{i+1}\bigr),
+\]
+with indices mod $5$.
+
+Observe that $F$ is linear in each variable $x_i$ when the other variables are fixed (because each term involves products $x_i x_{i+1}$ but never $x_i^2$). Therefore, over the box $[0,n]^5$, the maximum of $F$ is attained at an extreme point, i.e., at a point with each $x_i\in\{0,n\}$.
+
+At such an extreme point, each part $V_i$ lies entirely in $X$ or entirely in $Y$. Identifying $V_i$ with a vertex of $C_5$, the number of crossing edges between $V_i$ and $V_{i+1}$ is either $n^2$ (if $V_i$ and $V_{i+1}$ are on opposite sides) or $0$ (if they are on the same side). Hence
+\[
+F = n^2\cdot (\text{number of edges of }C_5\text{ crossing the induced cut}).
+\]
+The maximum cut in $C_5$ has size $4$ (because $C_5$ is an odd cycle and any 2-coloring leaves at least one monochromatic edge, so at most 4 edges cross; and there is a coloring with exactly one monochromatic edge, giving 4 crossing edges).
+
+Therefore $F\le 4n^2$ for every cut $(X,Y)$, so every bipartite subgraph has at most $4n^2$ edges. Since $H_n$ has $5n^2$ edges total, at least $n^2$ edges must be deleted to make it bipartite.
+
+This shows the bound $n^2$ in the question would be sharp if true. $\square$
+
+5) VERIFICATION
+
+- Lemma 23.1: expectation argument is standard and checks out; no hidden assumptions.
+- Lemma 23.2: the key inequality $\sum_{v_j\in N(v_i)} d_j \le d_i(N-d_i)$ is justified because $N(v_i)$ is independent, so all edges incident to neighbors go outside $N(v_i)$; the double sum identity is verified by swapping summations.
+- Lemma 23.4: the ``extreme point'' argument is correct because $F$ is multilinear; maxima of multilinear functions over a hyper-rectangle occur at vertices. The max-cut size of $C_5$ is checked explicitly.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result:
+- A fully proved sharp lower bound example: the balanced $C_5$ blow-up needs at least $n^2$ edge deletions to become bipartite (Lemma 23.4).
+- A fully proved (weak) universal upper bound: every triangle-free graph on $5n$ vertices can be made bipartite by deleting at most $(25/8)n^2$ edges (Corollary 23.3).
+
+(ii) First gap (crisp):
+Improve the universal constant from $25/8=3.125$ down to $1$; i.e., prove or disprove:
+\[
+\forall n\ \forall\text{ triangle-free }G\text{ on }5n\text{ vertices,}\ \exists F\subseteq E(G),\ |F|\le n^2,\ G-F\text{ bipartite}.
+\]
+
+(iii) Top 3 next moves (concrete):
+1. Prove a strengthened max-cut lower bound for triangle-free graphs on $5n$ vertices: show that every such graph has a cut of size at least $|E|-n^2$.
+2. Analyze stability around the $C_5$ blow-up: prove a structural theorem that any near-extremal example (requiring close to $n^2$ deletions) must resemble a $C_5$ blow-up, then push the constant down.
+3. Computationally for small $n$ (e.g. $n=1,2,3$), search over triangle-free graphs with heuristics (e.g. SAT/ILP) to estimate the true worst-case deletion number and infer likely extremal structures.
+
+(iv) Minimal counterexample structure:
+A minimal counterexample (if the statement is false) would be a triangle-free graph $G$ on $5n$ vertices with bipartite-deletion number $>n^2$. Such a graph would necessarily have many edges and a small maximum cut; it would likely be a dense, highly regular, $C_5$-like construction but with additional structure forcing any cut to lose more than $n^2$ edges.
+
+

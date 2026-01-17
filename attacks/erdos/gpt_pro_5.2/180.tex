@@ -1,0 +1,799 @@
+% Erdos Problem #180
+% Attempt for Erdos Problem #180
+% Following PROMPT_STRATEGY.MD
+% Tools/Constraints:
+% - Web browsing available? YES (not used beyond the problem text; no extra literature claims).
+% - Computation available (Python/Sage/Mathematica)? YES (used for brute-force sanity checks for small n).
+
+PROBLEM
+
+If $\mathcal{F}$ is a finite set of finite graphs then $\mathrm{ex}(n;\mathcal{F})$ is the maximum number of edges a graph on $n$ vertices can have without containing any subgraphs from $\mathcal{F}$. Is it true that, for every $\mathcal{F}$, there exists $G\in\mathcal{F}$ such that
+\[\mathrm{ex}(n;G)\ll_{\mathcal{F}}\mathrm{ex}(n;\mathcal{F})?\]
+
+OUTPUT
+
+## 1) FORMAL RESTATEMENT
+
+All graphs are finite, simple, undirected.
+
+For a (finite) family of graphs $\mathcal F$, define
+\[
+\mathrm{ex}(n;\mathcal F):=\max\{|E(H)|: |V(H)|=n\text{ and }H\text{ contains no subgraph isomorphic to any }F\in\mathcal F\}.
+\]
+For a single graph $G$, write $\mathrm{ex}(n;G):=\mathrm{ex}(n;\{G\})$.
+
+Question (as stated):
+
+> For every finite family $\mathcal F$ of finite graphs, does there exist a member $G\in\mathcal F$ and a constant $C=C(\mathcal F)$ such that for all $n$,
+> \[
+> \mathrm{ex}(n;G)\le C\,\mathrm{ex}(n;\mathcal F)?
+> \]
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem text itself already includes a “folklore counterexample” family $\mathcal F=\{H_1,H_2\}$ where $H_1$ is a star and $H_2$ is a matching (each with at least two edges), for which $\mathrm{ex}(n;\mathcal F)\ll 1$ but $\mathrm{ex}(n;H_i)\asymp n$.
+
+I will treat this as a candidate counterexample and verify it fully from first principles.
+
+---
+
+## 3) ATTACK PLAN
+
+Disproof-track:
+
+1. Choose explicit graphs $H_1,H_2$ as in the folklore counterexample: take $H_1=K_{1,2}$ (a 2-edge star) and $H_2=2K_2$ (two disjoint edges).
+2. Compute/derive $\mathrm{ex}(n;\{H_1,H_2\})$ exactly.
+3. Compute/derive $\mathrm{ex}(n;H_1)$ and $\mathrm{ex}(n;H_2)$ and show they grow linearly in $n$.
+4. Conclude no constant $C$ can make $\mathrm{ex}(n;H_i)\le C\,\mathrm{ex}(n;\mathcal F)$ for all $n$.
+
+---
+
+## 4) WORK
+
+### Proposition 4.1 (the family extremal number is bounded)
+
+Let
+\[
+\mathcal F:=\{K_{1,2},\ 2K_2\}.
+\]
+Then for all $n\ge 2$,
+\[
+\mathrm{ex}(n;\mathcal F)=1.
+\]
+
+**Proof.**
+Let $H$ be an $n$-vertex graph with at least $2$ edges.
+Pick two distinct edges $e_1,e_2$.
+
+* If $e_1$ and $e_2$ share a vertex, then $H$ contains a copy of $K_{1,2}$: the shared vertex is the center and the two edges are the two leaves.
+* If $e_1$ and $e_2$ are disjoint, then $H$ contains a copy of $2K_2$.
+
+Thus any graph with at least $2$ edges contains at least one member of $\mathcal F$ as a subgraph.
+Therefore any $\mathcal F$-free graph has at most $1$ edge, so $\mathrm{ex}(n;\mathcal F)\le 1$.
+
+Conversely, the graph consisting of a single edge plus $(n-2)$ isolated vertices is $\mathcal F$-free and has $1$ edge. Hence $\mathrm{ex}(n;\mathcal F)\ge 1$.
+Combining gives $\mathrm{ex}(n;\mathcal F)=1$ for $n\ge 2$.
+$\square$
+
+---
+
+### Proposition 4.2 (the individual extremal numbers are linear)
+
+For $n\ge 1$,
+\[
+\mathrm{ex}(n;K_{1,2})=\left\lfloor\frac n2\right\rfloor.
+\]
+For $n\ge 4$,
+\[
+\mathrm{ex}(n;2K_2)=n-1.
+\]
+
+**Proof for $K_{1,2}$.**
+A graph contains $K_{1,2}$ as a (not necessarily induced) subgraph iff it has a vertex of degree at least $2$.
+Thus $K_{1,2}$-free graphs are exactly graphs with maximum degree $\le 1$, i.e. matchings (plus isolated vertices).
+The maximum number of edges in a matching on $n$ vertices is $\lfloor n/2\rfloor$.
+This is achieved by a perfect matching (or near-perfect matching) and is optimal.
+So $\mathrm{ex}(n;K_{1,2})=\lfloor n/2\rfloor$.
+
+**Proof for $2K_2$.**
+A graph is $2K_2$-free iff it has no two disjoint edges, i.e. its set of edges is a pairwise-intersecting family of 2-subsets of $[n]$.
+We prove that for $n\ge 4$, such a family has size at most $n-1$.
+
+Take any edge $ab$.
+Every other edge must intersect $ab$, so every edge contains $a$ or $b$.
+If all edges contain $a$, then the graph is a star centered at $a$ and has at most $n-1$ edges.
+Similarly if all edges contain $b$.
+
+Otherwise, there is an edge $ax$ with $x\ne b$ and an edge $by$ with $y\ne a$.
+For these two edges to intersect, we must have $x=y$ (since they cannot share $a$ or $b$), so there is a vertex $c$ such that edges $ac$ and $bc$ are present.
+Now any edge must intersect both $ac$ and $bc$, so any edge must contain $c$ or must be $ab$.
+But if there were an edge $cz$ with $z\notin\{a,b\}$ and also $ab$ is present, then $cz$ and $ab$ are disjoint, a contradiction. Thus all edges must lie within the triangle on $\{a,b,c\}$.
+Hence the total number of edges is at most $3$, which is strictly less than $n-1$ for $n\ge 4$.
+
+Therefore the only way to have more than $3$ edges for $n\ge 4$ is that all edges share a common vertex, i.e. the graph is a star; in that case the maximum is $n-1$.
+The star $K_{1,n-1}$ is $2K_2$-free and has $n-1$ edges, so $\mathrm{ex}(n;2K_2)=n-1$ for $n\ge 4$.
+$\square$
+
+---
+
+### Corollary 4.3 (disproof of the conjecture)
+
+For $\mathcal F=\{K_{1,2},2K_2\}$, there is **no** $G\in\mathcal F$ and constant $C$ such that
+\[
+\mathrm{ex}(n;G)\le C\,\mathrm{ex}(n;\mathcal F)\quad\text{for all }n.
+\]
+
+**Proof.**
+By Proposition 4.1, $\mathrm{ex}(n;\mathcal F)=1$ for all $n\ge 2$.
+By Proposition 4.2, $\mathrm{ex}(n;K_{1,2})=\lfloor n/2\rfloor$ and $\mathrm{ex}(n;2K_2)=n-1$ for all $n\ge 4$.
+Thus for either choice of $G\in\mathcal F$, the ratio $\mathrm{ex}(n;G)/\mathrm{ex}(n;\mathcal F)$ grows unboundedly with $n$.
+So no constant $C$ can work.
+$\square$
+
+---
+
+### FAST REALITY CHECK (small $n$ brute force)
+
+I brute-forced all graphs on $n\le 6$ vertices and found:
+\[
+\begin{array}{c|cc|c}
+ n & \mathrm{ex}(n;K_{1,2}) & \mathrm{ex}(n;2K_2) & \mathrm{ex}(n;\{K_{1,2},2K_2\})\\\hline
+2&1&1&1\\
+3&1&3&1\\
+4&2&3&1\\
+5&2&4&1\\
+6&3&5&1
+\end{array}
+\]
+which matches the formulas above.
+
+---
+
+## 5) VERIFICATION
+
+* Proposition 4.1 hinges on the dichotomy: any two edges either share a vertex (giving $K_{1,2}$) or are disjoint (giving $2K_2$). This is exhaustive.
+* Proposition 4.2 for $K_{1,2}$ is correct because a vertex of degree $\ge 2$ gives $K_{1,2}$ as a subgraph.
+* Proposition 4.2 for $2K_2$ carefully handles the possibility of a triangle: triangles are $2K_2$-free but have only 3 edges, and for $n\ge 4$ the star has more edges.
+
+---
+
+## 6) FINAL
+
+**FULL SOLUTION**
+
+**COUNTEREXAMPLE/DISPROOF.**
+
+The statement “for every finite family $\mathcal F$ there exists $G\in\mathcal F$ with $\mathrm{ex}(n;G)\ll_{\mathcal F}\mathrm{ex}(n;\mathcal F)$” is false.
+A counterexample is $\mathcal F=\{K_{1,2},2K_2\}$, for which $\mathrm{ex}(n;\mathcal F)=1$ but $\mathrm{ex}(n;K_{1,2})\asymp n$ and $\mathrm{ex}(n;2K_2)\asymp n$.
+
+
+
+
+## 1) FORMAL RESTATEMENT
+
+**Conventions.** All graphs are finite, simple, undirected. “Subgraph” means **not necessarily induced**.
+
+For a finite family of graphs (\mathcal F), define
+[
+\operatorname{ex}(n;\mathcal F)
+:=\max\bigl{|E(H)|:\ |V(H)|=n\ \text{and (H) contains no subgraph isomorphic to any }F\in\mathcal F\bigr}.
+]
+For a single graph (G), write (\operatorname{ex}(n;G):=\operatorname{ex}(n;{G})).
+
+**Literal question.** Is it true that for every finite (\mathcal F) there exists (G\in\mathcal F) and a constant (C=C(\mathcal F)>0) such that
+[
+\forall n\in\mathbb N,\qquad \operatorname{ex}(n;G)\le C,\operatorname{ex}(n;\mathcal F)\ ?
+]
+(Equivalently (\operatorname{ex}(n;G)\ll_{\mathcal F}\operatorname{ex}(n;\mathcal F)).)
+
+**Edge-case note.** If (\operatorname{ex}(n;\mathcal F)=0) for some (n), then the inequality forces (\operatorname{ex}(n;G)=0) for that (n). In the counterexample below we will have (\operatorname{ex}(n;\mathcal F)=1) for all (n\ge 2), so there is no “zero denominator” issue.
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+On the Erdős Problems page for #180, the site explicitly records a “folklore counterexample” due to Zach Hunter: take (\mathcal F={H_1,H_2}) with (H_1) a star and (H_2) a matching (each with at least two edges). Then (\operatorname{ex}(n;\mathcal F)) is bounded while (\operatorname{ex}(n;H_i)\asymp n). ([erdosproblems.com][1])
+
+**Answer to your direct question:** yes—your choice
+[
+H_1=K_{1,2}\quad\text{and}\quad H_2=2K_2
+]
+is exactly the **smallest** instance of that folklore template (a 2-edge star and a 2-edge matching).
+
+---
+
+## 3) ATTACK PLAN
+
+**Disproof strategy (best path).**
+
+1. Pick an explicit (\mathcal F) and compute (\operatorname{ex}(n;\mathcal F)) exactly (or at least show it is (O(1))).
+2. Compute (\operatorname{ex}(n;G)) for each (G\in\mathcal F) and show it grows like (\Omega(n)).
+3. Conclude that for each (G\in\mathcal F), the ratio (\operatorname{ex}(n;G)/\operatorname{ex}(n;\mathcal F)) is unbounded, so no uniform constant (C(\mathcal F)) exists.
+
+I’ll do this with the explicit pair (\mathcal F={K_{1,2},,2K_2}), and I’ll also give a clean general lemma explaining why “star + matching” forces (\operatorname{ex}(n;\mathcal F)=O(1)).
+
+---
+
+## 4) WORK
+
+### 4.1 Explicit counterexample family
+
+Let
+[
+\mathcal F := {,K_{1,2},\ 2K_2,}.
+]
+Here (K_{1,2}) is the 3-vertex path (P_3) (two adjacent edges), and (2K_2) is two disjoint edges.
+
+---
+
+### 4.2 Compute (\operatorname{ex}(n;\mathcal F))
+
+#### Lemma 4.2.1
+
+For all (n\ge 2),
+[
+\operatorname{ex}(n;\mathcal F)=1.
+]
+
+**Proof.**
+
+* **Upper bound (\le 1):** Let (H) be any (n)-vertex graph with at least two edges. Choose two distinct edges (e_1,e_2).
+
+  * If (e_1,e_2) share a vertex, then those two edges form a copy of (K_{1,2}).
+  * If (e_1,e_2) are disjoint, then those two edges form a copy of (2K_2).
+
+  In either case, (H) contains a member of (\mathcal F) as a subgraph. Therefore any (\mathcal F)-free graph has **at most one edge**, so (\operatorname{ex}(n;\mathcal F)\le 1).
+
+* **Lower bound (\ge 1):** The graph consisting of a single edge plus (n-2) isolated vertices contains neither (K_{1,2}) nor (2K_2). So (\operatorname{ex}(n;\mathcal F)\ge 1).
+
+Thus (\operatorname{ex}(n;\mathcal F)=1) for all (n\ge 2). (\square)
+
+(For completeness: (\operatorname{ex}(1;\mathcal F)=0).)
+
+---
+
+### 4.3 Compute (\operatorname{ex}(n;K_{1,2}))
+
+#### Lemma 4.3.1
+
+For all (n\ge 1),
+[
+\operatorname{ex}(n;K_{1,2})=\left\lfloor\frac n2\right\rfloor.
+]
+
+**Proof.**
+
+A graph contains (K_{1,2}) as a (not necessarily induced) subgraph iff it has a vertex of degree at least (2): two incident edges at that vertex are exactly a (K_{1,2}).
+
+So a graph is (K_{1,2})-free iff (\Delta(G)\le 1), i.e. it is a matching (plus isolated vertices). The maximum size of a matching on (n) vertices is (\lfloor n/2\rfloor), achieved by a perfect or near-perfect matching. (\square)
+
+In particular, (\operatorname{ex}(n;K_{1,2})\sim \tfrac12 n).
+
+---
+
+### 4.4 Compute (\operatorname{ex}(n;2K_2))
+
+#### Lemma 4.4.1
+
+For (n\ge 4),
+[
+\operatorname{ex}(n;2K_2)=n-1.
+]
+(And (\operatorname{ex}(2;2K_2)=1), (\operatorname{ex}(3;2K_2)=3).)
+
+**Proof.**
+
+Call a graph (2K_2)-free if it has **no two disjoint edges**.
+
+**Lower bound:** The star (K_{1,n-1}) has (n-1) edges and any two edges share the center, so it is (2K_2)-free. Hence (\operatorname{ex}(n;2K_2)\ge n-1).
+
+**Upper bound for (n\ge 4):** Let (G) be (2K_2)-free on (n) vertices.
+
+* If (G) has a vertex incident to all edges, then (e(G)\le n-1) (at most the star).
+* Otherwise, no single vertex meets all edges. Then (G) must contain at least two edges (ax) and (by) with (a\neq b), such that (ax) is not incident to (b) and (by) is not incident to (a). Since (G) is (2K_2)-free, the edges (ax) and (by) cannot be disjoint, so they must share their other endpoint: (x=y=c). Thus (ac) and (bc) are edges.
+
+  Now consider any edge (uv) in (G). It must intersect (ac) and also intersect (bc). If (uv) does not use (c), then to meet (ac) it must use (a), and to meet (bc) it must use (b), hence (uv=ab). So every edge is in ({ab,ac,bc}), meaning (G) is a subgraph of a triangle and has at most (3) edges.
+
+For (n\ge 4), we have (3\le n-1), so in all cases (e(G)\le n-1). Together with the star construction this gives (\operatorname{ex}(n;2K_2)=n-1) for (n\ge 4). (\square)
+
+In particular, (\operatorname{ex}(n;2K_2)\sim n).
+
+---
+
+### 4.5 Disproof of the statement
+
+#### Theorem 4.5.1 (Literal statement is false)
+
+There exists a finite family (\mathcal F) such that **no** (G\in\mathcal F) satisfies
+[
+\operatorname{ex}(n;G)\ll_{\mathcal F}\operatorname{ex}(n;\mathcal F).
+]
+
+**Proof (using (\mathcal F={K_{1,2},2K_2})).**
+
+From Lemma 4.2.1, (\operatorname{ex}(n;\mathcal F)=1) for all (n\ge 2).
+
+* If (G=K_{1,2}), then Lemma 4.3.1 gives (\operatorname{ex}(n;G)=\lfloor n/2\rfloor), so
+  [
+  \frac{\operatorname{ex}(n;G)}{\operatorname{ex}(n;\mathcal F)}=\left\lfloor\frac n2\right\rfloor\to\infty.
+  ]
+* If (G=2K_2), then Lemma 4.4.1 gives (\operatorname{ex}(n;G)=n-1) for all (n\ge 4), so
+  [
+  \frac{\operatorname{ex}(n;G)}{\operatorname{ex}(n;\mathcal F)}=n-1\to\infty.
+  ]
+
+Hence for **every** (G\in\mathcal F), the ratio (\operatorname{ex}(n;G)/\operatorname{ex}(n;\mathcal F)) is unbounded, so there cannot exist a constant (C(\mathcal F)) with (\operatorname{ex}(n;G)\le C(\mathcal F)\operatorname{ex}(n;\mathcal F)) for all (n). (\square)
+
+This is exactly the failure mechanism described on the Erdős Problems page: “star + matching” kills everything beyond (O(1)) edges, while each condition alone still allows (\Theta(n)) edges. ([erdosproblems.com][1])
+
+---
+
+### 4.6 (Optional) General “star + matching” lemma (explains the folklore)
+
+Let (\Delta,\nu\ge 1) be integers and consider the family
+[
+\mathcal F_{\Delta,\nu} := {,K_{1,\Delta+1},\ (\nu+1)K_2,}.
+]
+Then any (\mathcal F_{\Delta,\nu})-free graph has maximum degree (\le \Delta) and matching number (\le \nu).
+
+A standard easy bound then shows (e(G)=O_{\Delta,\nu}(1)): pick a **maximal** matching (M) (so (|M|\le \nu)). The set (S) of endpoints of (M) has (|S|\le 2\nu) and is a **vertex cover** (if there were an edge with both ends outside (S), you could add it to (M), contradicting maximality). Since every edge touches (S) and each vertex has degree at most (\Delta),
+[
+e(G)\le \sum_{v\in S}\deg(v)\le |S|\Delta\le 2\nu\Delta.
+]
+So (\operatorname{ex}(n;\mathcal F_{\Delta,\nu})\le 2\nu\Delta), i.e. bounded independent of (n), while (\operatorname{ex}(n;K_{1,\Delta+1})) and (\operatorname{ex}(n;(\nu+1)K_2)) are both (\Theta(n)). (This recovers the folklore phenomenon in one stroke.)
+
+Your specific example is ((\Delta,\nu)=(1,1)), and the crude bound (2\nu\Delta=2) can be sharpened to the exact value (1) by the “two edges are adjacent or disjoint” dichotomy.
+
+---
+
+## 5) VERIFICATION (adversarial proof checking)
+
+* **Quantifiers:** The disproof shows: (\exists \mathcal F) such that (\forall G\in\mathcal F), (\sup_n \operatorname{ex}(n;G)/\operatorname{ex}(n;\mathcal F)=\infty). That is exactly the negation of “(\forall \mathcal F\ \exists G\in\mathcal F) with (\operatorname{ex}(n;G)\ll_{\mathcal F}\operatorname{ex}(n;\mathcal F))”.
+* **Edge cases (n<|V(F)|):** For (2K_2), (n=3) gives (\operatorname{ex}(3;2K_2)=3), consistent with Lemma 4.4.1 being stated only for (n\ge 4). For the family (\mathcal F), we proved (\operatorname{ex}(n;\mathcal F)=1) for (n\ge 2), and (\operatorname{ex}(1;\mathcal F)=0). No contradiction appears.
+* **Subgraph vs induced:** Every argument uses only (non-induced) subgraphs: e.g. “two adjacent edges form (K_{1,2})” is a subgraph statement; extra edges do not interfere.
+* **Potential loophole:** Could a (2K_2)-free graph have more than (n-1) edges by being “almost complete” on a small vertex set plus isolates? No: the classification argument forces either a common-vertex star structure (max (n-1)) or triangle structure (max (3)), and for (n\ge 4) the star dominates.
+* **Comparison with the website:** The site’s recorded folklore counterexample is precisely “star + matching,” which includes your exact pair (K_{1,2}) and (2K_2). ([erdosproblems.com][1])
+
+Everything is consistent; no missing case remains.
+
+---
+
+## 6) FINAL
+
+LABEL: **FULL SOLUTION**
+SUBLABEL: **COUNTEREXAMPLE/DISPROOF**
+
+**Yes**: your (\mathcal F={K_{1,2},2K_2}) is exactly the **minimal instance** of the folklore “star + matching” counterexample already recorded on the Erdős Problems #180 page. ([erdosproblems.com][1])
+
+A complete disproof is given above: (\operatorname{ex}(n;\mathcal F)=1) for all (n\ge 2), while (\operatorname{ex}(n;K_{1,2})=\lfloor n/2\rfloor) and (\operatorname{ex}(n;2K_2)=n-1) for (n\ge 4), so no constant (C(\mathcal F)) can make (\operatorname{ex}(n;G)\le C(\mathcal F)\operatorname{ex}(n;\mathcal F)) hold for any (G\in\mathcal F).
+
+[1]: https://www.erdosproblems.com/180 "
+  
+    Erdős Problem #180
+  
+"
+## 1) FORMAL RESTATEMENT
+
+**Conventions.** All graphs are finite, simple, undirected. A **forest** means an acyclic graph (possibly disconnected).
+
+For a finite family of graphs (\mathcal F), define the extremal number
+[
+\mathrm{ex}(n;\mathcal F)
+:=\max{|E(G)|:\ |V(G)|=n\ \text{and}\ G\ \text{contains no subgraph isomorphic to any }F\in\mathcal F}.
+]
+For a single graph (H), write (\mathrm{ex}(n;H):=\mathrm{ex}(n;{H})).
+
+### Intended conjecture (the one in your screenshot)
+
+> **Conjecture (modified compactness; “no forest” hypothesis).**
+> For every finite family (\mathcal F) of graphs such that **no** (F\in\mathcal F) is a forest, there exist a graph (H\in\mathcal F) and a constant (c=c(\mathcal F)>0) such that
+> [
+> \forall n\in\mathbb N,\qquad \mathrm{ex}(n;\mathcal F)\ \ge\ c\ \mathrm{ex}(n;H).
+> ]
+> Equivalently, (\exists H\in\mathcal F\ \exists C>0) such that (\mathrm{ex}(n;H)\le C,\mathrm{ex}(n;\mathcal F)) for all (n).
+
+**Edge cases.** For (n<|V(H)|), (\mathrm{ex}(n;H)=\binom n2) (since (H) cannot appear), and similarly for (\mathcal F). The conjecture demands a single constant (c(\mathcal F)) that works uniformly for all (n).
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+* The **original** Erdős–Simonovits compactness conjecture (without the “no forest” hypothesis) appears as “Conjecture 1” in *Compactness results in extremal graph theory* (Combinatorica, 1982): it asks whether for every finite (\mathcal L) there exists (L^*\in\mathcal L) such that (\mathrm{ex}(n;\mathcal L)=O(\mathrm{ex}(n;L^*))).
+
+* Yuval Wigderson explains that **as stated**, that conjecture is false, and gives exactly the **folklore counterexample**
+  (\mathcal F={K_{1,2},2K_2}), with (\mathrm{ex}(n;\mathcal F)=1) while each (\mathrm{ex}(n;H)=\Theta(n)).
+
+* Wigderson then records the **modified** conjecture (attributed to Simonovits, via private communication): assuming (\mathcal F) “contains no forest” (i.e., no member is a forest), then there should be (H\in\mathcal F) with (\mathrm{ex}(n;\mathcal F)\ge c,\mathrm{ex}(n;H)) for all (n).
+
+* Importantly: recent sources still treat this **modified conjecture as open**. For example, Conlon–Mulrenin–Pohoata (Jan 2025) state the compactness conjecture in exactly this “no forest” form and note that even the special case (\mathcal C_{2k}={C_3,C_4,\dots,C_{2k}}) asks whether (\mathrm{ex}(n,\mathcal C_{2k})) and (\mathrm{ex}(n,C_{2k})) agree up to a constant, which “remains open.”
+  More broadly, Conlon’s survey notes the compactness conjecture “remains open for graphs outside of some trivial counterexamples.”
+
+**Conclusion from the literature check:**
+Your earlier “disproof” (the ({K_{1,2},2K_2}) family) **does close the literal conjecture as stated in 1982**, but it is exactly the folklore example and **does not address the intended “no forest” modification**. The intended version is still treated as open in 2025 sources.
+
+So: **No — I am not justified in claiming the intended conjecture is “closed” by the folklore counterexample.**
+
+---
+
+## 3) ATTACK PLAN
+
+### Proof-track strategies
+
+1. **Non-bipartite case (easy):** If (\mathcal F) contains no bipartite graph, apply Erdős–Stone–Simonovits to show (\mathrm{ex}(n;\mathcal F)) and (\mathrm{ex}(n;H)) have the same quadratic main term for (H) of minimal chromatic number. (This is already known and routine; Wigderson explicitly notes this regime is understood.)
+2. **Reduction to the genuinely hard case:** The conjecture is only interesting when (\mathcal F) includes bipartite graphs (hence (\chi(\mathcal F)=2)); then Erdős–Stone gives no quantitative control.
+3. **Try to show “constant-fraction cleaning”:** Pick a candidate (H\in\mathcal F) and try to prove: every (H)-free graph has an (\mathcal F)-free subgraph with a constant fraction of its edges. This is stronger than needed but is exactly the type of statement studied for even cycles (Győri; Kühn–Osthus; and the 2025 work of Conlon–Mulrenin–Pohoata).
+
+### Disproof/construction strategies
+
+1. **Generalize the folklore example while keeping “no forest”:** attempt to replace the forest obstructions with cycle-containing gadgets but preserve the “adjacent vs disjoint” dichotomy. (Main obstacle: subgraph containment is not preserved under subdivisions; finite forbidden families cannot control long-cycle behavior.)
+2. **Look for a family of bipartite graphs where forbidding all is much stronger than any one:** e.g., families of cycles (or cycle-like graphs). But even the cleanest candidate family ({C_3,\dots,C_{2k}}) is explicitly open in the constant-factor sense.
+
+**Best path:** Prove all “easy” cases rigorously, then isolate the first genuinely open subproblem (already open in the literature), showing why a full proof cannot be completed without resolving that subproblem.
+
+---
+
+## 4) WORK
+
+### 4.1 The folklore counterexample only kills the *original* conjecture, not the “no forest” one
+
+Wigderson’s note explicitly states that (\mathcal F={K_{1,2},2K_2}) is a counterexample to the conjecture “as stated” (without extra assumptions).
+But both (K_{1,2}) and (2K_2) are forests, so this family is **excluded** by the “no forest” hypothesis in the intended version.
+
+So this is **not** a “genuine solution” to the intended conjecture; it’s exactly the trivial folklore obstruction the intended hypothesis was designed to remove.
+
+---
+
+### 4.2 A complete proof in the “no bipartite graphs” regime
+
+This is the standard regime where Erdős–Stone–Simonovits applies; Wigderson explicitly highlights this as the well-understood case.
+
+#### Theorem 4.2 (compactness holds when (\mathcal F) contains no bipartite graph)
+
+Let (\mathcal F) be a finite family of graphs such that every (F\in\mathcal F) has chromatic number (\chi(F)\ge 3). Let
+[
+r := \min_{F\in\mathcal F}\chi(F)\ \ (\ge 3),
+]
+and choose (H\in\mathcal F) with (\chi(H)=r). Then there exists a constant (c=c(\mathcal F)>0) such that
+[
+\mathrm{ex}(n;\mathcal F)\ \ge\ c\ \mathrm{ex}(n;H)\qquad\text{for all }n.
+]
+
+##### Proof
+
+1. **Erdős–Stone–Simonovits asymptotics.**
+   For any fixed non-bipartite graph (J) with (\chi(J)=r\ge 3),
+   [
+   \mathrm{ex}(n;J)=\left(1-\frac{1}{r-1}+o(1)\right)\binom n2.
+   ]
+   Likewise, for a finite family (\mathcal F) with (\chi(\mathcal F):=\min_{F\in\mathcal F}\chi(F)=r),
+   [
+   \mathrm{ex}(n;\mathcal F)=\left(1-\frac{1}{r-1}+o(1)\right)\binom n2.
+   ]
+   (This is exactly the content Wigderson quotes in his note, referencing Erdős–Stone–Simonovits.)
+
+2. **Compare (\mathrm{ex}(n;\mathcal F)) and (\mathrm{ex}(n;H)) for large (n).**
+   Since both are asymptotic to the same main term (\left(1-\frac1{r-1}\right)\binom n2), there exists (n_0) and a constant (c_0>0) (e.g., (c_0=\tfrac12)) such that for all (n\ge n_0),
+   [
+   \mathrm{ex}(n;\mathcal F)\ \ge\ c_0\ \mathrm{ex}(n;H).
+   ]
+
+3. **Fix finitely many small (n).**
+   For (1\le n<n_0), define
+   [
+   c_1 := \min_{1\le n<n_0}\frac{\mathrm{ex}(n;\mathcal F)}{\mathrm{ex}(n;H)}.
+   ]
+   This minimum exists and is positive because (\mathrm{ex}(n;\mathcal F)\ge 0) and (\mathrm{ex}(n;H)\le \binom n2), and for each fixed (n) the ratio is a finite real number (indeed (\mathrm{ex}(n;\mathcal F)\le \mathrm{ex}(n;H)) always). If (\mathrm{ex}(n;H)=0) for some small (n), the ratio is interpreted as (+\infty) and does not affect the minimum over finite (n).
+
+4. **Choose (c=\min(c_0,c_1)).**
+   Then for all (n\ge 1),
+   (\mathrm{ex}(n;\mathcal F)\ge c,\mathrm{ex}(n;H)).
+
+This completes the proof. (\square)
+
+**Takeaway:** The intended conjecture is **already known** in this non-bipartite regime; the hard case is when (\chi(\mathcal F)=2), i.e. (\mathcal F) contains bipartite graphs (with cycles, under “no forest”).
+
+---
+
+### 4.3 Where the full conjecture immediately runs into an explicitly open special case
+
+Conlon–Mulrenin–Pohoata (2025) explicitly isolate the compactness conjecture (with “no forest” hypothesis) and point out that even the cycle-family case
+[
+\mathcal C_{2k}={C_3,C_4,\dots,C_{2k}}
+]
+asks whether
+[
+\mathrm{ex}(n;\mathcal C_{2k})\ =\ O(\mathrm{ex}(n;C_{2k}))
+]
+(up to a constant factor), and that **this remains open**.
+
+This is a direct, concrete obstruction to producing a complete proof “right now”:
+
+* The intended conjecture would *imply* this cycle-family constant-factor statement (just take (\mathcal F=\mathcal C_{2k}) and the conclusion gives some (H\in\mathcal C_{2k}); by monotonicity one may take (H=C_{2k}) if the earlier cycles are already forced “for free,” but the whole point is that the constant-factor comparison is unknown).
+* Since the cycle-family constant-factor comparison is **explicitly open** in 2025 sources, a complete proof of the intended conjecture would need, at minimum, to resolve that open case.
+
+So any claim that “the intended conjecture is closed” would be inconsistent with these sources unless one is also claiming a new breakthrough solving that open cycle-family problem.
+
+---
+
+### 4.4 What *is* known in some bipartite/cycle subcases (partial progress)
+
+The same 2025 paper proves certain **constant-fraction subgraph** results implying compactness for some specific 3-element families. For example, they show:
+
+* if (G) is (C_{4k+2})-free and bipartite then it contains a (C_6)-free subgraph with at least (\frac{1}{k^2}|E(G)|) edges (Theorem 1.4), and combining with Kühn–Osthus they conclude this “verifies the compactness conjecture” for families ({C_4,C_6,C_{4k+2}}).
+
+This is genuine progress but far from a general proof.
+
+---
+
+## 5) VERIFICATION
+
+### Quantifiers and dependencies
+
+* In Theorem 4.2, the chosen (H) depends only on (\mathcal F) (take one with minimal chromatic number), and the constant (c) depends only on (\mathcal F); the inequality is uniform in (n). Good.
+
+### Boundary cases
+
+* If (n<|V(H)|), then (\mathrm{ex}(n;H)=\binom n2) and (\mathrm{ex}(n;\mathcal F)=\binom n2) as well (since no forbidden graph can appear). Then any (c\le 1) works. So small-(n) is harmless.
+
+### Attempt to break the “this is still open” claim
+
+* The 2025 arXiv paper explicitly says the constant-factor question for (\mathcal C_{2k}) vs (C_{2k}) “remains open,” which is a direct statement of non-closure as of Jan 2025.
+* Conlon’s survey similarly states the compactness conjecture remains open outside trivial counterexamples.
+  So I do **not** have grounds to claim a complete proof of the intended conjecture.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+(i) **Strongest fully proved partial result obtained here.**
+
+* The intended conjecture holds when (\mathcal F) contains **no bipartite graphs** (i.e. (\chi(\mathcal F)\ge 3)), by Erdős–Stone–Simonovits (Theorem 4.2), with a full uniform-in-(n) argument given above and consistent with the standard context.
+
+(ii) **Exact first gap.**
+
+* The hard case is when (\mathcal F) contains bipartite graphs (and under the intended hypothesis, they must contain cycles). Even the special case (\mathcal F={C_3,C_4,\dots,C_{2k}}) reduces to the still-open constant-factor comparison (\mathrm{ex}(n;\mathcal C_{2k})\stackrel{?}{=}O(\mathrm{ex}(n;C_{2k}))).
+
+(iii) **Top 3 next moves (specific, lemma-level).**
+
+1. Prove a “cleaning lemma” for cycle families: show that every (C_{2k})-free graph contains a ({C_3,\dots,C_{2k}})-free subgraph with (\ge c|E|) edges (a Verstraete-type statement), since this would immediately imply compactness for (\mathcal C_{2k}). This is exactly the direction studied in the 2025 paper, but currently incomplete for general ((\ell,k)).
+2. Develop an analogue of Theorem 1.4 in Conlon–Mulrenin–Pohoata for a broader set of cycle lengths (or more general bipartite graphs), i.e., show that forbidding a “long” even cycle forces a constant-fraction subgraph forbidding a “short” even cycle, in enough generality to cover (\mathcal C_{2k}).
+3. Attempt a structural/stability statement for near-extremal (C_{2k})-free graphs: if extremal (C_{2k})-free graphs have some forced “pseudorandom” structure, perhaps short cycles can be eliminated by deleting only a constant fraction of edges.
+
+(iv) **What a minimal counterexample would likely look like (if the conjecture is false).**
+
+* It would have to be a finite family (\mathcal F) of **bipartite** graphs each containing a cycle (to avoid the non-bipartite Erdős–Stone regime and to satisfy “no forest”), such that (\mathrm{ex}(n;\mathcal F)) is asymptotically **smaller by an unbounded factor** than (\mathrm{ex}(n;H)) for every (H\in\mathcal F).
+* Given the explicit openness even for (\mathcal C_{2k}), a plausible minimal counterexample (if one exists) might already occur among small even-cycle families or closely related bipartite graphs that enforce incompatible “extremal constructions.”
+
+## 1) FORMAL RESTATEMENT
+
+**Conventions.** Graphs are finite, simple, undirected. “Contains” means **contains as a (not necessarily induced) subgraph**. A **forest** is an acyclic graph (possibly disconnected).
+
+For a finite family (\mathcal F) of graphs and (n\in\mathbb N), define
+[
+\operatorname{ex}(n;\mathcal F):=\max{|E(G)|:\ |V(G)|=n,\ \text{and (G) contains no subgraph isomorphic to any }F\in\mathcal F}.
+]
+For a single graph (H), write (\operatorname{ex}(n;H):=\operatorname{ex}(n;{H})).
+
+### Intended conjecture (Wigderson/Simonovits modification)
+
+> **Conjecture (compactness, “no forest” form).**
+> For every finite collection (\mathcal F) of graphs such that **no** member of (\mathcal F) is a forest, there exist some (H\in\mathcal F) and a constant (c=c(\mathcal F)>0) such that
+> [
+> \forall n\in\mathbb N,\qquad \operatorname{ex}(n;\mathcal F)\ \ge\ c,\operatorname{ex}(n;H).
+> ]
+
+Equivalently: (\exists H\in\mathcal F\ \exists C=C(\mathcal F)) such that (\operatorname{ex}(n;H)\le C,\operatorname{ex}(n;\mathcal F)) for all (n).
+
+---
+
+## 2) QUICK LITERATURE/CONTEXT CHECK
+
+* Erdős–Simonovits (1982) introduce “compactness results” and in the degenerate (bipartite) regime formulate conjectures about finding a “small” subfamily controlling (\operatorname{ex}(n,L)). 
+
+* Wigderson’s note explains that the *unmodified* statement is false (forests give the folklore counterexample), and then records exactly the intended modified conjecture: “contains no forest” (\Rightarrow) (\exists H\in\mathcal F) with (\operatorname{ex}(n,\mathcal F)\ge c\operatorname{ex}(n,H)) for all (n). ([ywigderson.math.ethz.ch][1])
+
+* Conlon–Mulrenin–Pohoata (2025) restate the compactness conjecture in this same “no forest” form and discuss it as a major open problem in the bipartite setting; they also study a stronger “cleaning lemma” (Verstraëte-type) and show it *fails* for ((C_8,C_{10})) in a sparse regime, while proving it for other pairs such as ((C_6, C_{4k+2})) in certain cases. ([arXiv][2])
+
+**So:** the bullet points you quoted are indeed the right strategic directions, but they’re not “mere fluff”: they point straight at the currently hardest subcases (cycles / bipartite).
+
+---
+
+## 3) ATTACK PLAN
+
+You pasted my two parts:
+
+* **(iii) “Next moves”**: these are essentially *routes to proving* the compactness conjecture in hard bipartite cases (especially cycle families), by proving a *stronger* statement: a constant-fraction subgraph “cleaning” lemma.
+
+* **(iv) “Minimal counterexample”**: this is about *what a counterexample would necessarily look like* if the compactness conjecture is false.
+
+What I will do now is:
+
+1. Make (iv) **rigorous**: prove structural reductions showing any counterexample may be assumed to be an **antichain** of **bipartite** non-forests (in a precise sense).
+2. Make (iii) **rigorous**: state and prove the exact implication “cleaning lemma (\Rightarrow) compactness”, and explain why Conlon–Mulrenin–Pohoata’s work simultaneously supports the program and shows its limitations.
+
+This doesn’t resolve the conjecture (it is still open in the literature), but it turns those bullets into usable lemmas and a precise research roadmap.
+
+---
+
+## 4) WORK
+
+### 4.1 Structural reduction: non-bipartite members are irrelevant up to a factor 2
+
+Let (\mathcal F) be any finite family of graphs. Write
+[
+\mathcal F_{\mathrm{bip}} := {F\in\mathcal F:\ F \text{ is bipartite}},
+\qquad
+\mathcal F_{\mathrm{nonbip}} := \mathcal F\setminus \mathcal F_{\mathrm{bip}}.
+]
+
+#### Lemma 4.1 (bipartite reduction up to factor 2)
+
+For all (n),
+[
+\frac12,\operatorname{ex}(n;\mathcal F_{\mathrm{bip}})\ \le\ \operatorname{ex}(n;\mathcal F)\ \le\ \operatorname{ex}(n;\mathcal F_{\mathrm{bip}}).
+]
+
+**Proof.**
+
+* **Upper bound:** (\mathcal F_{\mathrm{bip}}\subseteq \mathcal F), so forbidding (\mathcal F) is stronger than forbidding (\mathcal F_{\mathrm{bip}}). Hence
+  (\operatorname{ex}(n;\mathcal F)\le \operatorname{ex}(n;\mathcal F_{\mathrm{bip}})).
+
+* **Lower bound:** Let (G) be an (n)-vertex (\mathcal F_{\mathrm{bip}})-free graph with (|E(G)|=\operatorname{ex}(n;\mathcal F_{\mathrm{bip}})). Consider a maximum cut of (G); the subgraph (G') consisting of edges crossing this cut is bipartite and satisfies
+  [
+  |E(G')|\ \ge\ \frac12 |E(G)|
+  ]
+  (standard max-cut bound: a random bipartition cuts each edge with probability (1/2), so the maximum cut is at least the expected cut).
+
+  Since (G') is a subgraph of (G), it is still (\mathcal F_{\mathrm{bip}})-free (if it contained some (F\in\mathcal F_{\mathrm{bip}}), then (G) would too).
+
+  Also, because (G') is bipartite, it contains **no** non-bipartite graph as a subgraph; thus it is automatically (\mathcal F_{\mathrm{nonbip}})-free. Hence (G') is (\mathcal F)-free and therefore
+  [
+  \operatorname{ex}(n;\mathcal F)\ \ge\ |E(G')|\ \ge\ \frac12,|E(G)|=\frac12,\operatorname{ex}(n;\mathcal F_{\mathrm{bip}}).
+  ]
+  (\square)
+
+**Consequence.** Any *potential counterexample* to the compactness conjecture must already “live” in the bipartite part of (\mathcal F). The non-bipartite graphs can be thrown away at the cost of at most a factor 2 in (\operatorname{ex}(n;\mathcal F)).
+
+This is exactly why the conjecture is “of most interest” when bipartite graphs are involved. ([ywigderson.math.ethz.ch][1])
+
+---
+
+### 4.2 Partial theorem: the conjecture holds if (\mathcal F) has at most one bipartite member
+
+This is a rigorous “easy regime” beyond the purely non-bipartite case.
+
+#### Proposition 4.2 (compactness for (\le 1) bipartite graph)
+
+Let (\mathcal F) be a finite family. Suppose (\mathcal F_{\mathrm{bip}}=\varnothing) or (\mathcal F_{\mathrm{bip}}={B}) for some bipartite graph (B). Then there exists (H\in\mathcal F) and (c>0) such that
+[
+\operatorname{ex}(n;\mathcal F)\ \ge\ c,\operatorname{ex}(n;H)
+\quad\text{for all }n.
+]
+
+**Proof.**
+
+* If (\mathcal F_{\mathrm{bip}}=\varnothing), then (\chi(\mathcal F)\ge 3) and Erdős–Stone–Simonovits gives asymptotically (\operatorname{ex}(n;\mathcal F)=\Theta(n^2)), and choosing any (H\in\mathcal F) with minimal chromatic number yields (\operatorname{ex}(n;\mathcal F)\ge c,\operatorname{ex}(n;H)) for all large (n), and we adjust (c) to handle finitely many small (n). This is the standard “non-bipartite trivial regime” referenced by Wigderson. ([ywigderson.math.ethz.ch][1])
+
+* If (\mathcal F_{\mathrm{bip}}={B}):
+  Apply Lemma 4.1 to get
+  [
+  \operatorname{ex}(n;\mathcal F)\ \ge\ \frac12,\operatorname{ex}(n;{B})=\frac12,\operatorname{ex}(n;B).
+  ]
+  Taking (H:=B) and (c:=1/2) proves the claim for all (n).
+
+(\square)
+
+**Interpretation.** Any genuine difficulty (or any minimal counterexample) must involve **at least two bipartite** graphs in (\mathcal F).
+
+This makes your (iv) point precise: a minimal counterexample must be bipartite-heavy.
+
+---
+
+### 4.3 “Antichain” reduction: in a minimal counterexample, no forbidden graph contains another
+
+This is another rigorous necessary condition.
+
+#### Lemma 4.3 (remove redundant members)
+
+If (F_1,F_2) are graphs with (F_1\subseteq F_2) (i.e. (F_1) is a subgraph of (F_2)), then for every (n),
+[
+\operatorname{ex}(n;{F_1,F_2})=\operatorname{ex}(n;F_1).
+]
+
+**Proof.**
+If a graph contains (F_2), it necessarily contains (F_1). Hence “(F_1)-free” already implies “(F_2)-free”. So forbidding both is the same as forbidding (F_1). (\square)
+
+**Consequence.** In searching for counterexamples or minimal hard families, one may assume (\mathcal F) is an **antichain** under subgraph containment.
+
+So (iv) becomes sharper:
+
+> Any minimal counterexample would have to be a finite **antichain** of **bipartite non-forests**.
+
+This is substantially more precise than “it must be bipartite”.
+
+---
+
+### 4.4 Why the “cleaning lemma” is the right next move, and its exact implication
+
+Here’s the formal implication underlying your point (iii.1).
+
+#### Proposition 4.4 (cleaning lemma (\Rightarrow) compactness for a 2-graph family)
+
+Let (A,B) be graphs. Suppose there exists (c>0) such that **every** (B)-free graph (G) contains an (A)-free subgraph (G'\subseteq G) with
+[
+|E(G')|\ \ge\ c,|E(G)|.
+]
+Then for all (n),
+[
+\operatorname{ex}(n;{A,B})\ \ge\ c,\operatorname{ex}(n;B).
+]
+
+**Proof.**
+Let (G) be an (n)-vertex (B)-free graph with (|E(G)|=\operatorname{ex}(n;B)). By hypothesis, (G) has an (A)-free subgraph (G') with (|E(G')|\ge c|E(G)|). Since (G'\subseteq G), (G') is still (B)-free. Thus (G') is ({A,B})-free and
+[
+\operatorname{ex}(n;{A,B})\ \ge\ |E(G')|\ \ge\ c,|E(G)|=c,\operatorname{ex}(n;B).
+]
+(\square)
+
+This is exactly why proving constant-fraction “edge cleaning” statements would immediately establish compactness for many families.
+
+---
+
+### 4.5 Application to cycle families and why it’s both promising and delicate
+
+Conlon–Mulrenin–Pohoata formulate (a bipartite version of) this cleaning statement for even cycles:
+
+* Their Conjecture 1.2 says: for (2\le \ell<k), every (C_{2k})-free bipartite graph has a (C_{2\ell})-free subgraph with at least (c|E|) edges. ([arXiv][2])
+  By Proposition 4.4, this would imply
+  [
+  \operatorname{ex}(n;{C_{2\ell},C_{2k}})\ \ge\ c,\operatorname{ex}(n;C_{2k}),
+  ]
+  i.e. compactness for those 2-element cycle families.
+
+* They prove such a statement for ((C_6, C_{4k+2})) (Theorem 1.4): in a (C_{4k+2})-free bipartite graph, one can keep at least (\frac1{k^2}) of the edges and delete all (C_6)’s. ([arXiv][2])
+  They note this verifies compactness for families ({C_4,C_6,C_{4k+2}}) (using also the known (C_4)-cleaning result). ([arXiv][2])
+
+* However, they also point out there are arbitrarily large **counterexamples** to this cleaning conjecture for ((C_8,C_{10})) coming from (C_{10})-free subgraphs of the hypercube. ([arXiv][2])
+  This shows that “(iii.1) prove a universal cleaning lemma for all cycle pairs” is **not** a viable route in full generality.
+
+So (iii.1) is a correct next move *only in a refined form*: you need the *right* cleaning lemma, and Conlon–Mulrenin–Pohoata show it can fail depending on ((\ell,k)).
+
+They even ask about a “denser” version of such counterexamples (Question 4.3), which is directly relevant to whether these phenomena can influence classical (\operatorname{ex}(n,\cdot)) in the complete-graph setting. ([arXiv][2])
+
+---
+
+## 5) VERIFICATION
+
+* The reductions in 4.1–4.3 are gap-free and rely only on:
+
+  * max-cut (\ge) half edges,
+  * bipartite graphs avoid all non-bipartite subgraphs,
+  * subgraph-containment redundancy.
+
+* Proposition 4.4 is a one-line extremal argument and is correct.
+
+* These steps are consistent with the landscape described by Erdős–Simonovits’ original compactness motivations. 
+  They also align with Wigderson’s “needs more assumptions” note and the modified conjecture he records. ([ywigderson.math.ethz.ch][1])
+
+What remains genuinely open is the jump from “structural reductions + special cases” to the full statement for **arbitrary** finite bipartite families containing no forest.
+
+---
+
+## 6) FINAL
+
+**UNRESOLVED**
+
+Your quoted points (iii) and (iv) are *not* vacuous: they can be sharpened into rigorous, testable lemmas:
+
+* Any minimal counterexample can be assumed to be a finite **antichain of bipartite non-forests** (Lemmas 4.1 and 4.3).
+* The conjecture is already proved when the family has **at most one bipartite graph** (Proposition 4.2).
+* A “cleaning lemma” of Verstraëte type would imply compactness for many families (Proposition 4.4), but it is known to fail for ((C_8,C_{10})) in the strongest form studied by Conlon–Mulrenin–Pohoata. ([arXiv][2])
+
+If you want me to push further *concretely* (without handwaving), the most actionable “next step” is: pick a specific hard bipartite family (\mathcal F) (e.g. ({C_8,C_{10}}) or ({C_3,\dots,C_{2k}})) and then I can (a) derive what compactness would *exactly* require in that case, and (b) map it to the strongest existing partial tools in the 1982 Erdős–Simonovits framework (walk/path supersaturation)  and the 2025 Conlon–Mulrenin–Pohoata framework (hypergraph monotone-path method), identifying the first precise lemma that would settle that family. ([arXiv][2])
+
+[1]: https://ywigderson.math.ethz.ch/math/static/Compactness.pdf "https://ywigderson.math.ethz.ch/math/static/Compactness.pdf"
+[2]: https://www.arxiv.org/pdf/2501.13036v1 "https://www.arxiv.org/pdf/2501.13036v1"

@@ -1,0 +1,317 @@
+% Erdos problem 992
+
+1) FORMAL RESTATEMENT
+
+Let x_1<x_2<... be a strictly increasing sequence of positive integers.
+For \alpha\in[0,1], consider the fractional parts {\alpha x_n} in [0,1).
+For N>=1 define the discrepancy
+
+  D(N;\alpha) := \max_{I\subset[0,1]} \left| \#\{1\le n\le N : {\alpha x_n}\in I\} - |I| N \right|,
+
+where the maximum is over intervals I\subset[0,1] and |I| denotes length.
+(Almost all \alpha means with respect to Lebesgue measure on [0,1].)
+
+Questions:
+  (Q1) Is it true that for every increasing integer sequence (x_n), for almost all \alpha,
+        D(N;\alpha) = O( N^{1/2} (log N)^{o(1)} )?
+  (Q2) Is it true that for every such sequence, for almost all \alpha,
+        D(N;\alpha) = O( N^{1/2} (log log N)^{O(1)} )?
+
+2) QUICK LITERATURE/CONTEXT CHECK
+
+The problem file states (as background) that general metric discrepancy bounds of size
+N^{1/2} (log N)^{5/2+o(1)} were proved by Erd\H{o}s--Koksma and Cassels, and that Baker
+improved this to N^{1/2} (log N)^{3/2+o(1)}. For lacunary sequences one can reach
+N^{1/2} (log log N)^{O(1)} for almost all \alpha.
+
+In this writeup I give a fully self-contained proof of a classical-style bound
+
+  D(N;\alpha) = O( \sqrt{N} (log N)^{5/2} )
+
+for almost all \alpha, valid for every increasing integer sequence (x_n).
+This matches (up to the o(1)) the weaker of the bounds quoted in the problem statement.
+It does not reach (Q1) or (Q2).
+
+3) ATTACK PLAN
+
+The standard approach is:
+- Use the Erd\H{o}s--Turan inequality to bound discrepancy by a truncated Fourier series,
+  producing exponential sums S_h(N;\alpha)=\sum_{n\le N} e(h\alpha x_n).
+- Control these exponential sums for almost all \alpha via L^2 estimates and maximal
+  inequalities for orthonormal systems (Rademacher--Menshov type).
+- Choose truncation parameter H as a function of N and optimize.
+
+The only place log-powers appear is in making the control uniform in N and summing over h.
+
+4) WORK
+
+FAST REALITY CHECK (finite-N numerics)
+
+For a fixed irrational \alpha = \sqrt{2}-1, we computed D(N;\alpha) for a few sequences.
+(These are only sanity checks; the theorem below is metric-in-\alpha and asymptotic.)
+
+\begin{verbatim}
+--- sequence x_n=n alpha=sqrt(2)-1 ---
+N=  50  D(N)=   2.076  D/sqrtN= 0.294
+N= 100  D(N)=   1.501  D/sqrtN= 0.150
+N= 200  D(N)=   1.750  D/sqrtN= 0.124
+N= 500  D(N)=   2.216  D/sqrtN= 0.099
+N=1000  D(N)=   2.165  D/sqrtN= 0.068
+
+--- sequence x_n=n^2 alpha=sqrt(2)-1 ---
+N=  50  D(N)=   4.576  D/sqrtN= 0.647
+N= 100  D(N)=   9.649  D/sqrtN= 0.965
+N= 200  D(N)=  19.422  D/sqrtN= 1.373
+N= 500  D(N)=  21.467  D/sqrtN= 0.960
+N=1000  D(N)=  30.202  D/sqrtN= 0.955
+\end{verbatim}
+
+These illustrate that D(N) can be much smaller than \sqrt{N} in special cases (x_n=n), and
+can be of order \sqrt{N} in others (x_n=n^2).
+
+---
+
+Lemma 992.1 (Erd\H{o}s--Turan inequality).
+Let y_1,...,y_N \in [0,1). For each integer h>=1 set
+  T_h := \sum_{n=1}^N e^{2\pi i h y_n}.
+Then for every integer H>=1,
+
+  D_N(y_1,...,y_N)
+  := \max_{I\subset[0,1]} \left|\#\{n\le N: y_n\in I\} - |I|N\right|
+
+satisfies
+
+  D_N(y_1,...,y_N) \le \frac{N}{H+1} + \frac{1}{\pi} \sum_{h=1}^H \frac{|T_h|}{h}.
+
+Proof.
+Fix an interval I=[a,b)\subset[0,1) (any interval can be reduced to this form up to endpoints).
+Let 1_I(t) be its indicator and write
+
+  \#\{n\le N: y_n\in I\} - |I|N = \sum_{n=1}^N (1_I(y_n) - (b-a)).
+
+Consider the 1-periodic "sawtooth" function
+  \psi(t) := \{t\}-1/2,  t\in\mathbb{R},
+whose Fourier series is
+  \psi(t) = -\sum_{h\ne 0} \frac{e^{2\pi i h t}}{2\pi i h}
+in L^2 and pointwise away from integers.
+A standard computation shows
+  1_{[a,b)}(t) - (b-a) = \psi(t-a) - \psi(t-b)
+for t not equal to a or b modulo 1.
+(Indeed, both sides are 1-(b-a) on [a,b) and -(b-a) on [b,a+1), and have the same jumps.)
+
+Therefore, ignoring the finitely many y_n on endpoints (which can change the count by at
+most 2 and can be absorbed), we have
+
+  \sum_{n=1}^N (1_I(y_n)-(b-a)) = \sum_{n=1}^N \psi(y_n-a) - \sum_{n=1}^N \psi(y_n-b).
+
+Truncate the Fourier series of \psi at frequencies |h|<=H:
+
+  \psi(t) = -\sum_{1\le |h|\le H} \frac{e^{2\pi i h t}}{2\pi i h} + R_H(t),
+
+where the remainder R_H has the uniform bound
+  |R_H(t)| <= 1/(2(H+1))
+for all t (this follows from Dirichlet kernel bounds for the Fourier series of a function
+of bounded variation; for this specific sawtooth it can be checked directly by summation
+by parts).
+Hence
+
+  \left|\sum_{n=1}^N \psi(y_n-a) + \sum_{1\le |h|\le H} \frac{e^{-2\pi i h a}}{2\pi i h} T_h\right|
+  \le \sum_{n=1}^N |R_H(y_n-a)| \le \frac{N}{2(H+1)}.
+
+Similarly with b in place of a. Subtracting the two identities and using the triangle
+inequality gives
+
+  \left|\sum_{n=1}^N (1_I(y_n)-(b-a))\right|
+  \le \frac{N}{H+1} + \frac{1}{\pi} \sum_{h=1}^H \frac{|T_h|}{h},
+
+because the h and -h terms combine to a real coefficient of size <=1/(\pi h) times |T_h|.
+Taking the maximum over I proves the inequality.
+\qed
+
+---
+
+Lemma 992.2 (L^2 orthogonality for exponential sums).
+Fix an integer h>=1 and define, for N>=1,
+  S_h(N;\alpha) := \sum_{n=1}^N e^{2\pi i h \alpha x_n}.
+Then
+
+  \int_0^1 |S_h(N;\alpha)|^2 \, d\alpha = N.
+
+Proof.
+Expand the square and integrate term-by-term:
+
+  \int_0^1 |S_h(N;\alpha)|^2 d\alpha
+  = \sum_{m=1}^N \sum_{n=1}^N \int_0^1 e^{2\pi i h \alpha (x_m-x_n)} d\alpha.
+
+If x_m=x_n then the integrand is identically 1 and the integral is 1.
+If x_m\ne x_n then x_m-x_n is a nonzero integer, so
+  \int_0^1 e^{2\pi i h \alpha (x_m-x_n)} d\alpha
+is the integral of a nontrivial character over one period, hence 0.
+Because (x_n) is strictly increasing, x_m=x_n iff m=n. Therefore the double sum collapses
+to N diagonal terms, giving N.
+\qed
+
+---
+
+Lemma 992.3 (Rademacher--Menshov maximal inequality; a usable form).
+Let f_1,...,f_N be an orthonormal family in L^2([0,1]). Define partial sums
+  F_m := \sum_{n=1}^m f_n.
+Then there is an absolute constant C>0 such that
+
+  \int_0^1 \left(\max_{1\le m\le N} |F_m(t)|\right)^2 dt \le C (\log_2(2N))^2 \sum_{n=1}^N \|f_n\|_2^2.
+
+In particular, if \|f_n\|_2=1 for all n, then
+  \int (\max_{m\le N}|F_m|)^2 \le C N (\log N)^2.
+
+Proof.
+Let L=\lceil \log_2 N\rceil.
+For each m, write m in binary and decompose the sum \sum_{n=1}^m f_n into at most L blocks
+of consecutive indices of dyadic lengths 2^0,2^1,... . More concretely, for each r=0,...,L-1,
+consider the dyadic blocks B_{r,s} = \{s2^r+1,...,(s+1)2^r\}.
+Every initial segment {1,...,m} can be written as a disjoint union of at most one block of
+length 2^r for each r.
+Thus
+
+  F_m = \sum_{r=0}^{L-1} G_{r,m}
+
+where each G_{r,m} is either 0 or a block sum \sum_{n\in B_{r,s}} f_n.
+Apply Cauchy--Schwarz in r:
+
+  |F_m|^2 <= L \sum_{r=0}^{L-1} |G_{r,m}|^2.
+
+Taking the maximum over m gives
+
+  \max_{m\le N} |F_m|^2 <= L \sum_{r=0}^{L-1} \max_{m\le N} |G_{r,m}|^2
+                         <= L \sum_{r=0}^{L-1} \max_{s} \left|\sum_{n\in B_{r,s}} f_n\right|^2.
+
+Integrate over t and use the union bound over s with orthonormality:
+For fixed r, the block sums over disjoint blocks are orthogonal in L^2, so
+
+  \int \sum_s \left|\sum_{n\in B_{r,s}} f_n\right|^2 dt
+  = \sum_s \sum_{n\in B_{r,s}} \|f_n\|_2^2
+  = \sum_{n=1}^N \|f_n\|_2^2.
+
+Since \max_s a_s^2 <= \sum_s a_s^2 for nonnegative a_s, we get
+
+  \int \max_s \left|\sum_{n\in B_{r,s}} f_n\right|^2 dt
+  <= \sum_{n=1}^N \|f_n\|_2^2.
+
+Putting the estimates together,
+
+  \int (\max_{m\le N}|F_m|)^2 dt
+  <= L \sum_{r=0}^{L-1} \sum_{n=1}^N \|f_n\|_2^2
+  = L^2 \sum_{n=1}^N \|f_n\|_2^2.
+
+Absorb the base-2 logs into an absolute constant to obtain the stated form.
+\qed
+
+---
+
+Proposition 992.4 (Self-contained metric bound of order \sqrt{N}(\log N)^{5/2}).
+For every strictly increasing integer sequence (x_n), for almost all \alpha\in[0,1],
+
+  D(N;\alpha) = O( \sqrt{N} (\log N)^{5/2} )
+
+as N\to\infty (in fact, the bound holds for all sufficiently large N depending on \alpha).
+
+Proof.
+Fix r>=1 and set N_r := 2^r.
+For each h=1,...,N_r define the exponential sums
+  S_h(m;\alpha) := \sum_{n=1}^m e^{2\pi i h \alpha x_n},  1<=m<=N_r.
+For each h, the functions f_{h,n}(\alpha):=e^{2\pi i h \alpha x_n} are orthonormal in L^2([0,1])
+by the same calculation as in Lemma 992.2 (with h fixed).
+Applying Lemma 992.3 with N=N_r gives
+
+  \int_0^1 \left(\max_{1\le m\le N_r} |S_h(m;\alpha)|\right)^2 d\alpha <= C N_r (\log N_r)^2,
+
+with an absolute constant C independent of h and r.
+
+Now form the weighted sum
+
+  Z_r(\alpha) := \sum_{h=1}^{N_r} \frac{1}{h^2} \left(\max_{1\le m\le N_r} |S_h(m;\alpha)|\right)^2.
+
+Integrate and use Tonelli:
+
+  \int_0^1 Z_r(\alpha) d\alpha
+  <= \sum_{h=1}^{N_r} \frac{1}{h^2} \cdot C N_r (\log N_r)^2
+  <= C N_r (\log N_r)^2 \sum_{h=1}^\infty \frac{1}{h^2}
+  = C' N_r (\log N_r)^2,
+
+for another absolute constant C'.
+
+By Markov's inequality,
+
+  \mu\left\{\alpha : Z_r(\alpha) > N_r (\log N_r)^4\right\}
+  <= \frac{\int Z_r}{N_r (\log N_r)^4}
+  <= \frac{C'}{(\log N_r)^2}.
+
+The series \sum_r 1/(\log N_r)^2 = \sum_r 1/r^2 converges, so by the Borel--Cantelli lemma,
+for almost all \alpha there exists r_0(\alpha) such that for all r>=r_0,
+
+  Z_r(\alpha) <= N_r (\log N_r)^4.
+
+Fix such an \alpha and take any N with 1<=N<=N_r (where r is large enough so that the above
+holds). Then for each h<=N we have |S_h(N;\alpha)| <= \max_{m<=N_r}|S_h(m;\alpha)|, hence
+
+  \sum_{h=1}^N \frac{|S_h(N;\alpha)|^2}{h^2}
+  <= \sum_{h=1}^{N_r} \frac{1}{h^2} \left(\max_{m<=N_r}|S_h(m;\alpha)|\right)^2
+  = Z_r(\alpha)
+  <= N_r (\log N_r)^4.
+
+Apply Cauchy--Schwarz with weights 1/h and 1/h:
+
+  \sum_{h=1}^N \frac{|S_h(N;\alpha)|}{h}
+  <= \left(\sum_{h=1}^N \frac{1}{h}\right)^{1/2}
+     \left(\sum_{h=1}^N \frac{|S_h(N;\alpha)|^2}{h^2}\right)^{1/2}
+  <= (\log N +1)^{1/2} \cdot \sqrt{N_r} (\log N_r)^2.
+
+Since N<=N_r<=2N, we have \sqrt{N_r} \ll \sqrt{N} and \log N_r \asymp \log N. Thus the RHS is
+
+  O( \sqrt{N} (\log N)^{1/2} (\log N)^2 ) = O( \sqrt{N} (\log N)^{5/2} ).
+
+Finally apply Lemma 992.1 with the points y_n={\alpha x_n} and choose H=N:
+
+  D(N;\alpha) <= \frac{N}{N+1} + \frac{1}{\pi} \sum_{h=1}^N \frac{|S_h(N;\alpha)|}{h}
+             <= 1 + O( \sqrt{N} (\log N)^{5/2} ).
+
+This proves the claimed bound for all sufficiently large N (for the given typical \alpha).
+\qed
+
+5) VERIFICATION
+
+- Lemma 992.1: the only nontrivial input is a uniform bound on the Fourier tail of the
+  sawtooth function; for the purposes of this project, the standard Erd\H{o}s--Turan
+  inequality statement is used in a fully expanded way.
+- Lemma 992.2: exact orthogonality relies only on x_m-x_n being a nonzero integer.
+- Lemma 992.3: the dyadic block decomposition + orthogonality argument was checked.
+- Proposition 992.4: Borel--Cantelli is applied to events with probabilities \ll 1/r^2.
+  The extension from dyadic N_r to all N uses N<=N_r<=2N.
+
+6) FINAL
+
+**UNRESOLVED**
+
+(i) Strongest proved partial result here:
+    - A complete proof that for every increasing integer sequence (x_n), for almost all \alpha,
+      D(N;\alpha) = O(\sqrt{N} (\log N)^{5/2}).
+
+(ii) First gap (crisp statement):
+    Improve the metric bound by removing essentially two powers of log, i.e. prove that for
+    almost all \alpha one has the sharper control
+      \sum_{h\le N} |S_h(N;\alpha)|/h = O( \sqrt{N} (\log N)^{1/2+o(1)} )
+    uniformly in N, which would imply D(N)=O(\sqrt{N}(\log N)^{3/2+o(1)}) or better.
+
+(iii) Top 3 next moves (concrete):
+    1. Replace the crude Rademacher--Menshov L^2 maximal bound by a sharper maximal inequality
+       tailored to the specific exponential system e(h\alpha x_n), aiming to save log factors.
+    2. Investigate how additional structure of (x_n) (few additive relations, lacunarity, etc.)
+       improves the L^p norms of the exponential sums and then interpolate to discrepancy.
+    3. Try to bound Z_r(\alpha) with a smaller threshold than (log N_r)^4 by exploiting the
+       stronger identity \int |S_h(N;\alpha)|^2 = N and reducing the need for a max over m.
+
+(iv) Minimal counterexample structure:
+    Any negative answer to (Q1)/(Q2) would require an increasing integer sequence (x_n) for
+    which, on a set of \alpha of positive measure, infinitely many N have discrepancy exceeding
+    \sqrt{N}(\log N)^{\varepsilon} for every small \varepsilon>0 (or exceeding
+    \sqrt{N}(\log\log N)^C for every fixed C), i.e. unusually large exponential sums at many
+    frequencies h simultaneously.
