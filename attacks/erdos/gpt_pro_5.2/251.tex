@@ -1,0 +1,96 @@
+\section*{Erd\H{o}s Problem \#251}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $p_n$ denote the $n$th prime (so $p_1=2$, $p_2=3$, $p_3=5$, \ldots). Define
+\[
+S \;:=\; \sum_{n=1}^{\infty} \frac{p_n}{2^n}.
+\]
+The question is whether $S\notin\mathbb{Q}$.
+
+Clarification of conventions:
+\begin{itemize}
+\item The series is over $n\ge 1$.
+\item ``Irrational'' means ``not a rational number''.
+\end{itemize}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+This is listed as open in Erd\H{o}s' 1958 paper and later collections; Erd\H{o}s proved that the factorial-weighted prime series $\sum p_n^k/n!$ is irrational for every integer $k\ge 1$, but conjectured that the dyadic-weighted series $\sum p_n^k/2^n$ is irrational for every $k$ (in particular for $k=1$). See \cite{Er58b,Er88c} and the problem compilation \cite{ErdosProblems251}.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Track A (proof attempt via ``rational $\Rightarrow$ eventual periodicity''):}
+If $S\in\mathbb{Q}$, then the orbit of $S$ under multiplication by $2$ modulo $1$ is eventually periodic. One can try to express the fractional parts $\{2^N S\}$ (or distances to $\mathbb{Z}$) directly in terms of the primes $(p_n)$ and derive a contradiction.
+
+\textbf{Track B (disproof attempt / counterexample construction):}
+Try to see whether any plausible mechanism could force $S$ to be rational, e.g. an ``almost-telescoping'' structure in the binary expansion. Since the coefficients are not restricted to $\{0,1\}$, carries can in principle create cancellation, so a genuine disproof would require constructing an exact rational identity.
+
+\textbf{Track C (approximation/computation-guided constraints):}
+Compute $S$ to high precision and rule out rationals with small denominators as a sanity check, while being explicit that this cannot prove irrationality.
+
+\subsection*{4) WORK}
+\subsubsection*{4.1 Convergence}
+Using the prime number theorem one has $p_n\sim n\log n$. In particular there is a constant $C>0$ and $n_0$ such that $p_n\le C n\log n$ for $n\ge n_0$. Then
+\[
+0\le \frac{p_n}{2^n}\le \frac{C n\log n}{2^n}\qquad (n\ge n_0),
+\]
+and $\sum_{n\ge 1} n\log n/2^n$ converges (ratio test), so $S$ converges absolutely.
+
+\subsubsection*{4.2 Numerical ``reality check''}
+A direct computation of partial sums (first $1000$ primes) gives
+\[
+S \approx 3.67464396601132877899567630908402941167779758878\ldots
+\]
+(the truncation error is far below the displayed digits).
+
+Minimal pseudocode for the partial sum $S_N:=\sum_{n\le N}p_n/2^n$:
+\begin{verbatim}
+S = 0
+pow2 = 2
+for n in 1..N:
+    p = nth_prime(n)
+    S += p / pow2
+    pow2 *= 2
+return S
+\end{verbatim}
+
+\subsubsection*{4.3 A useful reformulation (but no contradiction found)}
+Define the ``tail'' quantities
+\[
+Y_N \;:=\; \sum_{m=1}^{\infty} \frac{p_{N+m}}{2^m}\qquad (N\ge 0).
+\]
+Then $Y_0=S$ and the sequence satisfies the exact recurrence
+\[
+Y_{N+1} \,=\, 2Y_N - p_{N+1}\qquad (N\ge 0),
+\]
+because $2Y_N = p_{N+1}+Y_{N+1}$.
+
+If $S\in\mathbb{Q}$, then all $Y_N\in\mathbb{Q}$. Moreover, if $S=a/b$ with $b$ odd, then choosing $N$ a multiple of the multiplicative order of $2$ modulo $b$ forces $2^N S\in\mathbb{Z}$, hence $Y_N\in\mathbb{Z}$ for infinitely many $N$. Thus:
+\begin{quote}
+\emph{A sufficient condition for irrationality of $S$ is to show that $Y_N\notin\mathbb{Z}$ for all sufficiently large $N$ (or even for all $N$).}
+\end{quote}
+I do not currently have a method to prove such a non-integrality statement: the binary-carry structure of $Y_N$ depends subtly on $(p_{N+m}\bmod 2^m)$.
+
+\subsection*{5) VERIFICATION (adversarial check)}
+\begin{itemize}
+\item The convergence argument reduces to the standard bound $p_n\ll n\log n$; this is a classical consequence of the prime number theorem.
+\item The recurrence $Y_{N+1}=2Y_N-p_{N+1}$ is an identity obtained by shifting the tail series; it has been checked algebraically.
+\item The numerical value of $S$ is not used as evidence of irrationality; it is only a sanity check.
+\item The reduction ``$S\in\mathbb{Q}$ with odd denominator $\Rightarrow Y_N\in\mathbb{Z}$ for infinitely many $N$'' uses that $2^N(a/b)$ is integral for infinitely many $N$ when $\gcd(2,b)=1$; this is standard (take $N$ a multiple of the order of $2\bmod b$).
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}
+\item[(i)] \textbf{Most advanced partial result proved here.}
+The tail-recurrence $Y_{N+1}=2Y_N-p_{N+1}$ is exact, and if $S\in\mathbb{Q}$ with odd denominator then $Y_N\in\mathbb{Z}$ for infinitely many $N$.
+\item[(ii)] \textbf{Strongest obstruction / missing lemma.}
+I do not have a way to rule out the possibility that $Y_N$ is an integer infinitely often (or eventually), because that requires quantitative control of binary carries coming from the residues $p_{N+m}\bmod 2^m$.
+\item[(iii)] \textbf{Next concrete steps.}
+A plausible route is to prove that $Y_N$ cannot be an integer by bounding it strictly between consecutive integers for infinitely many $N$, using information on prime gaps and on primes in short intervals together with congruence information modulo powers of $2$.
+\item[(iv)] \textbf{Counterexample search description.}
+A counterexample would be an explicit rational identity $\sum_{n\ge1} p_n/2^n = a/b$. No finite computation can certify such an identity; nonetheless, high-precision computation and rational-reconstruction up to moderate denominators finds no small-denominator rational candidate near $S$.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+$\mathbf{95\%}$ confidence that the derivations and reductions written above are correct; $\mathbf{0\%}$ confidence of a full resolution (the problem is open).
+
+

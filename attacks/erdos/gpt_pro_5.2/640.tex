@@ -1,0 +1,139 @@
+\section*{Problem 640}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Does there exist a function $f:\mathbb N_{\ge 3}\to\mathbb N$ such that for every integer $k\ge 3$ and every finite graph $G$,
+\[
+  \chi(G)\ge f(k)
+\]
+implies there exists an \emph{odd} cycle $C$ in $G$ for which the subgraph spanned by its vertices has chromatic number at least $k$:
+\[
+  \chi\bigl(G[V(C)]\bigr)\ge k?
+\]
+(Here $G[V(C)]$ denotes the induced subgraph on the vertex set of $C$.)
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+This problem is widely recorded as open.
+It is closely related to a conjecture of Gy\'{a}rf\'{a}s and to a ``path'' variant: if every \emph{path} of $G$ spans an $r$-colourable subgraph, must $\chi(G)$ be bounded by a function of $r$?
+The odd-cycle formulation is essentially the contrapositive of ``bounded chromatic number when all odd cycles span bounded-chromatic subgraphs''.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}[label=\arabic*.]
+\item Record easy base case $k=3$.
+\item Prove the standard reduction to the path-variant (and conversely, that a sufficiently strong path-variant implies the odd-cycle statement up to a factor-2 loss).
+\item Identify the remaining bottleneck: producing a high-chromatic induced subgraph on the vertex set of a single path.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\paragraph{4.1. The case $k=3$ is trivial.}
+If $\chi(G)\ge 3$, then $G$ is not bipartite, so $G$ contains an odd cycle $C$.
+Since $C\subseteq G[V(C)]$, we have $\chi(G[V(C)])\ge\chi(C)=3$.
+Thus one may take
+\[
+  f(3)=3.
+\]
+
+\paragraph{4.2. A convenient ``path'' formulation.}
+Define the following property.
+
+\smallskip
+\noindent\textbf{(Path-$k$)}: There exists a function $g(k)$ such that every graph $G$ with $\chi(G)\ge g(k)$ contains a (simple) path $P$ for which
+$\chi(G[V(P)])\ge k$.
+
+\smallskip
+We show that the existence of $f$ in the problem is essentially equivalent to the existence of $g$.
+
+\begin{lemma}[Odd-cycle $\Rightarrow$ path]
+If the statement of Problem 640 holds with a function $f$, then (Path-$k$) holds with $g(k)\le f(k)$.
+\end{lemma}
+\begin{proof}
+Assume $\chi(G)\ge f(k)$.
+By the odd-cycle statement, there is an odd cycle $C$ with $\chi(G[V(C)])\ge k$.
+Traverse $C$ and delete one edge to obtain a path $P$ with $V(P)=V(C)$.
+Then $\chi(G[V(P)])=\chi(G[V(C)])\ge k$.
+\end{proof}
+
+\begin{lemma}[Path $\Rightarrow$ odd-cycle (with loss)]
+Assume (Path-$k$) holds for all $k$ with some function $g$.
+Then Problem 640 holds with
+\[
+  f(k) := 2g(k+1)-1.
+\]
+\end{lemma}
+\begin{proof}
+Let $G$ be a graph with $\chi(G)\ge 2g(k+1)-1$.
+Replacing $G$ by a connected component of maximum chromatic number, assume $G$ is connected.
+Fix a root $r$ and take the breadth-first search layers $L_0, L_1, L_2,\dots$ (so $L_i$ is the set of vertices at distance $i$ from $r$).
+Let $X:=\bigcup_i L_{2i}$ and $Y:=\bigcup_i L_{2i+1}$.
+Since edges of $G$ join only vertices in the same layer or adjacent layers, there are no edges between distinct even layers, and similarly for odd layers.
+Hence
+\[
+  \chi(G[X]) = \max_i \chi(G[L_{2i}])\qquad\text{and}\qquad
+  \chi(G[Y]) = \max_i \chi(G[L_{2i+1}]).
+\]
+Color $G[X]$ with $\chi(G[X])$ colors and $G[Y]$ with a disjoint palette of $\chi(G[Y])$ colors; this properly colors all edges between $X$ and $Y$.
+Thus
+\[
+  \chi(G)\le \chi(G[X]) + \chi(G[Y]).
+\]
+Since $\chi(G)\ge 2g(k+1)-1$, at least one of $\chi(G[X]),\chi(G[Y])$ is at least $g(k+1)$.
+Choose a layer $L:=L_j$ (of the corresponding parity) with
+$\chi(G[L])\ge g(k+1)$.
+Let $H$ be a connected component of $G[L]$ with $\chi(H)\ge g(k+1)$.
+By (Path-$(k+1)$) applied to $H$, there exists a path
+\[P=v_1v_2\cdots v_m\subseteq H\subseteq G[L]\]
+with $\chi(G[V(P)])=\chi(H[V(P)])\ge k+1$.
+
+Define $t:=\min\{i: \chi(G[\{v_1,\dots,v_i\}])\ge k\}$.
+This minimum exists because $\chi(G[\{v_1,\dots,v_m\}])\ge k+1$.
+Moreover $t<m$ (otherwise the final chromatic number would be $k$, contradicting $\ge k+1$).
+Now consider the initial segment path $Q:=v_1v_2\cdots v_{t'}$, where $t':=t$ if $t-1$ is odd, and $t':=t+1$ if $t-1$ is even.
+Then:
+\begin{itemize}
+\item $Q$ is a subpath of $P$ of \emph{odd} length (number of edges is $t'-1$, which is odd by construction),
+\item $\chi(G[V(Q)])\ge \chi(G[\{v_1,\dots,v_t\}])\ge k$ since $V(Q)\supseteq\{v_1,\dots,v_t\}$.
+\end{itemize}
+Let $x,y$ be the endpoints of $Q$.
+Since $x,y\in L_j$, the unique tree-path in the BFS tree between $x$ and $y$ has even length (it goes up from level $j$ to the LCA and back down to level $j$).
+This tree-path intersects $Q$ only at $x,y$ (all internal tree vertices have distance $<j$ from $r$).
+Therefore the union of $Q$ with the tree-path between $x$ and $y$ is a simple cycle $C$.
+Its length is (odd $+$ even) $=$ odd, so $C$ is an odd cycle.
+Finally, $V(Q)\subseteq V(C)$ implies
+\[
+  \chi(G[V(C)])\ge \chi(G[V(Q)])\ge k.
+\]
+This proves the odd-cycle conclusion.
+\end{proof}
+
+\paragraph{4.3. What remains.}
+Thus, proving Problem 640 is essentially equivalent to proving the path-variant (Path-$k$).
+At present, no general function $g$ is known; even the case $k=4$ corresponds to the conjectural boundedness of $\chi(G)$ under the assumption that every path spans a $3$-colourable subgraph.
+
+\subsection*{5) VERIFICATION / SANITY CHECKS}
+\begin{itemize}
+\item The reduction ``odd cycle $\Rightarrow$ path'' is immediate because a cycle has a Hamilton path on the same vertex set.
+\item The reduction ``path $\Rightarrow$ odd cycle'' uses only BFS layering and parity; the key parity step is that two vertices in the same BFS layer have an even tree-path between them.
+\item The extracted subpath $Q$ is guaranteed to have odd length because we may extend the minimal-$t$ initial segment by one vertex (which exists since $t<m$).
+\end{itemize}
+
+\subsection*{6) FINAL}
+\noindent\textbf{UNRESOLVED.}
+
+\smallskip
+\noindent\textbf{Best partial results/progress achieved here:}
+\begin{itemize}
+\item Verified the statement for $k=3$ (take $f(3)=3$).
+\item Proved that the odd-cycle formulation is essentially equivalent (up to a factor-$2$ in the threshold) to the path-variant: existence of $f$ is equivalent to existence of $g$ where large chromatic number forces a path whose vertex set spans large chromatic number.
+\end{itemize}
+
+\noindent\textbf{Concrete next moves that look most promising:}
+\begin{enumerate}[label=\arabic*.]
+\item Attack the path-variant (Path-$k$) directly: show that graphs in which every path spans a $(k-1)$-colourable induced subgraph form a $\chi$-bounded class.
+\item Study minimal counterexamples (vertex-critical graphs) under the ``every path/odd cycle spans bounded-chromatic'' hypothesis; attempt to force a bounded tree-depth or a bounded pathwidth decomposition.
+\item Explore whether existing tools from $\chi$-boundedness (e.g. decomposition theorems for graphs excluding certain induced subgraphs) can be adapted to the ``all paths span $(k-1)$-colourable'' condition.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\noindent\textbf{COMPLETION: 35\%}
+
+\hrule
+

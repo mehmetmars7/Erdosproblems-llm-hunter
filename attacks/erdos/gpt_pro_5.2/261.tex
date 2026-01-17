@@ -1,0 +1,135 @@
+\section*{Problem \#261}
+\addcontentsline{toc}{section}{Problem \#261}
+
+\subsection*{1. Formal Restatement}
+For $n\in\mathbb{N}$, consider the Diophantine equation
+\begin{equation}
+\label{eq:261}
+\frac{n}{2^n}=\sum_{k=1}^{t}\frac{a_k}{2^{a_k}},
+\end{equation}
+where $t\ge 2$ and $a_1,\dots,a_t$ are distinct positive integers.
+
+Questions:
+\begin{enumerate}[label=(\alph*),leftmargin=2em]
+\item Are there infinitely many $n$ for which \eqref{eq:261} is solvable?
+\item Is \eqref{eq:261} solvable for \emph{all} $n$?
+\item Does there exist a \emph{rational} $x$ for which
+\[
+ x = \sum_{k=1}^{\infty}\frac{a_k}{2^{a_k}}
+\]
+has at least $2^{\aleph_0}$ distinct solutions (i.e. uncountably many distinct increasing sequences $(a_k)$)?
+\end{enumerate}
+
+\subsection*{2. Quick Literature / Context Check}
+Borwein--Loring exhibited an explicit infinite family of $n$ admitting a solution (settling (a) positively), and proposed a greedy-type algorithm and conjectures toward (b). Tengely--Ulas--Zygad\l{}o extended computations and verified solvability for all $n\le 10^4$. The existence of a rational $x$ with continuum-many representations appears open.
+
+\subsection*{3. Attack Plan}
+\begin{itemize}[leftmargin=2em]
+\item For (a), prove the explicit identity
+\[
+\frac{n}{2^n}=\sum_{n<k\le n+m}\frac{k}{2^k}\quad\text{for }n=2^{m+1}-m-2,
+\]
+which yields infinitely many $n$.
+\item For (b), one would need a general constructive procedure producing a finite set of indices $\{a_1<\dots<a_t\}$ for each $n$. Greedy strategies (choose the largest $a$ with $a/2^a\le n/2^n$ and iterate) work numerically but lack a proof of termination.
+\item For (c), one seeks a rational $x$ with extreme non-uniqueness of representation; known constructions give irrationals with uncountably many representations, and rationals with many (finite) representations, but the ``continuum many'' rational case remains unclear.
+\end{itemize}
+
+\subsection*{4. Work}
+\subsubsection*{4.1 A complete proof for (a): infinitely many $n$}
+
+\begin{theorem}[Borwein--Loring/Cusick family]
+\label{thm:261-infinite}
+For every integer $m\ge 1$, let
+\[
+ n := 2^{m+1}-m-2.
+\]
+Then
+\begin{equation}
+\label{eq:261-identity}
+\frac{n}{2^n} = \sum_{k=n+1}^{n+m}\frac{k}{2^k},
+\end{equation}
+which gives a solution to \eqref{eq:261} with $t=m$ and $a_k=n+k$.
+In particular, there are infinitely many $n$ for which \eqref{eq:261} is solvable.
+\end{theorem}
+
+\begin{proof}
+We use the closed form for dyadic ``tails'':
+\begin{equation}
+\label{eq:tail}
+\sum_{k=N+1}^{\infty} \frac{k}{2^k} = \frac{N+2}{2^N},\qquad N\ge 1.
+\end{equation}
+(One derivation: start from $\sum_{k\ge 1} kx^k = x/(1-x)^2$ and specialize to $x=1/2$, then subtract the first $N$ terms.)
+
+Applying \eqref{eq:tail} twice gives
+\[
+\sum_{k=n+1}^{n+m}\frac{k}{2^k}
+=\sum_{k=n+1}^{\infty}\frac{k}{2^k}-\sum_{k=n+m+1}^{\infty}\frac{k}{2^k}
+=\frac{n+2}{2^n}-\frac{n+m+2}{2^{n+m}}.
+\]
+Therefore \eqref{eq:261-identity} is equivalent to
+\[
+\frac{n}{2^n}=\frac{n+2}{2^n}-\frac{n+m+2}{2^{n+m}}.
+\]
+Multiplying by $2^n$ and rearranging yields
+\[
+\frac{n+m+2}{2^m}=2
+\quad\Longleftrightarrow\quad
+n+m+2 = 2^{m+1}
+\quad\Longleftrightarrow\quad
+n=2^{m+1}-m-2,
+\]
+which is exactly how $n$ was defined.
+\end{proof}
+
+\subsubsection*{4.2 Tiny-case computation (evidence toward (b))}
+The following simple depth-first search (over finite subsets of indices) can find solutions to \eqref{eq:261} for small $n$:
+\begin{verbatim}
+Input: n, MaxExponent M
+Target := n/2^n
+Search over subsets A of {1,2,...,M} with |A|>=2:
+    if sum_{a in A} a/2^a == Target then output A
+Prune using that the terms a/2^a decrease for a>=2.
+\end{verbatim}
+A quick run for $1\le n\le 20$ (with $M=400$) finds at least one solution for every such $n$.
+For example:
+\[
+\frac{1}{2}=\frac{3}{2^3}+\frac{6}{2^6}+\frac{8}{2^8},\qquad
+\frac{4}{2^4}=\frac{5}{2^5}+\frac{6}{2^6}.
+\]
+This is consistent with the verified range $n\le 10^4$ in the literature.
+
+\subsubsection*{4.3 Status of (b) and (c)}
+No general proof is known (to the best of the sources consulted) that \eqref{eq:261} is solvable for every $n$. Likewise, the existence of a \emph{rational} $x$ with $2^{\aleph_0}$ distinct representations of the form $\sum a_k/2^{a_k}$ appears open.
+
+\subsection*{5. Verification / Sanity Checks}
+\begin{itemize}[leftmargin=2em]
+\item The tail formula \eqref{eq:tail} can be checked by differentiating the geometric series.
+\item In Theorem~\ref{thm:261-infinite}, all $a_k=n+k$ are distinct and $t=m\ge 2$ is achieved for $m\ge 2$; for $m=1$ the identity gives a one-term representation, but $m\ge 2$ already yields infinitely many examples with $t\ge 2$.
+\item The displayed small-$n$ examples can be verified by direct arithmetic.
+\end{itemize}
+
+\subsection*{6. FINAL}
+\textbf{UNRESOLVED}
+
+\subsubsection*{Why stuck / what remains open}
+Part (a) is completely solved (infinitely many $n$). The open parts are:
+\begin{itemize}[leftmargin=2em]
+\item (b) proving solvability for \emph{every} $n$ (or producing a counterexample),
+\item (c) finding a \emph{rational} value with continuum-many distinct representations.
+\end{itemize}
+
+\subsubsection*{Strongest partial result proved here}
+Theorem~\ref{thm:261-infinite} gives an explicit infinite family of $n$ for which \eqref{eq:261} has a solution.
+
+\subsubsection*{Next steps (concrete)}
+\begin{enumerate}[leftmargin=2em]
+\item Analyze the Borwein--Loring greedy algorithm: prove termination for all $n$, or find a structural obstruction.
+\item Use structural constraints from divisibility and size bounds on $a_t$ (as in later work) to reduce (b) to finitely many configurations for each $n$.
+\item For (c), attempt to build a rational $x$ admitting infinitely many independent ``local rewrite'' identities to force $2^{\aleph_0}$ representations.
+\end{enumerate}
+
+\subsection*{7. Completion Estimate}
+\textbf{55\%}. Part (a) is fully proved; parts (b) and (c) remain open.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

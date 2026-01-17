@@ -1,0 +1,181 @@
+\section*{Problem \#380}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+For integers $1\le u\le v$, define
+\[
+N(u,v)\ :=\ \prod_{m=u}^{v} m.
+\]
+Write $P(n)$ for the largest prime factor of an integer $n\ge 2$, and set $P(1):=1$ for convenience. For a prime $p$, write $\nu_p(n)$ for the exponent of $p$ in the prime factorisation of $n$.
+
+\begin{itemize}[leftmargin=2em]
+\item The interval $[u,v]$ is \emph{bad} if the largest prime factor of $N(u,v)$ occurs with exponent $>1$, i.e.
+\[
+\text{if }\, P\bigl(N(u,v)\bigr)=:Q \text{ then } \nu_Q\bigl(N(u,v)\bigr)\ge 2.
+\]
+\item Define
+\[
+B(x)\ :=\ \#\{\,n\in\{1,2,\dots,\lfloor x\rfloor\}:\ \exists\,u\le n\le v \text{ with } [u,v]\text{ bad}\,\}.
+\]
+\item Define the comparison counting function
+\[
+A(x)\ :=\ \#\{\,n\le x:\ P(n)^2\mid n\,\}.
+\]
+\end{itemize}
+
+\noindent\textbf{Question 380(a).} Is it true that $B(x)\sim A(x)$ as $x\to\infty$?
+
+\medskip
+
+\noindent Next, call $[u,v]$ \emph{very bad} if $N(u,v)$ is a \emph{powerful} (a.k.a.\ squareful) integer, meaning that every prime divisor occurs with exponent at least $2$:
+\[
+(\forall \text{ primes }p\mid N(u,v))\quad \nu_p\bigl(N(u,v)\bigr)\ge 2.
+\]
+Let
+\[
+V(x)\ :=\ \#\{\,n\le x:\ \exists\,u\le n\le v \text{ with } [u,v]\text{ very bad}\,\}.
+\]
+Let
+\[
+\mathrm{Pow}(x)\ :=\ \#\{\,n\le x:\ n\text{ is powerful}\,\}.
+\]
+
+\noindent\textbf{Question 380(b).} Is it true that $V(x)\ll x^{1/2}$, and in fact $V(x)\sim \mathrm{Pow}(x)$?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+The Erd\H{o}s Problems website lists Problem \#380 as open and records (from Erd\H{o}s--Graham, 1980) that $B(x)>x^{1-o(1)}$, and that
+\[
+A(x)=\frac{x}{\exp\!\Bigl((c+o(1))\sqrt{\log x\log\log x}\Bigr)}
+\]
+for some constant $c>0$.\footnote{\url{https://www.erdosproblems.com/380} (accessed 2026-01-17).}
+
+The same page attributes to Terence Tao the observation that if $[u,v]$ is bad then it contains no primes, hence $v<2u$.\footnote{Same source as above.}
+
+For powerful numbers, a classical asymptotic (going back at least to Bateman--Grosswald) is
+\[
+\mathrm{Pow}(x)=\frac{\zeta(3/2)}{\zeta(3)}\,x^{1/2}+\frac{\zeta(2/3)}{\zeta(2)}\,x^{1/3}+O(x^{1/6}),
+\]
+as recorded for example on OEIS A001694.\footnote{\url{https://oeis.org/A001694} (see the ``FORMULA'' section; accessed 2026-01-17).}
+
+\subsection*{3) ATTACK PLAN}
+
+\begin{enumerate}[leftmargin=2.5em]
+\item Prove the easy structural lemma ``bad intervals contain no primes'' and derive the strong geometric restriction $v<2u$.
+\item Use this restriction to justify finite computations of $B(x)$ and $V(x)$ up to moderate $x$ by searching only intervals with $v<2u\le 2x$.
+\item Establish trivial but useful inclusions:
+\[
+A(x)\le B(x)\quad\text{and}\quad \mathrm{Pow}(x)\le V(x),
+\]
+coming from singleton intervals.
+\item Try to upper bound the ``extra'' contribution $B(x)-A(x)$ by relating any bad interval to nearby integers $n$ with $P(n)^2\mid n$.
+(Here lies the main gap: badness can come from two distinct multiples of a large prime, not necessarily a square.)
+\end{enumerate}
+
+\subsection*{4) WORK}
+
+\begin{lemma}[Bad intervals contain no primes]
+If $[u,v]$ is bad, then $[u,v]$ contains no prime numbers.
+\end{lemma}
+
+\begin{proof}
+Suppose for contradiction that $[u,v]$ contains at least one prime. Let $p$ be the largest prime in $[u,v]$.
+We claim that $p$ is the largest prime factor of $N(u,v)$.
+
+Indeed, any prime factor $q$ of $N(u,v)$ divides some $m\in[u,v]$, hence $q\le m\le v$. If $q>p$, then $q$ itself is a prime in $[u,v]$ (since $u\le p<q\le v$), contradicting the maximality of $p$. Thus $P(N(u,v))=p$.
+
+Now show that $\nu_p(N(u,v))=1$. By Bertrand's postulate, for any integer $n>1$ there is a prime in $(n,2n)$.
+Apply this with $n=p$: if $v\ge 2p$, then the subinterval $(p,2p)$ lies in $[u,v]$ and contains a prime $>p$, again contradicting maximality of $p$.
+Hence $v<2p$, so the only multiple of $p$ in $[u,v]$ is $p$ itself (since $2p>v$). Also $p^2>v$ (because $v<2p\le p^2$ for all primes $p\ge 2$). Therefore $p$ appears to the first power only, i.e.\ $\nu_p(N(u,v))=1$.
+
+But then the largest prime factor of $N(u,v)$ occurs with exponent $1$, so $[u,v]$ is not bad, a contradiction.
+\end{proof}
+
+\begin{corollary}[A crude geometric constraint]
+If $[u,v]$ is bad, then $v<2u$.
+\end{corollary}
+
+\begin{proof}
+If $v\ge 2u$ and $u>1$, then Bertrand's postulate guarantees a prime in $(u,2u)\subseteq [u,v]$, contradicting the lemma.
+For $u=1$, the interval contains $2$ whenever $v\ge 2$, so it also contains a prime and cannot be bad.
+Thus any bad interval must satisfy $v<2u$.
+\end{proof}
+
+\begin{corollary}[Trivial lower bound for $B(x)$]
+For all $x\ge 1$, one has $A(x)\le B(x)$.
+\end{corollary}
+
+\begin{proof}
+If $P(n)^2\mid n$ then the singleton interval $[n,n]$ is bad (its product is $n$ and its largest prime factor occurs with exponent at least $2$). Hence every $n$ counted by $A(x)$ is also counted by $B(x)$.
+\end{proof}
+
+\begin{corollary}[Trivial lower bound for $V(x)$]
+For all $x\ge 1$, one has $\mathrm{Pow}(x)\le V(x)$.
+\end{corollary}
+
+\begin{proof}
+If $n$ is powerful, then $[n,n]$ is very bad, so $n$ is counted by $V(x)$.
+\end{proof}
+
+\paragraph{Finite computations (sanity checks).}
+Using the corollary $v<2u$, if $n\le x$ lies in a bad interval $[u,v]$, then
+\[
+u\le n\le v<2u\le 2n\le 2x.
+\]
+So to decide whether $n\le x$ is counted by $B(x)$, it suffices to search for bad intervals with endpoints $\le 2x$ (and satisfying $v<2u$).
+The following table was computed exactly by enumerating all $[u,v]$ with $1\le u\le x$ and $u\le v<\min(2u,2x]$ and checking badness/very-badness.
+
+\medskip
+
+\begin{center}
+\begin{tabular}{r|r r|r r}
+$x$ & $B(x)$ & $A(x)$ & $V(x)$ & $\mathrm{Pow}(x)$\\\hline
+50   & 13  & 11  & 10  & 10\\
+100  & 20  & 18  & 14  & 14\\
+200  & 33  & 29  & 22  & 22\\
+400  & 53  & 48  & 33  & 33\\
+800  & 81  & 75  & 47  & 47\\
+1000 & 95  & 87  & 54  & 54\\
+2000 & 152 & 138 & 78  & 78\\
+5000 & 281 & 253 & 128 & 128\\
+\end{tabular}
+\end{center}
+
+\noindent Observations:
+\begin{itemize}[leftmargin=2em]
+\item In this range, $B(x)$ is only about $5$--$15\%$ larger than $A(x)$, consistent with the conjecture $B(x)\sim A(x)$ (but of course far from proving it).
+\item In this range, the set of integers $\le x$ that lie in a very bad interval coincides with the set of powerful numbers $\le x$ (hence $V(x)=\mathrm{Pow}(x)$ for these $x$). This \emph{suggests} (but does not prove) the stronger statement that every very bad interval consists entirely of powerful numbers.
+\end{itemize}
+
+\subsection*{5) VERIFICATION}
+
+\begin{itemize}[leftmargin=2em]
+\item The lemma ``bad intervals contain no primes'' was checked against brute force search up to $v\le 200$ (no counterexamples found), and the proof uses only Bertrand's postulate plus a maximality argument.
+\item Edge cases: if $[u,v]$ contains a prime $p=2$, then $v<4$ by the proof, and indeed no such interval is bad. Singleton intervals work as claimed: $[n,n]$ is bad iff $P(n)^2\mid n$; $[n,n]$ is very bad iff $n$ is powerful.
+\item The computational reduction $v\le 2x$ for membership in $B(x)$ relies on $v<2u$; this is logically sound.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED.}
+
+\begin{enumerate}[leftmargin=2.5em]
+\item[(i)] \textbf{Strongest partial result obtained.}
+Every bad interval contains no primes, hence satisfies $v<2u$. Consequently $A(x)\le B(x)$ for all $x$, and $B(x)$ can be computed for a given $x$ by searching only intervals with endpoints $\le 2x$ and $v<2u$.
+Similarly, $\mathrm{Pow}(x)\le V(x)$.
+\item[(ii)] \textbf{First hard gap.}
+To prove $B(x)\sim A(x)$ one needs a near-complete classification of integers lying in \emph{some} bad interval. The obstruction is that badness can come from the largest prime factor $Q$ dividing \emph{two distinct} integers in $[u,v]$ (so that $\nu_Q(N(u,v))\ge 2$) without any single integer $n$ in the interval satisfying $Q^2\mid n$.
+\item[(iii)] \textbf{Top 3 next moves.}
+\begin{enumerate}[leftmargin=2.5em]
+\item Prove an upper bound on the length of bad intervals that is $v^{o(1)}$ (or even $v^{\varepsilon}$ for all $\varepsilon>0$); then one could attempt a union bound over ``anchors'' $n$ with $P(n)^2\mid n$.
+\item Show that every bad interval must contain \emph{many} integers $m$ whose largest prime factor equals the interval's maximal prime; quantify how often this can happen without forcing a square (or forcing nearby squares).
+\item Develop a local model around primes $q$ and intervals near $q^2$ (where $q^2$ supplies $\nu_q\ge 2$) to estimate the measure of the set covered by bad intervals and compare it to $A(x)$.
+\end{enumerate}
+\item[(iv)] \textbf{Why it might be true.}
+Heuristically, the only ``robust'' way to make the maximal prime appear with exponent $\ge 2$ is to have a square of that maximal prime present (or a very short interval containing two multiples), which suggests the coverage set should look like integers with $P(n)^2\mid n$ plus a thin halo.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+Estimated probability of a full resolution from these notes alone: \textbf{25\%}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

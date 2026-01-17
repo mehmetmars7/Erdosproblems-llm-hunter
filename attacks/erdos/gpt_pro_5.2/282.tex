@@ -1,0 +1,102 @@
+\section*{Erd\H{o}s Problem \#282}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $A\subseteq \mathbb{N}$ be infinite, and let $x\in(0,1)\cap\mathbb{Q}$. Consider the greedy procedure that repeatedly subtracts the \emph{largest} unit fraction from the allowed set $\{1/n : n\in A\}$ that does not exceed the current remainder.
+
+\medskip
+\noindent\textbf{(Ambiguity and minimal correction.)}
+As written in many informal descriptions, one chooses at each step the minimal $n\in A$ with $n\ge 1/x$ and replaces $x\leftarrow x-1/n$. For $A=\mathbb{N}$ this automatically yields \emph{distinct} denominators (indeed a strictly increasing sequence), but for sparse $A$ one can obtain repeats. Since the goal is an \emph{Egyptian fraction} (distinct denominators), the standard correction (used e.g. in the ``odd greedy expansion'' literature) is:
+
+\begin{quote}
+At step $j$, choose the least $n_j\in A\setminus\{n_1,\dots,n_{j-1}\}$ such that $\frac1{n_j}\le x_{j-1}$ (equivalently $n_j\ge 1/x_{j-1}$), and set $x_j=x_{j-1}-\frac1{n_j}$.
+\end{quote}
+We call this the \emph{distinct-denominator greedy algorithm} for $(x,A)$. It \emph{terminates} if $x_t=0$ for some finite $t$, yielding
+\[
+ x=\sum_{j=1}^t \frac1{n_j},\qquad n_1<\cdots<n_t\in A.
+\]
+
+\medskip
+\noindent\textbf{Main question (Stein).}
+With $A=2\mathbb{N}-1$ (the odd positive integers) and $x=a/b$ in lowest terms with $b$ odd: \emph{must the distinct-denominator greedy algorithm terminate?}
+
+\medskip
+\noindent\textbf{Further questions included in the prompt.}
+\begin{enumerate}[label=(\alph*)]
+\item Characterise pairs $(x,A)$ for which termination holds.
+\item (Congruence classes) Fix $d\ge 1$ and $a\bmod d$. When $x=m/n$ admits a representation as a sum of distinct unit fractions with denominators $\equiv a\pmod d$ (Graham's condition), must the corresponding restricted greedy algorithm terminate?
+\item (Squares) For $A=\{n^2:n\in\mathbb{N}\}$, Graham characterised exactly which $x$ admit a representation with distinct square denominators. Must the restricted greedy algorithm terminate for such $x$?
+\end{enumerate}
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The problem for odd denominators is attributed to Stein and is widely stated as open (often called ``Stein's conjecture'' or the ``odd greedy expansion problem''). It is known (Breusch--Stewart) that every rational with odd denominator admits \emph{some} Egyptian fraction expansion with all denominators odd, but it is unknown whether the \emph{odd greedy} choice always reaches such an expansion.
+
+The problem page also records:
+\begin{itemize}
+\item Fibonacci (1202) proved termination for $A=\mathbb{N}$ (the classical greedy/Sylvester algorithm).
+\item Graham gave a necessary-and-sufficient condition for existence of an expansion with denominators in a fixed residue class $\bmod d$.
+\item Graham also gave a necessary-and-sufficient condition for existence of an expansion with distinct square denominators, namely $x\in [0,\pi^2/6-1)\cup [1,\pi^2/6)$.
+\end{itemize}
+The question here is about \emph{termination of the greedy algorithm} in these settings.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=*]
+\item \textbf{Invariant/obstruction search.} Identify arithmetic invariants (e.g. parity, $p$-adic valuations, congruence constraints) that any finite $A$-Egyptian expansion forces on $x$. Use them to rule out termination for certain $(x,A)$ and to separate ``existence of some expansion'' from ``greedy termination''.
+\item \textbf{Termination proofs for subclasses.} Prove termination for special families (e.g. $x=1/(2k+1)$, or bounded numerator, or specific congruence classes) by finding a monotone measure that decreases under the restricted greedy step.
+\item \textbf{Search for counterexamples (falsification).} For the square-denominator and odd-denominator greedy variants, attempt to find a rational $x$ satisfying the known existence criteria but for which the greedy algorithm provably loops or generates an infinite series.
+\item \textbf{Understand known ``long expansion'' phenomena.} For odd greedy expansions, huge denominators and long expansions occur (e.g. $3/179$). Try to extract a structural description of when the numerator sequence behaves regularly (consecutive integers), which may hint at non-termination mechanisms.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\subsubsection*{4.1. Classical case $A=\mathbb{N}$: termination proof (Fibonacci/Sylvester)}
+Let $x=a/b\in(0,1)$ in lowest terms. Set $n=\lceil b/a\rceil$ and define
+\[
+ x' = \frac{a}{b}-\frac1n = \frac{an-b}{bn}.
+\]
+Since $n-1< b/a\le n$, we have $a(n-1)<b\le an$, hence $0\le an-b < a$. If $an=b$ then $x'=0$ and we terminate. Otherwise, in lowest terms $x'=a'/b'$ has numerator $a'\le an-b < a$. Thus the numerator strictly decreases at each step, so termination occurs in at most $a$ steps.
+
+\subsubsection*{4.2. A necessary obstruction for $A$ odd}
+\begin{lemma}
+If $n_1,\dots,n_t$ are \emph{odd} positive integers then $\sum_{j=1}^t \frac1{n_j}$, when reduced to lowest terms, has odd denominator.
+\end{lemma}
+\begin{proof}
+Let $D=\prod_{j=1}^t n_j$ (odd). Then
+\[
+\sum_{j=1}^t \frac1{n_j}=\frac{\sum_{j=1}^t D/n_j}{D}.
+\]
+Any common divisor of numerator and denominator divides $D$, hence is odd, so the reduced denominator remains odd.
+\end{proof}
+\begin{corollary}
+If $x=a/b$ in lowest terms has $b$ even, then $x$ cannot be written as a finite sum of distinct unit fractions with odd denominators. In particular, the odd-denominator greedy algorithm cannot terminate on such $x$.
+\end{corollary}
+
+\subsubsection*{4.3. Small computational sanity check for odd greedy termination}
+Implementing the \emph{distinct-denominator} odd greedy algorithm (choose the least unused odd $n\ge 1/x$ each step), an exhaustive check over all reduced fractions $a/b\in(0,1)$ with odd $b\le 51$ found termination for every such fraction within at most $16$ steps. Some expansions have enormous final denominators even for modest $b$.
+
+\medskip
+\noindent\emph{Warning:} This is only evidence. There are known examples (e.g. $3/179$) where the odd greedy expansion has many terms and astronomically large denominators.
+
+\subsubsection*{4.4. Congruence classes and squares}
+The prompt cites existence theorems (Graham) for Egyptian fraction representations with denominators restricted to a residue class $\bmod d$, and for representations with distinct square denominators. In both cases the open-ended question is: \emph{does the associated restricted greedy algorithm always terminate whenever a representation exists?}
+
+A basic necessary condition for greedy termination is of course \emph{existence} of some expansion in the allowed denominator set; beyond that, there is no known general monotone quantity analogous to the numerator-decrease argument in \S4.1.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item The proof in \S4.1 is standard and fully explicit: the numerator decreases strictly.
+\item The parity obstruction in \S4.2 is immediate from using an odd common denominator.
+\item The computational check in \S4.3 was implemented with exact integer arithmetic and a ``no-repeated-denominators'' rule; it is exhaustive for odd denominators $\le 51$ but does not address larger denominators (where known blow-ups occur).
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[label=(\roman*),leftmargin=*]
+\item \textbf{Furthest point reached:} proved basic necessary obstructions (even denominators impossible for odd $A$), recalled/verified classical termination for $A=\mathbb{N}$, and performed a complete finite check for all reduced $a/b$ with odd $b\le 51$ showing termination in these cases.
+\item \textbf{Key gap:} no global invariant/monotone measure is found that forces termination (or yields a forced infinite trajectory) for $A=2\mathbb{N}-1$ with $b$ odd, nor for the congruence-class or square-denominator greedy variants.
+\item \textbf{Most promising next step:} search for an explicit non-terminating example by exploiting ``consecutive numerator'' phenomena (as in long odd greedy expansions), or develop a Lyapunov-type function controlling the growth of denominators for restricted greedy steps.
+\item \textbf{Explicit missing lemma that would close it:} either (a) a proof that every odd-denominator rational eventually reaches a unit fraction under the odd greedy update, or (b) an explicit $x$ with odd denominator for which the odd greedy remainder sequence never becomes $0$.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\noindent\textbf{COMPLETION: 20\%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

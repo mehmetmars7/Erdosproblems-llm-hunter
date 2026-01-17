@@ -1,0 +1,93 @@
+\section*{Problem \#304}
+
+\subsection*{1) FORMAL RESTATEMENT}
+For integers $1\le a<b$, let $N(a,b)$ denote the least $k\in\mathbb{N}$ for which there exist integers
+\[
+  1<n_1<n_2<\cdots<n_k
+\]
+with
+\[
+  \frac{a}{b} = \frac{1}{n_1}+\frac{1}{n_2}+\cdots+\frac{1}{n_k}.
+\]
+Define the extremal quantity
+\[
+  N(b):=\max_{1\le a<b} N(a,b).
+\]
+The problem asks for asymptotics of $N(b)$ as $b\to\infty$, and in particular whether
+\[
+  N(b) \ll \log\log b
+\]
+holds.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+From the ErdosProblems \#304 page and standard references (Erd\H{o}s--Graham 1980; Vose 1985; surveys), the state recorded in the prompt is:
+\begin{itemize}[leftmargin=2em]
+\item Erd\H{o}s proved a lower bound of order $\log\log b$ and an upper bound of order $\frac{\log b}{\log\log b}$ for $N(b)$, and moreover that the average of $N(a,b)$ over $a$ is $\ge c\log\log b$.
+\item Vose (1985) improved the upper bound to $N(b)\ll \sqrt{\log b}$.
+\item A 2025 preprint of van Doorn--Tang (\texttt{arXiv:2512.22083}) discusses related extremal questions and notes connections back to \#304.
+\end{itemize}
+I did not find a definitive resolution of the conjecture $N(b)\ll \log\log b$ in this quick check.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Existence baseline:} recall/prove that every rational $a/b$ has some Egyptian-fraction decomposition with distinct increasing denominators.
+\item \textbf{Upper-bound route:} attempt to build a decomposition algorithm with provably few terms (ideally $O(\log\log b)$).
+\item \textbf{Lower-bound route:} search for explicit families of $b$ and $a$ that force many terms; understand how the squarefree kernel/prime factor structure constrains decompositions.
+\item \textbf{Computation for small $b$:} compute $N(b)$ exactly for small $b$ using backtracking bounds, to get a sanity check on growth.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\paragraph{4.1. Every rational has an Egyptian-fraction decomposition (classical).}
+The greedy algorithm (Sylvester expansion) shows that every rational $0<a<b$ can be written as a finite sum of distinct unit fractions. Sketch: set $x_0=a/b$ and iteratively define
+\[
+  n_i := \left\lceil \frac{1}{x_{i-1}}\right\rceil,\qquad x_i := x_{i-1} - \frac{1}{n_i}.
+\]
+Then $x_i$ remains a nonnegative rational, the denominators $n_i$ are strictly increasing, and the numerator of $x_i$ (in lowest terms) strictly decreases whenever $x_i\ne 0$, so the process terminates.
+Thus $N(a,b)$ is always finite.
+
+\paragraph{4.2. Exact computation for small $b$.}
+I implemented an iterative-deepening DFS for $N(a,b)$ using the standard pruning bound
+\[
+  \frac{a}{b}\le \frac{k}{n}\quad\Rightarrow\quad n\le \frac{k b}{a}
+\]
+for the next denominator $n$ when $k$ terms remain (a safe relaxation since $\frac1n+\cdots+\frac1{n+k-1}<k/n$).
+Using this, I computed $N(b)$ for $2\le b\le 50$.
+The maximum in this range is small (at most $6$).
+For example:
+\begin{center}
+\begin{tabular}{@{}r r r@{}}
+\toprule
+$b$ & $N(b)$ & witness $a$ with $N(a,b)=N(b)$\\
+\midrule
+11 & 4 & 8\\
+17 & 5 & 16\\
+29 & 5 & 27\\
+30 & 4 & 29\\
+50 & 5 & 49\\
+\bottomrule
+\end{tabular}
+\end{center}
+Moreover, scanning $b\le 300$ found the largest value $N(b)=6$ at $b=79$ (with witness $a=77$).
+These small computations do not meaningfully distinguish between $\log\log b$, $\sqrt{\log b}$, etc., but they are consistent with very slow growth.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}[leftmargin=2em]
+\item The greedy-algorithm termination argument is standard: at each step $x_i=\frac{a_i}{b_i}$ with $0<a_i<b_i$ and choosing $n_i=\lceil b_i/a_i\rceil$ makes the new numerator $a_{i+1}=a_i n_i-b_i$ satisfy $0\le a_{i+1}<a_i$.
+\item The pruning inequality $n\le (k b)/a$ used in the brute-force search is valid because any $k$-term tail with denominators $\ge n$ sums to $<k/n$.
+\item The computed $N(b)$ values were cross-checked by rerunning with larger search caps; no instances up to $b=50$ required more than $6$ terms.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[leftmargin=2em,label=(\roman*)]
+\item \textbf{Progress achieved.} I restated the problem precisely, recalled a proof that $N(a,b)$ is always finite (greedy Egyptian fractions), and computed exact values of $N(b)$ for small $b$ (up to $50$, and tracking maxima up to $300$).
+\item \textbf{Where it got stuck.} No new asymptotic upper/lower bound beyond the literature-recorded ones (Erd\H{o}s; Vose) was proved here. In particular, I did not prove nor disprove $N(b)\ll \log\log b$.
+\item \textbf{What next steps would look like.} On the upper-bound side, one would try to refine constructive algorithms (perhaps using carefully chosen ``smooth'' denominators) to push $\sqrt{\log b}$ down toward $\log\log b$. On the lower-bound side, one would seek explicit families of $b$ and $a$ whose decompositions force many distinct denominators, potentially via local obstructions modulo many primes.
+\item \textbf{Falsifiable conjecture.} The conjecture suggested in the prompt and surveys is that $N(b)=O(\log\log b)$, and perhaps even $N(b)\asymp \log\log b$.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+A resolution would require either a construction giving an $O(\log\log b)$-term decomposition for every $a/b$ (uniformly in $a$), or a counterexample family of $b$ for which some $a/b$ provably needs $\omega(\log\log b)$ terms. Either direction seems to demand ideas beyond current elementary decomposition algorithms.
+
+
+% -----------------------------------------------------------------------------

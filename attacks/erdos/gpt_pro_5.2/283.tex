@@ -1,0 +1,86 @@
+\section*{Erd\H{o}s Problem \#283}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $p\in\mathbb{Z}[X]$ be a polynomial with \emph{positive leading coefficient}, and assume there is \emph{no} integer $d\ge 2$ such that $d\mid p(n)$ for every $n\ge 1$ (equivalently, $\gcd\{p(1),p(2),\dots\}=1$).
+
+The conjecture asks whether there exists $M$ (depending on $p$) such that for every integer $m\ge M$ one can find distinct integers
+\[
+1\le n_1<n_2<\cdots<n_k
+\]
+with
+\[
+1=\frac1{n_1}+\cdots+\frac1{n_k}
+\qquad\text{and}\qquad
+m=p(n_1)+\cdots+p(n_k).
+\]
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Known special cases and related results recorded in the prompt/context include:
+\begin{itemize}
+\item For $p(x)=x$ (so $m=\sum n_i$), Graham (1963) proved the conjecture: all sufficiently large $m$ work.
+\item Cassels (1960) showed that the stated hypothesis on $p$ implies every sufficiently large integer is a sum of \emph{distinct} values $p(n_i)$ (without the reciprocal-sum constraint).
+\item Alekseyev (2019) proved the conjecture for $p(x)=x^2$ for all $m>8542$.
+\item Recent work of van Doorn (2025) investigates quantitative bounds and proves the conjecture for many further linear/quadratic $p$.
+\end{itemize}
+The general case for arbitrary admissible $p$ is still listed as open.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}[label=\textbf{P\arabic*.},leftmargin=*]
+\item \textbf{Closure operations on Egyptian fractions.} Use identities like
+\[\frac1n=\frac1{n+1}+\frac1{n(n+1)}\]
+(to keep the reciprocal sum equal to $1$) to generate many different denominator sets, while tracking how $\sum p(n_i)$ changes.
+\item \textbf{Additive semigroup approach.} Try to show that from one base solution one can generate an additive semigroup of attainable $m$ whose gcd is $1$, hence contains all sufficiently large integers.
+\item \textbf{Use Cassels to hit the $p$-sum, then tune reciprocals.} First choose distinct $n_i$ so that $\sum p(n_i)=m$ (possible for large $m$ by Cassels), then adjust the set via splitting/merging operations that preserve the $p$-sum modulo small numbers while forcing the reciprocal sum to become exactly $1$.
+\item \textbf{Search for counterexample polynomials.} If false, the obstruction likely comes from subtle congruences tying $p(n)$ to available Egyptian-fraction denominator patterns.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\subsubsection*{4.1. The divisibility hypothesis is necessary}
+If there exists $d\ge 2$ dividing $p(n)$ for all $n\ge 1$, then any sum $\sum_i p(n_i)$ is divisible by $d$, so it cannot equal all sufficiently large integers. Thus the ``no such $d$'' condition is necessary.
+
+\subsubsection*{4.2. A provable weaker statement: infinitely many $m$ are representable (for any $p$ with positive leading term)}
+\begin{proposition}
+Let $p\in\mathbb{Z}[X]$ have positive leading coefficient. Then there exist infinitely many integers $m$ for which there are distinct $n_1<\cdots<n_k$ with
+\[1=\sum_{i=1}^k \frac1{n_i}\qquad\text{and}\qquad m=\sum_{i=1}^k p(n_i).\]
+Moreover, one can ensure all $p(n_i)>0$ and hence $m>0$.
+\end{proposition}
+\begin{proof}
+Fix the identity
+\[\frac1n=\frac1{n+1}+\frac1{n(n+1)}\qquad(n\ge 2),\]
+which preserves the reciprocal sum.
+
+Since $p$ has positive leading coefficient, there exists $N$ such that $p(n)>0$ for all $n\ge N$. Starting from any Egyptian fraction for $1$ (e.g. $1=\frac12+\frac13+\frac16$) and repeatedly applying the above splitting operation to the \emph{largest} denominator, we can obtain an Egyptian fraction representation
+\[1=\sum_{i=1}^k \frac1{n_i}\]
+with all denominators $n_i\ge N$ (and still distinct, because splitting the current largest $n$ replaces it by $n+1$ and $n(n+1)$, both larger than all previous denominators).
+For this representation, set $m_0=\sum_{i=1}^k p(n_i)$, which is a positive integer.
+
+Now iterate: at each stage, split the current largest denominator $n$ into $n+1$ and $n(n+1)$. This keeps $\sum 1/n_i=1$, preserves distinctness, and changes the $p$-sum by
+\[\Delta(n)=p(n+1)+p(n(n+1))-p(n).\]
+For $n\ge N$, all terms are positive, so $\Delta(n)>0$ and the resulting $m$ strictly increases. Hence we obtain infinitely many distinct $m$.
+\end{proof}
+
+\subsubsection*{4.3. Why this does not yet solve the conjecture}
+The above produces an infinite set of attainable $m$ but does not show it is cofinite. To reach ``all sufficiently large $m$'', one would need a mechanism to adjust $m$ by controlled small increments while keeping $\sum 1/n_i=1$ and denominators distinct.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}
+\item The splitting identity is exact.
+\item Distinctness under ``split the current maximum denominator'' is immediate because both new denominators exceed the previous maximum.
+\item Positivity of $p(n)$ for large $n$ follows from positive leading coefficient.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[label=(\roman*),leftmargin=*]
+\item \textbf{Furthest point reached:} proved a weaker theorem (infinitely many representable $m$) by a clean closure operation on Egyptian fractions; verified necessity of the ``no common divisor'' condition.
+\item \textbf{Key gap:} no argument was found that the attainable set of $m$ is eventually all integers (cofinite), for a general admissible polynomial $p$.
+\item \textbf{Most promising next step:} develop a finite set of ``local moves'' on Egyptian fraction representations that change $\sum p(n_i)$ by $\pm 1$ (or generate an additive semigroup of increments with gcd $1$), while preserving $\sum 1/n_i=1$.
+\item \textbf{Explicit missing lemma that would close it:} existence of a bounded ``adjustment gadget''---a finite identity
+\[\sum_{j=1}^r \frac1{a_j}=\sum_{j=1}^s \frac1{b_j}=\text{(same rational)}\]
+with all $a_j,b_j$ distinct, such that $\sum p(a_j)-\sum p(b_j)=1$.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\noindent\textbf{COMPLETION: 25\%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

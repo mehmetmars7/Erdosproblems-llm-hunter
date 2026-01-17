@@ -1,0 +1,223 @@
+\section*{Problem 272}
+
+\subsection*{Problem statement (as given)}
+Let $N\ge 1$ be an integer.  Let $A_1,\ldots,A_t\subset \{1,\ldots,N\}$ such that $A_i\cap A_j$ ($i<j$) is a non-empty arithmetic progression.
+What is the largest possible $t$?
+
+% Source for statement/status and known results: citeturn1view2turn23view0turn15view0
+
+\subsection*{1. Formal restatement}
+
+Let $[N]:=\{1,2,\dots,N\}$.  Call a finite set $P\subset\mathbb{Z}$ an \emph{arithmetic progression} (AP) if there exist integers $a$ and $d\ge 0$ and an integer $\ell\ge 0$ such that
+\[
+P=\{a,a+d,a+2d,\dots,a+\ell d\}.
+\]
+(So singletons and 2-element sets count as APs.)
+
+Define $t(N)$ to be the maximum integer $t$ for which there exists a family $\mathcal{A}=\{A_1,\dots,A_t\}$ of \emph{distinct} subsets of $[N]$ such that for every $1\le i<j\le t$,
+\[
+A_i\cap A_j \neq \emptyset
+\quad\text{and}\quad
+A_i\cap A_j \text{ is an arithmetic progression.}
+\]
+Question: determine $t(N)$ exactly (or as sharply as possible).
+
+\subsection*{2. Quick literature/context check}
+
+Known asymptotics: Erd\H{o}s and F\"uredi proved that $t(N)\le \frac{N^2}{2}+o(N^2)$, so the correct leading term is $N^2/2$. % citeturn23view0
+
+Szab\'o later improved the error term, showing
+\[
+t(N)\le \frac{N^2}{2}+O\!\left(N^{5/3}\log^3 N\right)
+\]
+and also provided improved lower-bound constructions. % citeturn15view0turn23view0
+
+The discussion thread lists exact values for $3\le N\le 9$:
+\[
+t(3)=4,\ t(4)=7,\ t(5)=12,\ t(6)=17,\ t(7)=23,\ t(8)=30,\ t(9)=39.
+\]
+% citeturn23view0
+
+\subsection*{3. Attack plan}
+
+\begin{enumerate}[label=\textbf{(\alph*)},itemsep=2pt]
+\item \textbf{Baseline construction:} verify the easy lower bound $t(N)\ge \binom{N}{2}+1$.
+\item \textbf{Reproduce Szab\'o's stronger construction:} build an explicit family with size $\binom{N}{2}+\lfloor (N-1)/4\rfloor +1$ and check the intersection condition carefully.
+\item \textbf{Compute small $N$} by brute force (maximum clique search) to confirm the first few exact values and compare to the constructions.
+\end{enumerate}
+
+\subsection*{4. Work}
+
+\subsubsection*{4.1 The classical lower bound $t(N)\ge \binom{N}{2}+1$ (complete)}
+
+Fix an element $c\in[N]$ (say $c=1$) and let $\mathcal{F}$ be the family of all subsets $A\subset [N]$ such that $c\in A$ and $|A|\le 3$.
+Then any two distinct $A,B\in\mathcal{F}$ satisfy:
+\begin{itemize}[itemsep=2pt]
+\item $A\cap B\neq\emptyset$ because both contain $c$;
+\item $|A\cap B|\le 2$ because $A,B$ are distinct and have size $\le 3$,
+so $A\cap B$ is an arithmetic progression (any 1- or 2-element set is an AP).
+\end{itemize}
+Hence $\mathcal{F}$ is admissible and
+\[
+|\mathcal{F}| = \binom{N-1}{0}+\binom{N-1}{1}+\binom{N-1}{2}
+=1+(N-1)+\frac{(N-1)(N-2)}{2}
+=\binom{N}{2}+1.
+\]
+Therefore $t(N)\ge \binom{N}{2}+1$.
+
+\subsubsection*{4.2 A stronger Szab\'o-type lower bound (complete)}
+
+We now prove the lower bound
+\[
+t(N)\ \ge\ \binom{N}{2}+\left\lfloor\frac{N-1}{4}\right\rfloor +1
+\]
+via an explicit construction described by Szab\'o. % citeturn29view1
+
+\begin{lemma}[Intersection of two finite APs is a finite AP]\label{lem:APinter}
+Let $P,Q\subset\mathbb{Z}$ be finite arithmetic progressions.  Then $P\cap Q$ is either empty or a finite arithmetic progression.
+\end{lemma}
+
+\begin{proof}
+Write
+\[
+P=\{a+id:0\le i\le m\},\qquad Q=\{b+je:0\le j\le n\},
+\]
+with $d,e\ge 0$.  If $d=0$ or $e=0$ then one progression is a singleton and the claim is immediate.
+
+Assume $d,e\ge 1$.  Consider the infinite progressions
+\[
+P_\infty:=\{a+id:i\in\mathbb{Z}\},\qquad Q_\infty:=\{b+je:j\in\mathbb{Z}\}.
+\]
+Their intersection is the set of integer solutions to the congruences
+\[
+x\equiv a \pmod d,\qquad x\equiv b \pmod e.
+\]
+This is either empty, or (by the Chinese Remainder Theorem for possibly non-coprime moduli) is a full residue class modulo $\operatorname{lcm}(d,e)$, i.e.\ an infinite arithmetic progression with difference $\operatorname{lcm}(d,e)$.
+
+Finally, $P\cap Q = (P_\infty\cap Q_\infty)\cap [\min P,\max P]\cap[\min Q,\max Q]$, i.e.\ it is the intersection of an (infinite) arithmetic progression with an interval of integers.  This yields either $\emptyset$ or a consecutive block of terms of that infinite progression, hence a finite arithmetic progression.
+\end{proof}
+
+\begin{theorem}[Szab\'o construction gives $\binom{N}{2}+\lfloor (N-1)/4\rfloor +1$]\label{thm:szaboLB}
+Let $N\ge 1$ and $c=\lceil N/2\rceil$.
+There exists a family $\mathcal{C}$ of subsets of $[N]$ satisfying the pairwise-intersection condition, with
+\[
+|\mathcal{C}|=\binom{N}{2}+\left\lfloor\frac{N-1}{4}\right\rfloor +1.
+\]
+\end{theorem}
+
+\begin{proof}
+Let $m:=\left\lfloor\frac{N-1}{4}\right\rfloor$.
+
+\textbf{Step 1: start with the baseline family.}
+Let
+\[
+\mathcal{C}_1:=\{A\subset[N]: c\in A,\ |A|\le 3\}.
+\]
+As in \S4.1, $\mathcal{C}_1$ is admissible and $|\mathcal{C}_1|=\binom{N}{2}+1$.
+
+\textbf{Step 2: add AP-type sets and remove two ``bad'' triples for each $x$.}
+For each integer $x$ with $1\le x\le m$, define three arithmetic progressions:
+\begin{align*}
+B_x &:= \{c-2x,\ c-x,\ c,\ c+x\},\\
+C_x &:= \{c-x,\ c,\ c+x,\ c+2x\},\\
+A_x &:= \{c-2x,\ c-x,\ c,\ c+x,\ c+2x\}.
+\end{align*}
+Because $x\le (N-1)/4$ and $c=\lceil N/2\rceil$, we have $1\le c-2x$ and $c+2x\le N$, so $A_x,B_x,C_x\subset [N]$.
+
+Now set
+\[
+\mathcal{C}:=\Bigl(\mathcal{C}_1 \cup \{A_x,B_x,C_x:1\le x\le m\}\Bigr)\setminus \mathcal{D},
+\]
+where $\mathcal{D}$ is the set of the following $2m$ triples removed:
+\[
+\mathcal{D}:=\bigl\{\{c-2x,c,c+x\},\ \{c-x,c,c+2x\}: 1\le x\le m\bigr\}.
+\]
+Each removed set belongs to $\mathcal{C}_1$ (it contains $c$ and has size 3).
+
+\textbf{Step 3: count the size.}
+We add $3m$ new sets and remove $2m$ sets, so
+\[
+|\mathcal{C}| = |\mathcal{C}_1| + 3m - 2m = \left(\binom{N}{2}+1\right)+m.
+\]
+
+\textbf{Step 4: verify the intersection property.}
+First note that every set in $\mathcal{C}$ contains $c$ (true for $\mathcal{C}_1$, for $A_x,B_x,C_x$, and for the removed sets as well), so every pairwise intersection in $\mathcal{C}$ is automatically non-empty.
+
+We must show that for any distinct $X,Y\in\mathcal{C}$, the intersection $X\cap Y$ is an arithmetic progression.
+
+\emph{Case I: $X,Y\in\mathcal{C}_1\setminus \mathcal{D}$.}
+Then $|X|\le 3$ and $|Y|\le 3$.  If $X\ne Y$, then $|X\cap Y|\le 2$, hence $X\cap Y$ is an AP.
+
+\emph{Case II: one set is from $\mathcal{C}_1\setminus\mathcal{D}$ and the other is one of $A_x,B_x,C_x$.}
+Let $Y$ be one of $A_x,B_x,C_x$ and let $X\in\mathcal{C}_1\setminus\mathcal{D}$.
+Since $|X|\le 3$, the intersection $X\cap Y$ has size $1,2,$ or $3$.
+If $|X\cap Y|\le 2$, it is an AP.
+
+If $|X\cap Y|=3$, then necessarily $X\subseteq Y$ (because $|X|=3$ and $X$ contains $c$).
+So $X$ is a 3-element subset of $Y$ containing $c$.
+We check that the only 3-element subsets of $Y$ containing $c$ that are \emph{not} arithmetic progressions are exactly the ones removed in $\mathcal{D}$.
+
+\begin{itemize}[itemsep=2pt]
+\item If $Y=B_x=\{c-2x,c-x,c,c+x\}$, the 3-subsets containing $c$ are
+$\{c-2x,c-x,c\}$ (an AP), $\{c-x,c,c+x\}$ (an AP), and $\{c-2x,c,c+x\}$ (not an AP).  The non-AP triple is removed.
+\item If $Y=C_x=\{c-x,c,c+x,c+2x\}$, the 3-subsets containing $c$ are
+$\{c-x,c,c+x\}$ (AP), $\{c,c+x,c+2x\}$ (AP), and $\{c-x,c,c+2x\}$ (not AP).  The non-AP triple is removed.
+\item If $Y=A_x=\{c-2x,c-x,c,c+x,c+2x\}$, the only non-AP 3-subsets containing $c$ are
+$\{c-2x,c,c+x\}$ and $\{c-x,c,c+2x\}$ (check by direct spacing).  Both are removed.
+\end{itemize}
+Therefore $X\cap Y=X$ is an AP in the 3-element case as well.
+
+\emph{Case III: both $X$ and $Y$ are among the added AP-type sets $\{A_x,B_x,C_x\}$.}
+Each such set is itself an arithmetic progression.  By Lemma~\ref{lem:APinter}, the intersection of two arithmetic progressions is an arithmetic progression (or empty).  It is non-empty because both contain $c$.  Hence $X\cap Y$ is an AP.
+
+All cases are covered; thus $\mathcal{C}$ is admissible.
+\end{proof}
+
+\subsubsection*{4.3 Small $N$ computation (sanity check)}
+
+A brute-force maximum-clique search over all nonempty subsets of $[N]$ (for $N\le 7$) gives:
+\[
+t(1)=1,\ t(2)=2,\ t(3)=4,\ t(4)=7,\ t(5)=12,\ t(6)=17,\ t(7)=23.
+\]
+These agree with the values quoted in the project discussion for $3\le N\le 7$ and match the lower bound in Theorem~\ref{thm:szaboLB} for $N=5,6,7$.
+
+\subsection*{5. Verification}
+
+\begin{itemize}[itemsep=2pt]
+\item The only delicate point in Theorem~\ref{thm:szaboLB} is Case II, where a 3-element ``small'' set intersects a larger AP-type set in 3 points; removing precisely the two non-AP triples per $x$ fixes this.
+\item Lemma~\ref{lem:APinter} is a standard CRT/interval argument and ensures Case III.
+\item The construction is consistent with the small-$N$ exact computations and the discussion thread values. % citeturn23view0
+\end{itemize}
+
+\subsection*{6. Final}
+
+\textbf{UNRESOLVED.}
+
+\begin{enumerate}[label=\textbf{(\roman*)},itemsep=4pt]
+\item \textbf{Farthest-reaching partial results proved here.}
+\begin{itemize}[itemsep=2pt]
+\item The classical lower bound $t(N)\ge \binom{N}{2}+1$ (complete proof).
+\item Szab\'o's stronger lower bound $t(N)\ge \binom{N}{2}+\lfloor (N-1)/4\rfloor +1$ via an explicit family $\mathcal{C}$ (Theorem~\ref{thm:szaboLB}).
+\item Exact values for $t(N)$ for $N\le 7$ by computation (supporting evidence, not a proof for general $N$).
+\end{itemize}
+
+\item \textbf{Precise obstacle.}
+We do not have an exact characterization of the optimal families, nor a matching upper bound with the correct lower-order term.  The known best upper bounds are asymptotic ($N^2/2+o(N^2)$ and refinements) and do not determine the exact maximum $t(N)$.
+
+\item \textbf{Most promising next steps.}
+\begin{itemize}[itemsep=2pt]
+\item Strengthen stability/structure theorems around near-extremal families: show that any family of size $(1/2-o(1))N^2$ must resemble a ``centered'' construction.
+\item Improve the upper-bound error term and, ideally, determine the sharp second-order term (linear in $N$) if it exists.
+\item Push exact computation to larger $N$ (via ILP/sat or improved clique algorithms) to conjecture the exact formula for all $N$.
+\end{itemize}
+
+\item \textbf{Belief about truth value.}
+Given the match of the Szab\'o lower bound with the computed optimum for $N\le 9$ (as reported in the project discussion), it is plausible that $\binom{N}{2}+\lfloor (N-1)/4\rfloor +1$ is close to optimal and may even be exact for all sufficiently large $N$, but a proof (or a counterexample construction beating it) is not currently in hand.
+\end{enumerate}
+
+\subsection*{7. Completion estimate}
+\[
+\textbf{45\%}
+\]
+(I proved strong lower bounds and verified small cases, but the exact extremal value remains open.)
+

@@ -1,0 +1,97 @@
+\section*{Problem 620}
+
+\subsection*{FORMAL RESTATEMENT}
+
+For a graph $G=(V,E)$ and $W\subseteq V$, let $G[W]$ denote the induced subgraph.
+Define
+\[
+ f(n)\ :=\ \min\Bigl\{\ \max\bigl\{|W|:\ W\subseteq V(G),\ \text{$G[W]$ is triangle-free}\bigr\}:\ |V(G)|=n,\ \text{$G$ is $K_4$-free}\ \Bigr\}.
+\]
+Equivalently, $f(n)$ is the largest integer $m$ such that every $n$-vertex $K_4$-free graph contains an induced triangle-free subgraph on at least $m$ vertices.
+The problem asks to determine the order of growth of $f(n)$.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+
+The prompt states that $f(n)=n^{1/2+o(1)}$ is known and records the best bounds (up to polylogarithmic factors):
+\[
+ \Omega\!\left(\frac{\sqrt{n\log n}}{\log\log n}\right)\ \le\ f(n)\ \le\ O\!\left(\sqrt{n}\,\log n\right).
+\]
+Earlier work gave weaker polylogarithmic factors in the upper bound (e.g. $\sqrt{n}(\log n)^{120}$), later improved to $O(\sqrt{n}\log n)$.
+The ErdosProblems page lists the problem as open in the sense that the precise polylogarithmic factors (and constant-order behavior) are not settled.
+
+\subsection*{ATTACK PLAN}
+
+A robust baseline is to prove the ``$\sqrt n$'' lower bound directly.
+The key structural fact in $K_4$-free graphs is that \emph{neighborhoods are triangle-free}: if $v\in V(G)$, then $G[N(v)]$ contains no triangle (else together with $v$ it would form a $K_4$).
+Thus either there is a vertex of large degree (yielding a large triangle-free induced neighborhood), or all degrees are small, in which case a greedy bound produces a large independent set (which is triangle-free).
+
+\subsection*{WORK}
+
+\begin{theorem}[Elementary lower bound]
+\label{thm:sqrtn}
+Every $K_4$-free graph on $n$ vertices contains an induced triangle-free subgraph on at least $\lfloor\sqrt{n}\rfloor$ vertices. Consequently,
+\[
+ f(n)\ge \lfloor\sqrt{n}\rfloor.
+\]
+\end{theorem}
+
+\begin{proof}
+Let $G$ be a $K_4$-free graph on $n$ vertices and set $s:=\lfloor\sqrt{n}\rfloor$.
+Write $\Delta$ for its maximum degree.
+
+\emph{Case 1: $\Delta\ge s$.}
+Choose a vertex $v$ with $\deg(v)=\Delta$.
+Claim: the induced subgraph $G[N(v)]$ is triangle-free.
+Indeed, if $x,y,z\in N(v)$ form a triangle in $G$, then $\{v,x,y,z\}$ spans a $K_4$, contradicting that $G$ is $K_4$-free.
+Therefore $G[N(v)]$ is an induced triangle-free subgraph on $|N(v)|=\Delta\ge s$ vertices.
+
+\emph{Case 2: $\Delta\le s-1$.}
+A standard greedy bound gives an independent set of size at least $\frac{n}{\Delta+1}$: repeatedly choose a vertex, put it in the independent set, and delete it together with its neighbors; each chosen vertex removes at most $\Delta+1$ vertices.
+Thus
+\[
+\alpha(G)\ \ge\ \frac{n}{\Delta+1}\ \ge\ \frac{n}{s}.
+\]
+Since $s=\lfloor\sqrt{n}\rfloor$ implies $s^2\le n$, we have $n/s\ge s$, and so $\alpha(G)\ge s$.
+An independent set induces an edgeless (hence triangle-free) subgraph, so this yields an induced triangle-free subgraph on at least $s$ vertices.
+
+In both cases, $G$ contains an induced triangle-free subgraph on at least $s=\lfloor\sqrt{n}\rfloor$ vertices.
+Since $G$ was arbitrary $K_4$-free, the minimum over such $G$ satisfies $f(n)\ge \lfloor\sqrt{n}\rfloor$.
+\end{proof}
+
+\paragraph{Remarks toward the stated best-known bounds.}
+The proof above explains the ``$\sqrt n$'' phenomenon: it is essentially forced by the dichotomy ``large degree gives large triangle-free neighborhood'' vs ``bounded degree gives large independent set.''
+Improving the lower bound by the factor $\sqrt{\log n}/\log\log n$ and constructing $K_4$-free graphs with no induced triangle-free subgraph larger than $O(\sqrt{n}\log n)$ requires substantially deeper probabilistic and Ramsey-theoretic tools (e.g. the triangle-free process, dependent random choice, and container-type arguments), beyond what is reproduced here.
+
+\subsection*{VERIFICATION}
+
+\begin{itemize}[leftmargin=2.2em]
+\item The neighborhood-triangle argument is correct: a triangle inside $N(v)$ would create a $K_4$ with $v$.
+\item The greedy independent-set bound $\alpha(G)\ge n/(\Delta+1)$ is standard and holds for all finite graphs.
+\item The two cases cover all graphs and produce an induced triangle-free subgraph either as a neighborhood subgraph or as an independent set.
+\end{itemize}
+
+\subsection*{FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.5em]
+\item \textbf{Where and why the attempt fails.}
+The problem asks for the true asymptotic order (including the correct polylogarithmic factor) of $f(n)$. The elementary argument here only proves the baseline $f(n)\ge \lfloor\sqrt n\rfloor$.
+Closing the gap between the best known lower bound $\Omega(\sqrt{n\log n}/\log\log n)$ and the best known upper bound $O(\sqrt n\log n)$ appears to require sophisticated probabilistic constructions and/or new structural ideas about $K_4$-free graphs and induced triangle-free subgraphs.
+
+\item \textbf{Strongest partial result proved here.}
+A complete proof that $f(n)\ge \lfloor\sqrt n\rfloor$ (Theorem~\ref{thm:sqrtn}).
+
+\item \textbf{Most plausible next ideas.}
+To improve the lower bound, one needs a stronger dichotomy than ``large degree vs greedy independent set,'' likely using information about triangle structure in $K_4$-free graphs and refined bounds on large triangle-free induced subgraphs (e.g. Shearer-type entropy methods).
+To improve the upper bound, one needs an explicit or probabilistic construction of $K_4$-free graphs in which every induced subgraph on $m$ vertices contains a triangle for $m$ as large as possible (currently $m$ about $\sqrt n\log n$).
+
+\item \textbf{Small cases / computations.}
+For small $n$, $f(n)$ can in principle be computed by brute force over $K_4$-free graphs, but this grows rapidly.
+Theorem~\ref{thm:sqrtn} is consistent with the small-$n$ regime and provides a universally valid baseline.
+\end{enumerate}
+
+\subsection*{COMPLETION ESTIMATE}
+
+COMPLETION ESTIMATE: 45\%.
+

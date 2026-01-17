@@ -1,0 +1,136 @@
+\section*{Erd\H{o}s Problem \#312}
+
+\subsection*{FORMAL RESTATEMENT}
+Let $A$ be a finite multiset of (typically positive) integers, and write
+\[
+R(A):=\sum_{n\in A}\frac1n.
+\]
+For a submultiset $S\subseteq A$ write $R(S)=\sum_{n\in S}1/n$. Define the ``gap below $1$'' as
+\[
+\varepsilon(A):=\min\{\,1-R(S):\ S\subseteq A,\ R(S)\le 1\,\}.
+\]
+(Thus $0\le \varepsilon(A)\le 1$, and $\varepsilon(A)=0$ iff some submultiset sums to $1$ exactly.)
+
+The question asks whether there exists an absolute constant $c>0$ such that for all $K>1$,
+whenever $A$ is a sufficiently large finite multiset with $R(A)>K$, one has
+\[
+\varepsilon(A)\le e^{-cK},
+\]
+equivalently: there exists $S\subseteq A$ with
+\[
+1-e^{-cK}<R(S)\le 1.
+\]
+
+\textbf{Stress points / ambiguity checks.}
+\begin{itemize}
+\item If $1\in A$ then $\varepsilon(A)=0$ trivially by taking $S=\{1\}$; the interesting regime is $A\subseteq\{2,3,4,\dots\}$.
+\item The phrase ``sufficiently large'' is ambiguous in isolation (large cardinality? large elements?); I interpret it in the standard way: there exists $N_0(K)$ such that the conclusion holds whenever $|A|\ge N_0(K)$ and $R(A)>K$.
+\item The problem is quantitative: Erd\H{o}s--Graham reportedly knew a weaker bound with $e^{-cK}$ replaced by $c/K^2$.
+\end{itemize}
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+A quick web check indicates the problem is currently listed as open; the discussion notes the
+known weaker bound $\varepsilon(A)\ll 1/K^2$ (Erd\H{o}s--Graham) and provides an example multiset
+built from primes which avoids subset sums equal to $1$. (See sources cited in the accompanying chat message.)
+
+\subsection*{ATTACK PLAN}
+\begin{enumerate}
+\item Prove at least one robust construction illustrating obstructions (no exact subset sum $1$),
+and quantify the minimum possible gap in that construction.
+\item Examine whether generic ``pigeonhole/density of subset sums'' heuristics could yield an exponential gap $e^{-cK}$, and identify where positivity/submultiset constraints block a direct argument.
+\end{enumerate}
+
+\subsection*{WORK}
+\textbf{A modular obstruction construction (from the discussion thread).}
+Fix $N\ge 2$ and define a multiset
+\[
+A_N:=\bigsqcup_{p\le N}\{\underbrace{p,p,\dots,p}_{p-1\text{ copies}}\},
+\]
+i.e.\ for every prime $p\le N$, include $p$ with multiplicity $p-1$.
+
+\medskip
+\textbf{Lemma 1.} No submultiset $S\subseteq A_N$ satisfies $R(S)=1$.
+
+\emph{Proof.}
+Let $S\subseteq A_N$ be any submultiset. For each prime $p\le N$, let $a_p\in\{0,1,\dots,p-1\}$ be
+the number of times $p$ appears in $S$. Then
+\[
+R(S)=\sum_{p\le N}\frac{a_p}{p}.
+\]
+Let $L:=\prod_{p\le N} p$ (the primorial $N^\#$). Multiply the equation $R(S)=1$ by $L$ to get
+\[
+\sum_{p\le N} a_p\frac{L}{p} = L.
+\]
+Now fix a prime $r\le N$ and reduce this congruence modulo $r$.
+For $p\neq r$, the term $(L/p)$ is divisible by $r$, so it vanishes mod $r$.
+Thus the congruence becomes
+\[
+a_r\frac{L}{r}\equiv L \equiv 0 \pmod r.
+\]
+But $r\nmid (L/r)$, so $(L/r)$ is invertible modulo $r$, forcing $a_r\equiv 0\pmod r$.
+Since $0\le a_r\le r-1$, this implies $a_r=0$.
+As this holds for every prime $r\le N$, all $a_p=0$, hence $R(S)=0\neq 1$.
+\qed
+
+\medskip
+\textbf{Lemma 2 (Gap lower bound for $A_N$).}
+For $A_N$ as above,
+\[
+\varepsilon(A_N)\ge \frac{1}{N^\#}=\frac{1}{\prod_{p\le N}p}.
+\]
+
+\emph{Proof.}
+Every submultiset sum $R(S)=\sum_{p\le N} a_p/p$ is a rational with denominator dividing $N^\#$
+(after clearing denominators by $N^\#$). Therefore the set
+\[
+\{\,R(S): S\subseteq A_N\,\}
+\]
+lies in $(1/N^\#)\mathbb Z$. In particular, among values $\le 1$, the distance to $1$ is an integer
+multiple of $1/N^\#$. By Lemma 1 the distance is never $0$, so it is at least $1/N^\#$.
+This is exactly $\varepsilon(A_N)\ge 1/N^\#$. \qed
+
+\medskip
+\textbf{Size of $R(A_N)$.}
+We have
+\[
+R(A_N)=\sum_{p\le N}\frac{p-1}{p}=\sum_{p\le N}\left(1-\frac1p\right)
+= \pi(N)-\sum_{p\le N}\frac1p,
+\]
+so in particular $R(A_N)\ge \pi(N)-\sum_{p\le N}1/2 = \pi(N)-\pi(N)/2 = \pi(N)/2$,
+and in fact $R(A_N)\sim \pi(N)$ as $N\to\infty$.
+
+Thus this construction produces families with $R(A_N)$ growing like $\pi(N)$ while guaranteeing
+$\varepsilon(A_N)\ge 1/N^\#$, i.e.\ the gap can be \emph{as small as} $\exp(-(1+o(1))N)$.
+
+\subsection*{VERIFICATION (adversarial proof check; stress-test edge cases)}
+\begin{itemize}
+\item Lemma 1: The congruence reduction is valid because $L$ is divisible by every prime $\le N$,
+and for $p\neq r$, $L/p$ retains the factor $r$.
+The key invertibility of $L/r$ mod $r$ holds since $r\nmid (L/r)$.
+\item Lemma 2: The denominator argument uses that $R(S)$ has denominator dividing $N^\#$.
+This is true because $R(S)$ is a $\mathbb Z$-linear combination of $\{1/p\}_{p\le N}$.
+\item Edge case $N=2$: Then $A_2$ contains one copy of $2$; Lemma 1 says no subset sums to $1$, true.
+Lemma 2 gives $\varepsilon(A_2)\ge 1/2$, and indeed the best $R(S)\le 1$ is $1/2$.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+
+\begin{itemize}
+\item \textbf{What is proved here.} A clean obstruction family $A_N$ with no exact subset sum $1$,
+together with the rigorous lower bound $\varepsilon(A_N)\ge 1/N^\#$.
+\item \textbf{Key obstacle.} This does not decide whether \emph{every} multiset with $R(A)>K$ admits
+a submultiset sum in $(1-e^{-cK},1]$ for some absolute $c$; no proof of the desired exponential bound
+(or counterexample disproving it) is given.
+\item \textbf{Most promising next step.} Either:
+(i) attempt to prove a general exponential upper bound for $\varepsilon(A)$ by controlling the density
+of achievable submultiset sums near $1$; or
+(ii) search for constructions where $\varepsilon(A)$ is provably bounded below by a polynomial in $1/K$,
+which would refute the exponential claim.
+\item \textbf{Deliverables if continuing.} A complete proof of $\varepsilon(A)\le e^{-cR(A)}$ for some $c>0$,
+or an explicit family $A^{(K)}$ with $R(A^{(K)})\ge K$ but $\varepsilon(A^{(K)})\gg e^{-cK}$ for every $c$.
+\end{itemize}
+
+\subsection*{COMPLETION ESTIMATE}
+COMPLETION: 55\%
+

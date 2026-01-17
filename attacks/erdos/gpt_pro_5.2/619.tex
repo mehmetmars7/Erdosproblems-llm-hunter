@@ -1,0 +1,123 @@
+\section*{Problem 619}
+
+\subsection*{FORMAL RESTATEMENT}
+
+Let $G=(V,E)$ be a finite simple graph. For an integer $r\ge 2$, define $h_r(G)$ as follows (for triangle-free $G$):
+\[
+ h_r(G)\ :=\ \min\bigl\{|F|:\ F\subseteq \binom{V}{2}\setminus E,\ \text{$G+F$ is triangle-free and has diameter at most $r$}\bigr\}.
+\]
+(Here $G+F$ denotes the graph on the same vertex set with edge set $E\cup F$.)
+
+The question in the prompt (Erd\H{o}s--Gy\'arf\'as--Ruszink\'o, 1998) asks whether there exists an absolute constant $c>0$ such that
+\[
+\forall\ \text{connected triangle-free graphs $G$ on $n$ vertices},\qquad h_4(G)\ <\ (1-c)n.
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+
+Erd\H{o}s--Gy\'arf\'as--Ruszink\'o (1998) prove that for every connected triangle-free $n$-vertex graph,
+\[
+ h_3(G)\le n-1,
+\]
+and they also prove that
+\[
+ h_5(G)\le \frac{n-1}{2}.
+\]
+They explicitly pose the diameter-$4$ question as an open problem (their Problem~4.3): whether the $n-1$ bound can be improved by a positive fraction.
+They remark that without the triangle-free restriction, diameter-$4$ can be achieved by adding at most $n/2$ edges (and this is best possible), referring to work of Chung and Garey.
+
+\subsection*{ATTACK PLAN}
+
+The goal is to force diameter $\le 4$ while avoiding creation of triangles.
+A natural sufficient condition is to make the augmented graph have \emph{radius $\le 2$}: if there is a vertex $x$ at distance at most 2 from every vertex, then diameter is at most 4.
+However, in a triangle-free graph we may only add an edge $uv$ if $u$ and $v$ have no common neighbor (otherwise we would create a triangle).
+
+Approaches:
+\begin{enumerate}[label=(\arabic*),leftmargin=2.5em]
+\item Prove the statement for special classes, e.g. bipartite graphs (where any added edge across a bipartition preserves triangle-freeness).
+\item Try to extend the matching-based construction of Erd\H{o}s--Gy\'arf\'as--Ruszink\'o that gives diameter $\le 4$ with $n-\nu(G)$ added edges (where $\nu(G)$ is matching number), and find a complementary construction using $O(\nu(G))$ edges that also yields diameter $\le 4$.
+\item Explore whether odd cycles force an obstruction (since triangle-free graphs may have large chromatic number). Possibly reduce to controlling a large bipartite ``core'' plus a small exceptional set.
+\end{enumerate}
+
+\subsection*{WORK}
+
+\paragraph{A complete positive result for connected bipartite graphs.}
+Let $G=(V,E)$ be connected and bipartite with bipartition $V=A\sqcup B$.
+Assume without loss that $|A|\le |B|$.
+Pick any vertex $a\in A$.
+Let
+\[
+F\ :=\ \{\{a,b\}:\ b\in B\ \text{and}\ \{a,b\}\notin E\}.
+\]
+That is, we add all missing edges from $a$ to the opposite side $B$.
+
+\begin{claim}
+The augmented graph $H:=G+F$ is triangle-free and has diameter at most $4$.
+\end{claim}
+\begin{proof}
+\emph{Triangle-free:}
+$H$ is still bipartite with the same bipartition $A\sqcup B$, since all added edges go from $a\in A$ to $B$.
+Any bipartite graph is triangle-free.
+
+\emph{Diameter $\le 4$:}
+We show that every vertex is within distance $\le 2$ of $a$ in $H$.
+If $v\in B$, then $av\in E(H)$ by construction, so $\mathrm{dist}_H(a,v)=1$.
+If $v\in A$, then since $G$ is connected, $v$ has a neighbor $b\in B$ in $G$ (hence also in $H$). Then $\mathrm{dist}_H(a,v)\le \mathrm{dist}_H(a,b)+\mathrm{dist}_H(b,v)=1+1=2$.
+Thus the eccentricity of $a$ in $H$ is at most $2$, and therefore the diameter of $H$ is at most $4$.
+\end{proof}
+
+\begin{claim}
+The number of added edges satisfies $|F|\le |B|\le \tfrac{n}{2}$.
+\end{claim}
+\begin{proof}
+We add at most one edge from $a$ to each vertex of $B$, hence $|F|\le |B|$. Since $|A|\le |B|$ and $|A|+|B|=n$, we have $|B|\le n/2$.
+\end{proof}
+
+\paragraph{Implication.}
+For connected bipartite graphs, the desired inequality holds with $c=1/2$:
+\[
+\boxed{\text{If $G$ is connected bipartite on $n$ vertices, then } h_4(G)\le \frac{n}{2}.}
+\]
+
+\paragraph{Why this does not settle the triangle-free case.}
+If $G$ is triangle-free but non-bipartite, adding edges can easily create triangles due to existing odd-cycle structure: an added edge $uv$ is forbidden whenever $u$ and $v$ share a neighbor.
+The bipartite ``join one side to a hub'' construction above relies crucially on the existence of a bipartition, which fails in general.
+
+\paragraph{Connection to the matching-based construction in EGR (sketch only).}
+Erd\H{o}s--Gy\'arf\'as--Ruszink\'o show (among other things) that if $\nu(G)=t$ is the matching number, then one can build a triangle-free supergraph of diameter at most $4$ by adding at most $n-t$ edges.
+This is useful when $t$ is a positive fraction of $n$, but it does not yield a uniform $c>0$ because $t$ can be small (e.g. a star has $t=1$) while already having small diameter.
+The missing ingredient is a complementary ``$O(t)$-edge'' diameter-$4$ augmentation to combine with $n-t$.
+
+\subsection*{VERIFICATION}
+
+\begin{itemize}[leftmargin=2.2em]
+\item In the bipartite construction, triangle-freeness is immediate because bipartite graphs have no odd cycles, in particular no 3-cycles.
+\item The diameter bound is a direct radius-$2$ argument.
+\item Edge count is deterministic and worst-case sharp up to constants (balanced complete bipartite graphs already have diameter $2$ so need $0$ edges; paths show that $\Theta(n)$ edges can be needed in some sparse bipartite cases, but the bound $n/2$ is uniform).
+\end{itemize}
+
+\subsection*{FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.5em]
+\item \textbf{Where and why the attempt fails.}
+The obstacle is extending the clean bipartite ``make a radius-2 hub'' augmentation to \emph{all} triangle-free graphs. In non-bipartite triangle-free graphs, adding many edges incident to a hub vertex typically creates triangles because endpoints may have common neighbors. I did not find a uniform way to add $<(1-c)n$ edges (with fixed $c>0$) that guarantees diameter $\le 4$ while maintaining triangle-freeness.
+
+\item \textbf{Strongest partial result proved here.}
+If $G$ is connected and bipartite on $n$ vertices, then $h_4(G)\le n/2$ by an explicit construction (add all missing edges from a vertex in the smaller side to the opposite side).
+
+\item \textbf{Most plausible next ideas.}
+Try to adapt the Erd\H{o}s--Gy\'arf\'as--Ruszink\'o matching-based approach: find an augmentation with $O(\nu(G))$ edges that achieves diameter $\le 4$ (not $\le 5$), and then combine with their $n-\nu(G)$ augmentation to obtain a uniform fraction improvement.
+Alternatively, attempt a decomposition of an arbitrary triangle-free graph into a large bipartite subgraph plus a controlled exceptional set, and run the bipartite augmentation on the large part while carefully connecting the exceptional vertices without creating triangles.
+
+\item \textbf{Small cases / computations.}
+No exhaustive search was performed. The bipartite lemma can be checked on small examples (paths, even cycles) by hand; it gives the correct qualitative behavior (diameter becomes $\le 4$ after adding $O(n)$ edges).
+Determining the true worst-case behavior of $h_4(G)$ over all triangle-free $G$ appears to require ideas beyond this basic augmentation.
+\end{enumerate}
+
+\subsection*{COMPLETION ESTIMATE}
+
+COMPLETION ESTIMATE: 30\%.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

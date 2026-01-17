@@ -1,0 +1,135 @@
+\section*{Problem 616}
+
+\subsection*{FORMAL RESTATEMENT}
+
+Fix an integer $r\ge 2$. An \emph{$r$-uniform hypergraph} is a pair $G=(V,E)$ where $V$ is a finite vertex set and $E\subseteq \binom{V}{r}$.
+
+For a vertex subset $U\subseteq V$, write $G[U]$ for the \emph{induced} subhypergraph on $U$:
+\[
+G[U] \;:=\; \bigl(U,\ \{e\in E:\ e\subseteq U\}\bigr).
+\]
+
+A \emph{transversal} (or \emph{vertex cover}) of a hypergraph $H=(V(H),E(H))$ is a set $T\subseteq V(H)$ meeting every edge: $T\cap e\neq\varnothing$ for all $e\inE(H)$. The \emph{transversal number} $\tau(H)$ is the minimum size of a transversal.
+
+Assume $G$ satisfies the local property:
+\begin{equation}
+\label{eq:local}
+\forall U\subseteq V\ \ (|U|\le 3r-3\ \Rightarrow\ \tau(G[U])\le 1).
+\end{equation}
+Equivalently: every induced subhypergraph on at most $3r-3$ vertices is either edge-empty or a \emph{star} (all edges share a common vertex).
+
+Define
+\[
+ t(r)\;:=\; \max\bigl\{\tau(G):\ G\ \text{is $r$-uniform and satisfies \eqref{eq:local}}\bigr\}.
+\]
+The problem asks to determine the best possible $t(r)$ (exactly or asymptotically), and in particular the smallest universal $t$ such that $\tau(G)\le t$ for all $G$ satisfying \eqref{eq:local}.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+
+The statement in the prompt quotes Erd\H{o}s--Hajnal--Tuza (1991) giving linear-in-$r$ bounds of the form
+\[
+ c_1 r + O(1)\ \le\ t(r)\ \le\ c_2 r
+\]
+with explicit constants $c_1=\tfrac{3}{16}$ and $c_2=\tfrac{1}{5}$ (as written in the prompt).
+The ErdosProblems page for this item lists the problem as open and does not record a determination of $t(r)$.
+
+\subsection*{ATTACK PLAN}
+
+The local hypothesis \eqref{eq:local} is a Helly-type / local-to-global condition. A natural approach is:
+\begin{enumerate}[label=(\arabic*),leftmargin=2.5em]
+\item Extract \emph{structural consequences} of \eqref{eq:local}. In particular, apply it to unions of 2 or 3 edges to deduce strong intersection properties.
+\item Relate $\tau(G)$ to intersections of edges. If one can show that some pair of edges intersects in $\le c r$ vertices, then $\tau(G)\le c r$ would follow from triplewise intersection.
+\item If $\tau(G)$ is large, take a minimal transversal $T$ and use the standard ``witness edge'' construction (each $x\in T$ has an edge meeting $T$ exactly at $x$). Try to force a small-vertex induced subhypergraph whose transversal number is $\ge 2$, contradicting \eqref{eq:local}.
+\item If the above is insufficient, consider fractional transversals / LP duality and attempt to convert local constraints into a global bound (this is the sort of method used in several local-to-global covering results).
+\end{enumerate}
+
+\subsection*{WORK}
+
+\paragraph{Step 1: \eqref{eq:local} forces pairwise intersection (for $r\ge 3$).}
+Assume $r\ge 3$. Let $e,f\inE$ be two edges. Then $|e\cup f|\le 2r\le 3r-3$. Apply \eqref{eq:local} to $U=e\cup f$. Since $G[U]$ contains $e$ and $f$, the condition $\tau(G[U])\le 1$ implies there exists a vertex $v\in U$ contained in every edge of $G[U]$, in particular $v\in e\cap f$. Hence
+\[
+\boxed{\text{If $r\ge 3$, then every two edges intersect.}}
+\]
+So $G$ is an intersecting $r$-uniform hypergraph.
+
+\paragraph{Step 2: \eqref{eq:local} forces 3-wise intersection (for $r\ge 3$).}
+Assume again $r\ge 3$. Take any three edges $e_1,e_2,e_3\inE$. From Step~1 we know $|e_i\cap e_j|\ge 1$ for each $i\ne j$.
+If $e_1\cap e_2\cap e_3=\varnothing$, then by inclusion--exclusion,
+\[
+|e_1\cup e_2\cup e_3|
+= |e_1|+|e_2|+|e_3| - \sum_{i<j}|e_i\cap e_j| + |e_1\cap e_2\cap e_3|
+\le 3r - 3.
+\]
+Applying \eqref{eq:local} to $U=e_1\cup e_2\cup e_3$ would force $\tau(G[U])\le 1$, hence would force a vertex common to all edges of $G[U]$, in particular common to $e_1,e_2,e_3$, contradicting $e_1\cap e_2\cap e_3=\varnothing$.
+Therefore
+\[
+\boxed{\text{If $r\ge 3$, then every three edges have nonempty intersection.}}
+\]
+So $G$ is 3-wise intersecting.
+
+\paragraph{Step 3: In a 3-wise intersecting hypergraph, the intersection of two edges is a transversal.}
+Let $H=(V,E)$ be any hypergraph with the property that any three edges intersect.
+Fix two edges $e,f\inE$ and set $I:=e\cap f$.
+For any third edge $g\inE$, the triple intersection condition gives $(e\cap f\cap g)\neq\varnothing$, i.e., $I\cap g\neq\varnothing$.
+Thus every edge $g$ meets $I$, so $I$ is a transversal. Hence
+\[
+\boxed{\tau(H)\le |e\cap f|\ \text{for all edges $e,f\inE$.}}
+\]
+In particular,
+\begin{equation}
+\label{eq:tau-min-intersection}
+\tau(H)\ \le\ \min\bigl\{|e\cap f|:\ e,f\inE\bigr\}.
+\end{equation}
+Applying this to $G$ (Step~2) yields the same bound.
+
+\paragraph{A very coarse universal bound.}
+Since $G$ is intersecting (Step~1), for any edge $e\inE$ the set $e$ itself is a transversal (it meets every other edge). Therefore
+\[
+\boxed{\tau(G)\le r\quad\text{for all $r\ge 3$ under \eqref{eq:local}.}}
+\]
+This is far weaker than the best-known linear bounds, but it is immediate.
+
+\paragraph{Why this does not determine $t(r)$.}
+The inequality \eqref{eq:tau-min-intersection} reduces the problem to bounding how large the \emph{minimum} pairwise intersection $\min_{e\ne f}|e\cap f|$ can be under \eqref{eq:local}. The known upper bound $t(r)\le r/5$ amounts (morally) to showing existence of a pair of edges intersecting in at most about $r/5$ vertices.
+I did not find a clean argument from first principles that forces such a small intersection, nor an explicit construction matching $r/5$.
+
+\subsection*{VERIFICATION}
+
+\begin{itemize}[leftmargin=2.2em]
+\item Step~1 used only that $2r\le 3r-3$, i.e. $r\ge 3$. For $r=2$ the local condition $|U|\le 3$ is too small to force pairwise intersection, so the reduction above is specific to $r\ge 3$.
+\item Step~2 is a direct inclusion--exclusion calculation plus an application of \eqref{eq:local}. No hidden assumptions beyond Step~1.
+\item Step~3 is a standard consequence of 3-wise intersection and is completely general.
+\end{itemize}
+
+\subsection*{FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.5em]
+\item \textbf{Where and why the attempt fails.}
+The core missing step is an \emph{a priori} bound (as a function of $r$) on the minimum pairwise intersection size $\min_{e\ne f}|e\cap f|$ for $r$-uniform hypergraphs satisfying \eqref{eq:local}. While \eqref{eq:local} forces 3-wise intersection, that alone does not immediately control the size of a smallest pairwise intersection, and I did not succeed in pushing the local constraint to produce a pair with intersection $\le r/5$ or to build an example approaching the lower bound constant.
+
+\item \textbf{Strongest partial result proved here.}
+For $r\ge 3$, the local hypothesis \eqref{eq:local} implies:
+\begin{itemize}[leftmargin=2.2em]
+\item $G$ is pairwise intersecting and 3-wise intersecting;
+\item for any two edges $e,f$, the intersection $e\cap f$ is a transversal;
+\item consequently $\tau(G)\le \min_{e,f\inE}|e\cap f|$ and in particular $\tau(G)\le r$.
+\end{itemize}
+
+\item \textbf{Most plausible next ideas.}
+A promising route is to study minimal transversals $T$ and the associated witness edges $\{e_x:x\in T\}$ with $e_x\cap T=\{x\}$.
+Under 3-wise intersection, any three witness edges have a common vertex outside $T$, which imposes strong incidence constraints. One would like to convert these constraints into an upper bound on $|T|$ linear in $r$ with a sharp constant, perhaps via:
+(1) a density/averaging argument on the outside vertices,
+(2) a shifting/compression argument to obtain a near-extremal canonical form,
+or (3) a fractional transversal/packing duality argument.
+
+\item \textbf{Small cases / computations.}
+I did not carry out an exhaustive computation of $t(r)$ for small $r$. The arguments above show that for $r\ge 3$ any admissible $G$ is 3-wise intersecting, which already rules out many naive constructions. Determining $t(r)$ even for small fixed $r$ seems nontrivial and would likely require a dedicated search over $r$-uniform set systems.
+\end{enumerate}
+
+\subsection*{COMPLETION ESTIMATE}
+
+COMPLETION ESTIMATE: 35\%.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

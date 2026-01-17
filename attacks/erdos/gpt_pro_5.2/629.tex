@@ -1,0 +1,145 @@
+\section*{Problem 629}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $G=(V,E)$ be a graph.  A \emph{$k$-list assignment} is a function $L:V\to \binom{\mathcal{C}}{k}$ assigning to each vertex a set $L(v)$ of $k$ ``allowed colors'' from some color universe $\mathcal{C}$.
+An \emph{$L$-coloring} is a proper vertex-coloring $c:V\to\mathcal{C}$ such that $c(v)\in L(v)$ for all $v\in V$ and $c(u)\ne c(v)$ for every edge $uv\in E$.
+The \emph{list chromatic number} (choice number) $\chi_L(G)$ is the least $k$ such that $G$ has an $L$-coloring for every $k$-list assignment $L$.
+
+For $k\in\mathbb{N}$ define
+\[
+n(k)\ :=\ \min\bigl\{|V(G)|:\ G\text{ is bipartite and }\chi_L(G)>k\bigr\}.
+\]
+(\,$\chi_L(G)>k$ means $G$ is \emph{not} $k$-choosable.)
+
+\medskip
+\noindent\textbf{Goal.} Determine $n(k)$ (exactly or asymptotically) as a function of $k$.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Web browsing available: YES. Computation available: YES.
+
+The Erd\H{o}s Problems site lists this question as open.  It records the classical bounds of Erd\H{o}s--Rubin--Taylor:
+\[
+2^{k-1}\ <\ n(k)\ <\ k^2\,2^{k+2},
+\]
+and also notes the connection to \emph{property B} (2-colorability) of $k$-uniform hypergraphs via a function $m(k)$: the minimum size of a family of $k$-sets without property B.  The site records the inequalities $m(k)\le n(k)\le m(k+1)$ and the improved lower bound
+\[
+2^k\left(\frac{k}{\log k}\right)^{1/2}\ \ll\ n(k)
+\]
+coming from Radhakrishnan--Srinivasan.
+
+The original Erd\H{o}s--Rubin--Taylor manuscript (1980) gives a clean proof that $N(2,k)$, the minimum number of vertices of a graph that is $2$-colorable but not $k$-choosable, satisfies
+\[
+m(k)\ \le\ N(2,k)\ \le\ 2m(k),
+\]
+and in particular $N(2,2)=6$, and $12\le N(2,3)\le 14$ (with later work proving $N(2,3)=14$).
+For complete bipartite graphs $K_{n,n}$, Erd\H{o}s--Rubin--Taylor proved a threshold $M(k)=2^{k+o(k)}$ such that $K_{n,n}$ fails to be $k$-choosable when $n\ge M(k)$, i.e.\ $\chi_L(K_{n,n})\sim \log_2 n$.
+
+\subsection*{3) ATTACK PLAN}
+The problem is to determine (or sharply estimate) the minimum order of a bipartite graph with list chromatic number exceeding $k$.
+
+\begin{enumerate}[label=\textbf{(\Alph*)},leftmargin=3.2em]
+\item \textbf{Reduce to set systems / property B.}
+Use the Erd\H{o}s--Rubin--Taylor correspondence between $k$-choosability of complete bipartite graphs and families of $k$-sets without property B.  This suggests that determining $n(k)$ up to constants/polynomial factors is closely related to determining $m(k)$.
+\item \textbf{Prove clean inequalities between $n(k)$ and $m(k)$.}
+Re-derive (with full details) inequalities of the form $m(k)\le n(k)\le 2m(k)$ by explicit constructions and a ``witness set'' (property B) coloring argument.
+\item \textbf{Use known bounds on $m(k)$ to deduce asymptotics for $n(k)$.}
+Even if $m(k)$ is not known exactly, known bounds imply $n(k)=2^{k+o(k)}$.
+\end{enumerate}
+
+\subsection*{4) WORK}
+No exact formula for $n(k)$ was found.  I give a fully detailed reduction to property B and derive clean exponential-scale asymptotics.
+
+\subsubsection*{4.1. Property B and a basic lower bound $m(k)\ge 2^{k-1}$}
+A family $\mathcal{F}$ of $k$-subsets of a finite ground set $U$ is said to have \emph{property B} if there exists $B\subseteq U$ such that $B$ meets every $F\in\mathcal{F}$ but contains none of them.  Equivalently, $\mathcal{F}$ is 2-colorable as a $k$-uniform hypergraph.
+
+Let $m(k)$ be the minimum size of a family of $k$-sets \emph{without} property B.
+
+\begin{lemma}\label{lem:mk-lb}
+For every $k\ge 1$, $m(k)\ge 2^{k-1}$.
+\end{lemma}
+\begin{proof}
+Fix a family $\mathcal{F}$ of $k$-subsets of $U$ with $|\mathcal{F}|=m$.
+Color each element of $U$ red/blue independently with probability $1/2$ each.
+A fixed $k$-set $F$ is monochromatic with probability $2\cdot 2^{-k}=2^{1-k}$.
+By the union bound,
+\[
+\mathbb{P}(\exists\,F\in\mathcal{F}\text{ monochromatic})\ \le\ m\cdot 2^{1-k}.
+\]
+If $m<2^{k-1}$ then $m\cdot 2^{1-k}<1$, so with positive probability \emph{no} $F\in\mathcal{F}$ is monochromatic.  Then the 2-coloring witnesses property B.
+Therefore any family without property B must satisfy $m\ge 2^{k-1}$.
+\end{proof}
+
+\subsubsection*{4.2. From $m(k)$ to non-$k$-choosable bipartite graphs}
+\begin{proposition}\label{prop:nk-between-mk}
+For every $k\ge 1$,
+\[
+m(k)\ \le\ n(k)\ \le\ 2m(k).
+\]
+In particular, by Lemma~\ref{lem:mk-lb}, $n(k)\ge 2^{k-1}$.
+\end{proposition}
+
+\begin{proof}
+\emph{Upper bound $n(k)\le 2m(k)$.}
+Let $\mathcal{F}$ be a family of $k$-sets on a ground set $U$ of size $m(k)$ that has no property B.
+Consider the complete bipartite graph $K_{m(k),m(k)}$ with bipartition $A\cup B$, where $A=\{a_F:F\in\mathcal{F}\}$ and $B=\{b_F:F\in\mathcal{F}\}$.
+
+Define a $k$-list assignment $L$ by $L(a_F)=F$ and $L(b_F)=F$ for every $F\in\mathcal{F}$ (using the elements of $U$ as colors).
+Suppose for contradiction there is a proper $L$-coloring $c$.
+Let $C_A:=\{c(a_F):F\in\mathcal{F}\}\subseteq U$ be the set of colors used on side $A$.
+Since $c(a_F)\in F$, $C_A$ meets every $F\in\mathcal{F}$.
+Because $\mathcal{F}$ has no property B, every set meeting all $F\in\mathcal{F}$ must contain some $F\in\mathcal{F}$ entirely; i.e.\ there exists $F_0\in\mathcal{F}$ with $F_0\subseteq C_A$.
+But then for the vertex $b_{F_0}$ on the $B$ side, all allowed colors $L(b_{F_0})=F_0$ already appear among colors on $A$.
+Since $b_{F_0}$ is adjacent to \emph{every} vertex of $A$, it cannot be colored properly from $F_0$, contradiction.
+Hence $K_{m(k),m(k)}$ is not $k$-choosable, so $n(k)\le 2m(k)$.
+
+\medskip
+\emph{Lower bound $m(k)\le n(k)$.}
+Let $G$ be any bipartite graph with $|V(G)|<m(k)$.  We claim $G$ is $k$-choosable.
+Let $L$ be an arbitrary $k$-list assignment of $G$, with color universe $U:=\bigcup_{v\in V(G)}L(v)$.
+Let $\mathcal{F}:=\{L(v):v\in V(G)\}$ be the family of $k$-sets arising as lists; then $|\mathcal{F}|=|V(G)|<m(k)$, so $\mathcal{F}$ \emph{has} property B.
+Thus there exists $B\subseteq U$ meeting every $L(v)$ but containing none of them.
+
+Now fix a bipartition $V(G)=X\cup Y$.
+Color each $x\in X$ by choosing any color in $L(x)\cap B$ (nonempty since $B$ meets $L(x)$).
+Color each $y\in Y$ by choosing any color in $L(y)\setminus B$ (nonempty since $B$ contains no $L(y)$).
+Adjacent vertices lie on opposite sides, and their colors differ because one color is in $B$ and the other is not.
+So this is a proper $L$-coloring.
+Since $L$ was arbitrary, $G$ is $k$-choosable.
+
+Therefore any bipartite graph with $\chi_L(G)>k$ must have at least $m(k)$ vertices, i.e.\ $n(k)\ge m(k)$.
+\end{proof}
+
+\subsubsection*{4.3. Exponential-scale asymptotics $n(k)=2^{k+o(k)}$}
+From Proposition~\ref{prop:nk-between-mk}, determining $n(k)$ is equivalent (up to a factor $2$) to determining $m(k)$.
+
+Even without sharp knowledge of $m(k)$, the known bounds of the form
+\[
+2^{k-1}\ \le\ m(k)\ \le\ k^{O(1)}\,2^k
+\]
+imply
+\[
+\log_2 m(k)\ =\ k + O(\log k)\ =\ k+o(k),
+\]
+and hence
+\[
+n(k)\ =\ 2^{k+o(k)}.
+\]
+So the correct growth is exponential in $k$ with base $2$, but the polynomial factor (and exact values) remain the main difficulty.
+
+\subsection*{5) VERIFICATION}
+Lemma~\ref{lem:mk-lb} is a standard first-moment/union-bound argument and was checked carefully.
+Proposition~\ref{prop:nk-between-mk} is constructive in both directions: the upper bound builds a concrete complete bipartite graph with a ``hard'' list assignment from a property-B counterexample; the lower bound turns a property-B witness set $B$ into a valid list-coloring for any bipartite graph with fewer than $m(k)$ vertices.
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+
+\begin{enumerate}[label=\textbf{(\roman*)},leftmargin=2.6em]
+\item The exact (or sharp asymptotic) determination of $n(k)$ is open.
+\item I proved the clean reduction $m(k)\le n(k)\le 2m(k)$ to the extremal set-system quantity $m(k)$ (property B).
+\item This yields an elementary exponential lower bound $n(k)\ge 2^{k-1}$ and shows $n(k)=2^{k+o(k)}$ given standard polynomial-factor upper bounds for $m(k)$.
+\item A complete solution would require determining $m(k)$ (and hence $n(k)$) up to a sharp constant or sharp polynomial factor.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\textbf{COMPLETION: 45\%.}
+

@@ -1,0 +1,168 @@
+\section{Problem 643 (hypergraphs without generalized 4-cycles)}
+
+\subsection*{FORMAL RESTATEMENT}
+Fix an integer $t\ge 2$ and $n\ge 1$.  A \emph{$t$-uniform hypergraph} on vertex set $[n]=\{1,\dots,n\}$ is a family $\mathcal H\subseteq \binom{[n]}{t}$.
+
+A \emph{generalized $4$-cycle} in $\mathcal H$ (as in the prompt) is a quadruple of 
+\emph{distinct} edges $A,B,C,D\in\mathcal H$ such that
+\[
+A\cup B=C\cup D,\qquad A\cap B=C\cap D=\varnothing.
+\]
+Equivalently, $A,B$ are disjoint, $C,D$ are disjoint, and the two disjoint pairs have the same union.
+
+Define $f(n;t)$ to be the least integer such that every $t$-uniform hypergraph $\mathcal H\subseteq\binom{[n]}{t}$ with $|\mathcal H|\ge f(n;t)$ contains a generalized $4$-cycle.
+
+The problem asks for estimates on $f(n;t)$, and in particular whether for fixed $t\ge 3$ one has
+\[
+ f(n;t) = (1+o(1))\binomc{n}{t-1}\qquad (n\to\infty).
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK (browsing)}
+The attached prompt already lists the main historical bounds.  A quick web check confirms:
+
+\begin{itemize}
+\item Lower bounds of the form
+$\binomc{n-1}{t-1}+\lfloor (n-1)/t\rfloor \le f(n;t)$ are attributed to F\H{u}redi (1984).
+\item Upper bounds of order $\binomc{n}{t-1}$ are known; e.g. Frankl--F\H{u}redi (1987) give a constant $(7/2)$, and Pikhurko--Verstra\H{e}te (2009) improve the constant for fixed $t$.
+\item Recent surveys/updates (e.g. Brada\v{c} et al. 2023) still describe the asymptotic constant (and in particular F\H{u}redi's conjecture for $t\ge 4$) as open.
+\end{itemize}
+
+\subsection*{ATTACK PLAN}
+Interpret the forbidden configuration as a collision of unions of disjoint pairs.
+
+\begin{enumerate}
+\item (Definitions/normalization) Rephrase the condition ``no generalized $4$-cycle'' as an injectivity statement for the map
+\[\{\text{disjoint unordered edge-pairs}\}\to \binom{[n]}{2t},\quad \{E,F\}\mapsto E\cup F.\]
+\item (Small parameters) Check $t=2$ (graphs) to calibrate the problem and see how the condition compares to $C_4$-freeness.
+\item (Known extremal templates) Observe that an intersecting family has no disjoint pairs and hence avoids the configuration.  The basic extremal template is a star.
+\item (Attempt contradiction) Show that adding too many edges outside a star should create many disjoint pairs whose unions must collide.
+\item (Probabilistic/counting attempt) Count disjoint pairs and compare to $\binomc{n}{2t}$.
+\item (Explicit construction attempt) Give a family larger than a star that still avoids the configuration (matching F\H{u}redi's lower bound construction).
+\end{enumerate}
+
+\subsection*{WORK}
+
+\subsubsection*{Step 1: Definitions and a useful rephrasing}
+Let $\mathcal H\subseteq \binom{[n]}{t}$.  Define
+\[
+\mathcal P(\mathcal H) := \bigl\{\{E,F\}: E,F\in\mathcal H,\ E\cap F=\varnothing\bigr\}
+\]
+(the set of unordered disjoint edge-pairs).
+Define the map
+\[
+\Phi: \mathcal P(\mathcal H)\to \binom{[n]}{2t},\qquad \Phi(\{E,F\})=E\cup F.
+\]
+
+\begin{lemma}[Injectivity reformulation]
+$\mathcal H$ contains no generalized $4$-cycle if and only if $\Phi$ is injective.
+\end{lemma}
+
+\begin{proof}
+If $\Phi$ is not injective, there exist two distinct disjoint pairs $\{A,B\}\ne\{C,D\}$ with $A\cup B=C\cup D$ and $A\cap B=C\cap D=\varnothing$, which is exactly a generalized $4$-cycle.
+Conversely, any generalized $4$-cycle gives two distinct disjoint pairs with the same union, so $\Phi$ fails to be injective.
+\end{proof}
+
+A direct consequence is
+\begin{equation}
+|\mathcal P(\mathcal H)| \le \binomc{n}{2t}\qquad\text{whenever $\mathcal H$ is generalized-$C_4$-free.}
+\tag{$\star$}
+\end{equation}
+This inequality alone does not control $|\mathcal H|$ because $\mathcal P(\mathcal H)$ can be empty.
+
+\subsubsection*{Step 2: Small parameter sanity check ($t=2$)}
+When $t=2$, edges are graph edges.  A generalized $4$-cycle is then four distinct edges $A,B,C,D$ with $A\cap B=C\cap D=\varnothing$ and $A\cup B=C\cup D$.
+Writing $A=\{u,v\}$ and $B=\{x,y\}$ disjoint, the union has four vertices and the only other disjoint partition into two edges is a $4$-cycle. Thus forbidding generalized $4$-cycles is exactly forbidding $C_4$ in graphs. In that case $f(n;2)-1=\mathrm{ex}(n,C_4)\sim \tfrac12 n^{3/2}$.
+
+This highlights that the $t\ge 3$ regime is genuinely different: a star already has $\Theta(n^{t-1})$ edges and is automatically generalized-$C_4$-free because it has no disjoint edge-pairs.
+
+\subsubsection*{Step 3: A basic lower bound: stars}
+Fix a vertex $v\in[n]$.  The \emph{$v$-star}
+\[
+\mathcal S_v := \{E\in\binom{[n]}{t}: v\in E\}
+\]
+has size $|\mathcal S_v|=\binomc{n-1}{t-1}$.
+
+\begin{lemma}[Stars are generalized-$C_4$-free]
+$\mathcal S_v$ contains no generalized $4$-cycle.
+\end{lemma}
+\begin{proof}
+Any two edges in $\mathcal S_v$ intersect in $v$, hence there is no disjoint pair of edges at all.  The generalized $4$-cycle requires two disjoint pairs.
+\end{proof}
+
+Therefore there exists a generalized-$C_4$-free $t$-uniform hypergraph with $\binomc{n-1}{t-1}$ edges, so
+\[
+ f(n;t)\ge \binomc{n-1}{t-1}+1.
+\]
+
+\subsubsection*{Step 4: An explicit construction improving the star (F\H{u}redi-type)}
+Let $v=1$.  Partition $[n]\setminus\{1\}$ into $q:=\lfloor (n-1)/t\rfloor$ disjoint $t$-sets $F_1,\dots,F_q$ (ignore leftover vertices).
+Define
+\[
+\mathcal H := \mathcal S_1\ \cup\ \{F_1,\dots,F_q\}.
+\]
+Then
+\[
+|\mathcal H|=\binomc{n-1}{t-1} + \Bigl\lfloor \frac{n-1}{t}\Bigr\rfloor.
+\]
+
+\begin{lemma}[The star-plus-disjoint-blocks construction is generalized-$C_4$-free]
+The hypergraph $\mathcal H$ defined above contains no generalized $4$-cycle.
+\end{lemma}
+
+\begin{proof}
+We check the possibilities for a generalized $4$-cycle $A,B,C,D$.
+
+\smallskip
+\noindent\textbf{(i) Both disjoint pairs lie entirely inside the star.}
+Impossible, since the star has no disjoint pair.
+
+\smallskip
+\noindent\textbf{(ii) Both disjoint pairs lie entirely among the added blocks $\{F_i\}$.}
+The added blocks are pairwise disjoint.  If $F_i\cup F_j = F_{i'}\cup F_{j'}$ with all indices distinct, then $F_{i'}\subseteq F_i\cup F_j$; but $F_{i'}$ is disjoint from both $F_i$ and $F_j$ unless it equals one of them, which is impossible by size.  Hence equality of unions forces $\{i,j\}=\{i',j'\}$, so there is no generalized $4$-cycle of this type.
+
+\smallskip
+\noindent\textbf{(iii) At least one disjoint pair uses a star edge and a block.}
+Suppose $A\in\mathcal S_1$ and $B=F_i$ are disjoint.  Then $1\in A$ and $1\notin B$, hence $1\in A\cup B$.  In any disjoint pair $C,D$ with the same union, exactly one of $C,D$ contains $1$ (since $C\cap D=\varnothing$).  Thus the second disjoint pair must also be of the form (star edge) $\cup$ (block).  Without loss, $C\in\mathcal S_1$ and $D=F_j$.
+
+Now $A\cup B = C\cup D$ implies $F_i \subseteq A\cup F_i = A\cup B = C\cup F_j$, so $F_i\subseteq C\cup F_j$.  But $F_i$ is disjoint from $F_j$ when $i\ne j$, and $C$ has size $t$ with $1\in C$; hence $|C\cap ([n]\setminus\{1\})|=t-1$.  Since $F_i$ is a $t$-set disjoint from $1$, it cannot be contained in $C\cup F_j$ unless $i=j$ (otherwise it would have to fit into $(t-1)+t=2t-1$ vertices while avoiding $F_j$ entirely, impossible by pigeonhole).  More directly: if $i\ne j$, then $F_i\subseteq C\cup F_j$ and $F_i\cap F_j=\varnothing$ force $F_i\subseteq C$, but $|C\setminus\{1\}|=t-1<|F_i|=t$, contradiction.
+
+Thus $i=j$.  Then $A\cup F_i = C\cup F_i$ implies $A=C$.  Hence the two disjoint pairs coincide, and no generalized $4$-cycle exists.
+\end{proof}
+
+Consequently,
+\[
+ f(n;t)\ge \binomc{n-1}{t-1}+\Bigl\lfloor \frac{n-1}{t}\Bigr\rfloor +1.
+\]
+This matches the lower bound stated in the prompt.
+
+\subsubsection*{Step 5: Counting/probabilistic attempt toward an upper bound (incomplete)}
+A natural approach is to lower bound the number of disjoint pairs $|\mathcal P(\mathcal H)|$ as a function of $|\mathcal H|$, then combine with $(\star)$.
+However, this runs into the obstacle that very large families can have very few disjoint pairs (e.g. a star has none).  One needs a stability-type argument: if $|\mathcal H|$ exceeds the star by a positive proportion of $\binom{n}{t-1}$, then $\mathcal H$ must contain many edges not in a single star, and those should generate many disjoint pairs.
+
+I did not succeed in deriving such a quantitative lower bound on $|\mathcal P(\mathcal H)|$ strong enough to force a union-collision at the conjectured threshold.
+
+\subsection*{VERIFICATION}
+The two proved claims above are internal checks:
+\begin{itemize}
+\item The injectivity reformulation is a direct equivalence.
+\item The star-plus-disjoint-blocks construction is checked case-by-case and rules out any generalized $4$-cycle.
+\end{itemize}
+
+\subsection*{FINAL}
+\textbf{UNRESOLVED.}
+
+\medskip
+\noindent\textbf{Strongest fully proved partial result in this write-up:}
+\begin{quote}
+For every $t\ge 2$ and $n\ge 1$,
+\[
+ f(n;t)\ge \binomc{n-1}{t-1}+\Bigl\lfloor \frac{n-1}{t}\Bigr\rfloor +1,
+\]
+via the explicit generalized-$C_4$-free construction $\mathcal S_1\cup\{F_1,\dots,F_{\lfloor (n-1)/t\rfloor}\}$.
+\end{quote}
+The main open point remains the matching upper bound up to a $(1+o(1))$ factor for fixed $t\ge 3$.
+
+\subsection*{COMPLETION ESTIMATE}
+$0.35$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

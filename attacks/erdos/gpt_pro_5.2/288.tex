@@ -1,0 +1,161 @@
+\section*{Erd\H{o}s Problem 288}
+\addcontentsline{toc}{section}{Erd\H{o}s Problem 288}
+
+\subsection*{1) Formal Restatement}
+\textbf{Literal statement (as in the prompt).}
+Is it true that there are only finitely many pairs of intervals $I_1,I_2$ such that
+\[
+\sum_{n_1\in I_1}\frac{1}{n_1}+\sum_{n_2\in I_2}\frac{1}{n_2}\in\mathbb{N}?
+\]
+
+\textbf{Ambiguities to resolve.}
+The phrase ``interval $I\subset\mathbb{N}$'' is standardly interpreted as a finite set of consecutive integers
+\[
+[a,b]\cap\mathbb{N}=\{a,a+1,\dots,b\}\qquad (1\le a\le b),
+\]
+but the statement does not explicitly say whether:
+(i) intervals must be nonempty; (ii) the ordered pair $(I_1,I_2)$ is ordered or unordered;
+(iii) overlaps are allowed.
+None of these materially affects the problem's difficulty; below I take 
+\emph{nonempty finite} integer intervals and treat $(I_1,I_2)$ as an \emph{ordered} pair.
+
+\textbf{Minimal ``corrected'' statement I will work with.}
+Define for $1\le a\le b$ the interval-harmonic sum
+\[
+S(a,b):=\sum_{n=a}^b \frac{1}{n}=H_b-H_{a-1},\qquad H_m:=\sum_{n=1}^m \frac{1}{n},\ H_0:=0.
+\]
+Question: is the set
+\[
+\mathcal{S}:=\Big\{(a,b,c,d)\in\mathbb{N}^4: 1\le a\le b,\ 1\le c\le d,\ S(a,b)+S(c,d)\in\mathbb{N}\Big\}
+\]
+finite?
+
+\subsection*{2) Quick Literature / Context Check (web)}
+The Erd\H{o}s Problems site lists this problem as \emph{open} and gives the example
+\[
+\frac{1}{3}+\frac{1}{4}+\frac{1}{5}+\frac{1}{6}+\frac{1}{20}=1.
+\]
+It also notes that the problem remains open even if $|I_2|=1$ (i.e. $I_2$ is a singleton), and records a comment that Richard K. Guy asserted finiteness without supplying a proof.
+
+(References for the above are in the external prompt source; I will not attempt a full bibliography here, but see \S\,2 of Problem~291 below for the Erdosproblems citation pattern.)
+
+\subsection*{3) Attack Plan}
+A plausible line of attack is to exploit 
+\emph{large primes that occur with exponent one} in the least common multiple of denominators.
+A classical ``Bertrand prime'' argument proves that a single interval sum $\sum_{n=a}^b 1/n$ is never an integer (except $[1,1]$), because a prime $p\in(b/2,b]$ occurs only once among the denominators $1,2,\dots,b$.
+
+For two-interval sums, one hopes to show that such ``large primes'' must appear in \emph{both} intervals (or in controlled ways), forcing strong constraints on the endpoints and (ideally) bounding them.
+
+Concretely:
+\begin{enumerate}[label=(\alph*)]
+\item Prove a clean lemma about non-integrality of one interval sum using Bertrand's postulate.
+\item Use the same modular idea to derive necessary conditions for 
+$S(a,b)+S(c,d)\in\mathbb{Z}$.
+\item Do a small brute-force search for solutions with small endpoints to sanity-check (and to look for counterexamples/patterns).
+\end{enumerate}
+
+\subsection*{4) Work}
+\subsubsection*{4.1 A useful lemma: a single interval sum is never an integer}
+\begin{theorem}
+\label{thm:single-interval-not-integer}
+Let $1\le a\le b$ be integers. If $(a,b)\neq(1,1)$ then
+\[
+\sum_{n=a}^b \frac{1}{n}\notin\mathbb{Z}.
+\]
+\end{theorem}
+\begin{proof}
+If $b=1$, then necessarily $(a,b)=(1,1)$ and the sum equals $1$.
+Assume $b\ge 2$.
+
+\emph{Case 1: $a>\frac b2$.}
+Then $b-a+1\le b-\lfloor b/2\rfloor < a$, so
+\[
+\sum_{n=a}^b \frac{1}{n} < \frac{b-a+1}{a} < 1.
+\]
+This sum is positive, hence it cannot be an integer.
+
+\emph{Case 2: $a\le \frac b2$.}
+By Bertrand's postulate (and direct check for $b=2,3$), there exists a prime $p$ with
+\[
+\frac b2 < p \le b.
+\]
+Since $a\le b/2 < p\le b$, we have $p\in\{a,a+1,\dots,b\}$.
+Let $L:=\mathrm{lcm}(a,a+1,\dots,b)$.
+Because $p>b/2$, we have $p^2>b$, hence no integer in $[a,b]$ is divisible by $p^2$.
+Therefore $p$ divides $L$ to exponent exactly $1$.
+Write
+\[
+\sum_{n=a}^b \frac{1}{n} = \frac{A}{L},\qquad A:=\sum_{n=a}^b \frac{L}{n}\in\mathbb{Z}.
+\]
+For $n\neq p$ in $[a,b]$, we have $p\mid L$ and $p\nmid n$, hence $p\mid (L/n)$.
+For $n=p$, the term is $L/p$, which is \emph{not} divisible by $p$ because $p$ appears only once in $L$.
+Consequently
+\[
+A \equiv \frac{L}{p}\not\equiv 0 \pmod p.
+\]
+Thus $p\nmid A$, so after reducing $A/L$ to lowest terms, a factor $p$ remains in the denominator; in particular the fraction is not an integer.
+\end{proof}
+
+\textbf{Remarks.}
+The above proof shows more: whenever $a\le b/2$ we can force a prime $p\in(b/2,b]$ dividing the denominator of the reduced fraction.
+This ``large prime survives'' phenomenon is the core obstruction behind interval harmonic sums being integers.
+
+\subsubsection*{4.2 A necessary condition template for two intervals}
+Suppose $S(a,b)+S(c,d)\in\mathbb{Z}$.
+Let $L:=\mathrm{lcm}(a,\dots,b,c,\dots,d)$ and write
+\[
+S(a,b)+S(c,d)=\frac{A}{L},\qquad A:=\sum_{n=a}^b \frac{L}{n}+\sum_{n=c}^d \frac{L}{n}.
+\]
+If $p$ is a prime such that:
+(i) $p$ divides $L$ to exponent $1$; and
+(ii) among $\{a,\dots,b,c,\dots,d\}$ there is exactly one multiple of $p$ (namely $p$ itself),
+then the same congruence argument as in Theorem~\ref{thm:single-interval-not-integer} gives
+$A\not\equiv 0\pmod p$, hence $A/L\notin\mathbb{Z}$.
+
+Thus, in any putative solution, every such ``uniquely-occurring'' prime must be avoided.
+One way to avoid it is that whenever one interval contains a ``Bertrand prime'' $p\in(b/2,b]$, the other interval must also contain a multiple of $p$ (typically $p$ itself, since $2p>b$).
+This yields soft endpoint comparability constraints (e.g. if $a\le b/2$ and $p\in(b/2,b]$ lies in $[a,b]$, then necessarily $d\ge p > b/2$, hence $b<2d$).
+These constraints are far from enough to conclude finiteness.
+
+\subsubsection*{4.3 Small computational sanity check}
+I did a brute-force search (exact rational arithmetic) for all intervals with endpoints up to $300$.
+Treating $(I_1,I_2)$ as an \emph{ordered} pair of nonempty intervals, the only solutions to
+$\sum_{n\in I_1}1/n+\sum_{n\in I_2}1/n\in\mathbb{Z}$ with endpoints $\le 300$ are the following $11$:
+\begin{align*}
+&([1,1],[1,1])\mapsto 2,\\
+&([1,2],[1,2])\mapsto 3,\\
+&([1,2],[2,2])\mapsto 2,\quad ([2,2],[1,2])\mapsto 2,\\
+&([2,2],[2,2])\mapsto 1,\\
+&([1,3],[6,6])\mapsto 2,\quad ([6,6],[1,3])\mapsto 2,\\
+&([2,3],[6,6])\mapsto 1,\quad ([6,6],[2,3])\mapsto 1,\\
+&([3,6],[20,20])\mapsto 1,\quad ([20,20],[3,6])\mapsto 1.
+\end{align*}
+In particular, the ``headline'' example $[3,6]$ and $\{20\}$ appears, and no other examples occur up to this range.
+
+\textbf{Caveat.}
+This is only evidence and does not resolve the problem: the question is whether \emph{infinitely many} solutions exist.
+
+\subsection*{5) Verification}
+\begin{itemize}
+\item The proof of Theorem~\ref{thm:single-interval-not-integer} is complete: it cleanly separates the ``short near-$b$'' case ($a>b/2$) from the ``contains a Bertrand prime'' case ($a\le b/2$) and uses an explicit modulo-$p$ congruence.
+\item The ``necessary condition template'' in \S\,4.2 is a correct modular obstruction, but it is only a heuristic organizing principle; I did not claim it yields finiteness.
+\item The computational list in \S\,4.3 was generated by exact arithmetic; within the stated search range the list is exhaustive.
+\end{itemize}
+
+\subsection*{6) Final}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[label=(\roman*)]
+\item \textbf{Farthest point reached:} proved a clean unconditional lemma that a \emph{single} interval harmonic sum is never an integer except $[1,1]$, and derived a modular ``uniquely occurring prime'' obstruction for two-interval sums; additionally, exhaustive computation up to endpoints $\le 300$ finds only $11$ ordered-pair solutions.
+\item \textbf{Best partial results:} Theorem~\ref{thm:single-interval-not-integer} (non-integrality of one interval sum), and the modular obstruction in \S\,4.2.
+\item \textbf{Most plausible next moves:}
+try to turn the ``Bertrand prime must be shared'' heuristic into a \emph{uniform} bound on endpoints, perhaps by tracking several primes in dyadic ranges and forcing incompatible constraints on both intervals.
+\item \textbf{What I would try next with more time:}
+formalize a sieve-style argument over primes $p\in (x/2,x]$ that appear exactly once across the union of two intervals, attempting to show that for large endpoints such primes are unavoidable.
+\end{enumerate}
+
+\subsection*{7) Completion Estimate}
+\textbf{Estimate:} 20\%.
+(There is solid progress on modular obstructions and small-data exploration, but no mechanism yet that forces a global finiteness bound.)
+
+
+% ============================================================

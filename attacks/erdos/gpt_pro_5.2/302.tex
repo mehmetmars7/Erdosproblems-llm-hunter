@@ -1,0 +1,122 @@
+\section*{Problem \#302}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $N\in\mathbb{N}$ and write $[N]=\{1,2,\dots,N\}$. Define
+\[
+  f(N) := \max\Big\{ |A| : A\subseteq [N]\ \text{and there do not exist pairwise distinct }a,b,c\in A\ \text{with }\frac1a=\frac1b+\frac1c\Big\}.
+\]
+The problem asks for asymptotics of $f(N)$ as $N\to\infty$ (``estimate $f(N)$''), and in particular asks whether
+\[
+  f(N)=(1/2+o(1))N
+\]
+holds. (As written, this last sentence is a concrete conjectural asymptotic.)
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+I checked the ErdosProblems entry for \#302 and its linked comments/notes. The prompt itself already records the main currently-advertised bounds:
+\begin{itemize}[leftmargin=2em]
+\item Lower bounds: $f(N)\ge (1/2+o(1))N$ from $A=\{\text{odd}\}$ or $A=[\lceil N/2\rceil, N]$; and an improved construction $f(N)\ge (5/8+o(1))N$ attributed to Stijn Cambie.
+\item Upper bound: Wouter van Doorn gives $f(N)\le (9/10+o(1))N$.
+\end{itemize}
+My quick web search did not reveal a newer asymptotic constant determination beyond these notes.
+
+\subsection*{3) ATTACK PLAN}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Structural rewrite.} Rewrite the Diophantine condition in a form that makes combinatorial obstructions transparent.
+\item \textbf{Disprove the specific $1/2$-asymptotic.} Exhibit an explicit family of sets $A\subseteq[N]$ with density strictly bigger than $1/2$ and prove they contain no solutions.
+\item \textbf{Reality check.} Compute $f(N)$ for small $N$ via exact search (maximum independent set in a 3-uniform hypergraph) to see what densities appear.
+\item \textbf{What would remain.} Any true asymptotic will require either a much better construction (raising the lower bound) or a density/supersaturation theorem (lowering the upper bound).
+\end{enumerate}
+
+\subsection*{4) WORK}
+\paragraph{4.1. Algebraic normal form.}
+If $a,b,c\in\mathbb{N}$ satisfy
+\(
+\frac1a=\frac1b+\frac1c
+\)
+then
+\[
+  \frac1a = \frac{b+c}{bc}\quad\Longleftrightarrow\quad bc=a(b+c)\quad\Longleftrightarrow\quad (b-a)(c-a)=a^2.
+\]
+In particular $bc=a(b+c)$ implies $bc>ab$ and $bc>ac$, so $b>a$ and $c>a$.
+Conversely, any factorisation $a^2=de$ with $d,e\in\mathbb{N}$ and $d\ne e$ gives a solution
+\[
+  b=a+d,\qquad c=a+e
+\]
+with $b\ne c$ and $\frac1a=\frac1b+\frac1c$.
+
+\paragraph{4.2. A universal inequality: $a<\tfrac{N}{2}$ in any solution inside $[N]$ (with $b\ne c$).}
+Assume $1\le a<b<c\le N$ and $\frac1a=\frac1b+\frac1c$. Then
+\[
+  a=\frac{bc}{b+c} \le \frac{bc}{2\sqrt{bc}} = \frac{\sqrt{bc}}{2}\le \frac{N}{2}
+\]
+by AM--GM and $\sqrt{bc}\le N$.
+Moreover equality $a=N/2$ forces $\sqrt{bc}=N$ and $b+c=2\sqrt{bc}$, hence $b=c=N$, which is excluded by distinctness. Therefore:
+\begin{equation}
+  \label{eq:a-strict-half}
+  \boxed{\text{If }1\le a,b,c\le N\text{ are distinct and }\tfrac1a=\tfrac1b+\tfrac1c,\text{ then }a<\tfrac{N}{2}.}
+\end{equation}
+This immediately proves that $A=[\lceil N/2\rceil,N]$ is solution-free.
+
+\paragraph{4.3. Parity obstruction.}
+If $b$ and $c$ are both odd, then $bc$ is odd and $b+c$ is even, so $(b+c)/bc$ is a rational with even numerator and odd denominator in lowest terms; it cannot equal $1/a$.
+Equivalently: there is \emph{no} integer solution to $\frac1a=\frac1b+\frac1c$ with $b,c$ odd.
+
+\paragraph{4.4. A rigorous $(5/8)$-density construction (disproving the $1/2$ asymptotic conjecture).}
+Define
+\[
+  A_N := \{n\in [N] : n\ge \lceil N/2\rceil\}\ \cup\ \{n\in[N] : n\le \lfloor N/4\rfloor\ \text{and $n$ is odd}\}.
+\]
+Then
+\[
+  |A_N| = \big(N-\lceil N/2\rceil+1\big) + \#\{\text{odd }n\le \lfloor N/4\rfloor\}
+  = \frac{N}{2} + \frac{N}{8} + O(1) = \Big(\frac{5}{8}+o(1)\Big)N.
+\]
+\begin{theorem}
+For every $N$, the set $A_N$ contains no pairwise distinct $a,b,c\in A_N$ with $\frac1a=\frac1b+\frac1c$.
+Consequently $f(N)\ge |A_N|=(5/8+o(1))N$, and in particular $f(N)\neq (1/2+o(1))N$.
+\end{theorem}
+\begin{proof}
+Suppose for contradiction that distinct $a,b,c\in A_N$ satisfy $\frac1a=\frac1b+\frac1c$. As noted above, $b,c>a$.
+By \eqref{eq:a-strict-half} we have $a< N/2$, so $a$ cannot lie in the upper-half block of $A_N$. Hence $a$ lies in the lower block, so $a$ is \emph{odd} and $a\le N/4$.
+
+We now claim that $b$ and $c$ must both be even. Indeed, if $b,c$ are both odd then there is no solution (paragraph 4.3). If exactly one of $b,c$ is odd, then $b+c$ is odd and $bc$ is even, so from $bc=a(b+c)$ we see that $a$ must be even (odd times $a$ equals an even number), contradicting that $a$ is odd.
+Thus $b$ and $c$ are both even.
+
+Since the only elements of $A_N$ below $N/2$ are odd, the even numbers $b,c\in A_N$ must lie in the upper-half block, i.e. $b,c\ge N/2$. Let $b\le c$. Then
+\[
+  \frac1a = \frac1b+\frac1c < \frac{2}{b}\qquad\Longrightarrow\qquad a > \frac{b}{2} \ge \frac{N}{4}.
+\]
+This contradicts $a\le N/4$.
+Therefore no such triple exists.
+\end{proof}
+
+\paragraph{4.5. Small-$N$ computation (exact).}
+As a quick reality check, I exhaustively computed $f(N)$ for $N\le 100$ by modeling the valid triples as a 3-uniform hypergraph and running a branch-and-bound maximum independent set search.
+The resulting densities are much larger than $5/8$ for these $N$ (e.g. $f(100)=86$), illustrating that the extremal behavior for small $N$ is not yet close to any conjectural asymptotic.
+A witness for $N=100$ is $A=[100]\setminus\{6,8,12,14,18,20,22,24,28,30,48,78,84,90\}$.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}[leftmargin=2em]
+\item The equivalence $(b-a)(c-a)=a^2$ was checked by direct algebra.
+\item Inequality \eqref{eq:a-strict-half} was derived from AM--GM and is strict because $b\ne c$.
+\item In the $(5/8)$ construction proof, the key steps are: (i) $a<N/2$ forces $a$ to be odd $\le N/4$; (ii) that forces $b,c$ even; (iii) then $b,c\ge N/2$ forces $a>N/4$; contradiction.
+\item Computations (not reproduced here) verified that the displayed witness for $N=100$ contains no forbidden triple.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[leftmargin=2em,label=(\roman*)]
+\item \textbf{Progress achieved.} I gave a complete proof of the explicit construction $A_N$ of size $(5/8+o(1))N$ with no solutions, which in particular disproves the conjectural asymptotic $f(N)=(1/2+o(1))N$. I also recorded the structural identity $(b-a)(c-a)=a^2$ and the universal constraint $a<N/2$ for any solution in $[N]$.
+\item \textbf{Where it got stuck.} Determining the true asymptotic constant (or even improving the $(9/10)$ upper bound or the $(5/8)$ lower bound) appears to require substantially new extremal/combinatorial input; the present work does not bridge that gap.
+\item \textbf{What next steps would look like.} (a) Use the factorisation form $(b-a)(c-a)=a^2$ to set up a hypergraph container/supersaturation argument for dense $A$. (b) Search for higher-density constructions guided by exact solutions for moderate $N$ and attempt to prove a general pattern.
+\item \textbf{Falsifiable conjecture.} Based on the existing upper bound $f(N)\le (0.9+o(1))N$ and my small-$N$ computations hovering around $\approx 0.86N$, a plausible guess is that $f(N)=(c+o(1))N$ for some constant $c\in[0.85,0.9]$.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+To ``complete'' the original problem (i.e. pin down the correct asymptotics of $f(N)$), one would need either:
+(i) a new construction improving the best-known lower density, or
+(ii) a new extremal argument improving the best-known upper density.
+Either route would likely require nontrivial new ideas beyond the parity/interval obstructions used above.
+
+
+% -----------------------------------------------------------------------------

@@ -1,0 +1,125 @@
+\section*{Problem 388. Equal products of two disjoint blocks of consecutive integers}
+
+\subsection*{Formal restatement}
+For integers $m\ge 0$ and $k\ge 1$ define the \emph{rising factorial block}
+\[
+P_k(m) \;:=\; \prod_{i=1}^{k}(m+i) \;=\; \frac{(m+k)!}{m!}.
+\]
+The problem asks about integer solutions to
+\begin{equation}
+\label{eq:P388-main}
+P_{k_1}(m_1)=P_{k_2}(m_2)
+\end{equation}
+under the constraints
+\[
+ k_1,k_2>3,\qquad m_1,m_2\in\mathbb Z_{\ge 0},\qquad m_1+k_1\le m_2.
+\]
+The wording ``Are there only finitely many solutions?'' is ambiguous:
+\begin{itemize}[leftmargin=2em]
+\item[(A)] \emph{Fixed lengths:} for each fixed pair $(k_1,k_2)$ with $k_1,k_2>3$, are there only finitely many pairs $(m_1,m_2)$ satisfying \eqref{eq:P388-main} and $m_1+k_1\le m_2$?
+\item[(B)] \emph{All parameters:} are there only finitely many quadruples $(m_1,k_1,m_2,k_2)$ with $k_1,k_2>3$ and $m_1+k_1\le m_2$ satisfying \eqref{eq:P388-main}?
+\end{itemize}
+The statement ``classify all solutions'' suggests (B), while the appearance of fixed $a,b$ in the generalization suggests (A) as a natural first step.
+
+A more general variant mentioned is
+\begin{equation}
+\label{eq:P388-ab}
+ a\,P_{k_1}(m_1)=b\,P_{k_2}(m_2),
+\end{equation}
+with fixed nonzero integers $a,b$ and $k_1>2$.
+
+\subsection*{Quick literature/context check (browsing available)}
+A classical source of examples and discussion is the MathOverflow question ``Equal products of consecutive integers''; several small identities are known, e.g.
+$2\cdot 3\cdot 4\cdot 5\cdot 6 = 8\cdot 9\cdot 10$ and
+$19\cdot 20\cdot 21\cdot 22 = 55\cdot 56\cdot 57$.
+The smallest known example with \emph{both} block lengths $>3$ and with disjointness $m_1+k_1\le m_2$ is
+\begin{equation}
+\label{eq:P388-known}
+8\cdot 9\cdot 10\cdot 11\cdot 12\cdot 13\cdot 14
+\;=\;
+63\cdot 64\cdot 65\cdot 66
+\;=\;17297280.
+\end{equation}
+This example also appears in OEIS A163263 (numbers with multiple non-overlapping consecutive-product representations).
+The Erd\H{o}s Problems site (Problem \#388) records these examples and highlights the ``smoothness'' obstruction below.
+
+\subsection*{Attack plan}
+\begin{enumerate}[leftmargin=2em]
+\item Prove structural necessary conditions for any solution (e.g. compare lengths; prime-factor ``smoothness'' constraints).
+\item Do a bounded brute-force search to verify the smallest solutions and gain confidence about the landscape.
+\item Attempt to leverage general finiteness theorems for polynomial Diophantine equations of the form $f(x)=g(y)$ (e.g. Siegel/Bilu--Tichy) to prove finiteness for fixed $(k_1,k_2)$; identify the precise obstruction to converting this into a full classification across \emph{all} lengths.
+\end{enumerate}
+
+\subsection*{Work}
+\paragraph{Lemma 1 (the longer block must be the earlier one).}
+Assume $m_1+k_1\le m_2$ and \eqref{eq:P388-main} holds with $k_1,k_2\ge 1$. Then $k_1>k_2$.
+
+\begin{proof}
+Because $m_1+k_1\le m_2$, every factor on the right is at least $m_2+1\ge m_1+k_1+1$, while every factor on the left is at most $m_1+k_1$. Hence
+\[
+P_{k_2}(m_2)=\prod_{j=1}^{k_2}(m_2+j) \;\ge\; (m_1+k_1+1)^{k_2}.
+\]
+Also
+\[
+P_{k_1}(m_1)=\prod_{i=1}^{k_1}(m_1+i) \;\le\; (m_1+k_1)^{k_1}.
+\]
+If $k_1\le k_2$ then
+\[(m_1+k_1+1)^{k_2} \;\ge\; (m_1+k_1+1)^{k_1} \;>\; (m_1+k_1)^{k_1} \;\ge\; P_{k_1}(m_1),\]
+contradicting $P_{k_1}(m_1)=P_{k_2}(m_2)$. Therefore $k_1>k_2$.
+\end{proof}
+
+\paragraph{Lemma 2 (``smoothness'' obstruction).}
+Let $A:=m_1+k_1$. If \eqref{eq:P388-main} holds, then every prime factor of each integer in the right block
+$\{m_2+1,\dots,m_2+k_2\}$ is $\le A$. Equivalently, the entire right block consists of $A$-smooth integers.
+
+\begin{proof}
+All prime factors of $P_{k_1}(m_1)=\prod_{i=1}^{k_1}(m_1+i)$ are $\le m_1+k_1=A$, since each factor $m_1+i\le A$. Equality \eqref{eq:P388-main} forces the same set of primes (with the same multiplicities) to divide $P_{k_2}(m_2)=\prod_{j=1}^{k_2}(m_2+j)$, hence every prime dividing any $m_2+j$ must be $\le A$.
+\end{proof}
+
+\paragraph{A computational check (small search).}
+A brute-force search over
+\[
+4\le k_1,k_2\le 10,\quad 0\le m_1\le 500,\quad m_1+k_1\le m_2\le 500
+\]
+finds exactly one solution with both lengths $>3$, namely \eqref{eq:P388-known} (i.e. $m_1=7,k_1=7,m_2=62,k_2=4$).
+This does not prove uniqueness, but it supports the conjecture recorded on the Erd\H{o}s Problems site that \eqref{eq:P388-known} might be the only solution under the stated constraints.
+
+\paragraph{Where a full solution would likely come from.}
+Lemmas 1--2 reduce any putative classification to understanding long runs of consecutive $A$-smooth integers {
+\em above} $A$ (since $m_2+1>A$).
+One plausible route is to combine:
+\begin{itemize}[leftmargin=2em]
+\item quantitative bounds on the maximal length of a run of $A$-smooth integers in $[x,x+L]$ with $x$ much larger than $A$,
+\item together with the size constraint imposed by \eqref{eq:P388-main}, which forces the growth rates of $P_{k_1}(m_1)$ and $P_{k_2}(m_2)$ to match.
+\end{itemize}
+I did not find a way to complete this program in a gap-free way.
+
+\subsection*{Verification}
+\begin{itemize}[leftmargin=2em]
+\item Lemma 1 uses only monotone inequalities and the disjointness condition $m_1+k_1\le m_2$; the strict inequality step $(A+1)^{k_1}>(A)^{k_1}$ is immediate.
+\item Lemma 2 is immediate from prime-factor containment.
+\item The identity \eqref{eq:P388-known} was verified by direct multiplication (in a separate computation).
+\end{itemize}
+
+\subsection*{Final}
+\begin{quote}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[leftmargin=2.2em]
+\item[(i)] \textbf{Strongest proved partial result:}
+Any solution of \eqref{eq:P388-main} with $m_1+k_1\le m_2$ must satisfy $k_1>k_2$ and the entire right block $\{m_2+1,\dots,m_2+k_2\}$ is $(m_1+k_1)$-smooth (Lemmas 1--2).
+In addition, a bounded brute-force search (specified above) finds only the solution \eqref{eq:P388-known} with $k_1,k_2>3$ in that range.
+\item[(ii)] \textbf{First gap / obstruction:}
+Turning the smoothness obstruction into a global finiteness or uniqueness theorem requires nontrivial control of long runs of $A$-smooth numbers above $A$ that is uniform in the parameters and compatible with the size constraint from \eqref{eq:P388-main}.
+\item[(iii)] \textbf{Top 3 next moves:}
+(1) Translate \eqref{eq:P388-main} into a statement about smoothness of a short interval and try to apply strongest available bounds on smooth numbers in short intervals.
+(2) For fixed $(k_1,k_2)$, treat $P_{k_1}(x)=P_{k_2}(y)$ as an integral-point problem on an algebraic curve and attempt an effective determination of all integral points (in small degrees this reduces to elliptic/hyperelliptic methods).
+(3) Expand the computational search using modular sieving informed by Lemma 2 (restricting to candidate intervals whose elements are all $A$-smooth).
+\item[(iv)] \textbf{What a minimal counterexample (to ``only finitely many solutions'') would look like:}
+It would require an infinite family of pairs of disjoint blocks with $k_1>k_2\ge 4$ in which the later block forms unusually long runs of $A$-smooth numbers relative to $A=m_1+k_1$, while simultaneously matching the magnitude constraint $\log P_{k_1}(m_1)\approx \log P_{k_2}(m_2)$.
+\end{enumerate}
+\end{quote}
+
+\subsection*{Completion estimate}
+What remains is either (a) an unconditional finiteness/uniqueness theorem for \eqref{eq:P388-main} under $k_1,k_2>3,\ m_1+k_1\le m_2$, or (b) an explicit infinite family (or even a second distinct example). Any such proof likely needs deep input on smooth numbers or an effective resolution of integral points on families of curves.
+
+%============================================================

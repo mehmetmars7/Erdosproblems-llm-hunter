@@ -1,0 +1,179 @@
+\section*{Problem \#276}
+
+\subsection*{FORMAL RESTATEMENT}
+A \emph{(Fibonacci-like) Lucas sequence} in this problem means an integer sequence $(x_n)_{n\ge 0}$ satisfying
+\[
+x_{n+2}=x_{n+1}+x_n \qquad(n\ge 0),
+\]
+with given integers $x_0,x_1$.
+
+\medskip
+\noindent\textbf{Literal question.}
+\emph{Do there exist relatively prime positive integers $x_0,x_1$ such that every term $x_n$ is composite, and such that no integer $d>1$ divides every $x_n$?}
+(The last clause is equivalent to $\gcd(x_0,x_1)=1$, as proved below.)
+
+\medskip
+\noindent\textbf{Ambiguity noted.}
+The problem statement also mentions an additional, informal question about whether one can have such a composite sequence \emph{without} an ``underlying covering system of congruences responsible.''  That phrase is not a standard formal condition and admits multiple inequivalent formalizations.  The \emph{literal} existence question above \emph{is} formal and will be proved here.
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+Graham (1964) constructed the first example of a Fibonacci-like sequence with no prime terms and $\gcd(x_0,x_1)=1$ using covering congruences.  Subsequent improvements (Knuth, Wilf, Nicol, Vsemirnov) produced much smaller initial pairs.  A clean presentation of the ``covering system + Chinese remainder theorem'' method, including an explicit record-holding pair due to Vsemirnov, is given by Is\u{a}mailescu--Son (2014).
+
+\subsection*{ATTACK PLAN}
+\begin{enumerate}
+\item Use the standard representation of a Fibonacci-like sequence in terms of Fibonacci numbers $F_n$.
+\item Use a finite covering system of congruences $(r_i \bmod m_i)$ together with primes $p_i\mid F_{m_i}$.
+\item Choose $x_0,x_1$ so that for each $i$, $x_{r_i}\equiv 0\pmod{p_i}$; then $x_n$ is divisible by some $p_i$ for every $n$.
+\item Ensure $\gcd(x_0,x_1)=1$ so no integer $>1$ divides all terms.
+\end{enumerate}
+
+\subsection*{WORK}
+\paragraph{Fibonacci preliminaries.}
+Let $(F_n)_{n\ge 0}$ be the Fibonacci numbers: $F_0=0$, $F_1=1$, $F_{n+2}=F_{n+1}+F_n$.
+
+\begin{lemma}[Closed form for Fibonacci-like sequences]\label{lem:linear_combo}
+Let $(x_n)$ satisfy $x_{n+2}=x_{n+1}+x_n$ with given $x_0,x_1$.
+Then for all $n\ge 1$,
+\[
+x_n \;=\; x_0 F_{n-1} + x_1 F_n.
+\]
+\end{lemma}
+\begin{proof}
+For $n=1$ this gives $x_1=x_0F_0+x_1F_1=x_1$, true.
+Assume true for $n$ and $n+1$.
+Then
+\[
+x_{n+2}=x_{n+1}+x_n
+= (x_0F_n+x_1F_{n+1}) + (x_0F_{n-1}+x_1F_n)
+= x_0F_{n+1}+x_1F_{n+2},
+\]
+since $F_{n+1}=F_n+F_{n-1}$ and $F_{n+2}=F_{n+1}+F_n$.
+\end{proof}
+
+\begin{lemma}[Addition formula]\label{lem:addition}
+For all integers $u\ge 1$ and $v\ge 0$,
+\[
+F_{u+v} \;=\; F_u F_{v+1} + F_{u-1}F_v.
+\]
+\end{lemma}
+\begin{proof}
+Fix $u\ge 1$ and define $G_v := F_u F_{v+1}+F_{u-1}F_v$.
+Then $G_0=F_u=F_{u+0}$ and $G_1=F_uF_2+F_{u-1}F_1=F_u+F_{u-1}=F_{u+1}$.
+Also,
+\[
+G_{v+2}=F_uF_{v+3}+F_{u-1}F_{v+2}
+=F_u(F_{v+2}+F_{v+1})+F_{u-1}(F_{v+1}+F_v)
+=G_{v+1}+G_v.
+\]
+Thus $(G_v)_{v\ge 0}$ satisfies the Fibonacci recurrence with the same initial values as $(F_{u+v})_{v\ge 0}$, hence $G_v=F_{u+v}$ for all $v$.
+\end{proof}
+
+\begin{lemma}[Divisibility along multiples]\label{lem:F_divides}
+If $m\ge 1$ and $t\ge 1$, then $F_m \mid F_{tm}$.
+\end{lemma}
+\begin{proof}
+Induct on $t$.
+The case $t=1$ is trivial.
+Assume $F_m\mid F_{(t-1)m}$.
+Apply Lemma~\ref{lem:addition} with $u=m$ and $v=(t-1)m$:
+\[
+F_{tm}=F_{m+(t-1)m}=F_mF_{(t-1)m+1}+F_{m-1}F_{(t-1)m}.
+\]
+The first term is divisible by $F_m$, and the second term is divisible by $F_m$ by the induction hypothesis, hence so is $F_{tm}$.
+\end{proof}
+
+\paragraph{A concrete covering-system construction (Vsemirnov).}
+Consider the following $17$ quadruples $(p_i,m_i,r_i,c_i)$:
+\begin{align*}
+&(3,4,3,2),\ (2,3,1,1),\ (5,5,4,2),\ (7,8,5,3),\ (17,9,2,5),\\
+&(11,10,6,6),\ (47,16,9,34),\ (19,18,14,14),\ (61,15,12,29),\\
+&(23,24,17,6),\ (107,36,8,19),\ (31,30,0,21),\ (1103,48,33,9),\\
+&(181,90,80,58),\ (41,20,18,11),\ (541,90,62,185),\ (2521,60,48,306).
+\end{align*}
+These satisfy:
+\begin{enumerate}
+\item[(b)] $p_i \mid F_{m_i}$ for every $i$;
+\item[(c)] the congruences $n\equiv r_i\pmod{m_i}$ cover all integers $n\ge 0$ (equivalently, all residue classes mod $\mathrm{lcm}(m_1,\dots,m_{17})=720$).
+\end{enumerate}
+
+Define $x_0,x_1$ by the simultaneous congruences
+\begin{equation}\label{eq:CRT}
+x_0 \equiv c_i F_{m_i-r_i}\pmod{p_i},
+\qquad
+x_1 \equiv c_i F_{m_i-r_i+1}\pmod{p_i}
+\qquad (1\le i\le 17).
+\end{equation}
+Since the moduli $p_i$ are pairwise coprime, the Chinese remainder theorem guarantees solutions $(x_0,x_1)$.
+
+One explicit solution (due to Vsemirnov) is
+\[
+x_0 = 106276436867,
+\qquad
+x_1 = 35256392432,
+\]
+and $\gcd(x_0,x_1)=1$ (see Lemma~\ref{lem:gcd}).
+
+\paragraph{Key congruence: each residue class forces a prime divisor.}
+Fix $i$.
+For $n\ge 1$, use Lemma~\ref{lem:linear_combo} and the defining congruences~\eqref{eq:CRT}:
+\begin{align*}
+x_n
+&= x_0F_{n-1}+x_1F_n\\
+&\equiv c_iF_{m_i-r_i}F_{n-1} + c_iF_{m_i-r_i+1}F_n
+= c_i\bigl(F_{m_i-r_i}F_{n-1} + F_{m_i-r_i+1}F_n\bigr)
+\pmod{p_i}.
+\end{align*}
+Apply Lemma~\ref{lem:addition} with $u=m_i-r_i+1$ and $v=n-1$:
+\[
+F_{(m_i-r_i+1)+(n-1)} = F_{m_i-r_i+1}F_n + F_{m_i-r_i}F_{n-1}.
+\]
+Hence for all $n\ge 1$,
+\begin{equation}\label{eq:xn_cong}
+x_n \equiv c_i F_{n+m_i-r_i}\pmod{p_i}.
+\end{equation}
+If $n\equiv r_i\pmod{m_i}$ then $n+m_i-r_i$ is a multiple of $m_i$, so by Lemma~\ref{lem:F_divides} we have $F_{m_i}\mid F_{n+m_i-r_i}$, and since $p_i\mid F_{m_i}$ we get
+\[
+p_i \mid F_{n+m_i-r_i}
+\quad\Longrightarrow\quad
+p_i \mid x_n
+\qquad\text{whenever }n\equiv r_i\pmod{m_i}.
+\]
+By property (c), for every $n\ge 0$ there is some $i$ with $n\equiv r_i\pmod{m_i}$, hence every $x_n$ is divisible by (at least) one of the primes $\{p_i\}$.
+
+\paragraph{Compositeness.}
+All $x_n$ are positive and strictly increasing once $n\ge 1$ because $x_0,x_1>0$ and $x_{n+2}=x_{n+1}+x_n$.
+Moreover, the primes $p_i$ in the construction are all $\le 2521$ while $x_0>2521$.
+Thus, for each $n\ge 0$, the prime $p_i$ guaranteed above satisfies $1<p_i<x_n$, so $x_n$ is composite.
+
+\paragraph{No common factor divides all terms.}
+\begin{lemma}\label{lem:gcd}
+For any Fibonacci-like sequence $(x_n)$, $\gcd(x_n,x_{n+1})=\gcd(x_0,x_1)$ for all $n\ge 0$.
+In particular, $\gcd(x_0,x_1)=1$ implies no integer $d>1$ divides all terms.
+\end{lemma}
+\begin{proof}
+Let $d_n=\gcd(x_n,x_{n+1})$.
+Using the recurrence,
+\[
+d_{n+1}=\gcd(x_{n+1},x_{n+2})
+=\gcd(x_{n+1},x_{n+1}+x_n)
+=\gcd(x_{n+1},x_n)=d_n.
+\]
+Hence $d_n$ is constant in $n$ and equals $d_0=\gcd(x_0,x_1)$.
+\end{proof}
+For Vsemirnov's explicit pair, an application of the Euclidean algorithm gives $\gcd(106276436867,35256392432)=1$, so the sequence has no nontrivial common divisor.
+
+\subsection*{VERIFICATION}
+All of the following checks are finite and can be verified directly:
+\begin{itemize}
+\item $\mathrm{lcm}(m_1,\dots,m_{17})=720$ and every residue class modulo $720$ satisfies $n\equiv r_i\pmod{m_i}$ for at least one $i$ (so (c) holds).
+\item For each $i$, $F_{m_i}\equiv 0\pmod{p_i}$ (so (b) holds).
+\item The displayed pair $(x_0,x_1)=(106276436867,35256392432)$ satisfies the congruences~\eqref{eq:CRT}.
+\item The first several dozen terms $x_n$ are indeed composite; moreover, for each such $n$ one finds an $i$ with $n\equiv r_i\pmod{m_i}$ and $p_i\mid x_n$, consistent with the proof.
+\end{itemize}
+
+\subsection*{FINAL: PROVED}
+Yes: there exist relatively prime positive integers $x_0,x_1$ such that the Fibonacci-like sequence $x_{n+2}=x_{n+1}+x_n$ contains no primes and has no common divisor $>1$.
+An explicit example is $(x_0,x_1)=(106276436867,35256392432)$, and the proof above shows all $x_n$ are composite and $\gcd(x_0,x_1)=1$.
+
+\subsection*{COMPLETION ESTIMATE (honest)}
+The literal existence question is complete.  The additional informal question about ``no underlying covering congruences responsible'' would require a precise formal definition of that phrase; different formalizations lead to different problems, and some such variants remain open in the literature.

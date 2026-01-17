@@ -1,0 +1,119 @@
+\section*{Problem 642}
+
+\subsection*{1) FORMAL RESTATEMENT}
+For an integer $n\ge 1$, let $f(n)$ be the maximum number of edges in an $n$-vertex (simple, undirected) graph $G$ with the property:
+
+\begin{quote}
+For every cycle $C$ in $G$ with vertex set $S:=V(C)$, the number of \emph{diagonals} of $C$ present in $G$ (i.e., edges of $G[S]$ joining two nonconsecutive vertices of $C$) is strictly less than $|S|$.
+\end{quote}
+Equivalently, for every cycle $C$ of length $\ell$,
+\[
+  |E(G[S])| = \ell + \#\{\text{diagonals of $C$ present in }G\} < 2\ell.
+\]
+Question. Is it true that $f(n)\ll n$, i.e. $f(n)=O(n)$?
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Letting a ``diagonal'' mean a chord present in the graph, the best published general upper bounds currently are
+\[
+  f(n)\ll n^{3/2}\quad\text{(Chen--Erd\H{o}s--Staton, 1996)}
+\qquad\text{and}\qquad
+  f(n)\ll n(\log n)^8\quad\text{(Dragani\'{c}--Methuku--Munh\'{a} Correia--Sudakov, 2024)}.
+\]
+The linear bound remains open.
+
+\subsection*{3) ATTACK PLAN}
+Provide:
+\begin{enumerate}[label=\arabic*.]
+\item A clean linear lower bound construction, to pin down $f(n)$ from below.
+\item A structural sufficient condition (in terms of arboricity) guaranteeing the cycle/diagonal property.
+\item A summary of what would be needed to close the remaining polylogarithmic gap in the known upper bound.
+\end{enumerate}
+
+\subsection*{4) WORK}
+\paragraph{4.1. A sufficient condition via arboricity.}
+Recall that the \emph{arboricity} $\mathrm{arb}(G)$ is the least $a$ such that $E(G)$ can be partitioned into $a$ forests.
+Equivalently (Nash--Williams),
+\[\mathrm{arb}(G)=\max_{H\subseteq G,\,|V(H)|\ge 2}\left\lceil\frac{|E(H)|}{|V(H)|-1}\right\rceil.\]
+
+\begin{lemma}[Arboricity $\le 2$ implies the diagonal condition]
+If $\mathrm{arb}(G)\le 2$, then $G$ has the property that every cycle has fewer diagonals than vertices.
+\end{lemma}
+\begin{proof}
+Assume $\mathrm{arb}(G)\le 2$.
+Let $C$ be any cycle in $G$ with vertex set $S$ and $|S|=\ell$.
+The induced subgraph $G[S]$ is a subgraph of $G$, hence also has arboricity at most $2$.
+Therefore $G[S]$ can be written as the union of two forests on $\ell$ vertices, so
+\[
+  |E(G[S])|\le 2(\ell-1)=2\ell-2.
+\]
+Since $C$ contributes exactly $\ell$ edges inside $G[S]$, the number of diagonals of $C$ present in $G$ is
+\[
+  |E(G[S])| - \ell \le (2\ell-2)-\ell = \ell-2 < \ell,
+\]
+as required.
+\end{proof}
+
+\paragraph{4.2. A linear lower bound: $f(n)\ge 2n-2$ for $n\ge 4$.}
+We explicitly construct an $n$-vertex graph with $2n-2$ edges satisfying the diagonal condition.
+
+\begin{construction}
+Fix $n\ge 4$ and vertex set $\{1,2,\dots,n\}$.
+Let $T_1$ and $T_2$ be the following spanning trees:
+\begin{align*}
+E(T_1)&:=\{\,1i: 3\le i\le n\,\}\ \cup\ \{23\},\\
+E(T_2)&:=\{\,21\,\}\ \cup\ \{\,2i:4\le i\le n\,\}\ \cup\ \{34\}.
+\end{align*}
+Then $|E(T_1)|=|E(T_2)|=n-1$ and $E(T_1)\cap E(T_2)=\varnothing$.
+Define $G:=T_1\cup T_2$.
+\end{construction}
+
+\begin{lemma}
+For $n\ge 4$, the graph $G$ above has $|E(G)|=2n-2$ and satisfies the diagonal condition.
+\end{lemma}
+\begin{proof}
+By construction $|E(G)|=|E(T_1)|+|E(T_2)|=2n-2$.
+Moreover $G$ is the union of two forests, hence $\mathrm{arb}(G)\le 2$.
+By the previous lemma, $G$ satisfies the diagonal condition.
+\end{proof}
+
+Consequently,
+\[
+  f(n)\ge 2n-2\qquad(n\ge 4).
+\]
+
+\paragraph{4.3. Status summary.}
+Combining the explicit lower bound with the best current upper bounds yields
+\[
+  2n-2\ \le\ f(n)\ \ll\ n(\log n)^8.
+\]
+Closing the gap requires either:
+(i) improving the upper bound to $O(n)$ by showing that constant average degree already forces a cycle with at least as many chords as vertices, or
+(ii) constructing graphs with $\omega(n)$ edges in which every cycle has $<\ell$ diagonals.
+
+\subsection*{5) VERIFICATION / SANITY CHECKS}
+\begin{itemize}
+\item In a graph of arboricity $\le 2$, every induced subgraph on $\ell$ vertices has at most $2\ell-2$ edges; for cycle vertex sets this forces $\#\text{diagonals}\le \ell-2$.
+\item The construction produces two edge-disjoint spanning trees for every $n\ge 4$; their union has $2n-2$ edges and arboricity at most $2$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\noindent\textbf{UNRESOLVED.}
+
+\smallskip
+\noindent\textbf{Best partial results/progress achieved here:}
+\begin{itemize}
+\item Gave a simple sufficient condition: arboricity $\le 2$ implies the diagonal property.
+\item Built an explicit extremal-style construction with $2n-2$ edges (for $n\ge 4$), proving $f(n)\ge 2n-2$.
+\item Summarized the current best known upper bounds and the remaining gap.
+\end{itemize}
+
+\noindent\textbf{Concrete next moves that look most promising:}
+\begin{enumerate}[label=\arabic*.]
+\item Try to prove a constant-average-degree forcing result: show that if $|E(G)|\ge Cn$ then some cycle has at least $|C|$ diagonals.
+\item Alternatively, attempt explicit superlinear constructions satisfying the diagonal condition (e.g. iterated 2-arboric expansions) to refute linearity.
+\item Investigate whether random-walk/expander methods used for the $n(\log n)^8$ upper bound can be strengthened to remove the polylog factor.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\noindent\textbf{COMPLETION: 40\%}
+
