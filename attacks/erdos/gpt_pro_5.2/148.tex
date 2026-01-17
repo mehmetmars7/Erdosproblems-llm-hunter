@@ -1,0 +1,272 @@
+\section{Erd\H{o}s Problem \#148: Counting Egyptian fraction representations}
+
+\subsection*{FORMAL RESTATEMENT}
+For each integer $k\ge 1$, let $F(k)$ be the number of strictly increasing $k$-tuples
+$(n_1,\dots,n_k)\in \mathbb{N}^k$ with
+\[
+1 \;=\; \frac{1}{n_1}+\cdots+\frac{1}{n_k}
+\quad\text{and}\quad 1\le n_1<\cdots<n_k.
+\]
+The problem asks for \emph{good estimates} for $F(k)$ as $k\to\infty$.
+
+\medskip
+\noindent\textbf{Ambiguity note.} The prompt is open-ended (not a single proposition to prove/disprove).
+I interpret ``good estimates'' as: find explicit functions $L(k),U(k)$ with
+$L(k)\le F(k)\le U(k)$ and with $L,U$ as close as possible on a double-exponential scale
+(e.g.\ matching the correct order of magnitude of $\log\log F(k)$).
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The Erd\H{o}s Problems database currently records the best known general bounds as
+\[
+2^{c^{k/\log k}} \;\le\; F(k)\;\le\; c_0^{(\frac15+o(1))2^k},
+\]
+where $c>0$ is an absolute constant and $c_0\approx 1.26408\ldots$ is the Vardi constant.
+The lower bound is attributed to Konyagin (with later errata/clarifications noted on the
+problem discussion page), and the upper bound to Elsholtz--Planitzer.
+
+\medskip
+\noindent\textbf{What I do here.} I do \emph{not} reprove these deep best-known bounds. Instead I:
+\begin{itemize}[leftmargin=2em]
+\item compute $F(k)$ exactly for $k\le 6$ via exhaustive backtracking, as a consistency check;
+\item give a clean, fully self-contained \emph{exponential} lower bound $F(k)\ge 3^{k-3}$;
+\item give a clean, fully self-contained \emph{double-exponential} upper bound of the form
+$F(k)\le k^k \prod_{i=1}^k u_i$, where $(u_i)$ is the Sylvester sequence, implying
+$F(k)\le (c_0+o(1))^{2^{k+1}}$.
+\end{itemize}
+
+\subsection*{DEFINITIONS / SETUP}
+\begin{itemize}[leftmargin=2em]
+\item A \emph{unit fraction} is a rational number of the form $1/n$ with $n\in\mathbb{N}$.
+\item An \emph{Egyptian fraction representation of $1$ with $k$ terms} is a strictly increasing
+sequence $1\le n_1<\cdots<n_k$ such that $1=\sum_{i=1}^k 1/n_i$.
+\item The \emph{Sylvester sequence} $(u_i)_{i\ge 1}$ is defined by
+\[
+u_1=1,\qquad u_{i+1}=u_i(u_i+1)\ \ (i\ge 1).
+\]
+It is classical that $u_i$ grows doubly exponentially; one defines
+\[
+c_0 := \lim_{i\to\infty} u_i^{2^{-i}},
+\]
+the so-called \emph{Vardi constant} ($c_0\approx 1.26408\ldots$).
+\end{itemize}
+
+\subsection*{KNOWN RESULTS I WILL USE}
+All items below are proved in-line (so ``known'' means ``standard and I will verify it'').
+
+\begin{lemma}[Two-term splitting identity]\label{lem:split}
+Let $n\in\mathbb{N}$ and let $m$ be a proper divisor of $n$ (i.e.\ $m\mid n$ and $1\le m<n$).
+Then
+\[
+\frac{1}{n}
+\;=\;
+\frac{1}{n+m}
++
+\frac{1}{\frac{n(n+m)}{m}},
+\]
+and the two denominators $n+m$ and $\frac{n(n+m)}{m}$ are distinct integers exceeding $n$.
+\end{lemma}
+
+\begin{proof}
+Compute
+\[
+\frac{1}{n+m} + \frac{1}{n(n+m)/m}
+=
+\frac{1}{n+m} + \frac{m}{n(n+m)}
+=
+\frac{n}{n(n+m)}+\frac{m}{n(n+m)}
+=
+\frac{n+m}{n(n+m)}
+=
+\frac{1}{n}.
+\]
+Since $m\mid n$, the quantity $n(n+m)/m$ is an integer.
+Also $n+m>n$ and $n(n+m)/m\ge n(n+1)/m>n$.
+Finally, if $n+m = n(n+m)/m$ then $m=n$, contradicting $m<n$.
+\end{proof}
+
+\begin{lemma}[A standard independent-set lower bound]\label{lem:indep}
+If $G$ is a graph on $N$ vertices with maximum degree at most $\Delta$, then
+$\alpha(G)\ge \frac{N}{\Delta+1}$.
+\end{lemma}
+
+\begin{proof}
+Greedy algorithm: iteratively pick a vertex, add it to an independent set, and delete it
+together with its (at most $\Delta$) neighbors. Each chosen vertex removes at most $\Delta+1$
+vertices, so we choose at least $N/(\Delta+1)$ vertices.
+\end{proof}
+
+\subsection*{MAIN ATTEMPT}
+
+\subsubsection*{1) Exact values for small \texorpdfstring{$k$}{k}}
+Using backtracking with the elementary bounds
+\[
+n_i \ge \left\lceil \frac{1}{\text{(remaining sum)}}\right\rceil,
+\qquad
+n_i \le \left\lfloor \frac{\text{(\# remaining terms)}}{\text{(remaining sum)}} \right\rfloor,
+\]
+I enumerated all solutions for $k\le 6$. The results are:
+\[
+F(1)=1,\quad F(2)=0,\quad F(3)=1,\quad F(4)=6,\quad F(5)=72,\quad F(6)=2320.
+\]
+For instance, the $k=4$ solutions are
+\[
+(2,3,7,42),\ (2,3,8,24),\ (2,3,9,18),\ (2,3,10,15),\ (2,4,5,20),\ (2,4,6,12).
+\]
+These values agree with the rapid growth expected from the literature.
+
+\subsubsection*{2) A fully self-contained exponential lower bound}
+\begin{proposition}[Elementary exponential growth]\label{prop:exp-lb}
+For every $k\ge 3$ one has
+\[
+F(k)\ \ge\ 3^{k-3}.
+\]
+\end{proposition}
+
+\begin{proof}
+Start from the valid $3$-term representation
+\[
+1=\frac12+\frac13+\frac16,
+\]
+whose largest denominator is $6$, divisible by $6$.
+
+We define an operation that increases the number of terms by one:
+given a representation with largest denominator $N$ (necessarily $N\ge 6$ and divisible by $6$),
+replace the term $1/N$ using Lemma~\ref{lem:split} with one of the three choices $m\in\{1,2,3\}$:
+\[
+\frac1N
+=
+\frac{1}{N+m}
++
+\frac{1}{\frac{N(N+m)}{m}}
+\qquad (m=1,2,3).
+\]
+Since $m\mid N$ for $m=1,2,3$, this is always valid, and it replaces one term by two distinct
+terms with denominators $>N$. Therefore, the resulting list of denominators remains distinct,
+and after sorting we again have a strictly increasing representation of $1$.
+
+Let $N'$ denote the new largest denominator; it is
+\[
+N'=\frac{N(N+m)}{m}.
+\]
+We claim $N'$ is again divisible by $6$:
+\begin{itemize}[leftmargin=2em]
+\item For $m=1$, $N'=N(N+1)$ is divisible by $6$ because it is a product of two consecutive
+integers and $N$ is divisible by $6$.
+\item For $m=2$, since $N$ is divisible by $6$, $N/2$ is divisible by $3$, and $N+2$ is even,
+so $N'=(N/2)(N+2)$ is divisible by $6$.
+\item For $m=3$, $N'=(N/3)(N+3)$ with $N/3$ even and $N+3$ divisible by $3$, hence divisible by $6$.
+\end{itemize}
+Thus the operation can be iterated indefinitely while always keeping three available choices.
+
+Finally, different choices of $m$ at the \emph{first} step already yield different new largest
+denominators $N'$, hence different resulting $k$-tuples. By induction on the first index where two
+choice-sequences differ, we see that distinct sequences of $m$'s produce distinct final representations.
+Therefore after $t=k-3$ iterations we obtain at least $3^t=3^{k-3}$ distinct representations of length $k$.
+\end{proof}
+
+\subsubsection*{3) A fully self-contained double-exponential upper bound via Sylvester}
+The following is a standard ``Sylvester sequence'' argument giving an explicit upper bound
+on the \emph{sizes} of denominators in any solution, hence also an explicit (although crude)
+upper bound on $F(k)$.
+
+\begin{lemma}[Sylvester-type control of partial remainders]\label{lem:sylvester}
+Let $k\ge 1$ and let $x_1\le x_2\le \cdots\le x_k$ be integers such that
+$1=\sum_{i=1}^k \frac1{x_i}$.
+For $0\le m\le k$ define $y_m\in \mathbb{Q}_{>0}\cup\{\infty\}$ by
+\[
+1-\sum_{i=1}^m \frac1{x_i}=\frac1{y_m}
+\quad\text{(so $y_0=1$ and $y_k=\infty$)}.
+\]
+Then for $0\le m\le k-1$ we have the recurrence bound
+\[
+y_{m+1}\ \le\ y_m(y_m+1),
+\]
+and hence $y_m\le u_{m+1}$ for all $0\le m\le k-1$.
+\end{lemma}
+
+\begin{proof}
+Fix $0\le m\le k-1$. Since the remaining sum after $m$ terms is
+\[
+\frac1{y_m} = \frac{1}{x_{m+1}}+\cdots+\frac{1}{x_k},
+\]
+we have $x_{m+1}\ge y_m+1$ (because $x_{m+1}>y_m$; if $x_{m+1}\le y_m$ then
+$1/x_{m+1}\ge 1/y_m$, forcing the remaining sum to be $\ge 1/y_m$ with equality only if
+all other terms vanish, impossible unless $m=k-1$).
+Compute
+\[
+\frac1{y_{m+1}}=\frac1{y_m}-\frac1{x_{m+1}}=\frac{x_{m+1}-y_m}{y_m x_{m+1}}.
+\]
+Since $x_{m+1}-y_m\ge 1$, we obtain
+\[
+\frac1{y_{m+1}} \ge \frac{1}{y_m x_{m+1}}
+\ge \frac{1}{y_m(y_m+1)}.
+\]
+Taking reciprocals gives $y_{m+1}\le y_m(y_m+1)$.
+
+Now compare to Sylvester:
+$u_1=1$ and $u_{i+1}=u_i(u_i+1)$, so by induction $y_m\le u_{m+1}$.
+\end{proof}
+
+\begin{proposition}[Crude double-exponential upper bound]\label{prop:de-ub}
+For every $k\ge 1$,
+\[
+F(k) \ \le\ k^k \prod_{i=1}^k u_i,
+\]
+where $(u_i)$ is the Sylvester sequence. In particular, since $u_i \le (c_0+o(1))^{2^i}$,
+\[
+F(k) \ \le\ (c_0+o(1))^{2^{k+1}}
+\qquad\text{as }k\to\infty.
+\]
+\end{proposition}
+
+\begin{proof}
+Let $(x_1,\dots,x_k)$ be a solution with $x_1<\cdots<x_k$.
+From Lemma~\ref{lem:sylvester}, for each $1\le i\le k$ the remainder after $i-1$ terms satisfies
+$y_{i-1}\le u_i$ and
+\[
+\frac1{y_{i-1}}
+=
+\frac{1}{x_i}+\cdots+\frac{1}{x_k}
+\le \frac{k}{x_i}.
+\]
+Hence $x_i \le k y_{i-1} \le k u_i$.
+Therefore each coordinate $x_i$ lies in $\{1,2,\dots, k u_i\}$, and the number of possible
+$k$-tuples is at most $\prod_{i=1}^k (k u_i)=k^k\prod_{i=1}^k u_i$, giving the claimed bound on $F(k)$.
+
+Finally, the definition of $c_0$ implies $u_i=(c_0+o(1))^{2^i}$, so
+$\prod_{i=1}^k u_i = (c_0+o(1))^{\sum_{i=1}^k 2^i}=(c_0+o(1))^{2^{k+1}}$.
+\end{proof}
+
+\subsection*{ADVERSARIAL CHECK}
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Lower bound injectivity.} The proof of Proposition~\ref{prop:exp-lb} relies on the fact that
+distinct sequences of choices $m\in\{1,2,3\}$ yield distinct final representations. This is ensured because
+the largest denominator evolves deterministically via $N\mapsto N(N+m)/m$; two sequences that first differ
+at step $j$ produce different $N_{j+1}$ at that step, and subsequent operations only increase denominators,
+so final multisets differ.
+\item \textbf{Upper bound correctness.} Proposition~\ref{prop:de-ub} counts \emph{all} integer $k$-tuples
+bounded coordinate-wise; it does not attempt to enforce strict increase when counting, so it is indeed an
+upper bound.
+\item \textbf{Growth scale.} The upper bound is doubly exponential and very crude compared to the best known
+$c_0^{(\frac15+o(1))2^k}$; however it is completely self-contained and captures the correct ``double-exponential
+in $k$'' phenomenon.
+\end{itemize}
+
+\subsection*{FINAL}
+\noindent\textbf{UNRESOLVED --- PARTIAL PROGRESS.}
+
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Farthest point reached.} I proved an explicit elementary exponential lower bound
+$F(k)\ge 3^{k-3}$ and a fully self-contained double-exponential upper bound
+$F(k)\le k^k\prod_{i\le k}u_i \le (c_0+o(1))^{2^{k+1}}$. I also computed exact values $F(k)$ for $k\le 6$.
+\item \textbf{Remaining gap.} The true growth is known to be doubly exponential, but tightening the exponent
+from the crude constant ``$\approx 1$'' down to the best known $(1/5+o(1))$ (and improving the lower bound to
+match on the $\log\log$ scale) requires substantially deeper arguments.
+\item \textbf{Promising next steps.} (i) Implement Konyagin-type constructions carefully (taking into account
+the published errata) to recover a lower bound of the form $2^{c^{k/\log k}}$ in a fully verified way.
+(ii) Improve the crude Sylvester counting by using sharp upper bounds on the number of representations of a
+fixed rational as a sum of $3$ or $4$ unit fractions (the Elsholtz--Planitzer strategy).
+\end{itemize}
+
+\medskip
+\noindent\textbf{COMPLETION: 35\%}

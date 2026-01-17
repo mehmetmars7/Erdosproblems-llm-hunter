@@ -1,0 +1,136 @@
+\section*{Problem \#222 (gaps between sums of two squares)}
+
+\subsection*{1. Formal restatement}
+Let
+\[
+\mathcal S := \{n\in\mathbb Z_{\ge 0}: n=a^2+b^2 \text{ for some } a,b\in\mathbb Z\}
+\]
+and write its elements in increasing order
+\[
+0\le n_1 < n_2 < n_3 < \cdots.
+\]
+Define the consecutive gaps
+\[
+\Delta_k := n_{k+1}-n_k\qquad (k\ge 1).
+\]
+The prompt ``explore the behaviour'' is not a yes/no statement; interpreted minimally, it asks for meaningful upper and lower bounds on $\Delta_k$ (pointwise, on average, and for $\limsup$).
+
+\subsection*{2. Quick literature/context check (browsing available)}
+The Erd\H{o}s Problems page (OPEN) records the following known results:\footnote{\url{https://www.erdosproblems.com/222}}
+\begin{itemize}
+\item (Lower bounds) Erd\H{o}s proved infinitely often
+$\Delta_k \gg \dfrac{\log n_k}{\sqrt{\log\log n_k}}$.
+\item Richards (1982) improved this to
+$\displaystyle \limsup_{k\to\infty}\frac{\Delta_k}{\log n_k}\ge \frac14$.
+\item The constant $1/4$ was improved, most recently to $0.868\ldots=\frac{390}{449}$ by Dietmann--Elsholtz--Kalmynin--Konyagin--Maynard.\footnote{See e.g. the IMRN abstract page: \url{https://academic.oup.com/imrn/article-abstract/2023/12/10313/6595488}}
+\item (Upper bound) Bambah--Chowla proved $\Delta_k\ll n_k^{1/4}$.
+\end{itemize}
+
+\subsection*{3. Attack plan}
+\begin{enumerate}[label=(\roman*)]
+\item For \emph{lower bounds}, build long intervals $[M+1,\dots,M+K]$ with no sums of two squares by forcing each $M+i$ to have an ``odd'' prime factor $\equiv 3\pmod 4$ to odd exponent. Chinese remainder theorem (CRT) constructions are natural.
+\item For \emph{upper bounds}, find a constructive way to guarantee a sum of two squares in every interval of length $f(x)$ near $x$. The best known $f(x)=x^{1/4+o(1)}$ is nontrivial; a very weak bound can be obtained from the fact that perfect squares belong to $\mathcal S$.
+\end{enumerate}
+
+\subsection*{4. Work}
+\subsubsection*{4.1. Fast reality check (small $k$)}
+The first few sums of two squares are
+\[
+0,1,2,4,5,8,9,10,13,16,\dots
+\]
+so the first gaps are
+\[
+1,1,2,1,3,1,1,3,3,\dots.
+\]
+
+\subsubsection*{4.2. A key lemma for exclusions (prime $\equiv 3\pmod 4$)}
+\begin{lemma}
+Let $q$ be a prime with $q\equiv 3\pmod 4$. If $q\mid (a^2+b^2)$ for integers $a,b$, then $q\mid a$ and $q\mid b$. Consequently, in the prime factorization of any integer of the form $a^2+b^2$, the exponent of every prime $\equiv 3\pmod 4$ is even.
+\end{lemma}
+
+\begin{proof}
+Assume $q\mid a^2+b^2$.
+If $q\nmid b$, then $(a b^{-1})^2\equiv -1\pmod q$, i.e. $-1$ is a quadratic residue mod $q$.
+But for an odd prime $q$, $-1$ is a quadratic residue mod $q$ iff $q\equiv 1\pmod 4$, contradiction.
+Hence $q\mid b$, and then $q\mid a^2$ implies $q\mid a$.
+
+For the ``even exponent'' statement: if $q\mid a^2+b^2$ then writing $a=qa', b=qb'$ gives
+$a^2+b^2=q^2(a'^2+b'^2)$, so every time $q$ divides a sum of two squares, it divides it at least twice.
+Iterating yields that the exponent of $q$ is even.
+\end{proof}
+
+\subsubsection*{4.3. Unboundedness of gaps via CRT (fully explicit)}
+\begin{theorem}
+The gaps $\Delta_k=n_{k+1}-n_k$ are unbounded; equivalently, for every $K\ge 1$ there exists an interval of $K$ consecutive integers containing no sum of two squares.
+\end{theorem}
+
+\begin{proof}
+Fix $K\ge 1$.
+Choose distinct primes $q_1,\dots,q_K$ with $q_i\equiv 3\pmod 4$.
+Consider the system of congruences
+\[
+M+i\equiv q_i \pmod{q_i^2}\qquad (1\le i\le K).
+\]
+Because the moduli $q_i^2$ are pairwise coprime, the Chinese remainder theorem gives an integer $M$ satisfying all congruences.
+
+For each $i$, we have $q_i\mid (M+i)$ but $q_i^2\nmid (M+i)$ (since $M+i\equiv q_i\not\equiv 0\pmod{q_i^2}$).
+Thus the exponent of the prime $q_i\equiv 3\pmod 4$ in $M+i$ is odd.
+By the previous lemma, $M+i$ cannot be a sum of two squares.
+Therefore none of $M+1,\dots,M+K$ lies in $\mathcal S$, i.e. there is a gap of length at least $K$.
+\end{proof}
+
+\subsubsection*{4.4. A very weak universal upper bound}
+\begin{proposition}
+For every $x\ge 0$ there exists $n\in\mathcal S$ with
+\[
+ x\le n \le x+2\sqrt{x}+1.
+\]
+Consequently, for all $k\ge 1$,
+\[
+\Delta_k \le 2\sqrt{n_k}+1.
+\]
+\end{proposition}
+
+\begin{proof}
+Let $m=\lceil \sqrt{x}\rceil$. Then $m^2\in\mathcal S$ and
+\[
+0\le m^2-x \le (\sqrt{x}+1)^2-x=2\sqrt{x}+1.
+\]
+Taking $n=m^2$ proves the first claim.
+For the second, apply the first claim to $x=n_k$ and note that $n_{k+1}\le n$ because $n$ is some element of $\mathcal S$ exceeding $n_k$.
+\end{proof}
+
+\subsubsection*{4.5. Numerical experiment (finite data)}
+For $X=10^6,3\cdot 10^6,10^7$ I enumerated all $n\le X$ representable as $a^2+b^2$ and computed the maximal observed gap between consecutive such numbers up to $X$:
+\begin{center}
+\begin{tabular}{r|c|c}
+$X$ & $\#\{n\le X: n\in\mathcal S\}$ & $\max\{n_{j+1}-n_j: n_{j+1}\le X\}$\\
+\hline
+$10^6$ & $216{,}342$ & $35$\\
+$3\cdot 10^6$ & $621{,}797$ & $48$\\
+$10^7$ & $1{,}985{,}460$ & $50$\\
+\end{tabular}
+\end{center}
+This is consistent with the known theorems that the \emph{largest} gaps can be $\asymp \log X$ (and in fact at least $0.868\ldots\log X$ infinitely often), but the computational range is too small to see those asymptotics clearly.
+
+\subsection*{5. Verification}
+\begin{itemize}
+\item In the CRT construction, each $M+i$ is divisible by a prime $q_i\equiv 3\pmod 4$ to exact exponent $1$, so it is \emph{certainly} not a sum of two squares by Lemma 4.2.
+\item The universal upper bound uses only that squares are sums of two squares.
+\end{itemize}
+
+\subsection*{6. Final}
+\begin{center}
+\fbox{\parbox{0.92\linewidth}{\textbf{UNRESOLVED (as stated).}\\
+The prompt is an open-ended ``explore the behaviour'' problem; I did not achieve the sharp bounds $\Delta_k\ll n_k^{1/4}$ or the best known lower-bound constant $0.868\ldots$ with a complete derivation here.\\[6pt]
+\textbf{(i) Strongest fully proved partial result:} The gaps $\Delta_k$ are unbounded (explicit CRT construction of arbitrarily long runs of non-sums-of-two-squares), and the universal bound $\Delta_k\le 2\sqrt{n_k}+1$ holds for all $k$.\\[6pt]
+\textbf{(ii) First gap that blocks completion:} Proving a power-saving universal upper bound like $\Delta_k\ll n_k^{1/4}$ requires substantially deeper tools (distribution of lattice points / analytic number theory) than the elementary arguments used here.\\[6pt]
+\textbf{(iii) Top 3 next moves:} (1) Study/replicate the proof of Bambah--Chowla and modern treatments (e.g. Shiu's exposition) to obtain $n^{1/4}$; (2) study Richards' construction and its refinements (Dietmann--Elsholtz--Kalmynin--Konyagin--Maynard) to understand how the constants arise; (3) attempt to connect upper bounds to bounds on the number of lattice points in thin annuli.\\[6pt]
+\textbf{(iv) What a minimal counterexample would look like:} A refutation of a candidate upper bound $\Delta_k\le f(n_k)$ would require an explicit interval $[M+1,\dots,M+L]$ of length $L>f(M)$ containing no sums of two squares. The CRT method can produce such intervals, but controlling $M$ versus $L$ sharply is the hard part.}}
+\end{center}
+
+\subsection*{7. Completion estimate}
+\textbf{25\%}. The elementary structure of sums of two squares gives clean constructions (unbounded gaps) and crude bounds, but matching the best known exponents/constants requires deep analytic inputs.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

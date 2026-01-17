@@ -1,0 +1,153 @@
+\section*{Erd\H{o}s Problem \#236}
+
+\begin{enumerate}[label=\arabic*)]
+
+\item \textbf{FORMAL RESTATEMENT.}
+
+For an integer $n\ge 1$, define
+\[
+  f(n) := \bigl|\{k\in\mathbb{N}\cup\{0\}: 2^k < n\ \text{and}\ n-2^k\ \text{is prime}\}\bigr|.
+\]
+(Equivalently, $f(n)$ is the number of representations $n=p+2^k$ with $p$ prime and $k\ge 0$.)
+
+\textbf{Claim/conjecture.} As $n\to\infty$,
+\[
+  f(n) = o(\log n),
+\]
+meaning: for every $\varepsilon>0$ there exists $n_0(\varepsilon)$ such that $f(n)\le \varepsilon\log n$ for all $n\ge n_0(\varepsilon)$.
+
+\item \textbf{QUICK LITERATURE/CONTEXT CHECK.}
+
+This is a ``prime + power of two'' representation-count problem. Heuristics suggest $f(n)$ is typically $\asymp 1$, since there are $\asymp \log n$ possible exponents $k$ and each $n-2^k$ has ``probability'' $\asymp 1/\log n$ of being prime.
+
+Known results discussed in the problem literature include (i) lower bounds showing $f(n)$ can be large infinitely often (Erd\H{o}s obtained $f(n)\gg \log\log n$ infinitely often), and (ii) results of Vaughan bounding the rarity of integers $n$ for which $n-2^k$ is prime for \emph{all} $2^k<n$.
+
+\item \textbf{ATTACK PLAN.}
+
+\emph{Proof strategies.}
+\begin{itemize}
+  \item[(P1)] Seek a uniform sieve/large-sieve upper bound for the number of $k$ such that $n-2^k$ is prime; any bound $f(n)\ll \log n/\omega(n)$ with $\omega(n)\to\infty$ would imply the conjecture.
+  \item[(P2)] Control correlations of the set $\{n-2^k\}$ modulo many small primes to show that too many of them must be composite.
+\end{itemize}
+
+\emph{Disproof/construction strategies.}
+\begin{itemize}
+  \item[(D1)] Try to construct an explicit sequence $n_j$ for which $n_j-2^k$ is prime for $\gg \log n_j$ values of $k$ (this would contradict the conjecture). Any such construction would be extremely strong, akin to producing very long ``prime constellations'' along the translate of the power-of-two set.
+\end{itemize}
+
+\smallskip
+\textbf{Best path chosen here.} In this write-up, the proof track (P1)--(P2) stalls at producing a \emph{pointwise} $o(\log n)$ upper bound, and the disproof track (D1) would require constructing an explicit $n$ with $\gg \log n$ prime values among the translate $\{n-2^k\}$. Accordingly, I establish rigorous ``first-moment'' information: the average size of $f(n)$ is bounded (indeed tends to a constant), which implies $f(n)=o(\log n)$ for \emph{almost all} $n$ but leaves open the required uniform bound for all $n$.
+
+\item \textbf{WORK.}
+
+\paragraph{Lemma 236.1 (Trivial pointwise bound).}
+For all $n\ge 1$,
+\[
+  f(n) \le \bigl\lfloor \log_2(n-1)\bigr\rfloor + 1 \ll \log n.
+\]
+
+\begin{proof}
+If $2^k<n$ then $k\le \lfloor\log_2(n-1)\rfloor$. For each admissible $k$ there is at most one representation $n=(n-2^k)+2^k$, so $f(n)$ is at most the number of such $k$.
+\end{proof}
+
+\paragraph{Lemma 236.2 (Average order of $f(n)$).}
+Assume the Prime Number Theorem. Then, as $N\to\infty$,
+\[
+  \frac{1}{N}\sum_{n\le N} f(n) \to \frac{1}{\log 2}.
+\]
+
+\begin{proof}
+By definition,
+\[
+\sum_{n\le N} f(n)
+=\sum_{n\le N}\ \sum_{\substack{k\ge 0\\2^k<n}} \mathbf{1}_{\mathbb{P}}(n-2^k),
+\]
+where $\mathbf{1}_{\mathbb{P}}(m)$ is $1$ if $m$ is prime and $0$ otherwise. Interchanging the order of summation (all terms are nonnegative and the range is finite) gives
+\[
+\sum_{n\le N} f(n)
+=\sum_{k\ge 0}\ \sum_{\substack{n\le N\\2^k<n}} \mathbf{1}_{\mathbb{P}}(n-2^k).
+\]
+For fixed $k$, make the substitution $p=n-2^k$. Then $p$ runs over primes with
+$p\le N-2^k$, and the condition $2^k<n$ is equivalent to $p\ge 1$ which is automatic for primes. Thus the inner sum equals $\pi(N-2^k)$, and we obtain the exact identity
+\[
+\sum_{n\le N} f(n)=\sum_{0\le k\le \lfloor\log_2 N\rfloor} \pi(N-2^k).
+\]
+Let $K:=\lfloor\log_2 N\rfloor$. For each fixed $k\le K$, we have $N-2^k\asymp N$, and by the Prime Number Theorem,
+\[
+\pi(N-2^k)=\frac{N-2^k}{\log N}+o\!\left(\frac{N}{\log N}\right)
+\qquad (N\to\infty),
+\]
+uniformly for $0\le k\le K$ because $\log(N-2^k)=\log N+O(1)$ on this range. Summing over $k$ yields
+\[
+\sum_{n\le N} f(n)
+=\frac{1}{\log N}\sum_{k=0}^{K}(N-2^k)
++o\!\left(\frac{KN}{\log N}\right).
+\]
+Compute the finite geometric sum:
+\[
+\sum_{k=0}^{K}(N-2^k)=(K+1)N-(2^{K+1}-1)=(K+1)N+O(N),
+\]
+since $2^{K}\le N<2^{K+1}$ implies $2^{K+1}=O(N)$. Also, $K=(\log N)/(\log 2)+O(1)$, hence
+\[
+\frac{1}{\log N}\sum_{k=0}^{K}(N-2^k)=\frac{(K+1)N}{\log N}+O\!\left(\frac{N}{\log N}\right)=\frac{N}{\log 2}+o(N).
+\]
+Finally, the error term satisfies
+\[
+\frac{KN}{\log N}=\left(\frac{\log N}{\log 2}+O(1)\right)\frac{N}{\log N}=\frac{N}{\log 2}+O\!\left(\frac{N}{\log N}\right)=O(N),
+\]
+so multiplying by the little-$o(1)$ gives $o(N)$. Altogether,
+\[
+\sum_{n\le N} f(n)=\frac{N}{\log 2}+o(N).
+\]
+Dividing by $N$ gives the claimed limit.
+\end{proof}
+
+\paragraph{Corollary 236.3 (A density-one version of the conjecture).}
+Assume Lemma~236.2. For any fixed $A>0$,
+\[
+\bigl|\{n\le N: f(n)\ge A\log N\}\bigr| \ll \frac{N}{A\log N}.
+\]
+In particular, the set of $n$ for which $f(n)\ge A\log n$ has natural density $0$.
+
+\begin{proof}
+For each $N$,
+\[
+\sum_{n\le N} f(n) \ge \sum_{\substack{n\le N\\ f(n)\ge A\log N}} f(n)
+\ge A\log N\cdot \bigl|\{n\le N: f(n)\ge A\log N\}\bigr|.
+\]
+Rearrange and insert Lemma~236.2, which gives $\sum_{n\le N} f(n)\ll N$.
+\end{proof}
+
+\smallskip
+\emph{What this does not give.} Corollary~236.3 is an ``almost all $n$'' statement. The conjecture asks for the stronger pointwise bound $f(n)=o(\log n)$ holding for \emph{every} sufficiently large $n$, and the above averaging argument does not rule out a sparse exceptional sequence $n_j$ with $f(n_j)$ comparable to $\log n_j$.
+
+\item \textbf{VERIFICATION.}
+
+\begin{itemize}
+  \item \emph{Quantifiers.} Lemma~236.2 proves a limit for the average as $N\to\infty$ (not a pointwise estimate). All steps are finite sums; the only analytic input is PNT.
+  \item \emph{Edge cases.} The definition allows $k=0$ (so $2^k=1$); also $p=2$ is allowed.
+  \item \emph{Uniformity in $k$.} For $0\le k\le \log_2 N$, we indeed have $\log(N-2^k)=\log N+O(1)$, so PNT can be applied uniformly at the scale needed for an $o(N)$ aggregate error.
+\end{itemize}
+
+\item \textbf{FINAL.}
+
+\textbf{UNRESOLVED.}
+\begin{itemize}
+  \item[(i)] \emph{Strongest fully proved partial result obtained here.} Assuming PNT,
+  \(\frac1N\sum_{n\le N} f(n)\to 1/\log 2\), hence $f(n)=o(\log n)$ for a density-one subset of integers $n$.
+  \item[(ii)] \emph{First gap.} No argument here gives a uniform-in-$n$ improvement over the trivial bound $f(n)\ll \log n$; in particular it does not preclude a sparse exceptional sequence $n_j$ with $f(n_j)\asymp \log n_j$.
+  \item[(iii)] \emph{Top 3 next moves.}
+    \begin{itemize}
+      \item Develop a large-sieve/Selberg-sieve upper bound tailored to the set $\{n-2^k\}$ that holds uniformly in $n$.
+      \item Try to bound higher moments $\sum_{n\le N} f(n)^m$ sharply enough to force a global maximum bound on $f(n)$.
+      \item Explore whether results on primes in arithmetic progressions to moduli related to orders of $2$ can force many of the values $n-2^k$ to be composite.
+    \end{itemize}
+  \item[(iv)] \emph{What a minimal counterexample would likely look like.} An explicit sequence $n_j\to\infty$ and a fixed $\delta>0$ with $f(n_j)\ge \delta\log n_j$ for all $j$, i.e. unusually many primes among the translate $\{n_j-2^k\}$.
+\end{itemize}
+
+\item \textbf{COMPLETION ESTIMATE (MANDATORY).}\\
+COMPLETION: 40\%.
+
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

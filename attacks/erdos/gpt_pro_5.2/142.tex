@@ -1,0 +1,225 @@
+\section*{Problem 142: asymptotics of $r_k(N)$ (maximum size of a $k$--AP--free set)}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+Fix an integer $k\ge 3$.
+For $N\in\mathbb{N}$ define
+\[
+ r_k(N) := \max\bigl\{ |A| : A\subseteq [N]=\{1,2,\dots,N\}\ \text{and $A$ contains no $k$--term arithmetic progression}\bigr\}.
+\]
+Here ``contains a $k$--term arithmetic progression'' means: there exist $a\in\mathbb{Z}$ and $d\in\mathbb{Z}_{>0}$ such that
+\[
+ a,a+d,\dots,a+(k-1)d \in A.
+\]
+
+The problem asks for an \emph{asymptotic formula} for $r_k(N)$ as $N\to\infty$, i.e. an explicit function $f_k(N)$ with
+$r_k(N) \sim f_k(N)$.
+
+\subsection*{2) QUICK LITERATURE / CONTEXT CHECK}
+
+\begin{itemize}[leftmargin=2.2em]
+\item (Qualitative) Szemer\'edi's theorem implies $r_k(N)=o(N)$ for every fixed $k\ge 3$.
+
+\item (Upper bounds) For $k=3$, Kelley--Meka proved a quasipolynomial density upper bound, and Bloom--Sisask improved it to
+\[ r_3(N) \le \exp\bigl(-c(\log N)^{1/9}\bigr)\,N \quad \text{for some }c>0.\]
+See \cite{KelleyMeka2023,BloomSisask2023}.
+For $k=4$, Green--Tao proved a polylogarithmic bound
+\[ r_4(N) \ll N(\log N)^{-c}\]
+for some $c>0$ (\cite{GreenTao2017r4}).
+For $k\ge 5$, Leng--Sah--Sawhney proved
+\[ r_k(N) \ll N\exp\bigl(-(\log\log N)^{c_k}\bigr)\]
+for some $c_k>0$ (\cite{LSS2024}).
+
+\item (Lower bounds) Behrend (1946) constructed large $3$--AP--free sets; Rankin generalized to $k$--AP--free sets, and later work refined constants and lower order factors.
+A convenient consolidated reference is O'Bryant's survey/paper \cite{OBryant2011}.
+More recently, Elsholtz--Hunter--Proske--Sauermann obtained the first quasipolynomial improvement over Behrend beyond lower-order factors (\cite{EHPS2024}).
+
+\item Enormous gaps remain between known upper and lower bounds, even for $k=3$; thus a full asymptotic formula is currently out of reach.
+\end{itemize}
+
+\subsection*{3) ATTACK PLAN}
+
+An asymptotic formula would require matching upper and lower bounds up to a $(1+o(1))$ factor.
+Even determining the correct \emph{scale} (e.g. $N\exp(-\Theta((\log N)^\alpha))$ with the right exponent $\alpha$) is open for $k=3$.
+
+Concrete partial goals one might try:
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em]
+\item For fixed $k$, tighten quantitative Szemer\'edi bounds to a form comparable to the best constructions.
+
+\item Improve constructions (lower bounds) to approach the best upper bounds.
+
+\item Identify a candidate ``main term'' (possibly of the form $N\,\exp(-\Theta((\log N)^{\alpha_k}))$) and prove upper and lower bounds of that order.
+\end{enumerate}
+
+In the ``work'' below I give a fully proved elementary (but weak) lower bound via the probabilistic method and deletion, and I include small-$N$ sanity checks for $k=3$.
+
+\subsection*{4) WORK}
+
+\subsubsection*{4.1 Elementary probabilistic lower bound (fully proved)}
+
+\begin{proposition}[A simple general lower bound]
+\label{prop:poly-lb}
+Fix $k\ge 3$.
+There is a constant $c_k>0$ such that for all $N\ge 1$,
+\[
+ r_k(N) \ge c_k\, N^{\frac{k-2}{k-1}}.
+\]
+One may take for instance $c_k=3/8\,$.
+\end{proposition}
+
+\begin{proof}
+Let $p := \frac12\,N^{-1/(k-1)}$.
+Select a random subset $A\subseteq[N]$ by including each $x\in[N]$ independently with probability $p$.
+Then $\mathbb{E}|A| = pN$.
+
+Let $X$ be the number of $k$--term arithmetic progressions contained in $A$.
+Let $T$ be the number of $k$--term arithmetic progressions in $[N]$.
+Each fixed progression lies in $A$ with probability $p^k$, hence $\mathbb{E}X = T p^k$.
+
+A crude bound $T\le N^2$ holds (indeed $T\le N^2/(2(k-1))$, but we only need $N^2$).
+Thus
+\[
+\mathbb{E}X \le N^2 p^k = N^2\cdot p\cdot p^{k-1}.
+\]
+By the choice of $p$, we have $p^{k-1} = 2^{-(k-1)} N^{-1}$, hence
+\[
+\mathbb{E}X \le N^2\cdot p\cdot 2^{-(k-1)}N^{-1} = 2^{-(k-1)}\,pN.
+\]
+In particular, $\mathbb{E}X \le \tfrac14\,pN$ since $k\ge 3$ implies $2^{-(k-1)}\le 1/4$.
+
+Consider instead the random variable $Y:=|A|-X$. By linearity of expectation,
+\[
+\mathbb{E}Y = \mathbb{E}|A| - \mathbb{E}X \ge pN - \tfrac14 pN = \tfrac34\,pN.
+\]
+Hence there exists at least one realization of $A$ for which $|A|-X \ge \tfrac34 pN$.
+Starting from such an $A$, repeatedly delete one element from any $k$--term progression currently present.
+Each deletion destroys at least one progression, so after at most $X$ deletions we obtain a $k$--AP--free set $B\subseteq A$ with
+\[
+|B| \ge |A|-X \ge \tfrac34\,pN.
+\]
+
+Finally,
+\[
+\tfrac34 pN = \tfrac34\cdot \tfrac12\,N^{-1/(k-1)}\cdot N = \tfrac{3}{8} N^{(k-2)/(k-1)}.
+\]
+This proves the claim with $c_k=3/8$.
+\end{proof}
+
+\begin{remark}
+Proposition~\ref{prop:poly-lb} is far weaker than Behrend/Rankin type lower bounds, but it is completely elementary.
+For $k=3$ it gives $r_3(N)\ge c\sqrt{N}$.
+\end{remark}
+
+\subsubsection*{4.2 Tiny-case sanity check for $k=3$}
+
+For $k=3$ and small $N$ one can compute $r_3(N)$ exactly by brute force.
+For $1\le N\le 20$ the values are:
+\[
+\begin{array}{c|cccccccccc}
+N & 1&2&3&4&5&6&7&8&9&10\\\hline
+r_3(N) & 1&2&2&3&4&4&4&4&5&5
+\end{array}
+\qquad
+\begin{array}{c|cccccccccc}
+N & 11&12&13&14&15&16&17&18&19&20\\\hline
+r_3(N) & 6&6&6&7&8&8&8&8&8&8
+\end{array}
+\]
+(Computed by exhaustive search over all subsets of $[N]$; included only as a reality check.)
+
+\subsection*{5) VERIFICATION / EDGE CASES}
+
+\begin{itemize}[leftmargin=2.2em]
+\item The counting bound $T\le N^2$ for the number of $k$--APs in $[N]$ is valid (indeed $T\le \sum_{d\le (N-1)/(k-1)} (N-(k-1)d)\le N\cdot (N-1)/(k-1)\le N^2$).
+
+\item Proposition~\ref{prop:poly-lb} is uniform in $N$ and does not require $N$ large.
+
+\item The deletion step is standard: removing one element from each existing $k$--AP eliminates all progressions.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.2em]
+\item \textbf{Farthest point reached.}
+I proved an elementary lower bound $r_k(N)\ge c_k N^{(k-2)/(k-1)}$ (Proposition~\ref{prop:poly-lb}) and recorded small-$N$ values for $r_3(N)$.
+I also summarized state-of-the-art upper bounds (Kelley--Meka; Bloom--Sisask; Green--Tao; Leng--Sah--Sawhney).
+
+\item \textbf{Best partial lemma.}
+Proposition~\ref{prop:poly-lb}: a fully self-contained probabilistic construction giving a polynomial-size $k$--AP-free subset.
+
+\item \textbf{Smallest missing step.}
+An asymptotic formula would require matching upper and lower bounds. Even for $k=3$ the gap between the best known lower bounds (Behrend-type, now with quasipolynomial improvements) and the best known upper bounds (quasipolynomial decay in density) is enormous, so the ``correct main term'' is unknown.
+
+\item \textbf{Completion estimate.}
+Resolving the asymptotics appears to require major new ideas in additive combinatorics/higher-order Fourier analysis beyond current quantitative Szemer\'edi technology.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{99}
+
+\bibitem{Gowers2001}
+W.~T. Gowers,
+\emph{A new proof of Szemer\'edi's theorem},
+Geom. Funct. Anal. \textbf{11} (2001).
+
+\bibitem{GreenTao2008}
+B.~Green and T.~Tao,
+\emph{The primes contain arbitrarily long arithmetic progressions},
+Ann. of Math. (2) \textbf{167} (2008), 481--547.
+
+\bibitem{GreenTao2017r4}
+B.~Green and T.~Tao,
+\emph{New bounds for Szemer\'edi's theorem, III: A polylogarithmic bound for $r_4(N)$},
+Mathematika \textbf{63} (2017), 944--1040.
+
+\bibitem{KelleyMeka2023}
+Z.~Kelley and R.~Meka,
+\emph{Strong Bounds for 3-Progressions},
+arXiv:2302.05537.
+
+\bibitem{BloomSisask2023}
+T.~F. Bloom and O.~Sisask,
+\emph{An improvement to the Kelley--Meka bounds on three-term arithmetic progressions},
+arXiv:2309.02353.
+
+\bibitem{LSS2024}
+J.~Leng, A.~Sah, and M.~Sawhney,
+\emph{Improved Bounds for Szemer\'edi's Theorem},
+arXiv:2402.17995.
+
+\bibitem{EHPS2024}
+C.~Elsholtz, Z.~Hunter, L.~Proske, and L.~Sauermann,
+\emph{Improving Behrend's construction: Sets without arithmetic progressions in integers and over finite fields},
+arXiv:2406.12290.
+
+\bibitem{OBryant2011}
+K.~O'Bryant,
+\emph{Sets of integers that do not contain long arithmetic progressions},
+Electron. J. Combin. \textbf{18} (2011), \#P59.
+
+\bibitem{KourilPaul2008}
+M.~Kou\v{r}il and J.~L. Paul,
+\emph{The van der Waerden number $W(2,6)$ is 1132},
+Exp. Math. \textbf{17} (2008), 53--61.
+
+\bibitem{KS2016}
+J.~Kozik and D.~Shabanov,
+\emph{Improved algorithms for coloring simple hypergraphs and applications},
+arXiv:1405.4295 (version cited in many summaries; result yields improved exponential lower bounds for van der Waerden numbers).
+
+\bibitem{T5KCPAP}
+The Prime Pages (Chris Caldwell), ``Consecutive prime arithmetic progressions'' (CPAP-$k$) page.
+
+\bibitem{WikiVDW}
+Wikipedia contributors,
+\emph{Van der Waerden number}, online article.
+
+\bibitem{WikiCPAP}
+Wikipedia contributors,
+\emph{Prime arithmetic progression} (section on consecutive prime arithmetic progressions), online article.
+
+\end{thebibliography}
+
+

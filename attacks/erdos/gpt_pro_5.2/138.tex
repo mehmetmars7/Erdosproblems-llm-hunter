@@ -1,0 +1,176 @@
+\section*{Problem 138: van der Waerden numbers (two colors)}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+\begin{definition}[Two--color van der Waerden number]
+For an integer $k\ge 1$, define $W(k)$ to be the least integer $N$ such that for every coloring
+$c:[N]\to\{\text{red},\text{blue}\}$, there exist integers $a\ge 1$ and $d\ge 1$ with
+$a+(k-1)d\le N$ such that
+\[
+ c(a)=c(a+d)=\cdots=c\bigl(a+(k-1)d\bigr).
+\]
+Equivalently, every $2$--coloring of $\{1,\dots,N\}$ contains a monochromatic arithmetic progression of length $k$.
+\end{definition}
+
+The requested ``improvement of bounds'' is open--ended; the specific sample target statement in the prompt is:
+
+\begin{quote}
+\emph{Show that $W(k)^{1/k}\to\infty$ as $k\to\infty$.}
+\end{quote}
+
+Equivalently: for every constant $C>0$, there exists $k_0$ such that $W(k)>C^k$ for all $k\ge k_0$.
+
+\medskip
+\noindent\textbf{Trivial/edge cases.}
+$W(1)=1$ and $W(2)=3$ (since a monochromatic $2$--term progression is just two numbers of the same color).
+The first nontrivial case is $k=3$.
+
+\subsection*{2) QUICK LITERATURE / CONTEXT CHECK}
+
+\begin{itemize}[leftmargin=2.2em]
+\item Small exact values are known: $W(3)=9$, $W(4)=35$, $W(5)=178$, $W(6)=1132$; for $k=7$ only bounds are known (e.g. $W(7)>3703$).\footnote{See the table in \cite{WikiVDW} and the computational proof for $W(2,6)=1132$ in \cite{KourilPaul2008}.}
+
+\item Lower bounds: there are explicit and probabilistic constructions giving exponential growth in $k$.
+A classical application of the Lov\'asz Local Lemma gives $W(k)\ge c\,2^k/k$ for some absolute constant $c>0$ (a proof is included below).
+Stronger exponential lower bounds $W(k)\gg 2^k$ are known (e.g. work of Kozik--Shabanov, improving constants in the exponential base).\footnote{See \cite{KS2016}.}
+Berlekamp proved that for a prime $p$, $W(p+1)\ge p2^p$ (still only exponential in $k$).\footnote{See the discussion in \cite{ErdosProblems138} and references therein.}
+
+\item Upper bounds: the best general upper bounds are enormous (tower--type); Gowers obtained a very large explicit tower bound in his quantitative proof of Szemer\'edi's theorem.\footnote{See \cite{Gowers2001} and summaries such as \cite{ErdosProblems138,WikiVDW}.}
+
+\item The specific target $W(k)^{1/k}\to\infty$ is much stronger than any currently known lower bound and remains open.
+\end{itemize}
+
+\subsection*{3) ATTACK PLAN}
+
+To prove $W(k)^{1/k}\to\infty$ one needs \emph{super--exponential} lower bounds on $W(k)$.
+Known methods (random coloring + Local Lemma, algebraic constructions such as Berlekamp's for $k=p+1$, and computer--assisted ``certificates'') only give $\exp(\Theta(k))$ growth.
+
+A plausible route would be to construct, for each large $k$, a $2$--coloring of $[N]$ with no monochromatic $k$--AP for some $N$ of size, say, $\exp(k\log k)$ (or larger). Concretely:
+
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em]
+\item \textbf{Probabilistic approach:} strengthen Local Lemma--type arguments using sharper dependency structure or advanced hypergraph container/nibble constructions.
+
+\item \textbf{Algebraic/recursive constructions:} build long colorings by concatenation/product constructions that provably destroy long monochromatic APs.
+
+\item \textbf{Disproof attempt:} show instead that $W(k)\le C^k$ for some fixed $C$ (which would refute $W(k)^{1/k}\to\infty$). No such bound is known; existing upper bounds are far larger.
+\end{enumerate}
+
+In the ``work'' below I carry out (i) sanity checks on tiny cases, and (ii) the standard Local Lemma lower bound to locate precisely where current methods stall.
+
+\subsection*{4) WORK}
+
+\subsubsection*{4.1 Tiny-case reality check: $W(3)=9$}
+
+A concrete $2$--coloring of $[8]$ with no monochromatic $3$--term arithmetic progression is
+\[
+\text{red }\{1,2,5,6\},\qquad\text{blue }\{3,4,7,8\},
+\]
+(i.e. the pattern \texttt{RRBBRRBB}). One checks directly that every $3$--AP in $[8]$ meets both colors.
+
+For $N=9$, an exhaustive enumeration over all $2^9=512$ colorings confirms that every coloring of $[9]$ contains a monochromatic $3$--AP (this is the standard fact $W(3)=9$).
+
+\subsubsection*{4.2 A fully proved exponential lower bound via the Lov\'asz Local Lemma}
+
+The following is classical; I include a complete proof.
+
+\begin{proposition}[Local Lemma bound]
+\label{prop:LLL}
+Fix $k\ge 3$ and let
+\[
+N \le \frac{(k-1)\,2^{k-1}}{e\,k^2}.
+\]
+Then there exists a $2$--coloring of $[N]$ with \emph{no} monochromatic $k$--term arithmetic progression. Consequently,
+\[
+W(k) > \frac{(k-1)\,2^{k-1}}{e\,k^2},
+\]
+and in particular $W(k)\ge c\,2^k/k$ for some absolute constant $c>0$.
+\end{proposition}
+
+\begin{proof}
+Color each $x\in[N]$ independently red/blue with probability $1/2$.
+For each $k$--term arithmetic progression $P=\{a,a+d,\dots,a+(k-1)d\}\subseteq[N]$, let $E_P$ be the ``bad'' event that $P$ is monochromatic.
+Then
+\[
+\mathbb{P}(E_P)=2\cdot (1/2)^k = 2^{1-k}=:p.
+\]
+
+We use the symmetric Lov\'asz Local Lemma.
+Two events $E_P,E_Q$ are independent unless the progressions $P$ and $Q$ share at least one element.
+So we need an upper bound on how many $k$--APs in $[N]$ can intersect a fixed $k$--AP.
+
+\smallskip
+\noindent\emph{Claim.} Each integer $x\in[N]$ lies in at most
+\[
+T := k\,\Bigl\lfloor\frac{N-1}{k-1}\Bigr\rfloor
+\]
+many $k$--term arithmetic progressions in $[N]$.
+
+\smallskip
+\noindent\emph{Proof of claim.}
+Any $k$--AP in $[N]$ has common difference $d$ satisfying $1\le d\le \lfloor (N-1)/(k-1)\rfloor$ (since $a+(k-1)d\le N$).
+Fix such a $d$.
+If $x$ is the $j$th term of the progression ($j\in\{0,1,\dots,k-1\}$), then the start is forced to be $a=x-jd$.
+Thus for each $d$ there are at most $k$ progressions containing $x$ (one for each possible $j$), and there are at most $\lfloor (N-1)/(k-1)\rfloor$ possible values of $d$.
+Multiplying gives the claim.
+\hfill$\triangleleft$
+
+\smallskip
+Now fix a progression $P$. It has $k$ elements, and for each element $x\in P$ there are at most $T$ progressions containing $x$.
+Therefore the number of progressions $Q$ with $Q\cap P\ne\emptyset$ is at most $kT$ (this overcounts but is an upper bound).
+Hence each event $E_P$ depends on at most
+\[
+D := kT-1
+\]
+other events.
+In particular,
+\[
+D+1 \le kT = k^2\Bigl\lfloor\frac{N-1}{k-1}\Bigr\rfloor \le \frac{k^2 N}{k-1}.
+\]
+
+The symmetric Lov\'asz Local Lemma states that if
+\[
+e\,p\,(D+1) \le 1,
+\]
+then $\mathbb{P}(\bigcap_P \overline{E_P})>0$, i.e. a coloring exists with no bad events.
+A sufficient condition is
+\[
+ e\cdot 2^{1-k}\cdot \frac{k^2 N}{k-1} \le 1,
+\]
+which is exactly $N\le \frac{(k-1)2^{k-1}}{e k^2}$.
+Thus such a coloring exists, implying $W(k)>N$.
+\end{proof}
+
+\begin{remark}
+Proposition~\ref{prop:LLL} only yields $\log W(k)=\Omega(k)$, hence $W(k)^{1/k}$ stays bounded (indeed the lower bound gives $W(k)^{1/k}\gtrsim 2$).
+This illustrates the size of the gap to the desired $W(k)^{1/k}\to\infty$, which would require $\log W(k)/k\to\infty$.
+\end{remark}
+
+\subsection*{5) VERIFICATION / EDGE CASES}
+
+\begin{itemize}[leftmargin=2.2em]
+\item The dependency bound in Proposition~\ref{prop:LLL} is intentionally crude but valid: counting progressions through each point and summing over the $k$ points of $P$ yields an upper bound on intersecting progressions.
+
+\item For $k=1,2$ the definition of $W(k)$ is trivial; Proposition~\ref{prop:LLL} assumes $k\ge 3$ so that the ``$k$--AP'' events are genuinely constrained.
+
+\item The tiny-case verification $W(3)=9$ was checked both by an explicit $[8]$ coloring and by exhaustive enumeration on $[9]$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.2em]
+\item \textbf{Farthest point reached.}
+I proved the standard Lov\'asz Local Lemma lower bound $W(k)\ge c\,2^k/k$ (Proposition~\ref{prop:LLL}) and sanity-checked $W(3)=9$.
+
+\item \textbf{Best partial lemma.}
+Proposition~\ref{prop:LLL}: existence of $2$--colorings of length $\asymp 2^k/k$ with no monochromatic $k$--AP.
+
+\item \textbf{Smallest missing step.}
+To prove $W(k)^{1/k}\to\infty$ one needs a qualitatively new lower bound giving $\log W(k)\gg k\log k$ (or stronger), far beyond Local Lemma/exponential constructions.
+
+\item \textbf{Completion estimate.}
+The current best general lower bounds are exponential in $k$; obtaining super--exponential growth appears to require new structural/algebraic constructions or breakthroughs in quantitative Ramsey/additive combinatorics.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

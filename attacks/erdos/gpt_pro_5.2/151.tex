@@ -1,0 +1,129 @@
+\section{Erd\H{o}s Problem \#151: Clique transversals and triangle-free independence}
+
+\subsection*{FORMAL RESTATEMENT}
+For a graph $G=(V,E)$, let $\tau(G)$ be the minimum size of a vertex set $T\subseteq V$ such that
+$T$ meets every \emph{maximal clique} of $G$ of size at least $2$ (i.e.\ every inclusion-maximal clique
+that contains an edge). This is sometimes called the \emph{clique transversal number}.
+
+Let $H(n)$ be the largest integer such that every triangle-free graph on $n$ vertices has an independent set
+of size at least $H(n)$ (equivalently, $H(n)=\min\{\alpha(G): |V(G)|=n,\ G\text{ triangle-free}\}$).
+
+The question is whether for every graph $G$ on $n$ vertices,
+\[
+\tau(G)\ \le\ n-H(n).
+\]
+
+\subsection*{QUICK LITERATURE/CONTEXT CHECK}
+The Erd\H{o}s Problems database lists this as a problem of Erd\H{o}s and Gallai (1988) and later as
+Problem~1 in Erd\H{o}s--Gallai--Tuza (1992). It notes:
+\begin{itemize}[leftmargin=2em]
+\item It is ``easy'' that $\tau(G)\le n-\sqrt{n}$ for all $n$.
+\item Erd\H{o}s--Gallai--Tuza proved a stronger general bound $\tau(G)\le n-\sqrt{2n}+O(1)$.
+\item If $G$ is triangle-free, then $\tau(G)\le n-H(n)$ holds trivially.
+\end{itemize}
+Asymptotically, $H(n)$ is of order $\sqrt{n\log n}$ (connected to the classical Ramsey number $R(3,t)$).
+
+\subsection*{DEFINITIONS / SETUP}
+\begin{itemize}[leftmargin=2em]
+\item A \emph{clique} is a set of pairwise adjacent vertices. A clique is \emph{maximal} if it is not
+contained in a larger clique.
+\item A set $T\subseteq V$ is a \emph{clique transversal} if it meets every maximal clique of size at least $2$.
+\item $\alpha(G)$ denotes the independence number of $G$ (size of a largest independent set).
+\end{itemize}
+
+\subsection*{KNOWN RESULTS I WILL USE}
+\begin{lemma}\label{lem:tau-le-n-alpha}
+For every graph $G$ on $n$ vertices,
+\[
+\tau(G)\ \le\ n-\alpha(G).
+\]
+\end{lemma}
+
+\begin{proof}
+Let $I$ be a maximum independent set, $|I|=\alpha(G)$, and set $T:=V\setminus I$.
+Any maximal clique of size at least $2$ contains an edge, hence cannot be contained in the independent set $I$.
+Therefore it must intersect $T$, so $T$ is a clique transversal and $\tau(G)\le |T|=n-\alpha(G)$.
+\end{proof}
+
+Lemma~\ref{lem:indep} from Problem~\#148 (the greedy bound $\alpha(G)\ge N/(\Delta+1)$) will also be used.
+
+\subsection*{MAIN ATTEMPT}
+
+\subsubsection*{1) A complete proof that \texorpdfstring{$\tau(G)\le n-\sqrt{n}$}{tau(G) <= n - sqrt(n)}}
+\begin{proposition}[The ``easy'' bound]\label{prop:n-sqrtn}
+For every graph $G$ on $n$ vertices,
+\[
+\tau(G)\ \le\ n-\sqrt{n}.
+\]
+\end{proposition}
+
+\begin{proof}
+Let $\Delta$ be the maximum degree of $G$.
+
+\textbf{Case 1: $\Delta\le \sqrt{n}-1$.}
+By Lemma~\ref{lem:indep}, $\alpha(G)\ge \frac{n}{\Delta+1}\ge \frac{n}{\sqrt{n}}=\sqrt{n}$.
+Then Lemma~\ref{lem:tau-le-n-alpha} gives $\tau(G)\le n-\alpha(G)\le n-\sqrt{n}$.
+
+\textbf{Case 2: $\Delta\ge \sqrt{n}$.}
+Let $v$ be a vertex of degree $\deg(v)=\Delta'\ge \sqrt{n}$ and let $N(v)$ be its open neighborhood.
+Define
+\[
+T := \{v\}\ \cup\ (V\setminus N(v)).
+\]
+Then $|T| = 1 + (n-1-\deg(v)) = n-\deg(v) \le n-\sqrt{n}$.
+We claim $T$ is a clique transversal.
+
+Let $C$ be any maximal clique of size at least $2$.
+If $v\in C$ then $C\cap T\neq\emptyset$. If $v\notin C$ and $C\subseteq N(v)$, then
+$C\cup\{v\}$ is a larger clique (since $v$ is adjacent to every vertex of $N(v)$), contradicting maximality.
+Hence any maximal clique $C$ not containing $v$ must contain some vertex outside $N(v)$, i.e.\ in $V\setminus N(v)\subseteq T$.
+Thus $C\cap T\neq\emptyset$ in all cases, proving $T$ is a clique transversal and $\tau(G)\le |T|\le n-\sqrt{n}$.
+\end{proof}
+
+\subsubsection*{2) Trivial verification for triangle-free graphs}
+If $G$ is triangle-free on $n$ vertices then every maximal clique of size at least $2$ is an edge, so a clique transversal
+is precisely a vertex cover. Since vertex cover size equals $n-\alpha(G)$ for all graphs, we have
+\[
+\tau(G)=n-\alpha(G)\le n-H(n),
+\]
+because $\alpha(G)\ge H(n)$ for every triangle-free $G$ by definition of $H(n)$.
+
+\subsubsection*{3) Small-$n$ computational check (unlabeled graphs up to 7 vertices)}
+As an additional sanity check, I exhaustively tested the inequality $\tau(G)\le n-H(n)$ over all unlabeled graphs
+on $n\le 7$ vertices (using the NetworkX graph atlas) by:
+\begin{itemize}[leftmargin=2em]
+\item computing $H(n)$ exactly as the minimum $\alpha(G)$ over all triangle-free graphs in the atlas on $n$ vertices;
+\item computing $\tau(G)$ exactly by brute force over all vertex subsets and checking intersection with all maximal cliques.
+\end{itemize}
+The computed values are
+\[
+H(1)=1,\ H(2)=1,\ H(3)=2,\ H(4)=2,\ H(5)=2,\ H(6)=3,\ H(7)=3,
+\]
+and the inequality $\tau(G)\le n-H(n)$ held for every graph in the atlas for $n\le 7$.
+
+\subsection*{ADVERSARIAL CHECK}
+\begin{itemize}[leftmargin=2em]
+\item Proposition~\ref{prop:n-sqrtn} is fully rigorous: the only nontrivial step is showing that a maximal clique
+contained in $N(v)$ must contain $v$, since otherwise it is extendable by $v$.
+\item The triangle-free ``trivial'' case uses the identity $\tau_{\mathrm{VC}}(G)=n-\alpha(G)$ (vertex cover vs.\ independent set),
+which holds for all graphs, and the fact that in triangle-free graphs maximal cliques of size $\ge2$ are edges.
+\item The computational check is limited to $n\le 7$ and is not evidence of asymptotic truth; it is only a consistency check.
+\end{itemize}
+
+\subsection*{FINAL}
+\noindent\textbf{UNRESOLVED --- PARTIAL PROGRESS.}
+
+\begin{itemize}[leftmargin=2em]
+\item \textbf{Farthest point reached.} I proved the general bound $\tau(G)\le n-\sqrt{n}$ with a complete,
+short argument, and verified $\tau(G)\le n-H(n)$ for all graphs up to $7$ vertices by exhaustive computation.
+\item \textbf{Remaining gap.} The conjectured bound $\tau(G)\le n-H(n)$ would improve the general theory from a
+$\sqrt{n}$-scale subtraction to a $\sqrt{n\log n}$-scale subtraction (since $H(n)$ is of order $\sqrt{n\log n}$).
+No argument here bridges that gap, nor do I provide a counterexample.
+\item \textbf{Promising next steps.} (i) Try to relate $\tau(G)$ more directly to extremal triangle-free subgraphs
+or to Ramsey-theoretic obstructions (as suggested by the appearance of $H(n)$). (ii) Search computationally for
+counterexamples for $n\ge 8$ via SAT/ILP encodings of clique transversals and maximal cliques, to understand whether
+the conjecture might fail in small order.
+\end{itemize}
+
+\medskip
+\noindent\textbf{COMPLETION: 45\%}

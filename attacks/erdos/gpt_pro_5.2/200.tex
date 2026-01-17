@@ -1,0 +1,142 @@
+\section{Erd\H{o}s Problem \#200: Longest arithmetic progression of primes up to $N$}
+
+\subsection*{1) Formal restatement (quantifiers, definitions, edge cases)}
+For $N\ge 2$, let $L(N)$ be the maximum integer $k$ such that there exist integers $a\ge 2$ and $d\ge 1$ with
+\[
+a,\, a+d,\, a+2d,\,\dots,\, a+(k-1)d \ \text{all prime and}\ a+(k-1)d\le N.
+\]
+(Equivalently, $L(N)$ is the length of the longest arithmetic progression contained in the set of primes $\le N$.)
+
+\paragraph{Problem statement.}
+Is it true that
+\[
+L(N)=o(\log N)\qquad (N\to\infty)?
+\]
+
+\paragraph{Edge cases.}
+$L(N)$ is nondecreasing in $N$ and $L(N)\ge 1$ always.
+For $k\ge 3$, any $k$-term progression of odd primes has even common difference $d$.
+
+\subsection*{2) Quick literature/context check}
+\begin{itemize}[leftmargin=2em]
+\item The primes contain arbitrarily long arithmetic progressions (Green--Tao theorem) \cite{GreenTao08}, so $L(N)\to\infty$, but existing proofs give no usable quantitative growth rate for $L(N)$.
+\item A standard application of the prime number theorem (via the Chebyshev function $\vartheta(x)=\sum_{p\le x}\log p\sim x$) yields the upper bound
+\[
+L(N)\le (1+o(1))\log N.
+\]
+A complete proof is included below.
+\item Heuristics based on treating primes as a random set of density $\approx 1/\log N$ (and refined Hardy--Littlewood type constants) predict that the expected number of $k$-term prime progressions up to $N$ is about
+\[
+\asymp \frac{N^2}{(k-1)(\log N)^k},
+\]
+suggesting that the maximal $k$ satisfies $k\approx 2\log N/\log\log N$ (hence $o(\log N)$). A statement of this heuristic count appears, for instance, in The Prime Pages discussion of prime arithmetic progressions \cite{PrimePagesAP}.
+\end{itemize}
+
+\subsection*{3) Attack plan}
+\begin{enumerate}[leftmargin=2em]
+\item Prove the known PNT-based upper bound $L(N)\le (1+o(1))\log N$ carefully, since it is explicitly mentioned in the prompt.
+\item For the main open question $L(N)=o(\log N)$, outline why ``current technology'' (sieve bounds, distribution in residue classes, Green--Tao transference) does not presently deliver such a sharpening.
+\item Provide a quick computational sanity check for moderate $N$.
+\end{enumerate}
+
+\subsection*{4) Work}
+\paragraph{Theorem 4.1 (PNT upper bound).}
+Let $p_0, p_1,\dots,p_{k-1}$ be a $k$-term arithmetic progression of primes with $p_{k-1}\le N$.
+Then
+\[
+k\le (1+o(1))\log N\qquad (N\to\infty).
+\]
+
+\begin{proof}
+Write the progression as $p_j=a+jd$ with $d\ge 1$.
+
+\emph{Step 1: small primes up to $k/2$ divide $d$.}
+Let $q$ be a prime with $q\le k/2$.
+Suppose for contradiction that $q\nmid d$.
+Then $d$ is invertible modulo $q$, so the congruence
+\[
+a+jd\equiv 0\pmod q
+\]
+has exactly one solution class $j\equiv j_0\pmod q$.
+Among indices $j\in\\{0,1,\dots,k-1\\}$ there are at least $\lceil k/q\rceil\ge 2$ solutions (since $k\ge 2q$).
+Hence at least two distinct terms $a+jd$ are divisible by $q$.
+At most one of them can equal $q$; the other is a multiple of $q$ exceeding $q$, hence composite.
+This contradicts that all terms are prime.
+Therefore $q\mid d$ for every prime $q\le k/2$.
+
+Let
+\[
+P(x):=\prod_{q\le x\atop q\text{ prime}} q
+\]
+denote the primorial.
+We have shown $P(k/2)\mid d$, so $d\ge P(k/2)$.
+
+\emph{Step 2: almost all primes up to $k$ divide $d$.}
+For large $k$, $P(k/2)$ is enormous, in particular $P(k/2)>k$, so $d>k$.
+Now let $q$ be a prime with $k/2<q\le k$.
+If $q\nmid d$, then as above there is at least one index $j\in\\{0,1,\dots,k-1\\}$ such that $a+jd\equiv 0\pmod q$ (since $k\ge q$).
+That term is a prime divisible by $q$, so it must equal $q$.
+But $q\le k<d$, so the only term of the progression that could possibly equal $q$ is the \emph{first} term ($j=0$); all others satisfy $a+jd\ge a+d>d>k\ge q$.
+Thus, for primes $q$ with $k/2<q\le k$, the only possible exception to ``$q\mid d$'' is $q=a$ (and this can happen only if $a\le k$).
+In particular, the set of primes $q\le k$ not dividing $d$ has size at most $1$, so
+\[
+\log d\\ \ge\\ \sum_{q\le k\atop q\text{ prime}}\log q\\ -\\ \log k\\ =\\ \vartheta(k)-\log k,
+\]
+where $\vartheta(k):=\sum_{q\le k,\\ q\text{ prime}}\log q$ is Chebyshev's function.
+
+\emph{Step 3: apply the prime number theorem.}
+The prime number theorem implies $\vartheta(k)\sim k$ as $k\to\infty$.
+Hence
+\[
+\log d\ge (1+o(1))k.
+\]
+Since $p_{k-1}=a+(k-1)d\le N$, we have $N\ge (k-1)d$, and therefore
+\[
+\log N\ge \log d+\log(k-1)\ge (1+o(1))k.
+\]
+Rearranging gives $k\le (1+o(1))\log N$.
+\end{proof}
+
+\paragraph{Computational check (moderate $N$).}
+A brute-force search over all prime pairs $(p,q)$ with $p<q\le N$ (testing the progression with step $d=q-p$) gives:
+\[
+L(10^3)=7,\quad L(5\cdot 10^3)=10,\quad L(10^4)=10,\quad L(2\cdot 10^5)=10,
+\]
+with a longest example for these ranges being
+\[
+199,\\ 409,\\ 619,\dots,\\ 2089\qquad (\text{length }10,\\ d=210).
+\]
+This is only a sanity check; it is not evidence for asymptotic behaviour.
+
+\subsection*{5) Verification / consistency checks}
+\begin{itemize}[leftmargin=2em]
+\item The key modular argument is checked in two regimes: $q\le k/2$ forces $\ge2$ multiples, hence $q\mid d$; $q\in(k/2,k]$ gives at most one multiple, forcing a near-total divisibility of $d$ when $d>k$.
+\item The only analytic input is $\vartheta(x)\sim x$, a standard equivalent form of the prime number theorem.
+\end{itemize}
+
+\subsection*{6) Final}
+\paragraph{\textbf{UNRESOLVED.}}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Strongest proved partial result included here.}
+Theorem~4.1 proves the known upper bound $L(N)\le (1+o(1))\log N$ from the prime number theorem.
+Also $L(N)\to\infty$ by Green--Tao \cite{GreenTao08}.
+\item \textbf{First precise obstacle.}
+To improve the bound to $o(\log N)$ one would need a quantitative upper bound excluding $k$-term prime progressions for $k$ as large as $c\log N$, uniformly in the common difference.
+Current sieve/analytic tools (and the transference methods in Green--Tao) do not supply such a uniform ``union bound'' at this scale.
+\item \textbf{Most plausible next lemma.}
+A plausible route would be a sharp upper bound for the number of $k$-term prime progressions up to $N$ of the form
+\[
+\#\\{(a,d):\\ a,a+d,\dots,a+(k-1)d\le N\text{ all prime}\\}\\ \le\\ N^2\exp(-c k\log\log N)
+\]
+for $k$ up to (say) $\varepsilon\log N$, which would imply (by the first moment method) that $L(N)=o(\log N)$.
+Proving such bounds seems to require substantially stronger uniformity estimates for primes in progressions than are currently available.
+\end{enumerate}
+
+\subsection*{7) Completion estimate}
+\[
+\textbf{Completion: }40\%.
+\]
+(We can prove the standard PNT upper bound cleanly and explain the heuristic, but the main asymptotic sharpening remains open.)
+
+% ======================================================================
+

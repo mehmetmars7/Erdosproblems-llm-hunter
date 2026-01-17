@@ -1,0 +1,117 @@
+\section*{Erd\H{o}s Problem \#244}
+
+\subsection*{1) FORMAL RESTATEMENT}
+Fix a real number $C>1$. Define the ``geometric-floor'' sequence
+\[
+ t_k \coloneqq \lfloor C^k\rfloor\qquad (k\in\mathbb{Z}_{\ge 0}),
+\]
+and the set
+\[
+\mathcal{S}_C \coloneqq \{\, p + t_k : p\in\mathcal{P},\ k\in\mathbb{Z}_{\ge 0}\,\}\subseteq\mathbb{N},
+\]
+where $\mathcal{P}$ is the set of primes and $\lfloor\cdot\rfloor$ is the floor function.
+
+For $x\ge 1$ write
+\[
+\mathcal{S}_C(x) \coloneqq \#\bigl(\mathcal{S}_C\cap\{1,2,\dots,\lfloor x\rfloor\}\bigr).
+\]
+The (lower) asymptotic density of $\mathcal{S}_C$ is
+\[
+\underline{d}(\mathcal{S}_C) \coloneqq \liminf_{x\to\infty} \frac{\mathcal{S}_C(x)}{x}.
+\]
+
+\noindent\textbf{Question (Romanoff--Kalm\'ar type).} Is $\underline{d}(\mathcal{S}_C)>0$ for every real $C>1$?
+
+\medskip
+\noindent\textbf{Remark on ambiguity.} The original phrasing ``has density $>0$'' could mean (i) the natural density exists and is positive, or (ii) the lower asymptotic density is positive. The currently recorded results (Romanoff for integer $C$; Ding for almost all real $C$) are naturally stated in terms of \emph{positive lower asymptotic density}, so I interpret the question as above.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+\begin{itemize}[leftmargin=2em]
+\item For integer $C=a\ge 2$, the set $\{p+a^k\}$ has positive lower asymptotic density by Romanoff (often called \emph{Romanov's theorem}) \cite{Romanoff1934}. See also the modern summary ``Romanov's theorem'' \cite{WikipediaRomanov}.
+\item The Erd\H{o}s Problems database page for \#244 records: Romanoff's theorem for integer $C$, and that Y. Ding (2025) proved positivity of the lower density for \emph{almost all} $C>1$ (in the sense of Lebesgue measure) \cite{ErdosProblems244,Ding2025}.
+\item As of the last edit recorded on the Erd\H{o}s Problems site (Oct 28, 2025), the statement ``for every $C>1$'' remains open \cite{ErdosProblems244}.
+\end{itemize}
+
+\subsection*{3) ATTACK PLAN}
+A classical approach for $C\in\mathbb{Z}_{\ge 2}$ (Romanoff) is:
+\begin{enumerate}[leftmargin=2em]
+\item Let $r(n)$ count representations $n=p+a^k$.
+\item Use Cauchy--Schwarz: $\#\{n\le x:r(n)>0\}\ge \frac{(\sum_{n\le x} r(n))^2}{\sum_{n\le x} r(n)^2}$.
+\item Estimate $\sum r(n)$ from below and bound $\sum r(n)^2$ from above using sieve bounds for prime pairs with fixed differences $a^{k_2}-a^{k_1}$.
+\end{enumerate}
+
+For general real $C>1$, one would need to control differences
+\[
+\lfloor C^{k_2}\rfloor-\lfloor C^{k_1}\rfloor
+\]
+uniformly in $k_1,k_2$ and prevent exceptional $C$ for which these differences have ``too many'' small prime factors (making sieve upper bounds too large) or create excessive overlap.
+
+A disproof strategy (if false) would seek a specific $C$ where the set of shifts $\{\lfloor C^k\rfloor\}$ forces strong congruence restrictions so that $\mathcal{S}_C$ misses a positive proportion of residue classes for infinitely many moduli; no such explicit $C$ is currently known to me.
+
+\subsection*{4) WORK}
+\subsubsection*{4.1 A trivial but rigorous lower bound}
+Even without Romanoff/Ding, one always has a nontrivial growth lower bound (though it only gives density $0$):
+
+\begin{lemma}[Uniform lower bound from the $k=0$ shift]
+For every $C>1$ and every $x\ge 2$, we have
+\[
+\mathcal{S}_C(x)\ge \pi(x-1),
+\]
+where $\pi$ is the prime-counting function.
+\end{lemma}
+
+\begin{proof}
+Since $t_0=\lfloor C^0\rfloor=1$, every prime $p\le x-1$ produces an element $p+1\le x$ in $\mathcal{S}_C$. Distinct primes give distinct values, hence $\mathcal{S}_C(x)\ge \pi(x-1)$.
+\end{proof}
+
+Consequently $\mathcal{S}_C(x)/x \ge \pi(x-1)/x \sim 1/\log x$ as $x\to\infty$, so this does not approach a positive constant.
+
+\subsubsection*{4.2 Small computational sanity checks (not proofs)}
+I computed the empirical density
+\[
+\frac{\mathcal{S}_C(X)}{X}
+\]
+for a few sample values of $C$ and cutoffs $X\in\{2\cdot 10^5,10^6\}$. The computation used:
+\begin{itemize}[leftmargin=2em]
+\item all distinct shifts $t_k=\lfloor C^k\rfloor\le X$;
+\item all primes $p\le X$;
+\item a boolean array to mark $p+t_k\le X$.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+$C$ & $\mathcal{S}_C(2\cdot 10^5)/(2\cdot 10^5)$ & $\mathcal{S}_C(10^6)/(10^6)$ \\
+\midrule
+$2$ & $0.554360$ & $0.538970$ \\
+$1.5$ & $0.883265$ & $0.899666$ \\
+$\sqrt{2}$ & $0.856375$ & $0.864454$ \\
+$e$ & $0.672595$ & $0.665399$ \\
+$1.1$ & $0.999945$ & (not computed at $10^6$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These values are consistent with the intuition that as $C\downarrow 1$, the shifts $\lfloor C^k\rfloor$ take many small values and the union of translates of the primes covers most integers up to moderate $X$. For larger $C$ there are fewer shifts and the observed density drops.
+
+\subsection*{5) VERIFICATION}
+\begin{itemize}[leftmargin=2em]
+\item The proof of the lemma is straightforward and uses only that $t_0=1$.
+\item The computations were double-checked for off-by-one issues by ensuring (i) primes were generated up to $X$, (ii) only shifts $\le X$ were used, and (iii) only sums $p+t_k\le X$ were marked.
+\item The computational results are included only as heuristic evidence; they do not address the limiting density as $X\to\infty$.
+\end{itemize}
+
+\subsection*{6) FINAL}
+\textbf{UNRESOLVED.}
+\begin{enumerate}[label=(\roman*),leftmargin=2.5em]
+\item \textbf{Strongest fully proved partial result obtained here:} For every $C>1$, the counting function satisfies $\mathcal{S}_C(x)\ge \pi(x-1)$ for all $x\ge 2$ (Lemma above), hence $\mathcal{S}_C(x)\gg x/\log x$.
+\item \textbf{First gap preventing a full solution:} One needs a uniform lower bound $\mathcal{S}_C(x)\ge \delta x$ for all large $x$ with some $\delta=\delta(C)>0$. Achieving this requires controlling overlaps between the shifted prime sets $\{p+\lfloor C^k\rfloor\}$ across different $k$, typically via second-moment/sieve estimates. I did not obtain such an overlap bound for an arbitrary fixed real $C>1$.
+\item \textbf{Most promising next move:} Attempt to adapt Romanoff's Cauchy--Schwarz/second-moment method to the shift sequence $\lfloor C^k\rfloor$ for an arbitrary fixed $C$. The key technical step is bounding the number of solutions to $p_1-p_2=\lfloor C^{k_2}\rfloor-\lfloor C^{k_1}\rfloor$ with $p_1,p_2$ prime using sieve bounds, and then summing these bounds over $(k_1,k_2)$.
+\item \textbf{Smallest plausible counterexample (if false):} A candidate would be a special constant $C$ for which the differences $\lfloor C^{k_2}\rfloor-\lfloor C^{k_1}\rfloor$ are unusually ``smooth'' (have many small prime factors) for many pairs $(k_1,k_2)$, inflating sieve upper bounds and potentially allowing the second-moment argument to fail. I do not know any explicit $C$ with this property.
+\end{enumerate}
+
+\subsection*{7) COMPLETION ESTIMATE}
+\textbf{Estimated likelihood of completion with additional work:} \emph{Low} (\(\approx 10\%\)). The known results already cover integer $C$ and almost-every $C$, suggesting that the main obstacle is controlling a thin exceptional set of $C$.
+
+
+% =========================================================

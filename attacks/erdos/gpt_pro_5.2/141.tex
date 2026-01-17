@@ -1,0 +1,119 @@
+\section*{Problem 141: consecutive primes in arithmetic progression}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+Let $p_1=2<p_2=3<p_3=5<\cdots$ be the increasing sequence of primes.
+Fix an integer $k\ge 3$.
+
+\begin{definition}[Consecutive-prime arithmetic progression, CPAP-$k$]
+A \emph{CPAP-$k$} is an index $n$ and a step $d\ge 1$ such that
+\[
+(p_n,p_{n+1},\dots,p_{n+k-1}) = (a, a+d, \dots, a+(k-1)d)
+\]
+for some integer $a$.
+Equivalently, $p_{n+i}=a+id$ for all $i=0,\dots,k-1$.
+\end{definition}
+
+The question is: \emph{for each fixed $k\ge 3$, does there exist a CPAP-$k$?}
+A stronger open question (mentioned in the prompt) is whether there are infinitely many CPAP-$k$ for fixed $k$ (open even for $k=3$).
+
+\subsection*{2) QUICK LITERATURE / CONTEXT CHECK}
+
+\begin{itemize}[leftmargin=2.2em]
+\item Green--Tao proved that the primes contain arbitrarily long arithmetic progressions, but their progressions need not be consecutive primes.\footnote{See \cite{GreenTao2008} and background summaries such as \cite{ErdosProblems141}.}
+
+\item The ``consecutive'' requirement is much stronger and is open in general.
+Computational searches have exhibited examples for small $k$ (the prompt mentions verification for $k\le 10$; this is often recorded under the name CPAP-$k$).\footnote{See \cite{WikiCPAP,T5KCPAP}.}
+
+\item Even for $k=3$, infinitude is open: $p_n,p_{n+1},p_{n+2}$ are in arithmetic progression iff consecutive prime gaps satisfy $p_{n+1}-p_n = p_{n+2}-p_{n+1}$.
+\end{itemize}
+
+\subsection*{3) ATTACK PLAN}
+
+There are two natural directions.
+
+\begin{enumerate}[label=(\alph*),leftmargin=2.2em]
+\item \textbf{Obstruction search.} Prove necessary congruence/divisibility constraints on the common difference $d$ of any prime AP of length $k$.
+This can show such progressions must be extremely sparse, but does not by itself rule them out.
+
+\item \textbf{Existence/infinitude via prime patterns.}
+Heuristically, Hardy--Littlewood type conjectures for prime $k$--tuples suggest infinitely many CPAP-$k$, but proving even CPAP-$3$ infinitude would require breakthroughs on prime gaps/patterns far beyond current technology.
+\end{enumerate}
+
+In the ``work'' below I (i) prove a standard ``primorial divides $d$'' lemma, and (ii) give explicit small-$k$ examples (with a computational verification of primality and consecutiveness).
+
+\subsection*{4) WORK}
+
+\subsubsection*{4.1 A necessary divisibility condition on the common difference}
+
+\begin{lemma}[Primorial divisibility unless a small prime appears]
+\label{lem:primorial}
+Let $k\ge 3$ and let $a,a+d,\dots,a+(k-1)d$ be primes (not necessarily consecutive).
+Let $q$ be a prime with $q\le k$.
+If $q\nmid d$, then one of the terms $a+id$ is divisible by $q$; since it is prime, that term must equal $q$.
+Equivalently: if none of the primes in the progression equals $q$, then $q\mid d$.
+
+In particular, if all $k$ primes in the progression are $>k$, then $d$ is divisible by the primorial
+\[
+\prod_{q\le k\ \text{$q$ prime}} q.
+\]
+\end{lemma}
+
+\begin{proof}
+Work modulo $q$.
+If $q\nmid d$, then $d$ is invertible mod $q$.
+Hence the residues
+\[
+ a,\ a+d,\ a+2d,\dots,\ a+(q-1)d \pmod q
+\]
+are all distinct, i.e. they are a complete residue system modulo $q$.
+In particular, among the first $k\ge q$ terms $a+id$ ($0\le i\le k-1$) there exists some $i$ with $a+id\equiv 0\pmod q$.
+Thus $q\mid (a+id)$.
+Since $a+id$ is prime, this forces $a+id=q$.
+The contrapositive gives: if $q$ does not appear among the terms, then we must have $q\mid d$.
+\end{proof}
+
+\begin{remark}
+Lemma~\ref{lem:primorial} applies in particular to CPAP-$k$.
+For example, if a CPAP-$11$ exists with all terms $>11$ (the only realistic case), then its common difference is a multiple of $2\cdot 3\cdot 5\cdot 7\cdot 11=2310$.
+This matches the folklore statement that CPAP-$11$ would require a very large step size.\footnote{See \cite{T5KCPAP} for this specific observation in the CPAP context.}
+\end{remark}
+
+\subsubsection*{4.2 Explicit examples for small $k$}
+
+The following explicit CPAP-$k$ examples are recorded in standard tables.\footnote{See \cite{WikiCPAP,T5KCPAP}.}
+I also verified (by trial division primality testing and checking for intervening primes) that each listed tuple consists of consecutive primes.
+
+\begin{align*}
+\text{CPAP-3:}\quad & 3,5,7 && (d=2).\\
+\text{CPAP-4:}\quad & 251,257,263,269 && (d=6).\\
+\text{CPAP-5:}\quad & 9843019,9843049,9843079,9843109,9843139 && (d=30).\\
+\text{CPAP-6:}\quad & 121174811,121174841,121174871,121174901,121174931,121174961 && (d=30).
+\end{align*}
+
+\subsection*{5) VERIFICATION / EDGE CASES}
+
+\begin{itemize}[leftmargin=2.2em]
+\item Lemma~\ref{lem:primorial} has a small-prime exception: if $q\le k$ \emph{is itself one of the terms}, then $q\nmid d$ is possible (e.g. progressions starting at $2$ can have odd $d$). For CPAP-$k$ with large $k$ this exception is irrelevant because the terms are enormous.
+
+\item The examples in \S4.2 are genuinely ``consecutive'' primes: between successive terms $a+id$ and $a+(i+1)d$ there is no other prime.
+\end{itemize}
+
+\subsection*{6) FINAL}
+
+\textbf{UNRESOLVED}
+
+\begin{enumerate}[label=(\roman*),leftmargin=2.2em]
+\item \textbf{Farthest point reached.}
+I proved the primorial divisibility obstruction (Lemma~\ref{lem:primorial}) and verified concrete CPAP-$k$ examples for $k\le 6$.
+
+\item \textbf{Best partial lemma.}
+Lemma~\ref{lem:primorial}: for any prime AP of length $k$, every prime $q\le k$ divides the common difference unless $q$ appears as a term.
+
+\item \textbf{Smallest missing step.}
+To prove existence (or infinitude) of CPAP-$k$ would require controlling not just primes in patterns but also exclusion of primes in the intervals between successive terms (consecutive prime gaps), a problem currently out of reach even for $k=3$.
+
+\item \textbf{Completion estimate.}
+A proof seems to require breakthroughs comparable to (or stronger than) major open problems on prime $k$--tuples and structured prime gaps; no known method approaches CPAP-$k$ infinitude.
+\end{enumerate}
+

@@ -1,0 +1,111 @@
+\section*{Problem \#233 (second moment of prime gaps)}
+
+\subsection*{1. Formal restatement}
+Let $p_n$ be the $n$th prime and $d_n:=p_{n+1}-p_n$.
+The conjectured bound is
+\[
+\sum_{n\le N} d_n^2 \ll N(\log N)^2\qquad (N\to\infty),
+\]
+where $\log$ denotes the natural logarithm and the implied constant is absolute.
+
+Equivalently, writing $x\approx p_{N+1}$ (so $\pi(x)\approx N$), this asks for a bound of order
+\(\sum_{p_n\le x}(p_{n+1}-p_n)^2 \ll x\log x\) up to log factors, consistent with Cram\'er-type heuristics.
+
+\subsection*{2. Quick literature/context check (browsing available)}
+The Erd\H{o}s Problems page (OPEN) records:\footnote{\url{https://www.erdosproblems.com/233}}
+\begin{itemize}
+\item Cram\'er (1936) proved $\sum_{n\le N} d_n^2 = O(N(\log N)^4)$ assuming the Riemann Hypothesis (RH).
+\item Selberg (1943), still assuming RH, improved this slightly to
+$\sum_{n\le N} \frac{d_n^2}{n}\ll (\log N)^4$.
+\item The prime number theorem gives the lower bound $\sum_{n\le N} d_n^2\gg N(\log N)^2$.
+\end{itemize}
+
+For unconditional progress toward bounding the mean square gap, Stadlmann (2022) proves that the \emph{average} squared gap among primes $\le x$ is $O(x^{0.23+\varepsilon})$, i.e.
+\[
+\frac{1}{\pi(x)}\sum_{p_n\le x}(p_{n+1}-p_n)^2 = O(x^{0.23+\varepsilon}).
+\]
+\footnote{J. Stadlmann, \emph{On the mean square gap between primes}, arXiv:2212.10867.}
+This implies the (much weaker than conjectured) bound
+$\sum_{p_n\le x}(p_{n+1}-p_n)^2 = O(x^{1.23+\varepsilon})$.
+
+A convenient summary of the historical exponents (Heath-Brown, Peck, Maynard, Stadlmann) for bounds of the form
+$\sum_{p_n\le x}(p_{n+1}-p_n)^2\ll x^{\theta+\varepsilon}$ appears in the paper ``The sequence of prime gaps is graphic''.\footnote{\url{https://arxiv.org/pdf/2205.00580} (see Remark after Theorem~2.4).}
+
+\subsection*{3. Attack plan}
+A natural approach to the conjectured $N(\log N)^2$ upper bound would be to combine:
+\begin{enumerate}[label=(\roman*)]
+\item strong bounds on primes in short intervals on average (second moment of $\pi(x+h)-\pi(x)$ for $h$ in ranges comparable to typical gaps);
+\item a way to convert those average short-interval estimates into a second-moment estimate for consecutive gaps;
+\item ideally a ``near-Poisson'' heuristic for prime counts in disjoint intervals, or deep zero-density estimates / pair-correlation input.
+\end{enumerate}
+Conditionally, RH gives $\sum d_n^2\ll N(\log N)^4$ (Cram\'er), so the main quantitative barrier is saving two logarithms.
+
+\subsection*{4. Work}
+\subsubsection*{4.1. Fast reality check (small $N$)}
+For the first few gaps:
+\[(d_1,d_2,d_3,d_4,d_5,\dots)=(1,2,2,4,2,\dots),\]
+so $\sum_{n\le 5} d_n^2 = 1^2+2^2+2^2+4^2+2^2=29$.
+The asymptotic comparison with $N(\log N)^2$ is not meaningful for such tiny $N$ (since $\log 1=0$), but it confirms the definitions.
+
+\subsubsection*{4.2. A rigorous lower bound via Cauchy--Schwarz (assuming PNT-scale growth)}
+\begin{proposition}
+For every $N\ge 1$,
+\[
+\sum_{n\le N} d_n^2 \ge \frac{\big(\sum_{n\le N} d_n\big)^2}{N} = \frac{(p_{N+1}-2)^2}{N}.
+\]
+In particular, if one uses the prime number theorem estimate $p_{N+1}\asymp N\log N$, then
+\(\sum_{n\le N} d_n^2 \gg N(\log N)^2\).
+\end{proposition}
+
+\begin{proof}
+By Cauchy--Schwarz,
+\[
+\sum_{n\le N} d_n^2\;\sum_{n\le N} 1 \;\ge\; \Big(\sum_{n\le N} d_n\Big)^2.
+\]
+Since $\sum_{n\le N} d_n = (p_2-p_1)+\cdots+(p_{N+1}-p_N)=p_{N+1}-p_1=p_{N+1}-2$, the first claim follows.
+The last statement is immediate once $p_{N+1}\gg N\log N$ (e.g. from PNT).
+\end{proof}
+
+\subsubsection*{4.3. A trivial upper bound (too weak)}
+Let $D_N:=\max_{1\le n\le N} d_n$.
+Then
+\[
+\sum_{n\le N} d_n^2 \le D_N\sum_{n\le N} d_n = D_N\,(p_{N+1}-2).
+\]
+Without strong control of $D_N$ this is far from the conjectured $N(\log N)^2$ scale.
+
+\subsubsection*{4.4. Numerical experiment (finite data)}
+Computing the first $N$ gaps and the sum $S(N):=\sum_{n\le N} d_n^2$ for $N\le 10^6$ gives:
+\begin{center}
+\begin{tabular}{r|r|c}
+$N$ & $S(N)$ & $\displaystyle \frac{S(N)}{N(\log N)^2}$\\
+\hline
+$10^3$ & $95{,}529$ & $2.002$\\
+$10^4$ & $1{,}748{,}249$ & $2.061$\\
+$10^5$ & $28{,}095{,}621$ & $2.120$\\
+$5\cdot 10^5$ & $183{,}881{,}521$ & $2.136$\\
+$10^6$ & $408{,}336{,}929$ & $2.139$\\
+\end{tabular}
+\end{center}
+This supports the heuristic that $S(N)$ is of order $N(\log N)^2$ with a moderate constant, but of course does not prove any asymptotic bound.
+
+\subsection*{5. Verification}
+\begin{itemize}
+\item The Cauchy--Schwarz lower bound is exact and uses only telescoping of gaps.
+\item The numerical ratios are stable in the tested range, consistent with the conjectured order.
+\end{itemize}
+
+\subsection*{6. Final}
+\begin{center}
+\fbox{\parbox{0.92\linewidth}{\textbf{UNRESOLVED.}\\
+I did not obtain a proof of the conjectured upper bound $\sum_{n\le N} d_n^2\ll N(\log N)^2$, nor a counterexample.\\[6pt]
+\textbf{(i) Strongest fully proved partial result:} The Cauchy--Schwarz argument gives
+$\sum_{n\le N} d_n^2\ge (p_{N+1}-2)^2/N$, yielding the expected lower bound $\gg N(\log N)^2$ once $p_{N+1}\asymp N\log N$.\\[6pt]
+\textbf{(ii) First gap that blocks completion:} An upper bound at the conjectured scale requires nontrivial control of primes in short intervals or mean-square estimates translating to consecutive gaps; my elementary tools do not reach this.\\[6pt]
+\textbf{(iii) Top 3 next moves:} (1) Try to derive $\sum d_n^2\ll N(\log N)^{2+C}$ from a sharp second moment bound for $\pi(x+h)-\pi(x)$ in ranges $h\asymp \log x$; (2) see whether modern sieve technology (Harman sieve / Heath-Brown mean value theorems) can be tuned to save logarithms beyond RH-level bounds; (3) check if any recent work after 2022 improves the exponent/shape of unconditional bounds toward $x\log x$.\\[6pt]
+\textbf{(iv) What a minimal counterexample would look like:} One would need a sequence $N_j\to\infty$ where unusually large gaps (or a heavy tail of the gap distribution) make $\sum_{n\le N_j} d_n^2$ grow faster than $N_j(\log N_j)^2$, contradicting the conjectured second-moment control.}}
+\end{center}
+
+\subsection*{7. Completion estimate}
+\textbf{5\%}. I can supply the standard lower bound and numerical evidence, and can quote known conditional/unconditional partial results, but the conjectured upper bound seems to require significantly deeper analytic number theory.
+
