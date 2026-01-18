@@ -176,19 +176,12 @@
             // Problem meta
             const metaDiv = document.getElementById('problem-meta');
             
-            // Determine overall status: prioritize "solved" > "partial" > "unresolved"
+            const hasUnresolved = (attack) => /unresolved/i.test(attack.raw || '');
+
+            // Determine overall status from the source content.
             const determineOverallStatus = (attacks) => {
                 if (!attacks || attacks.length === 0) return 'None';
-                
-                const statuses = attacks.map(a => {
-                    const status = a.status || 'unknown';
-                    return status === 'unknown' ? 'unresolved' : status.toLowerCase();
-                });
-                
-                // Priority: solved > partial > unresolved
-                if (statuses.includes('solved')) return 'Solved';
-                if (statuses.includes('partial')) return 'Partial';
-                return 'Unresolved';
+                return attacks.some(hasUnresolved) ? 'Unresolved' : 'Solved';
             };
             
             if (type === 'erdos') {
@@ -231,10 +224,9 @@
             if (problem.attacks && problem.attacks.length > 0) {
                 const repoBaseUrl = 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/';
                 attemptsDiv.innerHTML = problem.attacks.map((attack, idx) => {
-                    const statusClass = attack.status === 'solved' ? 'status-solved' :
-                                       attack.status === 'partial' ? 'status-partial' :
-                                       attack.status === 'unresolved' ? 'status-unresolved' : '';
-                    const statusLabel = attack.status ? attack.status.toUpperCase() : 'UNKNOWN';
+                    const attackStatus = hasUnresolved(attack) ? 'unresolved' : 'solved';
+                    const statusClass = attackStatus === 'solved' ? 'status-solved' : 'status-unresolved';
+                    const statusLabel = attackStatus.toUpperCase();
                     const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
                     const sourceLink = sourceUrl ? ` <a href="${sourceUrl}" target="_blank">source</a>` : '';
                     
