@@ -180,6 +180,7 @@ def build_erdos_data():
                     content = read_tex_file(tex_file)
                     date_posted = get_file_date(tex_file)
                     parsed = parse_attack(content, model_name, date_posted)
+                    parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
 
                     if problem_num in problems:
                         problems[problem_num]['attacks'].append(parsed)
@@ -235,6 +236,7 @@ def build_mo_data():
                         content = read_tex_file(tex_file)
                         date_posted = get_file_date(tex_file)
                         parsed = parse_attack(content, model_name, date_posted)
+                        parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
 
                         # Check for "solved" in filename
                         if '--solved--' in filename.lower():
