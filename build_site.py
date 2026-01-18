@@ -31,24 +31,24 @@ def read_tex_file(filepath):
 
 
 def get_file_date(filepath):
-    """Get the date when a file was added/modified.
-    
-    First tries to get the git commit date, then falls back to
+    """Get the date when a file was last updated.
+
+    First tries to get the latest git commit date, then falls back to
     file modification time.
-    
+
     Returns date in YYYY-MM-DD format.
     """
     try:
-        # Try to get git commit date (when file was first added)
+        # Try to get the latest git commit date for this file
         result = subprocess.run(
-            ['git', 'log', '--format=%aI', '--diff-filter=A', '--', str(filepath)],
+            ['git', 'log', '-1', '--format=%aI', '--', str(filepath)],
             capture_output=True,
             text=True,
             cwd=filepath.parent
         )
         if result.returncode == 0 and result.stdout.strip():
             # Parse ISO format date and extract just the date part
-            git_date = result.stdout.strip().split('\n')[-1]  # Get oldest commit (first added)
+            git_date = result.stdout.strip().split('\n')[0]
             return datetime.fromisoformat(git_date.replace('Z', '+00:00')).strftime('%Y-%m-%d')
     except Exception as e:
         pass
