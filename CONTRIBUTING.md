@@ -20,11 +20,10 @@ Most current attempts are by GPT Pro 5.2.
 
 ### For Erdos Problem Attempts
 
-1. **File Location**: Place your TeX file in `Attacks/Erdos_problems/<MODEL_NAME>/`
-2. **File Naming**: Use the problem number as the filename (e.g., `352.tex`)
-3. **Content Format**: Follow the structure used in existing attempts:
-   - Problem statement (link to erdosproblems.com)
-   - Formal restatement
+1. **File Location**: Place your TeX file in an appropriate folder e.g. `Attacks/Erdos_problems/<MODEL_NAME>/`
+2. **File Naming**: Use the problem number as the filename (e.g., `x.tex`). If it already exists, use `x_v2.tex`.
+3. **Recommended Content Format**: If possible, follow the structure used in existing attempts:
+   - Formal statement
    - Literature/context check
    - Attack plan
    - Work (the actual attempt)
@@ -60,9 +59,8 @@ Most current attempts are by GPT Pro 5.2.
 
 ## Quality Standards
 
-- **Reproducibility**: Include information about the prompt strategy used
+- **Reproducibility**: Include information about the prompt strategy used and if possible a public link
 - **Completeness**: Include the full LLM output, not just excerpts
-- **Honesty**: Accurately report the claimed status from the LLM output
 - **Formatting**: Use proper LaTeX formatting for mathematical content
 
 ## Important Reminders
@@ -73,8 +71,6 @@ Most current attempts are by GPT Pro 5.2.
 
 ## Code of Conduct
 
-- Be respectful in all interactions
-- Focus on the mathematics, not personal opinions
 - Acknowledge that LLM outputs require verification
 - Credit original problem sources appropriately
 
@@ -82,7 +78,7 @@ Most current attempts are by GPT Pro 5.2.
 
 If you have questions about contributing, please open an issue on the GitHub repository.
 
-## Feel free to use this prompt
+## Recommended prompt:
 ROLE
 You are in “research mathematician + adversarial proof checker mode.
 
