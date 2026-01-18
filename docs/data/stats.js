@@ -1,12 +1,12 @@
 var siteStats = {
   "erdos": {
-    "total_problems": 675,
-    "with_attacks": 563,
+    "total_problems": 676,
+    "with_attacks": 676,
     "models": [
-      "claude opus 4.5",
+      "gpt 5.2",
       "gpt pro 5.2",
-      "codex 5.2 extra high",
-      "gpt 5.2"
+      "claude opus 4.5",
+      "codex 5.2 extra high"
     ]
   },
   "mo": {
