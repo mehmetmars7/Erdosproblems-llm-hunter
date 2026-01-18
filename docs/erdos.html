@@ -113,16 +113,12 @@
             const claimHeader = document.getElementById('claim-header');
             let sortByStatus = 0; // 0 = by number, 1 = status A-Z, -1 = status Z-A
             
+            const hasUnresolved = (attack) => /unresolved/i.test(attack.raw || '');
+
             // Helper to determine overall status
             const getOverallStatus = (attacks) => {
                 if (!attacks || attacks.length === 0) return 'zzz-none'; // Sort last
-                const statuses = attacks.map(a => {
-                    const status = a.status || 'unknown';
-                    return status === 'unknown' ? 'unresolved' : status.toLowerCase();
-                });
-                if (statuses.includes('solved')) return 'solved';
-                if (statuses.includes('partial')) return 'partial';
-                return 'unresolved';
+                return attacks.some(hasUnresolved) ? 'unresolved' : 'solved';
             };
 
             function renderTable() {
@@ -177,22 +173,16 @@
                     }
                     const models = uniqueModels.slice(0, 2).join(', ') || '-';
 
-                    // Determine overall status with priority: solved > partial > unresolved
+                    // Determine overall status based on the source content.
                     const determineStatus = (attacks) => {
-                        const statuses = attacks.map(a => {
-                            const status = a.status || 'unknown';
-                            return status === 'unknown' ? 'unresolved' : status.toLowerCase();
-                        });
-                        
-                        if (statuses.includes('solved')) return 'Solved';
-                        if (statuses.includes('partial')) return 'Partial';
-                        return 'Unresolved';
+                        if (!attacks || attacks.length === 0) return 'None';
+                        return attacks.some(hasUnresolved) ? 'Unresolved' : 'Solved';
                     };
                     
                     const status = determineStatus(p.attacks);
                     const statusClass = status === 'Solved' ? 'table-status-solved' :
-                                       status === 'Partial' ? 'table-status-partial' :
-                                       'table-status-unresolved';
+                                       status === 'Unresolved' ? 'table-status-unresolved' :
+                                       '';
 
                     return `
                         <tr>
