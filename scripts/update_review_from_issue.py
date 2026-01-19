@@ -16,18 +16,18 @@ FIELD_LABELS = {
     "problem_id": "Problem ID",
     "verdict": "Verdict",
     "explanation": "Explanation",
-    "citations": "Citation links (required for Verified / accepted)",
+    "citations": "Citation links (required for accepted)",
     "discussion_link": "Related discussion link (optional)",
 }
 
 VERDICT_MAP = {
-    "Unreviewed / flagging only": ("flagged", "Unreviewed / flagging only"),
-    "Reviewed - incorrect": ("incorrect", "Reviewed - incorrect"),
-    "Reviewed - technicality / loophole": ("technicality", "Reviewed - technicality / loophole"),
-    "Reviewed - trivial / already known": ("trivial", "Reviewed - trivial / already known"),
-    "Reviewed - partial progress": ("partial", "Reviewed - partial progress"),
-    "Reviewed - plausible but incomplete": ("plausible", "Reviewed - plausible but incomplete"),
-    "Verified / accepted (with citation)": ("accepted", "Verified / accepted (with citation)"),
+    "flagged": ("flagged", "flagged"),
+    "incorrect": ("incorrect", "incorrect"),
+    "technicality": ("technicality", "technicality"),
+    "trivial": ("trivial", "trivial"),
+    "partial": ("partial", "partial"),
+    "plausible": ("plausible", "plausible"),
+    "accepted": ("accepted", "accepted"),
 }
 
 

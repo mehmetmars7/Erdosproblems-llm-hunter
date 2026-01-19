@@ -72,7 +72,7 @@
                     <tr>
                         <th>Question</th>
                         <th>Score</th>
-                        <th>Review</th>
+                        <th id="review-header" style="cursor: pointer;" title="Click to sort by review">Community Review ⇅</th>
                         <th id="claim-header" style="cursor: pointer;" title="Click to sort by status">LLM Claim ⇅</th>
                         <th>Models</th>
                         <th>Link</th>
@@ -110,7 +110,9 @@
             const filterCheckbox = document.getElementById('filter-attacks');
             const searchInput = document.getElementById('search');
             const claimHeader = document.getElementById('claim-header');
+            const reviewHeader = document.getElementById('review-header');
             let sortByStatus = 0; // 0 = by score, 1 = status A-Z, -1 = status Z-A
+            let sortByReview = 0; // 0 = by score, 1 = review A-Z, -1 = review Z-A
             
             const hasUnresolved = (attack) => /unresolved/i.test(attack.raw || '');
 
@@ -131,8 +133,14 @@
 
                 let problems = Object.values(moProblems);
 
-                // Sort by score descending or status
-                if (sortByStatus !== 0) {
+                // Sort by score descending, review, or status
+                if (sortByReview !== 0) {
+                    problems.sort((a, b) => {
+                        const reviewA = window.ProblemHunting.getReviewLabel(a.review);
+                        const reviewB = window.ProblemHunting.getReviewLabel(b.review);
+                        return sortByReview * reviewA.localeCompare(reviewB);
+                    });
+                } else if (sortByStatus !== 0) {
                     problems.sort((a, b) => {
                         const statusA = getOverallStatus(a.attacks);
                         const statusB = getOverallStatus(b.attacks);
@@ -174,6 +182,7 @@
                         uniqueModels = ['GPT Pro', ...uniqueModels.filter(m => m !== 'GPT Pro')];
                     }
                     const models = uniqueModels.slice(0, 2).join(', ') || '-';
+                    const modelsLabel = models === '-' ? models : models.toLowerCase();
                     // Decode HTML entities in title
                     const tempDiv = document.createElement('div');
                     tempDiv.innerHTML = p.title || `Question ${p.id}`;
@@ -181,13 +190,13 @@
                     
                     // Determine overall status based on the source content.
                     const determineStatus = (attacks) => {
-                        if (!attacks || attacks.length === 0) return 'None';
-                        return attacks.some(hasUnresolved) ? 'Unresolved' : 'Solved';
+                        if (!attacks || attacks.length === 0) return 'none';
+                        return attacks.some(hasUnresolved) ? 'unresolved' : 'solved';
                     };
                     
                     const status = determineStatus(p.attacks);
-                    const statusClass = status === 'Solved' ? 'table-status-solved' :
-                                       status === 'Unresolved' ? 'table-status-unresolved' :
+                    const statusClass = status === 'solved' ? 'table-status-solved' :
+                                       status === 'unresolved' ? 'table-status-unresolved' :
                                        '';
                     const reviewLabel = window.ProblemHunting.getReviewLabel(p.review);
                     const reviewClass = window.ProblemHunting.getReviewClass(p.review);
@@ -198,7 +207,7 @@
                             <td>${p.score}</td>
                             <td class="${reviewClass}">${reviewLabel}</td>
                             <td class="${statusClass} claim-status">${status}</td>
-                            <td>${models}</td>
+                            <td>${modelsLabel}</td>
                             <td><a href="${p.link}" target="_blank">MathOverflow</a></td>
                         </tr>
                     `;
@@ -224,6 +233,19 @@
                 } else {
                     sortByStatus = 0;
                 }
+                sortByReview = 0;
+                renderTable();
+            });
+            reviewHeader.addEventListener('click', () => {
+                // Cycle: default (0) -> A-Z (1) -> Z-A (-1) -> default (0)
+                if (sortByReview === 0) {
+                    sortByReview = 1;
+                } else if (sortByReview === 1) {
+                    sortByReview = -1;
+                } else {
+                    sortByReview = 0;
+                }
+                sortByStatus = 0;
                 renderTable();
             });
             renderTable();

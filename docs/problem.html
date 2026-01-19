@@ -191,15 +191,19 @@
 
             // Determine overall status from the source content.
             const determineOverallStatus = (attacks) => {
-                if (!attacks || attacks.length === 0) return 'None';
-                return attacks.some(hasUnresolved) ? 'Unresolved' : 'Solved';
+                if (!attacks || attacks.length === 0) return 'none';
+                return attacks.some(hasUnresolved) ? 'unresolved' : 'solved';
             };
+            const reviewLabel = window.ProblemHunting && window.ProblemHunting.getReviewLabel
+                ? window.ProblemHunting.getReviewLabel(problem.review)
+                : 'unreviewed';
             
             if (type === 'erdos') {
                 const overallStatus = determineOverallStatus(problem.attacks);
                 metaDiv.innerHTML = `
                     <p><strong>Problem Number:</strong> ${problem.number}</p>
                     <p><strong>LLM Claims:</strong> ${overallStatus}</p>
+                    <p><strong>Community Review:</strong> ${reviewLabel}</p>
                 `;
             } else {
                 const overallStatus = determineOverallStatus(problem.attacks);
@@ -207,6 +211,7 @@
                     <p><strong>Question ID:</strong> ${problem.id}</p>
                     <p><strong>Score:</strong> ${problem.score}</p>
                     <p><strong>LLM Claims:</strong> ${overallStatus}</p>
+                    <p><strong>Community Review:</strong> ${reviewLabel}</p>
                 `;
             }
 
@@ -236,8 +241,7 @@
                 const repoBaseUrl = 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/';
                 attemptsDiv.innerHTML = problem.attacks.map((attack, idx) => {
                     const attackStatus = hasUnresolved(attack) ? 'unresolved' : 'solved';
-                    const statusClass = attackStatus === 'solved' ? 'status-solved' : 'status-unresolved';
-                    const statusLabel = attackStatus.toUpperCase();
+                    const statusLabel = attackStatus;
                     const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
                     const sourceLink = sourceUrl ? ` <a href="${sourceUrl}" target="_blank">source</a>` : '';
                     const commentsLink = ` <a href="#comments">comments</a>`;
@@ -251,7 +255,7 @@
                         <div class="attempt">
                             <div class="attempt-header">
                                 <h3>Attempt ${idx + 1}: ${attack.model}</h3>
-                                <span class="status-badge ${statusClass}">${statusLabel}</span>${sourceLink}${commentsLink}${reviewLink}
+                                <span class="status-text">${statusLabel}</span>${sourceLink}${commentsLink}${reviewLink}
                             </div>
                             ${datePosted}
                             <div class="attempt-content tex-content">

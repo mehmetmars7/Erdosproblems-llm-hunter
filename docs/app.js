@@ -150,26 +150,18 @@ function getStatusClass(status) {
  * Get review label for display
  */
 function getReviewLabel(review) {
-    if (!review) return 'Unreviewed';
-    if (review.label) return review.label;
-    const status = (review.status || '').toLowerCase();
+    const status = (review && review.status ? review.status : '').toLowerCase();
     switch (status) {
         case 'flagged':
-            return 'Unreviewed / flagging only';
         case 'incorrect':
-            return 'Reviewed - incorrect';
         case 'technicality':
-            return 'Reviewed - technicality / loophole';
         case 'trivial':
-            return 'Reviewed - trivial / already known';
         case 'partial':
-            return 'Reviewed - partial progress';
         case 'plausible':
-            return 'Reviewed - plausible but incomplete';
         case 'accepted':
-            return 'Verified / accepted';
+            return status;
         default:
-            return 'Unreviewed';
+            return 'unreviewed';
     }
 }
 
