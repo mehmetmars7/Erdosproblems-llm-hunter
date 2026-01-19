@@ -104,7 +104,7 @@
             </p>
         </section>
 
-        <section class="comments">
+        <section class="comments" id="comments">
             <h2>Comments</h2>
             <p id="gh-discussion-wrap" hidden>
                 <a id="gh-discussion-link" href="#" target="_blank" rel="noopener">View this discussion on GitHub</a>
@@ -167,6 +167,8 @@
                 document.getElementById('problem-meta').innerHTML = '<p>Problem not found</p>';
                 return;
             }
+
+            initGiscus(type, id);
 
             // Update page title
             if (type === 'erdos') {
@@ -237,6 +239,7 @@
                     const statusLabel = attackStatus.toUpperCase();
                     const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
                     const sourceLink = sourceUrl ? ` <a href="${sourceUrl}" target="_blank">source</a>` : '';
+                    const commentsLink = ` <a href="#comments">comments</a>`;
                     
                     // Format date if available
                     const datePosted = attack.date_posted ? 
@@ -246,7 +249,7 @@
                         <div class="attempt">
                             <div class="attempt-header">
                                 <h3>Attempt ${idx + 1}: ${attack.model}</h3>
-                                <span class="status-badge ${statusClass}">${statusLabel}</span>${sourceLink}
+                                <span class="status-badge ${statusClass}">${statusLabel}</span>${sourceLink}${commentsLink}
                             </div>
                             ${datePosted}
                             <div class="attempt-content tex-content">
@@ -681,21 +684,33 @@
 
             return formatted;
         }
-    </script>
-    <script src="https://giscus.app/client.js"
-        data-repo="mehmetmars7/Erdosproblems-llm-hunter"
-        data-repo-id="R_kgDOQ7heCw"
-        data-category="Comments"
-        data-category-id="DIC_kwDOQ7heC84C1Isv"
-        data-mapping="url"
-        data-strict="1"
-        data-reactions-enabled="1"
-        data-emit-metadata="1"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        crossorigin="anonymous"
-        async>
+
+        function initGiscus(type, id) {
+            const container = document.querySelector('.giscus');
+            if (!container) return;
+
+            const prefix = type === 'mo' ? 'MO' : 'Erdos';
+            const term = `${prefix}-${id}`;
+
+            const script = document.createElement('script');
+            script.src = 'https://giscus.app/client.js';
+            script.dataset.repo = 'mehmetmars7/Erdosproblems-llm-hunter';
+            script.dataset.repoId = 'R_kgDOQ7heCw';
+            script.dataset.category = 'Comments';
+            script.dataset.categoryId = 'DIC_kwDOQ7heC84C1Isv';
+            script.dataset.mapping = 'specific';
+            script.dataset.term = term;
+            script.dataset.strict = '1';
+            script.dataset.reactionsEnabled = '1';
+            script.dataset.emitMetadata = '1';
+            script.dataset.inputPosition = 'bottom';
+            script.dataset.theme = 'preferred_color_scheme';
+            script.dataset.lang = 'en';
+            script.crossOrigin = 'anonymous';
+            script.async = true;
+
+            container.appendChild(script);
+        }
     </script>
     <script>
         window.addEventListener('message', function(event) {
