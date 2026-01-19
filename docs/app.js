@@ -147,6 +147,81 @@ function getStatusClass(status) {
 }
 
 /**
+ * Theme handling
+ */
+function getStoredTheme() {
+    try {
+        return localStorage.getItem('theme');
+    } catch {
+        return null;
+    }
+}
+
+function getPreferredTheme() {
+    const stored = getStoredTheme();
+    if (stored === 'light' || stored === 'dark') return stored;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+    }
+    return 'light';
+}
+
+function updateThemeToggle(theme) {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    toggle.textContent = theme === 'dark' ? 'Dark' : 'Light';
+    toggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    toggle.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`);
+}
+
+function updateGiscusTheme(theme) {
+    const frame = document.querySelector('iframe.giscus-frame');
+    if (!frame || !frame.contentWindow) return;
+    frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: theme === 'dark' ? 'dark' : 'light' } } },
+        'https://giscus.app'
+    );
+}
+
+function applyTheme(theme, persist) {
+    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    if (persist) {
+        try {
+            localStorage.setItem('theme', nextTheme);
+        } catch {
+            // Ignore storage errors
+        }
+    }
+    updateThemeToggle(nextTheme);
+    updateGiscusTheme(nextTheme);
+}
+
+function initThemeToggle() {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    const initialTheme = getPreferredTheme();
+    applyTheme(initialTheme, false);
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        applyTheme(next, true);
+    });
+
+    if (window.matchMedia) {
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        if (media.addEventListener) {
+            media.addEventListener('change', (event) => {
+                if (getStoredTheme()) return;
+                applyTheme(event.matches ? 'dark' : 'light', false);
+            });
+        }
+    }
+}
+
+/**
  * Get review label for display
  */
 function getReviewLabel(review) {
@@ -252,6 +327,7 @@ window.ProblemHunting = {
     getStatusClass,
     getReviewLabel,
     getReviewClass,
+    initThemeToggle,
     initCollapsibles,
     scrollToElement,
     copyToClipboard,
@@ -260,5 +336,6 @@ window.ProblemHunting = {
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
+    initThemeToggle();
     initCollapsibles();
 });
