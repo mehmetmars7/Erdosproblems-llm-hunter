@@ -1,0 +1,98 @@
+name: Create review PR from labeled issue
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  review-pr:
+    if: >
+      github.event.label.name == 'ready-for-pr' &&
+      github.event.issue.state == 'open' &&
+      !contains(join(github.event.issue.labels.*.name, ','), 'review-pr-created')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update review file from issue
+        id: update
+        continue-on-error: true
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_CREATED_AT: ${{ github.event.issue.created_at }}
+        run: python scripts/update_review_from_issue.py
+
+      - name: Comment on validation error
+        if: steps.update.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              "I could not generate a review PR from this issue.",
+              "Please check the form fields and resubmit the label once fixed."
+            ].join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
+
+      - name: Remove ready-for-pr label
+        if: steps.update.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: "ready-for-pr"
+            });
+
+      - name: Fail job on validation error
+        if: steps.update.outcome == 'failure'
+        run: exit 1
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: review-issue-${{ github.event.issue.number }}
+          title: Review status from issue #${{ github.event.issue.number }}
+          body: Automated update from issue #${{ github.event.issue.number }}.
+          commit-message: Add review status from issue #${{ github.event.issue.number }}
+          delete-branch: true
+
+      - name: Comment with PR link
+        if: steps.cpr.outputs.pull-request-url != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prUrl = `${{ steps.cpr.outputs.pull-request-url }}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Created PR: ${prUrl}`
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["review-pr-created"]
+            });

@@ -18,6 +18,7 @@ BASE_DIR = Path(__file__).parent
 ATTACKS_DIR = BASE_DIR / "attacks"
 LISTS_DIR = BASE_DIR / "lists"
 DATA_DIR = BASE_DIR / "docs" / "data"
+REVIEWS_DIR = BASE_DIR / "reviews"
 
 
 def read_tex_file(filepath):
@@ -139,6 +140,19 @@ def load_mo_problems_list():
     return problems
 
 
+def load_review(problem_type, problem_id):
+    """Load review metadata for a problem, if present."""
+    review_path = REVIEWS_DIR / problem_type / f"{problem_id}.json"
+    if not review_path.exists():
+        return None
+    try:
+        with open(review_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Warning: Could not load review for {problem_type} {problem_id}: {e}")
+        return None
+
+
 def build_erdos_data():
     """Build data for Erdos problems.
 
@@ -181,6 +195,12 @@ def build_erdos_data():
                             'database_url': 'https://teorth.github.io/erdosproblems/',
                             'attacks': [parsed]
                         }
+
+    # Attach review metadata, if any
+    for problem_num, problem_data in problems.items():
+        review = load_review('erdos', problem_num)
+        if review:
+            problem_data['review'] = review
 
     # Aggregate status across all attacks for each problem
     problems = aggregate_problem_status(problems)
@@ -233,6 +253,12 @@ def build_mo_data():
 
                         if qid in problems:
                             problems[qid]['attacks'].append(parsed)
+
+    # Attach review metadata, if any
+    for qid, problem_data in problems.items():
+        review = load_review('mo', qid)
+        if review:
+            problem_data['review'] = review
 
     # Aggregate status across all attacks for each problem
     problems = aggregate_problem_status(problems)

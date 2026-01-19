@@ -147,6 +147,41 @@ function getStatusClass(status) {
 }
 
 /**
+ * Get review label for display
+ */
+function getReviewLabel(review) {
+    if (!review) return 'Unreviewed';
+    if (review.label) return review.label;
+    const status = (review.status || '').toLowerCase();
+    switch (status) {
+        case 'flagged':
+            return 'Unreviewed / flagging only';
+        case 'incorrect':
+            return 'Reviewed - incorrect';
+        case 'technicality':
+            return 'Reviewed - technicality / loophole';
+        case 'trivial':
+            return 'Reviewed - trivial / already known';
+        case 'partial':
+            return 'Reviewed - partial progress';
+        case 'plausible':
+            return 'Reviewed - plausible but incomplete';
+        case 'accepted':
+            return 'Verified / accepted';
+        default:
+            return 'Unreviewed';
+    }
+}
+
+/**
+ * Get review class for styling
+ */
+function getReviewClass(review) {
+    if (!review || !review.status) return 'review-unreviewed';
+    return `review-${review.status.toLowerCase()}`;
+}
+
+/**
  * Initialize collapsible sections
  */
 function initCollapsibles() {
@@ -223,6 +258,8 @@ window.ProblemHunting = {
     countWithAttacks,
     formatDate,
     getStatusClass,
+    getReviewLabel,
+    getReviewClass,
     initCollapsibles,
     scrollToElement,
     copyToClipboard,
