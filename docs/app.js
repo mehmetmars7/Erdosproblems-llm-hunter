@@ -249,6 +249,53 @@ function getReviewClass(review) {
     return `review-${review.status.toLowerCase()}`;
 }
 
+function normalizeReviewHandle(handle) {
+    if (handle === null || handle === undefined) return '';
+    let cleaned = String(handle).trim();
+    if (!cleaned) return '';
+    if (cleaned.startsWith('@')) cleaned = cleaned.slice(1);
+    cleaned = cleaned.replace(/[^A-Za-z0-9-]/g, '');
+    return cleaned;
+}
+
+function getReviewHandles(review) {
+    if (!review || !review.reviewed_by) return [];
+    const raw = review.reviewed_by;
+    let items = [];
+    if (Array.isArray(raw)) {
+        items = raw;
+    } else if (raw !== null && raw !== undefined) {
+        const text = String(raw).trim();
+        if (text) items = text.split(',');
+    }
+
+    const handles = [];
+    const seen = new Set();
+    items.forEach((item) => {
+        const normalized = normalizeReviewHandle(item);
+        if (!normalized) return;
+        const key = normalized.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        handles.push(normalized);
+    });
+    return handles;
+}
+
+function formatReviewHandles(review) {
+    const handles = getReviewHandles(review);
+    if (handles.length === 0) return '';
+    return handles.map((handle) => `@${handle}`).join(', ');
+}
+
+function formatReviewHandleLinks(review) {
+    const handles = getReviewHandles(review);
+    if (handles.length === 0) return '';
+    return handles
+        .map((handle) => `<a href="https://github.com/${handle}" target="_blank" rel="noopener">@${handle}</a>`)
+        .join(', ');
+}
+
 /**
  * Format completion percentage for display.
  */
@@ -342,6 +389,9 @@ window.ProblemHunting = {
     getStatusClass,
     getReviewLabel,
     getReviewClass,
+    getReviewHandles,
+    formatReviewHandles,
+    formatReviewHandleLinks,
     formatCompletion,
     initThemeToggle,
     initCollapsibles,
