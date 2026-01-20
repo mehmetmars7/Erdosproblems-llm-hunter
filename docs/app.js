@@ -229,6 +229,7 @@ function getReviewLabel(review) {
     switch (status) {
         case 'flagged':
         case 'incorrect':
+        case 'known':
         case 'technicality':
         case 'trivial':
         case 'partial':

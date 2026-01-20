@@ -23,6 +23,7 @@ FIELD_LABELS = {
 VERDICT_MAP = {
     "flagged": ("flagged", "flagged"),
     "incorrect": ("incorrect", "incorrect"),
+    "known": ("known", "known"),
     "technicality": ("technicality", "technicality"),
     "trivial": ("trivial", "trivial"),
     "partial": ("partial", "partial"),

@@ -224,12 +224,18 @@ def build_erdos_data():
         for model_dir in attacks_dir.iterdir():
             if model_dir.is_dir() and not model_dir.name.startswith('.'):
                 model_name = model_dir.name.replace('_', ' ')
-                for tex_file in model_dir.glob("*.tex"):
-                    problem_num = tex_file.stem
+                for tex_file in sorted(model_dir.glob("*.tex")):
+                    filename = tex_file.stem
+                    match = re.match(r'^(?P<id>\d+)(?:_v(?P<ver>\d+))?$', filename)
+                    if not match:
+                        continue
+                    problem_num = match.group('id')
+                    version = int(match.group('ver') or 1)
                     content = read_tex_file(tex_file)
                     date_posted = get_file_date(tex_file)
                     parsed = parse_attack(content, model_name, date_posted)
                     parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
+                    parsed['version'] = version
 
                     if problem_num in problems:
                         problems[problem_num]['attacks'].append(parsed)
@@ -247,6 +253,16 @@ def build_erdos_data():
         review = load_review('erdos', problem_num)
         if review:
             problem_data['review'] = review
+
+    # Sort attacks so versioned files appear after base attempts
+    for problem_data in problems.values():
+        problem_data['attacks'].sort(
+            key=lambda attack: (
+                attack.get('model', ''),
+                attack.get('version', 1),
+                attack.get('file_path', '')
+            )
+        )
 
     # Aggregate completion across all attacks for each problem
     for problem_num, problem_data in problems.items():
@@ -292,16 +308,19 @@ def build_mo_data():
         for model_dir in attacks_dir.iterdir():
             if model_dir.is_dir() and not model_dir.name.startswith('.'):
                 model_name = model_dir.name.replace('_', ' ')
-                for tex_file in model_dir.glob("*.tex"):
+                for tex_file in sorted(model_dir.glob("*.tex")):
                     # Extract question ID from filename
                     filename = tex_file.stem
                     qid_match = re.match(r'^(\d+)', filename)
                     if qid_match:
                         qid = qid_match.group(1)
+                        version_match = re.search(r'_v(\d+)', filename)
+                        version = int(version_match.group(1)) if version_match else 1
                         content = read_tex_file(tex_file)
                         date_posted = get_file_date(tex_file)
                         parsed = parse_attack(content, model_name, date_posted)
                         parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
+                        parsed['version'] = version
 
                         # Check for "solved" in filename without overriding unresolved content.
                         if '--solved--' in filename.lower() and parsed.get('status') != 'unresolved':
@@ -315,6 +334,16 @@ def build_mo_data():
         review = load_review('mo', qid)
         if review:
             problem_data['review'] = review
+
+    # Sort attacks so versioned files appear after base attempts
+    for problem_data in problems.values():
+        problem_data['attacks'].sort(
+            key=lambda attack: (
+                attack.get('model', ''),
+                attack.get('version', 1),
+                attack.get('file_path', '')
+            )
+        )
 
     # Aggregate completion across all attacks for each problem
     for qid, problem_data in problems.items():
