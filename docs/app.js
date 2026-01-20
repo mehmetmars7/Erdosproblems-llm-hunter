@@ -249,6 +249,20 @@ function getReviewClass(review) {
 }
 
 /**
+ * Format completion percentage for display.
+ */
+function formatCompletion(value) {
+    if (value === null || value === undefined) return '';
+    const num = Number(value);
+    if (!Number.isFinite(num)) return '';
+    const rounded = Math.round(num * 10) / 10;
+    if (Math.abs(rounded - Math.round(rounded)) < 1e-9) {
+        return `${Math.round(rounded)}%`;
+    }
+    return `${rounded}%`;
+}
+
+/**
  * Initialize collapsible sections
  */
 function initCollapsibles() {
@@ -327,6 +341,7 @@ window.ProblemHunting = {
     getStatusClass,
     getReviewLabel,
     getReviewClass,
+    formatCompletion,
     initThemeToggle,
     initCollapsibles,
     scrollToElement,

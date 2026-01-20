@@ -5,8 +5,8 @@ var siteStats = {
     "models": [
       "gpt 5.2",
       "gpt pro 5.2",
-      "codex 5.2 extra high",
-      "claude opus 4.5"
+      "claude opus 4.5",
+      "codex 5.2 extra high"
     ]
   },
   "mo": {

@@ -31,6 +31,47 @@ def read_tex_file(filepath):
         return ""
 
 
+def extract_completion(content):
+    """Extract completion estimate percentage from TeX content.
+
+    Looks for 'COMPLETION ESTIMATE' and scans that line plus the next 3 lines.
+    Returns a float percentage (0-100) or None.
+    """
+    lines = content.splitlines()
+    values = []
+
+    for idx, line in enumerate(lines):
+        if not re.search(r'COMPLETION\s*ESTIMATE', line, re.IGNORECASE):
+            continue
+
+        window = lines[idx:idx + 4]
+        window_text = "\n".join(window)
+
+        # Prefer explicit percentages.
+        for match in re.findall(r'(\d+(?:\.\d+)?)\s*\\?%', window_text):
+            try:
+                values.append(float(match))
+            except ValueError:
+                continue
+
+        if values:
+            continue
+
+        # Fallback: decimal fraction (e.g., 0.10) -> convert to percent.
+        for match in re.findall(r'\b0?\.\d+\b', window_text):
+            try:
+                decimal_value = float(match)
+            except ValueError:
+                continue
+            if decimal_value <= 1:
+                values.append(decimal_value * 100)
+
+    if not values:
+        return None
+
+    return max(values)
+
+
 def get_file_date(filepath):
     """Get the date when a file was last updated.
 
@@ -93,12 +134,17 @@ def parse_attack(content, model_name, date_posted=None):
     # Determine status from raw content.
     status = 'unresolved' if re.search(r'unresolved', content, re.IGNORECASE) else 'solved'
 
+    completion = extract_completion(content)
+
     attack_data = {
         'model': model_name,
         'sections': sections,
         'status': status,
         'raw': content
     }
+
+    if completion is not None:
+        attack_data['completion'] = completion
     
     if date_posted:
         attack_data['date_posted'] = date_posted
@@ -202,6 +248,16 @@ def build_erdos_data():
         if review:
             problem_data['review'] = review
 
+    # Aggregate completion across all attacks for each problem
+    for problem_num, problem_data in problems.items():
+        completions = [
+            attack.get('completion')
+            for attack in problem_data.get('attacks', [])
+            if isinstance(attack.get('completion'), (int, float))
+        ]
+        if completions:
+            problem_data['completion'] = max(completions)
+
     # Aggregate status across all attacks for each problem
     problems = aggregate_problem_status(problems)
 
@@ -259,6 +315,16 @@ def build_mo_data():
         review = load_review('mo', qid)
         if review:
             problem_data['review'] = review
+
+    # Aggregate completion across all attacks for each problem
+    for qid, problem_data in problems.items():
+        completions = [
+            attack.get('completion')
+            for attack in problem_data.get('attacks', [])
+            if isinstance(attack.get('completion'), (int, float))
+        ]
+        if completions:
+            problem_data['completion'] = max(completions)
 
     # Aggregate status across all attacks for each problem
     problems = aggregate_problem_status(problems)
