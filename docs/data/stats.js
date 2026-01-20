@@ -4,9 +4,9 @@ var siteStats = {
     "with_attacks": 676,
     "models": [
       "gpt pro 5.2",
-      "gpt 5.2",
+      "codex 5.2 extra high",
       "claude opus 4.5",
-      "codex 5.2 extra high"
+      "gpt 5.2"
     ]
   },
   "mo": {
