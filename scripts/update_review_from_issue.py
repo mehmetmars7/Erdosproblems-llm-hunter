@@ -74,6 +74,7 @@ def main():
     issue_number = os.environ.get("ISSUE_NUMBER", "")
     issue_url = os.environ.get("ISSUE_URL", "")
     issue_author = os.environ.get("ISSUE_AUTHOR", "")
+    review_labeler = os.environ.get("REVIEW_LABELER", "")
     issue_created_at = os.environ.get("ISSUE_CREATED_AT", "")
 
     problem_type_raw = extract_field(body, FIELD_LABELS["problem_type"])
@@ -112,13 +113,14 @@ def main():
         if len(explanation.strip()) < 20:
             raise SystemExit("Accepted verdict requires a short explanation (20+ characters).")
 
+    reviewed_by = review_labeler.strip() or issue_author.strip()
     review_data = {
         "status": status,
         "label": label,
         "note": explanation.strip(),
         "citations": citations,
         "discussion_link": discussion_link.strip(),
-        "reviewed_by": issue_author,
+        "reviewed_by": reviewed_by,
         "reviewed_at": issue_created_at[:10] if issue_created_at else "",
         "issue_number": issue_number,
         "issue_url": issue_url,

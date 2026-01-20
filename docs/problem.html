@@ -201,6 +201,29 @@
             const completionLabel = window.ProblemHunting && window.ProblemHunting.formatCompletion
                 ? window.ProblemHunting.formatCompletion(problem.completion)
                 : '';
+            const reviewedByValue = problem.review ? problem.review.reviewed_by : '';
+            const reviewedByList = [];
+            if (Array.isArray(reviewedByValue)) {
+                reviewedByValue.forEach((item) => {
+                    if (item === null || item === undefined) return;
+                    const handle = String(item).trim();
+                    if (handle) reviewedByList.push(handle);
+                });
+            } else if (reviewedByValue !== null && reviewedByValue !== undefined) {
+                String(reviewedByValue)
+                    .split(',')
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                    .forEach((handle) => reviewedByList.push(handle));
+            }
+
+            let reviewDisplay = reviewLabel;
+            if (reviewedByList.length > 0 && reviewLabel !== 'unreviewed') {
+                const handles = reviewedByList.map((handle) =>
+                    handle.startsWith('@') ? handle : `@${handle}`
+                );
+                reviewDisplay = `${reviewLabel} (${handles.join(', ')})`;
+            }
             
             if (type === 'erdos') {
                 const overallStatus = determineOverallStatus(problem.attacks);
@@ -208,7 +231,7 @@
                     <p><strong>Problem Number:</strong> ${problem.number}</p>
                     <p><strong>LLM Claims:</strong> ${overallStatus}</p>
                     <p><strong>Completion:</strong> ${completionLabel}</p>
-                    <p><strong>Community Review:</strong> ${reviewLabel}</p>
+                    <p><strong>Community Review:</strong> ${reviewDisplay}</p>
                 `;
             } else {
                 const overallStatus = determineOverallStatus(problem.attacks);
@@ -217,7 +240,7 @@
                     <p><strong>Score:</strong> ${problem.score}</p>
                     <p><strong>LLM Claims:</strong> ${overallStatus}</p>
                     <p><strong>Completion:</strong> ${completionLabel}</p>
-                    <p><strong>Community Review:</strong> ${reviewLabel}</p>
+                    <p><strong>Community Review:</strong> ${reviewDisplay}</p>
                 `;
             }
 

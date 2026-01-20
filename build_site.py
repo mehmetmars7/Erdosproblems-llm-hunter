@@ -39,6 +39,13 @@ def extract_completion(content):
     """
     lines = content.splitlines()
     values = []
+    confidence_re = re.compile(r'\bconfiden\w*\b', re.IGNORECASE)
+    has_confidence_estimate = False
+
+    def is_confidence_context(text, start, end, window=80):
+        left = max(0, start - window)
+        right = min(len(text), end + window)
+        return confidence_re.search(text[left:right]) is not None
 
     for idx, line in enumerate(lines):
         if not re.search(r'COMPLETION\s*ESTIMATE', line, re.IGNORECASE):
@@ -46,11 +53,15 @@ def extract_completion(content):
 
         window = lines[idx:idx + 4]
         window_text = "\n".join(window)
+        if confidence_re.search(window_text):
+            has_confidence_estimate = True
 
         # Prefer explicit percentages.
-        for match in re.findall(r'(\d+(?:\.\d+)?)\s*\\?%', window_text):
+        for match in re.finditer(r'(\d+(?:\.\d+)?)\s*\\?%', window_text):
+            if is_confidence_context(window_text, match.start(), match.end()):
+                continue
             try:
-                values.append(float(match))
+                values.append(float(match.group(1)))
             except ValueError:
                 continue
 
@@ -58,13 +69,18 @@ def extract_completion(content):
             continue
 
         # Fallback: decimal fraction (e.g., 0.10) -> convert to percent.
-        for match in re.findall(r'\b0?\.\d+\b', window_text):
+        for match in re.finditer(r'\b0?\.\d+\b', window_text):
+            if is_confidence_context(window_text, match.start(), match.end()):
+                continue
             try:
-                decimal_value = float(match)
+                decimal_value = float(match.group(0))
             except ValueError:
                 continue
             if decimal_value <= 1:
                 values.append(decimal_value * 100)
+
+    if has_confidence_estimate:
+        return None
 
     if not values:
         return None
