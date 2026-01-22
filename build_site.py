@@ -38,7 +38,7 @@ def extract_completion(content):
     Returns a float percentage (0-100) or None.
     """
     lines = content.splitlines()
-    values = []
+    last_value = None
     confidence_re = re.compile(r'\bconfiden\w*\b', re.IGNORECASE)
     has_confidence_estimate = False
 
@@ -57,15 +57,17 @@ def extract_completion(content):
             has_confidence_estimate = True
 
         # Prefer explicit percentages.
+        local_values = []
         for match in re.finditer(r'(\d+(?:\.\d+)?)\s*\\?%', window_text):
             if is_confidence_context(window_text, match.start(), match.end()):
                 continue
             try:
-                values.append(float(match.group(1)))
+                local_values.append(float(match.group(1)))
             except ValueError:
                 continue
 
-        if values:
+        if local_values:
+            last_value = local_values[-1]
             continue
 
         # Fallback: decimal fraction (e.g., 0.10) -> convert to percent.
@@ -77,15 +79,12 @@ def extract_completion(content):
             except ValueError:
                 continue
             if decimal_value <= 1:
-                values.append(decimal_value * 100)
+                last_value = decimal_value * 100
 
     if has_confidence_estimate:
         return None
 
-    if not values:
-        return None
-
-    return max(values)
+    return last_value
 
 
 def get_file_date(filepath):
