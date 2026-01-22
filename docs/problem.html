@@ -446,6 +446,61 @@
             }
 
             text = convertInlineMath(text);
+
+            function parseBracedArg(input, startIdx) {
+                if (input[startIdx] !== '{') return null;
+                let depth = 0;
+                let i = startIdx;
+                for (; i < input.length; i += 1) {
+                    const ch = input[i];
+                    if (ch === '\\') {
+                        i += 1;
+                        continue;
+                    }
+                    if (ch === '{') {
+                        depth += 1;
+                    } else if (ch === '}') {
+                        depth -= 1;
+                        if (depth === 0) {
+                            return {
+                                value: input.slice(startIdx + 1, i),
+                                end: i + 1
+                            };
+                        }
+                    }
+                }
+                return null;
+            }
+
+            function replaceTwoArgCommand(input, command, replacer) {
+                const needle = '\\' + command + '{';
+                let out = '';
+                let i = 0;
+
+                while (i < input.length) {
+                    const idx = input.indexOf(needle, i);
+                    if (idx === -1) {
+                        out += input.slice(i);
+                        break;
+                    }
+                    out += input.slice(i, idx);
+                    const startArg1 = idx + needle.length - 1;
+                    const arg1 = parseBracedArg(input, startArg1);
+                    if (!arg1) {
+                        out += input.slice(idx);
+                        return out;
+                    }
+                    const arg2 = parseBracedArg(input, arg1.end);
+                    if (!arg2) {
+                        out += input.slice(idx);
+                        return out;
+                    }
+                    out += replacer(arg1.value, arg2.value);
+                    i = arg2.end;
+                }
+
+                return out;
+            }
             
             // Handle LaTeX comments (lines starting with %) only in the first ~10 lines
             const lines = text.split('\n');
@@ -465,6 +520,43 @@
             
             // Convert \begin{center}...\end{center} to <div style="text-align: center;">...</div>
             text = text.replace(/\\begin\{center\}([\s\S]*?)\\end\{center\}/g, '<div style="text-align: center;">$1</div>');
+
+            text = replaceTwoArgCommand(text, 'parbox', (width, content) => {
+                let cssWidth = '';
+                const widthTrimmed = width.trim();
+                const lineWidthMatch = widthTrimmed.match(/^(\d*\.?\d+)\s*\\linewidth$/);
+                if (lineWidthMatch) {
+                    const percentage = Math.max(0, Math.min(100, parseFloat(lineWidthMatch[1]) * 100));
+                    cssWidth = `${percentage}%`;
+                } else if (widthTrimmed) {
+                    cssWidth = widthTrimmed.replace(/\\h?space\{[^}]+\}/g, '').trim();
+                }
+                const styleAttr = cssWidth ? ` style="max-width: ${cssWidth};"` : '';
+                return `<div class="latex-parbox"${styleAttr}>${content}</div>`;
+            });
+
+            text = replaceLatexCommand(text, 'fbox', '<div class="latex-fbox">', '</div>');
+
+            text = text.replace(/\\begin\{tabular\}\{([^}]*)\}([\s\S]*?)\\end\{tabular\}/g, function(match, colSpec, content) {
+                const alignments = colSpec.replace(/[^lcr]/g, '').split('');
+                const rows = content.split(/\\\\/).map(row => row.trim()).filter(Boolean);
+                const htmlRows = rows.map(row => {
+                    const cleanRow = row.replace(/\\hline/g, '').trim();
+                    if (!cleanRow) return '';
+                    const cells = cleanRow.split('&').map(cell => cell.trim());
+                    const cellHtml = cells.map((cell, idx) => {
+                        const align = alignments[idx] || 'l';
+                        const alignStyle = align === 'c'
+                            ? 'text-align: center;'
+                            : align === 'r'
+                                ? 'text-align: right;'
+                                : 'text-align: left;';
+                        return `<td style="${alignStyle}">${cell}</td>`;
+                    }).join('');
+                    return `<tr>${cellHtml}</tr>`;
+                }).filter(Boolean).join('');
+                return `<table class="latex-table"><tbody>${htmlRows}</tbody></table>`;
+            });
             
             // Convert \begin{itemize}...\end{itemize} to <ul>...</ul>
             text = text.replace(/\\begin\{itemize\}(?:\[.*?\])?([\s\S]*?)\\end\{itemize\}/g, function(match, content) {
@@ -669,6 +761,8 @@
                 .replace(/&lt;div class="remark"&gt;/g, '<div class="remark">')
                 .replace(/&lt;div class="definition"&gt;/g, '<div class="definition">')
                 .replace(/&lt;div class="proof"&gt;/g, '<div class="proof">')
+                .replace(/&lt;div class="latex-fbox"&gt;/g, '<div class="latex-fbox">')
+                .replace(/&lt;div class="latex-parbox"([^&]*)&gt;/g, '<div class="latex-parbox"$1>')
                 .replace(/&lt;\/div&gt;/g, '</div>')
                 .replace(/&lt;h2&gt;/g, '<h2>')
                 .replace(/&lt;\/h2&gt;/g, '</h2>')
@@ -686,7 +780,15 @@
                 .replace(/&lt;\/u&gt;/g, '</u>')
                 .replace(/&lt;a href="/g, '<a href="')
                 .replace(/&lt;\/a&gt;/g, '</a>')
-                .replace(/" target="_blank"&gt;/g, '" target="_blank">');
+                .replace(/" target="_blank"&gt;/g, '" target="_blank">')
+                .replace(/&lt;table class="latex-table"&gt;/g, '<table class="latex-table">')
+                .replace(/&lt;\/table&gt;/g, '</table>')
+                .replace(/&lt;tbody&gt;/g, '<tbody>')
+                .replace(/&lt;\/tbody&gt;/g, '</tbody>')
+                .replace(/&lt;tr&gt;/g, '<tr>')
+                .replace(/&lt;\/tr&gt;/g, '</tr>')
+                .replace(/&lt;td([^&]*)&gt;/g, '<td$1>')
+                .replace(/&lt;\/td&gt;/g, '</td>');
 
             // Use $...$ to avoid browsers that fail to render \( ... \) reliably.
             formatted = formatted
