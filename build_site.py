@@ -35,12 +35,12 @@ def extract_completion(content):
     """Extract completion estimate percentage from TeX content.
 
     Looks for 'COMPLETION ESTIMATE' and scans that line plus the next 3 lines.
+    If multiple blocks are present, the latest block with a valid value wins.
     Returns a float percentage (0-100) or None.
     """
     lines = content.splitlines()
     last_value = None
     confidence_re = re.compile(r'\bconfiden\w*\b', re.IGNORECASE)
-    has_confidence_estimate = False
 
     def is_confidence_context(text, start, end, window=80):
         left = max(0, start - window)
@@ -53,8 +53,6 @@ def extract_completion(content):
 
         window = lines[idx:idx + 4]
         window_text = "\n".join(window)
-        if confidence_re.search(window_text):
-            has_confidence_estimate = True
 
         # Prefer explicit percentages.
         local_values = []
@@ -80,9 +78,6 @@ def extract_completion(content):
                 continue
             if decimal_value <= 1:
                 last_value = decimal_value * 100
-
-    if has_confidence_estimate:
-        return None
 
     return last_value
 
