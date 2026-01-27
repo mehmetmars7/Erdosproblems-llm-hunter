@@ -1,0 +1,583 @@
+\section{Erd\H{o}s Problem \#39 (Round 2)}
+
+\subsection*{1) ROUND-2 OBJECTIVE}
+\textbf{Path (A) --- proof/construction track.}
+
+Round~1 ended \textbf{UNRESOLVED} with only the elementary greedy lower bound
+$|A\cap[1,N]|\gg N^{1/3}$ (Round~1, Lemma~39.3) and the crude interval upper bound
+$|A\cap[1,N]|<\sqrt{2N}+1$ (Round~1, Lemma~39.2).
+
+In Round~2 I push the constructive lower bound substantially past exponent $1/3$ by giving a fully explicit infinite Sidon sequence with counting function
+\[
+A(x)=x^{\sqrt2-1+o(1)},
+\]
+following and re-verifying the discrete-logarithm + deletion construction of Cilleruelo.
+This improves the Round~1 lower bound exponent from $1/3\approx0.333$ to $\sqrt2-1\approx0.414$.
+
+This does \emph{not} settle Erd\H{o}s's conjecture (which asks for $A(x)\gg_\varepsilon x^{1/2-\varepsilon}$ for \emph{every} $\varepsilon>0$). The conjecture remains open in the current literature listings\footnote{For instance, the Erd\H{o}s Problems project lists the conjectural density question among the open ``Sidon sets'' problems (last edited December~28,~2025).}. \cite{ErdosProblemsPrize,Cilleruelo2013}
+
+\subsection*{2) ROUND-1 FOUNDATION USED}
+I rely on the following Round~1 items as already established:
+\begin{itemize}
+\item The formal restatement/definition of an infinite Sidon set and counting function $A(x)=|A\cap[1,x]|$.
+\item Round~1, Lemma~39.3: the greedy algorithm gives an explicit infinite Sidon sequence with $A(x)\gg x^{1/3}$.
+\item Round~1, Lemma~39.2: $|A\cap[1,N]|\ll \sqrt N$ for any Sidon $A\subseteq[1,N]$ (upper bound context).
+\end{itemize}
+No Round~1 proof is repeated.
+
+\subsection*{3) NEW INSIGHT / TOOL (ROUND-2)}
+\begin{itemize}
+\item \textbf{Mixed-radix encoding with carry-free addition:} represent integers in a base $b_1,b_2,\dots$ where each digit is $<b_j/2$, so that addition of two encoded numbers is digitwise (no carries).
+\item \textbf{Discrete logarithm digit selection:} choose digits $x_j(p)$ so that $g_j^{x_j(p)}\equiv p\pmod{q_j}$ for a primitive root $g_j$ mod a prime $q_j$.
+\item \textbf{Deletion-by-largest-element:} characterize all possible repeated sums, then remove from the sequence the largest term in each potential collision. If the removed set is thin enough, the counting function is essentially unchanged.
+\end{itemize}
+
+\subsection*{4) ATTACK PLAN (ROUND-2)}
+\textbf{Gap after Round~1:} no explicit construction beating exponent $1/3$.
+
+\textbf{Claims to prove now:}
+\begin{enumerate}
+\item Construct an explicit infinite sequence $A_{q,c}$ (indexed by primes) with $A_{q,c}(x)=x^{c+o(1)}$ for any fixed $0<c<1/2$.
+\item Analyze all repeated sums in $A_{q,c}$ via digitwise equality (carry-free) and deduce strong congruence constraints on the corresponding primes.
+\item Show:
+  \begin{itemize}
+  \item for $c_0:=\frac{3-\sqrt5}{2}$, the constraints are impossible, so $A_{q,c_0}$ is already Sidon;
+  \item for $c:=\sqrt2-1$, remove an explicit thin subsequence of primes to destroy all repeated sums, and prove the surviving sequence is Sidon with counting function $x^{c+o(1)}$.
+  \end{itemize}
+\end{enumerate}
+
+\subsection*{5) WORK (ROUND-2)}
+
+\subsubsection*{5.1. Mixed radix and carry-free addition}
+Fix integers $b_j\ge 2$.
+Every $n\in\mathbb N$ has a unique expansion
+\[
+ n = x_1 + x_2 b_1 + x_3 b_1 b_2 + \cdots + x_k b_1\cdots b_{k-1}
+\]
+with digits $0\le x_j<b_j$ and $x_k\ne 0$.
+(Proof: repeated Euclidean division; uniqueness by induction.)
+We write this as the digit string $n=x_k\cdots x_1$.
+
+\begin{lemma}[Carry-free digitwise sums]
+\label{lem:carryfree}
+If $0\le u_j,v_j\le b_j-1$ and $u_j+v_j<b_j$ for every $j$, then
+\[
+\sum_{j\ge1} u_j\prod_{t<j} b_t\; +\; \sum_{j\ge1} v_j\prod_{t<j} b_t
+\]
+has digit string $(u_j+v_j)_j$.
+In particular equality of two such sums implies equality digitwise.
+\end{lemma}
+
+\begin{proof}
+This is immediate from the uniqueness of mixed-radix expansions: no carry occurs in any digit, so the coefficient of $\prod_{t<j}b_t$ in the sum is exactly $u_j+v_j$.
+\end{proof}
+
+\subsubsection*{5.2. Choice of primes and the discrete-log digit map}
+Choose a sequence of primes $(q_j)_{j\ge1}$ such that
+\begin{equation}
+\label{eq:qj-growth}
+2^{2j-1}<q_j\le 2^{2j+1}\qquad(j\ge1).
+\end{equation}
+Existence is easy, e.g. by Bertrand's postulate applied to $2^{2j-1}$.
+Set
+\[
+ b_j := 4q_j.
+\]
+For each $j$, fix a primitive root $g_j$ modulo $q_j$ (exists since $\mathbb F_{q_j}^\times$ is cyclic).
+
+Fix a parameter $c$ with $0<c<\tfrac12$.
+Partition the prime numbers into blocks
+\begin{equation}
+\label{eq:Pkdef}
+\mathcal P = \bigcup_{k\ge2} P_k,\qquad
+P_k := \Bigl\{p\text{ prime}: 2^{c(k-1)^2-3}<p\le 2^{ck^2-3}\Bigr\}.
+\end{equation}
+
+\begin{definition}[Digit assignment]
+\label{def:digits}
+For $p\in P_k$ define digits $x_j(p)$ by
+\begin{equation}
+\label{eq:digitcong}
+ g_j^{x_j(p)}\equiv p\pmod{q_j},\qquad q_j+1\le x_j(p)\le 2q_j-1\qquad(1\le j\le k),
+\end{equation}
+and set $x_j(p):=0$ for $j>k$.
+Define the integer
+\begin{equation}
+\label{eq:apdef}
+ a_p := x_1(p) + x_2(p)b_1 + \cdots + x_k(p) b_1\cdots b_{k-1},
+\end{equation}
+i.e. the digit string $a_p=x_k(p)\cdots x_1(p)$ in base $(b_j)$.
+Let
+\[
+A_{q,c}:=\{a_p: p\in\mathcal P\}.
+\]
+\end{definition}
+
+\begin{lemma}[Well-defined digits]
+\label{lem:digitwelldefined}
+For each $p\in\mathcal P$ and each $j\ge1$, the digit $x_j(p)$ in \eqref{eq:digitcong} exists and is unique.
+Moreover, for all $j$ and all $p$ we have $0\le x_j(p)\le 2q_j-1<b_j$.
+\end{lemma}
+
+\begin{proof}
+Fix $j$ and a prime $p\ne q_j$.
+Since $g_j$ is a primitive root mod $q_j$, there exists an exponent $e$ such that $g_j^e\equiv p\pmod{q_j}$.
+Replacing $e$ by $e+t(q_j-1)$ does not change $g_j^e\bmod q_j$.
+The interval $[q_j+1,2q_j-1]$ has length $q_j-1$, so it contains exactly one representative of the congruence class $e\pmod{q_j-1}$.
+That representative is $x_j(p)$.
+The stated inequalities are immediate.
+\end{proof}
+
+\subsubsection*{5.3. Injectivity and the counting function of $A_{q,c}$}
+
+\begin{proposition}[Injectivity]
+\label{prop:injective}
+The map $p\mapsto a_p$ is injective, so $A_{q,c}$ is an infinite set.
+\end{proposition}
+
+\begin{proof}
+Suppose $a_p=a_{p'}$.
+By uniqueness of mixed-radix expansion, $x_j(p)=x_j(p')$ for all $j$.
+Let $k$ be the largest index with $x_k(p)\ne0$; by construction $p,p'\in P_k$.
+For each $1\le j\le k$ we have
+$p\equiv g_j^{x_j(p)}\equiv g_j^{x_j(p')}\equiv p'\pmod{q_j}$.
+Hence $p\equiv p'\pmod{Q}$ where $Q:=q_1\cdots q_k$.
+From \eqref{eq:qj-growth} we get
+\[
+Q > \prod_{j=1}^k 2^{2j-1} = 2^{\sum_{j=1}^k(2j-1)} = 2^{k^2}.
+\]
+Also $|p-p'|<2^{ck^2-3}\le 2^{ck^2}$ (since $p,p'\le 2^{ck^2-3}$), and because $c<1$ we have $2^{ck^2}<2^{k^2}$ for all sufficiently large $k$.
+Thus the only way to have $Q\mid(p-p')$ is $p-p'=0$, i.e. $p=p'$.
+\end{proof}
+
+\begin{proposition}[Growth of $A_{q,c}$]
+\label{prop:growth}
+Let $A_{q,c}(x):=|A_{q,c}\cap[1,x]|$.
+For any fixed $0<c<\tfrac12$ we have
+\[
+A_{q,c}(x)=x^{c+o(1)}\qquad(x\to\infty).
+\]
+\end{proposition}
+
+\begin{proof}
+Let $B_k:=b_1\cdots b_k$.
+From \eqref{eq:qj-growth} we have
+\[
+2^{2j+1}<b_j\le 2^{2j+3}
+\quad\Rightarrow\quad
+2^{\sum_{j=1}^k(2j+1)}<B_k\le 2^{\sum_{j=1}^k(2j+3)}.
+\]
+Since $\sum_{j=1}^k(2j+1)=k^2+2k$ and $\sum_{j=1}^k(2j+3)=k^2+4k$, we get
+\begin{equation}
+\label{eq:Bk-asymp}
+2^{k^2+2k}<B_k\le 2^{k^2+4k}.
+\end{equation}
+Given $x$, choose $k$ such that $B_k<x\le B_{k+1}$.
+Then \eqref{eq:Bk-asymp} implies $k^2=\log_2 x+o(\log x)$.
+
+\emph{Lower bound.}
+If $p\le 2^{ck^2-3}$ then $p\in P_\ell$ for some $\ell\le k$, and by construction $a_p< B_k<x$.
+Hence
+\[
+A_{q,c}(x)\ge \pi(2^{ck^2-3}).
+\]
+By the prime number theorem, $\pi(2^{ck^2-3})=2^{ck^2+o(k^2)}=x^{c+o(1)}$.
+
+\emph{Upper bound.}
+If $p>2^{c(k+1)^2-3}$ then $p\in P_\ell$ for some $\ell\ge k+2$, and then $a_p\ge B_{\ell-1}\ge B_{k+1}\ge x$.
+Thus
+\[
+A_{q,c}(x)\le \pi(2^{c(k+2)^2-3})=2^{c(k+2)^2+o(k^2)}=x^{c+o(1)}.
+\]
+Combining gives the claim.
+\end{proof}
+
+\subsubsection*{5.4. Structure of repeated sums in $A_{q,c}$}
+The key point is that digitwise addition is carry-free:
+by Lemma~\ref{lem:digitwelldefined}, each digit satisfies $x_j(p)\in\{0\}\cup[q_j+1,2q_j-1]$.
+So for any two primes $p,p'$,
+\[
+0\le x_j(p)+x_j(p')\le (2q_j-1)+(2q_j-1)=4q_j-2<b_j.
+\]
+Thus Lemma~\ref{lem:carryfree} applies.
+
+\begin{proposition}[Congruence constraints from a repeated sum]
+\label{prop:congruences}
+Assume we have a nontrivial repeated sum in $A_{q,c}$, i.e.
+\begin{equation}
+\label{eq:repsum}
+ a_{p_1}+a_{p_2}=a_{p_1'}+a_{p_2'},\qquad \{p_1,p_2\}\ne\{p_1',p_2'\}.
+\end{equation}
+Reorder the four terms so that $a_{p_1}>a_{p_1'}\ge a_{p_2'}>a_{p_2}$.
+Then there exist integers $k_1\ge k_2\ge2$ such that
+\begin{enumerate}
+\item[(i)] $p_1,p_1'\in P_{k_1}$ and $p_2,p_2'\in P_{k_2}$;
+\item[(ii)] letting $Q_1:=q_1\cdots q_{k_2}$, we have
+\[p_1p_2\equiv p_1'p_2'\pmod{Q_1};\]
+\item[(iii)] if $k_2<k_1$ and $Q_2:=q_{k_2+1}\cdots q_{k_1}$ then
+\[p_1\equiv p_1'\pmod{Q_2};\]
+\item[(iv)] the indices satisfy
+\[
+(1-c)k_1^2<k_2^2<\frac{c}{1-c}k_1^2
+\]
+for all sufficiently large $k_1$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+By Lemma~\ref{lem:carryfree}, \eqref{eq:repsum} implies digitwise equality
+\begin{equation}
+\label{eq:digiteq}
+ x_j(p_1)+x_j(p_2)=x_j(p_1')+x_j(p_2')\qquad\text{for all }j\ge1.
+\end{equation}
+Define $k_1$ as the largest $j$ with $x_j(p_1)+x_j(p_2)\ge q_j+1$.
+Since a digit is either $0$ or at least $q_j+1$, the condition ``$\ge q_j+1$'' means that \emph{at least one} of $p_1,p_2$ has nonzero $j$th digit.
+So $k_1$ is the maximum of the block indices of $p_1,p_2$.
+Similarly define $k_2$ as the largest $j$ with $x_j(p_1)+x_j(p_2)\ge 2q_j+2$.
+Because $2q_j+2$ is the minimum of a sum of two nonzero digits, this means \emph{both} primes have nonzero $j$th digit, so $k_2$ is the minimum of the two block indices.
+Applying the same definitions to the right side of \eqref{eq:repsum} and using \eqref{eq:digiteq} yields (i).
+
+For (ii), fix $j\le k_2$.
+Then all four primes lie in blocks $\ge j$, so by definition $g_j^{x_j(p)}\equiv p\pmod{q_j}$ for each of $p=p_1,p_2,p_1',p_2'$.
+Raising $g_j$ to both sides of \eqref{eq:digiteq} gives
+\[
+ g_j^{x_j(p_1)+x_j(p_2)}\equiv g_j^{x_j(p_1')+x_j(p_2')}\pmod{q_j}
+\quad\Rightarrow\quad
+p_1p_2\equiv p_1'p_2'\pmod{q_j}.
+\]
+This holds for every $j\le k_2$, hence modulo $Q_1=q_1\cdots q_{k_2}$.
+
+For (iii), assume $k_2<k_1$ and take $k_2<j\le k_1$.
+Then $p_2,p_2'$ lie in $P_{k_2}$, so their $j$th digits are $0$, while $p_1,p_1'\in P_{k_1}$ so $g_j^{x_j(p_1)}\equiv p_1$ and $g_j^{x_j(p_1')}\equiv p_1'\pmod{q_j}$.
+Equation \eqref{eq:digiteq} becomes $x_j(p_1)=x_j(p_1')$, so $p_1\equiv p_1'\pmod{q_j}$.
+Multiplying over $j=k_2+1,\dots,k_1$ gives $p_1\equiv p_1'\pmod{Q_2}$.
+
+For (iv), note first that from \eqref{eq:qj-growth} we have
+\begin{equation}
+\label{eq:Qlower}
+Q_1=q_1\cdots q_{k_2}>2^{k_2^2},\qquad Q_2=q_{k_2+1}\cdots q_{k_1}>2^{k_1^2-k_2^2}.
+\end{equation}
+Also, since $p\in P_k$ implies $p\le 2^{ck^2-3}$, we have
+\[
+|p_1p_2-p_1'p_2'|\le p_1p_2+p_1'p_2'\le 2\cdot 2^{c(k_1^2+k_2^2)-6}=2^{c(k_1^2+k_2^2)-5}.
+\]
+If the congruence in (ii) is nontrivial then $Q_1\le |p_1p_2-p_1'p_2'|$, so by \eqref{eq:Qlower}
+\[
+2^{k_2^2}<Q_1\le 2^{c(k_1^2+k_2^2)-5},
+\]
+which rearranges to $k_2^2<\frac{c}{1-c}k_1^2+O(1)$.
+
+Similarly, if $k_2<k_1$, the congruence in (iii) is nontrivial (since $p_1\ne p_1'$ by our ordering), so $Q_2\le |p_1-p_1'|\le p_1\le 2^{ck_1^2-3}$.
+Using \eqref{eq:Qlower} again gives
+\[
+2^{k_1^2-k_2^2}<Q_2\le 2^{ck_1^2-3},
+\]
+which rearranges to $k_2^2>(1-c)k_1^2-O(1)$.
+For large $k_1$ the additive constants are negligible, giving (iv).
+\end{proof}
+
+\subsubsection*{5.5. An explicit Sidon sequence with exponent $\tfrac{3-\sqrt5}{2}$}
+Proposition~\ref{prop:congruences}(iv) is already enough to get a purely explicit Sidon sequence beating $1/3$ without deletions.
+
+\begin{theorem}[Cilleruelo's ``warm-up'' Sidon sequence]
+\label{thm:warmup}
+Let
+\[
+ c_0:=\frac{3-\sqrt5}{2}\approx0.381966.
+\]
+Then the set $A_{q,c_0}$ is a Sidon set and
+$A_{q,c_0}(x)=x^{c_0+o(1)}$.
+\end{theorem}
+
+\begin{proof}
+By Proposition~\ref{prop:growth} we have the growth statement.
+If a repeated sum exists, Proposition~\ref{prop:congruences}(iv) would give
+\[
+(1-c_0)k_1^2<k_2^2<\frac{c_0}{1-c_0}k_1^2.
+\]
+But $c_0$ is exactly the smaller root of $(1-c)^2=c$, so $c_0=(1-c_0)^2$ and therefore
+$\frac{c_0}{1-c_0}=1-c_0$.
+Hence the strict inequalities demand an integer $k_2$ lying in an empty open interval, impossible for large $k_1$.
+So no repeated sums occur and $A_{q,c_0}$ is Sidon.
+\end{proof}
+
+\subsubsection*{5.6. Deletion to reach exponent $c=\sqrt2-1$}
+Now take
+\[
+ c:=\sqrt2-1\approx0.414213.
+\]
+The set $A_{q,c}$ may have repeated sums, but Proposition~\ref{prop:congruences} shows they are highly structured.
+We now delete the ``largest'' element from every potential collision.
+
+\begin{definition}[Bad primes and the deleted set]
+\label{def:badprimes}
+For $k\ge2$, call $p\in P_k$ \emph{bad} if there exist primes $p_2,p_1',p_2'$ such that
+\begin{equation}
+\label{eq:bad}
+ a_p+a_{p_2}=a_{p_1'}+a_{p_2'},
+\qquad a_p> a_{p_1'}\ge a_{p_2'}>a_{p_2}.
+\end{equation}
+Let $B_k\subseteq P_k$ be the set of bad primes in block $k$.
+Define the surviving prime set
+\[
+\mathcal P^*:=\bigcup_{k\ge2} (P_k\setminus B_k),
+\qquad
+A_{q,c}^*:=\{a_p: p\in\mathcal P^*\}.
+\]
+\end{definition}
+
+\begin{lemma}[Deletion destroys all repeated sums]
+\label{lem:delete-sidon}
+$A_{q,c}^*$ is a Sidon set.
+\end{lemma}
+
+\begin{proof}
+Suppose $A_{q,c}^*$ contains a repeated sum.
+Choose a representation
+$a_{p_1}+a_{p_2}=a_{p_1'}+a_{p_2'}$ with
+$a_{p_1}\ge a_{p_1'}\ge a_{p_2'}\ge a_{p_2}$ and $\{p_1,p_2\}\ne\{p_1',p_2'\}$.
+If $a_{p_1}=a_{p_1'}$ then injectivity (Proposition~\ref{prop:injective}) forces $p_1=p_1'$, and then equality of sums forces $a_{p_2}=a_{p_2'}$, contradicting nontriviality.
+Hence we may assume $a_{p_1}>a_{p_1'}\ge a_{p_2'}>a_{p_2}$.
+But then $p_1$ is bad by Definition~\ref{def:badprimes}, so $p_1\in B_k$ for its block $k$, contradicting $p_1\in\mathcal P^*$.
+\end{proof}
+
+It remains to show that the deletion does not destroy the density exponent.
+
+\subsubsection*{5.7. Bounding the number of bad primes}
+Fix $k_1\ge2$.
+Let $p_1\in B_{k_1}$ and choose a witness collision as in \eqref{eq:bad}.
+By Proposition~\ref{prop:congruences} there is some $k_2<k_1$ with
+\begin{equation}
+\label{eq:k2range}
+ k_2^2<\frac{c}{1-c}k_1^2,
+\end{equation}
+and writing $Q_1=q_1\cdots q_{k_2}$, $Q_2=q_{k_2+1}\cdots q_{k_1}$ we have
+\begin{equation}
+\label{eq:cong-Q1Q2}
+ p_1p_2\equiv p_1'p_2'\pmod{Q_1},\qquad p_1\equiv p_1'\pmod{Q_2}.
+\end{equation}
+Thus there exist nonzero integers $s_1,s_2$ such that
+\begin{equation}
+\label{eq:s1s2}
+ p_1p_2-p_1'p_2'=s_1Q_1,\qquad p_1'-p_1=s_2Q_2.
+\end{equation}
+From $p\in P_k\Rightarrow p\le 2^{ck^2-3}$ we get
+\begin{equation}
+\label{eq:s1bound}
+|s_1|\le \frac{|p_1p_2-p_1'p_2'|}{Q_1}\le \frac{p_1p_2+p_1'p_2'}{Q_1}\le \frac{2\cdot 2^{c(k_1^2+k_2^2)-6}}{Q_1}=\frac{2^{c(k_1^2+k_2^2)-5}}{Q_1},
+\end{equation}
+and similarly
+\begin{equation}
+\label{eq:s2bound}
+|s_2|\le \frac{|p_1'-p_1|}{Q_2}\le \frac{2^{ck_1^2-3}}{Q_2}.
+\end{equation}
+Now rewrite
+\begin{equation}
+\label{eq:divides}
+ p_1(p_2-p_2')=(p_1p_2-p_1'p_2')+(p_1'-p_1)p_2'=s_1Q_1+s_2p_2'Q_2.
+\end{equation}
+So $p_1$ divides the integer
+\begin{equation}
+\label{eq:sdef}
+ s:=s_1Q_1+s_2p_2'Q_2.
+\end{equation}
+
+\begin{definition}[The integer sets $S_{k_2,k_1}$]
+For $k_2<k_1$ define $S_{k_2,k_1}$ to be the set of all nonzero integers of the form
+\eqref{eq:sdef} with parameters satisfying the bounds \eqref{eq:s1bound}, \eqref{eq:s2bound} and with $p_2'\in P_{k_2}$.
+\end{definition}
+Then every $p_1\in B_{k_1}$ divides some nonzero $s\in S_{k_2,k_1}$ for some $k_2$ satisfying \eqref{eq:k2range}.
+
+\begin{lemma}[No $s\ne 0$ has two large prime divisors from $P_{k_1}$]
+\label{lem:oneprime}
+For fixed $k_1$ and $k_2$ as above, any $s\in S_{k_2,k_1}$ is divisible by \emph{at most one} prime $p\in P_{k_1}$, for all sufficiently large $k_1$.
+\end{lemma}
+
+\begin{proof}
+If $p,p'\in P_{k_1}$ are distinct then $pp'> (2^{c(k_1-1)^2-3})^2=2^{2c(k_1-1)^2-6}$.
+On the other hand, using \eqref{eq:s1bound}--\eqref{eq:s2bound} and $p_2'\le 2^{ck_2^2-3}$,
+\[
+|s|\le |s_1|Q_1+|s_2|p_2'Q_2\le 2^{c(k_1^2+k_2^2)-5}+2^{ck_1^2-3}2^{ck_2^2-3}
+\le 2\cdot 2^{c(k_1^2+k_2^2)-5}.
+\]
+If $k_2$ satisfies \eqref{eq:k2range}, then for $c<1/2$ we have $k_1^2+k_2^2 \le (1+\frac{c}{1-c})k_1^2=\frac{1}{1-c}k_1^2$, hence
+$|s|\le 2\cdot 2^{\frac{c}{1-c}k_1^2-5}$.
+Since $c<1/2$ implies $2c>\frac{c}{1-c}$, we have
+$2c(k_1-1)^2-6 > \frac{c}{1-c}k_1^2-5$ for all large $k_1$.
+Thus for large $k_1$,
+$pp'>2^{2c(k_1-1)^2-6}>|s|$, so $s$ cannot be divisible by two distinct primes from $P_{k_1}$.
+\end{proof}
+
+Lemma~\ref{lem:oneprime} implies the combinatorial bound
+\begin{equation}
+\label{eq:Bk-sumSk}
+ |B_{k_1}|\le \sum_{k_2<\sqrt{\frac{c}{1-c}}\,k_1} |S_{k_2,k_1}|.
+\end{equation}
+We now estimate $|S_{k_2,k_1}|$.
+
+\begin{lemma}[Size of $S_{k_2,k_1}$]
+\label{lem:Sk-size}
+For fixed $k_1>k_2$ we have
+\[
+|S_{k_2,k_1}|\le 4\Bigl(\frac{2^{c(k_1^2+k_2^2)-5}}{Q_1}\Bigr)\Bigl(\frac{2^{ck_1^2-3}}{Q_2}\Bigr)|P_{k_2}|.
+\]
+\end{lemma}
+
+\begin{proof}
+By definition, $s$ is determined by the triple $(s_1,s_2,p_2')$.
+The number of possible $s_1$ is at most $2\cdot \frac{2^{c(k_1^2+k_2^2)-5}}{Q_1}$ (choices for $\pm s_1$), and the number of possible $s_2$ is at most $2\cdot \frac{2^{ck_1^2-3}}{Q_2}$.
+Finally $p_2'$ can be any prime in $P_{k_2}$.
+Multiplying gives the bound.
+\end{proof}
+
+To convert this into a bound on $|B_{k_1}|$, we use the crude estimates
+\begin{equation}
+\label{eq:Q12-lower}
+Q_1Q_2=q_1\cdots q_{k_1}>2^{k_1^2}
+\end{equation}
+(from \eqref{eq:qj-growth}) and the prime number theorem in the weak form
+$|P_{k}|\le \pi(2^{ck^2})=2^{ck^2+o(k^2)}$.
+For the boundary exponent $c=\sqrt2-1$ we keep one more term (a $k^{-2}$ factor) to compare against $|P_{k_1}|$.
+
+\begin{proposition}[Bad primes are a strict minority at $c=\sqrt2-1$]
+\label{prop:badminority}
+Let $c=\sqrt2-1$.
+Then
+\[
+|B_{k_1}|\le \Bigl(\tfrac12+o(1)\Bigr)|P_{k_1}|\qquad(k_1\to\infty).
+\]
+Consequently $|P_{k_1}\setminus B_{k_1}|\gg |P_{k_1}|$.
+\end{proposition}
+
+\begin{proof}
+Combine \eqref{eq:Bk-sumSk} with Lemma~\ref{lem:Sk-size} and \eqref{eq:Q12-lower}:
+\[
+|B_{k_1}|
+\le \sum_{k_2<\alpha k_1}
+4\cdot \frac{2^{c(k_1^2+k_2^2)-5}}{Q_1}\cdot \frac{2^{ck_1^2-3}}{Q_2}\,|P_{k_2}|
+\le 2^{-6}\,2^{(2c-1)k_1^2}\sum_{k_2<\alpha k_1} 2^{ck_2^2}\,|P_{k_2}|,
+\]
+where $\alpha:=\sqrt{\frac{c}{1-c}}$.
+Using the standard bound $\pi(x)\le 2x/\log x$ for $x$ large, we have
+$|P_{k_2}|\le \pi(2^{ck_2^2-3})\le \frac{2\cdot 2^{ck_2^2-3}}{ck_2^2\log 2}$ for large $k_2$.
+Hence
+\[
+2^{ck_2^2}|P_{k_2}|
+\le \frac{2^{-2}}{c\log 2}\,\frac{2^{2ck_2^2}}{k_2^2}.
+\]
+Therefore
+\begin{equation}
+\label{eq:B-bound-sum}
+|B_{k_1}|\le \frac{2^{-8}}{c\log 2}\,2^{(2c-1)k_1^2}
+\sum_{k_2<\alpha k_1}\frac{2^{2ck_2^2}}{k_2^2}.
+\end{equation}
+The sum is dominated by its largest term because $2^{2ck_2^2}$ grows super-exponentially in $k_2$:
+for $k_2\le \alpha k_1$ and large $k_1$, the ratio between consecutive terms is at least
+$2^{2c(2k_2-1)}/4\ge 2^{ck_1}$, so the sum is at most twice the last term.
+Thus
+\[
+\sum_{k_2<\alpha k_1}\frac{2^{2ck_2^2}}{k_2^2}
+\le 2\cdot \frac{2^{2c\alpha^2 k_1^2}}{\alpha^2 k_1^2}.
+\]
+Insert into \eqref{eq:B-bound-sum}:
+\[
+|B_{k_1}|\le \frac{2^{-7}}{c\log 2}\,\frac{1}{\alpha^2}\,\frac{2^{\bigl((2c-1)+2c\alpha^2\bigr)k_1^2}}{k_1^2}.
+\]
+Now $\alpha^2=\frac{c}{1-c}$, so $(2c-1)+2c\alpha^2=(2c-1)+\frac{2c^2}{1-c}=\frac{3c-1}{1-c}$.
+For $c=\sqrt2-1$ one checks $\frac{3c-1}{1-c}=c$ (equivalently $c^2+2c-1=0$), and also $\alpha^2=\frac{1}{\sqrt2}$.
+Therefore
+\begin{equation}
+\label{eq:B-asymp}
+|B_{k_1}|\le C\,\frac{2^{ck_1^2}}{k_1^2}
+\end{equation}
+for an explicit constant $C>0$ (here $C=2^{-7}\sqrt2/(c\log 2)$ works).
+
+On the other hand, by the prime number theorem and the fact that $2^{c(k_1-1)^2}$ is exponentially smaller than $2^{ck_1^2}$,
+\begin{equation}
+\label{eq:Pk-asymp}
+|P_{k_1}|=\pi(2^{ck_1^2-3})-\pi(2^{c(k_1-1)^2-3})=\Bigl(\frac{2^{-3}}{c\log 2}+o(1)\Bigr)\frac{2^{ck_1^2}}{k_1^2}.
+\end{equation}
+Comparing \eqref{eq:B-asymp} and \eqref{eq:Pk-asymp}, the ratio $|B_{k_1}|/|P_{k_1}|$ is bounded above by a fixed constant strictly smaller than $1$ (in fact much smaller), for large $k_1$.
+In particular $|B_{k_1}|\le (\tfrac12+o(1))|P_{k_1}|$.
+\end{proof}
+
+\subsubsection*{5.8. Final explicit lower bound exponent $\sqrt2-1$}
+\begin{theorem}[Explicit infinite Sidon set with exponent $\sqrt2-1$]
+\label{thm:main}
+With $c=\sqrt2-1$ and $A_{q,c}^*$ as in Definition~\ref{def:badprimes}, we have:
+\begin{enumerate}
+\item $A_{q,c}^*$ is a Sidon set;
+\item its counting function satisfies
+\[
+A_{q,c}^*(x)=x^{\sqrt2-1+o(1)}.
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Sidonness is Lemma~\ref{lem:delete-sidon}.
+For the counting function, Proposition~\ref{prop:growth} gives $|P_k|=2^{ck^2+o(k^2)}$ and hence
+$A_{q,c}(x)=x^{c+o(1)}$.
+Proposition~\ref{prop:badminority} shows that a positive proportion of each block $P_k$ survives the deletion.
+Since the block sizes grow like $2^{ck^2}$ and are overwhelmingly dominated by the last contributing block, removing a fixed fraction from each block does not change the exponent $c$.
+Formally, for $x$ with $B_k<x\le B_{k+1}$ we have
+\[
+A_{q,c}^*(x)\ge \sum_{\ell\le k} |P_\ell\setminus B_\ell|
+\gg \sum_{\ell\le k}|P_\ell|
+\asymp |P_k|
+=2^{ck^2+o(k^2)}=x^{c+o(1)}.
+\]
+The matching upper bound $A_{q,c}^*(x)\le A_{q,c}(x)=x^{c+o(1)}$ is immediate.
+\end{proof}
+
+\subsubsection*{5.9. What this achieves toward Erd\H{o}s's conjecture}
+The original conjecture asks for $A(x)\gg_\varepsilon x^{1/2-\varepsilon}$ for \emph{all} $\varepsilon>0$.
+Theorem~\ref{thm:main} gives exponent $\sqrt2-1$.
+Thus it implies the conjectured bound only for those $\varepsilon$ satisfying
+\[
+\frac12-\varepsilon \le \sqrt2-1\quad\Longleftrightarrow\quad \varepsilon\ge \frac32-\sqrt2\approx 0.085786.
+\]
+The remaining gap is to improve the exponent from $\sqrt2-1$ up to $1/2-o(1)$.
+
+\subsection*{6) ADVERSARIAL VERIFICATION}
+I tried to break the new argument in the following ways:
+\begin{itemize}
+\item \textbf{Carry issues:} digits satisfy $x_j(p)\le 2q_j-1$ and bases are $b_j=4q_j$, so $x_j(p)+x_j(p')<4q_j=b_j$. Hence Lemma~\ref{lem:carryfree} applies globally.
+\item \textbf{Uniqueness of digit choice:} the interval $[q_j+1,2q_j-1]$ has length exactly $q_j-1$, matching the period of discrete logs in $\mathbb F_{q_j}^\times$.
+\item \textbf{Injectivity:} requires $Q=q_1\cdots q_k$ to exceed possible differences $|p-p'|$ inside a block. This holds because $\log_2 Q\ge k^2$ whereas $\log_2|p-p'|\le ck^2+O(1)$ and $c<1$.
+\item \textbf{Repeated-sum classification:} the key step is that the thresholds $q_j+1$ and $2q_j+2$ distinguish whether 0, 1, or 2 summands have nonzero $j$th digit. This uses the digit range $\{0\}\cup[q_j+1,2q_j-1]$.
+\item \textbf{Deletion correctness:} any repeated sum has a largest element; removing all primes that can be the largest element of a collision eliminates all collisions.
+\item \textbf{Density after deletion:} the borderline case $c=\sqrt2-1$ is exactly where the exponent of the bad-set bound matches the block exponent. I checked that Proposition~\ref{prop:badminority} keeps a constant fraction of each block (in fact, the crude constants already make the ratio far below $1/2$).
+\end{itemize}
+No hidden quantifier issue was found: all ``for large $k$'' statements can be made uniform because the inequalities have polynomial/exponential separations in $k$.
+
+\subsection*{7) FINAL}
+\textbf{UNRESOLVED (BUT STRICTLY ADVANCED).}
+
+Round~1 established only an explicit lower bound exponent $1/3$.
+Round~2 constructs an explicit infinite Sidon set $A$ with
+\[
+|A\cap[1,x]|=x^{\sqrt2-1+o(1)}.
+\]
+This is a strict and substantial improvement, but still falls short of the conjectured $x^{1/2-o(1)}$.
+
+\subsection*{8) COMPLETION ESTIMATE (MANDATORY)}
+\textbf{COMPLETION: 65\%}
+
+\subsection*{9) REFERENCES}
+\begin{thebibliography}{9}
+\bibitem{Cilleruelo2013}
+J.~Cilleruelo,
+\emph{Infinite Sidon sequences},
+\texttt{arXiv:1209.0326v2} (2013).
+
+\bibitem{ErdosProblemsPrize}
+Erd\H{o}s Problems Project,
+\emph{Sidon set density conjecture} (Erd\H{o}s prize page / Sidon tags),
+last edited December~28,~2025.
+
+\bibitem{Ruzsa1998}
+I.~Z.~Ruzsa,
+\emph{An infinite Sidon sequence},
+J.~Number Theory \textbf{68} (1998), 63--71.
+\end{thebibliography}

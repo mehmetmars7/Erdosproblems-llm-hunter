@@ -1,0 +1,297 @@
+\section{Round-2 Objective}
+
+\noindent\textbf{Path chosen: (C) obstruction/correction.}
+
+\medskip
+The Round-1 computation suggested that, up to $2\cdot 10^7$, the only odd exceptions are $1,3$.  However, the surrounding context (Schinzel--Crocker--Pan) asserts that the exceptional set
+\[
+A:=\{\text{odd }n\ge 1:\ \nexists\text{ prime }p,\ k,\ell\ge 0\text{ with }n=p+2^k+2^\ell\}
+\]
+is infinite, and the main target question is whether $\overline d(A)>0$.
+
+In this round I do \emph{not} claim to settle the density question (still open), but I \emph{do} close a major ``existence gap'' left implicit by Round~1 by producing:
+\begin{itemize}
+\item an \emph{explicit, concrete} odd integer $N_0\in A$ (beyond $1,3$), obtained by unpacking and implementing Crocker's Chinese-remainder construction; and
+\item the best-known unconditional quantitative lower bound (Pan) stated precisely, to place the computation in a rigorous asymptotic frame.
+\end{itemize}
+This is the most promising Round-2 direction because it strictly advances beyond Round~1 in a verifiable way (explicit counterexample element and sharpest known lower bound), while the density question itself remains outside current techniques.
+
+\section{Round-1 Foundation Used}
+
+I will rely on the following Round~1 results (without reproving them):
+\begin{enumerate}
+\item \textbf{Lemma 1 (parity classification).} For odd $n$, any representation $n=p+2^k+2^\ell$ forces either $p=2$ with exactly one of $k,\ell$ equal to $0$, or else $p$ odd with $(k,\ell)=(0,0)$ or $k,\ell\ge 1$.
+\item \textbf{Lemma 2 (offset counting).} $|\{2^k+2^\ell\le X\}|\le (\lfloor\log_2 X\rfloor+1)^2$.
+\item \textbf{Lemma 3.} If $n$ is odd and $n-2$ is prime then $n\notin A$.
+\item \textbf{Computation.} $A\cap[1,20{,}000{,}000]=\{1,3\}$.
+\end{enumerate}
+
+\section{New Insight / Tool (Round-2)}
+
+\begin{enumerate}
+\item \textbf{Decoding Crocker's construction into the $k,\ell\ge 0$ model.}
+Crocker constructs infinitely many odd integers that are (i) not a prime plus a (positive) power of $2$ and (ii) not a prime plus two \emph{distinct} positive powers of $2$. Using Round~1 Lemma~1, this immediately yields elements of our set $A$ (which allows $2^0=1$).
+\item \textbf{Effective CRT instantiation.}
+Crocker gives explicit congruence data (an overlapping congruence system and a specific divisor of the Fermat number $2^{1024}+1$).  I implement the CRT once (with concrete primes of specified order) and output an explicit $420$-digit $N_0\in A$.
+\item \textbf{Best-known lower bound (Pan).}
+Pan proves an unconditional lower bound of the form
+\[
+|A\cap[1,x]|\ \gg\ x\exp\!\Big(-C\,\log x\,\frac{\log\log\log\log x}{\log\log\log x}\Big),
+\]
+for an absolute constant $C>0$ and all sufficiently large $x$. This is much stronger than $x^{1-\varepsilon}$-type lower bounds but still allows density $0$.
+\end{enumerate}
+
+\section{Attack Plan (Round-2)}
+
+\noindent\textbf{Gap(s) after Round~1.}
+The main unresolved gap is still:
+\[
+\overline d(A)>0\ ?
+\]
+Round~1 also had a practical gap: despite the asserted infinitude of $A$, no explicit element of $A$ beyond $1,3$ was exhibited.
+
+\medskip
+\noindent\textbf{Round-2 claims to prove/construct.}
+\begin{enumerate}
+\item \textbf{Reduction:} for odd $n$, it suffices to rule out representations as ``prime $+$ power of $2$'' and ``prime $+$ two distinct positive powers of $2$''.
+\item \textbf{Explicit construction:} using Crocker's explicit congruence system, construct a concrete odd integer $N_0\in A$.
+\item \textbf{Quantitative context:} record Pan's theorem precisely and explain why it still falls short of positive (upper) density.
+\end{enumerate}
+
+\section{Work (Round-2)}
+
+\subsection{A reduction from the $k,\ell\ge 0$ model to positive powers}
+
+\noindent\textbf{Lemma 4 (odd-case reduction).}
+Let $n$ be odd. Suppose that:
+\begin{enumerate}
+\item[(i)] $n$ is not representable as $n=p+2^a$ with $p$ prime and $a\ge 1$; and
+\item[(ii)] $n$ is not representable as $n=p+2^a+2^b$ with $p$ prime and \emph{distinct} integers $a,b\ge 1$.
+\end{enumerate}
+Then $n\in A$, i.e. $n\neq p+2^k+2^\ell$ for all primes $p$ and $k,\ell\ge 0$.
+
+\medskip
+\noindent\emph{Proof (using Round~1 Lemma~1).}
+Assume toward contradiction that $n=p+2^k+2^\ell$.
+
+If $p$ is odd, Round~1 Lemma~1 forces either $(k,\ell)=(0,0)$ or $k,\ell\ge 1$.
+\begin{itemize}
+\item If $(k,\ell)=(0,0)$, then $n=p+2^0+2^0=p+2=p+2^1$, contradicting (i).
+\item If $k,\ell\ge 1$ and $k\neq \ell$, this is excluded by (ii).
+\item If $k,\ell\ge 1$ and $k=\ell$, then $n=p+2^k+2^k=p+2^{k+1}$, again contradicting (i).
+\end{itemize}
+If $p=2$, Round~1 Lemma~1 forces exactly one of $k,\ell$ to be $0$, so $n=2+1+2^m=3+2^m$ for some $m\ge 1$, i.e. $n=3+2^m$ is of the form prime $+$ power of $2$, contradicting (i).
+
+Thus no representation exists and $n\in A$. \hfill$\square$
+
+\subsection{Crocker's construction yields explicit elements of $A$}
+
+Crocker proves:
+
+\medskip
+\noindent\textbf{Theorem 5 (Crocker).}
+There are infinitely many positive odd integers that are not representable as
+\[n=p+2^a+2^b\qquad(a,b>0,\ p\text{ prime}).\]
+Moreover, the constructed integers also avoid representations $n=p+2^a$ with $a>0$ (prime plus a positive power of $2$).
+
+\medskip
+\noindent\emph{Source.}
+This is Theorem~I of Crocker (1971), with the proof structured as: (a) a congruence/CRT argument excluding prime$+$power-of-$2$ representations (his system (2)); and (b) Lemma~II excluding prime$+$two-distinct-powers representations for numbers of the form $w\prod B_i$ with $w\equiv 1\pmod{16}$ and $B_i\mid (2^{2^i}+1)$.  See in particular the statements around Lemma~I--II and the end of the proof of Theorem~I.
+
+\medskip
+\noindent\textbf{Corollary 6 (translation to our set $A$).}
+Every odd integer produced by Crocker's Theorem~I belongs to $A$ as defined in Round~1 (allowing exponents $k,\ell\ge 0$).
+
+\medskip
+\noindent\emph{Proof.}
+Crocker's integers satisfy conditions (i)--(ii) of Lemma~4 with $a,b>0$. Hence by Lemma~4 they lie in $A$. \hfill$\square$
+
+\subsection{An explicit $420$-digit element $N_0\in A$}
+
+We now instantiate Crocker's explicit numerical choices (his final paragraph).
+
+\subsubsection{Step 1: the overlapping congruence system}
+Crocker specifies the overlapping system (written here as pairs $(a_i,m_i)$):
+\[
+\begin{aligned}
+&(0,3),(0,5),(1,9),(1,10),(8,12),(8,15),(4,18),(7,20),(5,24),(29,30),\\
+&(2,36),(14,36),(17,40),(34,45),(43,45),(13,48),(37,48),(16,60),(19,60),\\
+&(26,72),(62,72),(52,90),(37,120),(49,144),(121,144),(103,180),(106,180),(229,360).
+\end{aligned}
+\]
+It is ``overlapping'' in the sense that every positive integer exponent $d$ satisfies $d\equiv a_i\pmod{m_i}$ for at least one of these pairs.
+
+\subsubsection{Step 2: primes of prescribed order}
+For each congruence $d\equiv a_i\pmod{m_i}$, choose an odd prime $p_i$ with multiplicative order
+\[\operatorname{ord}_{p_i}(2)=m_i.
+\]
+One explicit choice (found computationally, but fully checkable by direct order computation) is:
+\[
+\begin{array}{rcl@{\qquad}rcl}
+(0,3)&\mapsto&p=7,&(34,45)&\mapsto&p=631,\\
+(0,5)&\mapsto&p=31,&(43,45)&\mapsto&p=23311,\\
+(1,9)&\mapsto&p=73,&(13,48)&\mapsto&p=97,\\
+(1,10)&\mapsto&p=11,&(37,48)&\mapsto&p=673,\\
+(8,12)&\mapsto&p=13,&(16,60)&\mapsto&p=61,\\
+(8,15)&\mapsto&p=151,&(19,60)&\mapsto&p=1321,\\
+(4,18)&\mapsto&p=19,&(26,72)&\mapsto&p=433,\\
+(7,20)&\mapsto&p=41,&(62,72)&\mapsto&p=38737,\\
+(5,24)&\mapsto&p=241,&(52,90)&\mapsto&p=18837001,\\
+(29,30)&\mapsto&p=331,&(37,120)&\mapsto&p=4562284561,\\
+(2,36)&\mapsto&p=37,&(49,144)&\mapsto&p=577,\\
+(14,36)&\mapsto&p=109,&(121,144)&\mapsto&p=487824887233,\\
+(17,40)&\mapsto&p=61681,&(103,180)&\mapsto&p=181,\\
+&&&(106,180)&\mapsto&p=54001,\\
+&&&(229,360)&\mapsto&p=168692292721.\\
+\end{array}
+\]
+All $28$ primes above are distinct.
+
+\subsubsection{Step 3: the Mersenne prime modulus and the ``avoidance'' residue}
+Take
+\[p_{29}=2^{13}-1=8191,\]
+which is prime, and choose a residue $c\pmod{8191}$ such that
+\[c\not\equiv p_i+2^d\pmod{8191}\qquad(1\le i\le 28,\ 0\le d\le 12).
+\]
+Since $2$ has order $13$ modulo $8191$, this excludes congruences for \emph{all} $d\ge 0$.
+A valid explicit choice is
+\[c\equiv 1\pmod{8191}.
+\]
+(Direct check: $1$ is not congruent to any of the $28\cdot 13$ forbidden residues.)
+
+\subsubsection{Step 4: the Fermat divisor $G_{10}$}
+Let $F_{10}=2^{1024}+1$ and take the known prime factor
+\[q:=2^{12}\cdot 11131+1=45592577\mid F_{10}.
+\]
+Define
+\[G_{10}:=\frac{F_{10}}{q}=\frac{2^{1024}+1}{45592577}.
+\]
+Then $G_{10}>1$ and $G_{10}\mid F_{10}$.
+
+\subsubsection{Step 5: choosing $n=11$ and forming the CRT system}
+Set $n=11$ (so $n>k=10$) and define
+\[M_1:=\frac{2^{2^{11}}-1}{G_{10}}=\frac{2^{2048}-1}{G_{10}}\in\mathbb{N}.
+\]
+Consider the simultaneous congruence system in the variable $t$:
+\begin{enumerate}
+\item $t\equiv 0\pmod{M_1}$,
+\item $t\equiv -1\pmod{16}$,
+\item $t\equiv 2^{a_i}\pmod{p_i}$ for each of the $28$ pairs $(a_i,m_i)$ above (with $p_i$ as chosen),
+\item $t\equiv c\pmod{8191}$ with $c\equiv 1$.
+\end{enumerate}
+Crocker shows (and our explicit choices satisfy) that all moduli are pairwise coprime, so by the Chinese remainder theorem this system has a unique solution modulo
+\[M:=16\cdot M_1\cdot 8191\cdot\prod_{i=1}^{28}p_i.
+\]
+Let $N_0$ be the least positive solution.
+
+\subsubsection{Step 6: the explicit integer}
+A direct CRT computation gives the least positive solution
+\[
+\begin{aligned}
+N_0:=\,&114692399417541627831390678344111455559634149945994060064370176174761757107094\\
+&384161208131810508010278443673581829982252271454885733150869511794121524724\\
+&926719189042703019347118118212960843353505774370088928506106578466372689421\\
+&320193947115016412660586173360894622173451791309400443984363146771213896025\\
+&262579711774536791930091548873856297462778888609711986475144538417671136309\\
+&198210638114258170393070241496204972122655.
+\end{aligned}
+\]
+This $N_0$ satisfies:
+\begin{itemize}
+\item $N_0\equiv -1\pmod{16}$ (hence $N_0$ is odd);
+\item $N_0\equiv 0\pmod{M_1}$ (so $N_0=M_1\cdot w$ for some integer $w$);
+\item $w\equiv 1\pmod{16}$ (since $M_1\equiv -1\pmod{16}$ and $N_0\equiv -1\pmod{16}$);
+\item $N_0\equiv 2^{a_i}\pmod{p_i}$ for each $i$ and $N_0\equiv 1\pmod{8191}$.
+\end{itemize}
+Also $N_0<2^{2048}-1$ (indeed $N_0<M$ and Crocker's inequality $16\prod_{i=1}^{29}p_i<G_{10}$ ensures $M<2^{2048}-1$).
+
+\subsubsection{Step 7: why $N_0\in A$}
+\begin{enumerate}
+\item \emph{$N_0$ is not a prime plus a power of $2$.}
+Let $d\ge 1$. By the overlapping property of the congruence system, choose $i$ with $d\equiv a_i\pmod{m_i}=\pmod{\operatorname{ord}_{p_i}(2)}$.
+Then $2^d\equiv 2^{a_i}\pmod{p_i}$, hence
+\[N_0-2^d\equiv 2^{a_i}-2^d\equiv 0\pmod{p_i}.
+\]
+So if $N_0-2^d$ were prime, it would have to equal $p_i$, i.e. $N_0=p_i+2^d$.
+Reducing modulo $8191$ and using that $2^d\bmod 8191$ depends only on $d\bmod 13$, this would force
+\[c\equiv N_0\equiv p_i+2^d\pmod{8191}
+\]
+for some $0\le d\le 12$, contradicting the choice of $c$.
+Thus $N_0\neq p+2^d$ for all primes $p$ and all $d\ge 1$.
+
+\item \emph{$N_0$ is not a prime plus two distinct positive powers of $2$.}
+Write $N_0=M_1\cdot w$ with $w\equiv 1\pmod{16}$ and
+\[M_1=\prod_{i=0}^{10}B_i\qquad(B_i\mid 2^{2^i}+1,\ B_{10}=(2^{1024}+1)/G_{10},\ B_i=2^{2^i}+1\text{ for }i\neq 10).
+\]
+Then $N_0=w\prod_{i=0}^{10}B_i\le 2^{2048}-1$ with $w\equiv 1\pmod{16}$, i.e. $N_0$ satisfies the hypotheses of Crocker's Lemma~II, which concludes that $N_0$ cannot equal $p+2^a+2^b$ with $a\neq b$ and $a,b\ge 1$.
+
+\item \emph{Conclude $N_0\in A$.}
+By the two bullets above, $N_0$ satisfies (i)--(ii) of Lemma~4, hence $N_0\in A$.
+\end{enumerate}
+
+\subsection{Pan's quantitative lower bound}
+
+For context toward the density question, Pan proves:
+
+\medskip
+\noindent\textbf{Theorem 7 (Pan).}
+There exists an absolute constant $C>0$ such that, for all sufficiently large $x$,
+\[
+\bigl|\{1\le n\le x:\ n\text{ odd and }n\not= p+2^a+2^b\ (p\text{ prime},\ a,b\ge 0)\}\bigr|
+\ \gg\ x\exp\!\Big(-C\,\log x\,\frac{\log\log\log\log x}{\log\log\log x}\Big).
+\]
+In particular, for every $\varepsilon>0$ one has $|A\cap[1,x]|\gg_\varepsilon x^{1-\varepsilon}$ for all sufficiently large $x$.
+
+\medskip
+\noindent\emph{Relevance.}
+This lower bound implies that $A$ is extremely large (size $x^{1-o(1)}$), yet the factor multiplying $x$ still tends to $0$, so it does not imply $\overline d(A)>0$.
+
+\section{Adversarial Verification}
+
+\begin{itemize}
+\item \textbf{Does Crocker apply to $k,\ell\ge 0$?}
+Yes for odd targets, by Lemma~4: any $k=\ell$ representation collapses to prime$+$power of $2$, and any $p=2$ representation collapses to $3+2^m$, also prime$+$power.
+
+\item \textbf{Is the ``$d\le 12$'' check modulo $8191$ sufficient?}
+Yes: $8191=2^{13}-1$ implies $2^{13}\equiv 1\pmod{8191}$, so $2^d\bmod 8191$ depends only on $d\bmod 13$.
+
+\item \textbf{Copairwise coprimality of moduli.}
+All $p_i$ are distinct odd primes, coprime to $16$.
+Each $p_i$ has order $m_i$ with an odd factor $>1$, hence $p_i\nmid 2^{2^n}-1$ for any $n$ (otherwise the order would divide $2^n$), so $p_i\nmid M_1$. Thus $\gcd(p_i,M_1)=1$.
+Also $\gcd(8191,M_1)=1$ because $8191$ has order $13$ and again cannot divide $2^{2048}-1$.
+
+\item \textbf{Internal computational consistency checks.}
+The CRT computation (performed separately from this writeup) verified:
+$N_0\equiv -1\pmod{16}$,
+$N_0\equiv 0\pmod{M_1}$,
+$N_0\equiv 1\pmod{8191}$,
+and $N_0\equiv 2^{a_i}\pmod{p_i}$ for all $28$ pairs. No hidden assumptions beyond these congruences are used.
+
+\item \textbf{Could $N_0-2^d=p_i$ still happen without contradicting $c$?}
+No. Equality implies the congruence $c\equiv p_i+2^d\pmod{8191}$, which is explicitly excluded by construction.
+\end{itemize}
+
+\section{Final Status}
+
+\noindent\textbf{UNRESOLVED (BUT STRICTLY ADVANCED).}
+
+\medskip
+The density question $\overline d(A)>0$ remains open.
+However, Round~2 strictly advances beyond Round~1 by:
+\begin{enumerate}
+\item providing a rigorous reduction (Lemma~4) connecting Crocker's ``positive power'' results to the $k,\ell\ge 0$ formulation of $A$;
+\item instantiating Crocker's CRT construction to produce an explicit $420$-digit odd integer $N_0\in A$ (hence $A$ is nontrivial beyond $\{1,3\}$);
+\item recording the sharpest known unconditional lower bound (Pan) for $|A\cap[1,x]|$.
+\end{enumerate}
+
+\section{Completion Estimate}
+
+\noindent\textbf{COMPLETION: 55\%}
+
+\section{References}
+
+\begin{enumerate}
+\item R. Crocker, \emph{On the sum of a prime and of two powers of two}, Pacific J. Math. \textbf{36} (1971), 103--107.
+\item H. Pan, \emph{On the integers not of the form $p+2^a+2^b$}, arXiv:0905.3809; published in Acta Arith. \textbf{148} (2011), 97--106.
+\item (Background identity) $\prod_{i=0}^{n-1}(2^{2^i}+1)=2^{2^n}-1$ (classical Fermat number product identity).
+\end{enumerate}

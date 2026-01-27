@@ -1,0 +1,286 @@
+\section{Round 2: covering-system reduction and a Wieferich-type obstruction}
+
+\subsection{1) ROUND-2 OBJECTIVE}
+\textbf{Path pursued: (C) obstruction track (with computational extension).}
+
+Round~1 proved only a fixed-$e$ positive-density result (Lemma~11.2), leaving the global quantifier gap
+\[
+\forall\,\text{odd }n\ge 3\ \exists e\ge 0:\ n-2^e\text{ is squarefree}.
+\]
+In Round~2 I focus on narrowing the space of possible counterexamples by extracting \emph{necessary algebraic structure} that any counterexample must satisfy. Concretely, I reduce counterexamples to a \emph{covering system in exponent space} governed by the multiplicative orders $\operatorname{ord}_{p^2}(2)$, and I prove a Wieferich-type obstruction to reusing a non-Wieferich prime square across multiple exponents.
+
+I also extend the Round~1 computation (which reached $10^6$) to a substantially larger range ($10^8$) as empirical support.
+
+\subsection{2) ROUND-1 FOUNDATION USED}
+I rely on the following Round~1 components (without reproving them):
+\begin{enumerate}
+\item \textbf{Lemma~11.1:} $Q(N)=\frac{6}{\pi^2}N+O(\sqrt N)$ for the count of squarefree integers $\le N$.
+\item \textbf{Lemma~11.2:} for each fixed $e\ge 0$, a positive proportion of odd $n$ admit $n=s+2^e$ with $s$ squarefree, with explicit constants.
+\item \textbf{Round~1 computation:} verified that every odd $3\le n\le 10^6$ has at least one representation.
+\end{enumerate}
+
+\subsection{3) NEW INSIGHT / TOOL (ROUND-2)}
+New ingredients introduced in Round~2:
+\begin{itemize}
+\item A \textbf{counterexample--to--covering-system reduction}: for each odd prime $p$, the exponents $e$ for which $p^2\mid (n-2^e)$ form either the empty set or a single congruence class modulo $\operatorname{ord}_{p^2}(2)$ (Lemma~11.3). Hence a counterexample forces a covering of $\{0,1,\dots,L\}$ by such classes.
+\item An \textbf{order-lifting dichotomy} (Lemma~11.4) giving $\operatorname{ord}_{p^2}(2)\in\{\operatorname{ord}_p(2),\,p\operatorname{ord}_p(2)\}$, and the corollary that a non-Wieferich prime square cannot divide two shifts $n-2^{e_1},n-2^{e_2}$ unless $p\mid(e_1-e_2)$.
+\item A \textbf{computational extension}: verified (empirically) that every odd $3\le n\le 10^8$ has a representation.
+\end{itemize}
+
+\subsection{4) ATTACK PLAN (ROUND-2)}
+\textbf{Gap after Round~1.}
+The only missing piece for a full proof is the universal statement that every odd $n\ge 3$ has \emph{some} exponent $e$ with $n-2^e$ squarefree.
+
+\textbf{Round~2 plan.}
+Instead of attempting uniform squarefree distribution in the sparse set $\{n-2^e\}$, I push the disproof/obstruction line:
+\begin{enumerate}
+\item Derive a structural characterization of counterexamples in terms of exponent coverings by arithmetic progressions with moduli $\operatorname{ord}_{p^2}(2)$.
+\item Prove that \emph{reusing} a prime square $p^2$ to cover \emph{two distinct} exponents forces a strong congruence constraint on the exponent difference; in particular, if $p$ is not Wieferich base~2 then any two such exponents differ by a multiple of $p$.
+\item Use this to rule out an entire class of ``efficient'' covering-congruence constructions: coverings that attempt to use a small number of large non-Wieferich primes to control many exponents.
+\item Extend computation to further restrict where a minimal counterexample could begin.
+\end{enumerate}
+
+\subsection{5) WORK (ROUND-2)}
+
+\subsubsection{5.1. Setup and notation}
+Fix an odd integer $n\ge 3$.
+Define
+\[
+L:=L(n):=\big\lfloor \log_2(n-1)\big\rfloor,
+\qquad
+E_L:=\{0,1,\dots,L\}.
+\]
+Then $2^e\le n-1$ for all $e\in E_L$, so $n-2^e\ge 1$ for all such $e$.
+
+Call $n$ a \emph{counterexample} if
+\[
+\forall e\in E_L:\quad n-2^e\ \text{is not squarefree}.
+\]
+Equivalently, for each $e\in E_L$ there exists a prime $p$ with $p^2\mid(n-2^e)$.
+
+\subsubsection{5.2. Exponents forced by a fixed prime square}
+
+\paragraph{Lemma 11.3 (exponent class for a fixed prime square).}
+Let $p$ be an odd prime and let
+\[
+\mathcal{E}_p(n):=\{e\in\mathbb{Z}_{\ge 0}:\ p^2\mid (n-2^e)\}.
+\]
+Then $\mathcal{E}_p(n)$ is either empty, or else it is a single residue class modulo the multiplicative order
+\[
+\operatorname{ord}_{p^2}(2):=\min\{t\ge 1: 2^t\equiv 1\pmod{p^2}\}.
+\]
+More precisely: if $e_0\in\mathcal{E}_p(n)$ then
+\[
+\mathcal{E}_p(n)=\{e\ge 0:\ e\equiv e_0\pmod{\operatorname{ord}_{p^2}(2)}\}.
+\]
+
+\paragraph{Proof.}
+Assume $\mathcal{E}_p(n)\ne\varnothing$ and fix $e_0\in\mathcal{E}_p(n)$, so $n\equiv 2^{e_0}\pmod{p^2}$.
+Let $e\ge 0$. Then
+\[
+ p^2\mid (n-2^e)
+\ \Longleftrightarrow\ 
+2^e\equiv n\equiv 2^{e_0}\pmod{p^2}
+\ \Longleftrightarrow\ 
+2^{e-e_0}\equiv 1\pmod{p^2}.
+\]
+Since $p$ is odd, $2$ is invertible modulo $p^2$ and the last congruence holds if and only if $\operatorname{ord}_{p^2}(2)\mid (e-e_0)$.
+This is exactly the claimed residue-class description. \qed
+
+\paragraph{Corollary 11.3.1 (counterexample implies an exponent covering).}
+If $n$ is a counterexample, then there exists a finite set of odd primes $\mathcal{P}$ and integers $a_p\ge 0$ such that
+\begin{align*}
+&\text{(i)}\quad n\equiv 2^{a_p}\pmod{p^2}\ \text{for each }p\in\mathcal{P},\\
+&\text{(ii)}\quad E_L\subseteq \bigcup_{p\in\mathcal{P}}\{e\ge 0:\ e\equiv a_p\pmod{\operatorname{ord}_{p^2}(2)}\}.
+\end{align*}
+In words: the exponent interval $E_L$ is covered by residue classes modulo the orders $\operatorname{ord}_{p^2}(2)$ coming from primes whose squares divide at least one shift $n-2^e$.
+
+\paragraph{Proof.}
+For each $e\in E_L$, choose a prime $p(e)$ with $p(e)^2\mid(n-2^e)$ and let $\mathcal{P}$ be the set of primes that occur.
+For each $p\in\mathcal{P}$ choose $a_p\in\mathcal{E}_p(n)$ (e.g. the smallest such exponent).
+Then (i) holds by definition, and (ii) follows from Lemma~11.3 because each $e\in E_L$ lies in $\mathcal{E}_{p(e)}(n)$, which is the residue class of $a_{p(e)}$ modulo $\operatorname{ord}_{p(e)^2}(2)$. \qed
+
+\subsubsection{5.3. Order lifting and the Wieferich obstruction}
+
+\paragraph{Lemma 11.4 (order modulo $p^2$ is $r$ or $pr$).}
+Let $p$ be an odd prime and set $r:=\operatorname{ord}_p(2)$.
+Then
+\[
+\operatorname{ord}_{p^2}(2)\in\{r,\ pr\}.
+\]
+More precisely:
+\begin{itemize}
+\item if $2^r\equiv 1\pmod{p^2}$, then $\operatorname{ord}_{p^2}(2)=r$;
+\item if $2^r\not\equiv 1\pmod{p^2}$, then $\operatorname{ord}_{p^2}(2)=pr$.
+\end{itemize}
+
+\paragraph{Proof.}
+Since $r=\operatorname{ord}_p(2)$, we have $2^r\equiv 1\pmod p$.
+Write
+\[
+2^r = 1 + pt
+\]
+for some integer $t$.
+
+If $p\mid t$ then $2^r\equiv 1\pmod{p^2}$ and therefore the order of $2$ modulo $p^2$ divides $r$. On the other hand, reducing mod $p$ shows the order modulo $p^2$ must be a multiple of $r$. Hence it is exactly $r$.
+
+If $p\nmid t$ then $2^r\not\equiv 1\pmod{p^2}$, so the order modulo $p^2$ is strictly larger than $r$ but still a multiple of $r$.
+Now consider
+\[
+2^{pr} = (2^r)^p = (1+pt)^p.
+\]
+By the binomial theorem,
+\[
+(1+pt)^p = 1 + p(pt) + \binom{p}{2}(pt)^2+\cdots,
+\]
+and every term beyond the first two is divisible by $p^3$ (since $(pt)^2$ already contributes $p^2$ and $\binom{p}{2}$ contributes another factor $p$).
+In particular,
+\[
+(1+pt)^p \equiv 1\pmod{p^2},
+\]
+so $2^{pr}\equiv 1\pmod{p^2}$ and therefore $\operatorname{ord}_{p^2}(2)$ divides $pr$.
+Since it is a multiple of $r$ and strictly larger than $r$, the only possibility is $pr$. \qed
+
+\paragraph{Corollary 11.4.1 (Wieferich characterization via $\operatorname{ord}_{p^2}(2)$).}
+An odd prime $p$ is Wieferich base~$2$ (i.e. $2^{p-1}\equiv 1\pmod{p^2}$) if and only if
+\[
+ p\nmid \operatorname{ord}_{p^2}(2).
+\]
+Equivalently: $p$ is Wieferich base~$2$ if and only if $\operatorname{ord}_{p^2}(2)=\operatorname{ord}_p(2)$.
+
+\paragraph{Proof.}
+If $p\nmid \operatorname{ord}_{p^2}(2)$, then $\operatorname{ord}_{p^2}(2)$ divides $\varphi(p^2)=p(p-1)$ but not $p$, hence must divide $p-1$.
+Thus $2^{p-1}\equiv 1\pmod{p^2}$.
+
+Conversely, if $2^{p-1}\equiv 1\pmod{p^2}$ then the order $\operatorname{ord}_{p^2}(2)$ divides $p-1$, so it is not divisible by $p$.
+Finally, the equivalence with $\operatorname{ord}_{p^2}(2)=\operatorname{ord}_p(2)$ follows immediately from Lemma~11.4. \qed
+
+\paragraph{Corollary 11.4.2 (obstruction to reusing a non-Wieferich prime square).}
+Let $p$ be an odd prime that is \emph{not} Wieferich base~$2$.
+If $p^2\mid (n-2^{e_1})$ and $p^2\mid (n-2^{e_2})$ with $e_1\ne e_2$, then
+\[
+ p\mid (e_1-e_2).
+\]
+
+\paragraph{Proof.}
+By Lemma~11.3, $e_1\equiv e_2\pmod{\operatorname{ord}_{p^2}(2)}$.
+By Corollary~11.4.1, since $p$ is not Wieferich we have $p\mid \operatorname{ord}_{p^2}(2)$.
+Hence $p\mid (e_1-e_2)$. \qed
+
+\paragraph{Corollary 11.4.3 (quantitative reuse bound in $E_L$).}
+If $p$ is not Wieferich base~$2$, then
+\[
+\big|\mathcal{E}_p(n)\cap E_L\big|\le 1+\Big\lfloor\frac{L}{p}\Big\rfloor.
+\]
+In particular, if $p>L$ and $p$ is not Wieferich, then $p^2$ can divide at most one of the shifts $n-2^e$ with $e\in E_L$.
+
+\paragraph{Proof.}
+By Lemma~11.3, $\mathcal{E}_p(n)$ is a residue class modulo $m:=\operatorname{ord}_{p^2}(2)$.
+By Corollary~11.4.1, $p\mid m$.
+Thus any two distinct elements of $\mathcal{E}_p(n)$ differ by at least $p$.
+An interval of length $L$ contains at most $1+\lfloor L/p\rfloor$ integers spaced by at least $p$. \qed
+
+\subsubsection{5.4. CRT reduction for counterexamples}
+
+\paragraph{Lemma 11.5 (reduction modulo the square-modulus of a certificate).}
+Assume $n$ is a counterexample.
+Let
+\[
+\mathcal{P}(n):=\{\text{odd primes }p:\ \exists e\in E_L\text{ with }p^2\mid(n-2^e)\},
+\qquad
+M:=\prod_{p\in\mathcal{P}(n)} p^2.
+\]
+Let $n_0$ be the least positive residue congruent to $n$ modulo $M$.
+Then $n_0$ is odd and satisfies:
+\[
+\forall e\in E_{L_0}:\ \exists p\in\mathcal{P}(n)\text{ such that }p^2\mid(n_0-2^e),
+\qquad L_0:=\big\lfloor \log_2(n_0-1)\big\rfloor.
+\]
+In particular, $n_0$ is itself a counterexample (possibly with a smaller exponent range).
+Consequently, if any counterexample exists, there is one with
+\[
+ n < \prod_{p\in\mathcal{P}(n)} p^2.
+\]
+
+\paragraph{Proof.}
+Since $M$ is odd, reducing modulo $M$ preserves parity, so $n_0$ is odd.
+Fix $e\in E_{L_0}$. Then $2^e\le n_0-1\le n-1$, hence $e\in E_L$.
+Because $n$ is a counterexample, there exists some odd prime $p\in\mathcal{P}(n)$ with $p^2\mid (n-2^e)$.
+But $n_0\equiv n\pmod{p^2}$ (since $p^2\mid M$), so
+\[
+ n_0-2^e\equiv n-2^e\equiv 0\pmod{p^2},
+\]
+which proves the displayed property for $n_0$.
+Finally, choosing $n_0$ as the least positive residue implies $n_0<M$.
+If $n$ was already $<M$ this gives no improvement; otherwise it strictly reduces the size of the counterexample. \qed
+
+\subsubsection{5.5. Computational extension (empirical)}
+\textbf{Empirical only.}
+I extended the Round~1 brute-force verification from $10^6$ to $10^8$.
+
+\paragraph{Method.}
+For a given bound $N$:
+\begin{enumerate}
+\item Compute an array $\mathrm{sqfree}[m]$ for $0\le m\le N$ by marking all multiples of $p^2$ (for primes $p\le \sqrt N$) as non-squarefree.
+\item For odd $n=2i+1$, mark $n$ as representable if any of the following hold:
+\begin{itemize}
+\item $e=0$: $\mathrm{sqfree}[n-1]=\mathrm{sqfree}[2i]$;
+\item $e\ge 1$: $\mathrm{sqfree}[n-2^e]$.
+\end{itemize}
+This is implemented efficiently on odd indices by shifting boolean slices by $2^{e-1}$.
+\end{enumerate}
+
+\paragraph{Result.}
+For $N=10^8$ the only odd failure is $n=1$; in particular every odd $3\le n\le 10^8$ admits $n=s+2^e$ with $s$ squarefree.
+
+\paragraph{Additional empirical data (Wieferich primes up to $2\cdot 10^5$).}
+A direct check of primes $p\le 200{,}000$ shows that the only primes satisfying $2^{p-1}\equiv 1\pmod{p^2}$ in this range are
+\[
+1093\ \text{and}\ 3511.
+\]
+(These are exactly the primes $p$ in this range for which $p\nmid\operatorname{ord}_{p^2}(2)$, consistent with Corollary~11.4.1.)
+
+\subsection{6) ADVERSARIAL VERIFICATION}
+\textbf{Quantifier hygiene.}
+Throughout I use $L=\lfloor\log_2(n-1)\rfloor$ so that $n-2^e\ge 1$ for all $e\in E_L$; this avoids the common pitfall of allowing $2^e=n$ which would force $s=0$.
+
+\textbf{Prime $p=2$.}
+Lemma~11.3 is stated only for odd primes because it uses invertibility of $2$ modulo $p^2$.
+This omission is harmless here: for $e\ge 2$ the shift $n-2^e$ is odd, hence never divisible by $4$; and for $e\in\{0,1\}$ the squarefree constraint can be checked directly (it is an even/odd parity issue already emphasized in Round~1).
+
+\textbf{Lemma~11.3 robustness.}
+The step $2^e\equiv 2^{e_0}\pmod{p^2}\iff 2^{e-e_0}\equiv 1\pmod{p^2}$ is valid because $\gcd(2,p^2)=1$ for odd $p$.
+No hidden assumption on $e-e_0$ being positive is needed: if $e<e_0$ we interpret $2^{e-e_0}$ modulo $p^2$ via inverses, equivalently applying the argument to $|e-e_0|$.
+
+\textbf{Lemma~11.4 check.}
+The only delicate point is showing that in the $p\nmid t$ case, the order cannot be a proper divisor of $pr$ other than $r$.
+This is settled because any order modulo $p^2$ must be a multiple of $r$ (by reduction mod $p$), and $p$ is prime, so the only multiples of $r$ dividing $pr$ are $r$ and $pr$.
+
+\textbf{Lemma~11.5 check.}
+The reduction $n\mapsto n_0$ only asserts counterexample behavior up to $L_0=\lfloor\log_2(n_0-1)\rfloor$, not up to the original $L$.
+This is important: if $n_0\ll n$ then there is no requirement to certify large exponents $e$ for $n_0$.
+The proof correctly restricts to $e\le L_0$ and uses $L_0\le L$.
+
+\textbf{Computation sanity.}
+The sieve marks $m$ as non-squarefree iff it is divisible by $p^2$ for some prime $p\le \sqrt N$; this is exact.
+The representability marking is purely logical OR of exact squarefree tests and hence cannot create false positives.
+As a cross-check, the code recovers the Round~1 result (no failures for odd $3\le n\le 10^6$) as a special case.
+
+\subsection{7) FINAL}
+\textbf{UNRESOLVED (BUT STRICTLY ADVANCED).}
+
+Round~2 does not close the universal quantifier gap. However it adds genuine structural constraints on any hypothetical counterexample:
+\begin{itemize}
+\item A counterexample forces a covering of the exponent interval $E_L$ by residue classes modulo $\operatorname{ord}_{p^2}(2)$ (Corollary~11.3.1).
+\item Reusing a non-Wieferich prime square across two exponents forces their difference to be divisible by $p$ (Corollary~11.4.2), giving the explicit reuse bound $|\mathcal{E}_p(n)\cap E_L|\le 1+\lfloor L/p\rfloor$ (Corollary~11.4.3).
+\item Any counterexample can be reduced modulo the product of its certifying prime squares without losing the counterexample property for its (possibly smaller) exponent range (Lemma~11.5).
+\end{itemize}
+
+Empirically, the statement holds for all odd $3\le n\le 10^8$.
+
+\subsection{8) COMPLETION ESTIMATE (MANDATORY)}
+\textbf{COMPLETION: 55\%}
+
+\subsection{9) REFERENCES}
+No external theorems beyond standard facts about multiplicative order and elementary binomial expansions were invoked.
+All computations were performed directly (NumPy/SymPy).

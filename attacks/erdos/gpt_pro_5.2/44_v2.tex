@@ -1,0 +1,212 @@
+\section{Erd\H{o}s Problem \#44 --- Round 2}
+
+\subsection*{1) ROUND-2 OBJECTIVE}
+\textbf{Path (A): proof.}
+Round 1 isolated the key gap: Lemma~1 and Lemma~2 only add $O(\log M)$ new elements, whereas the target size is $\asymp \sqrt{M}$.
+In this round I push the \emph{block extension} idea (Round-1 ``next move'' (2)) to obtain an unconditional constant-density extension.
+Specifically, I prove a gap-free theorem showing that every Sidon $A\subset [N]$ can be extended to a Sidon subset of some $[M]$ of size at least $(1/\sqrt2-\varepsilon)\sqrt M$.
+This does \emph{not} settle the original $(1-\varepsilon)\sqrt M$ target, but it is a strict quantitative advance.
+
+\subsection*{2) ROUND-1 FOUNDATION USED}
+I use the Round-1 formal restatement of the problem and the Round-1 identification of the main gap ("need $\Theta(\sqrt M)$ new elements without $M$ exponential").
+I do \emph{not} reuse Lemma~1 or Lemma~2 directly; instead I replace the exponential-growth tail with a dense block.
+
+\subsection*{3) NEW INSIGHT / TOOL (ROUND-2)}
+New ingredients beyond Round 1:
+\begin{itemize}
+\item \textbf{Sum-range separation.} Place the new set $B$ inside a top interval of $[M]$ so that
+\[A+A \;<\; A+B \;<\; B+B\]
+(as sets of integers). This deletes the hardest mixed collisions (e.g. $a+b=b_1+b_2$) by sheer range separation.
+\item \textbf{Forbidden-difference pruning lemma.} Starting from any Sidon set $T$, delete at most $|F|$ elements to ensure that the remaining subset has no pairwise differences lying in a prescribed finite forbidden set $F$.
+\item \textbf{Dense Sidon blocks from finite geometry.} Use Singer's construction of a perfect difference set (hence Sidon set) of size $q+1$ inside $[q^2+q+1]$ for every prime power $q$.
+\end{itemize}
+
+\subsection*{4) ATTACK PLAN (ROUND-2)}
+\textbf{Gap from Round 1.} We need a mechanism to add \emph{many} elements in $\{N+1,\dots,M\}$ while preserving Sidon-ness.
+
+\textbf{Plan.} Fix $A\subset [N]$ Sidon and choose a large length $L$ and an interval
+\[I:=[N+L+1,\,N+2L]\subset [M],\qquad M:=N+2L.
+\]
+We will place $B\subset I$ so that:
+\begin{enumerate}
+\item $B$ itself is Sidon;
+\item no nonzero difference of two elements of $B$ equals a difference of two elements of $A$;
+\item because $I$ sits far above $[N]$, the sum-ranges $A+A$, $A+B$, $B+B$ are disjoint.
+\end{enumerate}
+Then $A\cup B$ is Sidon by a direct case analysis.
+Choosing $L\approx q^2$ with $q$ large yields $|B|\approx \sqrt L$ and hence $|A\cup B|\approx \sqrt{M/2}=(1/\sqrt2)\sqrt M$.
+
+\subsection*{5) WORK (ROUND-2)}
+\subsubsection*{5.1\; A Sidon set has unique differences}
+\begin{lemma}[Differences are unique in a Sidon set]
+\label{lem:unique-differences}
+Let $S\subset \mathbb Z$ be Sidon.
+If $x_1-x_2=x_3-x_4\neq 0$ with $x_i\in S$, then $(x_1,x_2)=(x_3,x_4)$.
+Equivalently, for each nonzero integer $d$ there is at most one ordered pair $(x,y)\in S^2$ with $x-y=d$.
+\end{lemma}
+\begin{proof}
+From $x_1-x_2=x_3-x_4$ we obtain $x_1+x_4=x_3+x_2$.
+By Sidon-ness of $S$, the unordered multisets of summands are equal:
+\[\{x_1,x_4\}=\{x_3,x_2\}.
+\]
+If $x_1=x_2$ then the difference is $0$, excluded, so $x_1\neq x_2$.
+Thus the only way the multisets can coincide is $x_1=x_3$ and $x_4=x_2$, which forces $x_2=x_4$.
+Hence $(x_1,x_2)=(x_3,x_4)$.
+\end{proof}
+
+\subsubsection*{5.2\; Deleting a small set to avoid forbidden differences}
+\begin{lemma}[Forbidden-difference pruning]
+\label{lem:prune}
+Let $S\subset \mathbb Z$ be a finite Sidon set and let $F\subset \mathbb N$ be any finite set.
+Then there exists a subset $S'\subseteq S$ such that
+\begin{enumerate}
+\item for all distinct $u,v\in S'$ we have $|u-v|\notin F$; and
+\item $|S'|\ge |S|-|F|$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+Form a (simple) graph $G$ with vertex set $S$, joining two distinct vertices $u,v$ by an edge if $|u-v|\in F$.
+Fix $d\in F$. By Lemma~\ref{lem:unique-differences}, there is at most one unordered pair $\{u,v\}\subset S$ with $|u-v|=d$.
+Hence for each $d\in F$ there is at most one edge of $G$ labelled by $d$, and therefore
+\[|E(G)|\le |F|.
+\]
+Now pick a set $C\subseteq S$ by selecting, for each edge of $G$, \emph{one} of its endpoints, and taking the union over edges.
+Then $C$ is a vertex cover of $G$ and $|C|\le |E(G)|\le |F|$.
+Let $S':=S\setminus C$.
+By construction $S'$ spans no edges in $G$, hence has no forbidden differences.
+Also $|S'|=|S|-|C|\ge |S|-|F|$.
+\end{proof}
+
+\subsubsection*{5.3\; A dense Sidon block (Singer)}
+\begin{theorem}[Singer]
+\label{thm:singer}
+For every prime power $q$ there exists a set $D\subset \mathbb Z/(q^2+q+1)\mathbb Z$ of size $q+1$ such that every nonzero residue class has a unique representation as a difference of two elements of $D$.
+In particular, $D$ is a Sidon set in the cyclic group $\mathbb Z/(q^2+q+1)\mathbb Z$.
+Choosing representatives in $\{0,1,\dots,q^2+q\}$ gives a Sidon set of integers of size $q+1$ contained in $[0,q^2+q]$.
+\end{theorem}
+\begin{proof}[Comment]
+This is Singer's construction of a perfect difference set; we use only its existence.
+The implication ``perfect difference set $\Rightarrow$ Sidon'' follows from rewriting $a+b=c+d$ as $a-c=d-b$ and invoking uniqueness of differences.
+If a set is Sidon in $\mathbb Z/m\mathbb Z$, then it is Sidon as a set of integers when represented in $\{0,\dots,m-1\}$, because an integer equality implies the same congruence mod $m$.
+\end{proof}
+
+\subsubsection*{5.4\; Main theorem: a universal $1/\sqrt2$-density extension}
+\begin{theorem}[Uniform extension with constant $1/\sqrt2$]
+\label{thm:main}
+Let $N\ge 1$ and let $A\subset [N]$ be Sidon.
+Then for every $\varepsilon>0$ there exist $M\ge N$ and $B\subset\{N+1,\dots,M\}$ such that $A\cup B\subset [M]$ is Sidon and
+\[
+|A\cup B|\ge \Bigl(\frac1{\sqrt2}-\varepsilon\Bigr)\sqrt M.
+\]
+\end{theorem}
+\begin{proof}
+We may assume $0<\varepsilon<1/\sqrt2$ (otherwise the lower bound is nonpositive and the claim is trivial).
+
+\medskip
+\noindent\textbf{Step 1: choose a dense Sidon block length.}
+Let $q$ be a prime power satisfying
+\begin{equation}
+\label{eq:qchoice}
+q\ge \max\Bigl\{\frac N2,\ \frac{N-1}{\sqrt2\,\varepsilon}-1\Bigr\}.
+\end{equation}
+(Such $q$ exists, e.g. take $q=2^m$ for $m$ large.)
+Set
+\[L:=q^2+q+1,\qquad M:=N+2L.
+\]
+By Theorem~\ref{thm:singer} there exists a Sidon set $T\subset [L]$ of size $|T|=q+1$.
+
+\medskip
+\noindent\textbf{Step 2: forbid the differences coming from $A$.}
+Define the forbidden absolute difference set
+\[F_A:=\{ |a-a'| : a,a'\in A,\ a\neq a'\}\subset \{1,2,\dots,N-1\}.
+\]
+In particular $|F_A|\le N-1$.
+Apply Lemma~\ref{lem:prune} to $S=T$ and $F=F_A$ to obtain $T'\subseteq T$ such that:
+\begin{enumerate}
+\item for all distinct $u,v\in T'$ we have $|u-v|\notin F_A$; and
+\item $|T'|\ge |T|-|F_A|\ge (q+1)-(N-1)=q-N+2$.
+\end{enumerate}
+
+\medskip
+\noindent\textbf{Step 3: place the block in the top half of $[M]$.}
+Define
+\[B:=\{t+(N+L):\ t\in T'\} \subset [N+L+1,\,N+2L]=[N+L+1,\,M].
+\]
+Then $B\subset\{N+1,\dots,M\}$, and $B$ is Sidon because it is a translate of the Sidon set $T'$.
+
+\medskip
+\noindent\textbf{Step 4: verify $A\cup B$ is Sidon (sum-range separation + cross-sum injectivity).}
+Write $S:=A\cup B$.
+We compare the ranges of the three kinds of sums:
+\begin{align*}
+A+A &\subset [2,\,2N],\\
+A+B &\subset [\min(A)+\min(B),\ \max(A)+\max(B)]\subset [1+(N+L+1),\ N+(N+2L)]\\
+&\subset [N+L+2,\ 2N+2L],\\
+B+B &\subset [2\min(B),\ 2\max(B)]\subset [2(N+L+1),\ 2(N+2L)]\\
+&= [2N+2L+2,\ 2N+4L].
+\end{align*}
+Since $L> N$ (indeed $L=q^2+q+1> N$ since $q\ge N/2$), these three intervals are pairwise disjoint and ordered as
+\[A+A\;<\;A+B\;<\;B+B.
+\]
+Therefore, any solution of $x_1+x_2=x_3+x_4$ with $x_i\in S$ must lie entirely within one category.
+The $A+A$ and $B+B$ categories are trivial because $A$ and $B$ are Sidon.
+It remains to check $A+B$ sums are distinct.
+
+Suppose $a_1+b_1=a_2+b_2$ with $a_i\in A$ and $b_i\in B$.
+Rearranging gives $b_2-b_1=a_1-a_2$.
+If $a_1\neq a_2$, then $|a_1-a_2|\in F_A$; taking absolute values gives
+\[|b_2-b_1|=|a_1-a_2|\in F_A.
+\]
+But $b_i$ are translates of elements of $T'$, and $T'$ was constructed to avoid all differences in $F_A$.
+Hence this is impossible.
+Therefore $a_1=a_2$, and then the equality forces $b_1=b_2$.
+So all $A+B$ sums are distinct, completing the Sidon verification.
+
+\medskip
+\noindent\textbf{Step 5: size lower bound.}
+We have $|A\cup B|=|A|+|B|\ge |B|=|T'|\ge q-N+2$.
+Also, using $N\le 2q$ from \eqref{eq:qchoice},
+\[
+M=N+2(q^2+q+1)=2q^2+2q+(N+2)\le 2q^2+4q+2=2(q+1)^2,
+\]
+so $\sqrt M\le \sqrt2\,(q+1)$.
+Thus
+\[
+\Bigl(\frac1{\sqrt2}-\varepsilon\Bigr)\sqrt M
+\le \Bigl(\frac1{\sqrt2}-\varepsilon\Bigr)\sqrt2\,(q+1)=(1-\sqrt2\,\varepsilon)(q+1).
+\]
+Therefore it suffices to prove $q-N+2\ge (1-\sqrt2\,\varepsilon)(q+1)$.
+But this inequality is equivalent to
+\[\sqrt2\,\varepsilon\,(q+1)\ge N-1,
+\]
+which holds by the choice of $q$ in \eqref{eq:qchoice}.
+This proves the theorem.
+\end{proof}
+
+\subsection*{6) ADVERSARIAL VERIFICATION}
+\begin{itemize}
+\item \textbf{Repeated summands.} The Sidon definition allows $x_1=x_2$.
+In the range separation check, $2b\in B+B$ is still $\ge 2(N+L+1)=2N+2L+2$, strictly larger than any $a+b\le 2N+2L$, so no hidden overlap.
+\item \textbf{Cross-sums among themselves.} The only way $a_1+b_1=a_2+b_2$ could fail to force $a_1=a_2$ is if $b_1-b_2$ equals a nonzero difference of $A$.
+This is exactly what Lemma~\ref{lem:prune} eliminates.
+\item \textbf{Cardinality of $F_A$.} We used only $F_A\subset\{1,\dots,N-1\}$, hence $|F_A|\le N-1$ (no bound on $|A|$ is needed).
+\item \textbf{Quantifiers/dependence.} The construction chooses $M$ and $B$ depending on $(N,A,\varepsilon)$, as allowed.
+\item \textbf{Extremal small-$N$ cases.} When $N=1$, $F_A=\varnothing$ and the construction works verbatim.
+If $A=\varnothing$, then $F_A=\varnothing$ and we simply place a dense Sidon block $B$ in the top interval.
+\end{itemize}
+
+\subsection*{7) FINAL}
+\textbf{UNRESOLVED (BUT STRICTLY ADVANCED).}
+The original problem asks for extension to size $(1-\varepsilon)\sqrt M$.
+In Round 2 we proved the following unconditional quantitative extension theorem:
+for every Sidon $A\subset [N]$ and every $\varepsilon>0$ there exist $M$ and $B\subset\{N+1,\dots,M\}$ such that $A\cup B$ is Sidon and
+\[|A\cup B|\ge \bigl(\tfrac1{\sqrt2}-\varepsilon\bigr)\sqrt M.\]
+The structural reason for the $1/\sqrt2$ loss is that we enforced $A+B$ and $B+B$ to lie in disjoint ranges; improving the constant beyond $1/\sqrt2$ requires handling those mixed collisions rather than separating them.
+
+\subsection*{8) COMPLETION ESTIMATE (MANDATORY)}
+\textbf{COMPLETION: 55\%}
+
+\subsection*{9) REFERENCES}
+\begin{itemize}
+\item J. Singer, \emph{A theorem in finite projective geometry and some applications to number theory}, Trans. Amer. Math. Soc. \textbf{43} (1938), 377--385.
+\end{itemize}
