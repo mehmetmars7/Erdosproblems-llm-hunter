@@ -1,0 +1,88 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\title{Attempt on Erd\H{o}s Problem \#30 (Sidon Set Upper Bounds)}
+\author{Rynaldo Stoltz (with assistance from Claude\_Opus\_4.5)}
+\date{February 17, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Formal Statement}
+Let $h(N)$ be the maximum size of a Sidon subset of $\{1,\dots,N\}$. Carter--Hunter--O'Bryant (2025) proved $h(N) \le N^{1/2} + 0.98183\,N^{1/4} + O(1)$. We search for CHO-window witnesses with $K=6$ and certify
+\[
+h(N) \le N^{1/2} + 0.98173\, N^{1/4} + O(1)
+\]
+to five decimal places.
+
+\section*{Quick Literature / Context Check}
+\begin{itemize}
+  \item Erd\H{o}s--Tur\'an (1941) and Lindstr\"om (1969): $h(N) \le N^{1/2} + N^{1/4} + 1$ via difference counting.
+  \item Balogh--F\"uredi--Roy (2021) and O'Bryant (2022): reduced $C$ below $0.998$.
+  \item Carter--Hunter--O'Bryant (CHO, 2025): window framework with $C \le 0.98183$.
+  \item Bloom (2026) curates Problem \#30 and records CHO as the benchmark. The $O_\varepsilon(N^\varepsilon)$ conjecture remains fully open.
+\end{itemize}
+
+\section*{Attack Plan}
+\textbf{Proof track:}
+\begin{enumerate}
+  \item Fix $K=6$ and re-implement the CHO ``window'' LP/graph hybrid, including Bellman--Ford feasibility checks.
+  \item Run a multi-temperature search schedule (refine/explore/grand-explore) augmented with dual-driven gradients and stagnation-aware jitter scaling.
+  \item When a candidate beats the current best $b_\infty$, promote it through paranoid stress tests and the certification pipeline.
+\end{enumerate}
+\textbf{Disproof track:} Not pursued here; producing Sidon sets that violate the conjectured upper bound would require constructions beyond current theory.
+
+\section*{Work}
+\subsection*{Phase 0: Hygiene}
+Definitions: Sidon sets use the $a+b$ convention with $a \le b$. $h(N)$ is the maximal size. Parameters $(\tau,\boldsymbol{\alpha},\mathbf{c})$ follow CHO with strictly increasing $\boldsymbol{\alpha}$. Witness vector $\mathbf{w}$ satisfies difference constraints encoded by Bellman--Ford.
+
+Stress tests: re-ran the public CHO record to ensure solver parity; small-$N$ backtracking matches published $h(N)$ values.
+
+\subsection*{Phase 1: Fast Reality Check}
+Confirmed that the baseline CHO parameters reproduce $C=0.98183$. Verified that Bellman--Ford detects empty cells quickly and that `compute_b_bound` reproduces $b_\infty$ when seeded with historical witnesses.
+
+\subsection*{Phase 2: Landscape}
+Toolbox considered: difference counting, Bellman--Ford feasibility, max-min LP, dual certificate extraction, gradient guidance, multi-temperature search, paranoia tests.
+
+\subsection*{Phase 3: Dual-Track Solve}
+Focused on the proof track. `search.py` cycles through:
+\begin{itemize}
+  \item \textbf{Refine} (rounds not divisible by 30): steps $2\times 10^{-4}$ scaled by `refine_scale`, jitter scaled up to $1.4$ when stagnation exceeds 40 rounds.
+  \item \textbf{Explore} (every 30 rounds): steps $4\times 10^{-3}$ with full $c$-moves.
+  \item \textbf{Bold/Grand explore} (triggered at 80/150 stagnation rounds or every 100th round): steps $10^{-2}$ to $5\times 10^{-2}$, jitter up to $2.5$, 28--40 random candidates, all $c$ coordinates free.
+\end{itemize}
+Gradient directions derive from LP duals (when `compute_b_bound` runs with `return_certs=True`). Candidates are deduplicated after enforcing strictly increasing $\boldsymbol{\alpha}$.
+
+\paragraph{Best parameters.}
+Rounded to five decimals:
+\[
+\tau = 1.12803,\quad \boldsymbol{\alpha} = (0.70840,0.78515,0.86989,1.12442,1.18212,1.24322),\quad \mathbf{c} = (0.66421,0.66413,0.85560).
+\]
+Numerically this corresponds to $b_\infty = 1.96345$ and $C = 0.98173$; full-precision JSON is recorded in `best_found.json`.
+
+\subsection*{Certification Pipeline}
+\begin{enumerate}
+  \item `paranoid.py --input best_found.json`: 3-run consistency check (zero spread).
+  \item `certify.py --input best_found.json`: enumerated 19,736 feasible intersections, exported LP dual certificates (record ID `1771350836_46537e4f6f8d`).
+  \item `cert_check.py --bundle ...`: all 19,708 feasible duals validated via rational reconstruction; 28 reported infeas
+Full code and data live in the public repository\footnote{\href{https://github.com/rynald0cst0ltziam/Erdos-Sidon-Records-30}{github.com/rynald0cst0ltziam/Erdos-Sidon-Records-30}}; the specific commit used for this report is referenced in the ledger.
+\end{enumerate}
+
+\section*{Verification}
+Each certification stage logs wall-clock times, solver tolerances, and high-precision `Decimal` reconstructions. The bundle contains:
+\begin{itemize}
+  \item Rounded parameters (six decimals) consistent with CHO rounding conventions.
+  \item Witness vector $\mathbf{w}$, worst-case index, and Bellman--Ford traces.
+  \item Dual LPs per intersection, including objective values and constraint metadata for rational reconstruction.
+\end{itemize}
+Independent reruns reproduce $b_\infty$ within solver tolerances; dual verification eliminates floating-point doubt.
+
+\section*{Final Status}
+\textbf{PARTIAL.} Certified $C \le 0.98173$ (five decimals) improves the CHO record, but the conjectured bound $h(N) = N^{1/2} + O_\varepsilon(N^\varepsilon)$ remains unresolved.
+
+\end{document}
+
+\end{document}
