@@ -158,7 +158,7 @@ for (const filename of ['index.html', 'open_problems.html', 'mo.html', 'erdos.ht
     assert.match(html, /href="open_problems.html"[^>]*>Top Open Problems<\/a>/);
     for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) new vm.Script(match[1]);
     if (filename !== 'erdos.html') {
-        assert.match(html, /src="data\/open_problems_data.js"/);
+        assert.match(html, /src="data\/open_problems_data\.js(?:\?v=[0-9a-f]{16})?"/);
         assert.doesNotMatch(html, /src="data\/mo_data.js"/);
     }
 }
