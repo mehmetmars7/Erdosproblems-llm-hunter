@@ -27,7 +27,7 @@ var siteStats = {
     "with_attacks": 107,
     "ranked_with_attacks": 14,
     "models": [
-      "Research notebook",
+      "GPT 6 Astra Ultra",
       "gpt pro 5.2"
     ]
   }

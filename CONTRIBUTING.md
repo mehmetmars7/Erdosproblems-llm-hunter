@@ -14,7 +14,6 @@ Only contributions featuring attempts from the most advanced frontier LLMs are a
 - Other comparable frontier models with demonstrated mathematical reasoning capabilities such as Aristotle from Harmonic.
 
 We focus on frontier models because they have shown the most promise in making meaningful progress on open mathematical problems.
-Most current attempts are by GPT Pro 5.2.
 
 ## Submission Guidelines
 
@@ -37,6 +36,36 @@ Most current attempts are by GPT Pro 5.2.
 3. **File Naming**: Use `<number>.tex`, for example `1.tex` for P versus NP. Further versions use `1_v2.tex`, `1_v3.tex`, and so on. Keep the root definition file separate from model attempts. Existing stable-ID filenames in `attacks/open_problems/<MODEL_NAME>/` remain supported.
 4. **Mathematical Content**: Include a precise statement, definitions and conventions, a literature check, the actual mathematical attempt, verification, and a final status. Cite relevant sources for the definition and concepts as well as theorems, reductions, or prior work used during the attempt. Use identifiable bibliographic references and source URLs; do not invent citations.
 5. **Honest Scope**: Identify what is proved, what is known, and the first remaining gap. An unresolved attempt is welcome. Do not present a statement, generic plan, untested idea, or restatement of known results as a new solution.
+
+For catalogue-style research batches, use the importer from the repository root:
+
+```bash
+python3 scripts/import_top_problem_attempts.py --model GPT_6_Astra_Ultra /path/to/research_batch_101_103.tex
+python3 build_site.py
+```
+
+You can supply multiple batch paths in one command. Each batch must be a complete
+TeX document, including `\begin{document}` and `\end{document}`. Each problem
+section starts with the catalogue's `% problemId: ...` and
+`% source releaseRank: N; ...` comments and contains a `\section` with
+`\label{N}`. An imported section must contain nonempty `Definitions and
+mathematical statement`, `Short English statement`, `Research attempt`, and
+`Sources` subsections. Definition-only sections are skipped. Local source
+references must resolve to the section's source list.
+
+The importer validates every intended output before writing, checks the stable ID
+against the numbered root definition, and preserves the original preamble and
+entire problem section word for word. It adds a standalone document wrapper and
+`% ATTEMPT_STATUS: unresolved`; importing a batch does not establish a solution.
+Original batches and root definitions remain unchanged. The build expands
+supported catalogue macros and source links only in browser data, retaining the
+original TeX for download.
+
+An identical section already present is left alone, including when its document
+wrapper differs. A changed section never overwrites an existing attempt: pass
+`--version 2` (or another unused positive version) to create `N_v2.tex`. Conflicting
+sections in the same import fail before any files are written. After building,
+check both the problem statement and the model attempt on the detail page.
 
 ### For the MathOverflow Subset
 

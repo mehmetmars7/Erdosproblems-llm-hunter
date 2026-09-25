@@ -78,6 +78,12 @@ assert.match(quote, /\\sum\^\*/);
 assert.equal(render('*x* and **bold**.'), '<p><em>x</em> and <strong>bold</strong>.</p>');
 assert.match(render(tex`\textbf{FINAL: \textbf{UNRESOLVED}.}`), /<strong>FINAL: <strong>UNRESOLVED<\/strong>\.<\/strong>/);
 assert.equal(render(tex`\subparagraph{A nested {title}.}`), '<h6>A nested {title}.</h6>');
+assert.equal(render(tex`{\small\textit{Source \textbf{with nested formatting}, $\{x\}$.}}`),
+    '<p><em>Source <strong>with nested formatting</strong>, $\\{x\\}$.</em></p>');
+assert.equal(render(tex`\textit{\small Source note.} {\footnotesize A {nested} group.}`),
+    '<p><em>Source note.</em> A {nested} group.</p>');
+assert.equal(render(tex`{\small\textit{Literal \{braces\}, unmatched \{, and $\small x$.}}`),
+    '<p><em>Literal {braces}, unmatched {, and $\\small x$.</em></p>');
 assert.equal(render(tex`\section{\texorpdfstring{A bound for $N^{\varepsilon}$}{Plain PDF title}}`), '<h2>A bound for $N^{\\varepsilon}$</h2>');
 assert.equal(render(tex`\addcontentsline{toc}{section}{Hidden {metadata}}
 \textnormal{Visible} \textup{content}. \newblock See \S~2.`), '<p>Visible content.   See §\u00a02.</p>');

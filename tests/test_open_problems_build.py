@@ -71,7 +71,7 @@ class OpenCatalogValidationTests(unittest.TestCase):
                     build_site.load_open_problems_catalog()
 
     def test_verbatim_notebook_definitions_sources_and_research_are_separate(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / 'GPT_6_Astra_Ultra' / '1.tex').read_text()
         record = build_site.parse_numbered_problem_tex(source)
         self.assertIn('A language is a set $L', record['definitionTeX'])
         self.assertIn(r'\exists y\in\{0,1\}^{\le p(|x|)}', record['definitionTeX'])
@@ -87,6 +87,19 @@ class OpenCatalogValidationTests(unittest.TestCase):
         self.assertIn(r'\href{https://www.claymath.org/library/monographs/MPPc.pdf}{[S1]}', record['definitionTeX'])
         self.assertNotRegex(record['definitionTeX'] + record['researchTeX'],
                             r'\\(?:sref|eref|hypertarget|needspace|raggedright)\b')
+
+    def test_custom_math_macros_expand_before_subscripts_and_keep_longer_commands(self):
+        source = (build_site.OPEN_PROBLEMS_PATH / '151.tex').read_text()
+        source = source.replace(r'\subsection{Short English statement}',
+                                r'$\A_k,\E_{x},\Q,\Re,\Gamma$' + '\n'
+                                + r'\subsection{Short English statement}')
+        record = build_site.parse_numbered_problem_tex(source)
+        self.assertIn(r'{\mathbb{A}}_k,{\mathbb{E}}_{x},{\mathbb{Q}},\Re,\Gamma',
+                      record['definitionTeX'])
+
+    def test_numbered_definitions_have_no_embedded_research_attempts(self):
+        snapshot = build_site.load_open_problems_catalog()
+        self.assertTrue(all(r['researchTeX'] is None for r in snapshot['records']))
 
     def test_catalogue_quotation_with_nested_and_escaped_braces_is_omitted(self):
         source = (build_site.OPEN_PROBLEMS_PATH / '15.tex').read_text()
@@ -293,6 +306,25 @@ class OpenProblemsBuildTests(unittest.TestCase):
         exported = json.loads(js.removeprefix('var openProblems = ').split(';\n', 1)[0])
         self.assertEqual(exported, problems)
         self.assertTrue((build_site.DATA_DIR / 'mo_data.js').is_file())
+
+    def test_detail_json_matches_index_and_html_data_urls_follow_content_changes(self):
+        self.write('docs/problem.html', '<script src="data/open_problems_data.js"></script>')
+        self.write('docs/index.html', '<script src="data/open_problems_data.js?v=old"></script>')
+        snapshot = catalog()
+        snapshot['records'][0]['definitionTeX'] = 'Definition with $x^2$'
+        problems = build_site.build_open_problems_data({}, snapshot)
+        with patch.object(build_site, 'load_erdos_status', return_value={'problems': {}}):
+            build_site.generate_js_data({}, {}, problems, snapshot)
+            first = (self.root / 'docs/problem.html').read_text()
+            self.assertEqual(first, (self.root / 'docs/index.html').read_text())
+            self.assertRegex(first, r'open_problems_data\.js\?v=[0-9a-f]{16}')
+            record = json.loads((build_site.DATA_DIR / 'top_problems/1.json').read_text())
+            self.assertEqual(record, problems['problem.example'])
+            build_site.generate_js_data({}, {}, problems, snapshot)
+            self.assertEqual(first, (self.root / 'docs/problem.html').read_text())
+            problems['problem.example']['definition_tex'] = 'Revised definition'
+            build_site.generate_js_data({}, {}, problems, snapshot)
+            self.assertNotEqual(first, (self.root / 'docs/problem.html').read_text())
 
 
 class RepositoryMigrationTests(unittest.TestCase):

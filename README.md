@@ -71,12 +71,30 @@ Erdosproblems-llm-hunter/
    - Erdos problems: [erdosproblems.com/X](https://www.erdosproblems.com/) for problem X
    - Ranked open problems: Definitions and references from `attacks/open_problems/top_problems/<number>.tex`, with primary sources checked when preparing an attempt
    - MathOverflow subset: Original MathOverflow question links
-2. **LLM Attempts**: Stored as TeX files in `attacks/`. New ranked writeups use `attacks/open_problems/top_problems/<model>/<number>.tex` (or `<number>_v2.tex`). Definition-only files do not count as attempts; a root file containing a `Research attempt` subsection also supplies a research notebook, displayed as unresolved. Legacy stable-ID filenames remain supported. Each must contain actual mathematical work, references for definitions and concepts, citations for results used in the attempt, and an honest account of remaining gaps. A statement or research plan alone is not an attempt.
+2. **LLM Attempts**: Stored as TeX files in `attacks/`. Ranked writeups use `attacks/open_problems/top_problems/<model>/<number>.tex` (or `<number>_v2.tex`); the imported research batches are in `GPT_6_Astra_Ultra/`. Root numbered files provide definitions and sources separately and do not count as attempts. Legacy stable-ID filenames remain supported. Each attempt contains actual mathematical work, references for definitions and concepts, citations for results used, and an honest account of remaining gaps. A statement or research plan alone is not an attempt.
 3. **Build Process**: `build_site.py` processes the catalogs, attempts, and reviews into JSON and JavaScript data in `docs/data/`
 4. **Auto-Update**: GitHub Actions automatically rebuilds the site when:
    - Files in `attacks/`, `lists/`, or `reviews/` are modified
    - Site pages, build scripts, or tests are modified
-5. **Rendering**: MathJax renders LaTeX mathematics in the browser
+5. **Rendering**: The detail page renders the TeX definition and model attempts in the browser, with MathJax for mathematics. The build normalizes the catalogue's supported macros and source links for display while leaving the downloadable TeX unchanged. TeX document layout and preambles are omitted from the browser view.
+
+## Importing Research Batches
+
+Use the batch importer to copy each complete problem section containing a
+`Research attempt` subsection into its model folder:
+
+```bash
+python3 scripts/import_top_problem_attempts.py --model GPT_6_Astra_Ultra /path/to/research_batch_101_103.tex
+python3 build_site.py
+```
+
+The importer checks each section's `problemId` and `releaseRank` against its root
+definition. It preserves the original preamble and full section word for word,
+adds an explicit unresolved status, and leaves the source batch untouched.
+Definition-only sections are skipped. Repeating an import of the same section
+does nothing; changed work requires a new version, such as `--version 2`.
+See [the contribution guide](CONTRIBUTING.md#for-top-open-problems-attempts)
+for the required batch structure and checks.
 
 ## Local Development
 

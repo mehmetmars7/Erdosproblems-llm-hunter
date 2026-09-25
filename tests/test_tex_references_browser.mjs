@@ -155,7 +155,64 @@ See \\ref{shared}.
     assert.deepEqual(result.duplicateIDs, []);
     assert.equal(result.links.filter(link => link.sourceAttempt === 3).length, 1, 'The untrusted label must be exercised as a reference.');
     assert.deepEqual(result.security, { injectedElements: 0, executed: false, textPreserved: true });
-    console.log('Browser reference isolation, equation captions, copied statements, expansion and escaping passed.');
+
+    const rendered = await evaluate(`(() => {
+        document.body.innerHTML = '<main><article class="attempt"></article></main>';
+        const host = document.querySelector('main');
+        const attempt = host.querySelector('.attempt');
+        attempt.innerHTML = formatTeX(String.raw\`
+\\begin{lemma}[An unrelated enclosing heading]
+\\begin{equation}x=1\\label{single}\\end{equation}
+\\end{lemma}
+\\[x=2\\label{unnumbered}\\]
+\\begin{align}a=b\\label{row-one}\\\\c=d\\label{row-two}\\end{align}
+\\begin{lemma}[Local rank label]\\label{13}Local result.\\end{lemma}
+References: \\eqref{single}, \\ref{single}, \\eqref{unnumbered},
+\\eqref{row-one}, \\eqref{row-two}, \\ref{12}, \\ref{13}, \\ref{404}, \\eqref{12}.
+\`);
+        const catalog = {
+            'problem.np-vs-ppoly': { id: 'problem.np-vs-ppoly', rank: 12, title: 'NP versus P/poly' },
+            'problem.np-versus-conp-problem': { id: 'problem.np-versus-conp-problem', rank: 13, title: 'NP versus coNP' }
+        };
+        ProblemHunting.initTeXReferences(host, catalog);
+        const before = attempt.querySelector('[data-tex-reference="single"]').textContent;
+        // Match the accessible tag structure emitted by MathJax. The chosen
+        // captions deliberately differ from label order and theorem headings.
+        const addDisplay = (key, tags) => {
+            const display = document.createElement('mjx-container');
+            display.setAttribute('display', 'true');
+            display.innerHTML = '<mjx-assistive-mml><math><mtable>' + tags.map(tag =>
+                '<mlabeledtr><mtd><mtext>' + tag + '</mtext></mtd><mtd><mi>x</mi></mtd></mlabeledtr>'
+            ).join('') + '</mtable></math></mjx-assistive-mml>';
+            attempt.querySelector('[data-tex-label="' + key + '"]').after(display);
+        };
+        addDisplay('single', ['(17)']);
+        addDisplay('unnumbered', []);
+        addDisplay('row-two', ['(22)', '(23)']);
+        ProblemHunting.initTeXReferences(host, catalog);
+        const links = [...attempt.querySelectorAll('.tex-reference')].map(link => ({
+            key: link.dataset.texReference, kind: link.dataset.texReferenceKind,
+            caption: link.textContent, href: link.getAttribute('href')
+        }));
+        ProblemHunting.initTeXReferences(host);
+        const legacyLink = attempt.querySelector('[data-tex-reference="12"]').getAttribute('href');
+        return { before, links, legacyLink };
+    })()`);
+    const reference = (key, kind = 'eqref') => rendered.links.find(link => link.key === key && link.kind === kind);
+    assert.equal(rendered.before, '(single)', 'A caption must retain its key until a tag is rendered.');
+    assert.equal(reference('single').caption, '(17)');
+    assert.equal(reference('single', 'ref').caption, '17');
+    for (const key of ['unnumbered', 'row-one', 'row-two']) {
+        assert.equal(reference(key).caption, `(${key})`, 'Unnumbered or ambiguous rows must not receive invented tags.');
+        assert.match(reference(key).href, /^#tex-label-/, 'The source label must remain reachable.');
+    }
+    assert.equal(reference('12', 'ref').href, 'problem.html?type=open_problems&id=problem.np-vs-ppoly');
+    assert.equal(reference('13', 'ref').caption, 'Local rank label');
+    assert.match(reference('13', 'ref').href, /^#tex-label-/);
+    assert.equal(reference('404', 'ref').href, null);
+    assert.equal(reference('12').href, null, 'Equation references must not become cross-problem links.');
+    assert.equal(rendered.legacyLink, null, 'Legacy pages must not resolve numeric keys through ranked problems.');
+    console.log('Browser reference isolation, rendered equation captions, ranked links, copied statements, expansion and escaping passed.');
 } finally {
     await call('Page.close').catch(() => {});
     socket.close();

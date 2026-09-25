@@ -9,6 +9,7 @@ import os
 import json
 import csv
 import html
+import hashlib
 import re
 import subprocess
 from datetime import datetime
@@ -420,7 +421,7 @@ def parse_numbered_problem_tex(content):
             text = replace_tex_command(text, command, 2, source_link)
         text = replace_tex_command(text, 'needspace', 1, lambda space: '')
         text = re.sub(r'\\raggedright\b', '', text)
-        return re.sub(r'\\(' + '|'.join(macros) + r')\b',
+        return re.sub(r'\\(' + '|'.join(macros) + r')(?![A-Za-z])',
                       lambda match: macros[match[1]], text).strip()
 
     sections['Sources'] = sources_tex
@@ -430,8 +431,11 @@ def parse_numbered_problem_tex(content):
     if research:
         research = (r'\subsection{Research attempt}' + '\n' + display(research)
                     + '\n\n' + r'\subsection{Sources}' + '\n' + display(sources_tex))
+    title = re.search(r'^[ \t]*\\section\*?\{[^\n]+', body, re.MULTILINE)
+    document = ((title[0].strip() + '\n\n') if title else '') + '\n\n'.join(
+        r'\subsection{' + name + '}\n' + display(text) for name, text in sections.items())
     return {'definitionTeX': definition, 'exactTarget': display(sections['Short English statement']),
-            'sources': sources, 'researchTeX': research}
+            'sources': sources, 'researchTeX': research, 'documentTeX': document}
 
 
 def load_open_problems_catalog():
@@ -762,8 +766,14 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                         f'Unknown ranked open problem attempt: {tex_file}. '
                         'Use a numbered file in top_problems/<model>/, or a stable problemId in <model>/.'
                     )
-                parsed = parse_attack(read_tex_file(tex_file), model_dir.name.replace('_', ' '),
-                                      get_file_date(tex_file))
+                content = read_tex_file(tex_file)
+                raw = content
+                if numbered and r'\subsection{Definitions and mathematical statement}' in content:
+                    raw = parse_numbered_problem_tex(content)['documentTeX']
+                parsed = parse_attack(raw, model_dir.name.replace('_', ' '), get_file_date(tex_file))
+                declared_status = re.search(r'^% ATTEMPT_STATUS: (solved|unresolved)\s*$', content, re.MULTILINE)
+                if declared_status:
+                    parsed['status'] = declared_status[1]
                 parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
                 parsed['version'] = int(match.group('ver') or 1)
                 problems[problem_id]['attacks'].append(parsed)
@@ -855,6 +865,25 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
         }
         f.write(f'var openProblemsCatalog = {json.dumps(catalog_info, indent=2)};\n')
         f.write('window.OPEN_PROBLEMS_CATALOG = openProblemsCatalog;\n')
+
+    # Detail pages load a small current record independently of cached index
+    # data. Both formats are generated from the same TeX source in this build.
+    detail_dir = DATA_DIR / 'top_problems'
+    detail_dir.mkdir(exist_ok=True)
+    for problem in open_problems.values():
+        if problem.get('collection') == 'ranked':
+            (detail_dir / f"{problem['rank']}.json").write_text(
+                json.dumps(problem, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+    # Changing the generated content changes the URL, so a new page cannot
+    # accidentally pair with a pre-TeX copy of the index in the browser cache.
+    data_version = hashlib.sha256((DATA_DIR / 'open_problems_data.js').read_bytes()).hexdigest()[:16]
+    for page in DATA_DIR.parent.glob('*.html'):
+        original = page.read_text(encoding='utf-8')
+        versioned = re.sub(r'(?<=src=")data/open_problems_data\.js(?:\?v=[a-zA-Z0-9_-]+)?(?=")',
+                           f'data/open_problems_data.js?v={data_version}', original)
+        if versioned != original:
+            page.write_text(versioned, encoding='utf-8')
 
     # Generate summary statistics
     stats = {

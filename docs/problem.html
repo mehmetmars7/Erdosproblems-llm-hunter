@@ -156,14 +156,14 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js"></script>
+    <script src="data/open_problems_data.js?v=331a6d6e16c2ca91"></script>
     <script src="app.js"></script>
     <script src="attempt-previews.js"></script>
-    <script src="tex-references.js"></script>
+    <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
     <script src="catalog-math.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             const params = new URLSearchParams(window.location.search);
             let type = params.get('type');
             let id = params.get('id');
@@ -215,6 +215,30 @@
             if (!problem || !Object.prototype.hasOwnProperty.call(allProblems, id)) {
                 document.getElementById('problem-meta').innerHTML = '<p>Problem not found</p>';
                 return;
+            }
+
+            if (type === 'open_problems' && Number.isInteger(problem.rank) && problem.rank > 0) {
+                // The catalog script can outlive a deployment in browser caches.
+                // Load the definition and its attempts together from the current build.
+                document.getElementById('page-title').textContent = problem.title;
+                document.getElementById('problem-links').innerHTML = '<p>Loading TeX definition…</p>';
+                try {
+                    const options = { cache: 'no-store' };
+                    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+                        options.signal = AbortSignal.timeout(10000);
+                    }
+                    const response = await fetch(`data/top_problems/${problem.rank}.json`, options);
+                    if (response.ok) {
+                        const current = await response.json();
+                        if (current && current.id === id && current.rank === problem.rank &&
+                                typeof current.definition_tex === 'string' && current.definition_tex.trim() &&
+                                Array.isArray(current.attacks)) {
+                            problem = current;
+                        }
+                    }
+                } catch (error) {
+                    // A valid embedded record still works offline or during an outage.
+                }
             }
 
             const reviewIssueUrl = getReviewIssueUrl(type, id);
@@ -371,7 +395,7 @@
                     const sourceModel = escapeHtml((provenance.source_model || '').replace(/_/g, ' '));
                     const title = isStatement ? 'Problem statement: awaiting an attempt'
                         : isReused ? `Reused writeup: ${sourceModel}`
-                        : `Attempt ${idx + 1}: ${escapeHtml(attack.model)}`;
+                        : `Attempt ${idx + 1}: ${escapeHtml((attack.model || '').replace(/_/g, ' '))}`;
                     let provenanceNote = '';
                     if (isReused) {
                         const originalUrl = repoBaseUrl + provenance.primary_source.split('/').map(encodeURIComponent).join('/');
@@ -409,7 +433,7 @@
                     `;
                 }).join('');
                 window.ProblemHunting.initAttemptPreviews(attemptsDiv, type === 'open_problems' ? null : linksDiv);
-                window.ProblemHunting.initTeXReferences(attemptsDiv);
+                window.ProblemHunting.initTeXReferences(attemptsDiv, type === 'open_problems' ? allProblems : null);
             } else if (type === 'erdos' || type === 'open_problems') {
                 attemptsDiv.innerHTML = '<p>No LLM attempts yet.</p>';
             } else {
@@ -438,7 +462,8 @@
             if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
                 // Clear any previous math and re-typeset
                 MathJax.typesetPromise().then(() => {
-                    // Typeset complete
+                    // Equation captions must come from the rendered tags.
+                    window.ProblemHunting.initTeXReferences(attemptsDiv, type === 'open_problems' ? allProblems : null);
                 }).catch((err) => {
                     console.warn('MathJax typeset error:', err);
                 });
@@ -749,6 +774,12 @@
             text = text.replace(/\\\$/g, () => protectHTML('\\$'));
             // A literal ampersand inside a table cell must not become a column.
             text = text.replace(/\\&/g, () => protectHTML('&amp;'));
+            // Literal prose braces must not be mistaken for formatting groups.
+            text = text.replace(/\\([{}])/g, (match, brace) => protectHTML(brace));
+            // Discard a sizing group's wrapper, including nested formatting,
+            // without stripping an enclosing command's required argument.
+            text = text.replace(/\{\s*\\(?:tiny|scriptsize|footnotesize|small|normalsize|large|Large|LARGE|huge|Huge)(?![A-Za-z])\s*/g,
+                (match, offset, input) => /\\[A-Za-z]+\*?$/.test(input.slice(0, offset)) ? '{' : '\\textnormal{');
             // A table row ending "\\ " is a row break followed by whitespace,
             // not a prose control space. Keep both slashes for the table parser.
             text = text.replace(/\\begin\{tabular\}[\s\S]*?\\end\{tabular\}/g,
