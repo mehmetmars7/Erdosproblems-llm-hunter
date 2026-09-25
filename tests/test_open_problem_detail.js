@@ -78,7 +78,9 @@ assert.match(page.element('problem-links').innerHTML, /\$n &lt; 10\$/);
 assert.match(page.element('problem-links').innerHTML, /Definition &lt;source&gt;/);
 assert.doesNotMatch(page.element('problem-links').innerHTML, /Catalog edition:|2026-09-22/);
 assert.match(page.element('problem-links').innerHTML, /x=1&amp;y=2/);
-assert.match(page.element('problem-links').innerHTML, /View TeX definition \(1\.tex\)/);
+assert.match(page.element('problem-statement-source').innerHTML, /View TeX definition \(1\.tex\)/);
+assert.match(page.element('problem-statement-source').innerHTML, />source<\/a>/);
+assert.doesNotMatch(page.element('problem-links').innerHTML, /View TeX definition/);
 assert.equal(page.element('prev-problem').style.visibility, 'hidden');
 assert.equal(page.element('next-problem').href, 'problem.html?type=open_problems&id=problem.a-second');
 assert.match(page.element('attempts-container').innerHTML, /No LLM attempts yet/);
@@ -129,8 +131,8 @@ assert.match(statement, /class="problem-statement-text tex-content"/);
 assert.match(statement, /\\operatorname\{CH\}/);
 assert.match(statement, /\\mathbb\{Q\}\}_\\ell/);
 assert.match(statement, /\\longrightarrow H\^\{2i\}/);
-assert.match(statement, /View TeX definition/);
-assert.match(statement, /top_problems\/15\.tex/);
+assert.match(page.element('problem-statement-source').innerHTML, /top_problems\/15\.tex/);
+assert.doesNotMatch(statement, /View TeX definition/);
 assert.match(statement, /TateConjecture.html/);
 assert.doesNotMatch(statement, /fallback must not|cataloguescope|X_bar|H\^\(2i\)|Q_l/);
 assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:|Catalog status:|Rank:/);
@@ -139,7 +141,7 @@ const missingDefinition = { ...records['problem.z-first'], definition_tex: null,
     exact_target: 'Stale ProofAtlas statement must not be displayed.' };
 page = await render('?type=open_problems&id=problem.z-first', { 'problem.z-first': missingDefinition });
 assert.match(page.element('problem-links').innerHTML, /TeX definition could not be loaded/);
-assert.match(page.element('problem-links').innerHTML, /top_problems\/1\.tex/);
+assert.match(page.element('problem-statement-source').innerHTML, /top_problems\/1\.tex/);
 assert.doesNotMatch(page.element('problem-links').innerHTML, /Stale ProofAtlas/);
 
 // A cached index can lack definitions or retain an older attempt list. The
@@ -191,7 +193,8 @@ page = await render('?type=open_problems&id=problem.p-versus-np', { [pnp.id]: pn
 const pnpStatement = page.element('problem-links').innerHTML;
 assert.match(pnpStatement, /A language is a set/);
 assert.match(pnpStatement, /\\exists y\\in/);
-assert.match(pnpStatement, /View TeX definition \(1\.tex\)/);
+assert.match(page.element('problem-statement-source').innerHTML, /View TeX definition \(1\.tex\)/);
+assert.doesNotMatch(pnpStatement, /View TeX definition/);
 assert.match(pnpStatement, /claymath\.org\/library\/monographs\/MPPc\.pdf/);
 assert.doesNotMatch(pnpStatement, /cataloguescope|hypertarget|\\[se]ref|Research attempt|When a yes-or-no problem/);
 const notebook = page.element('attempts-container').innerHTML;
