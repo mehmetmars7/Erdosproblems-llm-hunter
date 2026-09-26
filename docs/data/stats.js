@@ -10,8 +10,7 @@ var siteStats = {
       "codex 5.2 extra high",
       "gpt 5.2",
       "gpt pro 5.2",
-      "gpt pro 5.4",
-      "gpt pro 5.6"
+      "gpt pro 5.4"
     ]
   },
   "mo": {
