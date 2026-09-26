@@ -69,6 +69,40 @@ are incorrect for the original open problem.
             with self.subTest(content=content):
                 self.assertEqual(parse_attack(content, 'test')['status'], expected)
 
+    def test_partial_statuses_and_formalizations_are_unresolved(self):
+        for content in [
+            '6) FINAL STATUS: PARTIAL\nA checked reduction; the general proof is missing.',
+            r'\section*{Final status}' + '\n' + r'\textbf{PARTIAL}.',
+            r'\textbf{Status: Partial (conditional formalization)}',
+            'PARTIAL formalization of the original problem.',
+            r'\noindent\textbf{LABEL: PARTIAL}',
+        ]:
+            with self.subTest(content=content):
+                self.assertEqual(parse_attack(content, 'test')['status'], 'unresolved')
+
+    def test_partial_mathematical_prose_does_not_override_full_solution(self):
+        for content in [
+            'The partial results of earlier work are strengthened here.\nFULL SOLUTION',
+            'Partial sums converge.\nFULL SOLUTION',
+            r'\[\partial f / \partial x = 0\]' + '\nFULL SOLUTION',
+        ]:
+            with self.subTest(content=content):
+                self.assertEqual(parse_attack(content, 'test')['status'], 'solved')
+
+    def test_status_marker_controls_short_descriptions_without_status_prose(self):
+        for value, expected in [('unresolved', 'unresolved'), ('PARTIAL', 'unresolved'),
+                                ('solved', 'solved')]:
+            content = (f'% ATTEMPT_STATUS: {value}\n'
+                       + r'\href{https://github.com/example/proof/blob/commit/Main.lean}{Lean source}')
+            with self.subTest(value=value):
+                self.assertEqual(parse_attack(content, 'test')['status'], expected)
+
+    def test_invalid_and_conflicting_status_markers_fail_explicitly(self):
+        for content in ['% ATTEMPT_STATUS: unknown',
+                        '% ATTEMPT_STATUS: solved\n% ATTEMPT_STATUS: partial']:
+            with self.subTest(content=content), self.assertRaisesRegex(ValueError, 'ATTEMPT_STATUS'):
+                parse_attack(content, 'test')
+
 
 if __name__ == '__main__':
     unittest.main()

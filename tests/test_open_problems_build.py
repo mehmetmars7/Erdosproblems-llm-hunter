@@ -209,6 +209,30 @@ class OpenProblemsBuildTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unknown ranked'):
             build_site.build_open_problems_data({}, catalog())
 
+    def test_numbered_attempt_keeps_declared_partial_status_after_display_conversion(self):
+        content = r'''% ATTEMPT_STATUS: partial
+\begin{document}
+\section{Example formalization}
+\subsection{Definitions and mathematical statement}
+An exact statement.
+\subsection{Short English statement}
+Does the statement hold?
+\subsection{Research attempt}
+A checked restricted case, with the general case missing.
+\subsection{Sources}
+\begin{itemize}
+\item[S1] Complete Lean source. \url{https://example.org/Main.lean}
+\end{itemize}
+\end{document}
+'''
+        self.write('attacks/open_problems/top_problems/Model/1.tex', content)
+        problem = build_site.build_open_problems_data({}, catalog())['problem.example']
+        attack = problem['attacks'][0]
+        self.assertNotIn('ATTEMPT_STATUS', attack['raw'])
+        self.assertEqual(attack['status'], 'unresolved')
+        self.assertEqual(problem['llm_status'], 'unresolved')
+        self.assertEqual(problem['status'], 'open_disputed_claim')
+
     def test_research_from_numbered_tex_is_shown_as_an_unresolved_notebook(self):
         snapshot = catalog()
         snapshot['records'][0].update({

@@ -81,6 +81,12 @@ assert.equal(api.getOpenProblemClaim(records['problem.beta']), 'solved');
 assert.equal(api.getOpenProblemStatusLabel(records['problem.beta']), 'open with solved subcases');
 assert.equal(api.getOpenProblemClaim({ status: 'solved', attacks: [attempt] }), 'unresolved');
 assert.equal(api.getOpenProblemClaim({ attacks: [{ model: 'unknown' }] }), 'not stated');
+assert.equal(api.getOpenProblemClaim({ attacks: [{ status: 'partial' }] }), 'unresolved');
+assert.equal(api.getOpenProblemClaim({ attacks: [{ status: 'solved' }, { status: 'partial' }] }), 'unresolved');
+assert.equal(api.getAttemptClaim({ status: ' PARTIAL ', raw: 'A formalized special case.' }), 'unresolved');
+assert.equal(api.getAttemptClaim({ raw: 'FINAL: PARTIAL.' }), 'unresolved');
+assert.equal(api.getOverallClaim([{ entry_kind: 'statement_only', status: 'solved' }]), 'none');
+assert.equal(api.getOverallClaim([{ status: 'solved' }, { model: 'unknown' }]), 'not stated');
 assert.equal(api.getOpenProblemHref(records['mo:23']), 'problem.html?type=mo&id=23');
 assert.equal(api.getOpenProblemHref(records['mo:40']), 'problem.html?type=mo&id=40');
 assert.equal(api.getOpenProblemHref(records['problem.alpha']), 'problem.html?type=open_problems&id=problem.alpha');
@@ -157,6 +163,12 @@ for (const filename of ['index.html', 'open_problems.html', 'mo.html', 'erdos.ht
     const html = fs.readFileSync(path.join(root, 'docs', filename), 'utf8');
     assert.match(html, /href="open_problems.html"[^>]*>Top Open Problems<\/a>/);
     for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) new vm.Script(match[1]);
+    const config = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)]
+        .map(match => match[1]).find(script => script.includes('window.MathJax ='));
+    const mathContext = vm.createContext({ window: {} });
+    vm.runInContext(config, mathContext);
+    assert.ok(mathContext.window.MathJax.loader.load.includes('ui/safe'), filename);
+    assert.equal(mathContext.window.MathJax.options.safeOptions.allow.URLs, 'none', filename);
     if (filename !== 'erdos.html') {
         assert.match(html, /src="data\/open_problems_data\.js(?:\?v=[0-9a-f]{16})?"/);
         assert.doesNotMatch(html, /src="data\/mo_data.js"/);

@@ -28,11 +28,15 @@ const records = {
     'mo:42': { id: 'mo:42', collection: 'mo', rank: null }
 };
 
-async function render(query, open = records, fetchRecord = async () => ({ ok: false, status: 404 })) {
+const erdosRecords = {
+    '1': { number: '1', status: 'open', llm_status: 'unresolved', problem_url: 'https://www.erdosproblems.com/1', attacks: [] }
+};
+
+async function render(query, open = records, fetchRecord = async () => ({ ok: false, status: 404 }), erdos = erdosRecords) {
     const elements = new Map();
     function element(id) {
         if (!elements.has(id)) elements.set(id, {
-            innerHTML: '', textContent: '', style: {}, hidden: false, children: [],
+            innerHTML: '', textContent: '', style: {}, hidden: id === 'contribute-cta', children: [],
             appendChild(child) { this.children.push(child); },
             querySelector(selector) { return element(`${id} ${selector}`); }
         });
@@ -56,7 +60,7 @@ async function render(query, open = records, fetchRecord = async () => ({ ok: fa
         window: { location: { search: query }, OPEN_PROBLEMS_DATA: open,
             OPEN_PROBLEMS_CATALOG: { edition_date: '2026-09-22' } },
         moProblems: { '42': { id: '42', title: 'Legacy question', score: 5, link: 'https://mathoverflow.net/questions/42', attacks: [] } },
-        erdosProblems: { '1': { number: '1', status: 'open', llm_status: 'unresolved', problem_url: 'https://www.erdosproblems.com/1', attacks: [] } }
+        erdosProblems: erdos
     });
     vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
     vm.runInContext(fs.readFileSync(path.join(root, 'docs/catalog-math.js'), 'utf8'), context);
@@ -105,9 +109,50 @@ page = await render('?type=erdos&id=1');
 assert.equal(page.element('page-title').textContent, 'Erdos Problem #1');
 assert.equal(page.element('.giscus').children[0].dataset.term, 'Erdos-1');
 assert.equal(page.requests.length, 0);
+assert.equal(page.element('contribute-cta').hidden, false);
+
+// A partial Lean formalization is an unresolved claim, and its external code
+// link is displayed as a link rather than embedded or executed.
+const leanAttempt = { model: 'Lean contributor', status: 'partial',
+    file_path: 'attacks/open_problems/erdos/Lean_contributor/1.tex',
+    raw: String.raw`\section{Lean formalization}This proves a special case only.
+\href{https://github.com/example/proofs/blob/0123456789abcdef/Main.lean}{Lean source}
+\url{https://live.lean-lang.org/#codez=ExamplePayload}` };
+page = await render('?type=erdos&id=1', records, undefined,
+    { '1': { ...erdosRecords['1'], llm_status: null, attacks: [leanAttempt] } });
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> unresolved/);
+assert.match(page.element('attempts-container').innerHTML, /class="status-text">unresolved</);
+assert.match(page.element('attempts-container').innerHTML,
+    /href="https:\/\/github.com\/example\/proofs\/blob\/0123456789abcdef\/Main\.lean" target="_blank" rel="noopener noreferrer">Lean source<\/a>/);
+assert.match(page.element('attempts-container').innerHTML, /href="https:\/\/live\.lean-lang\.org\/#codez=ExamplePayload"/);
+assert.doesNotMatch(page.element('attempts-container').innerHTML, /<iframe|<script|class="status-text">solved/);
+assert.equal(page.element('contribute-cta').hidden, false);
+assert.equal(page.requests.length, 0);
+
+// Invitations follow the problem's status even when the LLM claim disagrees.
+for (const status of ['open', 'open (Lean)', 'proved', 'disproved', 'independent', null]) {
+    const isOpen = status === 'open' || status === 'open (Lean)';
+    const erdos = { '1': { ...erdosRecords['1'], status, llm_status: isOpen ? 'solved' : 'unresolved' } };
+    page = await render('?type=erdos&id=1', records, undefined, erdos);
+    assert.equal(page.element('contribute-cta').hidden, !isOpen, `Erdos status: ${status}`);
+}
+for (const status of ['open', 'open_with_solved_subcases', 'open_disputed_claim', 'solved', 'unreviewed', 'reviewed_hold', null]) {
+    const isOpen = ['open', 'open_with_solved_subcases', 'open_disputed_claim'].includes(status);
+    const problem = { ...records['problem.z-first'], status, llm_status: isOpen ? 'solved' : 'unresolved' };
+    page = await render('?type=open_problems&id=problem.z-first', { [problem.id]: problem });
+    assert.equal(page.element('contribute-cta').hidden, !isOpen, `Ranked status: ${status}`);
+}
+// A current detail record can resolve a problem still marked open in a cached index.
+page = await render('?type=open_problems&id=problem.z-first', records,
+    async () => ({ ok: true, json: async () => ({ ...records['problem.z-first'], status: 'solved' }) }));
+assert.equal(page.element('contribute-cta').hidden, true);
+page = await render('?type=mo&id=42');
+assert.equal(page.element('contribute-cta').hidden, true);
 
 for (const id of ['problem.missing', '__proto__', 'constructor']) {
-    assert.match((await render(`?type=open_problems&id=${id}`)).element('problem-meta').innerHTML, /Problem not found/);
+    page = await render(`?type=open_problems&id=${id}`);
+    assert.match(page.element('problem-meta').innerHTML, /Problem not found/);
+    assert.equal(page.element('contribute-cta').hidden, true);
 }
 assert.match((await render('?type=open_problems&id=problem.z-first', null)).element('problem-meta').innerHTML, /Error loading Top Open Problems data/);
 const unsafeSource = { ...records['problem.z-first'], sources: [

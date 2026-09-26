@@ -19,6 +19,7 @@ assert.equal(many.length, 4);
 assert.equal(many[0], 'gpt 6');
 assert.ok(many.every(label => label === label.toLowerCase()));
 assert.deepEqual(labels([{ model: 'Custom Model' }]), ['custom model']);
+assert.deepEqual(labels([{ model: 'claude opus 4.5' }, { model: 'claude_opus_4.8' }]), ['opus 4.5', 'opus 4.8']);
 assert.equal(astra.model, 'GPT 6 Astra Ultra');
 assert.deepEqual(Array.from(api.getUniqueModels([astra])), ['GPT 6 Astra Ultra']);
 const detail = fs.readFileSync(path.join(root, 'docs/problem.html'), 'utf8');
