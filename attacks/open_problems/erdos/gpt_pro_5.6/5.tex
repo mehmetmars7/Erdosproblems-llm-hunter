@@ -1,0 +1,2105 @@
+\section*{Erd\H{o}s Problem 5}
+
+\subsection*{Submission metadata}
+
+\begin{itemize}
+\item \textbf{Model:} GPT Pro 5.6 (model slug: gpt-5-6-pro).
+\item \textbf{Source conversations:} initial response at \url{https://chatgpt.com/share/6a5932bb-bfb0-83ea-a0ea-e3eaf074fda1}; first continuation at \url{https://chatgpt.com/share/6a5ad95a-1b2c-83ea-8e1b-61acf662e80c}; latest continuation at \url{https://chatgpt.com/share/6a5e63d0-10dc-83ea-a2dc-1ce3a127badc}.
+\item \textbf{Prompt strategy:} research-mathematician and adversarial proof-checker mode, with web research, computation, a Lean-oriented formalization request, and a follow-up request to theorize a potential solution.
+\item \textbf{Claimed status:} UNRESOLVED.
+\end{itemize}
+
+\noindent\textbf{Verification notice.}
+This LLM output is not a claim that Erd\H{o}s Problem 5 has been solved. The source responses are reproduced below, converted from Markdown to repository-style LaTeX. Share-only citation markers have been replaced by durable source references where available. Artifacts from the latest continuation are mirrored as repository files and accompanied by a reproducibility report; their checks validate the response's stated finite computations and elementary reductions, not the missing analytic estimate or the open conjecture. Older \emph{sandbox:/mnt/data/...} paths remain archival identifiers only.
+
+\medskip
+\medskip
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+Let \(p_n\) be the \(n\)-th prime and
+
+\[
+g_n:=p_{n+1}-p_n.
+\]
+
+The problem asks whether, for every \(C\ge 0\), there is a strictly increasing sequence \(n_i\ge2\) such that
+
+\[
+\frac{g_{n_i}}{\log n_i}\longrightarrow C.
+\]
+
+The problem remains open. The currently known machinery can force \textbf{some pair} among several prime-containing clusters, but not a prescribed pair whose separation is \(C\log x\). Merikoski’s implementation gives the weighted prime-pair constant \(3.99\); a constant below \(2\) in that framework would settle the problem. (\textit{Normalized Prime Gaps and the Status of Erd\H{o}s Problem Five}, lines 5--28) (\textit{Normalized Prime Gaps and the Status of Erd\H{o}s Problem Five}, lines 300--321)
+
+What follows is not a completed proof. It is a concrete potential solution that reduces the conjecture to a new, precisely stated correlation theorem for bounded multiplicative functions.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+Merikoski proved that at least one third of the nonnegative real line consists of normalized-gap limit points and that the limit-point set is syndetic. His improvement comes from a Chen-sieve upper bound for a weighted prime-pair sum. (\url{https://arxiv.org/abs/1811.03008})
+
+Three later developments make a different attack plausible:
+
+\begin{itemize}
+\item Ford and Maynard developed a general prime-producing-sieve framework and proved that substantial Type-II information is unavoidable for nontrivial prime lower bounds. (\url{https://arxiv.org/abs/2407.14368})
+\item Pascadi obtained distribution of primes and smooth numbers to triply-well-factorable moduli up to \(x^{5/8-o(1)}\), including refined upper bounds for twin-prime-type sums. (\url{https://arxiv.org/abs/2505.00653})
+\item Runbo Li exhibited a prime-producing-sieve problem where a Type-II interval of width only \(1/29\) suffices. This does not apply directly here, but it shows that a comparatively thin, correctly located Type-II region can be decisive. (\url{https://arxiv.org/abs/2504.13195})
+\end{itemize}
+
+There are also logarithmically averaged correlation theorems for bounded multiplicative functions. Teräväinen, for example, proves decorrelation or factorization under suitable nonpretentiousness and arithmetic-progression hypotheses. The estimates presently available are not at the sparse, heavily divisor-weighted, relative-error scale needed below. (\url{https://arxiv.org/abs/1710.01195})
+
+Finally, the conditional picture is unambiguous: a sufficiently uniform Hardy–Littlewood conjecture gives Poisson counts in intervals of length \(\lambda\log x\) and therefore exponentially distributed normalized prime gaps. (\url{https://arxiv.org/abs/2605.23014})
+
+\subsection*{3) ATTACK PLAN}
+
+I considered three routes.
+
+\begin{enumerate}
+\item \textbf{Optimize Merikoski’s existing Chen/Buchstab coefficient.}
+The previous analysis disproved this route throughout its published parameter range: the resulting coefficient cannot cross \(2\).
+
+\item \textbf{Prove logarithmic-scale Hardy–Littlewood directly.}
+This would solve the problem, but it asks for essentially the complete local prime process.
+
+\item \textbf{Selected route: a two-block rough-Fourier sieve.}
+Use the tolerance inherent in the definition of a limit point. Instead of forcing one fixed pair of shifts, retain two whole blocks of shifts whose cross-differences all equal
+\[
+(C+O(\varepsilon))\log N.
+\]
+Then replace the prime indicator by an exact finite Fourier filter on rough integers. This turns the required aggregate prime-pair lower bound into nine block-averaged correlations of bounded multiplicative functions.
+\end{enumerate}
+
+The third route attacks parity without demanding the fixed-pair estimate that directly resembles twin primes.
+
+\subsection*{4) WORK}
+
+\subsubsection*{1. A rigorous two-block reduction}
+
+Fix \(C>0\). The case \(C=0\) is already known from GPY.
+
+\paragraph{Two-block criterion}
+
+Suppose that for every \(0<\eta<C/4\) and every \(N_0\), there exist:
+
+\begin{itemize}
+\item an integer \(N\ge N_0\);
+\item finite sets of nonnegative integer shifts \(H^-,H^+\);
+\item a finite set \(\mathcal A_N\subseteq[N,2N]\cap\mathbb Z\);
+\item nonnegative weights \(w_N(n)\), \(n\in\mathcal A_N\);
+\end{itemize}
+
+such that
+
+\[
+H^-\subseteq[0,\eta\log N],
+\tag{1}
+\]
+
+\[
+H^+\subseteq[(C-\eta)\log N,(C+\eta)\log N],
+\tag{2}
+\]
+
+and the following two conditions hold.
+
+First, for every \(n\in\mathcal A_N\) with \(w_N(n)>0\), every integer shift
+
+\[
+t\in[0,(C+\eta)\log N]\setminus(H^-\cup H^+)
+\]
+
+makes \(n+t\) composite.
+
+Second, defining
+
+\[
+X_-(n):=\sum_{h\in H^-}1_{\mathbb P}(n+h),
+\qquad
+X_+(n):=\sum_{h\in H^+}1_{\mathbb P}(n+h),
+\]
+
+one has
+
+\[
+\boxed{
+\sum_{n\in\mathcal A_N}w_N(n)X_-(n)X_+(n)>0.
+}
+\tag{3}
+\]
+
+Then \(C\) is a finite limit point of normalized consecutive prime gaps.
+
+\paragraph{Proof}
+
+Every summand in (3) is nonnegative. Consequently, there is some \(n\in\mathcal A_N\) such that
+
+\[
+w_N(n)>0,\qquad X_-(n)>0,\qquad X_+(n)>0.
+\]
+
+Define
+
+\[
+a:=\max\{h\in H^-:n+h\text{ is prime}\}
+\]
+
+and
+
+\[
+b:=\min\{h\in H^+:n+h\text{ is prime}\}.
+\]
+
+These sets are nonempty by \(X_-(n),X_+(n)>0\).
+
+By (1) and (2),
+
+\[
+a\le\eta\log N,
+\qquad
+b\ge(C-\eta)\log N.
+\]
+
+Because \(\eta<C/4\),
+
+\[
+b-a\ge(C-2\eta)\log N>0.
+\]
+
+Let
+
+\[
+p:=n+a,\qquad q:=n+b.
+\]
+
+We claim that \(p\) and \(q\) are consecutive primes. Let \(t\) be an integer satisfying
+
+\[
+a<t<b.
+\]
+
+There are three possibilities.
+
+If \(t\notin H^-\cup H^+\), then \(n+t\) is composite by the covering condition.
+
+If \(t\in H^-\), then \(t>a\), and the maximality of \(a\) implies that \(n+t\) is not prime.
+
+If \(t\in H^+\), then \(t<b\), and the minimality of \(b\) implies that \(n+t\) is not prime.
+
+Thus no prime lies strictly between \(p\) and \(q\). Hence \(q\) is the next prime after \(p\).
+
+The gap satisfies
+
+\[
+(C-2\eta)\log N
+\le q-p
+\le(C+\eta)\log N.
+\tag{4}
+\]
+
+Moreover,
+
+\[
+N\le p\le2N+\eta\log N,
+\]
+
+so
+
+\[
+\frac{\log p}{\log N}\longrightarrow1
+\]
+
+as \(N\to\infty\). Dividing (4) by \(\log p\) gives
+
+\[
+C-2\eta+o(1)
+\le
+\frac{q-p}{\log p}
+\le
+C+\eta+o(1).
+\]
+
+Choose \(\eta_j\downarrow0\) and choose the corresponding \(N_j\) recursively so that \(N_j>4N_{j-1}\). The resulting left endpoints \(p_j\) are strictly increasing and
+
+\[
+\frac{p_j^+-p_j}{\log p_j}\longrightarrow C,
+\]
+
+where \(p_j^+\) is the prime immediately following \(p_j\).
+
+Finally, the prime number theorem gives
+
+\[
+\frac{\log p_n}{\log n}\longrightarrow1,
+\]
+
+so normalization by \(\log p_n\) and by \(\log n\) has the same finite limit points. (\textit{Normalized Prime Gaps and the Status of Erd\H{o}s Problem Five}, lines 50--59)
+
+Therefore \(C\) is a limit point in the normalization of the question. ∎
+
+The covering and cluster portions of this criterion are variants of ingredients already present in the modified Erdős–Rankin/Maynard–Tao construction. The genuinely new requirement is the aggregate positivity (3).
+
+\medskip
+\medskip
+
+
+\subsubsection*{2. Do not force one pair; average the entire target window}
+
+Merikoski’s existing argument considers individual weighted pair sums
+
+\[
+S_{a,b}:=
+\sum_n w_N(n)
+1_{\mathbb P}(n+a)1_{\mathbb P}(n+b).
+\]
+
+Forcing a prescribed pair requires a lower bound for one \(S_{a,b}\), or an upper-bound constant below the parity threshold.
+
+The proposed modification is to retain the whole sum
+
+\[
+S_\times
+:=
+\sum_{a\in H^-}\sum_{b\in H^+}S_{a,b}
+=
+\sum_n w_N(n)X_-(n)X_+(n).
+\tag{5}
+\]
+
+All differences \(b-a\) lie in
+
+\[
+[(C-2\eta)\log N,(C+\eta)\log N],
+\]
+
+so every cross pair is acceptable. There is no need to identify which pair occurs.
+
+For the averaging to provide genuine analytic leverage, the number of surviving shifts in each block should tend to infinity. An ideal target would be
+
+\[
+|H^\pm|
+\asymp
+\eta\log N\,\frac{\varphi(W)}{W},
+\]
+
+or at least \(|H^\pm|\to\infty\) sufficiently slowly.
+
+\medskip
+\medskip
+
+
+\subsubsection*{3. Exact rough-prime Fourier filtering}
+
+The main new device is an exact identity, not a heuristic approximation.
+
+Let
+
+\[
+0<\sigma<\frac1{16},
+\qquad
+z=N^{1/4+\sigma},
+\]
+
+and define
+
+\[
+\rho_z(m):=
+1_{\{p\mid m\Rightarrow p>z\}}.
+\]
+
+Thus \(\rho_z(m)=1\) when \(m\) has no prime factor at most \(z\).
+
+Let
+
+\[
+\omega=e^{2\pi i/3}.
+\]
+
+\paragraph{Lemma: exact three-phase prime filter}
+
+For all sufficiently large \(N\) and every integer \(m\in[N,3N]\),
+
+\[
+\boxed{
+1_{\mathbb P}(m)
+=
+\frac{\rho_z(m)}3
+\sum_{j=0}^{2}\omega^{j(\Omega(m)-1)}.
+}
+\tag{6}
+\]
+
+Here \(\Omega(m)\) denotes the number of prime factors of \(m\), counted with multiplicity.
+
+\paragraph{Proof}
+
+Since \(\sigma>0\),
+
+\[
+z^4=N^{1+4\sigma}>3N
+\]
+
+for all sufficiently large \(N\).
+
+If \(m\) is \(z\)-rough and \(m\le3N\), then \(\Omega(m)\le3\). Otherwise \(m\) would have at least four prime factors, each greater than \(z\), and hence
+
+\[
+m>z^4>3N,
+\]
+
+a contradiction.
+
+Also \(m\ge N>z\), so any prime \(m\) is automatically \(z\)-rough.
+
+For an integer \(r\),
+
+\[
+\frac13\sum_{j=0}^2\omega^{j(r-1)}
+=
+\begin{cases}
+1,&r\equiv1\pmod3,\\
+0,&r\not\equiv1\pmod3.
+\end{cases}
+\]
+
+For a \(z\)-rough \(m\in[N,3N]\), the only possible values are
+
+\[
+\Omega(m)\in\{1,2,3\}.
+\]
+
+Among these, the congruence \(\Omega(m)\equiv1\pmod3\) is equivalent to
+
+\[
+\Omega(m)=1,
+\]
+
+which is equivalent to \(m\) being prime.
+
+If \(m\) is not \(z\)-rough, the right side of (6) is zero, while \(m\) cannot be prime because \(m>z\) and has a factor at most \(z\).
+
+Thus both sides agree in all cases. ∎
+
+Define three bounded multiplicative functions
+
+\[
+F_j(m):=\rho_z(m)\omega^{j\Omega(m)}
+\qquad(j=0,1,2).
+\]
+
+Then (6) becomes
+
+\[
+1_{\mathbb P}(m)
+=
+\frac13
+\sum_{j=0}^2\omega^{-j}F_j(m).
+\tag{7}
+\]
+
+For the two blocks, define
+
+\[
+Y_{\pm,j}(n)
+:=
+\sum_{h\in H^\pm}F_j(n+h).
+\]
+
+Substituting (7) into (5) gives the exact identity
+
+\[
+\boxed{
+S_\times
+=
+\frac19
+\sum_{j,k=0}^2
+\omega^{-j-k}T_{jk},
+}
+\tag{8}
+\]
+
+where
+
+\[
+T_{jk}
+:=
+\sum_n w_N(n)Y_{-,j}(n)Y_{+,k}(n).
+\tag{9}
+\]
+
+Thus aggregate positivity has been converted into the analysis of \textbf{nine correlations of bounded multiplicative functions}.
+
+No approximation has occurred yet.
+
+\medskip
+\medskip
+
+
+\subsubsection*{4. Why three phases rather than Liouville alone?}
+
+The simpler exact identity is obtained with the Liouville function
+
+\[
+\lambda(m)=(-1)^{\Omega(m)}.
+\]
+
+If \(z^3>3N\), then every \(z\)-rough \(m\in[N,3N]\) has at most two prime factors, and
+
+\[
+1_{\mathbb P}(m)
+=
+\rho_z(m)\frac{1-\lambda(m)}2.
+\tag{10}
+\]
+
+But (10) requires
+
+\[
+z>N^{1/3+o(1)}.
+\]
+
+The cubic Fourier filter (6) lowers the required roughness threshold to
+
+\[
+z>N^{1/4+o(1)}.
+\]
+
+This matters because, with \(0<\sigma<1/16\),
+
+\[
+z^2=N^{1/2+2\sigma}<N^{5/8}.
+\tag{11}
+\]
+
+Equation (11) does not mean that Pascadi’s \(5/8\) distribution theorem automatically proves the required correlation estimate. It does show that the most basic two-layer modulus arising from a \(z=N^{1/4+\sigma}\) decomposition lies inside the exponent reached by modern smooth-modulus technology. Pascadi’s theorem is precisely about distribution to \(x^{5/8-o(1)}\) with triply-well-factorable weights. (\url{https://arxiv.org/abs/2505.00653})
+
+This exponent alignment is the main reason I regard the three-phase filter as more plausible than a direct Liouville filter at the \(1/3\) threshold.
+
+\medskip
+\medskip
+
+
+\subsubsection*{5. The exact conjectural analytic lemma}
+
+The naive assertion that \(T_{jk}\) simply equals a product of one-block means is false in general. The two linear forms \(n+a,n+b\) have shift-dependent local correlations, encoded by singular-series factors.
+
+Those local factors must be extracted first.
+
+\paragraph{Relative Sifted Block-Elliott Lemma, three-phase form}
+
+For each \(j,k\in\{0,1,2\}\), expand \(T_{jk}\) into its explicit local \(p\)-adic main term \(M_{jk}\) and an error:
+
+\[
+T_{jk}=M_{jk}+E_{jk}.
+\tag{12}
+\]
+
+The proposed theorem is that, uniformly in the two blocks,
+
+\[
+\boxed{
+E_{jk}
+=
+o(\mathcal M_N)
+}
+\tag{13}
+\]
+
+for all nine pairs, where \(\mathcal M_N\) is the natural scale of the full block correlation, and that the Fourier-combined local main terms satisfy
+
+\[
+\boxed{
+\frac19
+\sum_{j,k=0}^2
+\omega^{-j-k}M_{jk}
+\ge
+\delta_{C,\eta}\mathcal M_N
+}
+\tag{14}
+\]
+
+for some \(\delta_{C,\eta}>0\).
+
+More concretely, the right side of (14) should be a positive multiple of
+
+\[
+\sum_{\substack{a\in H^-\\b\in H^+}}
+\mathfrak S_W(b-a)
+\frac{N}{\varphi(W)^2\log^2N},
+\tag{15}
+\]
+
+with the normalization adjusted to the exact sieve weight \(w_N\). The shifts in the two blocks should be chosen with the same parity, so every admissible pair has a positive prime-pair singular series.
+
+Equations (8), (12), (13), and (14) immediately give
+
+\[
+S_\times
+\ge
+\delta_{C,\eta}\mathcal M_N+o(\mathcal M_N)>0
+\]
+
+for sufficiently large \(N\).
+
+The rigorous two-block criterion then completes the proof of the original conjecture.
+
+This is the proposed replacement for “prove \(A<2\).”
+
+\medskip
+\medskip
+
+
+\subsubsection*{6. How I would try to prove the new lemma}
+
+\paragraph{Step 1: Preserve the block average}
+
+The crucial departure from the current proof is:
+
+\[
+\text{do not take absolute values pair-by-pair.}
+\]
+
+Keep
+
+\[
+\sum_{a\in H^-}\sum_{b\in H^+}
+\]
+
+inside every Buchstab, dispersion, and Cauchy–Schwarz step. The available target interval contains \(\asymp\eta\log N\) integer shifts, and that averaging is discarded if each pair is bounded separately.
+
+\paragraph{Step 2: Zero mode}
+
+The term \(T_{00}\) counts two \(z\)-rough linear forms. Its main term should be accessible by a two-dimensional beta/Buchstab sieve, including its explicit local density.
+
+This step does not need to distinguish primes from semiprimes or triple almost-primes.
+
+\paragraph{Step 3: One nonzero Fourier mode}
+
+The terms
+
+\[
+T_{10},T_{20},T_{01},T_{02}
+\]
+
+contain one factor of
+
+\[
+\rho_z(n+h)\omega^{\Omega(n+h)}
+\]
+
+or its square.
+
+These functions are bounded and multiplicative. The zeros at every prime \(p\le z\) make them strongly nonpretentious in the usual pretentious metric. One should combine:
+
+\begin{itemize}
+\item a Type-I expansion of the roughness condition;
+\item mean-value estimates for nonpretentious multiplicative functions;
+\item the full shift-block average;
+\item smooth-modulus distribution for the remaining progression variables.
+\end{itemize}
+
+Teräväinen’s existing correlation theorems show the appropriate qualitative factorization phenomenon for logarithmically averaged bounded multiplicative functions, but not yet with the required relative error for this sparse, \(N\)-dependent, divisor-weighted sequence. (\url{https://arxiv.org/abs/1710.01195})
+
+\paragraph{Step 4: Two nonzero Fourier modes}
+
+The terms
+
+\[
+T_{11},T_{12},T_{21},T_{22}
+\]
+
+contain the genuine parity-sensitive two-point information.
+
+After Buchstab or Heath–Brown decomposition, the hard pieces should be bilinear forms schematically resembling
+
+\[
+\sum_{a\in H^-}
+\sum_{b\in H^+}
+\sum_{m\sim M}\alpha_m
+\sum_{\ell\sim N/M}\beta_\ell\,
+\Psi(m\ell+a,m\ell+b),
+\tag{16}
+\]
+
+where \(\Psi\) contains the rough Fourier phases and the Erdős–Rankin/Maynard congruence conditions.
+
+The desired estimate is a power-saving or relative \(o(1)\) bound for (16) after subtracting its local main term.
+
+The likely tools are:
+
+\begin{itemize}
+\item dispersion;
+\item Poisson summation in the shift or modulus variable;
+\item bilinear Kloosterman-sum estimates;
+\item triply-well-factorable smooth moduli;
+\item Ford–Maynard’s geometric classification of the necessary Type-I/II region.
+\end{itemize}
+
+Ford–Maynard’s theory confirms that some substantial Type-II region is logically necessary for this sort of lower bound. (\url{https://arxiv.org/abs/2407.14368}) Runbo Li’s \(1/29\) example suggests that the needed region need not be very wide, although its location for the present sequence has not been computed. (\url{https://arxiv.org/abs/2504.13195})
+
+\paragraph{Step 5: Recombine before estimating signs}
+
+Once the nine \(T_{jk}\) have relative asymptotics, recombine them through (8). One must not attempt to prove that every nonzero mode is individually negligible. The empirical calculation below shows that the nonzero modes are of main-term size.
+
+Their correctly weighted combination is what isolates \(\Omega=1\).
+
+\paragraph{Step 6: Invoke the covering}
+
+Aggregate positivity gives at least one prime in each survivor block. The deterministic covering then makes the last left-block prime and first right-block prime consecutive.
+
+This completes the two-block criterion.
+
+\medskip
+\medskip
+
+
+\subsubsection*{7. Computational experiment}
+
+I implemented:
+
+\begin{itemize}
+\item a fast prime sieve;
+\item Liouville and \(\Omega(n)\bmod3\) sieves;
+\item the exact two-phase identity (10);
+\item the exact three-phase identity (6);
+\item two-block correlation matrices;
+\item a scan of normalized consecutive prime gaps.
+\end{itemize}
+
+At
+
+\[
+N=10^6,\qquad C=1,\qquad \eta=0.4,
+\]
+
+the sample blocks were
+
+\[
+H^-=\{0,2,4\},
+\qquad
+H^+=\{12,14\}.
+\]
+
+For the Liouville decomposition with \(z=127\), the computed terms were
+
+\[
+\begin{array}{c|r}
+\text{term}&\text{value}\\ \hline
+\sum R_-R_+&154044\\
+\sum L_-R_+&-35302\\
+\sum R_-L_+&-35024\\
+\sum L_-L_+&8066
+\end{array}
+\]
+
+and therefore
+
+\[
+\frac{154044-(-35302)-(-35024)+8066}{4}
+=
+58109.
+\]
+
+The directly counted block prime-pair moment was also
+
+\[
+58109.
+\]
+
+For the cubic Fourier filter with \(z=39\), all nine complex correlations reconstructed the same integer:
+
+\[
+58108.99999999999-5.7\times10^{-12}i.
+\]
+
+The numerical error from the exact integer \(58109\) was about
+
+\[
+9.2\times10^{-12}.
+\]
+
+The significant point is not that pairs exist at \(10^6\). It is that the parity-sensitive terms are large: simply discarding them or asking each to be \(o(T_{00})\) would be the wrong theorem. One needs their local asymptotics and exact Fourier recombination.
+
+The finite normalized-gap search below \(10^7\) found the following numbers of consecutive gaps in windows of radius \(0.05\):
+
+\[
+\begin{array}{c|r}
+C&\#\{|g/\log p-C|\le0.05\}\\ \hline
+0.25&53498\\
+0.5&39655\\
+1&23165\\
+2&10015\\
+3&2840\\
+5&192
+\end{array}
+\]
+
+This is consistent with an exponentially decreasing gap density, but of course cannot prove an infinite-subsequence statement.
+
+\paragraph{Code and data}
+
+\noindent\textbf{Artifact access note.}
+All files listed below are attached inside the linked ChatGPT conversation. The \emph{sandbox:/mnt/data/...} strings are ephemeral model-runtime paths copied from the original response for identification only; they should not be treated as accurate public download links. Open the shared conversation to access the actual files.
+
+\begin{itemize}
+\item \emph{Full Python research program} (archival source path: sandbox:/mnt/data/normalized_prime_gap_research.py)
+\item \emph{Exact finite decomposition results} (archival source path: sandbox:/mnt/data/normalized_prime_gap_experiment.json)
+\item \emph{Normalized-gap window counts} (archival source path: sandbox:/mnt/data/normalized_gap_window_counts.csv)
+\item \emph{Empirical normalized-gap histogram} (archival source path: sandbox:/mnt/data/normalized_gap_histogram.png)
+\item \emph{Research note: two-block rough Fourier sieve} (archival source path: sandbox:/mnt/data/two_block_rough_fourier_sieve.md)
+\item \emph{Lean algebra and formal target definitions} (archival source path: sandbox:/mnt/data/TwoBlock_Rough_Fourier_Reduction.lean)
+\item \emph{Previous Lean file proving the coefficient and Type-I barriers} (archival source path: sandbox:/mnt/data/Merikoski_Parity_Barrier.lean)
+\end{itemize}
+
+The Lean files contain no \emph{sorry}, but this environment has no Lean executable, so I have not represented them as kernel-checked.
+
+\subsection*{5) VERIFICATION}
+
+\subsubsection*{What is rigorously proved here}
+
+\begin{enumerate}
+\item The two-block positivity criterion implies that \(C\) is a normalized consecutive-prime-gap limit point.
+\item The Liouville prime filter is exact above the \(N^{1/3}\) roughness threshold.
+\item The cubic roots-of-unity prime filter is exact above the \(N^{1/4}\) roughness threshold.
+\item The aggregate cross-prime moment is exactly a combination of nine bounded-multiplicative-function correlations.
+\item The numerical implementation reconstructs the prime-pair count exactly, up to floating-point roundoff.
+\end{enumerate}
+
+\subsubsection*{What remains conjectural}
+
+The Relative Sifted Block-Elliott estimate (13)–(14) has not been proved.
+
+That is not a cosmetic gap. It asks for:
+
+\begin{itemize}
+\item relative rather than absolute error;
+\item a main term at a sparse sifted scale;
+\item \(N\)-dependent multiplicative functions;
+\item a modulus and divisor weight supplied by an Erdős–Rankin/Maynard construction;
+\item uniformity over logarithmic shift blocks;
+\item explicit preservation of the local singular-series factors.
+\end{itemize}
+
+Existing averaged Elliott theorems generally do not provide this entire package.
+
+\subsubsection*{Attempt to break the proposal}
+
+\paragraph{Local correlations}
+
+A plain independence formula is false because the divisibility of \(n+a\) and \(n+b\) by a prime \(p\) depends on \(b-a\bmod p\). This is why the proposed theorem explicitly removes local \(p\)-adic factors before factorization.
+
+\paragraph{Sparse-scale error}
+
+An estimate of the form \(o(N)\) is not automatically enough. The required error must be smaller than the sifted cross-pair main term. This is probably the most serious quantitative issue.
+
+\paragraph{Growing survivor blocks}
+
+A modified Erdős–Rankin construction with a fixed finite tuple is standard in this area. The proposed argument benefits from survivor blocks whose cardinalities tend to infinity. Uniformity of the covering and subsequent analytic estimates with growing block size must be proved.
+
+\paragraph{N-dependent multiplicative functions}
+
+The functions
+
+\[
+F_j(n)=\rho_{N^{1/4+\sigma}}(n)\omega^{j\Omega(n)}
+\]
+
+change with \(N\). Any invocation of an existing multiplicative-correlation theorem must be checked for uniformity over such a family.
+
+\paragraph{Relation to \(5/8\)}
+
+The inequality
+
+\[
+z^2<N^{5/8}
+\]
+
+is promising numerology, not a derivation from Pascadi’s theorem. The moduli and coefficients resulting from the full two-block expansion must actually possess the necessary triply-well-factorable structure.
+
+\subsubsection*{Assessment}
+
+Among the routes I examined, this is the most concrete alternative to directly crossing Merikoski’s \(A<2\) threshold:
+
+\[
+\boxed{
+\text{two survivor blocks}
++
+\text{exact cubic rough-prime filter}
++
+\text{relative block-averaged Type-II correlation}.
+}
+\]
+
+It exploits two pieces of freedom that the pairwise upper-bound proof does not fully use:
+
+\begin{enumerate}
+\item the target is an interval of \(\asymp\varepsilon\log N\) possible integer gaps, not one fixed shift;
+\item among \(N^{1/4+o(1)}\)-rough integers, primality is an exact three-point Fourier condition on \(\Omega\).
+\end{enumerate}
+
+A proof of the relative sifted block-correlation lemma would complete the original problem by the fully proved reduction above.
+
+\subsection*{6) FINAL}
+
+\textbf{LABEL: UNRESOLVED}
+\textbf{SUBLABEL: CONCRETE TWO-BLOCK ROUGH-FOURIER SIEVE PROGRAM WITH AN EXACT CONDITIONAL REDUCTION, A NEW \(N^{1/4}\) PRIME FILTER, AND COMPUTATIONAL VALIDATION}
+
+\medskip
+\medskip
+
+\section*{Continuation: Two New Exact Reductions}
+
+The full conjecture is still unresolved. The latest work has nevertheless produced two useful advances:
+
+\begin{enumerate}
+\item a \textbf{sharp deterministic barrier theorem} showing that no rearrangement or reweighting of Merikoski-style candidate clusters can evade the constant \(2\) using occupancy information alone;
+\item a \textbf{four-channel identity}
+\[
+PP=PR+RP-RR+SS
+\]
+that improves the earlier Bonferroni reduction by restoring the positive semiprime--semiprime channel.
+\end{enumerate}
+
+The second point gives the most promising analytic route developed so far.
+
+\subsection*{1. A sharp sequential target-window barrier}
+
+Fix
+
+\[
+0<a\le b
+\]
+
+and arbitrary real candidate locations
+
+\[
+x_1<x_2<\cdots<x_M.
+\]
+
+Call a subsequence \(x_{i_1}<\cdots<x_{i_L}\) \textbf{target-free} when
+
+\[
+x_{i_{j+1}}-x_{i_j}\notin[a,b]
+\]
+
+for every consecutive pair in the subsequence.
+
+\paragraph{Theorem 1}
+
+Every \(M\)-point configuration has a target-free subsequence of length at least
+
+\[
+\boxed{
+\left\lceil
+\frac{M}{\lfloor b/a\rfloor+1}
+\right\rceil.
+}
+\tag{1}
+\]
+
+\paragraph{Proof}
+
+For every \(j\), define recursively
+
+\[
+\ell_j
+:=
+1+
+\max\left(
+\{\ell_i:i<j,\ x_j-x_i\notin[a,b]\}\cup\{0\}
+\right).
+\]
+
+Then \(\ell_j\) is the maximum length of a target-free subsequence ending at \(x_j\).
+
+Suppose that \(i<j\) and
+
+\[
+\ell_i=\ell_j.
+\]
+
+We must have
+
+\[
+x_j-x_i\in[a,b].
+\]
+
+Indeed, if the difference lay outside \([a,b]\), then \(x_i\) would be an allowable predecessor of \(x_j\), yielding
+
+\[
+\ell_j\ge\ell_i+1,
+\]
+
+a contradiction.
+
+Consider one level set
+
+\[
+\{x_j:\ell_j=r\}.
+\]
+
+If its elements in increasing order are
+
+\[
+y_1<\cdots<y_q,
+\]
+
+then every pairwise difference lies in \([a,b]\). In particular,
+
+\[
+y_{t+1}-y_t\ge a
+\]
+
+for every \(t\), while
+
+\[
+y_q-y_1\le b.
+\]
+
+Therefore
+
+\[
+(q-1)a
+\le y_q-y_1
+\le b,
+\]
+
+so
+
+\[
+q\le\lfloor b/a\rfloor+1.
+\]
+
+If \(L=\max_j\ell_j\), there are \(L\) nonempty level sets, each containing at most \(\lfloor b/a\rfloor+1\) points. Hence
+
+\[
+M\le L\bigl(\lfloor b/a\rfloor+1\bigr),
+\]
+
+which proves (1). ∎
+
+\paragraph{Narrow target windows}
+
+For the normalized-gap window
+
+\[
+[a,b]=[C-\eta,C+\eta],
+\]
+
+if
+
+\[
+0<\eta<\frac C3,
+\]
+
+then
+
+\[
+C+\eta<2(C-\eta),
+\]
+
+and therefore
+
+\[
+\lfloor b/a\rfloor+1=2.
+\]
+
+Theorem 1 gives a target-free subsequence of size at least
+
+\[
+\boxed{\left\lceil\frac M2\right\rceil.}
+\tag{2}
+\]
+
+This is sharp. Choose an arithmetic progression
+
+\[
+x_j=jc
+\]
+
+with
+
+\[
+c\in[a,b],
+\qquad
+2c>b.
+\]
+
+Adjacent points have forbidden target distance \(c\), but every second point forms a target-free subsequence. Its maximum size is exactly \(\lceil M/2\rceil\).
+
+\subsection*{2. Weighted strengthening}
+
+Give the candidate locations arbitrary nonnegative weights
+
+\[
+w_1,\ldots,w_M.
+\]
+
+Form a directed graph whose vertices are the locations and in which, for \(i<j\), there is an arc \(i\to j\) precisely when
+
+\[
+x_j-x_i\notin[a,b].
+\]
+
+A directed path is exactly a target-free subsequence.
+
+A stable set in this digraph consists of points whose pairwise differences all belong to \([a,b]\). By the preceding span argument, its size is at most
+
+\[
+Q:=\lfloor b/a\rfloor+1.
+\]
+
+The Gallai--Milgram theorem partitions the vertices of a finite digraph with stability number at most \(Q\) into at most \(Q\) directed paths. The path weights sum to the total vertex weight, so one path has weight at least
+
+\[
+\boxed{
+\frac1Q\sum_{i=1}^{M}w_i.
+}
+\tag{3}
+\]
+
+For a narrow target window, \(Q=2\). Thus even with completely arbitrary importance weights, there exists a target-free collection carrying at least half the total weight.
+
+\paragraph{Consequence for the \(A=2\) threshold}
+
+In the Merikoski concentration architecture, a pair-correlation constant \(A\) leads, schematically, to \(r+1\) occupied clusters among approximately \(Ar+1\) candidates. When \(A\ge2\), this is no more than half of the candidates asymptotically.
+
+Theorems 1 and (3) therefore show:
+
+\begin{quote}
+\textbf{No argument that retains only the number or total weight of occupied clusters can force a consecutive occupied pair in an arbitrarily narrow target window unless it crosses below \(A=2\).} (4)
+\end{quote}
+
+This eliminates several possible evasions:
+
+\begin{itemize}
+\item changing the candidate-cluster geometry;
+\item introducing arbitrary nonnegative cluster weights;
+\item duplicating clusters;
+\item replacing a path by an odd-cycle construction;
+\item obtaining only \(A=2+o(1)\) from above.
+\end{itemize}
+
+A successful \(A\ge2\) argument must retain additional arithmetic information, not merely occupancy data.
+
+\subsection*{3. The four-channel endpoint identity}
+
+The earlier pair-rough Bonferroni inequality was
+
+\[
+PP\ge PR+RP-RR.
+\]
+
+It discards a positive and potentially substantial channel. That channel can be restored exactly.
+
+Choose a roughness cutoff \(z\) such that
+
+\[
+z^3>3X.
+\]
+
+For integers \(m\in[X,3X]\), define
+
+\[
+R(m)
+:=
+1_{\{p\mid m\Rightarrow p>z\}},
+\qquad
+P(m):=1_{\mathbb P}(m).
+\]
+
+Every \(z\)-rough integer in this range has at most two prime factors. Therefore
+
+\[
+S(m):=R(m)-P(m)
+\]
+
+is exactly the indicator of the \(z\)-rough semiprimes. Pointwise,
+
+\[
+R=P+S.
+\tag{5}
+\]
+
+For two endpoints, abbreviate
+
+\[
+PP=P_1P_2,
+\qquad
+PS=P_1S_2,
+\qquad
+SP=S_1P_2,
+\qquad
+SS=S_1S_2.
+\]
+
+Then
+
+\[
+PR=P_1R_2=PP+PS,
+\]
+
+\[
+RP=R_1P_2=PP+SP,
+\]
+
+and
+
+\[
+RR=R_1R_2=PP+PS+SP+SS.
+\]
+
+Subtracting gives the exact pointwise identity
+
+\[
+\boxed{
+PP=PR+RP-RR+SS.
+}
+\tag{6}
+\]
+
+It remains exact after multiplication by arbitrary nonnegative weights and summation over arbitrary \(n\) and shifts \(h\).
+
+\subsection*{4. Why this improves the Bonferroni route}
+
+The previous lower bound was
+
+\[
+PR+RP-RR.
+\]
+
+Using the channel decomposition,
+
+\[
+PR+RP-RR=PP-SS.
+\tag{7}
+\]
+
+Thus the Bonferroni expression tries to prove positivity only after subtracting all false-positive semiprime pairs. This explains why its one-sided marginal thresholds remained so severe.
+
+The exact identity restores those pairs:
+
+\[
+PP=(PP-SS)+SS.
+\]
+
+This does not eliminate parity. It isolates the missing parity-sensitive contribution as the explicit bilinear channel \(SS\).
+
+\subsection*{5. A rigorous four-channel sufficient condition}
+
+Let \(M_X>0\) be a common reference main term. Suppose that, over the target shift interval and with the Erdős--Rankin/Maynard weights, one proves
+
+\[
+PR\ge(\ell_1+o(1))M_X,
+\tag{8}
+\]
+
+\[
+RP\ge(\ell_2+o(1))M_X,
+\tag{9}
+\]
+
+\[
+RR\le(u+o(1))M_X,
+\tag{10}
+\]
+
+and
+
+\[
+SS\ge(s+o(1))M_X.
+\tag{11}
+\]
+
+Then (6) gives
+
+\[
+PP
+\ge
+\bigl(\ell_1+\ell_2-u+s+o(1)\bigr)M_X.
+\]
+
+Consequently,
+
+\[
+\boxed{
+\ell_1+\ell_2-u+s>0
+\quad\Longrightarrow\quad
+PP>0
+}
+\tag{12}
+\]
+
+for all sufficiently large \(X\).
+
+If the shifts lie in
+
+\[
+[(C-\eta)\log X,(C+\eta)\log X]
+\]
+
+and the covering forces all other intermediate positions to be composite, positivity of \(PP\) supplies consecutive primes with normalized gap in
+
+\[
+[C-\eta+o(1),C+\eta+o(1)].
+\]
+
+A diagonal choice \(\eta\to0\) proves the original assertion for \(C\).
+
+Thus (8)--(12), together with the covering construction, are a complete conditional reduction.
+
+\subsection*{6. Ideal-model threshold}
+
+Suppose the rough semiprime class has normalized density \(\sigma\) relative to primes. The local independent model predicts
+
+\[
+PP:PS:SP:SS
+=
+1:\sigma:\sigma:\sigma^2.
+\]
+
+Therefore
+
+\[
+PR=RP=1+\sigma,
+\]
+
+\[
+RR=(1+\sigma)^2,
+\]
+
+and
+
+\[
+SS=\sigma^2.
+\]
+
+Suppose the two prime--rough lower bounds retain a proportion \(\kappa\) of their predicted main terms, while \(RR\) and \(SS\) have their predicted asymptotics. Condition (12) becomes
+
+\[
+2\kappa(1+\sigma)
+-(1+\sigma)^2
++\sigma^2
+>0.
+\]
+
+Since
+
+\[
+(1+\sigma)^2-\sigma^2=1+2\sigma,
+\]
+
+this is equivalent to
+
+\[
+\boxed{
+\kappa>
+\frac{1+2\sigma}{2(1+\sigma)}.
+}
+\tag{13}
+\]
+
+This threshold is strictly below \(1\), and it is substantially less restrictive than the earlier Bonferroni threshold because the \(SS\) contribution is no longer thrown away.
+
+For example:
+
+\[
+\begin{array}{c|c}
+\sigma&\text{required }\kappa\\ \hline
+0.25&0.6000\\
+0.40&0.642857\\
+0.50&0.666667\\
+0.70&0.705882\\
+1.00&0.7500
+\end{array}
+\]
+
+These are ideal-model calculations. A proof must include the correct local singular series and the actual weighted-sieve constants.
+
+\subsection*{7. Finite exact experiment}
+
+I computed all four channels for
+
+\[
+X=5{,}000{,}000,
+\qquad
+C=1,
+\qquad
+\eta=0.25,
+\]
+
+using the even shifts
+
+\[
+12,14,16,18.
+\]
+
+For effective roughness exponent
+
+\[
+\alpha=0.348480\ldots,\qquad z=216,
+\]
+
+the exact counts were
+
+\[
+\begin{array}{c|r}
+\text{channel}&\text{count}\\ \hline
+PP&163682\\
+PS&105783\\
+SP&105712\\
+SS&68232\\
+PR&269465\\
+RP&269394\\
+RR&443406
+\end{array}
+\]
+
+and indeed
+
+\[
+269465+269394-443406+68232
+=
+163682.
+\]
+
+Relative to \(PP\),
+
+\[
+\frac{PR}{PP}=1.646271\ldots,
+\]
+
+\[
+\frac{RP}{PP}=1.645838\ldots,
+\]
+
+\[
+\frac{RR}{PP}=2.708966\ldots,
+\]
+
+and
+
+\[
+\frac{SS}{PP}=0.416857\ldots.
+\]
+
+The semiprime-pair correction is therefore not numerically negligible.
+
+At the larger effective roughness exponent \(0.439983\ldots\), the measured ratios were
+
+\[
+\frac{PR}{PP}=1.275944\ldots,
+\qquad
+\frac{RR}{PP}=1.628261\ldots,
+\qquad
+\frac{SS}{PP}=0.075891\ldots.
+\]
+
+Again, the four-channel recombination was exact.
+
+These computations are diagnostics only. They do not prove a limiting formula.
+
+\subsection*{8. Division of the analytic work}
+
+The identity suggests splitting the proof among three kinds of estimates.
+
+\paragraph{Channel \(RR\): rough--rough}
+
+This should be the most accessible channel. It is a two-dimensional rough-sieve correlation and requires a relative upper asymptotic with the correct local factors.
+
+\paragraph{Channels \(PR\) and \(RP\): prime--rough}
+
+These are Chen-type one-prime lower-bound problems. Ford--Maynard's theory gives a systematic framework for deciding when Type-I and Type-II information suffices to produce primes in a weighted sequence, and it proves that genuinely nontrivial Type-II information is indispensable.
+
+\paragraph{Channel \(SS\): semiprime--semiprime}
+
+This channel has genuine bilinear structure. Results on correlations of restricted \(E_2\)-numbers demonstrate that semiprime correlations can be evaluated much farther than prime-pair correlations when one prime factor is localized.
+
+The present limitation is the shift range. Available restricted-\(E_2\) correlation asymptotics reach almost all shifts when the averaging range is at least roughly
+
+\[
+H\ge(\log X)^{19+\varepsilon},
+\]
+
+while prime--\(E_2\) correlations require ranges as large as
+
+\[
+H\ge X^{1/6+\varepsilon}.
+\]
+
+The normalized-gap problem needs only
+
+\[
+H\asymp\eta\log X.
+\]
+
+Thus the \(SS\) theory is about eighteen logarithmic powers away, while the \(PR\) theory is much farther away in its currently published averaged form.
+
+\subsection*{9. A promising new external ingredient}
+
+Grimmelt and Teräväinen's 2025 work constructs a nonnegative approximation to Chen-prime sieve weights and proves that, in suitable additive problems, primes can be approximated by a power-sifted Cramér rough-number model. Their proof uses a power-saving Bombieri--Vinogradov theorem and a physical-space approximation principle.
+
+This is unusually close in spirit to the four-channel program:
+
+\begin{itemize}
+\item it uses nonnegative Chen-type models;
+\item it replaces primes by rough numbers while preserving additive structure;
+\item it works with power-size roughness cutoffs;
+\item it keeps track of large-sieve and exceptional-zero errors.
+\end{itemize}
+
+However, their theorem concerns additive convolutions outside a power-saving exceptional set. It does not provide the relative, divisor-weighted, uniform estimate for every logarithmic target interval required here. A power-saving global exceptional set could still contain all \(O(\log X)\) target shifts.
+
+The useful research question is therefore not whether their theorem applies verbatim---it does not---but whether their \textbf{physical-space approximation mechanism} can be inserted into the Maynard/Erdős--Rankin target-shift average before the shift variable is specialized.
+
+\subsection*{10. Current leading theorem to prove}
+
+The most focused target is now the following.
+
+\begin{quote}
+\textbf{Four-channel endpoint theorem.}
+For every fixed \(C>0\) and \(\eta>0\), construct a modified Erdős--Rankin covering, a set of even shifts
+\[
+\mathcal H_X\subset[(C-\eta)\log X,(C+\eta)\log X],
+\]
+and nonnegative Maynard-type weights such that the four weighted channels satisfy
+\[
+PR\ge(\ell_1+o(1))M_X,
+\]
+\[
+RP\ge(\ell_2+o(1))M_X,
+\]
+\[
+RR\le(u+o(1))M_X,
+\]
+\[
+SS\ge(s+o(1))M_X,
+\]
+with
+\[
+\ell_1+\ell_2-u+s>0.
+\]
+\end{quote}
+
+This theorem would solve the original problem by the exact identity and covering argument.
+
+The most likely division of techniques is:
+
+\[
+\begin{array}{c|c}
+\text{channel}&\text{proposed machinery}\\ \hline
+RR&\text{beta/Buchstab rough sieve}\\
+PR,RP&\text{Chen sieve plus Ford--Maynard Type II}\\
+SS&\text{bilinear dispersion for restricted semiprimes}\\
+\text{local errors}&\text{smooth or well-factorable moduli}\\
+\text{consecutiveness}&\text{modified Erdős--Rankin covering}
+\end{array}
+\]
+
+The new structural insight is that the proof does \textbf{not} need to derive the entire prime-pair lower bound from the prime--rough marginals. It can recover the missing false-positive mass through a separately tractable semiprime--semiprime channel.
+
+\subsection*{11. Adversarial verification}
+
+\paragraph{Exactness of \(R=P+S\)}
+
+The condition \(z^3>3X\) is essential. Without it, a \(z\)-rough integer could have three or more prime factors, and \(S\) would not be a pure semiprime indicator.
+
+\paragraph{Singular-series dependence}
+
+The ideal constants \(1,\sigma,\sigma,\sigma^2\) cannot be inserted directly into a proof. Every channel has local correlations depending on the shift. They must be normalized or combined with their correct singular-series factors.
+
+\paragraph{Relative errors}
+
+An error \(o(X)\) is insufficient. The desired prime-pair main term over a logarithmic shift window is sparse. Each error must be \(o(M_X)\), where \(M_X\) is the actual weighted rough-pair scale.
+
+\paragraph{Exceptional-shift theorems}
+
+An estimate valid for almost all shifts in a much larger interval does not guarantee a good shift in every prescribed interval of length \(O(\log X)\).
+
+\paragraph{Count-only alternatives}
+
+The sequential barrier proves that no candidate-placement trick can replace the arithmetic estimates. The constant \(2\) is a genuine transition for the concentration architecture, not an artifact of equally spaced clusters.
+
+\subsection*{Artifacts}
+
+\noindent\textbf{Artifact access note.}
+All files listed below are attached inside the linked ChatGPT conversation. The \emph{sandbox:/mnt/data/...} strings are ephemeral model-runtime paths copied from the original response for identification only; they should not be treated as accurate public download links. Open the shared conversation to access the actual files.
+
+\begin{itemize}
+\item \emph{Four-channel research note} (archival source path: sandbox:/mnt/data/four_channel_endpoint_reduction.md)
+\item \emph{Four-channel experiment code} (archival source path: sandbox:/mnt/data/four_channel_endpoint_experiment.py)
+\item \emph{Exact channel counts} (archival source path: sandbox:/mnt/data/four_channel_endpoint_counts.csv)
+\item \emph{Complete experiment results} (archival source path: sandbox:/mnt/data/four_channel_endpoint_results.json)
+\item \emph{Four-channel plot} (archival source path: sandbox:/mnt/data/four_channel_endpoint_channels.png)
+\item \emph{Lean four-channel identities} (archival source path: sandbox:/mnt/data/PrimeGap_FourChannel_Identity.lean)
+\item \emph{Sequential target-window theorem} (archival source path: sandbox:/mnt/data/sequential_target_window_barrier.md)
+\item \emph{Sequential-barrier verification code} (archival source path: sandbox:/mnt/data/sequential_target_window_barrier.py)
+\item \emph{Sequential-barrier data} (archival source path: sandbox:/mnt/data/sequential_target_window_barrier.csv)
+\item \emph{Sequential-barrier plot} (archival source path: sandbox:/mnt/data/sequential_target_window_barrier.png)
+\item \emph{Lean sequential-barrier lemmas} (archival source path: sandbox:/mnt/data/PrimeGap_Sequential_Barrier.lean)
+\end{itemize}
+
+The Lean files contain no \emph{sorry}. They have not been kernel-checked because the current runtime does not provide a Lean executable.
+
+\subsection*{Final}
+
+\textbf{LABEL: UNRESOLVED}
+
+\textbf{SUBLABEL: COUNT-ONLY EVASIONS OF THE \(A=2\) BARRIER ARE NOW RULED OUT; THE FOUR-CHANNEL \(PP=PR+RP-RR+SS\) DECOMPOSITION IS THE STRONGEST CURRENT ROUTE}
+
+\subsection*{Citations}
+
+\begin{enumerate}
+\item The official Erdős Problems record continues to classify the normalized-prime-gap question as open and records the known initial interval, positive-measure, \(1/3\)-measure, and syndeticity results. (\url{https://www.erdosproblems.com/5})
+\item Merikoski proves the four-point limit-point theorem, the \(1/3\)-measure bound and syndeticity, obtains the weighted constant \(3.99\), and identifies \(A<2\) as sufficient for the full conjecture. (\url{https://arxiv.org/abs/1811.03008})
+\item Ford and Maynard develop the Type-I/Type-II prime-producing-sieve framework and prove that substantial Type-II information is necessary in general for nontrivial prime lower bounds. (\url{https://arxiv.org/abs/2407.14368})
+\item Evans proves averaged correlations for restricted products of two primes, with the shortest \(E_2\)--\(E_2\) shift range of logarithmic-power size and a much longer range for prime--\(E_2\) correlations. (\url{https://www.cambridge.org/core/journals/mathematical-proceedings-of-the-cambridge-philosophical-society/article/correlations-of-almost-primes/08F8E4E4C36F68ED6DDA373CCAF7A221})
+\item Grimmelt and Teräväinen construct a nonnegative model for Chen primes and approximate primes by a power-sifted Cramér rough-number model in additive problems, using power-saving Bombieri--Vinogradov input. (\url{https://arxiv.org/abs/2508.16400})
+\item The Gallai--Milgram theorem partitions the vertices of a finite digraph into at most its stability number many directed paths, which yields the weighted form of the sequential target-window barrier. (\url{https://www.combinatorics.org/ojs/index.php/eljc/article/view/v16i1n23})
+\item The uploaded literature report identifies prescribed-pair positivity and the \(A<2\) weighted prime-pair threshold as the central unresolved gap; its page-8 diagram summarizes the direct smooth-modulus/Chen/Ford--Maynard route. The report was supplied to the model in the source conversation and is not a repository file.
+\end{enumerate}
+
+\medskip
+\medskip
+
+\section*{Latest Continuation: Singular-Series Barrier and Balanced-Semiprime Type-II Route}
+
+\subsection*{1) FORMAL RESTATEMENT}
+
+Let \(p_n\) denote the \(n\)-th prime and define
+
+\[
+g_n:=p_{n+1}-p_n.
+\]
+
+The intended statement is
+
+\[
+\forall C\in[0,\infty)\quad
+\exists\,2\le n_1<n_2<\cdots
+\quad\text{such that}\quad
+\lim_{i\to\infty}\frac{g_{n_i}}{\log n_i}=C.
+\tag{EP5}
+\]
+
+The problem remains open in the current literature. Merikoski's theorem still provides the strongest general unconditional structural result: the limit-point set has lower density at least \(1/3\) on every initial interval and is syndetic. His proof gives the weighted pair constant \(3.99\), while any constant below \(2\) would prove (EP5). (\url{https://www.erdosproblems.com/5}) (\url{https://arxiv.org/abs/1811.03008})
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+
+No new theorem located in this continuation proves a prescribed normalized prime gap. The most directly relevant higher-tuple result remains Mastrostefano's upper bound for weighted prime tuples under Maynard weights. It has the appropriate general architecture and discusses possible normalized-gap applications, but its constants and local factors do not supply the sharp triple threshold developed in the previous work, namely \(A_3<4\). (\url{https://arxiv.org/abs/1804.06290})
+
+Recent progress on primes in arithmetic progressions reaches substantially beyond the classical \(1/2\) barrier for specially structured bilinear, trilinear, or well-factorable moduli. Those results are important possible ingredients, but they do not apply as an unrestricted modulus budget to the pair-rough Maynard expansion below. (\url{https://ora.ox.ac.uk/objects/uuid:d75350eb-1358-474a-b070-0b4b5ad720b2})
+
+\subsection*{3) ATTACK PLAN}
+
+I continued four strategies.
+
+\begin{enumerate}
+\item \textbf{Singular-series amplification.} Try to concentrate on target differences with exceptionally large prime-pair singular series, hoping to compensate for the fixed error in averaged pair lower bounds.
+
+\item \textbf{Balanced-semiprime Type-II route.} Replace primality by an exact rough-number dichotomy in which every false positive is a balanced semiprime. Try to prove that primes form a strict majority under the pair-rough weighted measure.
+
+\item \textbf{Higher-order concentration.} Retain the previously proved conditional alternative \(A_r<2^{r-1}\), especially \(A_3<4\).
+
+\item \textbf{Finite-order Hardy--Littlewood route.} Retain the exact Bonferroni reduction to finitely many prime-tuple correlations.
+\end{enumerate}
+
+The first strategy is now rigorously ruled out. The second is the strongest remaining route.
+
+\subsection*{4) WORK}
+
+\subsubsection*{I. Singular-series amplification is insufficient}
+
+For an even prime-pair difference \(d\), remove the fixed twin-prime constant and define the variable local factor
+
+\[
+F(d):=
+\prod_{\substack{p\mid d\\p>2}}
+\frac{p-1}{p-2}.
+\tag{1}
+\]
+
+Large values occur when \(d\) has many small prime factors. It is therefore natural to ask whether one can choose only exceptionally singular differences inside
+
+\[
+[(C-\eta)\log X,(C+\eta)\log X]
+\]
+
+and retain enough total local main term even when \(\eta\to0\).
+
+The answer is no.
+
+\paragraph{Theorem 1: bounded second moment of the pair singular factor}
+
+There is an absolute constant \(K<\infty\) such that, for every \(H\ge1\),
+
+\[
+\boxed{
+\sum_{d\le H}F(d)^2\le KH.
+}
+\tag{2}
+\]
+
+Consequently, every subset \(\mathcal D\subseteq\{1,\ldots,H\}\) satisfies
+
+\[
+\boxed{
+\sum_{d\in\mathcal D}F(d)
+\le
+\sqrt{K|\mathcal D|H}.
+}
+\tag{3}
+\]
+
+In particular, if
+
+\[
+|\mathcal D|=\eta H,
+\]
+
+then
+
+\[
+\frac1H\sum_{d\in\mathcal D}F(d)
+\le\sqrt{K\eta}\longrightarrow0
+\qquad(\eta\to0).
+\tag{4}
+\]
+
+\paragraph{Proof}
+
+For every odd prime \(p\), put
+
+\[
+b_p:=
+\left(\frac{p-1}{p-2}\right)^2-1.
+\]
+
+A direct calculation gives
+
+\[
+b_p
+=
+\frac{2p-3}{(p-2)^2}
+\ll\frac1p.
+\tag{5}
+\]
+
+Expanding over the distinct odd prime divisors of \(d\),
+
+\[
+F(d)^2
+=
+\prod_{\substack{p\mid d\\p>2}}(1+b_p)
+=
+\sum_{\substack{q\mid d\\q\text{ odd and squarefree}}}b(q),
+\tag{6}
+\]
+
+where
+
+\[
+b(q):=\prod_{p\mid q}b_p.
+\]
+
+Every term is nonnegative. Therefore
+
+\[
+\begin{aligned}
+\sum_{d\le H}F(d)^2
+&=
+\sum_{\substack{q\text{ odd}\\q\text{ squarefree}}}
+b(q)\left\lfloor\frac Hq\right\rfloor\\
+&\le
+H\sum_{\substack{q\text{ odd}\\q\text{ squarefree}}}
+\frac{b(q)}q\\
+&=
+H\prod_{p>2}\left(1+\frac{b_p}{p}\right).
+\end{aligned}
+\tag{7}
+\]
+
+The Euler product converges because
+
+\[
+\frac{b_p}{p}\ll\frac1{p^2}
+\]
+
+and
+
+\[
+\sum_p\frac1{p^2}<\infty.
+\]
+
+This proves (2), with
+
+\[
+K:=\prod_{p>2}\left(1+\frac{b_p}{p}\right).
+\]
+
+Cauchy--Schwarz now gives
+
+\[
+\begin{aligned}
+\left(\sum_{d\in\mathcal D}F(d)\right)^2
+&\le
+|\mathcal D|
+\sum_{d\in\mathcal D}F(d)^2\\
+&\le
+K|\mathcal D|H,
+\end{aligned}
+\]
+
+which is (3). Substituting \(|\mathcal D|=\eta H\) proves (4). \(\square\)
+
+\paragraph{Consequence}
+
+A shrinking normalized target window contains only
+
+\[
+O(\eta\log X)
+\]
+
+available differences of size \(O(\log X)\). Even choosing the differences with the largest singular series leaves total singular mass
+
+\[
+o(\log X)
+\qquad(\eta\to0).
+\]
+
+Therefore an averaged pair theorem with an unavoidable error equal to a fixed positive multiple of \(X\log X\) cannot be made sufficient merely by selecting highly singular differences.
+
+This does not rule out a theorem with a genuinely smaller error. It rules out singular-series amplification as a substitute for that improvement.
+
+The finite computation up to five million differences agrees strongly with the theorem. The top \(0.01\%\) of even differences carried only about \(0.0259\%\) of the total variable singular-factor mass.
+
+\subsubsection*{II. Exact balanced-semiprime reduction}
+
+Fix
+
+\[
+\frac13<\alpha<\frac12
+\]
+
+and put
+
+\[
+z=X^\alpha.
+\]
+
+Define the rough indicator
+
+\[
+R_z(m):=
+1_{\{P^-(m)>z\}},
+\]
+
+where \(P^-(m)\) is the least prime factor of \(m\).
+
+\paragraph{Lemma 2: exact classification of rough integers}
+
+For all sufficiently large \(X\), every \(z\)-rough integer
+
+\[
+X\le m\le3X
+\]
+
+is either prime or a product of exactly two primes, counted with multiplicity.
+
+\paragraph{Proof}
+
+Because \(m>1\), it has at least one prime factor.
+
+If \(m\) had at least three prime factors, counted with multiplicity, then each would exceed \(z\), so
+
+\[
+m>z^3=X^{3\alpha}.
+\]
+
+Since \(3\alpha>1\),
+
+\[
+X^{3\alpha}>3X
+\]
+
+for all sufficiently large \(X\), contradicting \(m\le3X\). \(\square\)
+
+Let \(P(m)=1_{\mathbb P}(m)\), and let \(S_z(m)\) denote the indicator that \(m\) is a \(z\)-rough semiprime. Lemma 2 gives the exact identity
+
+\[
+\boxed{R_z=P+S_z.}
+\tag{8}
+\]
+
+Every number counted by \(S_z\) has a unique representation
+
+\[
+m=pq,\qquad z<p\le q,
+\tag{9}
+\]
+
+where \(p\) is its least prime factor. In particular,
+
+\[
+X^\alpha<p\le\sqrt{3X}.
+\tag{10}
+\]
+
+Thus the smaller prime variable occupies the Type-II exponent interval
+
+\[
+\boxed{
+\alpha<
+\frac{\log p}{\log X}
+\le\frac12,
+}
+\tag{11}
+\]
+
+whose width is
+
+\[
+\boxed{\frac12-\alpha<\frac16.}
+\tag{12}
+\]
+
+This converts the false-positive part of a rough sieve into a narrow, balanced bilinear prime sum.
+
+\subsubsection*{III. Exact two-block majority theorem}
+
+Let \(H^-,H^+\) be two sets of shifts satisfying
+
+\[
+H^-\subseteq[0,\eta\log X]
+\]
+
+and
+
+\[
+H^+\subseteq[(C-\eta)\log X,(C+\eta)\log X].
+\]
+
+For each \(n\), define
+
+\[
+P_-(n):=\sum_{h\in H^-}P(n+h),
+\qquad
+P_+(n):=\sum_{h\in H^+}P(n+h),
+\]
+
+and similarly
+
+\[
+R_-(n):=\sum_{h\in H^-}R_z(n+h),
+\qquad
+R_+(n):=\sum_{h\in H^+}R_z(n+h).
+\]
+
+Since \(P_\pm(n)\le R_\pm(n)\), the elementary majorant identity gives
+
+\[
+P_-(n)P_+(n)
+\ge
+P_-(n)R_+(n)
++
+R_-(n)P_+(n)
+-
+R_-(n)R_+(n).
+\tag{13}
+\]
+
+Let \(w(n)\ge0\) be arbitrary weights and put
+
+\[
+D:=\sum_nw(n)R_-(n)R_+(n),
+\tag{14}
+\]
+
+\[
+L:=\sum_nw(n)P_-(n)R_+(n),
+\tag{15}
+\]
+
+\[
+R:=\sum_nw(n)R_-(n)P_+(n).
+\tag{16}
+\]
+
+Summing (13) gives
+
+\[
+\boxed{
+\sum_nw(n)P_-(n)P_+(n)\ge L+R-D.
+}
+\tag{17}
+\]
+
+\paragraph{Theorem 3: pair-rough prime-majority criterion}
+
+Suppose \(D>0\), and suppose that for some fixed \(\delta>0\),
+
+\[
+L\ge\left(\frac12+\delta\right)D
+\tag{18}
+\]
+
+and
+
+\[
+R\ge\left(\frac12+\delta\right)D.
+\tag{19}
+\]
+
+Then
+
+\[
+\sum_nw(n)P_-(n)P_+(n)>0.
+\]
+
+\paragraph{Proof}
+
+Equations (17)--(19) give
+
+\[
+\begin{aligned}
+\sum_nw(n)P_-(n)P_+(n)
+&\ge
+\left(
+\frac12+\delta+
+\frac12+\delta-1
+\right)D\\
+&=
+2\delta D>0.
+\end{aligned}
+\]
+
+\(\square\)
+
+Consequently, there is some \(n\) for which both blocks contain a prime.
+
+If the weight support also imposes an Erdős--Rankin covering of every intervening position outside \(H^-\cup H^+\), the greatest prime in the left block and the least prime in the right block are consecutive. Their gap lies between
+
+\[
+(C-2\eta)\log X
+\]
+
+and
+
+\[
+(C+\eta)\log X.
+\]
+
+Letting \(\eta\to0\) diagonally proves the target value \(C\). Thus Theorem 3 is a complete conditional reduction of (EP5).
+
+\subsubsection*{IV. The precise Type-II statement that is still required}
+
+Write
+
+\[
+S_-(n):=\sum_{h\in H^-}S_z(n+h),
+\qquad
+S_+(n):=\sum_{h\in H^+}S_z(n+h).
+\]
+
+Since \(R_z=P+S_z\), the two marginal inequalities in (18)--(19) are equivalent to proving that rough semiprimes contribute strictly less than half of the pair-rough mass at either endpoint. A sufficient relative estimate is
+
+\[
+\boxed{
+\begin{aligned}
+\sum_n w(n)S_-(n)R_+(n)
+&\le
+\left(\frac12-\delta+o(1)\right)D,\\
+\sum_n w(n)R_-(n)S_+(n)
+&\le
+\left(\frac12-\delta+o(1)\right)D.
+\end{aligned}
+}
+\tag{22}
+\]
+
+Using the unique representation in (9), the first left-hand side in (22) is a prime--prime bilinear form of the shape
+
+\[
+\sum_{X^\alpha<p\le\sqrt{3X}}
+\ \sum_{\substack{q\ge p\\pq\asymp X}}
+\ \sum_{h\in H^-}
+w(pq-h)R_+(pq-h),
+\tag{23}
+\]
+
+with both \(p\) and \(q\) prime. The second estimate is analogous. The genuinely missing input is therefore a \emph{relative, pair-conditioned, balanced-semiprime Type-II estimate} for the narrow interval
+
+\[
+p\in[X^\alpha,X^{1/2}].
+\tag{24}
+\]
+
+It must remain uniform after the target-window average, the Erdős--Rankin congruence, and the squared Maynard weight are imposed. Proving an unconditioned rough-number asymptotic is not enough.
+
+\subsubsection*{V. Why a large-modulus theorem is not a black box here}
+
+A direct two-layer expansion of the two roughness conditions has nominal modulus exponent \(2\alpha\). But
+
+\[
+2\alpha>\frac23>\frac58>\frac35.
+\tag{25}
+\]
+
+Thus neither a generic exponent-\(3/5\) well-factorable distribution theorem nor the specialized exponent-\(5/8\) triply-well-factorable theorem can simply be inserted as a black-box two-layer sieve. The balanced representation (23), rather than a full expansion paying exponent \(2\alpha\), has to be exploited. This is the exact point at which a Ford--Maynard/Harman-style Type-II decomposition would have to do new work.
+
+\subsubsection*{VI. Buchstab benchmark and computational audit}
+
+For \(1/3<\alpha<1/2\), the one-dimensional Buchstab model predicts that the prime fraction among \(X^\alpha\)-rough integers is
+
+\[
+r(\alpha)
+=
+\frac{\alpha}{\omega(1/\alpha)}
+=
+\frac{1}{1+\log((1-\alpha)/\alpha)}.
+\tag{26}
+\]
+
+Since \((1-\alpha)/\alpha<2\) and \(\log2<1\),
+
+\[
+r(\alpha)>\frac12.
+\tag{27}
+\]
+
+This is favorable evidence for (22), not a proof: the model does not show that the strict majority survives conditioning the other endpoint to be rough, the target-window restriction, the Erdős--Rankin congruence, or the squared Maynard weight.
+
+The supplied ledger recomputes (26) at several \(\alpha\)-values, verifies the positive model margin \(2r(\alpha)-1\), records the Type-II width \(1/2-\alpha<1/6\), and records the obstruction \(2\alpha>2/3\). The singular-series audit independently computes the variable factor for every even difference up to five million; for the top-density cutoff \(\eta=10^{-4}\), the selected 250 differences carry approximately \(2.5913\times10^{-4}\) of the total variable-factor mass. This agrees with Theorem 1 and provides no evidence for a singular-series concentration mechanism.
+
+\subsubsection*{Artifact verification and scope}
+
+The uploaded artifacts have been mirrored into the website and checked as one reproducible bundle:
+
+\begin{itemize}
+\item \href{artifacts/erdos/gpt_pro_5.6/5/singular_series_concentration_barrier.md}{singular\_series\_concentration\_barrier.md};
+\item \href{artifacts/erdos/gpt_pro_5.6/5/singular_series_tail_audit.py}{singular\_series\_tail\_audit.py}, \href{artifacts/erdos/gpt_pro_5.6/5/singular_series_tail_audit.csv}{CSV}, and \href{artifacts/erdos/gpt_pro_5.6/5/singular_series_tail_mass.png}{plot};
+\item \href{artifacts/erdos/gpt_pro_5.6/5/PrimeGap_SingularMass_Barrier.lean}{PrimeGap\_SingularMass\_Barrier.lean};
+\item \href{artifacts/erdos/gpt_pro_5.6/5/balanced_semiprime_typeII_route.md}{balanced\_semiprime\_typeII\_route.md};
+\item \href{artifacts/erdos/gpt_pro_5.6/5/balanced_semiprime_typeII_ledger.py}{balanced\_semiprime\_typeII\_ledger.py}, \href{artifacts/erdos/gpt_pro_5.6/5/balanced_semiprime_typeII_ledger.csv}{CSV}, and \href{artifacts/erdos/gpt_pro_5.6/5/balanced_semiprime_typeII_tradeoff.png}{plot};
+\item \href{artifacts/erdos/gpt_pro_5.6/5/PrimeGap_BalancedSemiprime_Reduction.lean}{PrimeGap\_BalancedSemiprime\_Reduction.lean};
+\item the earlier reductions \href{artifacts/erdos/gpt_pro_5.6/5/rough_liouville_target_criterion.md}{rough\_liouville\_target\_criterion.md}, \href{artifacts/erdos/gpt_pro_5.6/5/rough_liouville_adversarial_update.md}{rough\_liouville\_adversarial\_update.md}, and \href{artifacts/erdos/gpt_pro_5.6/5/higher_order_target_block_criterion.md}{higher\_order\_target\_block\_criterion.md};
+\item the \href{artifacts/erdos/gpt_pro_5.6/5/README.md}{verification report} and \href{artifacts/erdos/gpt_pro_5.6/5/verify_artifacts.py}{executable verifier}.
+\end{itemize}
+
+The executable audit regenerates both numerical tables, checks the stated formulas and inequalities, validates the JSON mirrors and PNG payloads, and enforces the declared formal scope. Both integrated Lean files were additionally kernel-checked against Lean 4.32.0 and Mathlib v4.32.0. The uploaded balanced-semiprime file initially failed at its three-factor inequality; its integrated copy replaces that unsuccessful automation with an explicit chain of positive multiplication inequalities. The Lean files formalize only the elementary algebraic consequences and factor-size reductions; they do not formalize the Euler-product convergence in Theorem 1 or the missing estimate (22). Accordingly, none of these artifacts constitutes a proof of (EP5).
+
+\subsubsection*{Final assessment}
+
+\[
+\boxed{\text{LABEL: UNRESOLVED}}
+\]
+
+\[
+\boxed{
+\begin{array}{c}
+\text{SUBLABEL: SINGULAR-SERIES AMPLIFICATION IS RIGOROUSLY RULED OUT;}\\
+\text{THE LEADING PATH IS NOW THE EXPLICIT PAIR-ROUGH}\\
+\text{PRIME-MAJORITY TYPE-II ESTIMATE (22).}
+\end{array}
+}
+\]
+
+The new proved advances are therefore exact but partial: bounded second moment prevents singular-factor mass from concentrating on a vanishing-density set of target shifts; \(X^\alpha\)-rough integers in \([X,3X]\) are exactly primes or balanced semiprimes when \(1/3<\alpha<1/2\); and the two-block inequality reduces the problem to the explicit pair-conditioned majority estimates (22). The first unproved statement is (22), and it is strong enough that proving it would complete the proposed route to the conjecture.
