@@ -241,6 +241,65 @@ def parse_collection_metadata(content):
     return metadata, remainder if separator else ''
 
 
+def current_collection_provenance(metadata):
+    """Resolve migrated source links in site data while retaining source records."""
+    if metadata['kind'] != 'reused_writeup':
+        return metadata
+
+    def current_path(path):
+        for collection in ('erdos', 'mo'):
+            old_prefix = f'attacks/{collection}/'
+            if path.startswith(old_prefix):
+                return f'attacks/open_problems/{collection}/' + path[len(old_prefix):]
+        return path
+
+    return {
+        **metadata,
+        'primary_source': current_path(metadata['primary_source']),
+        'source_paths': [current_path(path) for path in metadata['source_paths']],
+    }
+
+
+def declared_attempt_status(content):
+    """Read the optional shared status marker, rejecting ambiguous declarations."""
+    values = re.findall(r'^[ \t]*%[ \t]*ATTEMPT_STATUS:[ \t]*([^\r\n]*)',
+                        content, re.MULTILINE | re.IGNORECASE)
+    statuses = set()
+    for value in values:
+        value = value.strip().lower()
+        if value not in {'solved', 'unresolved', 'partial'}:
+            raise ValueError(f'Invalid ATTEMPT_STATUS: {value!r}')
+        statuses.add('unresolved' if value == 'partial' else value)
+    if len(statuses) > 1:
+        raise ValueError('Conflicting ATTEMPT_STATUS declarations')
+    return next(iter(statuses), None)
+
+
+def infer_attempt_status(content):
+    """Keep explicit partial submissions out of the legacy solved fallback.
+
+    This extracts author claims, not mathematical correctness. Recognize status
+    headings and standalone partial labels without interpreting ordinary prose
+    about partial sums/results as a declaration that a full proof is incomplete.
+    """
+    declared = declared_attempt_status(content)
+    if declared:
+        return declared
+    if re.search(r'\bunresolved\b|\bremains\s+open\b', content, re.IGNORECASE):
+        return 'unresolved'
+    labels = re.sub(r'\\(?:textbf|textit|emph|section|subsection|paragraph|noindent)\*?',
+                    '', content)
+    labels = re.sub(r'[{}*]', '', labels)
+    partial = re.search(
+        r'^[ \t]*(?:\d+[.)][ \t]*)?'
+        r'(?:(?:FINAL[ \t]+)?(?:STATUS|LABEL)[ \t]*:?[ \t]*)?'
+        r'PARTIAL(?:[ \t]*(?:[.:;/()—–-]|$)|'
+        r'[ \t]+(?:formalization|progress|solution|results?|proof)\b)',
+        labels, re.MULTILINE | re.IGNORECASE,
+    )
+    return 'unresolved' if partial else 'solved'
+
+
 def parse_attack(content, model_name, date_posted=None):
     """Parse an attack TeX file and extract structured data."""
     provenance, content = parse_collection_metadata(content)
@@ -269,10 +328,7 @@ def parse_attack(content, model_name, date_posted=None):
     if current_content:
         sections[current_section] = '\n'.join(current_content).strip()
 
-    # Determine status from raw content.
-    status = 'unresolved' if re.search(
-        r'\bunresolved\b|\bremains\s+open\b', content, re.IGNORECASE
-    ) else 'solved'
+    status = infer_attempt_status(content)
 
     completion = extract_completion(content)
     if provenance:
@@ -292,7 +348,7 @@ def parse_attack(content, model_name, date_posted=None):
     }
 
     if provenance:
-        attack_data['provenance'] = provenance
+        attack_data['provenance'] = current_collection_provenance(provenance)
         attack_data['entry_kind'] = provenance['kind']
 
     if completion is not None:
@@ -771,9 +827,11 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                 if numbered and r'\subsection{Definitions and mathematical statement}' in content:
                     raw = parse_numbered_problem_tex(content)['documentTeX']
                 parsed = parse_attack(raw, model_dir.name.replace('_', ' '), get_file_date(tex_file))
-                declared_status = re.search(r'^% ATTEMPT_STATUS: (solved|unresolved)\s*$', content, re.MULTILINE)
+                # Numbered documents lose comments during display conversion;
+                # read their declaration from the original source as well.
+                declared_status = declared_attempt_status(content)
                 if declared_status:
-                    parsed['status'] = declared_status[1]
+                    parsed['status'] = declared_status
                 parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
                 parsed['version'] = int(match.group('ver') or 1)
                 problems[problem_id]['attacks'].append(parsed)

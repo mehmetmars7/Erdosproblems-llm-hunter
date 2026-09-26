@@ -59,6 +59,22 @@ assert.match(render(tex`\url{https://example.org/?a=1\&b=2}`), /href="https:\/\/
 assert.match(render(tex`\url{https://users.renyi.hu/\~{}p_erdos/1982-01.pdf}`), /href="https:\/\/users\.renyi\.hu\/~p_erdos\/1982-01\.pdf"/);
 assert.match(render(tex`\href{https://example.org/}{\emph{Source} $x^2$}`), /<em>Source<\/em> \$x\^2\$/);
 
+// Submitted HTML and TeX sizing arguments cannot acquire event handlers, CSS
+// payloads, or unvalidated anchors when generated markup is restored.
+for (const source of [
+    '<div class="latex-parbox" onclick="window.pwned=true">payload</div>',
+    '<table class="latex-table"><tr><td onclick="window.pwned=true">payload</td></tr></table>',
+    '<a href="javascript:window.pwned=true" target="_blank">payload</a>',
+    tex`\parbox{1px; position: fixed; inset: 0}{payload}`,
+    tex`\parbox{1px;" onclick="window.pwned=true}{payload}`,
+]) {
+    assert.doesNotMatch(render(source), /<(?:a|div|td)\b[^>]*(?:onclick|javascript:|position:)/);
+}
+assert.match(render(tex`\parbox{0.8\linewidth}{A safe box.}`), /class="latex-parbox" style="max-width: 80%;"/);
+assert.match(render(tex`\parbox{12em}{A safe box.}`), /class="latex-parbox" style="max-width: 12em;"/);
+assert.ok(context.window.MathJax.loader.load.includes('ui/safe'));
+assert.equal(context.window.MathJax.options.safeOptions.allow.URLs, 'none');
+
 assert.equal(render('Round~2 and Round&nbsp;4.'), '<p>Round\u00a02 and Round\u00a04.</p>');
 assert.equal(render(tex`A prize of \$250 for $\alpha=\omega_1^{\omega+2}$ and \$500 otherwise.`),
     tex`<p>A prize of \$250 for $\alpha=\omega_1^{\omega+2}$ and \$500 otherwise.</p>`);

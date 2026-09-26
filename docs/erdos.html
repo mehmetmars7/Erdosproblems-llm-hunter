@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="styles.css">
     <script>
         window.MathJax = {
+            loader: { load: ['ui/safe'] },
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
@@ -31,7 +32,8 @@
                 }
             },
             options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+                safeOptions: { allow: { URLs: 'none' } }
             }
         };
     </script>
@@ -99,8 +101,8 @@
         <section class="contribute-cta">
             <h3>Contribute</h3>
             <p>
-                Have an LLM attempt to share for an Erdos problem?
-                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank">Contributing Guidelines</a>
+                Have an LLM attempt or Lean formalization to share for an Erdos problem?
+                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guidelines</a>
                 to submit your contribution.
             </p>
         </section>
@@ -129,13 +131,7 @@
             let sortByCompletion = 0; // 0 = by number, 1 = completion asc, -1 = completion desc
 
             
-            const hasUnresolved = (attack) => /unresolved/i.test(attack.raw || '');
-
-            // Helper to determine overall status
-            const getOverallStatus = (attacks) => {
-                if (!attacks || attacks.length === 0) return 'zzz-none'; // Sort last
-                return attacks.some(hasUnresolved) ? 'unresolved' : 'solved';
-            };
+            const getOverallStatus = window.ProblemHunting.getOverallClaim;
 
             function renderTable() {
                 if (typeof erdosProblems === 'undefined') {
@@ -190,13 +186,8 @@
                         (p.attacks.some(a => a.entry_kind === 'statement_only') ? 'awaiting attempt' : '-');
                     const modelsLabel = window.ProblemHunting.escapeHtml(models);
 
-                    // Legacy fallback; current builds supply the database-derived display label.
-                    const determineStatus = (attacks) => {
-                        if (!attacks || attacks.length === 0) return 'none';
-                        return attacks.some(hasUnresolved) ? 'unresolved' : 'solved';
-                    };
-                    
-                    const status = p.llm_status || determineStatus(p.attacks);
+                    // Current builds supply the database-derived display label.
+                    const status = p.llm_status || getOverallStatus(p.attacks);
                     const statusClass = status === 'solved' ? 'table-status-solved' :
                                        status === 'unresolved' ? 'table-status-unresolved' :
                                        '';

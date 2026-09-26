@@ -105,6 +105,22 @@ function getMathematicalAttempts(attacks) {
     return (attacks || []).filter(a => a.entry_kind !== 'statement_only');
 }
 
+// Partial work is not a solution. Keep legacy browser fallbacks aligned with
+// the builder's solved/unresolved claim labels without changing problem status.
+function getAttemptClaim(attack) {
+    const status = String(attack.status || '').trim().toLowerCase();
+    if (status === 'solved') return 'solved';
+    if (status === 'partial' || status === 'unresolved') return 'unresolved';
+    return /\b(?:unresolved|remains open|partial)\b/i.test(attack.raw || '') ? 'unresolved' : 'not stated';
+}
+
+function getOverallClaim(attacks) {
+    const claims = getMathematicalAttempts(attacks).map(getAttemptClaim);
+    if (!claims.length) return 'none';
+    if (claims.includes('unresolved')) return 'unresolved';
+    return claims.every(claim => claim === 'solved') ? 'solved' : 'not stated';
+}
+
 function getUniqueModels(attacks) {
     const attempts = getMathematicalAttempts(attacks);
     const authoredModels = new Set(attempts.filter(a => a.entry_kind !== 'reused_writeup').map(a => a.model));
@@ -123,7 +139,9 @@ function getModelLabels(attacks) {
         if (/gpt[ _]pro/i.test(name)) return 'gpt pro';
         if (/gpt[ _]5\.2/i.test(name)) return 'gpt 5.2';
         if (/codex/i.test(name)) return 'codex';
-        if (/claude|opus/i.test(name)) return 'opus 4.5';
+        if (/claude|opus/i.test(name)) {
+            return name.toLowerCase().replace(/_/g, ' ').replace(/^claude\s+(opus|sonnet|haiku)\b/, '$1');
+        }
         if (/gemini/i.test(name)) return 'gemini';
         return name.toLowerCase();
     };
@@ -202,8 +220,7 @@ function getOpenProblemClaim(problem) {
     const attempts = getMathematicalAttempts(problem.attacks);
     if (!attempts.length) return 'no attempt';
     if (problem.llm_status && problem.llm_status !== 'none') return problem.llm_status;
-    const statuses = [...new Set(attempts.map(attempt => attempt.status).filter(Boolean))];
-    return statuses.length === 1 ? statuses[0] : statuses.length ? 'mixed claims' : 'not stated';
+    return getOverallClaim(attempts);
 }
 
 function getOpenProblemStatusLabel(problem) {
@@ -647,6 +664,8 @@ window.ProblemHunting = {
     getUniqueModels,
     getModelLabels,
     getMathematicalAttempts,
+    getAttemptClaim,
+    getOverallClaim,
     countWithAttacks,
     getOpenProblemCollection,
     getOpenProblemHref,

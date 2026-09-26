@@ -156,6 +156,28 @@ See \\ref{shared}.
     assert.equal(result.links.filter(link => link.sourceAttempt === 3).length, 1, 'The untrusted label must be exercised as a reference.');
     assert.deepEqual(result.security, { injectedElements: 0, executed: false, textPreserved: true });
 
+    const unsafeMarkup = await evaluate(`(() => {
+        const host = document.createElement('div');
+        host.innerHTML = formatTeX([
+            '<div class="latex-parbox" onclick="window.markupPayloadExecuted=true">raw box</div>',
+            '<table class="latex-table"><tr><td onclick="window.markupPayloadExecuted=true">raw cell</td></tr></table>',
+            '<a href="javascript:window.markupPayloadExecuted=true" target="_blank">raw link</a>',
+            String.raw\`\\parbox{1px;" onclick="window.markupPayloadExecuted=true}{TeX box}\`,
+            String.raw\`\\href{https://github.com/example/proofs/blob/123/Main.lean}{Lean source}\`
+        ].join('\\n\\n'));
+        document.body.append(host);
+        return {
+            handlers: host.querySelectorAll('[onclick]').length,
+            links: [...host.querySelectorAll('a')].map(link => ({ href: link.getAttribute('href'), rel: link.rel })),
+            executed: window.markupPayloadExecuted === true
+        };
+    })()`);
+    assert.equal(unsafeMarkup.handlers, 0, 'Raw or TeX-generated markup must not add event handlers.');
+    assert.deepEqual(unsafeMarkup.links, [{
+        href: 'https://github.com/example/proofs/blob/123/Main.lean', rel: 'noopener noreferrer'
+    }]);
+    assert.equal(unsafeMarkup.executed, false);
+
     const rendered = await evaluate(`(() => {
         document.body.innerHTML = '<main><article class="attempt"></article></main>';
         const host = document.querySelector('main');

@@ -25,6 +25,8 @@ class OpenProblemReviewTests(unittest.TestCase):
             (self.definitions / f"{number}.tex").write_text(
                 '% TOP_PROBLEM: ' + json.dumps({"problemId": problem_id}) + '\n', encoding="utf-8")
         (self.lists / "erdos_problems.csv").write_text("number\n665\n", encoding="utf-8")
+        (self.lists / "erdos_status.json").write_text(
+            json.dumps({"problems": {"665": {}, "1221": {}}}), encoding="utf-8")
         (self.lists / "mo_problems.csv").write_text("question_id\n123\n", encoding="utf-8")
         for name, value in [("LISTS_DIR", self.lists), ("REVIEWS_DIR", self.output), ("TOP_PROBLEMS_DIR", self.definitions)]:
             patcher = patch.object(reviews, name, value)
@@ -75,6 +77,12 @@ class OpenProblemReviewTests(unittest.TestCase):
             with self.subTest(problem_id=problem_id), self.assertRaisesRegex(SystemExit, "not found"):
                 self.submit(problem_id=problem_id)
         self.assertFalse(self.output.exists())
+
+    def test_erdos_review_accepts_published_snapshot_ids_missing_from_old_csv(self):
+        self.submit(problem_type="Erdos", problem_id="1221")
+        self.assertTrue((self.output / "erdos/1221.json").is_file())
+        with self.assertRaisesRegex(SystemExit, "not found"):
+            self.submit(problem_type="Erdos", problem_id="1222")
 
     def test_unsafe_ids_are_rejected_even_if_the_catalog_contains_them(self):
         for problem_id in ["../../outside", "problem../outside", "problem.bad\\path",

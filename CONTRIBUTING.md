@@ -78,6 +78,74 @@ The website groups ranked problems and MathOverflow records under **Top Open Pro
 The numbered definitions contain stable IDs for existing problem links and reviews. Keep the number-to-ID mapping consistent with any numbered model attempts.
 MathOverflow entries retain their numeric source IDs and existing links.
 
+### Lean Code Contributions
+
+Submit a short `.tex` description using the same problem directory, model folder,
+and filename/version convention as a normal LLM attempt above. It will appear as
+an attempt on that problem's page. Keep the Lean source in an external repository;
+submit only the description here, so contributors and readers do not need to
+download `.lean` files into this website repository.
+
+The description must include:
+
+- **Lean source**: A public HTTPS link to the complete Lean code, such as a GitHub
+  file or repository. Prefer a link pinned to a commit, and identify the relevant
+  file and theorem when linking a larger project. Include the link in the TeX
+  text using `\href{https://...}{Lean source}` or `\url{https://...}`.
+- **Scope**: The precise statement formalized, its relationship to the original
+  problem, and what remains open. Disclose `sorry`/`admit`, additional axioms,
+  assumptions, and other gaps. A partial formalization is welcome; successful
+  checking alone does not establish that the original problem is solved.
+- **Attribution**: The LLM model used, prompting/process, and any human
+  contributions or edits. Link to the complete original generated output.
+- **Reproduction**: The Lean version and Mathlib version/commit (if used), or the
+  Lean Web project used to test the example. Identify other dependencies and
+  report the actual checking outcome, including warnings, failures, or "not
+  tested". Do not imply that repository maintainers verified the result.
+
+**Lean code submitted or linked here is not manually reviewed for correctness or
+safety. Do not run untrusted submitted Lean code locally**, including through an
+editor's automatic Lean checking. The website publishes descriptions and links;
+it does not run the linked Lean code.
+
+When possible, also provide a browser-based reproduction using
+[Lean Web](https://live.lean-lang.org/). For very small, self-contained examples,
+use a Lean Web share link (`code` or `codez`). For larger examples, commit the
+`.lean` file to the **external source repository** and link to Lean Web with
+`#url=` set to its URL-encoded raw-file HTTPS URL, preferably pinned to a commit,
+instead of embedding a large amount of code in a `codez` URL. An optional
+`&project=` must name a project already available on that Lean Web server; it
+does not load an arbitrary project from GitHub. See the
+[Lean Web URL documentation](https://github.com/leanprover-community/lean4web/blob/main/doc/Usage.md).
+Test the shared link in the selected project. A project with multiple files or
+custom dependencies may not work as a single-file playground example; document
+those requirements in the external repository. A Lean Web link is a reproduction
+aid, not a correctness or safety certification.
+
+Example description template (replace the placeholders and describe your actual
+result; use the appropriate problem/model path):
+
+```tex
+\documentclass{article}
+\usepackage{hyperref}
+% ATTEMPT_STATUS: unresolved
+\begin{document}
+\section*{Lean formalization of Erdos problem 5}
+Model and process: [model/version, prompting, and human contributions].
+
+Scope: [precise lemma or statement formalized and remaining gaps].
+Lean source and original output:
+\href{https://github.com/OWNER/REPO/blob/COMMIT/erdos/5/Main.lean}{Lean source}.
+
+Reproduction: [Lean version and Mathlib commit, or Lean Web project].
+Checking outcome: [actual result, warnings, or not tested].
+Additional assumptions or placeholders: [list, or none].
+
+\section*{Final status}
+PARTIAL formalization; the original problem remains UNRESOLVED.
+\end{document}
+```
+
 ## Pull Request Process
 
 1. **Fork the Repository**: Create your own fork of the project
@@ -102,7 +170,7 @@ MathOverflow entries retain their numeric source IDs and existing links.
 ## Quality Standards
 
 - **Reproducibility**: Include information about the prompt strategy used and if possible a public link
-- **Completeness**: Include the full LLM output, not just excerpts
+- **Completeness**: Include the full LLM output, not just excerpts. For Lean contributions, the short TeX description may link to the complete original output and Lean source hosted externally.
 - **Formatting**: Use proper LaTeX formatting for mathematical content
 - **Sources**: Cite primary sources for the target and definitions, and cite the results used in the mathematical argument. Check cited statements and explain how their hypotheses apply.
 - **Substance**: Include actual mathematical reasoning or a checked construction. Keep catalogs and statement-only records separate from attempts.
@@ -115,11 +183,14 @@ for a ranked record and copy its stable ID (such as `problem.p-versus-np`) from 
 detail page. Select **MO** and its numeric question ID for the MathOverflow subset,
 or **Erdos** and its numeric problem number. An accepted review requires a citation
 and an explanation. Review changes pass through a pull request before publication.
+Maintainers use the `ready-for-pr` label to create that pull request. Its required
+`build` check must pass before merging; if GitHub displays an **Approve workflows
+to run** banner, a maintainer must review and approve the workflow run first.
 
 ## Important Reminders
 
 1. **No Verification Claims**: Do not claim a problem is definitively solved. All claims are subject to expert review.
-2. **Original Output**: Submit the actual LLM output, not human-edited versions.
+2. **Original Output**: Submit the actual LLM output, not human-edited versions. For Lean contributions, the short TeX summary may be written by the contributor; preserve the original generated output at the external source link and disclose any subsequent human edits separately.
 3. **Disclosure**: If you used any special prompting techniques, document them.
 
 ## Code of Conduct
@@ -129,7 +200,7 @@ and an explanation. Review changes pass through a pull request before publicatio
 
 ## Questions?
 
-If you have questions about contributing, please open an issue on the GitHub repository.
+For questions about contributing, use [GitHub Discussions](https://github.com/mehmetmars7/Erdosproblems-llm-hunter/discussions). The issue form is reserved for reviews of specific attempts.
 
 ## Recommended prompt:
 ROLE

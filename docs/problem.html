@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="styles.css">
     <script>
         window.MathJax = {
-            loader: { load: ['[tex]/mathtools'] },
+            loader: { load: ['[tex]/mathtools', 'ui/safe'] },
             tex: {
                 packages: { '[+]': ['mathtools'] },
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -78,7 +78,10 @@
                 }
             },
             options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+                // External sources belong in prose links, which the formatter
+                // validates. Do not let mathematical macros introduce URLs.
+                safeOptions: { allow: { URLs: 'none' } }
             }
         };
     </script>
@@ -123,12 +126,13 @@
             </div>
         </section>
 
-        <section class="contribute-cta">
+        <section class="contribute-cta" id="contribute-cta" hidden>
             <h3>Contribute</h3>
             <p>
-                Have an LLM attempt to share for this problem?
-                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank">Contributing Guidelines</a>
-                to submit your contribution.
+                Have an LLM attempt or Lean formalization to share for this open problem?
+                Lean contributions use a short TeX summary with a link to the externally hosted code.
+                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guidelines</a>
+                for the submission format and Lean code safety guidance.
             </p>
         </section>
 
@@ -156,7 +160,7 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=331a6d6e16c2ca91"></script>
+    <script src="data/open_problems_data.js?v=9ec3782b0b035e2d"></script>
     <script src="app.js"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
@@ -241,6 +245,14 @@
                 }
             }
 
+            // Use the mathematical status, not an LLM claim or a partial proof.
+            // Historical MO records do not supply a reviewed problem status.
+            const problemStatus = String(problem.status || '').trim().toLowerCase();
+            const isOpenProblem = type === 'erdos'
+                ? /^open(?: \(lean\))?$/.test(problemStatus)
+                : type === 'open_problems' && (problemStatus === 'open' || problemStatus.startsWith('open_'));
+            document.getElementById('contribute-cta').hidden = !isOpenProblem;
+
             const reviewIssueUrl = getReviewIssueUrl(type, id);
             initGiscus(type, id);
 
@@ -263,16 +275,7 @@
             // Problem meta
             const metaDiv = document.getElementById('problem-meta');
             
-            const hasUnresolved = (attack) => attack.status
-                ? attack.status === 'unresolved'
-                : /unresolved/i.test(attack.raw || '');
-
-            // Determine overall status from the source content.
-            const determineOverallStatus = (attacks) => {
-                const actualAttempts = (attacks || []).filter(attack => attack.entry_kind !== 'statement_only');
-                if (actualAttempts.length === 0) return 'none';
-                return actualAttempts.some(hasUnresolved) ? 'unresolved' : 'solved';
-            };
+            const determineOverallStatus = window.ProblemHunting.getOverallClaim;
             const reviewLabel = window.ProblemHunting && window.ProblemHunting.getReviewLabel
                 ? window.ProblemHunting.getReviewLabel(problem.review)
                 : 'unreviewed';
@@ -385,7 +388,7 @@
                     attemptsSection.querySelector('h2').textContent = 'LLM claims and collection records';
                 }
                 attemptsDiv.innerHTML = problem.attacks.map((attack, idx) => {
-                    const attackStatus = hasUnresolved(attack) ? 'unresolved' : 'solved';
+                    const attackStatus = window.ProblemHunting.getAttemptClaim(attack);
                     const provenance = attack.provenance || {};
                     const isReused = attack.entry_kind === 'reused_writeup';
                     const isStatement = attack.entry_kind === 'statement_only';
@@ -875,8 +878,8 @@
                 if (lineWidthMatch) {
                     const percentage = Math.max(0, Math.min(100, parseFloat(lineWidthMatch[1]) * 100));
                     cssWidth = `${percentage}%`;
-                } else if (widthTrimmed) {
-                    cssWidth = widthTrimmed.replace(/\\h?space\{[^}]+\}/g, '').trim();
+                } else if (/^(?:\d+(?:\.\d+)?|\.\d+)(?:em|ex|ch|rem|px|mm|cm|in|pt|pc|%)$/.test(widthTrimmed)) {
+                    cssWidth = widthTrimmed;
                 }
                 const styleAttr = cssWidth ? ` style="max-width: ${cssWidth};"` : '';
                 return `<div class="latex-parbox"${styleAttr}>${content}</div>`;
@@ -1170,7 +1173,7 @@
                 .replace(/&lt;div class="definition"&gt;/g, '<div class="definition">')
                 .replace(/&lt;div class="proof"&gt;/g, '<div class="proof">')
                 .replace(/&lt;div class="latex-fbox"&gt;/g, '<div class="latex-fbox">')
-                .replace(/&lt;div class="latex-parbox"([^&]*)&gt;/g, '<div class="latex-parbox"$1>')
+                .replace(/&lt;div class="latex-parbox"( style="max-width: (?:\d+(?:\.\d+)?|\.\d+)(?:em|ex|ch|rem|px|mm|cm|in|pt|pc|%);")?&gt;/g, '<div class="latex-parbox"$1>')
                 .replace(/&lt;\/div&gt;/g, '</div>')
                 .replace(/&lt;h2&gt;/g, '<h2>')
                 .replace(/&lt;\/h2&gt;/g, '</h2>')
@@ -1188,16 +1191,13 @@
                 .replace(/&lt;\/em&gt;/g, '</em>')
                 .replace(/&lt;u&gt;/g, '<u>')
                 .replace(/&lt;\/u&gt;/g, '</u>')
-                .replace(/&lt;a href="/g, '<a href="')
-                .replace(/&lt;\/a&gt;/g, '</a>')
-                .replace(/" target="_blank"&gt;/g, '" target="_blank">')
                 .replace(/&lt;table class="latex-table"&gt;/g, '<table class="latex-table">')
                 .replace(/&lt;\/table&gt;/g, '</table>')
                 .replace(/&lt;tbody&gt;/g, '<tbody>')
                 .replace(/&lt;\/tbody&gt;/g, '</tbody>')
                 .replace(/&lt;tr&gt;/g, '<tr>')
                 .replace(/&lt;\/tr&gt;/g, '</tr>')
-                .replace(/&lt;td([^&]*)&gt;/g, '<td$1>')
+                .replace(/&lt;td( style="text-align: (?:left|center|right);")?&gt;/g, '<td$1>')
                 .replace(/&lt;\/td&gt;/g, '</td>');
 
             // Use $...$ to avoid browsers that fail to render \( ... \) reliably.

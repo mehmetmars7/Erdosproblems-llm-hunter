@@ -65,6 +65,11 @@ def load_problem_ids(problem_type):
         reader = csv.DictReader(f)
         for row in reader:
             ids.add(row.get(key, "").strip())
+    if problem_type == "erdos":
+        # The site includes the complete saved database, not only the older CSV.
+        # Accept reviews for every published problem number.
+        with (LISTS_DIR / "erdos_status.json").open(encoding="utf-8") as f:
+            ids.update(json.load(f)["problems"])
     return ids
 
 

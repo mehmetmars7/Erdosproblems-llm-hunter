@@ -6,7 +6,10 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from build_site import aggregate_problem_status, apply_erdos_status, build_erdos_data, parse_attack
+from build_site import (
+    aggregate_problem_status, apply_erdos_status, build_erdos_data,
+    parse_attack, parse_collection_metadata,
+)
 
 
 class CollectionProvenanceTests(unittest.TestCase):
@@ -36,10 +39,43 @@ class CollectionProvenanceTests(unittest.TestCase):
         attack = parse_attack(self.record(metadata, body), 'GPT 6 Astra Ultra', '2026-09-23')
         self.assertEqual(attack['status'], 'solved')
         self.assertEqual(attack['completion'], 35)
-        self.assertEqual(attack['provenance'], metadata)
+        self.assertEqual(attack['provenance'], {
+            **metadata,
+            'primary_source': 'attacks/open_problems/erdos/gpt_pro_5.2/51_v2.tex',
+            'source_paths': [
+                'attacks/open_problems/erdos/gpt_pro_5.2/51.tex',
+                'attacks/open_problems/erdos/gpt_pro_5.2/51_v2.tex',
+            ],
+        })
         self.assertEqual(attack['entry_kind'], 'reused_writeup')
         self.assertEqual(attack['model'], 'GPT 6 Astra Ultra')
         self.assertEqual(attack['date_posted'], '2026-09-23')
+
+    def test_migrated_source_links_preserve_submitted_metadata_and_other_paths(self):
+        metadata = self.reused_metadata(
+            primary_source='attacks/mo/model/123-question.tex',
+            source_paths=[
+                'attacks/erdos/model/5.tex',
+                'attacks/mo/model/123-question.tex',
+                'attacks/open_problems/erdos/model/5_v2.tex',
+                'attacks/another_collection/model/5.tex',
+            ],
+        )
+        body = 'Original attribution and mathematical text are preserved.'
+        source = self.record(metadata, body)
+        attack = parse_attack(source, 'collection')
+        self.assertEqual(attack['provenance'], {
+            **metadata,
+            'primary_source': 'attacks/open_problems/mo/model/123-question.tex',
+            'source_paths': [
+                'attacks/open_problems/erdos/model/5.tex',
+                'attacks/open_problems/mo/model/123-question.tex',
+                'attacks/open_problems/erdos/model/5_v2.tex',
+                'attacks/another_collection/model/5.tex',
+            ],
+        })
+        self.assertEqual(parse_collection_metadata(source), (metadata, body))
+        self.assertEqual(attack['raw'], body)
 
     def test_machine_metadata_is_removed_from_display_text_and_sections(self):
         body = 'PROBLEM 51\nAn attributed writeup.'
