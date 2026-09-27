@@ -437,6 +437,83 @@ def replace_tex_command(text, command, count, replacement):
     return ''.join(parts) + text[cursor:]
 
 
+def tex_notation_macros(preamble, defaults):
+    """Read document-local, argument-free notation without executing TeX.
+
+    Parameterized commands and layout helpers stay with their existing display
+    handlers. This is deliberately not an interpreter for packages or TeX code.
+    """
+    # Escaped percent signs survive; actual comments cannot declare a macro.
+    preamble = re.sub(r'\\.|%[^\n]*',
+                      lambda match: match[0] if match[0].startswith('\\') else '',
+                      preamble)
+    declarations = re.compile(
+        r'\\(newcommand|renewcommand|providecommand|DeclareMathOperator)(\*)?\s*'
+        r'(?:\{\s*\\([A-Za-z]+)\s*\}|\\([A-Za-z]+))\s*'
+        r'(?:\[(\d+)\]\s*)?')
+    aliases = dict(defaults)
+    declared = set()
+    cursor = 0
+    for match in declarations.finditer(preamble):
+        if match.start() < cursor:
+            continue
+        start = match.end()
+        if start >= len(preamble) or preamble[start] != '{':
+            continue
+        end, depth = start + 1, 1
+        while end < len(preamble) and depth:
+            if preamble[end] == '\\':
+                end += 2
+                continue
+            if preamble[end] == '{':
+                depth += 1
+            elif preamble[end] == '}':
+                depth -= 1
+            end += 1
+        cursor = end
+        if depth or int(match[5] or 0):
+            continue
+        name = match[3] or match[4]
+        body = preamble[start + 1:end - 1].strip()
+        if name in {'arraystretch', 'tightlist'}:
+            continue
+        if match[1] == 'providecommand' and name in declared:
+            continue
+        declared.add(name)
+        if match[1] == 'DeclareMathOperator':
+            body = r'\operatorname' + (match[2] or '') + '{' + body + '}'
+        # Keep the existing normalized spelling for standard number sets.
+        body = re.sub(r'\\mathbb\s+([A-Za-z])', r'\\mathbb{\1}', body)
+        aliases[name] = body if defaults.get(name) == body else '{' + body + '}'
+
+    command = re.compile(r'\\([A-Za-z]+|[^A-Za-z])')
+    resolved = {}
+
+    def resolve(name, trail=()):
+        if name in resolved:
+            return resolved[name]
+        if name in trail or len(trail) >= 32:
+            raise ValueError(f'Recursive or excessively nested TeX notation macro: {name}')
+        value = command.sub(lambda m: resolve(m[1], (*trail, name))
+                            if m[1] in aliases else m[0], aliases[name])
+        if len(value) > 65536:
+            raise ValueError(f'TeX notation macro expansion too large: {name}')
+        resolved[name] = value
+        return value
+
+    return {name: resolve(name) for name in aliases}
+
+
+def expand_tex_notation(text, macros):
+    """Expand notation while retaining literal code/verbatim examples."""
+    tokens = re.compile(
+        r'\\begin\{(verbatim\*?|Verbatim|Code|lstlisting|minted)\}'
+        r'[\s\S]*?\\end\{\1\}'
+        r'|\\verb\*?([^\w\s])[^\n]*?\2'
+        r'|\\([A-Za-z]+|[^A-Za-z])')
+    return tokens.sub(lambda m: macros.get(m[3], m[0]) if m[3] else m[0], text)
+
+
 def parse_numbered_problem_tex(content, *, require_source_urls=True):
     """Extract display content while leaving the downloadable source untouched."""
     # Standalone submissions can retain archival comments after the document.
@@ -476,6 +553,7 @@ def parse_numbered_problem_tex(content, *, require_source_urls=True):
               'R': r'{\mathbb{R}}', 'C': r'{\mathbb{C}}', 'F': r'{\mathbb{F}}',
               'A': r'{\mathbb{A}}', 'PP': r'{\mathbb{P}}', 'E': r'{\mathbb{E}}',
               'eps': r'\varepsilon', 'dd': r'\,\mathrm d'}
+    macros = tex_notation_macros(content[:document.start()], macros)
 
     def display(text):
         # The website uses the mathematical exposition, not the repeated
@@ -495,8 +573,7 @@ def parse_numbered_problem_tex(content, *, require_source_urls=True):
             text = replace_tex_command(text, command, 1, source_link)
         text = replace_tex_command(text, 'needspace', 1, lambda space: '')
         text = re.sub(r'\\raggedright\b', '', text)
-        return re.sub(r'\\(' + '|'.join(macros) + r')(?![A-Za-z])',
-                      lambda match: macros[match[1]], text).strip()
+        return expand_tex_notation(text, macros).strip()
 
     sections['Sources'] = sources_tex
     definition = '\n\n'.join(r'\subsection{' + name + '}\n' + display(sections[name])

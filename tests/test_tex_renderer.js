@@ -252,6 +252,23 @@ for (const fixture of ['244', '529', '530', '533', '535']) {
 const spacedRows = render(tex`\begin{tabular}{cc}A & B\\ \hline 1 & 2\\ \end{tabular}`);
 assert.equal((spacedRows.match(/<tr>/g) || []).length, 2);
 assert.equal((spacedRows.match(/<td /g) || []).length, 4);
+const longTable = render(tex`\begin{longtable}{L{0.5\textwidth}r}
+\toprule Name & Count\\ \midrule\endhead
+Example & $3$\\ \bottomrule
+\end{longtable}`);
+assert.equal((longTable.match(/<tr>/g) || []).length, 2);
+assert.match(longTable, /text-align: right;">\$3\$/);
+assert.doesNotMatch(longTable, /\\(?:begin|end|endhead|textwidth)|L\{/);
+assert.equal(render(tex`\begin{Code}
+if x < 3: print("\CH", "$x$", "<script>")
+\end{Code}`), '<pre>\nif x &lt; 3: print(&quot;\\CH&quot;, &quot;$x$&quot;, &quot;&lt;script&gt;&quot;)\n</pre>');
+const hodge = JSON.parse(fs.readFileSync(path.join(root, 'docs/data/top_problems/6.json'), 'utf8'));
+const hodgePro = hodge.attacks.find(a => a.file_path.endsWith('/gpt_6_astra_pro/6.tex'));
+const hodgeDisplay = render(hodgePro.raw);
+assert.equal((hodgeDisplay.match(/<table class="latex-table">/g) || []).length, 15); // 12 longtable + 3 tabular
+assert.equal((hodgeDisplay.match(/<pre>/g) || []).length, 3);
+assert.doesNotMatch(hodgeDisplay, /\\(?:begin|end)\{(?:longtable|Code)\}|\\endhead\b/);
+assert.match(hodgeDisplay, /\\operatorname\{CH\}/);
 const problem529 = render(fs.readFileSync(path.join(root, 'attacks/open_problems/erdos/gpt_pro_5.2/529.tex'), 'utf8'));
 const tables529 = [...problem529.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/g)].map(match =>
     [...match[1].matchAll(/<tr>([\s\S]*?)<\/tr>/g)].map(row =>

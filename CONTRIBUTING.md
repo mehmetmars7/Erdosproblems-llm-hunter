@@ -60,6 +60,14 @@ Original batches and root definitions remain unchanged. The build expands
 supported catalogue macros and source links only in browser data, retaining the
 original TeX for download.
 
+For Top Open Problems, the build also reads argument-free notation declared in
+the document preamble with `\newcommand`, `\renewcommand`, `\providecommand`, or
+`\DeclareMathOperator`. For example, `\newcommand{\CH}{\operatorname{CH}}` renders
+as the upright operator CH. Definitions remain local to that document; nested
+aliases are expanded, while verbatim/code examples are preserved. Arbitrary
+TeX package code and custom commands with arguments are not interpreted by this
+notation converter; use browser-supported notation for those cases.
+
 An identical section already present is left alone, including when its document
 wrapper differs. A changed section never overwrites an existing attempt: pass
 `--version 2` (or another unused positive version) to create `N_v2.tex`. Conflicting
