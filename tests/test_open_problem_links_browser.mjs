@@ -95,6 +95,15 @@ try {
             assert.ok(result.external.every(([url]) => !url.includes('unsolvedmath.com')));
         }
     }
+    await visit('problem.html?type=open_problems&id=1881', "document.querySelector('#erdos-main-link a')");
+    const erdosLink = await evaluate(`({
+        href: document.querySelector('#erdos-main-link a').getAttribute('href'),
+        hidden: document.querySelector('#erdos-main-link').hidden,
+        beforeStatement: !!(document.querySelector('#erdos-main-link').compareDocumentPosition(document.querySelector('.problem-statement')) & Node.DOCUMENT_POSITION_FOLLOWING)
+    })`);
+    assert.equal(erdosLink.href, 'problem.html?type=erdos&id=9');
+    assert.equal(erdosLink.hidden, false);
+    assert.equal(erdosLink.beforeStatement, true);
     await visit('open_problems.html', "document.querySelector('#open-problems-tbody .catalogue-problem')");
     const catalogue = await evaluate(`({
         headings: [...document.querySelectorAll('th')].map(th => th.textContent),
