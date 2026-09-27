@@ -13,9 +13,17 @@ function createBrowser(search = '', subset = false) {
         addEventListener(type, handler) { this.handlers[type] = handler; }
     }]));
     const location = new URL(`https://example.org/${subset ? 'mo' : 'open_problems'}.html${search}`);
+    const headers = Object.fromEntries(['rank', 'title', 'status', 'review', 'claim', 'completion', 'models', 'source', 'unsolvedmath'].map(key => {
+        const header = { attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } };
+        const indicator = { textContent: '' };
+        return [key, { dataset: { sort: key }, handlers: {}, header, indicator,
+            addEventListener(type, handler) { this.handlers[type] = handler; },
+            closest() { return header; }, querySelector() { return indicator; } }];
+    }));
     const document = {
         body: { dataset: { collection: subset ? 'mo' : 'all' } },
         addEventListener() {},
+        querySelectorAll() { return Object.values(headers); },
         getElementById(id) { return elements[id] || null; }
     };
     const window = {
@@ -24,7 +32,7 @@ function createBrowser(search = '', subset = false) {
     };
     const context = vm.createContext({ window, document, URL, URLSearchParams, setTimeout, clearTimeout });
     vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
-    return { api: window.ProblemHunting, window, elements, context };
+    return { api: window.ProblemHunting, window, elements, headers, context };
 }
 
 const browser = createBrowser();
@@ -114,7 +122,7 @@ for (const record of registry) {
         assert.equal(api.resolveOpenProblemId(canonicalRecords, legacy), String(record.id));
     }
 }
-assert.match(fs.readFileSync(path.join(root, 'docs/open_problems.html'), 'utf8'), /<th scope="col">UnsolvedMath #<\/th>/);
+assert.match(fs.readFileSync(path.join(root, 'docs/open_problems.html'), 'utf8'), /data-sort="unsolvedmath">UnsolvedMath #/);
 assert.doesNotMatch(rendered, /<td>20000601<\/td>/);
 assert.deepEqual(ids(api.filterOpenProblems(records, { search: '20000601' })), ['20000601']);
 assert.match(rendered, /title="See &quot;partial&quot; result &lt;not a resolution&gt;\."/);
@@ -167,6 +175,52 @@ assert.match(browser.elements['results-count'].textContent, /^1 of 4/);
 browser.elements['reset-filters'].handlers.click();
 assert.match(browser.elements['results-count'].textContent, /^4 of 4/);
 assert.equal(browser.window.history.lastURL.search, '');
+
+// Column buttons toggle direction, update the dropdown/URL and preserve filters.
+const sorted = loadPage(createBrowser());
+const rowIds = page => [...page.elements['open-problems-tbody'].innerHTML.matchAll(/class="catalogue-problem"><a href="[^"]*id=([^"]+)"/g)].map(m => m[1]);
+assert.equal(sorted.headers.rank.header.attributes['aria-sort'], 'ascending');
+sorted.headers.title.handlers.click();
+assert.equal(sorted.elements['sort-by'].value, 'title');
+assert.deepEqual(rowIds(sorted), ['20000601', '6', '23', '40']);
+assert.equal(sorted.headers.title.indicator.textContent, '↑');
+sorted.headers.title.handlers.click();
+assert.deepEqual(rowIds(sorted), ['40', '23', '6', '20000601']);
+assert.equal(sorted.headers.title.header.attributes['aria-sort'], 'descending');
+assert.equal(sorted.headers.rank.header.attributes['aria-sort'], 'none');
+assert.equal(sorted.window.history.lastURL.searchParams.get('dir'), 'desc');
+sorted.elements['filter-source'].value = 'ranked';
+sorted.elements['filter-source'].handlers.change();
+assert.deepEqual(rowIds(sorted), ['6', '20000601']);
+assert.equal(sorted.headers.title.indicator.textContent, '↓');
+sorted.elements['sort-by'].value = 'completion';
+sorted.elements['sort-by'].handlers.change();
+assert.equal(sorted.headers.completion.header.attributes['aria-sort'], 'descending');
+assert.deepEqual(rowIds(sorted), ['6', '20000601']);
+sorted.headers.completion.handlers.click();
+assert.deepEqual(rowIds(sorted), ['6', '20000601']); // missing completion stays last
+sorted.elements['reset-filters'].handlers.click();
+assert.equal(sorted.headers.rank.header.attributes['aria-sort'], 'ascending');
+assert.equal(sorted.window.history.lastURL.search, '');
+const restored = loadPage(createBrowser('?sort=title&dir=desc&source=ranked'));
+assert.deepEqual(rowIds(restored), ['6', '20000601']);
+assert.equal(restored.headers.title.header.attributes['aria-sort'], 'descending');
+for (const [key, low, high] of [
+    ['rank', { rank: 2 }, { rank: 10 }],
+    ['status', { status: 'open' }, { status: 'solved' }],
+    ['claim', { attacks: [attempt], llm_status: 'solved' }, { attacks: [attempt], llm_status: 'unresolved' }],
+    ['completion', { attacks: [attempt], completion: 9 }, { attacks: [attempt], completion: 100 }],
+    ['models', { attacks: [{ model: 'Alpha' }] }, { attacks: [{ model: 'Beta' }] }],
+    ['source', { sources: [{ url: 'https://a.org' }] }, { sources: [{ url: 'https://b.org' }] }],
+    ['unsolvedmath', { external_url: 'https://example.org', problem_number: 'EP-2' }, { external_url: 'https://example.org', problem_number: 'EP-10' }]
+]) {
+    assert.ok(api.compareOpenProblems(low, high, key, 'asc') < 0, key);
+    assert.ok(api.compareOpenProblems(low, high, key, 'desc') > 0, key);
+}
+for (const page of ['open_problems.html', 'mo.html']) {
+    const html = fs.readFileSync(path.join(root, 'docs', page), 'utf8');
+    assert.equal((html.match(/<button type="button" class="column-sort" data-sort=/g) || []).length, 9);
+}
 
 const query = loadPage(createBrowser('?source=mo&attempts=1&q=question&sort=title'));
 assert.match(query.elements['results-count'].textContent, /^1 of 4/);

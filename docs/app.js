@@ -199,6 +199,36 @@ function sortOpenProblems(a, b) {
     return rankA - rankB || String(a.id).localeCompare(String(b.id));
 }
 
+function defaultOpenSortDirection(key) {
+    return ['attempts', 'score', 'completion'].includes(key) ? 'desc' : 'asc';
+}
+
+function compareOpenProblems(a, b, key, direction) {
+    const value = problem => {
+        switch (key) {
+            case 'rank': return problem.collection === 'mo' ? null : problem.rank;
+            case 'title': return problem.title;
+            case 'status': return getOpenProblemStatusLabel(problem);
+            case 'review': return getReviewLabel(problem.review);
+            case 'claim': return getOpenProblemClaim(problem);
+            case 'completion': return getMathematicalAttempts(problem.attacks).length ? problem.completion : null;
+            case 'attempts': return getMathematicalAttempts(problem.attacks).length;
+            case 'score': return problem.score;
+            case 'models': return getModelLabels(problem.attacks).join(', ');
+            case 'source': return getOpenProblemSources(problem)[0]?.url;
+            case 'unsolvedmath': return problem.external_url ? problem.problem_number : null;
+        }
+    };
+    const x = value(a), y = value(b);
+    const missing = value => value === null || value === undefined || value === '' ||
+        (typeof value === 'number' && !Number.isFinite(value));
+    // Empty cells remain last in either direction; ties retain catalogue order.
+    if (missing(x) || missing(y)) return Number(missing(x)) - Number(missing(y)) || sortOpenProblems(a, b);
+    const result = typeof x === 'number' && typeof y === 'number'
+        ? x - y : String(x).localeCompare(String(y), undefined, { numeric: true, sensitivity: 'base' });
+    return (direction === 'desc' ? -result : result) || sortOpenProblems(a, b);
+}
+
 function getOpenProblemDomains(problems) {
     const grouped = new Map();
     for (const problem of Object.values(problems)) {
@@ -330,37 +360,47 @@ function initOpenProblemsPage() {
     domains.value = domainOptions.find(group => group.aliases.includes(params.get('domain')))?.value || '';
     sources.value = subset ? 'mo' : ['ranked', 'mo'].includes(params.get('source')) ? params.get('source') : '';
     attempts.checked = params.get('attempts') === '1';
-    const validSorts = ['rank', 'title', 'attempts', 'score', 'review', 'claim', 'completion'];
+    const validSorts = ['rank', 'title', 'attempts', 'score', 'status', 'review', 'claim', 'completion', 'models', 'source', 'unsolvedmath'];
     sort.value = validSorts.includes(params.get('sort')) ? params.get('sort') : subset ? 'score' : 'rank';
+    let direction = ['asc', 'desc'].includes(params.get('dir')) ? params.get('dir') : defaultOpenSortDirection(sort.value);
+    const sortButtons = Array.from(document.querySelectorAll('[data-sort]'));
 
     function renderTable(syncUrl = true) {
         const filtered = filterOpenProblems(records, {
             search: search.value, domain: domains.value, source: sources.value, withAttempts: attempts.checked
         });
-        filtered.sort((a, b) => {
-            if (sort.value === 'title') return String(a.title).localeCompare(String(b.title)) || sortOpenProblems(a, b);
-            if (sort.value === 'attempts') return getMathematicalAttempts(b.attacks).length - getMathematicalAttempts(a.attacks).length || sortOpenProblems(a, b);
-            if (sort.value === 'score') return sortByScore(a, b) || sortOpenProblems(a, b);
-            if (sort.value === 'review') return getReviewLabel(a.review).localeCompare(getReviewLabel(b.review)) || sortOpenProblems(a, b);
-            if (sort.value === 'claim') return getOpenProblemClaim(a).localeCompare(getOpenProblemClaim(b)) || sortOpenProblems(a, b);
-            if (sort.value === 'completion') return (Number.isFinite(b.completion) ? b.completion : -1) - (Number.isFinite(a.completion) ? a.completion : -1) || sortOpenProblems(a, b);
-            return sortOpenProblems(a, b);
+        filtered.sort((a, b) => compareOpenProblems(a, b, sort.value, direction));
+        sortButtons.forEach(button => {
+            const active = button.dataset.sort === sort.value;
+            button.closest('th').setAttribute('aria-sort', active ? (direction === 'asc' ? 'ascending' : 'descending') : 'none');
+            button.querySelector('.sort-indicator').textContent = active ? (direction === 'asc' ? '↑' : '↓') : '⇅';
         });
         if (typeof MathJax !== 'undefined' && MathJax.typesetClear) MathJax.typesetClear([tbody]);
         tbody.innerHTML = renderOpenProblemRows(filtered);
         count.textContent = `${filtered.length} of ${records.length} entries · ${countWithAttacks(filtered)} with LLM attempts`;
         if (syncUrl) updateUrl({ q: search.value.trim(), domain: domains.value, source: subset ? null : sources.value,
-            attempts: attempts.checked ? '1' : null, sort: sort.value === (subset ? 'score' : 'rank') ? null : sort.value });
+            attempts: attempts.checked ? '1' : null, sort: sort.value === (subset ? 'score' : 'rank') ? null : sort.value,
+            dir: direction === defaultOpenSortDirection(sort.value) ? null : direction });
         renderMath();
     }
     search.addEventListener('input', debounce(() => renderTable(), 200));
-    [domains, sources, attempts, sort].forEach(input => input.addEventListener('change', () => renderTable()));
+    [domains, sources, attempts].forEach(input => input.addEventListener('change', () => renderTable()));
+    sort.addEventListener('change', () => {
+        direction = defaultOpenSortDirection(sort.value);
+        renderTable();
+    });
+    sortButtons.forEach(button => button.addEventListener('click', () => {
+        direction = sort.value === button.dataset.sort && direction === 'asc' ? 'desc' : 'asc';
+        sort.value = button.dataset.sort;
+        renderTable();
+    }));
     document.getElementById('reset-filters').addEventListener('click', () => {
         search.value = '';
         domains.value = '';
         sources.value = subset ? 'mo' : '';
         attempts.checked = false;
         sort.value = subset ? 'score' : 'rank';
+        direction = defaultOpenSortDirection(sort.value);
         renderTable();
     });
     renderTable(false);
@@ -690,6 +730,7 @@ window.ProblemHunting = {
     resolveOpenProblemId,
     getUnsolvedMathLink,
     sortOpenProblems,
+    compareOpenProblems,
     getOpenProblemDomains,
     filterOpenProblems,
     getOpenProblemClaim,
