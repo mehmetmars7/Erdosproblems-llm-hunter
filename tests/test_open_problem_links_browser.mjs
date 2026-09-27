@@ -103,14 +103,34 @@ try {
             external: [...row.querySelectorAll('td:last-child a')].map(a => [a.href, a.textContent, a.target, a.rel])
         }))
     })`);
-    assert.ok(catalogue.headings.includes('UnsolvedMath #'));
+    assert.ok(catalogue.headings.some(label => label.trim().startsWith('UnsolvedMath #')));
     for (const record of registry) {
         const row = catalogue.links.find(row => row.href === `problem.html?type=open_problems&id=${record.id}`);
         assert.ok(row, `Missing numeric link for ${record.id}`);
         assert.deepEqual(row.external, record.external_url ? [[record.external_url, record.problem_number, '_blank', 'noopener noreferrer']] : []);
     }
+    for (const key of ['title', 'rank', 'status', 'review', 'claim', 'completion', 'models', 'source', 'unsolvedmath']) {
+        const states = await evaluate(`(() => {
+            const button = document.querySelector('[data-sort="${key}"]');
+            const states = [];
+            for (let i = 0; i < 2; i++) {
+                button.click();
+                states.push(button.closest('th').getAttribute('aria-sort'));
+            }
+            return { states, selected: document.querySelector('#sort-by').value,
+                rows: document.querySelectorAll('#open-problems-tbody tr').length };
+        })()`);
+        assert.deepEqual(states.states, ['ascending', 'descending']);
+        assert.equal(states.selected, key);
+        assert.equal(states.rows, catalogue.links.length);
+    }
+    await call('Page.bringToFront');
+    await evaluate(`document.querySelector('[data-sort="title"]').focus()`);
+    await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' });
+    await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
+    assert.equal(await evaluate(`document.querySelector('[data-sort="title"]').closest('th').getAttribute('aria-sort')`), 'ascending');
     assert.deepEqual(errors, []);
-    console.log('Browser verified old and numeric P/NP and Hodge URLs, statements, attempts, all 503 catalogue links and all 188 external links.');
+    console.log(`Browser verified detail routes, ${registry.length} catalogue links, external links, all nine sortable columns and keyboard activation.`);
 } finally {
     socket.close();
     await fetch(`${debug}/json/close/${target.id}`);
