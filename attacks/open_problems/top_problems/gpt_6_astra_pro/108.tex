@@ -1,0 +1,361 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 108.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research attempt: Problem 108},pdfauthor={Research notebook},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small Problem 108 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\usepackage{etoolbox}
+\AtBeginEnvironment{itemize}{\small}
+\numberwithin{equation}{section}
+% Standalone export. Original section 108 preserved verbatim outside marked additions.
+\begin{document}
+\setcounter{section}{107}
+% ================================================================
+% problemId: problem.invariant-subspace-problem-for-hilbert-space-operators
+% source releaseRank: 108; source releaseStatus: open
+% exactTarget SHA-256: 032dd770aec1016bafc4bdebc7e1b550ce671688b112cf86ed76a571dbac92de
+\clearpage
+\section{\texorpdfstring{Invariant Subspace Problem for Hilbert Space Operators}{Invariant Subspace Problem for Hilbert Space Operators}}\label{108}
+\subsection{Definitions and mathematical statement}
+A complex Hilbert space is separable if it has a countable dense subset. A bounded operator $T:H\to H$ is linear and satisfies $\|Tx\|\le C\|x\|$. A closed linear subspace $M$ is invariant if $T(M)\subseteq M$. The assertion is
+\[
+ \forall T\in\mathcal B(H)\ \exists M\subset H:\qquad
+ M\text{ closed},\quad\{0\}\ne M\ne H,\quad T(M)\subseteq M.
+\]
+The subspace need not be reducing: invariance under the adjoint $T^*$ is not required. The field is complex and $H$ is infinite-dimensional.
+\par\smallskip\textit{Formulation and concept references:} \sref{108}{1}.
+\cataloguescope{Does every bounded linear operator T on an infinite-dimensional separable complex Hilbert space H have a nontrivial closed invariant subspace, that is, a closed subspace M with \{0\} != M != H such that T(M) is a subset of M?}
+\subsection{Short English statement}
+Must every bounded operator on a separable complex Hilbert space preserve some proper nonzero closed subspace?
+% BEGIN RESEARCH ADDITION 108
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The 2025 survey in the supplied source distinguishes the unresolved Hilbert
+space problem from negative results on other Banach spaces. It also records
+the existence of almost-invariant half-spaces of defect at most one for
+bounded operators on reflexive spaces: $TY\subseteq Y+F$ with
+$\dim F\leq1$. The finite-dimensional error is not an invariant-subspace
+theorem for $T$ itself. \sref{108}{1}
+
+A 2026 preprint of Clemente--Gallardo-Guti\'errez proves, as its stated
+Theorem 2.6, a hyperinvariant-subspace result for nonscalar \emph{hyponormal}
+operators admitting a decomposition into a tridiagonal operator and a
+trace-class operator. These additional hypotheses are retained here; neither
+hyponormality nor such a decomposition is assumed for the catalogue's
+arbitrary $T$. The recent preprint is not independently proof-audited in
+this entry. \eref{108}{1}
+
+\paragraph{Attack route.}
+Every finite complex compression has invariant subspaces, but its invariant
+vectors can escape to higher coordinates as the dimension grows. One route
+would force convergence of the corresponding projections. A more economical
+route is to preserve only two fixed vectors: one approximately inside the
+subspaces and one approximately orthogonal to them. I prove that these two
+anchors suffice, without needing convergence of the projections.
+
+A second possible route starts with a defect-one almost-invariant subspace
+and repairs it by an invariant graph. I also test that route; a concrete
+nilpotent example shows why a repair over the \emph{same} initial half-space
+cannot be automatic. Thus neither weak compactness nor rank-one defect is
+silently treated as the missing theorem.
+
+\paragraph{Attempt.}
+\textbf{1. Finite sections and the exact selection problem.}
+Choose an orthonormal basis $(e_j)_{j\geq1}$ of $H$ and let $P_n$ project onto
+$H_n=\operatorname{span}\{e_1,\ldots,e_n\}$. Define
+\[
+ T_n=P_nTP_n,
+\]
+viewed as an operator on all of $H$, zero on $H_n^\perp$. Then
+$\|T_n\|\leq\|T\|$ and $T_n\to T$ strongly. For each fixed $k\geq0$,
+\begin{equation}\label{108:powers}
+ T_n^k x\longrightarrow T^k x\qquad(x\in H).
+\end{equation}
+For $k\geq1$, use the telescoping identity
+\[
+ T_n^k-T^k=\sum_{j=0}^{k-1}T_n^{k-1-j}(T_n-T)T^j;
+\]
+each term converges strongly to zero and the outer powers are uniformly
+bounded. No convergence uniform in $k$ is required or asserted.
+
+Let $\mathcal I_n(T)$ be the set of all orthogonal projections $Q$ satisfying
+\begin{equation}\label{108:finite-invariance}
+ Q=P_nQ=QP_n,\qquad (P_n-Q)TQ=0.
+\end{equation}
+These are exactly the projections onto invariant subspaces of $T_n$ lying
+in $H_n$. The set is nonempty, since it includes $0$ and $P_n$; Schur
+triangularization also supplies nontrivial intermediate ranks when $n>1$.
+As a subset of finite-dimensional matrices it is compact: the projection
+and invariance equations are closed and $\|Q\|\leq1$.
+
+For fixed unit vectors $a,b\in H$, set
+\begin{equation}\label{108:objective}
+ d_n(a,b)=\min_{Q\in\mathcal I_n(T)}
+ \left(\|(I-Q)a\|^2+\|Qb\|^2\right).
+\end{equation}
+The minimum is attained by finite-dimensional compactness. This only proves
+that each optimization problem is well posed; it does not say its minima
+tend to zero.
+
+\medskip
+\textbf{2. The two-anchor lemma.}
+Suppose there are fixed unit vectors $a,b$, an increasing sequence $n_j$, and
+$Q_j\in\mathcal I_{n_j}(T)$ such that
+\begin{equation}\label{108:anchors}
+ \eta_j=\|(I-Q_j)a\|\longrightarrow0,
+ \qquad \zeta_j=\|Q_jb\|\longrightarrow0.
+\end{equation}
+Then $T$ has a nonzero proper closed invariant subspace.
+
+\emph{Proof.} Put $S_j=T_{n_j}$. Invariance gives
+$S_j^kQ_ja\in\operatorname{ran}Q_j$ for every $k\geq0$. Therefore
+\begin{align}
+ |\langle T^ka,b\rangle|
+ &\leq \|(T^k-S_j^k)a\|
+       +|\langle S_j^k(I-Q_j)a,b\rangle|
+       +|\langle S_j^kQ_ja,Q_jb\rangle|\nonumber\\
+ &\leq\|(T^k-S_j^k)a\|+\|T\|^k(\eta_j+\zeta_j).
+ \label{108:anchor-estimate}
+\end{align}
+At $k=0$ use $\|T\|^0=1$. For every fixed $k$, the right side tends to zero
+by \eqref{108:powers} and \eqref{108:anchors}. Hence
+$\langle T^ka,b\rangle=0$ for all $k\geq0$. The space
+\begin{equation}\label{108:cyclic-space}
+ M=\overline{\operatorname{span}}\{a,Ta,T^2a,\ldots\}
+\end{equation}
+contains the nonzero vector $a$ and is contained in $b^\perp$, so it is
+proper. It is closed by definition. Boundedness of $T$ carries the algebraic
+span into itself and permits passage to its norm closure, proving
+$T(M)\subseteq M$. No condition involving $T^*(M)$ has been imposed.
+$\square$
+
+In particular, the following concrete selection statement would imply the
+exact catalogue problem:
+\begin{quote}
+For every bounded operator $T$ and every chosen orthonormal basis, there
+exist unit vectors $a\perp b$ such that
+\begin{equation}\label{108:missing}
+ \liminf_{n\to\infty}d_n(a,b)=0.
+\end{equation}
+\end{quote}
+Choosing a subsequence of minimizers then supplies \eqref{108:anchors}.
+Statement \eqref{108:missing} is \emph{not proved}. It is presented as a
+sufficient finite-section selection principle, not as an established
+equivalence or a theorem about all bases. The insistence that $a,b$ be the
+same vectors at every stage is essential.
+
+\medskip
+\textbf{3. Comparison with a stronger compactness route.}
+Suppose, more strongly, $Q_j\to Q$ strongly, with $Q$ a nonzero proper
+orthogonal projection. From \eqref{108:finite-invariance},
+\[
+ (I-Q_j)TQ_j=(I-P_{n_j})TQ_j.
+\]
+For each fixed vector, the right side tends to zero: first replace $Q_jx$
+by $Qx$, then use $P_{n_j}\to I$ strongly. Strong convergence and uniform
+boundedness allow passage through the products on the left, giving
+$(I-Q)TQ=0$. Thus $\operatorname{ran}Q$ is invariant.
+
+This argument is valid, but its compactness assumption is absent in general.
+The two-anchor lemma avoids having to compactify the entire sequence of
+projections. It only asks for enough information to construct the cyclic
+space \eqref{108:cyclic-space} and a single nonzero orthogonal vector.
+The unproved selection principle remains a substantial requirement, rather
+than a technical consequence of finite-dimensional triangularization.
+
+\medskip
+\textbf{4. Testing the defect-one repair idea.}
+Let $Y$ be an almost-invariant half-space supplied by the theorem recorded
+in \eref{108}{2}. Relative to $H=Y\oplus Y^\perp$, write
+\[
+ T=\begin{pmatrix}A&B\\ C&D\end{pmatrix},\qquad\operatorname{rank}C\leq1.
+\]
+A bounded graph $\{(y,Xy):y\in Y\}$ is invariant exactly when
+\begin{equation}\label{108:riccati}
+ C+DX=XA+XBX.
+\end{equation}
+This follows by applying $T$ to $(y,Xy)$ and equating its second component
+with $X$ applied to its first. Hence a proposed repair by a bounded graph
+has a precise operator Riccati equation to solve.
+
+Rank one alone does not solve it. Take infinite-dimensional $Y,Z$,
+$H=Y\oplus Z$, and
+\[
+ A=D=B=0,\qquad C:Y\to Z\text{ nonzero of rank one}.
+\]
+Then $T^2=0$ and $Y$ is almost invariant with defect one, but
+\eqref{108:riccati} reduces to $C=0$, an impossibility. Thus there is no
+invariant bounded graph over this particular $Y$. Nevertheless $Z$ itself
+is an invariant subspace of $T$. This example refutes the universal
+\emph{same-half-space graph-repair lemma}, not the invariant subspace
+conjecture. Additional choices of half-space or genuinely different
+constructions would be needed.
+
+\paragraph{Stress test.}
+\textbf{Escape at finite sections.}
+Let $S e_j=e_{j+1}$ be the unilateral forward shift. Its compression to $H_n$
+is a single nilpotent Jordan block. Its invariant subspace of dimension $m$
+is
+\[
+ \operatorname{span}\{e_{n-m+1},\ldots,e_n\}.
+\]
+For fixed $m$ its projection tends strongly to zero. The same is true for
+$m=\lfloor n/2\rfloor$: both its dimension and codimension tend to infinity,
+but every fixed basis vector eventually lies outside it. A balance of
+dimensions therefore gives no nonzero limiting subspace.
+
+There is also a successful choice in this test case. Taking $m=n-1$ gives
+$Q_n$ onto $\operatorname{span}\{e_2,\ldots,e_n\}$. The anchors $a=e_2$,
+$b=e_1$ satisfy \eqref{108:anchors} exactly for $n\geq2$, and the resulting
+space is $\overline{\operatorname{span}}\{e_2,e_3,\ldots\}$. Notice that
+\[
+ \|(I-Q_n)SQ_n\|=1
+\]
+for every $n\geq2$, because $e_n$ is sent to $e_{n+1}$. Requiring the
+\emph{operator norm} of the invariance defect to vanish would exclude this
+successful sequence. The pointwise limiting argument above needs no such
+requirement.
+
+\textbf{Weak limits of projections need not be projections.}
+For $T=I$, let $R_n$ project onto the span of the $n$ orthonormal vectors
+\[
+ 2^{-1/2}(e_i+e_{n+i}),\qquad1\leq i\leq n.
+\]
+Every $R_n$ is an exactly invariant projection lying in $H_{2n}$, but
+$R_n\to\tfrac12 I$ in the weak operator topology. To see this, for each fixed
+$i$ and all large $n$,
+$R_ne_i=(e_i+e_{n+i})/2$; extend convergence of matrix entries by the uniform
+norm bound and density. The limit is not idempotent. For any fixed unit
+vector $u$,
+\[
+ \|R_nu\|^2\to\tfrac12,
+ \qquad\|(I-R_n)u\|^2\to\tfrac12.
+\]
+So merely keeping vectors away from zero and from one in these norms does
+not provide the two anchors.
+
+More generally, if projections $Q_j$ converge weakly to a positive
+contraction $A$, then
+\begin{equation}\label{108:variance}
+ \lim_j\|Q_ju-Au\|^2
+ =\langle Au,u\rangle-\|Au\|^2
+ =\langle(A-A^2)u,u\rangle.
+\end{equation}
+Expand the square, use $\|Q_ju\|^2=\langle Q_ju,u\rangle$, and pass to
+weak limits in the cross term to prove the identity. The defect $A-A^2$
+quantifies exactly why weak compactness fails to give the required strong
+convergence. For $A=I/2$ it is $I/4$, not zero. Multiplication in the
+invariance equation cannot simply be passed through a weak limit.
+
+\textbf{A moving orthogonal vector is not an anchor.}
+For every $n$ one can choose a unit vector $b_n$ perpendicular to
+$a,Ta,\ldots,T^na$. This finite-dimensional observation is true even when
+$a$ is cyclic for all of $H$. For example, with $T=S$, $a=e_1$, choose
+$b_n=e_{n+2}$; then $b_n$ converges weakly to zero while
+$\overline{\operatorname{span}}\{S^ke_1:k\geq0\}=H$.
+Thus the selection statement must allow a suitable choice of $a$, and must
+produce a \emph{fixed nonzero} $b$. It cannot be replaced by finitely many
+orthogonality tests with an escaping witness.
+
+The finite matrix tests in the companion script reproduce the Jordan-block
+and projection identities. The infinite-dimensional conclusions are proved
+above, not inferred from a numerical truncation. No compactness of the unit
+sphere in norm, no spectral gap, and no diagonalizability of an arbitrary
+operator is assumed.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+The proved two-anchor lemma reduces a positive solution to the explicit
+selection principle \eqref{108:missing}; the latter remains unproved.
+The argument includes a direct norm estimate and constructs the desired
+closed invariant cyclic subspace once the anchors exist. It does not
+supply those anchors for a general operator.
+
+The stress tests identify three distinct failures: finite-section subspaces
+can escape despite balanced dimensions; weak limits can lose idempotence;
+and a rank-one almost-invariance defect need not admit a bounded graph
+repair over the chosen half-space. These are counterexamples to intermediate
+lemmas only. No bounded operator on the stipulated Hilbert space has been
+shown to lack invariant subspaces, and no complete proof of the universal
+positive assertion is claimed. No priority claim is made for the elementary
+selection lemma or examples.
+
+\par\needspace{20\baselineskip}
+% END RESEARCH ADDITION 108
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:108:1}{} I. Chalendar and J. R. Partington, "Recent perspectives on the Invariant Subspace Problem," arXiv:2507.21834 (29 Jul 2025).
+\url{https://arxiv.org/pdf/2507.21834}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN REFERENCE ADDITION 108
+\item[\textnormal{[E1]}]\hypertarget{extra:108:1}{} N. Clemente and
+E. A. Gallardo-Guti\'errez, \emph{Hyperinvariant subspaces of hyponormal
+operators: A constructive decomposition approach}, arXiv:2606.00865v1
+(2026), Theorem 2.6; see also Corollary 2.4.
+\url{https://arxiv.org/html/2606.00865v1}.
+{\small\textit{Consulted 27 September 2026; recent preprint, with the hyponormality and trace-class-perturbation hypotheses retained.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:108:2}{} I. Chalendar and
+J. R. Partington, \emph{Recent perspectives on the Invariant Subspace
+Problem}, arXiv:2507.21834v1 (29 July 2025), Section 2,
+Definition 2.1 and Theorem 2.2, citing A. I. Popov and A. Tcaciuc,
+\emph{Every operator has almost-invariant subspaces},
+Journal of Functional Analysis 265 (2013), 257--265.
+\url{https://arxiv.org/html/2507.21834v1}.
+{\small\textit{Exact locator supplement to [S1], consulted 27 September 2026. The theorem is used only for almost invariance, not exact invariance.}}
+% END REFERENCE ADDITION 108
+\end{itemize}
+
+\end{document}

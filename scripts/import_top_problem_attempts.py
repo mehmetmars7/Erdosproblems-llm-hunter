@@ -14,7 +14,7 @@ from build_site import OPEN_PROBLEMS_PATH, parse_numbered_problem_tex
 
 MARKER = re.compile(r'^(?:[ \t]*% =+\r?\n)?[ \t]*% problemId: ([^\r\n]+)\r?\n', re.MULTILINE)
 RANK = re.compile(r'^[ \t]*% source releaseRank: ([1-9]\d*);[^\r\n]*$', re.MULTILINE)
-RESEARCH = re.compile(r'^[ \t]*\\subsection\{Research attempt\}', re.MULTILINE)
+RESEARCH = re.compile(r'^[ \t]*\\subsection\{Research attempt(?:: [^}\n]+)?\}', re.MULTILINE)
 
 
 @dataclass(frozen=True)
@@ -77,7 +77,7 @@ def section_key(section):
 
 
 def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
-                    model='GPT_6_Astra_Ultra', version=1):
+                    model='gpt_6_astra_ultra', version=1):
     """Validate the complete import first, then create only missing attempts.
 
     Returns (created_paths, unchanged_paths). Existing files are never replaced.
@@ -143,7 +143,7 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('sources', nargs='+', type=Path, help='Catalogue-style research batch .tex files')
-    parser.add_argument('--model', default='GPT_6_Astra_Ultra', help='Destination model folder')
+    parser.add_argument('--model', default='gpt_6_astra_ultra', help='Destination model folder')
     parser.add_argument('--version', type=int, default=1, help='Attempt version (default: 1; 2 produces N_v2.tex)')
     parser.add_argument('--catalog-dir', type=Path, default=OPEN_PROBLEMS_PATH,
                         help='Directory containing the numbered TOP_PROBLEM definitions')

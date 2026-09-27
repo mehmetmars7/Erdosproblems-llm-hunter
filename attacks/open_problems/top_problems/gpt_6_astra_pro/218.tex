@@ -1,0 +1,256 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 218.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research Notebook: Section 218},pdfauthor={Research notebook},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems | Research notebook}
+\fancyhead[R]{\small 218 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Independently compilable extraction; original section text retained.
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{217}
+% ================================================================
+% problemId: problem.sharp-erdos-distinct-distances-conjecture-plane
+% source releaseRank: 218; source releaseStatus: open_with_solved_subcases
+% exactTarget SHA-256: ab249bc9dbc8d365dd25838bab9d0599e91bcb9be6771aa4a97805c5f8f683ad
+\clearpage
+\section{\texorpdfstring{Sharp Erdos Distinct-Distances Conjecture in the Plane}{Sharp Erdos Distinct-Distances Conjecture in the Plane}}\label{218}
+\subsection{Definitions and mathematical statement}
+For a finite set $P\subset\R^2$ of distinct points, put
+$D(P)=|\{|x-y|:x,y\in P,\ x\ne y\}|$, and let
+$D(n)=\min_{|P|=n}D(P)$. The selected lower bound is
+\[
+ \exists c>0\ \exists n_0\ \forall n\ge n_0,
+ \qquad D(n)\ge c\frac{n}{\sqrt{\log n}}.
+\]
+Together with the square-lattice comparison specified in the catalogue, this would determine the order up to constants. Distances are counted once regardless of multiplicity, and the metric is the usual Euclidean metric, not a generic norm. Improving a bound while leaving an extra power of $\log n$ does not reach this target.
+\par\smallskip\textit{Formulation and concept references:} \sref{218}{1}.
+\cataloguescope{Let D(n) be the minimum, over all sets of n distinct points in the Euclidean plane, of the number of distinct pairwise distances determined by the set. Prove D(n) = Omega(n/sqrt(log n)), matching up to a constant factor the square-lattice construction D(n) = O(n/sqrt(log n)).}
+\subsection{Short English statement}
+Must every n-point set in the Euclidean plane determine at least a constant times n divided by the square root of log n distinct distances?
+% BEGIN RESEARCH ATTEMPT 218
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The Guth--Katz theorem gives $D(P)\gg n/\log n$ for arbitrary Euclidean
+point sets. The remaining square root of the logarithm is not a change
+of constants. \eref{218}{1}, Theorem~1.1.
+The catalogue's formulation reference studies \emph{typical norms}; its
+statements about that class do not improve the Euclidean bound simply by
+specializing the norm. \sref{218}{1}, Introduction. The source search for
+this attempt did not identify a verified Euclidean theorem attaining the
+selected bound. The argument below tests an energy improvement and then
+replaces uniform pair-counting by a fractional allocation problem.
+All research additions in this batch are dated 27 September 2026.
+
+\paragraph{Attack route.}
+Three routes are plausible: improve the equal-distance energy, discard
+its highly concentrated fibers, or assign nonuniform weights to incidences
+between points and their distances. The first route has a decisive lattice
+obstruction, proved below. Merely truncating that energy still needs a
+bound on the discarded mass. The third route has an exact max-flow
+criterion; it avoids the false energy lemma but exposes a uniform subset
+estimate that remains as difficult as the original assertion.
+
+\paragraph{Attempt.}
+\textbf{1. Why a stronger second-moment bound is the wrong goal.}
+For a positive distance $t$ let
+\[
+ r_t=|\{(x,y)\in P^2:x\ne y,\ |x-y|=t\}|,
+ \qquad S=\sum_t r_t=n(n-1),\qquad E(P)=\sum_t r_t^2.
+\]
+Cauchy--Schwarz gives $D(P)\ge S^2/E(P)$. Thus a bound
+$E(P)\ll n^3\sqrt{\log n}$ would suffice, but it is false.
+Here is a direct proof of the obstruction, independent of any numerical
+experiment.
+
+Take $P=\{1,\ldots,m\}^2$, $n=m^2$. A displacement
+$h=(h_1,h_2)$ occurs as an ordered difference in
+$(m-|h_1|)(m-|h_2|)$ pairs. In particular each displacement of Euclidean
+norm at most $m/2$ has multiplicity at least $m^2/4$. Identify integer
+vectors with Gaussian integers. For coprime positive integers $a,b$,
+put $w=a+ib$ and, for $v\in\Z[i]\setminus\{0\}$, form
+\[
+ h=\overline w v,\qquad h'=wv.
+\]
+These are equal-length integer vectors. Restrict $a,b$ to $[R,2R]$ and
+$|v|\le m/(8R)$. Then $|h|,|h'|<m/2$. There are at least $cR^2$
+coprime pairs in that square for sufficiently large $R$, and at least
+$c'(m/R)^2$ choices of $v$ when $R\le m/32$. For clarity, the former
+count follows from
+\[
+ \sum_{q\le2R}\mu(q)
+ \bigl(\lfloor2R/q\rfloor-\lfloor(R-1)/q\rfloor\bigr)^2
+ =\frac{R^2}{\zeta(2)}+O(R\log R),
+\]
+using absolute convergence of $\sum q^{-2}$ and the elementary divisor
+expansion for coprimality.
+
+No two coprime positive $w$ with different slopes give the same ordered
+pair $(h,h')$: the quotient $h'/h=w/\overline w$ determines the slope,
+and primitivity determines $w$. For fixed $w$, $h$ determines $v$.
+Use disjoint dyadic ranges for $a,b$, adjusting endpoints to avoid overlap.
+Each range therefore contributes at least $cm^2$ different equal-length
+displacement pairs, and there are $\gg\log m$ ranges. Each contributes
+at least $m^4/16$ ordered point quadruples to $E(P)$. Consequently
+\begin{equation}\label{218:lattice}
+ E(P)\ge c m^6\log m\asymp n^3\log n.
+\end{equation}
+Thus even a successful proof of the requested distance bound cannot
+supply the proposed universal second-moment improvement. The quadruples
+counted here have nonzero displacements; including or excluding the zero
+distance does not cause the obstruction.
+
+\textbf{2. Fractional allocation in place of multiplicity.}
+Let $T$ be the positive distance set, and join $p\in P$ to $t\in T$
+when some $q\ne p$ satisfies $|p-q|=t$. Ask for nonnegative numbers
+$w_{p,t}$ on these incidences such that
+\begin{equation}\label{218:allocation}
+ \sum_{t\sim p}w_{p,t}=1\quad(p\in P),\qquad
+ \sum_{p\sim t}w_{p,t}\le B\quad(t\in T).
+\end{equation}
+Such an allocation immediately gives $n\le B|T|$. It can suppress large
+pair multiplicities because a point contributes at most one unit of mass,
+not one unit for each point at the same distance.
+
+The exact existence criterion is
+\begin{equation}\label{218:hall}
+ |A|\le B\,|T(A)|\quad\hbox{for every }A\subseteq P,
+ \qquad T(A)=\bigcup_{p\in A}\{t:t\sim p\}.
+\end{equation}
+To prove this, put capacities $1$ on source--point edges, $n+1$ on
+point--distance edges and $B$ on distance--sink edges. A minimum cut of
+capacity less than $n$ cannot cut a point--distance edge. If the retained
+point subset is $A$, its optimal cut has capacity
+$n-|A|+B|T(A)|$. The max-flow/min-cut theorem gives a flow of value $n$
+exactly when \eqref{218:hall} holds. Necessity also follows directly by
+summing \eqref{218:allocation}. Real capacities cause no integrality
+issue; only a fractional allocation is requested.
+
+A hoped-for geometric lemma would be \eqref{218:hall} with
+$B=C\sqrt{\log(n+2)}$. It is tempting to regard this as much weaker than
+the target, but that would be misleading. The case $A=P$ gives the target
+immediately. Conversely the original bound, if true, would imply this
+Hall estimate up to an absolute constant: for $|A|$ large,
+\[
+ |T(A)|\ge D(A)\ge c\frac{|A|}{\sqrt{\log |A|}}
+            \ge c\frac{|A|}{\sqrt{\log(n+2)}}.
+\]
+For bounded nonempty $|A|$ and $n\ge2$, $T(A)$ is nonempty, and increasing
+$C$ handles the remaining cases. Thus allocation is a useful exact
+reformulation, not a secretly established intermediate theorem.
+
+\textbf{3. A geometric test and an obstruction to naive truncation.}
+A set with $m$ collinear points has at least $(m-1)/2$ distinct distances:
+fix one of those points and note that a positive distance on its line has
+at most two preimages. The same bound holds for $m$ points on a circle,
+by intersecting that circle with a circle centered at a fixed point of it.
+Consequently a line or circle carrying
+$\gg n/\sqrt{\log n}$ points already proves the desired bound for that
+configuration. A viable structural argument could therefore restrict
+attention to sets with no such rich line or circle. This restriction is
+only a solved subcase reduction, not an incidence theorem for the
+remaining sets.
+
+For a truncation level $L$, let $T_{\le L}=\{t:r_t\le L\}$. Then
+\[
+ D(P)\ge \frac{S-\sum_{r_t>L}r_t}{L}.
+\]
+To choose $L\asymp n\sqrt{\log n}$ and finish by this inequality one
+must prove that the heavy fibers carry less than, say, $S/2$.
+An energy bound $E\ll n^3\log n$ gives only
+$\sum_{r_t>L}r_t\le E/L\ll n^2\sqrt{\log n}$, which is useless relative
+to $S\asymp n^2$. This calculation identifies the missing tail estimate;
+it does not justify it. The companion computation records exact grid
+multiplicities, energy and distance counts at several sizes solely to
+test these formulas.
+
+\paragraph{Stress test.}
+The lattice obstruction uses actual integer coordinates, not a norm
+perturbation. The allocation criterion quantifies over \emph{all} point
+subsets; checking only the full set assumes the target, and checking only
+small sets cannot certify a flow. The rich-circle argument concerns
+points of $P$ on the circle, not arbitrary distance circles with no such
+points. No conclusion for all $n$ is drawn from a finite lattice scan.
+Finally, the Guth--Katz energy method and the typical-norm result are
+kept separate: neither supplies the unproved tail or Hall estimate here.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The attempt proves a sharp obstruction to improving the universal second
+moment, an exact fractional-allocation reformulation, and elementary
+rich-line/rich-circle subcases. These calculations explain why the
+obvious logarithm-saving route fails; they are not a claimed improvement
+of the best general lower bound or a claim of priority.
+The unresolved task is a genuinely stronger geometric allocation or
+tail estimate for arbitrary point configurations. No counterexample to
+the selected distance conjecture has been found.
+% END RESEARCH ATTEMPT 218
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:218:1}{} Unit and distinct distances in typical norms.
+\url{https://arxiv.org/abs/2302.09058}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN ADDED REFERENCES 218
+\item[\textnormal{[E1]}]\hypertarget{extra:218:1}{}
+L. Guth and N. H. Katz, \emph{On the Erd\H{o}s distinct distances problem
+in the plane}, Annals of Mathematics \textbf{181} (2015), 155--190,
+Theorem~1.1 and the equal-distance-quadruple reduction in the Introduction.
+\url{https://annals.math.princeton.edu/wp-content/uploads/annals-v181-n1-p02-p.pdf}.
+Consulted 27 September 2026.
+% END ADDED REFERENCES 218
+\end{itemize}
+
+\end{document}

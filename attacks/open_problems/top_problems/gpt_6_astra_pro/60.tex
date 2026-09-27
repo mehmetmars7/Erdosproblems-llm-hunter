@@ -1,0 +1,159 @@
+% !TeX program = lualatex
+% Standalone research notebook for original catalogue problem 60.
+% Compile twice: lualatex 60.tex
+% Original entry retained; research subsection and [E] references added.
+% No external bibliography, image, data, or style file is required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,
+ urlcolor=MidnightBlue,bookmarksnumbered=true,
+ pdftitle={Research notebook - Problem 60},
+ pdfauthor={Research attempt; not independently refereed}}
+\usepackage{bookmark}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Research notebook}
+\fancyhead[R]{\small\sffamily Problem 60}
+\fancyfoot[L]{\scriptsize 27 September 2026}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\scriptsize Unrefereed research attempt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=2pt,topsep=3pt,parsep=0pt,before=\small}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\newtheorem{notebooklemma}{Lemma}[section]
+\newtheorem{notebookproposition}[notebooklemma]{Proposition}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{59}
+% ================================================================
+% problemId: problem.l-p-problem
+% source releaseRank: 60; source releaseStatus: open
+% exactTarget SHA-256: dfe86ddfbc0f260d86eeb793d72cf1fe7668e3346f1e3c313b613bd60220d2a8
+\clearpage
+\section{\texorpdfstring{L = P Problem}{L = P Problem}}\label{60}
+\subsection{Definitions and mathematical statement}
+In the standard Turing-machine model, $\mathsf L=\mathsf{DSPACE}(\log n)$ counts work-tape space but not read-only input cells. The class $\mathsf P$ consists of total deterministic polynomial-time deciders. The equality question is
+\[
+ \forall L\in\mathsf P\ \exists\text{ deterministic decider for }L
+ \text{ using }O(\log n)\text{ work space}.
+\]
+The algorithm and constants may depend on the language. A fixed polynomial saving in space, or a logarithmic-space procedure with advice, does not establish the stated equality.
+\par\smallskip\textit{Formulation and concept references:} \sref{60}{1}.
+\cataloguescope{Prove or disprove that every language decidable by a deterministic polynomial-time Turing machine is decidable using O(log n) work space; equivalently, determine whether the complexity classes L and P are equal.}
+\subsection{Short English statement}
+Can every polynomial-time decision problem be solved using only logarithmically much working memory?
+% BEGIN RESEARCH INSERTION
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+Circuit value is complete for $\mathsf P$ under deterministic log-space reductions, so a log-space evaluator for general circuits would settle the equality in the stated uniform model \sref{60}{1}, Theorem 6.1. Williams proves a deterministic time-$t$ simulation in $O(\sqrt{t\log t})$ space; substituting $t=n^c$ does not give logarithmic space \eref{60}{1}, Theorem 1.1. Pyne--Tell's March 2026 revision investigates composition with simultaneous time and space constraints, rather than an unrestricted collapse of $\mathsf P$ to $\mathsf L$ \eref{60}{2}. These results motivate reevaluation instead of retaining all intermediate values, but do not justify iterating a space saving as though it were a time saving.
+
+\paragraph{Attack route.}
+Recursive reevaluation needs a way to compress unresolved dependencies. Iterating a time--space simulation needs a new bound on the time of the intermediate simulator. A frontier method needs a representation with few computed values still relevant. We pursue the last route, remove an avoidable logarithmic factor from its storage accounting, and then test whether graph ordering alone could supply the missing bound.
+
+\paragraph{Attempt: store values and recompute addresses.}
+Take a fan-in-two Boolean circuit with $N$ gates and encoded length $M$, together with an explicitly supplied topological ordering $v_1,\ldots,v_N$. The ordering may instead be generated in log space. Append an output-copy gate if necessary so that the output is evaluated last. Define
+\begin{equation}\label{r60:frontier}
+ F_i=\{v_j:j\le i,\ \text{$v_j$ has a successor $v_\ell$ with $\ell>i$}\},
+ \qquad w=\max_{0\le i\le N}|F_i|.
+\end{equation}
+Input gates are included; counting their rereadable values only weakens the bound.
+
+\begin{notebooklemma}\label{r60:stream}
+An ordered circuit of frontier width $w$ can be evaluated deterministically in $O(w+\log M)$ work space and time polynomial in $M$. The algorithm is uniform, and its polynomial time exponent is independent of $w$.
+\end{notebooklemma}
+\begin{proof}
+After step $i$, store exactly the values of $F_i$, in the supplied order. Do not store gate identifiers beside the values. Membership of a given gate in $F_i$ is decidable by scanning the input and its ordering with $O(\log M)$-bit counters. Its rank in $F_i$ is found by counting earlier members. The rescans have polynomial cost and require no recursive graph traversal.
+
+Before evaluating $v_i$, every predecessor belongs to $F_{i-1}$: it has the unprocessed successor $v_i$. Retrieve its value by its computed rank. Build a second buffer for $F_i$, copying surviving values and appending the new value if it remains live. Each buffer has at most $w+1$ bits. A constant number of gate indices and scan counters require $O(\log M)$ additional bits. Output the last value. All nested input scans have fixed depth and each buffer traversal has length at most $N$, proving the time claim.
+\end{proof}
+
+The space is $O(w+\log M)$, not the $O(w\log M)$ of a list storing an address with each bit. This does not imply that general circuits have small $w$.
+
+\begin{notebookproposition}\label{r60:conditional}
+Suppose a deterministic log-space transducer transforms every circuit-value instance of length $M$ into a polynomial-length equivalent instance with a topological ordering of width $O(\log M)$. Then $\mathsf L=\mathsf P$.
+\end{notebookproposition}
+\begin{proof}
+Apply Lemma~\ref{r60:stream}. A requested symbol of the transducer's output can be regenerated with an output-position counter; the entire transformed instance need not be stored. Output length is polynomial, so its addresses have logarithmic length. Compose this evaluator with the log-space reductions from $\mathsf P$ \sref{60}{1}. Conversely, a total deterministic log-space machine has only polynomially many configurations and cannot repeat one before halting, so $\mathsf L\subseteq\mathsf P$.
+\end{proof}
+
+\paragraph{Attempt to falsify an ordering-only solution.}
+Consider the $k\times k$ grid directed toward increasing coordinates. Put an input $x$ at $(1,1)$, copy gates on the two initial boundaries, and OR gates in the interior. Every gate computes $x$. Nevertheless every topological ordering has frontier width at least $k-1$.
+
+An ordering of width $w$ produces bags $B_i=F_{i-1}\cup\{v_i\}$, each of size at most $w+1$. Every edge belongs to a bag: when its later endpoint is processed, the earlier endpoint is live. The bags containing a fixed vertex form an interval.
+
+For each $(a,b)$, let $C_{a,b}$ be row $a$ together with column $b$ of the undirected grid. These sets are connected and pairwise intersect. The bags meeting a connected vertex set form an interval, because the vertex intervals overlap along the edges of a connecting tree. The intervals for all $C_{a,b}$ therefore pairwise intersect. By the finite interval Helly property, one bag meets every $C_{a,b}$. Any set of fewer than $k$ vertices misses some row and some column, and hence misses their union. That bag has at least $k$ vertices, giving $w\ge k-1$.
+
+Thus $N=k^2$ gates can require $\Omega(\sqrt N)$ frontier width for a one-variable function with a one-gate representation. This refutes the proposed ordering-only lemma, not Proposition~\ref{r60:conditional}, which permits semantic changes to the circuit.
+
+\paragraph{Stress test.}
+The ordering is supplied or generated by the hypothesized transducer; finding arbitrary topological orders is not silently treated as a log-space operation. All counters refer to encoded length, not merely the number of Boolean inputs. The grid lower bound concerns a representation, not every algorithm computing its output. A space-efficient simulator may run much longer than the original computation, so feeding its space bound into a theorem about time is invalid \eref{60}{1}.
+
+The accompanying script enumerates small grid order ideals to check optimal frontier widths and compares the buffer evaluator with direct circuit evaluation. For grid sides $1,2,3,4,5$, the computed optimal widths are $0,2,3,4,5$, and all 200 seeded circuit comparisons agree. These are finite checks of implementations. The uniform storage bound and the grid obstruction are proved above, not inferred experimentally.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+The argument supplies a uniform $O(w+\log M)$ evaluator and a precise sufficient semantic-normalization condition for $\mathsf L=\mathsf P$. A family of grids proves that reordering alone cannot supply that condition. No normalization of the required generality, or language separating the classes, is obtained. The storage observation is not asserted to be new to the literature.
+
+% END RESEARCH INSERTION
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:60:1}{} Cornell CS 6820 handout, The Circuit Value Problem, Fall 2022.
+\url{https://www.cs.cornell.edu/courses/cs6820/2022fa/Handouts/CVP.pdf}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:60:2}{} Composing Low-Space Algorithms, revision 1 (29 March 2026).
+\url{https://eccc.weizmann.ac.il/report/2025/140/revision/1/download/}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:60:3}{} Simulating Time With Square-Root Space.
+\url{https://arxiv.org/abs/2502.17779}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+
+% BEGIN ADDED RESEARCH REFERENCES
+\item[\textnormal{[E1]}]\hypertarget{extra:60:1}{} R. Ryan Williams, \emph{Simulating Time With Square-Root Space}, arXiv:2502.17779 (2025), Theorem 1.1; STOC 2025.
+\url{https://arxiv.org/abs/2502.17779}.
+{\small\textit{Deterministic time--space simulation; no claim of logarithmic space for all polynomial time. Consulted 27 September 2026.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:60:2}{} Edward Pyne and Roei Tell, \emph{Composing Low-Space Algorithms}, ECCC TR25-140, revision 1, 29 March 2026.
+\url{https://eccc.weizmann.ac.il/report/2025/140/revision/1/}.
+{\small\textit{Composition under simultaneous resource constraints; frontier comparison only. Consulted 27 September 2026.}}
+% END ADDED RESEARCH REFERENCES
+\end{itemize}
+
+\end{document}

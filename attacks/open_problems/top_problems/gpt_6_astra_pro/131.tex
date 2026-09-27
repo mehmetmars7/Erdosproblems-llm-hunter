@@ -1,0 +1,286 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 131.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\hypersetup{pdftitle={Problem 131 - Polynomial simplex pivot count},pdfauthor={Open Problems Math research notebook}}
+\fancyhead[L]{\small\sffamily Open Problems Math \textbar\ Research notebook}
+\fancyhead[R]{\small\sffamily 131 \textbar\ 27 September 2026}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{130}
+% ================================================================
+% problemId: problem.polynomial-pivot-rule-for-the-simplex-method
+% source releaseRank: 131; source releaseStatus: open
+% exactTarget SHA-256: 84962be046fea3ae2dd52dfba4ffb327b67213cc9288d69c41ba9839897d1fda
+\clearpage
+\section{\texorpdfstring{Polynomial pivot rule for the simplex method}{Polynomial pivot rule for the simplex method}}\label{131}
+\subsection{Definitions and mathematical statement}
+In standard form a rational linear program has $Ax=b$, $x\ge0$, and a linear objective. A feasible basis selects an invertible basic submatrix and yields a feasible basic solution. A simplex pivot exchanges one basic and one nonbasic variable according to the rule while maintaining the algorithm's feasibility and objective conventions. For bounded nondegenerate inputs, seek a rule with
+\[
+ \sup_{\text{allowed LPs and feasible bases}}\mathbb E[\text{pivots to an optimum}]
+ \le p(m,n)
+\]
+for one polynomial independent of coefficient bit lengths. For a deterministic rule omit expectation. The catalogue requests a pivot-count bound and does not separately impose an efficient per-pivot selection model.
+\par\smallskip\textit{Formulation and concept references:} \sref{131}{1}.
+\cataloguescope{Construct a deterministic or randomized simplex pivot rule and a polynomial p such that, for every bounded nondegenerate rational linear program with m equality constraints and n variables and every feasible starting basis, the rule reaches an optimal basis in at most p(m,n) pivots, in expectation when the rule is randomized; or prove that no such rule exists.}
+\subsection{Short English statement}
+Is there a simplex pivot rule that always reaches an optimum after polynomially many pivots, independent of coefficient magnitudes?
+% BEGIN RESEARCH ADDITION 131
+\subsection{Research attempt}
+
+\paragraph{Current frontier and scope.}
+The catalogue asks for a polynomial \emph{pivot count}; it does not
+require polynomial-time computation of the next pivot.  That omission
+is mathematically important, not a defect to be silently repaired.
+\sref{131}{1}  The August 2026 revision of Disser--Loho--Maat--Mosis
+proves lower bounds for specified ranking-based classes of pivot rules,
+not for every rule allowed by this broad selection model.
+\eref{131}{2}  Black's September 2026 preprint constructs lattice
+polytopes in $[0,3]^{6d}$ with monotone diameter at least $2^d-1$.
+Its parameter is geometric dimension with a coordinate bound, not
+immediately the catalogue's pair $(m,n)$ for nondegenerate equality
+form. \eref{131}{1}  These recent statements are recorded with their
+hypotheses and are not treated as independently audited universal
+resolutions.
+
+\paragraph{Attack map.}
+One route constructs a potential decreasing at every legal pivot and
+bounded by a polynomial in $m,n$; its missing property is a uniform
+range independent of numerical coefficients.  A second searches all
+paths and chooses a shortest improving one, exploiting the absence
+of a per-pivot efficiency condition.  That route reduces the problem
+to a geometric distance question, but does not automatically bound the
+distance.  A counterexample route must force \emph{every} legal path
+to be long in the correct input parameters; an exponentially long
+trajectory of one favorite rule is insufficient.  The shortest-path
+route and its exact quantifiers are investigated here.
+
+\paragraph{Attempt I: the directed feasible-basis graph.}
+Assume redundant equations have been removed so that $A$ has row rank
+$m$; this operation cannot increase either relevant input parameter.
+For a bounded nondegenerate feasible rational program in standard form,
+let $\mathcal B$ be its feasible bases.  Every basis corresponds to a
+vertex, and nondegeneracy makes that correspondence one-to-one.  Join
+two bases when a feasible single-variable exchange connects them.
+Orient an edge toward strictly larger objective value; optimal bases
+are terminal targets.
+
+A nonoptimal vertex has an improving incident edge.  Here is the usual
+geometric reason rather than an assumption of termination: if $v$ is
+nonoptimal and $w$ is better, the feasible direction $w-v$ lies in the
+polyhedral tangent cone at $v$.  That cone is generated by the incident
+edge directions for a bounded polytope.  A positive value of the
+objective on $w-v$ forces a positive value on at least one generator.
+Nondegeneracy realizes that edge as a simplex pivot.  Every improving
+walk is finite because the objective strictly increases on a finite
+vertex set.  Hence each feasible basis has a directed path to an optimum.
+
+Let $\ell(B)$ be the length of a shortest such path.  If the convention
+also permits zero-objective pivots, include those edges in the legal
+graph and use shortest distances there instead.  Improving paths still
+ensure reachability.  The equivalence proved next works with either
+specified convention; it does not exploit worsening pivots.
+
+\textbf{Pivot-count equivalence.}
+In the catalogue's model, a deterministic or randomized polynomial
+pivot-count rule exists if and only if there is a polynomial $p(m,n)$
+such that every allowed input and every feasible starting basis satisfy
+\begin{equation}\label{131:distance}
+ \ell(B)\leq p(m,n).
+\end{equation}
+Moreover, if any randomized rule has this expected bound, a uniform
+deterministic rule with no worse pivot-count bound exists, although
+its per-pivot running time may be exponential.
+
+\emph{Proof.} Every realized sequence of legal pivots reaching an
+optimum has length at least $\ell(B)$.  Thus an expected-length bound
+implies \eqref{131:distance}; finite expected termination also excludes
+nontermination with positive probability.  Conversely, enumerate all
+$\binom nm$ candidate bases using exact rational arithmetic, test
+invertibility and feasibility, and construct the legal exchange graph.
+Compare the finitely many exact objective values to identify all
+optimal bases.  Reverse breadth-first search from them computes
+$\ell$ on every feasible basis.  Choose, with a deterministic
+lexicographic tie-break, an outgoing edge from $B$ to a basis with
+distance $\ell(B)-1$.  Repeating reaches an optimum in exactly
+$\ell(B)$ pivots.  The enumeration is finite and uniformly computable
+from the input.  It need not be efficient, and no length-dependent
+advice or existence-only oracle is being used. \hfill$\square$
+
+The construction is therefore a legitimate rule in the specified
+model.  The unproved part is \eqref{131:distance}, not the existence
+or computability of the shortest-path selector.  Enumerating all bases
+without proving a short path would yield only the elementary bound
+\[
+ \ell(B)\leq|\mathcal B|-1\leq\binom nm-1.
+\]
+This is polynomial when $m$ or $n-m$ is fixed, but not for jointly
+varying $m,n$.
+
+\paragraph{Attempt II: geometric consequences and a calibration family.}
+A full-dimensional simple rational $d$-polytope with $f$ facets admits
+a slack-coordinate representation in $\R^f$:
+\[
+ s_i=b_i-a_i\cdot x\geq0\quad(1\leq i\leq f),\qquad As=b,
+\]
+where the affine relations among the slacks have rank $f-d$.
+The affine slack map is injective for a bounded full-dimensional
+polytope: a direction annihilated by all facet normals would otherwise
+be a lineality direction.  A simple vertex has exactly $d$ zero slacks
+and $f-d$ positive ones, giving a nondegenerate feasible basis in this
+representation.  Edges and objective improvements are preserved.
+Thus a polynomial bound in \eqref{131:distance} would imply polynomial
+monotone distances to an optimum in terms of $f,d$ for such polytopes.
+
+With a generic rational objective there is a unique optimum.  Routing
+two arbitrary vertices to that same vertex would also bound their
+undirected graph distance by $2p(f-d,f)$.  Hence the proposed pivot
+bound has a polynomial polytope-diameter consequence.  The converse
+inference is not valid: a short undirected path may decrease the
+objective, and the route required by simplex is directed.  No
+polynomial-diameter conjecture is assumed as an established theorem.
+
+For an exact small-model check, consider
+\[
+ x_i+y_i=1,\quad x_i,y_i\geq0\quad(1\leq i\leq d),\qquad
+ \max\sum_{i=1}^d w_i x_i,\quad w_i>0.
+\]
+Here $m=d,n=2d$, all $2^d$ vertices are nondegenerate, and an improving
+pivot changes one zero $x_i$ to one.  The distance to the unique
+optimum is exactly the number of zero $x_i$, at most $d$.  The number
+of bases is exponential, but the shortest-path distance is linear.
+This separates the cost of the brute-force selector from its pivot
+count and prevents an exponential state count from being mistaken
+for a geometric lower bound.
+
+\paragraph{Attempt III: audit a plausible counterexample transfer.}
+Black's recent preprint concerns genuine \emph{shortest} monotone
+distances, not just one inefficient pivot trajectory: its construction
+traps improving paths in an exponentially long shadow path.  This is
+a relevant obstruction to any argument bounding monotone diameter by
+a polynomial in geometric dimension and a fixed lattice coordinate
+range. \eref{131}{1}, Theorem 1.1 and Section 2.
+
+To turn it into a counterexample to the selected statement, one would
+still need to give an allowed nondegenerate equality-form family with
+$m,n$ polynomial in the parameter $d$, preserve the long directed
+distance, and verify that the bound beats \emph{every} polynomial in
+those $m,n$.  The displayed construction starts with exponentially
+many listed vertices and uses a Minkowski sum.  Its geometric dimension
+alone supplies no verified polynomial bound on the number of facets
+in the resulting description, and a change to slack variables need
+not preserve the small lattice-coordinate range.  Nor may
+nondegeneracy be imposed by an arbitrary perturbation without checking
+that new short improving paths have not appeared.
+
+The preprint itself distinguishes equality-form lattice polytopes in
+its introduction.  This notebook does not prove either that its family
+has polynomially many facets or that such a conversion is impossible.
+It records the missing conversion rather than claiming a counterexample
+to a stronger or differently parametrized statement.  Likewise, the
+ranking restrictions in \eref{131}{2} exclude the arbitrary global
+shortest-path selector above, so those lower bounds do not refute
+\eqref{131:distance}.
+
+\paragraph{Stress test.}
+Multiple optimal bases are handled by reverse search from all of them;
+a tie does not require an illegal objective decrease.  The proof uses
+exact rational feasibility and objective comparisons, not a numerical
+tolerance that could change the directed graph.  Randomness cannot
+reduce the expected number of traversed edges below shortest-path
+distance.  On the other hand, the deterministic selector's arithmetic
+work is unbounded by a polynomial in $m,n$, so it would not yield a
+strongly polynomial-time linear-programming algorithm merely from a
+polynomial pivot bound.
+
+The companion script enumerates the complementary-variable cube bases
+for small $d$, computes the improving graph and reverse distances, and
+checks the distance formula against every starting basis.  It also
+checks a finite directed-path example where an extra undirected edge
+is unusable because it decreases the objective.  Such graph examples
+are diagnostics only, not claimed realizations as arbitrary LP graphs.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+For the exact pivot-count model, existence of any expected-polynomial
+rule is equivalent to a uniform polynomial shortest legal path bound,
+and that bound would already admit a deterministic uniform selector.
+The reduction isolates the geometric statement that must be proved or
+disproved and audits the parameter and nondegeneracy obstacles in a
+recent potential counterexample transfer.  No polynomial bound on
+those distances, or superpolynomial lower bound in the required
+parameters, has been established.  No priority claim is made.
+% END RESEARCH ADDITION 131
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:131:1}{} Math Conjectures, OPT-002, catalog snapshot 31 July 2026.
+\url{https://mathconjectures.com/conjectures/OPT-002}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH REFERENCES 131
+\item[\textnormal{[E1]}]\hypertarget{extra:131:1}{} Alexander E. Black.
+\emph{Monotone Diameters of Lattice Polytopes}, arXiv:2609.08647v1, 8 September 2026. Theorem 1.1 and Section 2; the geometric-dimension parameter and equality-form distinction in the introduction. Recent preprint; no conversion to the catalogue\textquotesingle s required input family is presumed.
+\url{https://arxiv.org/html/2609.08647v1}.
+{\small\textit{Consulted 27 September 2026 for the indicated result or scope.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:131:2}{} Yann Disser, Georg Loho, Matthew Maat, and Nils Mosis.
+\emph{Lower bounds for ranking-based pivot rules}, arXiv:2512.16684v2, 10 August 2026. Abstract and introduction; restrictions on the information used by the pivot rule.
+\url{https://arxiv.org/abs/2512.16684v2}.
+{\small\textit{Consulted 27 September 2026 for the indicated result or scope.}}
+% END RESEARCH REFERENCES 131
+\end{itemize}
+
+
+\end{document}

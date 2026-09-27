@@ -1,0 +1,286 @@
+% Standalone research entry 213; batch 208--217.
+% Original section material preserved from Pasted text(3).txt.
+% Research additions: 27 September 2026.
+% Compile twice with: lualatex 213.tex
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Standalone wrapper; no external inputs or bibliography files are required.
+\fancyhead[L]{\small\sffamily Research notebook: section 213}
+\fancyhead[R]{\small 27 September 2026}
+\hypersetup{pdftitle={Research attempt 213},pdfauthor={Research notebook}}
+\setlength{\parskip}{4pt plus 1pt}
+\setlist[itemize]{before=\small\interlinepenalty10000,itemsep=3pt}
+\begin{document}
+\setcounter{section}{212}
+% ================================================================
+% problemId: problem.polynomial-diameter-bound-for-polytopes
+% source releaseRank: 213; source releaseStatus: open
+% exactTarget SHA-256: dc658c9c77171afa204e6501eaf44cdda8900867b9a2a6aa05721c72b50d4e34
+\clearpage
+\section{\texorpdfstring{Polynomial Diameter Bound for Polytopes}{Polynomial Diameter Bound for Polytopes}}\label{213}
+\subsection{Definitions and mathematical statement}
+A pointed polyhedron is an intersection of finitely many closed affine half-spaces in $\R^d$ containing no affine line; assume its affine dimension is $d$. Its graph has vertices the zero-dimensional faces and edges joining pairs that share a bounded one-dimensional face. Graph diameter is the maximum shortest edge-path distance between vertices. The target is a single polynomial $p$ such that
+\[
+ \operatorname{diam}(P)\le p(n,d)
+\]
+for every pointed $d$-dimensional polyhedron with $n$ facets, including unbounded polyhedra. Coordinates and their bit lengths do not enter the bound. This asks for a polynomial diameter estimate, not the stronger historical linear bound nor a polynomial-time pivot rule.
+\par\smallskip\textit{Formulation and concept references:} \sref{213}{1}.
+\cataloguescope{Prove or disprove that there is a polynomial p such that the vertex-edge graph of every pointed d-dimensional polyhedron, bounded or unbounded, with n facets has diameter at most p(n,d).}
+\subsection{Short English statement}
+Can the graph distance between any two vertices of a pointed polyhedron always be bounded by a polynomial in its dimension and number of facets?
+% BEGIN RESEARCH ADDITION 213
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+Kalai--Kleitman give a quasipolynomial worst-case bound rather than a
+polynomial with a fixed exponent \eref{213}{1}. The catalogue's formulation
+reference studies random polytopes; its probabilistic conclusions do not
+bound every pointed polyhedron \sref{213}{1}. Particularly relevant adjacent
+progress is Natura's February 2026 preprint: its Theorem 1.1 bounds
+\emph{circuit} diameter by $O(m^2\log m)$ in standard equality form with
+$m$ independent equations \eref{213}{2}. Circuit walks may visit nonvertices,
+and the result is not a bound for the graph in this entry. The attempt below
+investigates the precise conversion needed, rather than identifying these
+two notions of diameter.
+
+\paragraph{Attack route.}
+A direct attack would find a polynomial-length edge path. A potentially more
+flexible route is to begin with a short continuous or circuit walk and replace
+it by a chain of low-dimensional faces, inside which vertex enumeration has
+polynomial cost. The missing geometric lemma would have to keep the face
+dimension uniformly bounded, or provide a different polynomial navigation
+bound inside the visited faces. I prove the conversion statement and then
+try to derive its hypothesis from support-minimality of circuit directions.
+The latter derivation fails in an explicit family.
+
+\paragraph{Attempt.}
+\textit{1. Standard form does not discard the unbounded case.}
+Write a full-dimensional pointed polyhedron as
+$P=\{x\in\R^d:Bx\le b\}$ with $n$ facet inequalities. Its normals span
+$\R^d$: otherwise a vector in $\ker B$ would produce an affine line in $P$.
+The slack map $x\mapsto b-Bx$ is therefore an affine injection and identifies
+$P$ with an affine subspace intersected with $\R^n_{\ge0}$, equivalently
+\[
+ Q=\{s\in\R^n:As=c,\ s\ge0\},\qquad\operatorname{rank}A=n-d.
+\]
+Faces, vertices, bounded edges, and their incidences are preserved. No
+boundedness or rationality assumption on the coefficients was used. In the
+remainder, $m$ denotes the equation rank in standard form, not the original
+dimension $d$.
+
+\textit{2. Face-chain lifting lemma.}
+Let $u,v$ be vertices of a pointed polyhedron with at most $n$ facets.
+Suppose faces $F_1,\ldots,F_L$ satisfy
+\[
+ u\in F_1,\quad v\in F_L,\quad
+ F_i\cap F_{i+1}\ne\varnothing,\quad \dim F_i\le r.
+\]
+Then
+\[
+ \operatorname{dist}_{\mathrm{graph}}(u,v)
+ \le L\left(\sum_{j=0}^{r}\binom nj-1\right).                  \tag{213.1}
+\]
+For $r=0$ the hypotheses force $u=v$, so the zero right-hand side is correct.
+To prove the other cases, every nonempty face of a pointed polyhedron has
+a vertex. Choose a vertex $w_i$ of $F_i\cap F_{i+1}$, with $w_0=u$ and
+$w_L=v$. A vertex of a face is a vertex of the entire polyhedron. A
+$k$-dimensional face described in its affine hull by at most $n$ inequalities
+has at most $\binom nk$ vertices: a vertex is specified by some $k$
+independent active inequalities, and a fixed such choice determines at most
+one point. Degeneracy only permits several choices for the same vertex and
+does not invalidate the upper bound.
+
+For completeness the vertex graph of each such face is connected even if
+the face is unbounded. Choose a linear functional strictly positive on its
+nonzero recession directions and generic on its finite vertex set. It has
+a unique minimizing vertex. From any other vertex there is a descending
+incident edge: the tangent cone is generated by edge directions and
+recession rays, and descent cannot be supplied solely by recession rays
+on which the functional is positive. Strict descent visits finitely many
+vertices and terminates at the minimizer. Hence there is a simple graph
+path between $w_{i-1}$ and $w_i$ inside $F_i$, of length at most the number
+of its vertices minus one. Summing proves (213.1). All used edges of a face
+are also edges of the original polyhedron.
+
+A piecewise linear walk whose successive segments lie in faces of dimension
+at most $r$ gives such a chain. Consequently, the following precise
+hypothesis would imply the full target:
+\begin{equation}\tag{213.2}
+ \begin{gathered}
+ \text{A fixed integer }r\text{ and a polynomial }L(n,d)\text{ exist such that}\\
+ \text{every vertex pair admits a chain of at most }L(n,d)\\
+ \text{intersecting faces, each of dimension at most }r.
+ \end{gathered}
+\end{equation}
+This is a sufficient geometric reformulation, not a bound already obtained.
+In fact polynomial graph diameter itself would give (213.2) with $r=1$;
+the interest would be a new proof of a bounded-width chain by non-edge
+methods. Allowing $r$ to grow like $\log n$ in (213.1) only recovers a
+quasipolynomial scale, so the uniformity in $r$ cannot be hidden in notation.
+
+\textit{3. A maximal circuit step need not end at a vertex.}
+Take
+\[
+ A=\begin{pmatrix}1&0&1&1\\0&1&1&-1\end{pmatrix},\quad
+ b=\binom11,\quad Q=\{x\ge0:Ax=b\}.
+\]
+The point $u=(1,1,0,0)$ is a vertex, and
+$g=(-2,0,1,1)$ lies in $\ker A$. Its support $\{1,3,4\}$ is minimal:
+every pair of those columns is linearly independent. The largest feasible
+step is $\lambda=1/2$, giving
+\[
+ u+\tfrac12 g=(0,1,1/2,1/2)
+ =\tfrac12(0,0,1,0)+\tfrac12(0,2,0,1).                        \tag{213.3}
+\]
+The two points on the right are distinct vertices. The endpoint on the left
+is not a vertex. Thus the proposed conversion ``each maximal circuit step
+is an edge step'' is false for a two-dimensional bounded polytope already.
+The midpoints of the segment from $u$ to this endpoint have every coordinate
+positive, so that segment runs through the relative interior of $Q$.
+
+\textit{4. The obstruction has arbitrarily large face width.}
+There is a direct extension of (213.3). Fix any $m\ge2$, let
+\[
+ w_1=e_1,\ldots,w_{m-1}=e_{m-1},\quad
+ w_m=-\sum_{j=1}^{m-1}e_j\quad\text{in }\R^{m-1},
+ \qquad c_j=(1,w_j)\in\R^m,
+\]
+and set
+\[
+ A_m=[\,I_m\mid c_1\ \cdots\ c_m\,],\quad
+ Q_m=\{x\ge0:A_mx=\mathbf1\}.
+\]
+The columns $c_j$ are linearly independent. Indeed, a relation between them
+has coefficient sum zero, whereas its remaining coordinates force all
+coefficients to be equal. The relation
+$\sum_jc_j=m e_1$ is the unique relation, up to scale, between the $m+1$
+columns $e_1,c_1,\ldots,c_m$, and all of its coefficients are nonzero.
+It therefore defines a circuit direction
+\[
+ g=(-m,0,\ldots,0;1,\ldots,1).
+\]
+Starting at the vertex $u=(\mathbf1;\mathbf0)$, the maximal step has size
+$1/m$. At every intermediate time $0<t<1/m$ all $2m$ coordinates are
+positive. Thus the segment's minimal containing face is \emph{all} of
+$Q_m$, of dimension $2m-m=m$. At the endpoint only coordinate $1$ is zero;
+the remaining columns still span $\R^m$, so its minimal face has dimension
+$(2m-1)-m=m-1$. In particular it is not a vertex.
+
+These polyhedra are pointed automatically, being contained in an orthant.
+They are even bounded: the first equation bounds $x_1$ and the sum of the
+last $m$ coordinates by one; the other equations then bound the remaining
+basic coordinates. A positive intermediate point verifies the asserted
+affine dimension. The phenomenon is thus not caused by recession rays,
+degeneracy, or enormous coordinate bit lengths. A circuit's support bound
+$m+1$ does not bound by an absolute constant the dimension of the face
+traversed by that circuit. Exact rank checks for $m=2,\ldots,8$ accompany
+the general proof, but the proof, not this finite list, establishes the
+arbitrarily large dimension.
+
+\paragraph{Stress test.}
+The examples do not have large graph diameter and are not counterexamples
+to the requested polynomial bound. They disprove a conversion lemma, not
+the conclusion. Nor do they refute the circuit theorem in \eref{213}{2};
+its steps are expressly allowed to have the behavior above. A more careful
+route could replace one large-face segment by several low-face segments,
+but no polynomial bound on the replacement cost has been supplied.
+
+The lifting proof uses vertices of face intersections, not arbitrary nearest
+vertices; nearest-point rounding would not preserve adjacency. It also
+explicitly includes unbounded faces. Truncating an unbounded polyhedron and
+then forgetting the new facets would not be a valid alternative without
+controlling the introduced paths and combinatorial parameters. Finally,
+short paths between two \emph{specified} vertices do not themselves give a
+pivot rule that finds an unknown optimal vertex. Nothing here implies a
+strongly polynomial linear-programming algorithm or makes an unsupported
+complexity-theoretic inference.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+A bounded-face-width chain of polynomial length would yield a polynomial
+graph-diameter bound by (213.1), with all unbounded and degenerate cases
+included. The serious obstruction to obtaining such chains from short
+circuit walks is demonstrated by a complete family of maximal circuit steps
+through faces of unbounded dimension. The required refinement theorem, or
+a different polynomial navigation estimate for these high-dimensional
+faces, remains unproved. No unconditional improvement of the worst-case
+graph-diameter bound is claimed.
+% END RESEARCH ADDITION 213
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:213:1}{} Bonnet, Dadush, Grupel, Huiberts, and Livshyts, SoCG 2022.
+\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.SoCG.2022.18}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH REFERENCES 213
+\item[\textnormal{[E1]}]\hypertarget{extra:213:1}{} Gil Kalai and Daniel J. Kleitman,
+\emph{A quasi-polynomial bound for the diameter of graphs of polyhedra},
+Bulletin of the American Mathematical Society 26 (1992), 315--316;
+arXiv:math/9204233, main theorem.
+\url{https://arxiv.org/abs/math/9204233}.
+\item[\textnormal{[E2]}]\hypertarget{extra:213:2}{} Bento Natura,
+\emph{Circuit Diameter of Polyhedra is Strongly Polynomial},
+arXiv:2602.06958v2 (10 February 2026), Section 1.1, Theorem 1.1,
+Theorem 3.1, and Corollary 3.2.
+\url{https://arxiv.org/html/2602.06958v2}.
+{\small\textit{Recent preprint concerning circuit, not vertex-edge, diameter; not independently proof-audited here.}}
+% END RESEARCH REFERENCES 213
+\end{itemize}
+
+\end{document}

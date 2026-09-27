@@ -1,0 +1,252 @@
+% TOP_PROBLEM: {"problemId": "problem.np-versus-conp-problem", "canonicalTitle": "NP versus coNP Problem", "releaseRank": 13, "primaryDomain": "theoretical_computer_science", "primaryDomainLabel": "Theoretical computer science", "displayStatus": "open", "releaseStatus": "open"}
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{NP versus coNP Problem}{NP versus coNP Problem}}\label{13}
+\subsection{Definitions and mathematical statement}
+For $L\subseteq\{0,1\}^*$ write $\overline L=\{0,1\}^*\setminus L$ and set $\mathsf{coNP}=\{\overline L:L\in\mathsf{NP}\}$. The question is $\mathsf{NP}=\mathsf{coNP}$. A Cook--Reckhow proof system is a polynomial-time computable surjection $P:\{0,1\}^*\to\mathsf{TAUT}$, where $\mathsf{TAUT}$ is the set of propositional tautologies. Polynomial boundedness means
+\[
+ \exists\text{ polynomial }q\ \forall\varphi\in\mathsf{TAUT}\ \exists\pi:
+ P(\pi)=\varphi,\quad|\pi|\le q(|\varphi|).
+\]
+The equivalent proof-system question permits choosing the system; it is not restricted to a familiar calculus.
+\par\smallskip\textit{Formulation and concept references:} \href{https://www.scottaaronson.com/papers/pnp.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Does efficient certification of yes-answers always come with efficient certification of no-answers?
+\subsection{Research attempt}
+\paragraph{Scope, source check, and plan.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. The process was to check the proof-system formulation, examine a
+concrete certificate-compression strategy, and construct adversarial examples
+for conclusions drawn from representation size. No separation or collapse of
+complexity classes is claimed.
+
+Cook--Reckhow [E1], Propositions 1.1 and 1.4, give the equivalence between
+$\mathsf{NP}=\mathsf{coNP}$ and existence of a polynomially bounded proof
+system. Their definition ranges over all polynomial-time surjections onto
+tautologies. The catalogue's [S3] explicitly restricts its lower-bound target
+to tree-like semantic systems with bounded line size. The other catalogue
+research entries are retained as references; their titles are not accepted
+as proofs of a class equality or separation.
+
+The selected route is to test whether short unsatisfiability certificates can
+be obtained by eliminating auxiliary variables from a verifier. Parity gives
+an exact calculation: elimination can require exponentially many clauses,
+while an elementary algebraic certificate remains short. A separate explicit
+proof-system construction then tests whether a lower bound in one verifier
+can possibly quantify over all verifiers.
+
+\paragraph{The universal quantifier over proof systems.}
+If a proof system $P$ has proofs bounded by a polynomial $q$, a verifier for
+$\mathsf{TAUT}$ guesses $\pi$ of length at most $q(|\varphi|)$ and checks
+$P(\pi)=\varphi$. Conversely, if $\mathsf{TAUT}$ has a polynomially bounded
+NP verifier $V$, define $P(\varphi,w)=\varphi$ when $V(\varphi,w)$ accepts,
+and output a fixed tautology $\tau_0$ otherwise. This is a polynomial-time
+surjection with polynomially bounded proofs. Together with coNP-completeness
+of tautology, this proves the equivalence used here [E1]. Consequently a
+negative answer requires failure of polynomial boundedness for \emph{every}
+such $P$. A positive answer needs just one sound, complete, polynomial-time
+verifier with a uniform polynomial proof bound.
+
+\paragraph{Lemma 13.1: exact clause complexity of parity.}
+For $n\ge1$ let
+\[
+ E_n=\{x\in\{0,1\}^n:x_1+\cdots+x_n=0\pmod2\}.
+\]
+Every CNF on these $n$ variables alone whose satisfying set is exactly $E_n$
+contains at least $2^{n-1}$ non-tautological clauses. This bound is attained.
+
+\emph{Proof.} Remove repeated literals and tautological clauses. Every
+remaining clause must be true on all even-parity inputs. If a clause omits
+$x_i$, assign the variables it mentions so as to falsify every literal.
+Choose the other unspecified variables arbitrarily except $x_i$, and choose
+$x_i$ last to make the total parity even. This gives a satisfying input of
+$E_n$ falsifying the clause, a contradiction. Thus every such clause mentions
+all $n$ variables. With no repeated or complementary literals, it is falsified
+by exactly one assignment; that assignment must have odd parity. All
+$2^{n-1}$ odd assignments must be excluded, giving the lower bound.
+Conversely, for each odd assignment take the width-$n$ clause falsified
+precisely by it. Their conjunction defines $E_n$.\hfill$\square$
+
+The result also holds for odd parity, by exchanging the final parity bit.
+It is a lower bound on an exact visible-variable representation, with no
+hypothesis about how that representation is generated. It therefore falsifies
+any proposed universal procedure that projects an arbitrary short CNF onto
+its visible variables and always returns a polynomial-size equivalent CNF
+without new variables.
+
+\paragraph{A short extended representation, checked gate by gate.}
+Introduce prefix variables $p_0,\ldots,p_n$, require $p_0=0$, and impose
+\[
+                   p_i=p_{i-1}+x_i\pmod2\quad(1\le i\le n).
+\]
+Each relation $c=a+b\pmod2$ is given by the four clauses
+\[
+ (a\vee b\vee\neg c),\quad
+ (a\vee\neg b\vee c),\quad
+ (\neg a\vee b\vee c),\quad
+ (\neg a\vee\neg b\vee\neg c).
+\]
+They exclude exactly the four triples violating the XOR equation. The unit
+clauses $\neg p_0$ and $\neg p_n$ complete a CNF with $4n+2$ clauses.
+For every input $x$, the gate equations determine a unique sequence $p_i$;
+its final value is the parity of $x$. Thus existentially projecting the
+$p$ variables gives exactly $E_n$. With binary variable indices, the encoded
+length is $O(n\log(n+2))$.
+
+The exponential lower bound is consequently not a statement that parity
+requires long descriptions, or that checking parity is difficult. It records
+the cost of requiring a particular description after forgetting the internal
+prefix values. This distinction matters in proof search: a short proof can
+retain useful intermediate variables instead of projecting them away.
+
+\paragraph{Lemma 13.2: short certificates for affine inconsistency.}
+Let $A\in\mathbb F_2^{m\times r}$ and $b\in\mathbb F_2^m$. The system
+$Az=b$ is inconsistent if and only if there is
+$\lambda\in\mathbb F_2^m$ with
+\begin{equation}\label{a13:dual}
+                  \lambda^{\mathsf T}A=0,
+                  \qquad\lambda^{\mathsf T}b=1.
+\end{equation}
+This is an $m$-bit certificate checked in $O(mr+m)$ field operations.
+
+\emph{Proof.} Such a certificate would transform a hypothetical solution
+into $0=1$, so it proves inconsistency. Conversely apply Gaussian row
+elimination to the augmented matrix $(A\mid b)$, tracking each row operation
+on an additional identity matrix $I_m$. If elimination never produces a zero
+coefficient row with right side $1$, assign free variables arbitrarily and
+solve the pivot equations backwards, obtaining a solution. In the
+inconsistent case there is therefore a row $(0\mid1)$; the corresponding
+tracked row of the identity matrix is $\lambda^{\mathsf T}$. Row operations
+preserve the stated linear-combination interpretation. All matrices and all
+operations have polynomial size.\hfill$\square$
+
+Apply this directly to two prefix encodings on the same $x$ variables, with
+$p_0=q_0=0$, respective equations
+\[
+ p_i+p_{i-1}+x_i=0,\qquad q_i+q_{i-1}+x_i=0,
+\]
+and the incompatible requirements $p_n=0$, $q_n=1$. Sum every displayed
+prefix equation and all four boundary equations. Each $x_i$ occurs twice;
+every internal $p_i,q_i$ occurs twice; the boundary occurrences also cancel.
+The right side is $1$. Thus the all-ones row-combination vector is already
+an explicit certificate for $0=1$. It has $2n+4$ bits.
+
+A procedure that first expands both projected parity conditions into CNF
+would generate exponentially many clauses before noticing their conflict.
+The affine certificate avoids that expansion. This demonstrates why the
+representation lower bound in Lemma 13.1 cannot by itself lower-bound proof
+length across all proof systems.
+
+\paragraph{Where the algebraic upper-bound proposal breaks.}
+Boolean circuits do not consist only of XOR relations. Over $\mathbb F_2$,
+an AND gate has equation $z+xy=0$. Treating the monomial $xy$ as an independent
+linear variable discards its relation to $x$ and $y$. There is an immediate
+counterexample: the equations
+\[
+                    x=0,\quad y=0,\quad z=1,\quad z=xy
+\]
+are inconsistent, but replacing $xy$ by a free variable $u$ gives the
+consistent affine system $x=0,y=0,z=1,z=u$. Therefore affine inconsistency
+certificates remain sound for the affine systems to which they apply, but
+this naive linearization is incomplete for Boolean gate systems. Restoring
+$u=xy$ restores the nonlinear constraint. No polynomial bound for certificates
+handling every such nonlinear system is proved here.
+
+\paragraph{An explicit stress test for proof-system lower bounds.}
+There is also a simple way to make the quantifier failure concrete. Define
+a truth-table proof system $T$: a well-formed proof contains a formula
+$\varphi$ and the evaluations on all assignments in a fixed order; $T$
+checks the table and outputs $\varphi$ if all entries are $1$. Otherwise it
+outputs $\tau_0$. The checker first verifies that the supplied table length
+is exactly $2^v$, where $v$ is the number of distinct variables. It performs
+the exponential-in-$v$ scan only when that many bits were supplied. Hence
+its running time is polynomial in the \emph{proof} length, as required, and
+it is a surjection onto tautologies.
+
+Let $\tau_n=\bigwedge_{i=1}^n(x_i\vee\neg x_i)$, choosing $n$ so that this
+formula is not the default $\tau_0$. Its formula length is
+$O(n\log(n+2))$, but every $T$-proof has at least $2^n$ table entries. Now
+extend $T$ with a tagged input containing any formula of the syntactic form
+$\tau_n$, which is output immediately. Recognition and output take
+polynomial time, and every added output is a tautology. The resulting system
+is still sound and surjective, and the same family has proofs of length
+$O(n\log(n+2))$. Thus a proved exponential lower bound for a particular
+system and family can coexist with short proofs in another permitted system.
+This is an illustrative construction, not a claim that any familiar strong
+system simulates all others.
+
+\paragraph{Verification and first remaining gap.}
+The companion checks enumerate all normalized clauses on up to six variables,
+confirm that every non-tautological clause valid on even parity has full
+width, and count exactly $2^{n-1}$ necessary excluded odd assignments.
+They test all eight XOR triples and the four displayed gate clauses.
+They also enumerate all $2\times3$ affine systems, comparing the existence
+of a solution with the absence of a certificate \eqref{a13:dual}. These
+checks support the finite identities, while the proofs cover arbitrary sizes.
+
+The first missing lemma for the proposed upper-bound route is a sound,
+complete polynomial-time verifier whose certificates for \emph{all}
+unsatisfiable Boolean gate systems have length polynomial in the original
+encoding. The affine lemma proves this only for a tractable subclass. For
+a lower-bound route, the missing quantifier is a bound against every
+Cook--Reckhow system, including systems with additional certificate types.
+Next work must address nonlinear constraints, retained auxiliary variables,
+and this universal quantifier together; more accurate parity clause counts
+will not bridge the gap.
+
+\paragraph{Outcome.}
+\textbf{UNRESOLVED.} The attempt proves an exact parity representation bound,
+constructs polynomial certificates for an affine contradiction family, and
+exhibits a proof-system extension defeating a particular exponential lower
+bound. These elementary results are presented without novelty claims. They
+identify two invalid inferences, but establish neither
+$\mathsf{NP}=\mathsf{coNP}$ nor $\mathsf{NP}\ne\mathsf{coNP}$.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Scott Aaronson, "P =? NP," in Open Problems in Mathematics (J. F. Nash Jr., M. Th. Rassias, eds.), Springer, 2016, pp. 1-122.
+\url{https://www.scottaaronson.com/papers/pnp.pdf}.
+\textit{Formulation source.}
+\item[S2]Proof Complexity and Feasible Interpolation — Amirhossein Akbar Tabatabai (2025).
+\url{https://arxiv.org/html/2505.03002v1}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Superpolynomial Length Lower Bounds for Tree-Like Semantic Proof Systems with Bounded Line Size — de Rezende, Engström, Ghannane and Risse (2026).
+\url{https://eccc.weizmann.ac.il/report/2026/078/}.
+\textit{Further reference; not a proof endorsement.}
+\item[S4]Simulating Polynomial-Time Nondeterministic Turing Machines via Nondeterministic Turing Machines — Tianrong Lin, v28.
+\url{https://arxiv.org/abs/2406.10476}.
+\textit{Further reference; not a proof endorsement.}
+\item[S5]A Critique of Lin's On NP versus coNP and Frege Systems — DeJesse, Lyudovyk, Pai and Reidy (2025).
+\url{https://arxiv.org/abs/2505.05658}.
+\textit{Further reference; not a proof endorsement.}
+\item[S6]Proofs of NP = coNP = PSPACE: Current upgrade — Lev Gordeev and Edward Hermann Haeusler, v3.
+\url{https://arxiv.org/abs/2311.17939}.
+\textit{Further reference; not a proof endorsement.}
+\item[S7]A simplified lower bound for implicational logic — Emil Jeřábek (September 2024 version; published 2025).
+\url{https://arxiv.org/html/2303.15090v3}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Stephen A. Cook and Robert A. Reckhow,
+\emph{The Relative Efficiency of Propositional Proof Systems},
+Journal of Symbolic Logic 44(1) (1979), pp. 36--50, especially
+Propositions 1.1 and 1.4 and Definition 1.3.
+\url{https://www.cs.toronto.edu/~sacook/homepage/cook_reckhow.pdf}.
+\url{https://doi.org/10.2307/2273702}.
+\textit{Primary source for the proof-system equivalence and definition;
+consulted 27 September 2026.}
+\end{itemize}
+\end{document}

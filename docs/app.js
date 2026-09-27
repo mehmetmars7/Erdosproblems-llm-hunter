@@ -232,7 +232,7 @@ function getOpenProblemSources(problem) {
 }
 
 function renderOpenProblemRows(problems) {
-    if (!problems.length) return '<tr><td colspan="8">No problems match these filters.</td></tr>';
+    if (!problems.length) return '<tr><td colspan="9">No problems match these filters.</td></tr>';
     return problems.map(problem => {
         const isMO = getOpenProblemCollection(problem) === 'mo';
         const rank = !isMO && Number.isFinite(problem.rank) ? problem.rank : '—';
@@ -255,10 +255,11 @@ function renderOpenProblemRows(problems) {
             <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
             <td${qualification}>${escapeHtml(getOpenProblemStatusLabel(problem))}${reviewed}</td>
             <td class="${escapeHtml(getReviewClass(problem.review))}"${reviewTitle}>${escapeHtml(getReviewLabel(problem.review))}</td>
-            <td class="claim-status">${escapeHtml(getOpenProblemClaim(problem))}<span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td class="claim-status"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(getOpenProblemClaim(problem))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td>${attempts.length ? escapeHtml(formatCompletion(problem.completion)) || '—' : '—'}</td>
             <td>${labels.length ? labels.map(escapeHtml).join(', ') : '—'}</td>
             <td>${sourceLink}</td>
+            <td></td>
         </tr>`;
     }).join('');
 }
@@ -293,7 +294,7 @@ function initOpenProblemsPage() {
     const catalogue = window.OPEN_PROBLEMS_DATA;
     const count = document.getElementById('results-count');
     if (!catalogue) {
-        tbody.innerHTML = '<tr><td colspan="8">Unable to load the problem catalogue.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9">Unable to load the problem catalogue.</td></tr>';
         count.textContent = 'Catalogue unavailable';
         return;
     }

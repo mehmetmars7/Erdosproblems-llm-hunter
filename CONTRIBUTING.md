@@ -40,7 +40,7 @@ We focus on frontier models because they have shown the most promise in making m
 For catalogue-style research batches, use the importer from the repository root:
 
 ```bash
-python3 scripts/import_top_problem_attempts.py --model GPT_6_Astra_Ultra /path/to/research_batch_101_103.tex
+python3 scripts/import_top_problem_attempts.py --model gpt_6_astra_ultra /path/to/research_batch_101_103.tex
 python3 build_site.py
 ```
 

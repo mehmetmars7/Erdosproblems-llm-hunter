@@ -71,7 +71,7 @@ class OpenCatalogValidationTests(unittest.TestCase):
                     build_site.load_open_problems_catalog()
 
     def test_verbatim_notebook_definitions_sources_and_research_are_separate(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / 'GPT_6_Astra_Ultra' / '1.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / 'gpt_6_astra_ultra' / '1.tex').read_text()
         record = build_site.parse_numbered_problem_tex(source)
         self.assertIn('A language is a set $L', record['definitionTeX'])
         self.assertIn(r'\exists y\in\{0,1\}^{\le p(|x|)}', record['definitionTeX'])
@@ -96,6 +96,40 @@ class OpenCatalogValidationTests(unittest.TestCase):
         record = build_site.parse_numbered_problem_tex(source)
         self.assertIn(r'{\mathbb{A}}_k,{\mathbb{E}}_{x},{\mathbb{Q}},\Re,\Gamma',
                       record['definitionTeX'])
+
+    def test_attempt_with_trailing_comments_and_print_only_reference(self):
+        source = r'''\begin{document}
+\section{Example}
+\subsection{Definitions and mathematical statement}
+The target statement.
+\subsection{Short English statement}
+Does it hold?
+\subsection{Research attempt: a restricted case}
+Partial progress using \eref{1}{1}; the general case is unresolved.
+Additional provenance: \srcref{A1}. Statement: \src{S1}.
+\subsection{Sources}
+\begin{itemize}
+\item[S1] Statement. \url{https://example.org/statement}
+\item[E1] A printed theorem, Journal 12 (1983), 1--10.
+\item[A1] An offline computation transcript.
+\end{itemize}
+\end{document}
+% Archived material follows, including literal \end{document} text.
+% This comment must not appear on the website.
+'''
+        with self.assertRaisesRegex(ValueError, 'Missing URL for source E1'):
+            build_site.parse_numbered_problem_tex(source)
+        record = build_site.parse_numbered_problem_tex(source, require_source_urls=False)
+        self.assertIn('Research attempt: a restricted case', record['researchTeX'])
+        self.assertIn('Partial progress using [E1]', record['researchTeX'])
+        self.assertIn('Additional provenance: [A1]', record['researchTeX'])
+        self.assertIn(r'Statement: \href{https://example.org/statement}{[S1]}', record['researchTeX'])
+        self.assertIsNone(record['sources'][1]['url'])
+        self.assertNotIn('Archived material', record['documentTeX'])
+        self.assertNotIn('Partial progress', record['definitionTeX'])
+        with self.assertRaisesRegex(ValueError, 'Missing local source E2'):
+            build_site.parse_numbered_problem_tex(source.replace(r'\eref{1}{1}', r'\eref{1}{2}'),
+                                                 require_source_urls=False)
 
     def test_numbered_definitions_have_no_embedded_research_attempts(self):
         snapshot = build_site.load_open_problems_catalog()
@@ -208,6 +242,18 @@ class OpenProblemsBuildTests(unittest.TestCase):
         self.write('attacks/open_problems/top_problems/Model/501.tex', 'UNRESOLVED')
         with self.assertRaisesRegex(ValueError, 'Unknown ranked'):
             build_site.build_open_problems_data({}, catalog())
+
+    def test_lowercase_astra_folders_preserve_model_paths_and_exclude_unlisted_files(self):
+        for model in ['gpt_6_astra_ultra', 'gpt_6_astra_pro']:
+            self.write(f'attacks/open_problems/top_problems/{model}/1.tex', 'UNRESOLVED')
+        self.write('attacks/open_problems/top_problems/gpt_6_astra_pro/unlisted/501.tex',
+                   'Outside the ranked catalogue')
+        result = build_site.build_open_problems_data({}, catalog())['problem.example']
+        self.assertEqual({a['model'] for a in result['attacks']},
+                         {'gpt 6 astra ultra', 'gpt 6 astra pro'})
+        self.assertEqual({a['file_path'] for a in result['attacks']},
+                         {'attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex',
+                          'attacks/open_problems/top_problems/gpt_6_astra_pro/1.tex'})
 
     def test_numbered_attempt_keeps_declared_partial_status_after_display_conversion(self):
         content = r'''% ATTEMPT_STATUS: partial

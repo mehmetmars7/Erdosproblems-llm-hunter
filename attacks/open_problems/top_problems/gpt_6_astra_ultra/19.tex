@@ -1,0 +1,274 @@
+% TOP_PROBLEM: {"problemId": "problem.unconditional-separation-of-quantum-and-classical-bounded-error-polynomial-time-bqp-bpp", "canonicalTitle": "Unconditional Separation of Quantum and Classical Bounded-Error Polynomial Time (BQP != BPP)", "releaseRank": 19, "primaryDomain": "quantum_information_computation", "primaryDomainLabel": "Quantum information & computation", "displayStatus": "open", "releaseStatus": "open"}
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Unconditional Separation of Quantum and Classical Bounded-Error Polynomial Time (BQP != BPP)}{Unconditional Separation of Quantum and Classical Bounded-Error Polynomial Time (BQP != BPP)}}\label{19}
+\subsection{Definitions and mathematical statement}
+Both classes decide total binary languages with error at most $1/3$ on every input and polynomial running time. The class $\mathsf{BPP}$ uses classical random bits; $\mathsf{BQP}$ uses uniform quantum computation over a fixed effective universal gate set. The target is
+\[
+ \exists L\subseteq\{0,1\}^*:\quad L\in\mathsf{BQP}\ \text{and}\ L\notin\mathsf{BPP}.
+\]
+The assertion is unconditional and unrelativized: a separation only in the presence of an oracle or under a conjectured hardness assumption does not meet it.
+\par\smallskip\textit{Formulation and concept references:} \href{https://doi.org/10.1137/S0097539796300921}{[S1]}.
+
+\subsection{Short English statement}
+Can one prove, without computational assumptions, that quantum computers efficiently solve some decision problem beyond all efficient randomized classical computers?
+\subsection{Research attempt}
+\paragraph{Scope, source check, and process.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. The strategy was to test whether explicitly structured interference
+supplies a total decision-language separation, while auditing the conversion
+from sampling and oracle results. All circuits are uniform and use fixed
+effective gates. Error bounds must hold on every input of the resulting
+language, including malformed encodings, which may be rejected explicitly.
+
+The classical simulation inclusion $\mathsf{BPP}\subseteq\mathsf{BQP}$ is
+compatible with the target: fair bits are obtained by Hadamard gates and
+classical gates by reversible computation with ancillas. What is missing is
+one total language escaping \emph{all} polynomial-time randomized deciders.
+The original Bernstein--Vazirani reference [S1] supplies the model and
+relativized context. The CCC 2025 work [S2] concerns sampling and functional
+tasks with its stated assumptions and parameters. Mantri's September 2026
+paper [S3] explicitly concerns oracle separations in a Fourier hierarchy.
+Neither is treated here as the unrelativized total-language separation.
+
+The concrete interference family below lies inside the efficiently simulable
+stabilizer setting studied in [E1]. Its exact probability formula and sampler
+are derived here to expose why a large superposition and cancellation do not
+alone provide classical hardness. This calculation is an illustrative
+special case, not a new stabilizer-simulation theorem.
+
+\paragraph{Attack: quadratic phases between two Fourier layers.}
+Let $G$ be a simple graph on $n$ labeled vertices, with adjacency matrix
+$A\in\mathbb F_2^{n\times n}$, so $A$ is symmetric and has zero diagonal.
+Define
+\[
+ q(x)=\sum_{\{i,j\}\in E(G),\,i<j}x_i x_j\pmod2,
+ \qquad D_q|x\rangle=(-1)^{q(x)}|x\rangle.
+\]
+The circuit
+\[
+                 H^{\otimes n}D_qH^{\otimes n}|0^n\rangle
+\]
+has $O(n^2)$ gates: each edge contributes a controlled-$Z$ phase. Such gates
+have fixed finite decompositions in a universal effective basis, or may be
+included in that fixed basis. All gates and their order are generated from
+the input graph in polynomial time. Before the final Hadamards the state has
+exactly $2^n$ nonzero amplitudes and can be entangled.
+
+On measurement, the amplitude and probability of $y$ are
+\begin{equation}\label{a19:fourier}
+ \alpha_y=2^{-n}\sum_{x\in\mathbb F_2^n}(-1)^{q(x)+y\cdot x},
+ \qquad p_y=|\alpha_y|^2.
+\end{equation}
+The sum appears exponentially large. Squaring it and changing variables
+gives a much smaller description of the full distribution.
+
+\paragraph{Lemma 19.1: an exact affine-support formula.}
+Put $K=\ker A$ and $r=\operatorname{rank}A$. Then
+\begin{equation}\label{a19:distribution}
+ p_y=
+ \begin{cases}
+  2^{-r},&y\cdot z=q(z)\text{ for every }z\in K,\\
+  0,&\text{otherwise}.
+ \end{cases}
+\end{equation}
+The support is a nonempty affine subspace of dimension $r$. It is computable,
+and its uniform distribution is exactly samplable, in classical polynomial
+time.
+
+\emph{Proof.} The polarization identity is
+\[
+                   q(x+z)+q(x)+q(z)=x^{\mathsf T}Az.
+\]
+Expand the square in \eqref{a19:fourier} and substitute $x'=x+z$:
+\[
+ p_y=2^{-2n}\sum_z(-1)^{q(z)+y\cdot z}
+                   \sum_x(-1)^{x^{\mathsf T}Az}.
+\]
+If $Az\ne0$, choose a coordinate where it is $1$. Pair each $x$ with $x$
+plus the corresponding unit vector; the inner summands cancel. If $Az=0$,
+all $2^n$ inner summands equal $1$. Therefore
+\[
+                 p_y=2^{-n}\sum_{z\in K}(-1)^{q(z)+y\cdot z}.
+\]
+For $u,z\in K$, polarization gives $q(u+z)=q(u)+q(z)$; also $q(0)=0$.
+Thus $q$ restricted to $K$ is a linear functional. The last sum is $|K|$
+if that functional equals $z\mapsto y\cdot z$, and otherwise is zero by
+pairing with an element on which they disagree. As $|K|=2^{n-r}$, this
+proves \eqref{a19:distribution}.
+
+Every linear functional on $K$ extends to one on $\mathbb F_2^n$: extend
+a basis of $K$ to a full basis and assign arbitrary values to the added
+basis vectors. Every such full functional has the form $z\mapsto y\cdot z$.
+Hence the support is nonempty, with one independent equation for each basis
+vector of $K$, and has dimension $r$.
+
+Compute a kernel basis by Gaussian elimination, evaluate $q$ on each basis
+vector, and solve those linear equations for $y$. Obtain a particular
+solution $y_0$ and a basis $v_1,\ldots,v_r$ for their homogeneous solutions.
+Output $y_0+\sum_i B_i v_i$ for independent fair bits $B_i$. The map from
+the $r$ bits to the affine subspace is bijective, so this is the exact
+required distribution. Every arithmetic operation is over $\mathbb F_2$,
+and all storage and work are polynomial in the graph encoding.
+\hfill$\square$
+
+An easily missed detail is the affine shift $q|_K$. For a triangle,
+$K=\{000,111\}$ and $q(111)=1$, so the output is uniform on the four
+odd-parity strings, not the even-parity subspace. For the empty graph,
+$K=\mathbb F_2^n$ and the output is always $0^n$. For a single edge on
+two vertices, $A$ is invertible and all four outputs have probability $1/4$.
+These cases test both interference cancellation and the normalization.
+
+\paragraph{Consequence for attempted decision separations.}
+Suppose an input $x$ determines such a graph in polynomial time and a
+polynomial-time predicate $R(x,y)$ is applied to its measured output. The
+classical sampler above, followed by $R$, reproduces the quantum acceptance
+probability \emph{exactly}. If those probabilities satisfy the total BQP
+gap on all inputs, the same procedure is a BPP decider for the language.
+Consequently this entire proposed source of separating decision problems
+fails, despite exponential state support and nontrivial interference.
+Adding arbitrary nonquadratic phases changes the calculation: the derivative
+of the phase need no longer be linear in $x$, and the inner sum need not
+reduce to the kernel test. No polynomial simulator for that generalization
+is proved here, but failure of this formula is not a classical lower bound.
+
+\paragraph{A cubic stress test: losing the formula still need not give hardness.}
+Take $q(x)=x_1x_2x_3$. Its sign function is $1$ at seven inputs and $-1$
+at $111$. The Walsh sum is therefore $6$ at $y=000$. At every nonzero
+$y$, the Walsh sum of the constant function is zero, so changing the one
+sign gives $-2(-1)^{y_1+y_2+y_3}$. The output probabilities are
+\[
+                 p_{000}=9/16,\qquad p_y=1/16\quad(y\ne000).
+\]
+This full-support, nonuniform distribution cannot have the form in
+Lemma 19.1. Nevertheless it has an exact constant-time classical sampler:
+draw four fair bits, map nine of the sixteen outcomes to $000$, and map
+the other seven bijectively to the seven nonzero strings.
+
+For $k$ disjoint triples, let the phase polynomial be the sum of these
+$k$ cubic monomials. Both Hadamard layers and the phase operator factor
+across triples. Consequently the measured distribution is the product of
+the $k$ displayed distributions and is sampled with $4k$ fair bits and
+linear work. This family has $2^{3k}$ output strings of positive probability
+and falls outside the quadratic calculation, yet it remains efficiently
+classically samplable. Nonquadratic degree is therefore not a hardness
+criterion by itself. A plausible next candidate must also address coupling
+between blocks and prove an algorithm-independent lower bound, rather than
+merely invalidate one Gaussian-elimination formula.
+
+There is also a quantitative version of the sampling-to-decision implication.
+If a classical polynomial-time sampler approximates each circuit's output
+distribution within total variation distance $1/12$, the probability of any
+specified accept event changes by at most $1/12$. A BQP gap of $2/3$ versus
+$1/3$ becomes at least $7/12$ versus at most $5/12$. On $145$ independent
+runs, majority voting fails with probability at most $36/145<1/3$ by
+Chebyshev's inequality: the sample mean has variance at most $1/(4\cdot145)$
+and its expectation is separated from $1/2$ by at least $1/12$.
+Thus such uniform approximate sampling would already suffice for BPP.
+The converse inference from a sampling hardness claim to a particular total
+decision-language lower bound requires an additional argument.
+
+\paragraph{Stress test: compiling an oracle can reveal its secret.}
+Simon's original separation [E2] is explicitly an oracle result. To test a
+naive conversion to explicit circuit inputs, fix a nonzero
+$s\in\mathbb F_2^n$ and an index $j$ with $s_j=1$. Define
+\[
+                         f_s(x)=x+x_j s.
+\]
+This linear map satisfies
+$f_s(x)=f_s(x')$ precisely when $x'=x$ or $x'=x+s$. Indeed its kernel
+contains $0,s$, and solving $v+v_js=0$ shows these are its only elements.
+Thus it has the usual two-to-one hidden-XOR collision structure.
+
+Yet a circuit description of this particular family can explicitly record
+$j$ and the bits of $s$, using $O(n)$ gates to implement the displayed
+formula. A classical algorithm reading that description recovers $s$
+immediately. Even oracle access to this restricted linear family permits
+learning its whole matrix with $n$ standard-basis queries, so it is not the
+hard arbitrary-label oracle distribution used in Simon's lower bound.
+This example does not refute that lower bound. It shows exactly why merely
+choosing an efficient family satisfying the same collision promise does not
+transport the lower bound to algorithms reading circuit descriptions.
+
+A valid unrelativized separation would need an explicitly uniform family
+with a hardness proof against every randomized algorithm allowed to inspect
+its representation. Hiding the description behind a query interface changes
+the input model. Listing the full oracle table changes the input length;
+a runtime polynomial in the table length can be exponential in the number
+of oracle-address bits without contradicting BPP.
+
+\paragraph{Stress test: a promise cannot be filled in by a threshold rule.}
+Suppose a quantum procedure distinguishes promised yes- and no-inputs with
+probabilities at least $2/3$ and at most $1/3$. Declaring every other input
+a yes-instance exactly when its acceptance probability is greater than
+$1/2$ defines a total set, but need not give that set a bounded-error quantum
+decider. On newly assigned inputs the probability may be $1/2$ or differ
+from it by an exponentially small amount.
+
+For a concrete gap test, generate $m+1$ fair bits and accept when the first
+bit is $1$ or when all bits are $0$. The probability is
+$1/2+2^{-(m+1)}$. Sampling this output polynomially often does not turn its
+comparison with a fair coin into a bounded-error test: couple a Bernoulli
+sample of bias $1/2+\delta$ to a fair bit with disagreement probability
+$\delta$. For $R$ independent samples, the transcripts have total variation
+distance at most $R\delta$ by the union bound. Constant distinguishing
+advantage therefore requires exponentially many samples when
+$\delta=2^{-(m+1)}$. This is an obstruction to the proposed generic repetition
+wrapper, not a lower bound for all algorithms analyzing those simple circuits.
+
+\paragraph{Verification, remaining gap, and outcome.}
+The accompanying exact checks enumerate every simple graph on up to five
+vertices, compute all integer Walsh sums in \eqref{a19:fourier}, and compare
+their squared probabilities with \eqref{a19:distribution}. They check the
+triangle shift, normalization, and all hidden-XOR fibers through dimension
+six. No empirical timing comparison is used to infer an asymptotic separation.
+
+\textbf{UNRESOLVED.} The main checked result is a complete classical sampler
+for a structured interference family, together with three explicit scope
+obstructions: approximate sampling can already simulate decision, oracle
+compilation may expose structure, and a threshold rule need not preserve a
+total bounded-error gap. A successful positive continuation needs one total
+uniform BQP language and an unconditional lower bound against all randomized
+polynomial-time deciders for that same language. A negative continuation
+would need a general classical simulation far beyond the quadratic-phase
+family. Neither has been obtained; the restricted calculations carry no
+claim of historical novelty.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]E. Bernstein, U. Vazirani, SIAM J. Comput. 26(5):1411-1473, 1997.
+\url{https://doi.org/10.1137/S0097539796300921}.
+\textit{Formulation source.}
+\item[S2]Improved Separation Between Quantum and Classical Computers for Sampling and Functional Tasks — Marshall, Aaronson and Dunjko, CCC 2025.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol339-ccc2025/LIPIcs.CCC.2025.5/LIPIcs.CCC.2025.5.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Oracle Separations in the Fourier Hierarchy — Atul Mantri, September 10, 2026.
+\url{https://arxiv.org/abs/2609.11830}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Scott Aaronson and Daniel Gottesman,
+\emph{Improved Simulation of Stabilizer Circuits}, Physical Review A 70
+(2004), 052328.
+\url{https://arxiv.org/abs/quant-ph/0406196}.
+\textit{Primary classical-simulation context; consulted 27 September 2026.
+The quadratic-phase special case needed here is proved directly.}
+\item[E2]Daniel R. Simon, \emph{On the Power of Quantum Computation},
+SIAM Journal on Computing 26(5) (1997), pp. 1474--1483.
+\url{https://doi.org/10.1137/S0097539796298637}.
+\textit{Primary source; publisher abstract consulted 27 September 2026.
+Its oracle-input restriction is retained.}
+\end{itemize}
+\end{document}

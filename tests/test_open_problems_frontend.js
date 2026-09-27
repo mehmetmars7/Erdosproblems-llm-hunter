@@ -97,7 +97,7 @@ const rendered = api.renderOpenProblemRows([records['problem.beta'], records['mo
 assert.match(rendered, /Beta &amp; &quot;target&quot;/);
 assert.match(rendered, /title="See &quot;partial&quot; result &lt;not a resolution&gt;\."/);
 assert.match(rendered, /open with solved subcases/);
-assert.match(rendered, /class="claim-status">solved/);
+assert.match(rendered, /class="claim-status"><a href="problem\.html\?type=open_problems&amp;id=problem\.beta">solved<\/a>/);
 assert.match(rendered, /Reviewed 2026-09-14/);
 assert.match(rendered, /<td>—<\/td>/);
 assert.match(rendered, /no attempt/);

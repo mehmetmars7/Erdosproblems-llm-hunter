@@ -1,0 +1,271 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 219.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research Notebook: Section 219},pdfauthor={Research notebook},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems | Research notebook}
+\fancyhead[R]{\small 219 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Independently compilable extraction; original section text retained.
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{218}
+% ================================================================
+% problemId: problem.polynomial-time-distribution-free-pac-learning-of-dnf-formulas
+% source releaseRank: 219; source releaseStatus: open_with_solved_subcases
+% exactTarget SHA-256: a2c4b2de3c6cc38835b336cb611743c1863c7928f8b10bdab2b7063d77f85d6f
+\clearpage
+\section{\texorpdfstring{Polynomial-Time Distribution-Free PAC Learning of DNF Formulas}{Polynomial-Time Distribution-Free PAC Learning of DNF Formulas}}\label{219}
+\subsection{Definitions and mathematical statement}
+An $s$-term DNF on $\{0,1\}^n$ is an OR of at most $s$ terms, each an AND of literals $x_i$ or $\neg x_i$. The learner receives independent labeled examples $(x,f(x))$ with $x\sim D$, where $D$ is arbitrary and unknown. For $0<\eps,\delta<1$, it must output an efficiently evaluable hypothesis $h$ such that
+\[
+ \Pr_{\mathrm{samples,coins}}\bigl[\Pr_{x\sim D}(h(x)\ne f(x))\le\eps\bigr]\ge1-\delta
+\]
+using time polynomial in $n,s,1/\eps,\log(1/\delta)$. The hypothesis need not itself be a DNF. Membership queries or a known special input distribution are not supplied by the target.
+\par\smallskip\textit{Formulation and concept references:} \sref{219}{1}.
+\cataloguescope{Given an unknown s-term DNF f on \{0,1\}\textasciicircum{}n and random labeled examples drawn from an arbitrary unknown distribution D, construct a possibly improper hypothesis in time polynomial in n, s, 1/epsilon, and log(1/delta) whose D-error is at most epsilon with probability at least 1-delta.}
+\subsection{Short English statement}
+Can arbitrary DNF formulas be learned efficiently from random labeled examples drawn from any unknown distribution, even when the learner may output a different kind of hypothesis?
+% BEGIN RESEARCH ATTEMPT 219
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The 2025 paper supplied with the entry develops a quasipolynomial-time
+procedure with \emph{membership queries}, including results for DNFs whose
+terms have equal length. Its Section~1.1 explicitly separates these models
+from distribution-free example-only learning. Its locally mixing walk
+therefore cannot simply be run using the sample oracle in this target.
+\sref{219}{1}, Abstract and Section~1.1.
+A separate line of hardness results constrains learners that must output
+DNF hypotheses of specified sizes; that is not automatically a barrier to
+the unrestricted improper learner requested here. \eref{219}{1}, Abstract
+and Introduction. No full example-only polynomial learner is obtained from
+these sources. The attempt below isolates an algorithmic task that would
+suffice, and tests an overly strong implementation of it.
+
+\paragraph{Attack route.}
+Exhaustive empirical risk minimization has enough samples but too much
+computation. A random-walk strategy needs labels at points the unknown
+distribution may never sample. A third route greedily covers positive
+examples with conjunctions that exclude all negative examples. The
+pigeonhole principle supplies a useful term at every stage. The missing
+step is to \emph{find} one at polynomial cost, without enumerating all
+$3^n$ conjunctions. This route may output a larger DNF, so its sample
+bound must be checked for that larger hypothesis class, not for the
+unknown $s$-term target alone.
+
+\paragraph{Attempt.}
+\textbf{1. Sample complexity is not the obstruction.}
+Allow each variable in a term to appear positively, negatively, or not at
+all. There are at most $3^n$ noncontradictory terms. Padding lists by an
+empty choice bounds the number of $s$-term DNFs by $(3^n+1)^s$.
+For any hypothesis with true error greater than $\eps$, the probability
+of agreeing with $m$ independent realizable examples is at most
+$(1-\eps)^m\le e^{-m\eps}$. A union bound gives a consistent learner
+using
+\[
+ m\ge\frac{s\log(3^n+1)+\log(1/\delta)}{\eps}.
+\]
+Searching the entire hypothesis class meets this statistical guarantee,
+but costs exponentially many tests. This calculation neither bounds that
+search by a polynomial nor establishes a computational lower bound.
+
+\textbf{2. A precise conditional greedy learner.}
+Consider the following promised finite-sample search task, denoted
+\emph{weak consistent-term search}. Given a labeled sample realizable by
+an $s$-term DNF, a subset $R$ of its positive examples, and the full list
+of its negative examples, return a conjunction $T$ which accepts no
+listed negative and accepts at least $|R|/s$ of the examples in $R$.
+Examples are counted with multiplicity. A valid conjunction always
+exists: each target term excludes every true negative, and the target's
+at most $s$ terms cover $R$.
+
+Suppose a uniform algorithm solves this task in time polynomial in
+$n,s,m$. Start with all positive examples in $R$, find a term, delete
+its covered positives, and repeat. With $r$ terms selected, the number
+left is at most $m(1-1/s)^r\le me^{-r/s}$ for $s>1$.
+The $s=1$ case finishes in one step. In either case at most
+\[
+ T_m=\lceil s\log m\rceil+1\le s\log m+2
+\]
+terms suffice, with the natural one-step convention if $m=1$.
+Their OR is consistent with the whole sample and is evaluable in
+$O(nT_m)$ operations.
+
+Choose $m\ge2$ by doubling until
+\begin{equation}\label{219:sample}
+ m\eps\ge n(s\log m+2)\log4+\log(1/\delta).
+\end{equation}
+This loop terminates with $m$ bounded by a polynomial in
+$n,s,1/\eps,\log(1/\delta)$: for example, putting
+$B=ns+\log(1/\delta)+2$, an absolute sufficiently large constant times
+$(B/\eps)^2$ satisfies the inequality, using $\log u\le\sqrt u$ for
+large $u$. The class of all DNFs of at most $T_m$ terms has cardinality
+at most $4^{nT_m}$. Applying the same union bound to that fixed class,
+\eqref{219:sample} proves that \emph{every} consistent output of the
+procedure has error at most $\eps$ with probability at least $1-\delta$.
+The number of search calls is also polynomial.
+
+Thus a polynomial-time weak consistent-term search algorithm would prove
+the full selected learning assertion. The proof handles arbitrary $D$
+and uses examples only. It does not assume that the hypothesis has just
+$s$ terms. It also does not prove the converse: an arbitrary improper
+PAC learner need not solve this particular finite-sample search task.
+
+\textbf{3. Exact optimization is too strong a proposed implementation.}
+An apparent implementation is to find a consistent term covering the
+\emph{largest} number of positive examples. The following reduction
+shows a concrete difficulty even for a term required to accept the
+all-one point.
+
+Let $G$ be a simple graph on $\{1,\ldots,n\}$. Use an anchor
+$a=(1,\ldots,1)$, and for each vertex $i$ a positive example $p^i$ which
+is zero at coordinate $i$ and one elsewhere. For each edge $\{i,j\}$,
+use a negative example $q^{ij}$ which is zero exactly at $i,j$.
+A conjunction accepting $a$ has only positive literals, indexed by a
+subset $S$. It rejects every $q^{ij}$ exactly when $S$ meets every edge,
+that is, when $S$ is a vertex cover. It accepts $p^i$ exactly when
+$i\notin S$. Consequently
+\begin{equation}\label{219:independent}
+ \max_T|\{i:T(p^i)=1\}|=\alpha(G),
+\end{equation}
+where the maximum is over consistent conjunctions accepting $a$ and
+$\alpha(G)$ is the maximum independent-set size.
+To remove the explicit anchor requirement for an exact optimizer, give
+$a$ more than $n$ positive copies. Any conjunction missing $a$ loses
+more positives than it could gain among all $p^i$; a consistent term
+containing the anchor exists, namely the conjunction of all variables.
+Thus an exact maximum-coverage optimizer yields a maximum independent
+set in polynomial time.
+
+This is an exact reduction, not a claim that the \emph{weak} $1/s$
+search task is NP-hard. Indeed the constructed sample may need many
+terms to realize all its positives, making the weak guarantee small.
+Nor does \eqref{219:independent} show that a general improper PAC
+learner decides NP-complete problems. The familiar hardness of maximum
+independent set is used only to reject this stronger proposed optimizer.
+\eref{219}{2}, the clique/vertex-cover reductions.
+
+\textbf{4. Two tests of distribution-dependent shortcuts.}
+First, a long conjunction need not be rare. If $D$ is concentrated at
+the all-one point, the conjunction $x_1\wedge\cdots\wedge x_n$ has
+probability one. Deleting long terms by the uniform-distribution bound
+$2^{-\text{length}}$ therefore fails at the first step.
+
+Second, suppose $f\equiv1$ and $D$ is uniform on the $n$ standard basis
+vectors $e_1,\ldots,e_n$. The most specific conjunction accepting
+$k\ge2$ \emph{distinct} observed positives contains negative literals
+on every as-yet-unobserved coordinate. It accepts exactly the $k$
+observed basis vectors, and has mass $k/n$, although the empty target
+term accepts everything. Thus positive consensus from a small seed does
+not automatically find a term covering a constant fraction of the
+positive distribution. This example does not rule out algorithms that
+successfully generalize beyond the most specific conjunction.
+
+The companion finite computation checks \eqref{219:independent} by
+exhaustive subset enumeration on several small graphs. Its purpose is to
+verify the reduction, not to infer an asymptotic complexity separation.
+
+\paragraph{Stress test.}
+The sample bound is applied to the \emph{output} class of $T_m$-term
+DNFs; applying it only to $s$ terms would be unjustified. Every selected
+term is consistent with the original negative sample, rather than merely
+with negatives retained after deletions. The search promise is preserved
+because the same target DNF covers every residual positive subset.
+The proposed oracle is uniform and polynomial in the sample size; it is
+not implemented by $3^n$ enumeration under another name. No membership
+query or assumption on marginal probabilities appears in the reduction.
+
+There is no inference of $\mathrm P=\mathrm{NP}$ from the target. The
+maximum-coverage subroutine is stronger than necessary, and the proper
+learning limitations in \eref{219}{1} have an output restriction absent
+from the question. Those distinctions are substantive, not terminological.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+A polynomial weak consistent-term search procedure would give an
+example-only distribution-free learner, with polynomial running time,
+efficient evaluation, and the required dependence on $\log(1/\delta)$.
+The full reduction and its generalization estimate are supplied here.
+An exact-optimization implementation encounters a maximum-independent-set
+reduction, and two distributional heuristics have explicit counterexamples.
+
+The weak search procedure itself remains unconstructed. Therefore this
+is not a polynomial-time DNF learner, and it does not exclude a different
+improper learner. No priority claim is made for the elementary counting
+or greedy-cover principles used in the argument.
+\needspace{20\baselineskip}
+% END RESEARCH ATTEMPT 219
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:219:1}{} Alman, Nadimpalli, Patel, and Servedio, DNF Learning via Locally Mixing Random Walks, Section 1.1.
+\url{https://arxiv.org/html/2505.18839v1}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN ADDED REFERENCES 219
+\item[\textnormal{[E1]}]\hypertarget{extra:219:1}{}
+N. H. Bshouty, \emph{Superpolynomial Lower Bounds for Learning Monotone
+Classes}, arXiv:2301.08486, Abstract and Introduction (the DNF-output
+and complexity-assumption restrictions are retained).
+\url{https://arxiv.org/abs/2301.08486}. Consulted 27 September 2026.
+\item[\textnormal{[E2]}]\hypertarget{extra:219:2}{}
+R. M. Karp, \emph{Reducibility Among Combinatorial Problems}, in
+\emph{Complexity of Computer Computations}, Plenum, 1972, 85--103,
+clique and node-cover problems and their polynomial reductions.
+\url{https://doi.org/10.1007/978-1-4684-2001-2_9}.
+Used only for the complexity interpretation of the explicitly proved
+finite reduction, not a lower bound for improper PAC learning.
+% END ADDED REFERENCES 219
+\end{itemize}
+
+\end{document}

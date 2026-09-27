@@ -24,10 +24,11 @@ var siteStats = {
     "total_problems": 600,
     "ranked_total": 500,
     "mo_total": 100,
-    "with_attacks": 107,
-    "ranked_with_attacks": 14,
+    "with_attacks": 558,
+    "ranked_with_attacks": 465,
     "models": [
-      "GPT 6 Astra Ultra",
+      "gpt 6 astra pro",
+      "gpt 6 astra ultra",
       "gpt pro 5.2"
     ]
   }

@@ -195,8 +195,8 @@ const freshRecord = { ...records['problem.z-first'], title: 'Fresh title',
     definition_tex: String.raw`\subsection{Definitions and mathematical statement}
 Fresh definition with $x^2$ and \textbf{proper formatting}.`,
     llm_status: 'unresolved',
-    attacks: [{ model: 'GPT_6_Astra_Ultra', status: 'unresolved',
-        file_path: 'attacks/open_problems/top_problems/GPT_6_Astra_Ultra/1.tex',
+    attacks: [{ model: 'gpt_6_astra_ultra', status: 'unresolved',
+        file_path: 'attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex',
         raw: String.raw`\section{Fresh attempt}\[x^2=1\]Still unresolved.` }]
 };
 page = await render('?type=open_problems&id=problem.z-first', { 'problem.z-first': missingDefinition },
@@ -205,9 +205,9 @@ assert.equal(page.element('page-title').textContent, 'Fresh title');
 assert.match(page.element('problem-links').innerHTML, /Fresh definition with \$x\^2\$/);
 assert.match(page.element('problem-links').innerHTML, /<strong>proper formatting<\/strong>/);
 assert.doesNotMatch(page.element('problem-links').innerHTML, /could not be loaded|Stale ProofAtlas/);
-assert.match(page.element('attempts-container').innerHTML, /GPT 6 Astra Ultra/);
+assert.match(page.element('attempts-container').innerHTML, /gpt 6 astra ultra/);
 assert.match(page.element('attempts-container').innerHTML, /Fresh attempt/);
-assert.match(page.element('attempts-container').innerHTML, /top_problems\/GPT_6_Astra_Ultra\/1\.tex/);
+assert.match(page.element('attempts-container').innerHTML, /top_problems\/gpt_6_astra_ultra\/1\.tex/);
 assert.match(page.element('problem-meta').innerHTML, /unresolved/);
 assert.equal(page.element('next-problem').style.visibility, 'hidden');
 
@@ -243,8 +243,8 @@ assert.doesNotMatch(pnpStatement, /View TeX definition/);
 assert.match(pnpStatement, /claymath\.org\/library\/monographs\/MPPc\.pdf/);
 assert.doesNotMatch(pnpStatement, /cataloguescope|hypertarget|\\[se]ref|Research attempt|When a yes-or-no problem/);
 const notebook = page.element('attempts-container').innerHTML;
-assert.match(notebook, /Attempt 1: GPT 6 Astra Ultra/);
-assert.match(notebook, /top_problems\/GPT_6_Astra_Ultra\/1\.tex/);
+assert.match(notebook, /Attempt 1: gpt 6 astra ultra/);
+assert.match(notebook, /top_problems\/gpt_6_astra_ultra\/1\.tex/);
 assert.equal((notebook.match(/class="attempt"/g) || []).length, 1);
 assert.match(notebook, /Current frontier and source audit/);
 assert.match(notebook, /unresolved gap/);

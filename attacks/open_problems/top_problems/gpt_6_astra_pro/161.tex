@@ -1,0 +1,274 @@
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+% Standalone notebook for original catalogue section 161.
+% Compile twice with: lualatex 161.tex
+\numberwithin{equation}{section}
+\hypersetup{pdftitle={Research attempt -- problem 161},pdfauthor={Research notebook; original compilation retained}}
+\fancyhead[L]{\small\sffamily Research notebook}
+\fancyhead[R]{\small\sffamily Problem 161 | 27 September 2026}
+\begin{document}
+\setcounter{section}{160}
+% ================================================================
+% problemId: problem.3sum-conjecture
+% source releaseRank: 161; source releaseStatus: open
+% exactTarget SHA-256: a94892f0e869f5f358c6b88ab0dea9b2a02ca0eb1ffb31b7751d6173d1a750bb
+\clearpage
+\section{\texorpdfstring{Randomized Integer Word-RAM 3SUM Conjecture}{Randomized Integer Word-RAM 3SUM Conjecture}}\label{161}
+\subsection{Definitions and mathematical statement}
+For a set $S\subseteq[-n^3,n^3]\cap\Z$ of $n$ distinct integers, define
+$\mathrm{3SUM}(S)=1$ precisely when distinct $a,b,c\in S$ satisfy $a+b+c=0$. Work on a uniform integer word-RAM with $\Theta(\log n)$-bit words and the operations specified by the source. A Las Vegas algorithm always answers correctly and terminates almost surely; its cost is expected running time over its internal random bits. The conjecture excludes, for every fixed $\eps>0$, an algorithm satisfying
+\[
+ \sup_{|S|=n}\E[T(S)]=O(n^{2-\eps}).
+\]
+There is no real-arithmetic oracle, free preprocessing, or input-specific advice. Logarithmic improvements to $n^2$ are not excluded by this exponent statement.
+\par\smallskip\textit{Formulation and concept references:} \sref{161}{1}.
+\cataloguescope{For every epsilon>0, there is no uniform Las Vegas randomized integer word-RAM algorithm that, on every set S of n distinct integers in [-n\textasciicircum{}3,n\textasciicircum{}3], decides whether three distinct elements sum to zero in worst-case expected O(n\textasciicircum{}(2-epsilon)) time. Use the standard logarithmic-word model of Abboud–Vassilevska Williams Conjecture 1, with enough Theta(log n) bits for the input universe, unit-cost word arithmetic, comparisons, Boolean operations, shifts and indirect memory access; no real-number oracle or free input-dependent preprocessing is permitted. Las Vegas means an always-correct answer with almost-sure termination, expectation over internal randomness, and a bound uniform over all valid inputs. Constants may depend on the algorithm and epsilon. This is not a literal quadratic lower bound.}
+\subsection{Short English statement}
+Must exact three-sum testing on bounded integers resist every always-correct randomized algorithm whose worst-case expected exponent is strictly below two?
+% BEGIN RESEARCH ADDITION ATTEMPT-161
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The formulation source treats the exponent form of integer 3SUM hardness,
+not an exact quadratic lower bound \sref{161}{1}, Conjecture 1. The
+logarithmic savings of Gr\o nlund--Pettie do not refute this selected
+statement \eref{161}{1}. A particularly relevant recent result is the
+$O(n^{3/2}\log n)$ query algorithm of Kasliwal--Polak--Sharma after
+quadratic preprocessing of three fixed universes
+\eref{161}{2}. Its preprocessing is forbidden as a free resource here.
+The attempt below does not use it. Instead it isolates a streaming
+witness-reporting statement whose truth would give a genuinely
+subquadratic algorithm in the exact model of the catalogue.
+
+\paragraph{Attack route.}
+Dense convolution is fast but the input universe has size $\Theta(n^3)$.
+Modular hashing reduces that universe while introducing false triples.
+The usual obstruction is that a convolution coefficient reports a count,
+not an efficiently accessible list of witnesses. A second obstruction is
+that even a true instance may have quadratically many valid witnesses,
+although a decision algorithm needs only one. The proposed attack joins a
+random modulus with \emph{prefix-efficient} witness enumeration. Both
+obstructions are quantified rather than hidden in a subroutine call.
+
+\paragraph{Attempt: the missing algorithmic lemma.}
+Fix the following precise hypothesis, denoted $\mathsf{StreamConv}$.
+Given a prime $p$ and a Boolean array $A$ indexed by $\Z/p\Z$, there is a
+uniform algorithm in the logarithmic-word RAM model that lists, without
+repetition, all ordered triples
+\begin{equation}\label{161:residue-triples}
+ (r,s,t),\qquad r+s+t=0\pmod p,\qquad A(r)A(s)A(t)=1.
+\end{equation}
+If the total number is $K$, the time to produce the first $k$ triples is
+$\widetilde O(p+k)$ for every $1\le k\le K$, and the time to report
+exhaustion is $\widetilde O(p+K)$. The algorithm is deterministic and uses
+only polynomially many $O(\log p)$-bit words. The notation
+$\widetilde O$ hides fixed powers of logarithms, uniformly over inputs.
+
+This is an \textbf{unproved reporting hypothesis}. Ordinary fast Fourier
+transform convolution does not supply it. In particular a total-output
+bound without the prefix guarantee is not enough for the argument below.
+
+\paragraph{Attempt: reduction theorem.}
+\textbf{Conditional lemma.} If $\mathsf{StreamConv}$ holds, the problem in
+this section has a uniform Las Vegas algorithm with worst-case expected
+running time $\widetilde O(n^{3/2})$. Thus this hypothesis would disprove
+the exact 3SUM conjecture printed above.
+
+\emph{Construction.} For a valid input $S$ let
+$m=\lceil n^{3/2}\rceil$. Enumerate the primes in $[m,2m]$ by a sieve and
+choose one uniformly. The finitely many small $n$ are handled by brute
+force. For all sufficiently large $m$ the prime number theorem gives
+\begin{equation}\label{161:prime-count}
+ \#\{p\text{ prime}:m\le p\le2m\}\gg m/\log m.
+\end{equation}
+The sieve and the explicit list use $\widetilde O(m)$ word operations and
+space. An exactly uniform random index can be sampled by rejection from
+a power-of-two range; the acceptance probability exceeds $1/2$.
+
+For each residue $r$, form its bucket
+$S_r=\{a\in S:a\equiv r\pmod p\}$ and set
+$A(r)=1$ exactly for nonempty buckets. Invoke $\mathsf{StreamConv}$.
+For each emitted triple $(r,s,t)$ inspect the Cartesian product
+$S_r\times S_s\times S_t$, stopping immediately if
+\[
+ a+b+c=0\quad\text{as integers},\qquad |\{a,b,c\}|=3.
+\]
+If the reporter exhausts its list without finding this, answer no.
+Every genuine zero triple has residue sum zero for every chosen prime,
+so no yes instance can be missed. Every yes answer is checked in the
+integers. The randomness affects only the cost, not correctness.
+
+\paragraph{Attempt: a uniform expected-cost bound.}
+Call an ordered integer triple \emph{false} if $a+b+c\ne0$ but
+$p\mid a+b+c$. For such a triple set $q=a+b+c$; then
+$0<|q|\le3n^3$. The number of different prime divisors of $q$ in
+$[m,2m]$ is at most
+\begin{equation}\label{161:divisor-count}
+ \frac{\log(3n^3)}{\log m}\le3
+\end{equation}
+for all sufficiently large $n$. Indeed, the product of $k$ such distinct
+primes is at least $m^k$ and divides $|q|$. Together with
+\eqref{161:prime-count}, this gives
+\begin{equation}\label{161:false}
+ \E F_p
+ \le \sum_{(a,b,c)\in S^3\, :\,a+b+c\ne0}
+       \Pr(p\mid a+b+c)
+ \ll \frac{n^3\log m}{m},
+\end{equation}
+where $F_p$ is the number of false ordered triples. No independence among
+these events is used: this is only linearity of expectation.
+
+Repeated-element zero triples need separate treatment. For each of the
+three equality patterns, such as $a=b$, the equation $2a+c=0$ leaves at
+most $n$ possibilities because $S$ is a set. Hence at most $3n$ ordered
+zero triples have a repeated element. Counting the all-equal triple more
+than once only strengthens this upper bound.
+
+Before termination, therefore, at most
+\begin{equation}\label{161:prefix-count}
+ F_p+3n+1
+\end{equation}
+integer triples are inspected. On a no instance the last $1$ can be
+omitted; on a yes instance there is only one inspected distinct-element
+zero triple, because the algorithm stops at the first one. Each emitted
+residue triple has a nonempty Cartesian product and accounts for at
+least one inspected integer triple, except that the final product may
+be only partly inspected. Thus the number of reporter outputs needed is
+also at most \eqref{161:prefix-count}.
+
+The prefix and exhaustion guarantees now imply cost
+\[
+ \widetilde O(m+n+F_p),\qquad
+ \sup_{|S|=n}\E T(S)
+ =\widetilde O\left(m+n+\frac{n^3}{m}\right)
+ =\widetilde O(n^{3/2}).
+\]
+All integer sums, residues, array indices and sieve indices use
+$O(\log n)$ bits. The constants in the estimates are independent of the
+input values. Rejection sampling terminates almost surely, and all
+remaining loops are finite. These observations check the uniform
+Las Vegas and worst-case-expectation requirements, rather than replacing
+them by a high-probability Monte Carlo statement.
+
+\paragraph{Stress test: attempted implementation of the reporter.}
+Convolution of $A$ with itself gives, for each $u$, the number of pairs
+$r+s=u$. It does not give the first such pair for every requested target
+in near-linear total time. Scanning $r$ independently for each occupied
+$t$ can cost $p\,|\operatorname{supp}A|$; at
+$p\asymp n^{3/2}$ this loses the claimed exponent. Building all residue
+pairs explicitly costs $\Theta(|\operatorname{supp}A|^2)$ and also loses
+the desired bound in the worst case. Hashing by itself therefore does
+not finish the algorithm.
+
+One might recursively bisect the support and use convolution to prune
+empty pair rectangles. The unresolved amortization is that many target
+sums can keep overlapping rectangles alive; I did not prove an
+$\widetilde O(p+k)$ prefix bound on the total convolution work. Paying
+for all $K$ outputs before emitting the first is invalid: a symmetric
+set can have $\Theta(n^2)$ distinct-element zero triples. The quadratic
+preprocessing in \eref{161}{2} is an explicit illustration of why a fast
+query guarantee does not automatically solve the present problem.
+
+The checking script exhausts all $462$ five-element subsets of
+$[-5,5]$, using each of five small prime moduli. A deliberately slow
+reporter confirms correctness and the handling of repeated entries.
+This verifies neither $\mathsf{StreamConv}$ nor the asymptotic running
+time. It also checks the elementary divisor bound at a finite sample
+scale. No finite test could certify the required uniform reporting
+complexity.
+
+\paragraph{Dependency check.}
+The reduction is not a lower bound against an unrestricted word-RAM and
+is not a proof of the catalogue's conjecture. Its direction is the
+opposite: the proposed reporting lemma would violate that conjecture,
+with a polynomial exponent saving (for example any fixed saving below
+$1/2$ after absorbing logarithms). Since 3SUM already belongs to
+polynomial time, this consequence alone does not imply
+$\mathrm P=\mathrm{NP}$ or its negation. The strong consequence is
+nevertheless a warning against accepting the reporter as a routine FFT
+primitive. The connection between integer 3SUM and output-sensitive
+reporting is also consonant with the reductions in
+\sref{161}{1}, Section 10.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+The hashing, false-positive estimate, repeated-element bound, stopping
+argument, and exact model audit above form a proved conditional reduction.
+The single missing algorithmic input is $\mathsf{StreamConv}$ with its
+prefix-time and exhaustion guarantees. No implementation achieving those
+guarantees has been obtained, and the finite checker is not such an
+implementation. Thus no unconditional subquadratic algorithm or lower
+bound is claimed.
+% END RESEARCH ADDITION ATTEMPT-161
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:161:1}{} Abboud and Vassilevska Williams, Popular Conjectures Imply Strong Lower Bounds for Dynamic Problems (2014), Conjecture 1; KPP (2019) for Las Vegas convention.
+\url{https://arxiv.org/pdf/1402.0054}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH ADDITION SOURCES-161
+\item[\textnormal{[E1]}]\hypertarget{extra:161:1}{} Allan Gr\o nlund and Seth Pettie, ``Threesomes, Degenerates, and Love Triangles,'' arXiv:1404.0799 (2014). Introduction and 3SUM algorithm bounds.
+\url{https://arxiv.org/abs/1404.0799}.
+{\small\textit{Logarithmic improvements and the distinction from a fixed exponent saving.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:161:2}{} Shashwat Kasliwal, Adam Polak and Pratyush Sharma, ``3SUM in Preprocessed Universes: Faster and Simpler,'' \emph{TheoretiCS} 4 (2025), DOI 10.46298/theoretics.25.24; arXiv:2410.16784v3 (15 October 2025). Abstract, introduction and preprocessing/query theorem.
+\url{https://arxiv.org/html/2410.16784v3}.
+{\small\textit{Quadratic preprocessing is counted and is not available for free in the selected model.}}
+% END RESEARCH ADDITION SOURCES-161
+\end{itemize}
+
+\end{document}

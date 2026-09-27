@@ -1,0 +1,235 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 79.tex
+% Standalone research notebook; original section preserved.
+% Research additions: 27 September 2026. No external TeX input or BibTeX file.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook - Problem 79},pdfauthor={Open Problems Math},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small\sffamily Problem 79 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\begin{document}
+\setcounter{section}{78}
+\section{\texorpdfstring{Graph Isomorphism in Polynomial Time}{Graph Isomorphism in Polynomial Time}}\label{79}
+\subsection{Definitions and mathematical statement}
+Two finite graphs $G=(V,E)$ and $H=(W,F)$ are isomorphic if some bijection $\varphi:V\to W$ satisfies
+\[
+ \{u,v\}\in E\quad\Longleftrightarrow\quad\{\varphi(u),\varphi(v)\}\in F.
+\]
+The problem asks for a deterministic classical algorithm deciding the existence of such a bijection in time polynomial in the ordinary graph encoding length. No planarity, degree bound, or structural restriction is assumed. A quasipolynomial algorithm, or an algorithm efficient only on typical graphs, is not the demanded bound.
+\par\smallskip\textit{Formulation and concept references:} \sref{79}{1}.
+\cataloguescope{Determine whether the graph isomorphism problem for general finite graphs is decidable by a deterministic classical Turing machine in polynomial time.}
+\subsection{Short English statement}
+Can arbitrary finite graphs be tested for isomorphism in deterministic polynomial time?
+% BEGIN RESEARCH_ADDITION ATTEMPT_79
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+Babai's general algorithm is quasipolynomial, not polynomial in the ordinary
+encoding length \eref{79}{1}. Polynomial or efficient smoothed-case and
+numerical methods do not by themselves resolve worst-case deterministic
+GI; the smoothed setting in \eref{79}{2} illustrates the distinction.
+The general polynomial-time claim retained as \sref{79}{4} is not treated
+as established merely because it was posted. The following attempt tests
+a concrete convex-relaxation route and gives an exact stopping certificate
+for a sufficiently integral solution.
+
+\paragraph{Attack route.}
+Spectral invariants are cheap but incomplete. Fractional isomorphism adds
+entrywise positivity and linear constraints, yet permits many nonpermutation
+solutions. A plausible repair would be to drive a feasible matrix near a
+permutation using a provable integrality gap. The attempt proves a precise
+rounding threshold, then constructs two explicit nonisomorphic graphs whose
+fractional and heat-kernel information defeats the simpler route. The gap
+certificate is mathematical; an efficient method for attaining it is not
+assumed.
+
+\paragraph{Attempt: a robust integrality certificate.}
+Let $A,B$ be the $n\times n$ adjacency matrices of two simple graphs.
+Consider the rational polytope
+\[
+ \mathcal P(A,B)=\{X\geq0:X\mathbf1=X^{\mathsf T}\mathbf1=\mathbf1,
+                                     \ AX=XB\}.
+\]
+A permutation matrix in this set is an exact isomorphism. Define
+$\Delta(X)=n-\|X\|_F^2$. Each row is a probability vector, so
+$\Delta(X)\geq0$, with equality exactly when every row is a coordinate
+vector. The column sums then make those coordinates distinct.
+
+There is also a nonzero exact threshold:
+\begin{equation}\label{eq79:round}
+ X\in\mathcal P(A,B),\qquad \Delta(X)<\frac1{4n^2}
+ \quad\Longrightarrow\quad G\cong H.
+\end{equation}
+For a proof, put $m_i=\max_jX_{ij}$. Since
+$\sum_jX_{ij}^2\leq m_i$, a row with $m_i\leq1/2$ would already
+contribute at least $1/2$ to $\Delta$, impossible under the displayed
+bound. The unique entries exceeding $1/2$ in different rows must occupy
+distinct columns, by the column-sum condition. They define a permutation
+matrix $P$. Moreover,
+\[
+ \sum_i(1-m_i)\leq\Delta(X),\qquad
+ \|X-P\|_F^2=2\sum_i(1-m_i)-\Delta(X)\leq\Delta(X).
+\]
+Since $\|A\|_{\rm op},\|B\|_{\rm op}\leq n$ and $AX=XB$,
+\[
+ \|AP-PB\|_F\leq2n\|P-X\|_F<1.
+\]
+But $AP-PB$ has integer entries. Any nonzero integer matrix has Frobenius
+norm at least one, so $AP=PB$. This proves \eqref{eq79:round}.
+It yields the contrapositive gap: for a nonisomorphic pair every feasible
+$X$ has $\Delta(X)\geq1/(4n^2)$.
+
+The exactness of the linear constraints matters. A rationally certified
+feasible matrix below the threshold is a finite, polynomially checkable
+isomorphism certificate and can be rounded directly. A floating-point
+residual is not automatically such a certificate; quantitative residual
+terms would need to be included in the last inequality. Conversely,
+searching for the minimum of the concave function $n-\|X\|_F^2$ over the
+polytope is not linear programming. The existence of a gap does not prove
+that a deterministic polynomial-time algorithm finds a point attaining
+it whenever a permutation exists.
+
+\paragraph{Attempt: explicit fractional and spectral obstruction.}
+Every pair of $d$-regular graphs of the same order admits
+$X=J/n\in\mathcal P(A,B)$, since $AJ=dJ=JB$. Thus feasibility alone
+cannot settle GI. For a stronger stress test take two graphs on $16$
+vertices. The rook graph has vertices $(i,j)\in(\Z/4\Z)^2$, with edges
+between distinct vertices in the same row or column. The Shrikhande graph
+is the Cayley graph on the same group with connection set
+\[
+ \{(1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,-1)\}.
+\]
+Both are six-regular, and direct neighbour counting gives
+\begin{equation}\label{eq79:srg}
+ A^2=4I+2J
+\end{equation}
+for each adjacency matrix: the diagonal is six and each pair of distinct
+vertices has two common neighbours. On the subspace orthogonal to
+$\mathbf1$, \eqref{eq79:srg} gives eigenvalues $2$ and $-2$; trace zero
+then gives multiplicities $6$ and $9$, with the remaining eigenvalue $6$.
+So their adjacency spectra coincide exactly.
+
+They are not isomorphic. A row of the rook graph is a four-clique. In the
+Shrikhande graph the induced graph on the six neighbours of $(0,0)$ is a
+six-cycle, as one checks by subtracting pairs in the displayed connection
+set. A clique containing $(0,0)$ therefore has at most three vertices.
+Translations are automorphisms, so this holds for a clique through any
+vertex; triangles exist. Its clique number is three, proving the claimed
+nonisomorphism. The companion script verifies the adjacency identities,
+the six-cycle and the clique numbers by exact finite enumeration.
+
+For the graph Laplacian $L=6I-A$, every analytic function of $L$ lies in
+$\operatorname{span}\{I,A,J\}$ by \eqref{eq79:srg}. In particular the
+heat matrix $e^{-tL}$ has, for every fixed $t$, entries determined solely
+by equality, adjacency, or nonadjacency of the two vertices, with identical
+three values for both graphs. Hence their global entry multisets agree at
+every heat time. This does not make the matrices conjugate by a permutation;
+it shows that the multiset invariant throws away the combinatorial
+placement of the entries. Also $AX=XB$ automatically implies
+$A^rX=XB^r$ for every $r$, so appending those redundant linear constraints
+does not remove $J/n$.
+
+\paragraph{Stress test.}
+The gap \eqref{eq79:round} could be useful if one had a polynomial-time
+global near-integrality method, but no such method is supplied. Local
+improvement of a quadratic objective or convergence of a numerical flow
+to a stationary point is not a worst-case global certificate. Nor is an
+exponential branch search made polynomial simply because most branches
+collapse on typical graphs. Those are algorithmic missing steps, not
+statements that optimization methods cannot ever help.
+
+The rook/Shrikhande example defeats the specified relaxation and spectral
+summaries; it does not defeat all higher-dimensional refinement algorithms,
+all invariant rings, or Babai's group-theoretic method. Likewise it is not
+a complexity lower bound. An isomorphism algorithm is allowed to exploit
+information beyond eigenvalues, heat-entry multisets, and fractional
+intertwiners. For graphs of different orders rejection is immediate; the
+argument's equal-order assumption is not a restriction on the full decision
+problem because that case is handled first.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+A robust exact rounding criterion is proved, and an explicit nonisomorphic
+pair defeats a natural convex/spectral simplification. The remaining
+question is whether a deterministic polynomial-time procedure can find
+near-integral feasible intertwiners whenever an isomorphism exists, or
+use a different complete invariant with polynomial evaluation cost.
+No such procedure or superpolynomial lower bound is obtained. These are
+method tests and a certificate lemma, not a claim of a new general GI
+algorithm or of literature priority.
+% END RESEARCH_ADDITION ATTEMPT_79
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:79:1}{} E. W. Weisstein, 'Graph Isomorphism,' MathWorld, accessed 2026.
+\url{https://mathworld.wolfram.com/GraphIsomorphism.html}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:79:2}{} Graph Isomorphism: Mixed-Integer Convex Optimization from First-Order Methods.
+\url{https://arxiv.org/abs/2512.17417}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:79:3}{} Finding Graph Isomorphisms in Heated Spaces in Almost No Time.
+\url{https://arxiv.org/abs/2601.03787}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S4]}]\hypertarget{source:79:4}{} Testing Isomorphism of Graphs in Polynomial Time.
+\url{https://arxiv.org/abs/2305.12688}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN RESEARCH_ADDITION REFERENCES_79
+\item[\textnormal{[E1]}]\hypertarget{extra:79:1}{} L\'aszl\'o Babai,
+\emph{Graph Isomorphism in Quasipolynomial Time}, arXiv:1512.03547,
+main algorithmic theorem and complexity convention.
+\url{https://arxiv.org/abs/1512.03547}.
+{\small\textit{Inspected 27 September 2026; quasipolynomial is not polynomial.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:79:2}{} Michael Anastos,
+Matthew Kwan and Benjamin Moore, \emph{Smoothed analysis for graph isomorphism},
+STOC 2025, DOI 10.1145/3717823.3718173.
+\url{https://research-explorer.ista.ac.at/record/20007}.
+{\small\textit{Institutional publication record inspected 27 September
+2026; smoothed hypotheses are not dropped in discussing the general target.}}
+% END RESEARCH_ADDITION REFERENCES_79
+\end{itemize}
+
+\end{document}

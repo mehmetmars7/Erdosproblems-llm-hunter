@@ -1,0 +1,317 @@
+% ATTEMPT_STATUS: unresolved
+% TOP_PROBLEM: {"problemId": "problem.valiants-algebraic-p-versus-np-conjecture-vp-vnp", "canonicalTitle": "Valiants Algebraic P versus NP Conjecture (VP != VNP)", "releaseRank": 32, "primaryDomain": "theoretical_computer_science", "primaryDomainLabel": "Theoretical computer science", "displayStatus": "open", "releaseStatus": "open"}
+% !TeX program = lualatex
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Valiants Algebraic P versus NP Conjecture (VP != VNP)}{Valiants Algebraic P versus NP Conjecture (VP != VNP)}}\label{32}
+\subsection{Definitions and mathematical statement}
+For variables $x_{ij}$ over a characteristic-zero field $K$, define
+\[
+ \operatorname{per}_n(x)=\sum_{\sigma\in S_n}\prod_{i=1}^n x_{i,\sigma(i)}.
+\]
+An algebraic circuit computes a polynomial using field constants, variables, addition, and multiplication. The class $\mathsf{VP}$ has polynomially bounded numbers of variables, degrees, and circuit sizes; $\mathsf{VNP}$ consists of polynomially long Boolean sums of such efficiently computable polynomials. The selected claim is that no polynomial bounds the arithmetic circuit sizes of $\operatorname{per}_n$, equivalently $\mathsf{VP}\ne\mathsf{VNP}$ in characteristic zero. This is a nonuniform algebraic-operation model, not a bit-complexity assertion.
+\par\smallskip\textit{Formulation and concept references:} \href{https://www.prateekdwivedi.in/papers/symACT-confversion.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can one prove that the permanent requires more than polynomially many arithmetic operations in general algebraic circuits?
+\subsection{Research attempt}
+
+\paragraph{Scope, sources, and the chosen attack (27 September 2026).}
+Fix the characteristic-zero field $K$. Constants from $K$ are allowed,
+and the circuit for one matrix size need not be computably recoverable
+from the circuit for another. The desired conclusion is that no
+polynomial bounds the minimum sizes for all $n$; a lower bound against
+one restricted circuit form does not suffice.
+The symmetric classes in [S1, S2] impose conditions absent here, and
+[S1] explicitly distinguishes their orbit-size measure from general
+circuit size. The August 2026 report [S3] gives elusive-function and
+bounded-depth results; its discussion identifies degree growth as an
+obstruction to deriving the full separation. None is read as a solution
+to unrestricted $\mathsf{VP}\ne\mathsf{VNP}$.
+
+The strategy is to calculate concrete derivative invariants of the
+permanent, extract the lower bounds they actually prove, and test their
+ability to survive general multiplication gates. A second calculation
+recovers the known quadratic determinantal bound of Mignon--Ressayre
+[E2]. This is a reconstruction and stress test of classical tools, not
+a claim of a new circuit lower bound. Valiant's completeness theorem
+[E1] supplies the stated equivalence with the class separation; the
+membership direction can be proved explicitly here.
+
+\paragraph{An explicit Boolean-sum witness and an exact upper bound.}
+For $y=(y_1,\ldots,y_n)$ define
+\begin{equation}\label{vp:witness}
+ g_n(x,y)=(-1)^n\prod_{j=1}^n(1-2y_j)
+                   \prod_{i=1}^n\left(\sum_{j=1}^n x_{ij}y_j\right).
+\end{equation}
+This polynomial has degree at most $3n$, $n^2+n$ variables, and a
+circuit of size $O(n^2)$. For Boolean $y$ with support $S$,
+its value is $(-1)^{n-|S|}\prod_i\sum_{j\in S}x_{ij}$. Expanding the
+sum of these values over all $S$ gives, for each function
+$f:[n]\to[n]$, the monomial $\prod_i x_{i,f(i)}$ with coefficient
+\[
+ \sum_{S\supseteq\operatorname{im}f}(-1)^{n-|S|}
+ =\begin{cases}1,&\operatorname{im}f=[n],\\0,&\text{otherwise}.
+ \end{cases}
+\]
+The identity follows by choosing the subset of the complement; a
+nonempty complement contributes $(1-1)^d=0$. A surjective map between
+these two $n$-element sets is a permutation. Therefore
+\begin{equation}\label{vp:boolean}
+ \operatorname{per}_n(x)=\sum_{y\in\{0,1\}^n}g_n(x,y).
+\end{equation}
+This proves the required $\mathsf{VNP}$ membership with polynomially
+many witness bits. It also gives an exact $O(n^2 2^n)$ circuit by
+explicit summation, the usual inclusion--exclusion mechanism.
+The phrase ``polynomially long Boolean sum'' bounds the number of
+witness bits, not the number of summands. Evaluating $g_n$ efficiently
+does not make the exponential summation a polynomial-size computation.
+
+For $n=1$, the two Boolean evaluations give $x_{11}$. For $n=2$,
+the subset terms cancel the two monomials that reuse a column and leave
+$x_{11}x_{22}+x_{12}x_{21}$. Thus the witness has the correct signs
+even at the first nontrivial size. Direct enumeration for sizes up to
+five checked the identity on integer matrices in the local calculation.
+
+\paragraph{Exact derivative dimensions.}
+For a homogeneous degree-$n$ polynomial $f$, let $D_k(f)$ be the
+$K$-linear span of all order-$k$ partial derivatives, and set
+$d_k(f)=\dim_K D_k(f)$. Here $0\le k\le n$.
+A nonzero derivative of $\operatorname{per}_n$ differentiates distinct
+variables occupying distinct rows and columns. It is exactly the
+permanent on the undeleted rows and columns. Conversely every choice
+of $k$ deleted rows and $k$ deleted columns occurs by choosing a
+matching between them. Hence
+\begin{equation}\label{vp:derivatives}
+ d_k(\operatorname{per}_n)=\binom nk^2.
+\end{equation}
+To justify equality rather than just a spanning bound, observe that
+the surviving monomials determine their row set and column set.
+Different subpermanents consequently have disjoint monomial supports.
+They are nonzero and linearly independent. At $k=n$ there is just the
+constant polynomial, agreeing with the formula.
+
+This yields an exponential lower bound for a genuine restricted model.
+Suppose
+\[
+ \operatorname{per}_n=\sum_{a=1}^s c_a\ell_a^n
+\]
+with homogeneous linear forms $\ell_a$ and scalars $c_a$. Every
+order-$k$ derivative belongs to the span of the $s$ polynomials
+$\ell_a^{n-k}$. Thus
+\[
+ s\ge\binom n{\lfloor n/2\rfloor}^{\!2}
+       \ge\frac{4^n}{(n+1)^2}.
+\]
+The last inequality uses the largest of the $n+1$ binomial
+coefficients and their sum $2^n$. This is a lower bound for sums of
+powers of linear forms, not for unrestricted depth-three circuits or
+general circuits. No reduction preserving polynomial size from the
+latter models to this restricted representation has been proved here.
+
+\paragraph{Why derivative dimension does not control general circuits.}
+The elementary product $h(z)=z_1\cdots z_n$ has a circuit with $n-1$
+multiplications, but $d_k(h)=\binom nk$, because its derivatives are
+all squarefree monomials of degree $n-k$. This already refutes the
+proposal that exponential derivative dimension implies exponential
+general circuit size. The product rule explains the failure:
+\[
+ D_k(fh)\subseteq\sum_{j=0}^k D_j(f)D_{k-j}(h),\qquad
+ d_k(fh)\le\sum_{j=0}^k d_j(f)d_{k-j}(h),
+\]
+where a product of spaces denotes the span of pairwise products.
+Repeated multiplication can generate binomially many derivatives
+without using binomially many gates.
+
+There is a stronger countertest: the determinant has exactly the same
+entire derivative-dimension profile as the permanent. Its nonzero
+order-$k$ derivatives are signed complementary minors, which are
+independent by the same disjoint-support argument. Thus
+\[
+ d_k(\det_n)=\binom nk^2=d_k(\operatorname{per}_n)
+ \quad(0\le k\le n).
+\]
+Nevertheless $\det_n$ has polynomial-size circuits over $K$. For
+completeness, compute $p_j=\operatorname{tr}(X^j)$ for $j\le n$ by
+successive matrix products, at cost $O(n^4)$, and use
+\[
+ e_0=1,\qquad
+ e_k=\frac1k\sum_{j=1}^k(-1)^{j-1}e_{k-j}p_j.
+\]
+Newton's identities give $e_n=\det X$. These identities follow by
+logarithmically differentiating
+$\prod_i(1+\lambda_i t)$ and comparing coefficients; polynomial
+identity then gives them for the generic matrix. The divisions by
+the positive integers $k$ are permitted field constants in
+characteristic zero, not divisions by input expressions.
+Consequently no invariant that depends only on this derivative-rank
+profile can distinguish the two families. A successful refinement
+must retain additional structure or exploit restrictions on gates.
+
+\paragraph{A more local calculation: the quadratic determinant bound.}
+Let $\operatorname{dc}(f)$ be the least $m$ for which
+$f(x)=\det_m(A_0+\sum x_{ij}A_{ij})$ over $K$.
+If $H_f$ denotes the Hessian, the affine chain rule gives
+\begin{equation}\label{vp:hessian}
+ H_f(x_0)=L^{\mathsf T}H_{\det_m}(A(x_0))L.
+\end{equation}
+At a singular $m$ by $m$ matrix the determinant Hessian has rank at
+most $2m$. Row and column transformations reduce the matrix to
+$\operatorname{diag}(I_r,0)$. For $r\le m-3$ its quadratic term
+vanishes. For $r=m-2$ it is a two-by-two determinant, of Hessian
+rank four. For $r=m-1$ the quadratic term is
+\[
+ z_{mm}\sum_{i<m}z_{ii}-\sum_{i<m}z_{im}z_{mi},
+\]
+whose Hessian rank is at most $2+2(m-1)=2m$.
+The case $m=1$ has zero Hessian.
+
+Here is an explicit permanent calculation to apply that bound.
+Take $X_0$ with all entries one except $(X_0)_{11}=1-n$.
+Then $\operatorname{per}_n(X_0)=(n-1)!(n-1+1-n)=0$.
+For $n\ge3$, divide its Hessian by $(n-3)!$.
+An entry for two variables in a common row or column is zero;
+for compatible variables it is $t=n-2$ if their deleted rows or
+columns include index one, and $-2$ otherwise.
+
+To check nonsingularity directly, write a kernel vector in blocks
+$(a,(b_j),(c_i),(d_{ij}))$ for the corner, first row, first column,
+and interior. All interior indices range over $2,\ldots,n$.
+Write $S_b,S_c,S_d$ for the corresponding sums, and $R_i,C_j$ for
+interior row and column sums. The corner and border equations give
+\[
+ tS_d=0,\quad t(S_c+S_d-C_j)=0,\quad
+ t(S_b+S_d-R_i)=0.
+\]
+Summing them yields $S_b=S_c=S_d=R_i=C_j=0$.
+The interior equations reduce to
+\[
+ 2d_{ij}=t(a-b_j-c_i).
+\]
+Their row sums give $c_i=a$, their column sums give $b_j=a$, and
+$S_b=0$ forces $a=0$. All coordinates vanish. For $n=2$, the
+Hessian of $x_{11}x_{22}+x_{12}x_{21}$ has rank four directly.
+Thus $\operatorname{rank}H_{\operatorname{per}_n}(X_0)=n^2$ for
+$n\ge2$. Substitution in \eqref{vp:hessian} proves the classical
+Mignon--Ressayre bound [E2]
+\begin{equation}\label{vp:dc}
+ \operatorname{dc}(\operatorname{per}_n)\ge n^2/2.
+\end{equation}
+
+\paragraph{What that bound leaves open.}
+The Hessian argument is stronger than merely comparing the global
+dimensions $d_k$: it evaluates derivatives at a specially chosen zero
+and uses the geometry of singular determinant matrices. It still
+produces a polynomial lower bound, compatible with determinantal
+representations of size $n^3$, for example. Its input Hessian has only
+$n^2$ rows, so comparing its rank with $2m$ cannot by itself produce
+a superquadratic lower bound in $n$.
+
+There is a second, independent gap in using this route for the selected
+problem. A polynomial-size affine determinantal representation would
+give a polynomial-size general circuit, by the determinant algorithm
+above. The reverse implication is not known with polynomial overhead:
+determinant is complete for polynomial-size algebraic branching
+programs, a potentially smaller model than $\mathsf{VP}$ [E3,
+Sections 2.5 and 2.9]. Thus even a superpolynomial lower bound on
+$\operatorname{dc}(\operatorname{per}_n)$ would not automatically
+separate $\mathsf{VP}$ from $\mathsf{VNP}$. It would do so under the
+additional hypothesis that every polynomial-size, polynomial-degree
+general circuit family admits polynomial-size affine determinantal
+representations. That simulation is an extra hypothesis, not a step
+established by \eqref{vp:hessian}.
+
+\paragraph{Why a generic counting argument does not select the permanent.}
+There are indeed degree-$n$ polynomials in $n^2$ variables with large
+circuits. To see the distinction from this task, fix a size bound $s$
+for binary arithmetic circuits. There are finitely many circuit
+topologies and choices of variable labels of that size. A topology
+has at most $2s$ constant input slots; regard them as parameters.
+The coefficients of its homogeneous degree-$n$ component are
+polynomial functions of those parameters. Their image in the
+coefficient space of dimension
+\[
+ N=\binom{n^2+n-1}{n}
+\]
+has Zariski closure of dimension at most $2s$: the field generated
+by these coefficient functions has transcendence degree at most the
+number of parameters. If $2s<N$, each such closure is proper.
+A finite union of these proper closed sets cannot fill $K^N$ over
+the infinite field $K$. Equivalently, the product of nonzero defining
+polynomials for the closures is nonzero and cannot vanish at every
+point of $K^N$. This proves existence of a polynomial beyond the
+specified circuit bound, even while allowing arbitrary constants.
+
+However, the permanent is one fixed coefficient vector, not a generic
+one. The argument supplies no reason it avoids any of these circuit
+images, and the chosen hard polynomial is not shown to have a
+polynomial-length Boolean-sum description. Counting unrestricted
+coefficient vectors therefore does not give a hard family in
+$\mathsf{VNP}$. This also explains why counting circuit strings with
+only a finite alphabet of constants would address a different model:
+the actual constants range over all of $K$. The parameter argument
+handles that issue but leaves the essential explicitness gap intact.
+
+\paragraph{Verification, first gap, and outcome.}
+Exact finite checks compared the Boolean witness sum with the
+permutation definition, derivative-support counts with
+$\binom nk^2$, and the displayed Hessian with direct complementary
+subpermanent calculations. Hessian ranks were computed over the
+rationals for $2\le n\le7$, yielding $n^2$ each time. The proof above,
+not those finite ranks, handles arbitrary $n$. Characteristic zero
+was used in Newton's identities, the kernel calculation, and the
+completeness formulation; these arguments are not silently transferred
+to characteristic two, where permanent and determinant coincide.
+
+The first gap in the derivative strategy is a nontrivial upper bound
+for a stronger permanent invariant on \emph{all} small circuits,
+consistent with the product and determinant countertests. Three useful
+next tasks are to preserve row/column structure in a refined derivative
+space; to prove gate-by-gate bounds that account for reuse and
+cancellation; and to identify a higher-order local obstruction whose
+growth exceeds every fixed polynomial after the relevant simulation
+cost is included. Merely enlarging the ordinary derivative spaces or
+finding more small Hessian examples cannot meet these requirements.
+
+\textbf{UNRESOLVED.} The attempt proves explicit membership and upper
+bounds, an exponential lower bound for sums of powers, and reconstructs
+the known quadratic determinantal lower bound. It does not give a
+superpolynomial lower bound for general arithmetic circuits.
+Written by GPT-6 Astra Ultra with primary-source scope checks and exact
+finite calculations; no formal verification or novelty is asserted.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Dwivedi, Pago, and Seppelt, Lower Bounds in Algebraic Complexity via Symmetry and Homomorphism Polynomials, STOC 2026, Introduction.
+\url{https://www.prateekdwivedi.in/papers/symACT-confversion.pdf}.
+\textit{Formulation source.}
+\item[S2]Symmetric Algebraic Circuits and Homomorphism Polynomials.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol362-itcs2026/LIPIcs.ITCS.2026.46/LIPIcs.ITCS.2026.46.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Arithmetic circuit lower bounds from sumset expansion.
+\url{https://eccc.weizmann.ac.il/report/2026/138/}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Leslie G. Valiant, \emph{Completeness classes in algebra}, Proceedings of STOC 1979, 249--261.
+\url{https://doi.org/10.1145/800135.804419}.
+Author-paper scan: \url{https://sites.math.washington.edu/~billey/colombia/references/valiant.completeness.1979.pdf}.
+\textit{Primary source for algebraic completeness; the explicit Boolean-sum membership identity is proved above. Consulted 27 September 2026.}
+\item[E2]Thierry Mignon and Nicolas Ressayre, \emph{A quadratic bound for the determinant and permanent problem}, International Mathematics Research Notices 2004(79), 4241--4253.
+\url{https://math.univ-lyon1.fr/~ressayre/PDFs/permdet.pdf}.
+\textit{Primary source of the known characteristic-zero quadratic determinantal lower bound, reconstructed here by an explicit Hessian calculation; consulted 27 September 2026.}
+\item[E3]Peter B\"urgisser, \emph{Completeness classes in algebraic complexity theory}, arXiv:2406.06217 (2024), Sections 2.4--2.9.
+\url{https://arxiv.org/html/2406.06217v1}.
+\textit{Author account of the determinant, branching-program completeness, and the distinction from general circuits; consulted 27 September 2026.}
+\end{itemize}
+\end{document}

@@ -98,7 +98,7 @@ Erdosproblems-llm-hunter/
    - Erdos problems: [erdosproblems.com/X](https://www.erdosproblems.com/) for problem X
    - Ranked open problems: Definitions and references from `attacks/open_problems/top_problems/<number>.tex`, with primary sources checked when preparing an attempt
    - MathOverflow subset: Original MathOverflow question links
-2. **LLM Attempts**: Stored as TeX files in `attacks/`. Ranked writeups use `attacks/open_problems/top_problems/<model>/<number>.tex` (or `<number>_v2.tex`); the imported research batches are in `GPT_6_Astra_Ultra/`. Root numbered files provide definitions and sources separately and do not count as attempts. Legacy stable-ID filenames remain supported. Each attempt contains actual mathematical work, references for definitions and concepts, citations for results used, and an honest account of remaining gaps. Lean contributions use a short TeX description linking to the complete source and original output in an external repository, as described in the [Lean contribution guidelines](CONTRIBUTING.md#lean-code-contributions). A statement or research plan alone is not an attempt.
+2. **LLM Attempts**: Stored as TeX files in `attacks/`. Ranked writeups use `attacks/open_problems/top_problems/<model>/<number>.tex` (or `<number>_v2.tex`); the research writeups are in `gpt_6_astra_ultra/` and `gpt_6_astra_pro/`. Root numbered files provide definitions and sources separately and do not count as attempts. Legacy stable-ID filenames remain supported. Each attempt contains actual mathematical work, references for definitions and concepts, citations for results used, and an honest account of remaining gaps. Lean contributions use a short TeX description linking to the complete source and original output in an external repository, as described in the [Lean contribution guidelines](CONTRIBUTING.md#lean-code-contributions). A statement or research plan alone is not an attempt.
 3. **Build Process**: `build_site.py` processes the catalogs, attempts, and reviews into JSON and JavaScript data in `docs/data/`
 4. **Auto-Update**: GitHub Actions automatically rebuilds the site when:
    - Files in `attacks/`, `lists/`, or `reviews/` are modified
@@ -111,7 +111,7 @@ Use the batch importer to copy each complete problem section containing a
 `Research attempt` subsection into its model folder:
 
 ```bash
-python3 scripts/import_top_problem_attempts.py --model GPT_6_Astra_Ultra /path/to/research_batch_101_103.tex
+python3 scripts/import_top_problem_attempts.py --model gpt_6_astra_ultra /path/to/research_batch_101_103.tex
 python3 build_site.py
 ```
 

@@ -193,6 +193,10 @@ def get_file_date(filepath):
         prefix = 'attacks/open_problems/erdos/'
         if relative.startswith(prefix):
             candidates.append('attacks/erdos/' + relative[len(prefix):])
+        astra_prefix = 'attacks/open_problems/top_problems/gpt_6_astra_ultra/'
+        if relative.startswith(astra_prefix):
+            candidates.append('attacks/open_problems/top_problems/GPT_6_Astra_Ultra/'
+                              + relative[len(astra_prefix):])
         known = [dates[path] for path in candidates if path in dates]
         return min(known) if known else None
     except (OSError, ValueError):
@@ -290,6 +294,10 @@ def infer_attempt_status(content):
     labels = re.sub(r'\\(?:textbf|textit|emph|section|subsection|paragraph|noindent)\*?',
                     '', content)
     labels = re.sub(r'[{}*]', '', labels)
+    if re.search(r'^[ \t]*OUTCOME\s*:\s*(?:CONDITIONAL\s+REDUCTION|'
+                 r'COUNTEREXAMPLE\s+CANDIDATE|(?:NEW\s+)?PARTIAL\s+RESULT)\b',
+                 labels, re.MULTILINE | re.IGNORECASE):
+        return 'unresolved'
     partial = re.search(
         r'^[ \t]*(?:\d+[.)][ \t]*)?'
         r'(?:(?:FINAL[ \t]+)?(?:STATUS|LABEL)[ \t]*:?[ \t]*)?'
@@ -427,8 +435,10 @@ def replace_tex_command(text, command, count, replacement):
     return ''.join(parts) + text[cursor:]
 
 
-def parse_numbered_problem_tex(content):
+def parse_numbered_problem_tex(content, *, require_source_urls=True):
     """Extract display content while leaving the downloadable source untouched."""
+    # Standalone submissions can retain archival comments after the document.
+    content = re.sub(r'^[ \t]*%[^\n]*(?:\n|$)', '', content, flags=re.MULTILINE)
     document = re.search(r'\\begin\{document\}(.*?)\\end\{document\}\s*$',
                          content, re.DOTALL)
     if not document:
@@ -447,17 +457,18 @@ def parse_numbered_problem_tex(content):
 
     # Both the original standalone files and verbatim notebook sections use
     # local S/E source labels; the latter wrap them in textnormal/hypertarget.
-    sources_tex = re.sub(r'\\item\[\\textnormal\{\[([SE]\d+)\]\}\]',
+    sources_tex = re.sub(r'\\item\[\\textnormal\{\[([A-Z]\d+)\]\}\]',
                          r'\\item[\1]', sections['Sources'])
     sources_tex = replace_tex_command(sources_tex, 'hypertarget', 2, lambda key, text: text)
     sources, urls = [], {}
-    for item in re.finditer(r'\\item\[([SE]\d+)\]\s*(.*?)(?=\\item\[|\\end\{itemize\}|\Z)',
+    for item in re.finditer(r'\\item\[([A-Z]\d+)\]\s*(.*?)(?=\\item\[|\\end\{itemize\}|\Z)',
                             sources_tex, re.DOTALL):
         url = re.search(r'\\url\{([^}]+)\}', item[2])
-        if not url:
+        if not url and require_source_urls:
             raise ValueError(f'Missing URL for source {item[1]}')
-        urls[item[1]] = url[1]
-        sources.append({'citation': item[2][:url.start()].strip(), 'url': url[1]})
+        urls[item[1]] = url[1] if url else None
+        sources.append({'citation': item[2][:url.start()].strip() if url else item[2].strip(),
+                        'url': url[1] if url else None})
 
     macros = {'N': r'{\mathbb{N}}', 'Z': r'{\mathbb{Z}}', 'Q': r'{\mathbb{Q}}',
               'R': r'{\mathbb{R}}', 'C': r'{\mathbb{C}}', 'F': r'{\mathbb{F}}',
@@ -468,13 +479,18 @@ def parse_numbered_problem_tex(content):
         # The website uses the mathematical exposition, not the repeated
         # catalogue quotation. Keep that quotation in the original .tex file.
         text = replace_tex_command(text, 'cataloguescope', 1, lambda quote: '')
+        def source_link(label):
+            if label not in urls:
+                raise ValueError(f'Missing local source {label}')
+            if urls[label] is None:
+                return '[' + label + ']'
+            return r'\href{' + urls[label] + '}{[' + label + ']}'
+
         for command, prefix in [('sref', 'S'), ('eref', 'E')]:
-            def source_link(rank, number, prefix=prefix):
-                label = prefix + number
-                if label not in urls:
-                    raise ValueError(f'Missing local source {label}')
-                return r'\href{' + urls[label] + '}{[' + label + ']}'
-            text = replace_tex_command(text, command, 2, source_link)
+            text = replace_tex_command(text, command, 2,
+                                       lambda rank, number, prefix=prefix: source_link(prefix + number))
+        for command in ('src', 'srcref'):
+            text = replace_tex_command(text, command, 1, source_link)
         text = replace_tex_command(text, 'needspace', 1, lambda space: '')
         text = re.sub(r'\\raggedright\b', '', text)
         return re.sub(r'\\(' + '|'.join(macros) + r')(?![A-Za-z])',
@@ -483,10 +499,11 @@ def parse_numbered_problem_tex(content):
     sections['Sources'] = sources_tex
     definition = '\n\n'.join(r'\subsection{' + name + '}\n' + display(sections[name])
                              for name in required)
-    research = sections.get('Research attempt')
-    if research:
-        research = (r'\subsection{Research attempt}' + '\n' + display(research)
-                    + '\n\n' + r'\subsection{Sources}' + '\n' + display(sources_tex))
+    research = '\n\n'.join(r'\subsection{' + name + '}\n' + display(text)
+                           for name, text in sections.items()
+                           if re.fullmatch(r'Research attempt(?:: .+)?', name) and text)
+    research = (research + '\n\n' + r'\subsection{Sources}' + '\n' + display(sources_tex)
+                if research else None)
     title = re.search(r'^[ \t]*\\section\*?\{[^\n]+', body, re.MULTILINE)
     document = ((title[0].strip() + '\n\n') if title else '') + '\n\n'.join(
         r'\subsection{' + name + '}\n' + display(text) for name, text in sections.items())
@@ -825,7 +842,7 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                 content = read_tex_file(tex_file)
                 raw = content
                 if numbered and r'\subsection{Definitions and mathematical statement}' in content:
-                    raw = parse_numbered_problem_tex(content)['documentTeX']
+                    raw = parse_numbered_problem_tex(content, require_source_urls=False)['documentTeX']
                 parsed = parse_attack(raw, model_dir.name.replace('_', ' '), get_file_date(tex_file))
                 # Numbered documents lose comments during display conversion;
                 # read their declaration from the original source as well.

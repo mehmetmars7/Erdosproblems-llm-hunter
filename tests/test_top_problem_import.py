@@ -66,6 +66,7 @@ class TopProblemImportTests(unittest.TestCase):
         created, unchanged = import_attempts([source], self.catalog)
         self.assertEqual(unchanged, [])
         self.assertEqual([path.name for path in created], ['2.tex'])
+        self.assertEqual(created[0].parent.name, 'gpt_6_astra_ultra')
         result = read_exact(created[0])
         self.assertIn(preamble, result)
         self.assertIn(original_section, result)
@@ -74,7 +75,7 @@ class TopProblemImportTests(unittest.TestCase):
         self.assertNotIn('Front matter omitted', result)
         self.assertEqual(extract_attempts(result)[0].section, original_section)
         self.assertEqual(source.read_bytes(), original)
-        self.assertFalse((self.catalog / 'GPT_6_Astra_Ultra' / '1.tex').exists())
+        self.assertFalse((self.catalog / 'gpt_6_astra_ultra' / '1.tex').exists())
 
     def test_repeat_import_with_different_wrapper_is_idempotent(self):
         source = self.source(batch(section(1)))
@@ -85,6 +86,12 @@ class TopProblemImportTests(unittest.TestCase):
         self.assertEqual(new, [])
         self.assertEqual(unchanged, created)
         self.assertEqual(created[0].read_bytes(), original)
+
+    def test_descriptive_research_heading_is_imported_verbatim(self):
+        original = section(1).replace('Research attempt}', 'Research attempt: a special case}')
+        source = self.source(batch(original))
+        created, _ = import_attempts([source], self.catalog)
+        self.assertEqual(extract_attempts(read_exact(created[0]))[0].section, original)
 
     def test_indented_catalogue_markers_and_sections_are_preserved(self):
         indented = ''.join('\t' + line for line in section(3).splitlines(keepends=True))
@@ -110,7 +117,7 @@ class TopProblemImportTests(unittest.TestCase):
         wrong = self.source(batch(section(2).replace('problem.example-2', 'problem.wrong')), 'wrong.tex')
         with self.assertRaisesRegex(ValueError, 'Identity mismatch'):
             import_attempts([good, wrong], self.catalog)
-        self.assertFalse((self.catalog / 'GPT_6_Astra_Ultra').exists())
+        self.assertFalse((self.catalog / 'gpt_6_astra_ultra').exists())
 
     def test_late_collision_creates_no_other_output(self):
         old = self.source(batch(section(2)), 'old.tex')
@@ -127,7 +134,7 @@ class TopProblemImportTests(unittest.TestCase):
         second = self.source(batch(section(1).replace('checked partial', 'changed partial')), 'second.tex')
         with self.assertRaisesRegex(ValueError, 'Conflicting input sections'):
             import_attempts([first, second], self.catalog)
-        self.assertFalse((self.catalog / 'GPT_6_Astra_Ultra').exists())
+        self.assertFalse((self.catalog / 'gpt_6_astra_ultra').exists())
 
     def test_malformed_documents_and_sections_are_rejected(self):
         cases = [

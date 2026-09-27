@@ -1,0 +1,286 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 128.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\hypersetup{pdftitle={Problem 128 - Zeta zero density hypothesis},pdfauthor={Open Problems Math research notebook}}
+\fancyhead[L]{\small\sffamily Open Problems Math \textbar\ Research notebook}
+\fancyhead[R]{\small\sffamily 128 \textbar\ 27 September 2026}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{127}
+% ================================================================
+% problemId: problem.density-hypothesis-for-zeroes-of-the-riemann-zeta-function
+% source releaseRank: 128; source releaseStatus: open
+% exactTarget SHA-256: 3c1a915de699bd704436e9353a8a97c10069b6c0f9276b4c73eed5335c6dbf59
+\clearpage
+\section{\texorpdfstring{Density Hypothesis for Zeroes of the Riemann Zeta Function}{Density Hypothesis for Zeroes of the Riemann Zeta Function}}\label{128}
+\subsection{Definitions and mathematical statement}
+Count zeta zeros with multiplicity by
+\[
+ N(\sigma,T)=\#\{\rho=\beta+i\gamma:\zeta(\rho)=0,\ 0<\beta<1,
+                                  \beta\ge\sigma,\ |\gamma|\le T\}.
+\]
+For each fixed $1/2\le\sigma\le1$ and $\varepsilon>0$, the density hypothesis predicts
+\[
+ N(\sigma,T)\ll_{\sigma,\varepsilon}T^{2(1-\sigma)+\varepsilon}.
+\]
+The bound is uniform in large $T$, with dependence on $\sigma,\varepsilon$ permitted. It limits the number of off-line zeros rather than asserting that they do not exist.
+\par\smallskip\textit{Formulation and concept references:} \sref{128}{1}.
+\cataloguescope{Prove that for every sigma with 1/2 <= sigma <= 1 and every epsilon > 0, the number N(sigma,T) of nontrivial zeros rho = beta + i gamma of the Riemann zeta function with beta >= sigma and |gamma| <= T satisfies N(sigma,T) <= C\_\{sigma,epsilon\} T\textasciicircum{}\{2(1-sigma)+epsilon\} for all sufficiently large T.}
+\subsection{Short English statement}
+Are zeta zeros to the right of any fixed vertical line as sparse as the density hypothesis predicts?
+% BEGIN RESEARCH ADDITION 128
+\subsection{Research attempt}
+
+\paragraph{Current frontier and scope.}
+The zero count includes multiplicities and both signs of the ordinate.
+Guth--Maynard's Theorem 1.2 gives
+$N(\sigma,T)\leq T^{15(1-\sigma)/(3+5\sigma)+o(1)}$; combining it with
+Ingham's estimate gives the uniform benchmark
+$T^{30(1-\sigma)/13+o(1)}$.  The version consulted was revised on
+7 April 2026.  Its Section 13 carefully separates zero detection from
+large-value estimation.  Neither displayed exponent is the conjectural
+$2(1-\sigma)$ throughout the strip. \eref{128}{1}
+These are the relevant established benchmarks for this attempt, not a
+claim that one formula is the strongest available at every $\sigma$.
+
+\paragraph{Attack map.}
+A large-values approach needs stronger control of the particular
+Dirichlet polynomials produced by zero detection, not of an arbitrary
+coefficient sequence without hypotheses.  A mollifier approach tries
+to make $\zeta M$ close to $1$ in mean square: every zero forces a
+unit-sized defect, which should consume some of that mean square.
+A direct zero-repulsion approach would need a spacing theorem stronger
+than the elementary local zero count; simple distinctness or multiplicity
+bounds would not control the total.  The mollifier route is developed
+below using area integrals, which makes the zero-detection implication
+particularly transparent and exposes its still-unproved analytic input.
+
+\paragraph{Attempt I: an area-budget zero detector.}
+For $T\geq4$, set
+\[
+ M_T(s)=\sum_{d\leq\lfloor T\rfloor}\frac{\mu(d)}{d^s},\qquad
+ g_T(s)=\zeta(s)M_T(s)-1.
+\]
+For each fixed $1/2<u_0<1$, define the genuine analytic quantity
+\begin{equation}\label{128:area}
+ \mathcal E(u_0,T)=\int_{u_0}^{2}\int_{T-1}^{2T+1}
+                       |g_T(u+it)|^2\,dt\,du.
+\end{equation}
+No Dirichlet-series expansion in the critical strip is assumed in this
+definition.  The following is a sufficient, but \emph{unproved}, estimate:
+\begin{equation}\label{128:missing}
+ \forall u_0\in(1/2,1)\ \forall\eta>0:\qquad
+ \mathcal E(u_0,T)\ll_{u_0,\eta}T^{2(1-u_0)+\eta}.
+\end{equation}
+The mollifier length here grows with $T$.  A theorem for a fixed
+mollifier with constants depending arbitrarily on its length would not
+establish this assertion.
+
+\textbf{Area-detection lemma.}
+Estimate \eqref{128:missing} implies the density hypothesis in the exact
+form stated in this entry.
+
+\emph{Proof.} Fix $1/2<\sigma<1$ and $\varepsilon>0$.  Choose
+\[
+ 0<r<\min\{(\sigma-1/2)/2,1/4,\varepsilon/8\},\qquad u_0=\sigma-r.
+\]
+The standard local zero bound is $O(\log T)$ zeros, counted with
+multiplicity, in any horizontal strip of height one at ordinates of
+size $T$; this is explicitly used in \eref{128}{1}, Section 13.1.
+From the zeros with $\beta\geq\sigma$ and $T\leq\gamma\leq2T$,
+greedily select centers whose ordinates are at least $2r$ apart.
+Each choice removes only $O(\log T)$ zeros, including repeated zeros.
+Thus, if the original count is $Z$, there are at least
+$Z/(C\log T)$ selected centers.
+
+For each selected $\rho$, the disk $D(\rho,r)$ lies inside the rectangle
+in \eqref{128:area}.  The disks are pairwise disjoint up to boundaries.
+The function $g_T$ is analytic there, since the pole of $\zeta$ is far
+away, and $g_T(\rho)=-1$.  The submean inequality for the subharmonic
+function $|g_T|^2$ gives
+\[
+ \int_{D(\rho,r)}|g_T(s)|^2\,dA(s)\geq\pi r^2.
+\]
+Summing these nonnegative integrals yields
+\begin{equation}\label{128:detection}
+ Z\ll r^{-2}(\log T)\mathcal E(\sigma-r,T)
+   \ll_{\sigma,r,\eta}T^{2(1-\sigma)+2r+\eta}\log T.
+\end{equation}
+Take $\eta=\varepsilon/4$ and absorb the logarithm into
+$T^{\varepsilon/4}$ for large $T$.  Dyadic summation bounds the positive
+ordinates up to any height, with the finitely many small ordinates
+absorbed in the constant; complex conjugation handles negative ones.
+At $\sigma=1/2$, the standard total zero bound $O(T\log T)$ suffices.
+At $\sigma=1$, the stipulated nontrivial zeros have $\beta<1$, so the
+count is empty.  All constants may depend on $\sigma,\varepsilon$, as
+allowed in the original statement. \hfill$\square$
+
+This proof accounts for multiplicity through the local count, rather
+than pretending that one disk detects a multiplicity proportional
+amount of area.  It also avoids evaluating a function only on a
+measure-zero set without a justified neighborhood estimate.
+
+\paragraph{Attempt II: why the required exponent looks plausible.}
+For $\Re s>1$, absolute convergence permits the exact expansion
+\begin{equation}\label{128:coefficients}
+ \zeta(s)M_T(s)-1=\sum_{n>X}a_X(n)n^{-s},\qquad
+ X=\lfloor T\rfloor,\quad
+ a_X(n)=\sum_{\substack{d\mid n\\d\leq X}}\mu(d).
+\end{equation}
+For $2\leq n\leq X$, the omitted coefficient is zero by
+$\sum_{d\mid n}\mu(d)=0$; the constant coefficient has been subtracted.
+Also $|a_X(n)|\leq\tau(n)$.  For fixed $u>1/2$ and sufficiently small
+$\eta>0$, the elementary divisor bound $\tau(n)\ll_\eta n^{\eta/2}$ gives
+\begin{equation}\label{128:diagonal}
+ \sum_{n>X}|a_X(n)|^2n^{-2u}
+ \ll_{u,\eta}X^{1-2u+\eta}.
+\end{equation}
+If a mean-square theorem with time length $T$ retained only this
+coefficient-square term, it would give
+$T X^{1-2u+\eta}=T^{2-2u+\eta}$, exactly the exponent needed by
+\eqref{128:missing}.  Integrating over $u$ would not cost a new power
+when $u\geq u_0>1/2$.
+
+This is a motivation, not an application of a mean-square theorem.
+Equation \eqref{128:coefficients} was proved only for $\Re s>1$.
+Square summability of its coefficients with a weight does not establish
+ordinary convergence of that Dirichlet series at the desired points,
+nor does it justify a mean-square approximation uniform in $X=T$.
+For fixed $X$, its summatory coefficients have main term
+\[
+ \sum_{n\leq Y}\sum_{\substack{d\mid n\\d\leq X}}\mu(d)
+   =Y\sum_{d\leq X}\frac{\mu(d)}d+O(X),
+\]
+so absolute convergence across the line $1$ certainly has not followed
+from the cancellation of the first $X$ coefficients.  Subtracting the
+single constant coefficient does not change this issue.
+
+\paragraph{Attempt III: an explicit off-diagonal obstruction.}
+Even for a finite polynomial $D(t)=\sum_{L<n\leq2L}b_n n^{-it}$,
+expanding the integral gives off-diagonal factors
+\[
+ \int_T^{2T}e^{it\log(m/n)}\,dt,
+ \qquad
+ \left|\int_T^{2T}e^{it\log(m/n)}\,dt\right|
+ \leq\min\{T,2/|\log(m/n)|\}.
+\]
+Distinct integers do not make this integral vanish.  In particular,
+adjacent integers near $L\gg T$ can be coherent throughout a substantial
+part of the averaging interval.
+
+A direct counterexample to a uniform ``diagonal only'' bound is
+$b_n=n^{iT}$.  For $t=T+v$ with $0\leq v\leq1/4$,
+\[
+ e^{iv\log L}D(T+v)=\sum_{L<n\leq2L}e^{-iv\log(n/L)}.
+\]
+Every summand has real part at least $\cos((\log2)/4)>0$.  Hence
+\[
+ \int_T^{2T}|D(t)|^2\,dt\gg L^2,
+ \qquad T\sum_{L<n\leq2L}|b_n|^2=TL.
+\]
+Taking $L/T\to\infty$ disproves a bound by an absolute constant times
+the second expression.  This does \emph{not} disprove
+\eqref{128:missing}: the coefficients here are not the arithmetic
+coefficients of the mollifier.  It proves that the desired estimate
+would require their arithmetic structure or a different cancellation
+mechanism, rather than a general orthogonality principle.
+
+\paragraph{Stress test.}
+The attempt separates three levels: the area lemma is proved;
+\eqref{128:diagonal} is a valid estimate of a formal diagonal expression;
+and the passage from that expression to \eqref{128:area} is unproved.
+An interchange of an infinite sum with an integral, or a passage from
+fixed mollifier length to length $T$, is not asserted.  The loss
+$2r$ in \eqref{128:detection} is made arbitrarily small only after
+$\sigma,\varepsilon$ are fixed.  No uniformity as $\sigma\downarrow1/2$
+is needed or claimed.
+
+The companion computation checks the coefficient cancellation in
+\eqref{128:coefficients} for finite $X$ and records exact finite
+coefficient-square sums at rational exponents where possible.  It also
+checks the coherent-polynomial construction numerically, explicitly as
+a numerical check of an already proved elementary bound.  No computed
+list of zeta zeros is promoted to a density theorem.  Even the full
+density hypothesis would permit isolated zeros off the critical line;
+this argument is not a proposed proof of the Riemann hypothesis.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+The density hypothesis has been reduced to the explicit area estimate
+\eqref{128:missing} for a growing mollifier.  The exponent is explained
+by a valid coefficient calculation, and the tempting invalid
+mean-square step is falsified for general coefficients.  A proof of the
+arithmetic off-diagonal estimate, with the required uniformity in the
+mollifier length, is still missing.  No improved unconditional zero
+density exponent or historical novelty claim is made.
+% END RESEARCH ADDITION 128
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:128:1}{} Terence Tao, "A computation-outsourced discussion of zero density theorems for the Riemann zeta function", What's new, 7 July 2024.
+\url{https://terrytao.wordpress.com/tag/riemann-zeta-function/}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH REFERENCES 128
+\item[\textnormal{[E1]}]\hypertarget{extra:128:1}{} Larry Guth and James Maynard.
+\emph{New large value estimates for Dirichlet polynomials}, arXiv:2405.20552v2, 7 April 2026. Theorem 1.2 and Section 13.1, including the local zero count and zero-detection reduction.
+\url{https://arxiv.org/html/2405.20552v2}.
+{\small\textit{Consulted 27 September 2026 for the indicated result or scope.}}
+% END RESEARCH REFERENCES 128
+\end{itemize}
+
+
+\end{document}

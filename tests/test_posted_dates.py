@@ -8,6 +8,21 @@ from unittest.mock import patch
 import build_site
 
 class PostedDatesTests(unittest.TestCase):
+    def test_lowercase_astra_rename_preserves_first_posting_without_changing_models(self):
+        base = build_site.BASE_DIR
+        prefix = 'attacks/open_problems/top_problems/'
+        dates = {
+            prefix + 'GPT_6_Astra_Ultra/1.tex': '2026-09-20',
+            prefix + 'gpt_6_astra_ultra/1.tex': '2026-09-27',
+            prefix + 'gpt_6_astra_pro/1.tex': '2026-09-26',
+        }
+        with patch.object(build_site, 'load_first_posted_dates', return_value=dates):
+            self.assertEqual(build_site.get_file_date(base / prefix / 'gpt_6_astra_ultra/1.tex'),
+                             '2026-09-20')
+            self.assertEqual(build_site.get_file_date(base / prefix / 'gpt_6_astra_pro/1.tex'),
+                             '2026-09-26')
+            self.assertIsNone(build_site.get_file_date(base / prefix / 'gpt_6_astra_ultra/1_v2.tex'))
+
     def test_history_survives_rewrite_and_migration(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

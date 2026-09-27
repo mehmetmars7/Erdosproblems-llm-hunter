@@ -1,0 +1,303 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 227.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research Notebook: Section 227},pdfauthor={Research notebook},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems | Research notebook}
+\fancyhead[R]{\small 227 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Independently compilable extraction; original section text retained.
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{226}
+% ================================================================
+% problemId: problem.deterministic-parallel-perfect-matching-in-nc
+% source releaseRank: 227; source releaseStatus: open_with_solved_subcases
+% exactTarget SHA-256: 288b7b6cebbed74d641638fbfaf0c9f127f7e57ebdd79adc40e023286a206cd2
+\clearpage
+\section{\texorpdfstring{Perfect-Matching Search in Deterministic NC (General Graphs)}{Perfect-Matching Search in Deterministic NC (General Graphs)}}\label{227}
+\subsection{Definitions and mathematical statement}
+A perfect matching in a finite simple undirected graph is a set of disjoint edges covering every vertex. On the adjacency-matrix encoding of a labeled $n$-vertex graph, seek one logspace-uniform family of deterministic Boolean circuits that outputs a matching matrix, or a distinguished NO flag precisely when no perfect matching exists. With fan-in at most two for AND and OR, the bounds are
+\[
+ \operatorname{size}(C_n)\le Cn^c,\qquad
+ \operatorname{depth}(C_n)\le C(\log(n+2))^k
+\]
+for constants independent of $G,n$. A logarithmic-space transducer must print $C_n$ from $1^n$, including its designated outputs. This is a multi-output search problem on general graphs, not just testing existence or treating bipartite graphs.
+\par\smallskip\textit{Formulation and concept references:} \sref{227}{1}.
+\cataloguescope{Assert the existence of one logspace-uniform family (C\_n) of deterministic Boolean AND/OR/NOT circuits which, for every n>=1 and every finite simple undirected graph G on labelled vertices 1,...,n given by its n-by-n adjacency matrix, outputs a perfect matching of G if one exists and outputs a distinguished NO flag if none exists. Matching output is an n-by-n edge-indicator matrix, required to encode disjoint edges covering every vertex and belonging to G; its bits are ignored when NO is output. Circuit size is bounded by C n\textasciicircum{}c and depth by C (log(n+2))\textasciicircum{}k for constants C,c,k independent of n and G, and AND/OR fan-in is at most two. A deterministic logspace transducer on unary 1\textasciicircum{}n outputs the complete circuit description, including all designated outputs. This fixes ordinary logspace-uniform NC for the multi-output search relation. It does not conflate a search algorithm with an unweighted decision algorithm or restrict the input to bipartite or planar graphs.}
+\subsection{Short English statement}
+Can perfect matchings be found deterministically in general graphs by uniform polynomial-size circuits of polylogarithmic depth?
+% BEGIN RESEARCH ATTEMPT 227
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+Svensson--Tarnawski obtain deterministic quasi-NC for general-graph
+matching: polylogarithmic parallel time with quasipolynomially many
+processors. Polynomial size is the missing requirement, not merely
+polylogarithmic depth. Their use of odd-set constraints and laminar faces
+cannot be replaced by a bipartite argument without further work.
+\sref{227}{1}, Abstract and Introduction.
+The isolating-weights method originates in Mulmuley--Vazirani--Vazirani's
+randomized parallel algorithm. \eref{227}{1}.
+A 2025 manuscript revised in August 2026 gives a randomized
+matrix-multiplication-time algorithm for the red-edge-count version of
+\emph{Exact Matching}; it is a different problem and does not supply
+the deterministic uniform circuits here. \eref{227}{3}, Abstract.
+The attempt below isolates the uniform construction step instead of
+claiming that a probabilistically existing list is already an algorithm.
+
+\paragraph{Attack route.}
+A decision-to-search self-reduction can require linearly many dependent
+rounds. A parallel algebraic extraction is possible once a common
+minimum matching is isolated; without isolation different processors
+can make incompatible choices. The route pursued here combines a short
+list of weight assignments, parallel determinant computations and an
+explicit verification circuit. The main question becomes whether the
+list can be generated uniformly, with both its length and its weight
+magnitudes polynomially bounded. We first prove its nonuniform existence
+and then show exactly why that does not close the target.
+
+\paragraph{Attempt.}
+\textbf{1. State the missing list construction precisely.}
+Consider the following sufficient hypothesis, for some fixed $c,k$:
+there is a logspace-uniform deterministic circuit family of polynomial
+size and depth $O(\log^k n)$ which, from the adjacency matrix of $G$,
+outputs a list of at most $n^c$ assignments
+\[
+ w^{(r)}:E(G)\longrightarrow\{1,\ldots,n^c\}.
+\]
+Whenever $G$ has a perfect matching, at least one assignment makes its
+minimum-weight perfect matching unique. No requirement is imposed on a
+list entry that fails to isolate. Call this hypothesis (ULI).
+A stronger, input-independent construction would print such a list on
+the complete graph for each $n$, isolating every subgraph with a perfect
+matching. That stronger version also suffices, but is not assumed
+necessary for deterministic NC.
+
+\textbf{2. Isolated minimum matching gives parallel search, not just decision.}
+Fix one assignment $w$, and form the skew-symmetric polynomial Tutte
+matrix
+\[
+ T_w(t)_{ij}=\begin{cases}
+ t^{w_{ij}},&i<j,\ ij\in E(G),\\
+ -t^{w_{ij}},&i>j,\ ij\in E(G),\\
+ 0,&\text{otherwise}.
+ \end{cases}
+\]
+For even $n$, its Pfaffian is
+\[
+ \operatorname{Pf}(T_w(t))=
+    \sum_{M\text{ perfect}}\operatorname{sgn}(M)t^{w(M)},
+ \qquad \det T_w(t)=\operatorname{Pf}(T_w(t))^2.
+\]
+If $M_*$ is the unique minimum with weight $W$, the coefficient of
+$t^W$ in the Pfaffian is $1$ or $-1$, so
+\begin{equation}\label{227:valuation}
+ \operatorname{val}_t\det T_w=2W.
+\end{equation}
+Give the zero polynomial valuation $+\infty$. For every edge $e$,
+compute also the determinant after deleting $e$. Then
+\begin{equation}\label{227:extract}
+ e\in M_*
+ \quad\Longleftrightarrow\quad
+ \operatorname{val}_t\det T_{w,G-e}>\operatorname{val}_t\det T_{w,G}.
+\end{equation}
+If $e\notin M_*$, the unique least term survives. If $e\in M_*$,
+all remaining matchings have strictly greater weight, or none exist.
+Cancellation among these higher terms cannot create a smaller exponent.
+This proves \eqref{227:extract}, including the zero-polynomial case.
+For a nonisolating assignment the extracted edge set may be wrong, so
+we do not accept it without checking it.
+
+All degrees here are at most $D=n\max w$, a polynomial. One concrete
+way to perform the polynomial determinant computations is to evaluate
+at $t=0,1,\ldots,D$ in parallel and interpolate. Each matrix entry has
+polynomial bit length, and each determinant has bit length at most
+$O(n\max w\log(D+1)+n\log n)$. Uniform parallel determinant algorithms
+are available for these integer matrices. \eref{227}{2}, Section~2,
+Definition~2.6 and Lemma~2.7. For interpolation one may use
+\[
+ P(t)=\sum_{j=0}^{D}P(j)
+       \frac{\prod_{0\le r\le D,\ r\ne j}(t-r)}
+            {(-1)^{D-j}j!(D-j)!}.
+\]
+A common denominator $D!$ makes all computations integral until a final
+exact division; coefficient lists, factorials and products have
+polynomial length and bit size. Balanced addition/multiplication trees
+and standard uniform integer-arithmetic circuits have polylogarithmic
+depth. Thus no arithmetic operation on an exponentially long integer is
+being counted as one Boolean gate.
+
+For every list entry compute \eqref{227:extract} in parallel, reject it
+if its original determinant is zero, and verify that the resulting
+indicator matrix uses graph edges and has exactly one incident selected
+edge at every vertex. Those tests are uniform NC. Select the first
+valid entry using prefix OR circuits; if none is valid, output NO.
+Under (ULI), an existing perfect matching produces at least one valid
+entry. If no perfect matching exists, no indicator matrix can pass the
+verification. For odd $n$, output NO directly. This proves that (ULI)
+implies the precise multi-output, logspace-uniform NC target. All
+large fan-in conjunctions used in this description are replaced by
+balanced fan-in-two trees.
+
+\textbf{3. A polynomial universal list exists nonuniformly.}
+Let $m=\binom n2$, $n\ge2$, and independently assign each of the $m$
+possible edges a weight uniformly in $\{1,\ldots,2m\}$.
+For any fixed nonempty family $\mathcal F$ of edge subsets, its
+minimum-weight member is unique with probability at least $1/2$.
+Here is the relevant isolation proof. Fix all weights but that of edge
+$e$. Let $a$ be the least sum excluding $e$ among members containing
+$e$, and $b$ the least weight of a member not containing $e$; if either
+class is empty it cannot cause a tie. There is at most one critical
+value $w_e=b-a$. If two different global minimizers exist, an edge in
+their symmetric difference must have this critical value. A union bound
+over the $m$ possible edges gives failure probability at most
+$m/(2m)=1/2$. This is the isolating lemma of \eref{227}{1}, specialized
+with all constants exposed.
+
+Take $m+1$ independent assignments. For any fixed graph with a perfect
+matching, the probability that every assignment fails to isolate is
+at most $2^{-(m+1)}$. There are at most $2^m$ labelled graphs. Hence
+\[
+ \Pr(\text{some graph is not isolated by the entire list})
+       \le2^m2^{-(m+1)}<1.
+\]
+There therefore exists, for each $n$, a universal list of $m+1$
+assignments with weights at most $2m$. Its description length is
+$O(n^4\log n)$. Hardwiring this list into the circuits of part~2 gives
+\emph{nonuniform} polynomial-size, polylogarithmic-depth search circuits.
+It does not give a logspace transducer printing their descriptions.
+Enumerating all lists and testing all graphs would eventually find
+one, but its time, space and circuit size are not those in the target.
+The attempt stops at that uniformity gap, rather than promoting the
+union bound to a deterministic parallel construction.
+
+\textbf{4. Two ways to break an apparent shortcut.}
+First, weights $w_e=2^{\operatorname{index}(e)}$ distinguish every
+subset and therefore isolate every nonempty family. Their binary
+encodings have only $O(n^2)$ bits, but the degrees of $T_w(t)$ are
+exponential. The coefficient-based computation above would have
+exponentially many output positions. A short encoding of an exponent
+is not a polynomial degree bound. A compressed-polynomial valuation
+algorithm with the same NC bounds is not supplied here.
+
+Second, on $K_4$ give every edge weight one. With vertices in their
+usual order,
+\[
+ \operatorname{Pf}(T_w)=t^2-t^2+t^2=t^2.
+\]
+Deleting edge $12$, $34$, $14$ or $23$ makes the Pfaffian zero; deleting
+$13$ or $24$ leaves $2t^2$. The valuation rule would consequently
+select the four-cycle $\{12,23,34,14\}$, not a matching. The companion
+check verifies all six deletions exactly. This refutes the rule
+\emph{without its isolation hypothesis}; it also explains the need for
+a final output validator even when a list is guaranteed to contain one
+good entry.
+
+\paragraph{Stress test.}
+The Pfaffian is used over characteristic zero, so its signs are not
+silently discarded. Its polynomial identity does not assert that a
+single arbitrary numeric substitution witnesses every perfect matching.
+The determinant routine's ring-operation bounds have been accompanied
+by degree and bit bounds. All deletions are computed in parallel, not
+adaptively after an earlier choice of an edge.
+
+The probabilistic argument proves existence of short advice, not uniform
+NC. Conversely, (ULI) is sufficient but has not been proved necessary:
+a future deterministic matching algorithm might avoid isolation entirely.
+Nothing here makes an unweighted decision procedure automatically a
+polylogarithmic-depth search procedure. Nor has the quasipolynomial
+resource bound in \sref{227}{1} been relabelled polynomial.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+A uniform short-list isolation hypothesis has been shown to imply the
+exact search relation in the catalogue, including NO outputs, Boolean
+bit costs and logspace uniformity. The same method yields an elementary
+nonuniform existence proof with an explicit polynomial advice length.
+An exact four-vertex test rules out dropping isolation. These are
+reconstructions and deductions within the notebook, not claims of a new
+matching complexity theorem.
+
+The missing step is a logspace-uniform polynomial-resource construction
+of the lists, or a different search method avoiding them. The existence
+proof by random choice does not provide that construction.
+% END RESEARCH ATTEMPT 227
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:227:1}{} Svensson and Tarnawski, The Matching Problem in General Graphs is in Quasi-NC, introduction; FGT Section 2.1 defines Search-PM; Nanongkai–Scquizzato Section 2.2 fixes logspace-uniform NC.
+\url{https://arxiv.org/pdf/1704.01929}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN ADDED REFERENCES 227
+\item[\textnormal{[E1]}]\hypertarget{extra:227:1}{}
+K. Mulmuley, U. V. Vazirani and V. V. Vazirani,
+\emph{Matching is as easy as matrix inversion}, Combinatorica
+\textbf{7} (1987), 105--113; isolating lemma and randomized parallel
+matching method. \url{https://doi.org/10.1007/BF02579206}.
+\item[\textnormal{[E2]}]\hypertarget{extra:227:2}{}
+M. Soltys, \emph{Berkowitz's algorithm and clow sequences}, Electronic
+Journal of Linear Algebra \textbf{9} (2002), 42--54, Section~2,
+Definition~2.6 and Lemma~2.7. \url{https://arxiv.org/pdf/math/0201315}.
+Used for the uniform, division-free parallel determinant construction.
+\item[\textnormal{[E3]}]\hypertarget{extra:227:3}{}
+R. Sato and Y. Yamaguchi, \emph{Exact Matching in Matrix Multiplication
+Time}, arXiv:2508.04081v2, 10 August 2026, Abstract.
+\url{https://arxiv.org/abs/2508.04081}.
+The red-edge-count problem and randomized sequential time in this source
+are not the uniform deterministic NC target. All consulted
+27 September 2026.
+% END ADDED REFERENCES 227
+\end{itemize}
+
+\end{document}

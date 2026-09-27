@@ -89,6 +89,13 @@ are incorrect for the original open problem.
             with self.subTest(content=content):
                 self.assertEqual(parse_attack(content, 'test')['status'], 'solved')
 
+    def test_conditional_and_candidate_outcomes_are_not_full_solutions(self):
+        for outcome in ['Conditional reduction', 'Counterexample candidate',
+                        'New partial result / lemma candidate']:
+            with self.subTest(outcome=outcome):
+                content = r'\textbf{Outcome: ' + outcome + '.}'
+                self.assertEqual(parse_attack(content, 'test')['status'], 'unresolved')
+
     def test_status_marker_controls_short_descriptions_without_status_prose(self):
         for value, expected in [('unresolved', 'unresolved'), ('PARTIAL', 'unresolved'),
                                 ('solved', 'solved')]:

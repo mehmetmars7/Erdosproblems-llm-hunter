@@ -1,0 +1,283 @@
+% !TeX program = lualatex
+% Compile twice: lualatex 132.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\hypersetup{pdftitle={Problem 132 - Planted clique exact recovery},pdfauthor={Open Problems Math research notebook}}
+\fancyhead[L]{\small\sffamily Open Problems Math \textbar\ Research notebook}
+\fancyhead[R]{\small\sffamily 132 \textbar\ 27 September 2026}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{131}
+% ================================================================
+% problemId: problem.planted-clique-conjecture
+% source releaseRank: 132; source releaseStatus: open_with_solved_subcases
+% exactTarget SHA-256: 0467ea804b5e8b27c747327862cbba100692a5f50a05149dd518cf07298e7db8
+\clearpage
+\section{\texorpdfstring{Planted Clique Conjecture}{Planted Clique Conjecture}}\label{132}
+\subsection{Definitions and mathematical statement}
+Fix $0<\alpha<1/2$ and $k_n=\lfloor n^{1/2-\alpha}\rfloor$. Choose $S$ uniformly among $k_n$-subsets of $[n]$, place every edge inside $S$, and choose all other edges independently with probability $1/2$. The conjecture rules out a polynomial-time randomized estimator $A$ satisfying
+\[
+ \Pr[A(G)=S]\longrightarrow1.
+\]
+Probability includes the planted set, background edges, and algorithmic randomness. This is \emph{exact recovery}, not merely detection that a clique was planted. The algorithm may depend on $\alpha$ but has no length-dependent advice.
+\par\smallskip\textit{Formulation and concept references:} \sref{132}{1}.
+\cataloguescope{For every fixed real alpha with 0<alpha<1/2, set k\_n=floor(n\textasciicircum{}(1/2-alpha)). Sample a uniform k\_n-subset S of n labeled vertices, put every edge inside S, and independently include each other edge with probability1/2. There is no randomized algorithm running in time polynomial in n that, given this graph, outputs exactly S with probability tending to1 as n tends to infinity, over S, remaining edges and its internal coins. Algorithms may depend on the fixed alpha but receive no advice depending on n.}
+\subsection{Short English statement}
+Can one rule out efficient exact recovery of planted cliques whose size is a fixed power below the square-root threshold?
+% BEGIN RESEARCH ADDITION 132
+\subsection{Research attempt}
+
+\paragraph{Current frontier and scope.}
+The target is exact recovery of the hidden set for each fixed
+$0<\alpha<1/2$, with no nonuniform advice.  The supplied paper studies
+reductions among planted-clique conjectures, with parameters and success
+notions made explicit; those reductions are not unconditional lower
+bounds against all algorithms. \sref{132}{1}
+As an adjacent restricted-model result, Mardia--Verchand--Wein analyze
+nonadaptive low-degree detection in the \emph{above}-square-root,
+sublinear-time regime.  That restriction and regime must not be
+relabelled as a proof of the present below-square-root exact-recovery
+claim. \eref{132}{1}  No unrestricted lower bound establishing the
+catalogue target was verified in the literature check of
+27 September 2026.
+
+\paragraph{Attack map.}
+A counterexample algorithm could try to find a small certified seed
+inside the planted clique and then recover the rest by common neighbors.
+Its two gaps are finding that seed efficiently and controlling adaptive
+selection bias.  A hardness route can study the low-degree likelihood
+ratio; the gap is transferring a fixed-degree calculation to every
+uniform polynomial-time algorithm.  An information-theoretic route
+might seek ambiguity between several large cliques, but the calculation
+below rules that out in the selected regime.  All probabilities retain
+the random planted set and independent background edges.
+
+\paragraph{Attempt I: rule out an information-theoretic counterexample.}
+Write $k=\lfloor n^{1/2-\alpha}\rfloor$ and condition on the planted
+set $S$.  An alternative $k$-set $T$ with $|T\setminus S|=j$ is a
+clique only if all
+\[
+ j(k-j)+\binom j2=jk-\frac{j(j+1)}2
+\]
+edges of $T$ not forced by the planting are present.  Their joint
+probability is $2^{-jk+j(j+1)/2}$.  There are
+$\binom kj\binom{n-k}j$ such sets.  Hence
+\begin{align}\label{132:unique}
+ \Pr[\exists\text{ another $k$-clique}\mid S]
+ &\leq\sum_{j=1}^{k}\binom kj\binom{n-k}j
+                  2^{-jk+j(j+1)/2}\\
+ &\leq\sum_{j=1}^{k}\left(n^2 2^{-(k-1)/2}\right)^j=o(1).\notag
+\end{align}
+The last assertion holds because $k/\log n\to\infty$ for every
+allowed fixed $\alpha$.  The bound is independent of the particular
+$S$, so it remains valid without conditioning.  The hidden set is thus
+the unique $k$-clique with high probability, and exhaustive search can
+recover it.  That search has no polynomial runtime guarantee.
+Ambiguity of the statistical model does not establish the conjectured
+computational obstruction.
+
+\paragraph{Attempt II: a correct seed-recovery lemma with fresh edges.}
+Partition the vertices deterministically into two approximately equal
+sets $U,W$.  Suppose a procedure inspects only $G[U]$ and outputs a
+set $T\subset U$ of size
+$t\geq(1+\varepsilon)\log_2 n$, for a fixed $\varepsilon>0$.
+The crucial, still-unproved algorithmic requirement is that
+$T\subseteq S$ with probability $1-o(1)$.
+
+Conditional on $S$, the training information $G[U]$, and a correct
+output $T$, the edges from $T$ to vertices of $W\setminus S$ are
+fresh independent fair bits.  Define
+\[
+ C_W=\{v\in W:v\text{ is adjacent to every vertex of }T\}.
+\]
+All of $S\cap W$ belongs to $C_W$, while
+\begin{equation}\label{132:fresh}
+ \Pr[C_W\ne S\cap W,\ T\subseteq S]
+ \leq n2^{-t}\leq n^{-\varepsilon}.
+\end{equation}
+This is a bound on the intersection event and does not assume the
+correct-seed event has a probability bounded below.
+
+With probability $1-o(1)$, hypergeometric concentration gives
+$m=|S\cap W|\geq k/3$.  For each $v\notin S$, its number of neighbors
+in the \emph{true} set $S\cap W$ is binomial with parameters $m,1/2$.
+A Chernoff bound and a union bound show that, simultaneously for every
+outside vertex, this number is less than $3m/4$ with failure at most
+$n\exp(-c m)=o(1)$.  This is an unconditional high-probability event
+conditional only on $S$; it need not stay independent of the event in
+\eqref{132:fresh}.  A union bound is enough.
+
+On both good events, output $C_W$ together with all vertices outside
+$C_W$ adjacent to at least $3|C_W|/4$ of its vertices.  Every remaining
+planted vertex is included and no outside vertex is included.  The
+result is exactly $S$.  Therefore
+\begin{equation}\label{132:seedrecovery}
+ \Pr[\text{successful recovery}]
+ \geq\Pr[T\subseteq S]-o(1).
+\end{equation}
+The cleanup takes polynomial time.  The entire unsolved algorithmic
+burden of this route lies in finding a sufficiently large correct
+seed from the training graph.
+
+There is a real adaptivity pitfall here.  A claim that
+\eqref{132:fresh} holds \emph{simultaneously for every}
+$t$-subset $T\subseteq S$ selected after seeing all edges is false.
+An outside vertex has approximately $k/2$ neighbors in $S$, much more
+than $t$.  Choosing $T$ among those neighbors forces that vertex into
+the common-neighbor set.  This is a counterexample to a universally
+quantified seed lemma, not a proposed algorithm with access to the
+hidden $S$.  The held-out set $W$ is what removes this bias in the
+proved lemma.
+
+For a uniformly random $t$-subset of $U$, the success probability is
+\[
+ \frac{(|S\cap U|)_t}{(|U|)_t}
+ \leq\left(\frac{|S\cap U|}{|U|}\right)^t
+ =\exp(-\Theta_\alpha((\log n)^2))
+\]
+with high probability, when $t$ is a fixed positive multiple of
+$\log n$.  Here $(a)_t$ is the falling factorial.  Polynomially many
+independent blind guesses therefore do not supply the missing seed.
+Enumerating all such seeds is quasipolynomial rather than polynomial.
+
+\paragraph{Attempt III: an exact fixed-degree likelihood calculation.}
+Under the null model $P_0=G(n,1/2)$, let $X_e=1$ for a present edge
+and $-1$ for an absent edge.  The likelihood ratio of the planted
+model is exactly
+\begin{equation}\label{132:likelihood}
+ L(X)=\E_S\prod_{e\subset S}(1+X_e).
+\end{equation}
+For an edge set $F$, let $v(F)$ be the number of vertices incident to
+its edges, and set $X_F=\prod_{e\in F}X_e$.  The monomials $X_F$ are
+an orthonormal basis under $P_0$.  Expanding \eqref{132:likelihood}
+gives the coefficient
+\[
+ \widehat L(F)=\Pr[V(F)\subseteq S]=\frac{(k)_{v(F)}}{(n)_{v(F)}}.
+\]
+For fixed integer $D\geq1$, let $L_{\leq D}$ be the projection onto
+monomials using at most $D$ edges.  Then
+\begin{equation}\label{132:lowdegree}
+ \|L_{\leq D}-1\|_{L^2(P_0)}^2
+ =\sum_{1\leq|F|\leq D}
+       \left(\frac{(k)_{v(F)}}{(n)_{v(F)}}\right)^2
+ \ll_D\sum_{v=2}^{2D}\left(\frac{k^2}{n}\right)^v=o(1),
+\end{equation}
+To justify the bound, for fixed $v\leq2D$ there are at most
+$C_D n^v$ edge sets on their $v$ incident vertices with at most $D$
+edges.  For large $n$, the falling-factorial ratio is at most
+$C_D(k/n)^v$.  Finally $k^2/n\leq n^{-2\alpha}\to0$.
+
+Thus every degree-at-most-$D$ real polynomial statistic $f$ normalized
+by $\E_0f=0$ and $\E_0f^2=1$ satisfies
+\[
+ |\E_1f-\E_0f|
+   =|\langle f,L_{\leq D}-1\rangle_{P_0}|
+   \leq\|L_{\leq D}-1\|_{L^2(P_0)}=o(1).
+\]
+This is a rigorous mean-separation obstruction for fixed-degree
+statistics.  It is \emph{not} a lower bound for all thresholdings of
+such statistics, for degree growing arbitrarily with $n$, or for
+all polynomial-time computations.  No equivalence between those
+models has been proved in this notebook.
+
+\paragraph{Stress test and dependency checks.}
+Exact recovery would give a detector: check that the output is a
+clique of size at least $\lceil(\log_2 n)^2\rceil$.  This check is
+uniform and need not compute a possibly noncomputable fixed real
+$\alpha$.  The planted output has that size eventually, whereas under
+$P_0$ the probability of any such clique is at most
+$\binom n\ell2^{-\binom\ell2}=o(1)$ for that $\ell$.
+However, this implication does not convert the restricted
+mean-separation estimate into a hardness theorem for every detector.
+It is also not an assertion that every weak detection procedure
+immediately gives exact recovery without additional reductions;
+the distinctions made in \sref{132}{1} remain important.
+
+The companion script verifies the Fourier coefficient and projected
+norm identities by exact enumeration for a small graph.  It checks
+the alternative-clique union-bound terms and the seed cleanup on
+specified finite instances.  No finite sample success rate is
+extrapolated to an asymptotic algorithm or lower bound.  The argument
+allows constants and algorithms to depend on the fixed $\alpha$, but
+adds no advice depending on $n$.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The planted set is shown to be information-theoretically identifiable;
+a correctly trained logarithmic seed would yield efficient exact
+recovery; and fixed-degree polynomial statistics have vanishing
+normalized mean separation in the selected regime.  The adaptive-seed
+shortcut is explicitly falsified.  Neither an efficient seed-finding
+algorithm nor a bridge from the restricted likelihood calculation to
+all uniform polynomial-time algorithms is supplied.  No resolution
+or historical novelty claim is made.
+% END RESEARCH ADDITION 132
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:132:1}{} Planted Clique Conjectures Are Equivalent, ECCC TR24-058,29March2024.
+\url{https://eccc.weizmann.ac.il/report/2024/058/download/}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH REFERENCES 132
+\item[\textnormal{[E1]}]\hypertarget{extra:132:1}{} Jay Mardia, Kabir Aladin Verchand, and Alexander S. Wein.
+\emph{Low-degree phase transitions for detecting a planted clique in sublinear time}, Proceedings of the 37th Conference on Learning Theory, PMLR \textbf{247} (2024), 3798--3822. The model is nonadaptive low-degree detection in the above-square-root regime, not unrestricted exact recovery below that threshold.
+\url{https://proceedings.mlr.press/v247/mardia24a.html}.
+{\small\textit{Consulted 27 September 2026 for the indicated result or scope.}}
+% END RESEARCH REFERENCES 132
+\end{itemize}
+
+
+\end{document}
