@@ -36,7 +36,7 @@ async function render(query, open = records, fetchRecord = async () => ({ ok: fa
     const elements = new Map();
     function element(id) {
         if (!elements.has(id)) elements.set(id, {
-            innerHTML: '', textContent: '', style: {}, hidden: id === 'contribute-cta', children: [],
+            innerHTML: '', textContent: '', style: {}, hidden: ['contribute-cta', 'erdos-main-link'].includes(id), children: [],
             appendChild(child) { this.children.push(child); },
             querySelector(selector) { return element(`${id} ${selector}`); }
         });
@@ -100,6 +100,7 @@ assert.equal(reviewURL.searchParams.get('problem_type'), 'Open Problems');
 assert.equal(reviewURL.searchParams.get('problem_id'), '20000601');
 
 page = await render('?type=open_problems&id=6');
+assert.equal(page.element('erdos-main-link').hidden, true);
 assert.equal(page.element('prev-problem').href, 'problem.html?type=open_problems&id=20000601');
 assert.equal(page.element('next-problem').style.visibility, 'hidden');
 
@@ -112,6 +113,26 @@ assert.equal(page.element('page-title').textContent, 'Erdos Problem #1');
 assert.equal(page.element('.giscus').children[0].dataset.term, 'Erdos-1');
 assert.equal(page.requests.length, 0);
 assert.equal(page.element('contribute-cta').hidden, false);
+assert.equal(page.element('erdos-main-link').hidden, true);
+
+// The UnsolvedMath ID and the Erdős number are separate namespaces.
+const erdosNine = { '9': { ...erdosRecords['1'], number: '9' } };
+const epNine = JSON.parse(fs.readFileSync(path.join(root, 'docs/data/top_problems/1881.json'), 'utf8'));
+page = await render('?type=open_problems&id=1881', { '1881': epNine }, undefined, erdosNine);
+assert.equal(page.element('erdos-main-link').hidden, false);
+assert.match(page.element('erdos-main-link').innerHTML, /href="problem\.html\?type=erdos&amp;id=9">Erdős Problem #9<\/a>/);
+assert.ok(html.indexOf('id="erdos-main-link"') < html.indexOf('<section class="problem-statement">'));
+for (const code of ['MPP-001', 'EP-0', 'EP-999999', 'EP-9<script>', 'EP--9']) {
+    page = await render('?type=open_problems&id=1881', { '1881': { ...epNine, problem_number: code } }, undefined, erdosNine);
+    assert.equal(page.element('erdos-main-link').hidden, true, code);
+}
+const erdosDataSource = fs.readFileSync(path.join(root, 'docs/data/erdos_data.js'), 'utf8');
+const erdosData = JSON.parse(erdosDataSource.slice('var erdosProblems = '.length).split(';\n', 1)[0]);
+const registry = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/problems.json'), 'utf8'));
+for (const entry of registry.filter(entry => /^EP-\d+$/.test(entry.problem_number))) {
+    const id = String(Number(entry.problem_number.slice(3)));
+    assert.ok(Object.hasOwn(erdosData, id), `Missing main Erdős page for ${entry.id} (${entry.problem_number})`);
+}
 
 // A partial Lean formalization is an unresolved claim, and its external code
 // link is displayed as a link rather than embedded or executed.
