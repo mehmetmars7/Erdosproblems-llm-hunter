@@ -272,8 +272,8 @@ for (const [legacy, record] of [['problem.p-versus-np', pnp], ['problem.hodge-co
     assert.equal(page.context.window.history.lastURL.searchParams.get('view'), 'all');
     assert.equal(page.context.window.history.lastURL.hash, '#llm-attempts-section');
     assert.equal(page.element('.giscus').children[0].dataset.term, `OpenProblem-${record.id}`);
-    assert.ok(page.element('problem-statement-source').innerHTML.includes(record.external_url));
-    assert.ok(page.element('problem-statement-source').innerHTML.includes(`UnsolvedMath ${record.problem_number}`));
+    assert.doesNotMatch(page.element('problem-statement-source').innerHTML, /unsolvedmath\.com|UnsolvedMath/);
+    assert.ok(page.element('problem-statement-source').innerHTML.includes(`/top_problems/${record.id}.tex`));
     assert.equal((page.element('attempts-container').innerHTML.match(/class="attempt"/g) || []).length, record.attacks.length);
     assert.equal(new URL(page.context.getReviewIssueUrl('open_problems', String(record.id))).searchParams.get('problem_id'), String(record.id));
 }
