@@ -160,7 +160,7 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=fe084ac74a3711f1"></script>
+    <script src="data/open_problems_data.js?v=3ec4326270d5da2b"></script>
     <script src="app.js?v=1b4362d014719d60"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
@@ -315,12 +315,19 @@
             } else if (type === 'open_problems') {
                 const escapeHtml = window.ProblemHunting.escapeHtml;
                 const claim = problem.llm_status || determineOverallStatus(problem.attacks);
+                const firstSolvedDate = claim === 'solved'
+                    ? window.ProblemHunting.getMathematicalAttempts(problem.attacks)
+                        .filter(attack => window.ProblemHunting.getAttemptClaim(attack) === 'solved')
+                        .map(attack => attack.date_posted)
+                        .filter(date => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date))
+                        .sort()[0]
+                    : null;
                 metaDiv.innerHTML = `
                     <p><strong>Field:</strong> ${escapeHtml(problem.domain_label)}</p>
                     <p><strong>Problem Status:</strong> ${escapeHtml(window.ProblemHunting.getOpenProblemStatusLabel(problem))}</p>
                     ${problem.status_reviewed_at ? `<p><strong>Status reviewed in catalog:</strong> ${escapeHtml(problem.status_reviewed_at)}</p>` : ''}
                     ${problem.status_qualification ? `<p class="status-note">${escapeHtml(problem.status_qualification)}</p>` : ''}
-                    <p><strong>LLM Claim:</strong> ${claim === 'none' ? 'No attempts yet' : escapeHtml(claim)}</p>
+                    <p><strong>LLM Claim:</strong> ${claim === 'none' ? 'No attempts yet' : escapeHtml(claim)}${firstSolvedDate ? ` (${escapeHtml(firstSolvedDate)})` : ''}</p>
                     ${completionLabel ? `<p><strong>LLM completion estimate:</strong> ${completionLabel}</p>` : ''}
                     <p><strong>Community Review:</strong> ${reviewDisplay}</p>
                 `;
