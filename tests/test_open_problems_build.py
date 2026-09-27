@@ -153,6 +153,55 @@ Our own summary.
         self.assertIn(r'{\mathbb{A}}_k,{\mathbb{E}}_{x},{\mathbb{Q}},\Re,\Gamma',
                       record['definitionTeX'])
 
+    def test_hodge_source_notation_survives_preamble_removal(self):
+        source = (build_site.OPEN_PROBLEMS_PATH / 'gpt_6_astra_pro' / '6.tex').read_text()
+        record = build_site.parse_numbered_problem_tex(source, require_source_urls=False)
+        for field in ('definitionTeX', 'researchTeX', 'documentTeX'):
+            self.assertNotRegex(record[field], r'\\(?:cl|CH|Res|PD|Tr)\b')
+            self.assertIn(r'\operatorname{cl}', record[field])
+            self.assertIn(r'\operatorname{CH}', record[field])
+        self.assertIn(r'\boxed{', record['definitionTeX'])
+        self.assertIn(r'\operatorname{Hdg}^{2p}(X)', record['definitionTeX'])
+
+    def test_local_notation_handles_nested_aliases_and_operator_declarations(self):
+        macros = build_site.tex_notation_macros(r'''
+% \newcommand{\ignored}{wrong}
+\newcommand*{\field}{\mathbb Q}
+\newcommand\closure{\overline{\field}}
+\DeclareMathOperator{\cycle}{cl}
+\DeclareMathOperator*{\limitop}{lim}
+\renewcommand{\field}{\mathbb C} % source definition wins
+\providecommand{\field}{wrong}
+\newcommand{\parameterized}[1]{#1}
+''', {})
+        rendered = build_site.expand_tex_notation(
+            r'\cycle(\closure)_p + \field + \cycleLong + \parameterized{x}', macros)
+        self.assertIn(r'{\operatorname{cl}}', rendered)
+        self.assertIn(r'\overline{{\mathbb{C}}}', rendered)
+        self.assertNotIn(r'\mathbb{Q}', rendered)
+        self.assertIn(r'\cycleLong', rendered)
+        self.assertIn(r'\parameterized{x}', rendered)
+        self.assertNotIn('ignored', macros)
+        self.assertIn(r'\operatorname*{lim}', macros['limitop'])
+        self.assertEqual(build_site.tex_notation_macros('', {}), {})
+        self.assertEqual(build_site.tex_notation_macros(
+            r'\providecommand{\R}{\mathcal{R}}', {'R': r'{\mathbb{R}}'})['R'],
+            r'{\mathcal{R}}')
+
+    def test_notation_preserves_code_escaped_commands_and_detects_cycles(self):
+        macros = build_site.tex_notation_macros(r'\newcommand{\CH}{\operatorname{CH}}', {})
+        source = r'''\verb|\CH| \\CH
+\begin{Code}
+literal = "\CH"
+\end{Code}
+$\CH^p(X)$'''
+        rendered = build_site.expand_tex_notation(source, macros)
+        self.assertIn(r'\verb|\CH| \\CH', rendered)
+        self.assertIn('literal = "\\CH"', rendered)
+        self.assertIn(r'${\operatorname{CH}}^p(X)$', rendered)
+        with self.assertRaisesRegex(ValueError, 'Recursive'):
+            build_site.tex_notation_macros(r'\newcommand{\aa}{\bb}\newcommand{\bb}{\aa}', {})
+
     def test_attempt_with_trailing_comments_and_print_only_reference(self):
         source = r'''\begin{document}
 \section{Example}
