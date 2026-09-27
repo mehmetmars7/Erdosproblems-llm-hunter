@@ -1,6 +1,10 @@
 var openProblems = {
   "1": {
     "id": 1,
+    "problem_number": "MPP-001",
+    "legacy_ids": [
+      "problem.p-versus-np"
+    ],
     "title": "P versus NP Problem",
     "collection": "ranked",
     "rank": 1,
@@ -9,8 +13,8 @@ var openProblems = {
     "exact_target": "Does an efficient way to check a proposed yes-answer always imply an efficient way to decide whether the answer is yes?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA language is a set $L\\subseteq\\{0,1\\}^*$. Write $\\mathsf P$ for languages decided by a deterministic Turing machine in time bounded by a polynomial in the input length. A language belongs to $\\mathsf{NP}$ if there are a deterministic polynomial-time verifier $V$ and a polynomial $p$ such that\n\\[\n x\\in L\\quad\\Longleftrightarrow\\quad \\exists y\\in\\{0,1\\}^{\\le p(|x|)}\\;V(x,y)=1.\n\\]\nThe polynomial and machine may depend on $L$, but not on its individual inputs. The question is whether $\\mathsf P=\\mathsf{NP}$. A negative answer requires a language in $\\mathsf{NP}$ outside $\\mathsf P$, not merely a slow algorithm for one problem.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/library/monographs/MPPc.pdf}{[S1]}, \\href{https://www.claymath.org/wp-content/uploads/2022/06/pvsnp.pdf}{[E1]}.\n\n\\subsection{Short English statement}\nDoes an efficient way to check a proposed yes-answer always imply an efficient way to decide whether the answer is yes?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Clay Mathematics Institute, The Millennium Prize Problems.\n\\url{https://www.claymath.org/library/monographs/MPPc.pdf}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[S2] P vs NP.\n\\url{https://www.claymath.org/millennium/p-vs-np/}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S3] Constructive solvability and the P versus NP problem \u2014 Arne Hole.\n\\url{https://arxiv.org/abs/2406.16843}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S4] PNP Labs \u2014 P versus NP formal reconstruction.\n\\url{https://pnplabs.com.au/}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[E1] Stephen Cook, The P versus NP Problem, Clay Mathematics Institute, Section 1 and Appendix.\n\\url{https://www.claymath.org/wp-content/uploads/2022/06/pvsnp.pdf}.\n{\\small\\textit{Added primary source: Definitions and formulation. Consulted 24 September 2026.}}\n\n\\item[E2] Theodore Baker, John Gill and\nRobert Solovay, \\emph{Relativizations of the $\\mathcal P=?\\mathcal{NP}$ Question},\nSIAM Journal on Computing 4(4) (1975), 431--442, oracle equality and separation\nresults. \\url{https://doi.org/10.1137/0204037}.\n{\\small\\textit{Consulted 24 September 2026: publisher abstract; used only for\nthe stated oracle obstruction, not a new proof audit.}}\n\\item[E3] Alexander A. Razborov and Steven\nRudich, \\emph{Natural Proofs}, Journal of Computer and System Sciences 55(1)\n(1997), 24--35; author manuscript dated 30 November 1996, abstract and the\nnatural-property/hardness framework.\n\\url{https://www.cs.umd.edu/~gasarch/BLOGPAPERS/natural.pdf}.\n{\\small\\textit{Consulted 24 September 2026. The pseudorandomness assumption is\nretained; no unconditional barrier is asserted.}}\n\\item[E4] Scott Aaronson and Avi Wigderson,\n\\emph{Algebrization: A New Barrier in Complexity Theory}, ACM Transactions on\nComputation Theory 1(1) (2009), Article 2; author manuscript, Sections 1--2\nand 5, especially Theorems 5.1 and 5.3.\n\\url{https://www.scottaaronson.com/papers/alg.pdf}.\n{\\small\\textit{Consulted 24 September 2026: definitions and barrier statements.}}\n\\item[E5] Ryan Williams,\n\\emph{Nonuniform ACC Circuit Lower Bounds}, Journal of the ACM 61(1) (2014),\nArticle 2, 32 pages; author manuscript, Theorem 1.1 and Section 1.1.\n\\url{https://people.csail.mit.edu/rrw/acc-lbs.pdf}.\n\\url{https://doi.org/10.1145/2559903}.\n{\\small\\textit{Consulted 24 September 2026.}}\n\\item[E6] Lijie Chen, Avishay Tal and\nYichuan Wang, \\emph{Super-quadratic Lower Bounds for Depth-2 Linear Threshold\nCircuits}, ECCC TR26-039, 15 March 2026, abstract and reported\n$\\mathsf E^{\\mathsf{NP}}$ threshold-circuit bound.\n\\url{https://eccc.weizmann.ac.il/report/2026/039/}.\n{\\small\\textit{Consulted 24 September 2026: report page and abstract. A\nrecent manuscript result, not an independent verification of its full proof.}}\n\\item[E7] Adnan Darwiche and Pierre\nMarquis, \\emph{A Knowledge Compilation Map}, Journal of Artificial Intelligence\nResearch 17 (2002), 229--264, Sections 1--2 and the separation of succinctness,\nqueries and transformations.\n\\url{https://arxiv.org/abs/1106.1819}.\n\\url{https://doi.org/10.1613/jair.989}.\n{\\small\\textit{Consulted 24 September 2026: article introduction and language\ndefinitions. Used as methodological context, not as the source of Lemma 1.1.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1.tex",
-    "link": "https://www.unsolvedmath.com/problems/1",
-    "external_url": "https://www.unsolvedmath.com/problems/1",
+    "link": "https://www.unsolvedmath.com/problems/MPP-001",
+    "external_url": "https://www.unsolvedmath.com/problems/MPP-001",
     "sources": [
       {
         "citation": "Clay Mathematics Institute, The Millennium Prize Problems.",
@@ -90,6 +94,10 @@ var openProblems = {
   },
   "2": {
     "id": 2,
+    "problem_number": "MPP-002",
+    "legacy_ids": [
+      "problem.riemann-hypothesis"
+    ],
     "title": "The Riemann Hypothesis",
     "collection": "ranked",
     "rank": 2,
@@ -98,8 +106,8 @@ var openProblems = {
     "exact_target": "Are all zeta zeros between the vertical lines zero and one located on the halfway line?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $s\\in{\\mathbb{C}}$ with $\\Re s>1$, define\n\\[\n \\zeta(s)=\\sum_{n=1}^{\\infty}n^{-s}=\\prod_{p\\text{ prime}}(1-p^{-s})^{-1}.\n\\]\nUse its meromorphic continuation to ${\\mathbb{C}}$, whose only pole is at $s=1$. The assertion is\n\\[\n \\forall\\rho\\in{\\mathbb{C}},\\qquad \\bigl(0<\\Re\\rho<1\\ \\text{and}\\ \\zeta(\\rho)=0\\bigr)\n \\ \\Longrightarrow\\ \\Re\\rho=\\tfrac12.\n\\]\nThe open critical strip excludes the negative even integer zeros. The assertion concerns locations, not multiplicities, of zeros.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre all zeta zeros between the vertical lines zero and one located on the halfway line?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Enrico Bombieri, Problems of the Millennium: the Riemann Hypothesis, Section I and the prime-counting equivalence.\n\\url{https://www.claymath.org/wp-content/uploads/2022/05/riemann.pdf}.\n{\\small\\textit{Catalogue formulation source. Consulted 24 September 2026: Section I, definition and zero-location statement.}}\n\\item[S2] Riemann Hypothesis.\n\\url{https://www.claymath.org/millennium/riemann-hypothesis/}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S3] A new proof that more than 2/3 of the zeros of the Riemann zeta function are simple and on the critical line.\n\\url{https://arxiv.org/abs/2609.02882}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S4] Lamzouri lecture at Max Planck Institute for Mathematics, September 3, 2026.\n\\url{https://math-events.uni-bonn.de/event/1560/}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S5] On the Extended, Generalized, and Grand Riemann Hypotheses: A Unified Approach Based on the General Properties of L-Functions \u2014 Weicun Zhang, v19.\n\\url{https://www.preprints.org/manuscript/202506.0481}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\n\\item[E1] Dave Platt and Tim Trudgian,\n\\emph{The Riemann hypothesis is true up to $3\\cdot10^{12}$},\narXiv:2004.09765v1 (21 April 2020), Theorem~1 and Section~2;\npublished in \\emph{Bulletin of the London Mathematical Society} (2021).\n\\url{https://arxiv.org/pdf/2004.09765v1}.\n{\\small\\textit{Research reference: rigorous bounded-height verification,\nincluding completeness of the zero count. Consulted 24 September 2026.}}\n\n\\item[E2] Larry Guth and James Maynard,\n\\emph{New large value estimates for Dirichlet polynomials},\n\\emph{Annals of Mathematics} 203 (2026), no.~2, 623--675,\nDOI: 10.4007/annals.2026.203.2.6, Theorem~1.2.\n\\url{https://annals.math.princeton.edu/2026/203-2/p06}.\nAuthor manuscript: arXiv:2405.20552v2 (7 April 2026),\n\\url{https://arxiv.org/pdf/2405.20552v2}.\n{\\small\\textit{Research reference: zero-density estimate; publication metadata\nand the stated theorem were checked. Consulted 24 September 2026.}}\n\n\\item[E3] Michael Griffin, Ken Ono,\nLarry Rolen and Don Zagier,\n\\emph{Jensen polynomials for the Riemann zeta function and other sequences},\narXiv:1902.07321v2 (31 March 2019), Section~1, Theorems~1--2;\npublished in \\emph{Proceedings of the National Academy of Sciences} (2019).\n\\url{https://arxiv.org/pdf/1902.07321v2}.\n{\\small\\textit{Research reference: the fixed-degree, sufficiently-large-shift\nquantifiers, not all-degree hyperbolicity. Consulted 24 September 2026.}}\n\n\\item[E4] Brad Rodgers and Terence Tao,\n\\emph{The de Bruijn--Newman constant is non-negative},\n\\emph{Forum of Mathematics, Pi} 8 (2020), e6,\nDOI: 10.1017/fmp.2020.6.\nAuthor manuscript arXiv:1801.05914v5 (3 July 2021),\nSection~1, equations~(1)--(4), and the main theorem.\n\\url{https://arxiv.org/pdf/1801.05914v5}.\n{\\small\\textit{Research reference: the theta-kernel normalization and the\nendpoint obstruction. Consulted 24 September 2026.}}\n\n\\item[E5] David W. Farmer,\n\\emph{Jensen polynomials are not a plausible route to proving the Riemann\nHypothesis}, arXiv:2008.07206, Sections~2--4.\n\\url{https://arxiv.org/pdf/2008.07206}.\n{\\small\\textit{Research reference: differentiation and information loss;\nthe paper's methodological assessment is not used as an impossibility theorem.\nConsulted 24 September 2026.}}\n\n\\item[E6] Jonathan Holland,\n\\emph{A new hyperbolicity wedge and a joint semicircle limit for Jensen\npolynomials of Riemann's $\\xi$-function},\narXiv:2608.08682v1 (9 August 2026), Theorem~1.1.\n\\url{https://arxiv.org/html/2608.08682v1}.\n{\\small\\textit{Research reference: recent manuscript, statement inspected,\nfull proof not independently audited here; not used as a premise of any lemma.\nConsulted 24 September 2026.}}\n\n\\item[E7] Kiran S. Kedlaya,\n\\emph{More on the zeroes of $\\zeta$}, MIT 18.785: Analytic Number Theory,\nspring 2007, Section~1, Lemma~1 and Theorems~2--3.\n\\url{https://kskedlaya.org/18.785/zeroes.pdf}.\n{\\small\\textit{Research reference: growth of the completed function, zero\ncounting, and Hadamard factorization. Consulted 24 September 2026.}}\n\n\\item[E8] Paul Garrett,\n\\emph{12. Weierstrass and Hadamard products}, author lecture notes,\n3 February 2021, Section~3 (Hadamard products).\n\\url{https://www-users.cse.umn.edu/~garrett/m/complex/notes_2020-21/12_Hadamard_products.pdf}.\n{\\small\\textit{Research reference: canonical products and the finite-order\nfactorization theorem. Consulted 24 September 2026.}}\n\n\\item[E9] Youness Lamzouri,\n\\emph{A new proof that more than $2/3$ of the zeros of the Riemann zeta\nfunction are simple and on the critical line},\narXiv:2609.02882v2 (8 September 2026), Theorem~1.1,\nProposition~2.1 and Sections~2--3.\n\\url{https://arxiv.org/html/2609.02882v2}.\n{\\small\\textit{Version-specific research supplement to [S3]: the stated bound\nand method were inspected. Neither a complete analytic proof audit nor a\nformal-certificate audit was performed. Consulted 24 September 2026.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/2.tex",
-    "link": "https://www.unsolvedmath.com/problems/2",
-    "external_url": "https://www.unsolvedmath.com/problems/2",
+    "link": "https://www.unsolvedmath.com/problems/MPP-002",
+    "external_url": "https://www.unsolvedmath.com/problems/MPP-002",
     "sources": [
       {
         "citation": "Enrico Bombieri, Problems of the Millennium: the Riemann Hypothesis, Section I and the prime-counting equivalence.",
@@ -191,6 +199,10 @@ var openProblems = {
   },
   "3": {
     "id": 3,
+    "problem_number": "MPP-003",
+    "legacy_ids": [
+      "problem.yang-mills-existence-and-mass-gap"
+    ],
     "title": "Yang\u2013Mills Existence and Mass Gap",
     "collection": "ranked",
     "rank": 3,
@@ -199,8 +211,8 @@ var openProblems = {
     "exact_target": "Can every compact simple gauge symmetry produce a rigorously defined four-dimensional Yang--Mills quantum theory with a nonzero energy gap above its vacuum?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA classical $G$-connection has curvature $F_A=dA+A\\wedge A$ and Yang--Mills action proportional to $\\int_{{\\mathbb{R}}^4}\\langle F_A,F_A\\rangle\\,dx$. The question concerns a rigorous, nontrivial \\emph{quantum} theory associated with this action, not only classical solutions or a formal functional integral. In its vacuum representation, let $\\Omega$ be the vacuum and $H\\ge0$ the self-adjoint generator of time translations, with $H\\Omega=0$. A positive finite mass gap means\n\\[\n 0<m:=\\inf\\bigl(\\operatorname{spec}(H)\\setminus\\{0\\}\\bigr)<\\infty.\n\\]\nFor every compact simple $G$, construct such a theory with the local observable fields, positivity, covariance, locality, and short-distance conditions required in Jaffe--Witten, Sections 3--4. Those axioms are part of the target and are not replaced by the displayed spectral condition alone.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/wp-content/uploads/2022/06/yangmills.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan every compact simple gauge symmetry produce a rigorously defined four-dimensional Yang--Mills quantum theory with a nonzero energy gap above its vacuum?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Arthur Jaffe and Edward Witten, Quantum Yang-Mills Theory, official Clay problem description.\n\\url{https://www.claymath.org/wp-content/uploads/2022/06/yangmills.pdf}.\n\\textit{Formulation source. Consulted 24 September 2026: Sections 3--4, especially page 6.}\n\\item[S2]Yang-Mills \\& the Mass Gap.\n\\url{https://www.claymath.org/millennium/yang-mills-the-maths-gap/}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Towards a Proof of Mass Gap in 3d Yang-Mills Theory \u2014 V. P. Nair.\n\\url{https://arxiv.org/abs/2608.10133}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]A Constructive Proof of Existence and Mass Gap for Pure SU(3) Yang-Mills in Four-Dimensional Space-Time \u2014 D. C. Jacobsen.\n\\url{https://arxiv.org/abs/2506.00284}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3.tex",
-    "link": "https://www.unsolvedmath.com/problems/3",
-    "external_url": "https://www.unsolvedmath.com/problems/3",
+    "link": "https://www.unsolvedmath.com/problems/MPP-003",
+    "external_url": "https://www.unsolvedmath.com/problems/MPP-003",
     "sources": [
       {
         "citation": "Arthur Jaffe and Edward Witten, Quantum Yang-Mills Theory, official Clay problem description.",
@@ -241,6 +253,10 @@ var openProblems = {
   },
   "6": {
     "id": 6,
+    "problem_number": "MPP-006",
+    "legacy_ids": [
+      "problem.hodge-conjecture"
+    ],
     "title": "Hodge Conjecture",
     "collection": "ranked",
     "rank": 4,
@@ -249,8 +265,8 @@ var openProblems = {
     "exact_target": "Does every rational cohomology class of the appropriate Hodge type come from a rational combination of algebraic subvarieties?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $X$ be a smooth projective complex variety of dimension $d$. Singular cohomology has the Hodge decomposition $H^k(X,{\\mathbb{C}})=\\bigoplus_{a+b=k}H^{a,b}(X)$. Define\n\\[\n \\operatorname{Hdg}^{p}(X)=H^{2p}(X,{\\mathbb{Q}})\\cap H^{p,p}(X),\\qquad 0\\le p\\le d.\n\\]\nA rational codimension-$p$ algebraic cycle is a finite sum $z=\\sum_j a_j Z_j$, with $a_j\\in{\\mathbb{Q}}$ and $Z_j\\subseteq X$ closed irreducible subvarieties of codimension $p$. Its class is $\\operatorname{cl}(z)=\\sum_j a_j[Z_j]$. The conjecture says\n\\[\n \\operatorname{Hdg}^{p}(X)=\\operatorname{span}_{{\\mathbb{Q}}}\\{[Z]:\\operatorname{codim}_X Z=p\\}\n\\]\nfor all $X,p$. Integral coefficients and nonprojective compact K\u00e4hler manifolds are not the selected formulation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/library/monographs/MPPc.pdf}{[S1]}, \\href{https://www.claymath.org/wp-content/uploads/2022/06/hodge.pdf}{[E1]}.\n\n\\subsection{Short English statement}\nDoes every rational cohomology class of the appropriate Hodge type come from a rational combination of algebraic subvarieties?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Clay Mathematics Institute, The Millennium Prize Problems.\n\\url{https://www.claymath.org/library/monographs/MPPc.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Hodge Conjecture.\n\\url{https://www.claymath.org/millennium/hodge-conjecture/}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]A Proof of the Hodge Conjecture Derived from One Semiregular Witness Axiom \u2014 Mohammad F Islam.\n\\url{https://zenodo.org/records/22701510}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]The Hodge conjecture for Fermat fourfolds of odd degree at most 199 \u2014 Rifat Jumagulov.\n\\url{https://arxiv.org/abs/2608.18134}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[E1]Pierre Deligne, The Hodge Conjecture, Clay Mathematics Institute, Sections 1--2.\n\\url{https://www.claymath.org/wp-content/uploads/2022/06/hodge.pdf}.\n\\textit{Added primary source: Definitions and formulation. Consulted 24 September 2026.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/6.tex",
-    "link": "https://www.unsolvedmath.com/problems/6",
-    "external_url": "https://www.unsolvedmath.com/problems/6",
+    "link": "https://www.unsolvedmath.com/problems/MPP-006",
+    "external_url": "https://www.unsolvedmath.com/problems/MPP-006",
     "sources": [
       {
         "citation": "Clay Mathematics Institute, The Millennium Prize Problems.",
@@ -306,6 +322,10 @@ var openProblems = {
   },
   "30006674": {
     "id": 30006674,
+    "problem_number": "LOCAL-30006674",
+    "legacy_ids": [
+      "problem.navier-stokes-existence-and-smoothness"
+    ],
     "title": "Navier-Stokes Existence and Smoothness: Fefferman A",
     "collection": "ranked",
     "rank": 5,
@@ -356,6 +376,10 @@ var openProblems = {
   },
   "5": {
     "id": 5,
+    "problem_number": "MPP-005",
+    "legacy_ids": [
+      "problem.birch-and-swinnerton-dyer-conjecture"
+    ],
     "title": "Birch and Swinnerton-Dyer Conjecture",
     "collection": "ranked",
     "rank": 6,
@@ -364,8 +388,8 @@ var openProblems = {
     "exact_target": "Does the number of independent rational points on an elliptic curve equal the multiplicity of its $L$-function's zero at one?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn elliptic curve $E/{\\mathbb{Q}}$ is a smooth projective genus-one curve with a specified rational point. Its rational points form a group $E({\\mathbb{Q}})\\simeq{\\mathbb{Z}}^r\\oplus E({\\mathbb{Q}})_{\\rm tors}$; $r$ is its Mordell--Weil rank. At a good prime $p$, put $a_p=p+1-\\#E({\\mathbb{F}}_p)$ and use the factor $(1-a_pp^{-s}+p^{1-2s})^{-1}$ in $L(E,s)$. The usual bad-prime factors complete the Hasse--Weil Euler product. Write $r_{\\rm an}=\\operatorname{ord}_{s=1}L(E,s)$, the smallest derivative order with a nonzero value at one. The selected assertion is\n\\[\n \\forall E/{\\mathbb{Q}},\\qquad \\operatorname{rank}E({\\mathbb{Q}})=\\operatorname{ord}_{s=1}L(E,s).\n\\]\nIt does not include the stronger leading-coefficient formula.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/library/monographs/MPPc.pdf}{[S1]}, \\href{https://www.claymath.org/wp-content/uploads/2022/05/birchswin.pdf}{[E1]}.\n\n\\subsection{Short English statement}\nDoes the number of independent rational points on an elliptic curve equal the multiplicity of its $L$-function's zero at one?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Clay Mathematics Institute, The Millennium Prize Problems.\n\\url{https://www.claymath.org/library/monographs/MPPc.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Birch and Swinnerton-Dyer Conjecture.\n\\url{https://www.claymath.org/millennium/birch-and-swinnerton-dyer-conjecture/}.\n\\textit{Further reference; not a proof endorsement. Consulted 24 September 2026: Institutional overview only.}\n\\item[S3]Introduction to the Birch and Swinnerton-Dyer Conjecture \u2014 Fabio Ferrari Ruffino.\n\\url{https://arxiv.org/abs/2608.25975}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Proof of the Birch and Swinnerton-Dyer Conjecture \u2014 Yoshinori Shimizu.\n\\url{https://zenodo.org/records/17010555}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[E1]Andrew Wiles, The Birch and Swinnerton-Dyer Conjecture, official Clay Mathematics Institute problem description, pages 1\u20132.\n\\url{https://www.claymath.org/wp-content/uploads/2022/05/birchswin.pdf}.\n\\textit{Added primary source: Elliptic curves, the Hasse\u2013Weil L-function, and the rank formulation; the leading-coefficient refinement is not added to this entry.. Consulted 24 September 2026.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/5.tex",
-    "link": "https://www.unsolvedmath.com/problems/5",
-    "external_url": "https://www.unsolvedmath.com/problems/5",
+    "link": "https://www.unsolvedmath.com/problems/MPP-005",
+    "external_url": "https://www.unsolvedmath.com/problems/MPP-005",
     "sources": [
       {
         "citation": "Clay Mathematics Institute, The Millennium Prize Problems.",
@@ -421,6 +445,10 @@ var openProblems = {
   },
   "30006675": {
     "id": 30006675,
+    "problem_number": "LOCAL-30006675",
+    "legacy_ids": [
+      "problem.global-langlands-functoriality-conjecture"
+    ],
     "title": "Global Langlands Functoriality Conjecture",
     "collection": "ranked",
     "rank": 7,
@@ -477,6 +505,10 @@ var openProblems = {
   },
   "3403": {
     "id": 3403,
+    "problem_number": "OPG-59968",
+    "legacy_ids": [
+      "problem.existence-of-one-way-functions"
+    ],
     "title": "One-way functions exist",
     "collection": "ranked",
     "rank": 8,
@@ -485,8 +517,8 @@ var openProblems = {
     "exact_target": "Is there an efficiently computable function whose outputs no efficient randomized algorithm can usually reverse, even when any preimage counts?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA nonnegative function $\\eta(n)$ is negligible if for every $c>0$ it is at most $n^{-c}$ for all sufficiently large $n$. The sought function family is uniformly computable in deterministic polynomial time and satisfies, for every probabilistic polynomial-time $A$,\n\\[\n \\Pr_{x\\leftarrow\\{0,1\\}^n,\\,A}\\!\\bigl[A(1^n,f_n(x))\\in f_n^{-1}(f_n(x))\\bigr]\n \\le \\eta_A(n)\n\\]\nfor some negligible $\\eta_A$. An output of the wrong input length is a failed inversion. The probability includes both a uniformly random input and the inverter's internal randomness. The inverter only has to find \\emph{some} preimage; recovering the originally sampled input is unnecessary.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://eprint.iacr.org/2024/1388.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs there an efficiently computable function whose outputs no efficient randomized algorithm can usually reverse, even when any preimage counts?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Shuichi Hirahara, Zhenjian Lu, and Igor C. Oliveira, One-Way Functions and pKt Complexity, IACR ePrint 2024/1388 (2024).\n\\url{https://eprint.iacr.org/2024/1388.pdf}.\n\\textit{Formulation source.}\n\\item[S2]One-Way Functions and pKt Complexity \u2014 Hirahara, Lu and Oliveira.\n\\url{https://wrap.warwick.ac.uk/id/eprint/187935/1/WRAP-One-way-functions-pKt-complexity-24.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]One-Way Functions and Boundary Hardness of Randomized Time-Bounded Kolmogorov Complexity \u2014 Liu and Pass.\n\\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2026.97}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3403.tex",
-    "link": "https://www.unsolvedmath.com/problems/3403",
-    "external_url": "https://www.unsolvedmath.com/problems/3403",
+    "link": "https://www.unsolvedmath.com/problems/OPG-59968",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-59968",
     "sources": [
       {
         "citation": "Shuichi Hirahara, Zhenjian Lu, and Igor C. Oliveira, One-Way Functions and pKt Complexity, IACR ePrint 2024/1388 (2024).",
@@ -533,6 +565,10 @@ var openProblems = {
   },
   "30006676": {
     "id": 30006676,
+    "problem_number": "LOCAL-30006676",
+    "legacy_ids": [
+      "problem.the-generalized-riemann-hypothesis-for-dirichlet-l-functions"
+    ],
     "title": "Generalized Riemann Hypothesis for Dirichlet L-functions",
     "collection": "ranked",
     "rank": 9,
@@ -589,6 +625,10 @@ var openProblems = {
   },
   "30006677": {
     "id": 30006677,
+    "problem_number": "LOCAL-30006677",
+    "legacy_ids": [
+      "problem.extended-riemann-hypothesis-for-dedekind-zeta-functions"
+    ],
     "title": "Extended Riemann hypothesis for Dedekind zeta functions",
     "collection": "ranked",
     "rank": 10,
@@ -649,6 +689,10 @@ var openProblems = {
   },
   "13": {
     "id": 13,
+    "problem_number": "NT-005",
+    "legacy_ids": [
+      "problem.the-abc-conjecture-of-masser-and-oesterle"
+    ],
     "title": "ABC Conjecture",
     "collection": "ranked",
     "rank": 11,
@@ -657,8 +701,8 @@ var openProblems = {
     "exact_target": "Can the size of a coprime additive triple always be controlled, up to any small exponent loss, by its distinct prime factors?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a positive integer $n$, its radical is $\\operatorname{rad}(n)=\\prod_{p\\mid n}p$, with $\\operatorname{rad}(1)=1$. A triple $a,b,c>0$ with $a+b=c$ and $\\gcd(a,b)=1$ is automatically pairwise coprime. The conjecture is\n\\[\n \\forall\\varepsilon>0\\ \\exists C_\\varepsilon>0\\ \\forall a,b,c\\in{\\mathbb{Z}}_{>0},\\qquad\n \\begin{cases}a+b=c,\\\\\\gcd(a,b)=1\\end{cases}\n \\Longrightarrow c<C_\\varepsilon\\operatorname{rad}(abc)^{1+\\varepsilon}.\n\\]\nThe constant depends on $\\varepsilon$ only. A counterexample must defeat every constant for some fixed positive $\\varepsilon$; one unusually large triple does not suffice.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s00025-026-02616-5}{[S1]}.\n\n\\subsection{Short English statement}\nCan the size of a coprime additive triple always be controlled, up to any small exponent loss, by its distinct prime factors?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Distance Between Cubics and Rationals, Results in Mathematics (2026), statement of the abc conjecture.\n\\url{https://link.springer.com/article/10.1007/s00025-026-02616-5}.\n\\textit{Formulation source.}\n\\item[S2]Construction of Arithmetic Teichmuller Spaces IV: Proof of the abc-conjecture \u2014 Kirti Joshi.\n\\url{https://arxiv.org/abs/2403.10430}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Why abc is still a conjecture \u2014 Peter Scholze and Jakob Stix, July 16, 2018.\n\\url{https://www.math.uni-bonn.de/people/scholze/WhyABCisStillaConjecture.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]The abc Conjecture Revisited \u2014 Patrick Letendre, July 2026.\n\\url{https://arxiv.org/abs/2607.07641}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/13.tex",
-    "link": "https://www.unsolvedmath.com/problems/13",
-    "external_url": "https://www.unsolvedmath.com/problems/13",
+    "link": "https://www.unsolvedmath.com/problems/NT-005",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-005",
     "sources": [
       {
         "citation": "Distance Between Cubics and Rationals, Results in Mathematics (2026), statement of the abc conjecture.",
@@ -709,6 +753,10 @@ var openProblems = {
   },
   "30006678": {
     "id": 30006678,
+    "problem_number": "LOCAL-30006678",
+    "legacy_ids": [
+      "problem.np-vs-ppoly"
+    ],
     "title": "NP versus P/poly",
     "collection": "ranked",
     "rank": 12,
@@ -761,6 +809,10 @@ var openProblems = {
   },
   "30006679": {
     "id": 30006679,
+    "problem_number": "LOCAL-30006679",
+    "legacy_ids": [
+      "problem.np-versus-conp-problem"
+    ],
     "title": "NP versus coNP Problem",
     "collection": "ranked",
     "rank": 13,
@@ -833,6 +885,10 @@ var openProblems = {
   },
   "3402": {
     "id": 3402,
+    "problem_number": "OPG-36892",
+    "legacy_ids": [
+      "problem.p-versus-pspace"
+    ],
     "title": "P vs. PSPACE",
     "collection": "ranked",
     "rank": 14,
@@ -841,8 +897,8 @@ var openProblems = {
     "exact_target": "Can every decision problem solvable with polynomially much memory also be solved in polynomially much time?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an input of length $n$, time counts computation steps and space counts work-tape cells. Define\n\\[\n \\mathsf P=\\bigcup_{k\\ge1}\\mathsf{DTIME}(n^k),\\qquad\n \\mathsf{PSPACE}=\\bigcup_{k\\ge1}\\mathsf{DSPACE}(n^k).\n\\]\nMachines must halt and decide their language correctly on every input. Determine whether these classes coincide. An algorithm with polynomial space and exponential time does not establish membership in $\\mathsf P$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://art.torvergata.it/bitstream/2108/32769/60437/ComputabilityDecidabilityComplexity.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan every decision problem solvable with polynomially much memory also be solved in polynomially much time?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Walter S. Brainerd and Lawrence H. Landweber et al., Computability, Decidability, Complexity, third edition.\n\\url{https://art.torvergata.it/bitstream/2108/32769/60437/ComputabilityDecidabilityComplexity.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Simulating Time With Square-Root Space \u2014 Ryan Williams, February 24, 2025.\n\\url{https://eccc.weizmann.ac.il/report/2025/017/download}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Some Recent Developments in Space Complexity \u2014 R. Ryan Williams, MFCS 2026.\n\\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.MFCS.2026.3}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Some conditions implying if P=NP then P=PSPACE \u2014 Ismael Rodriguez (February 10, 2026).\n\\url{https://arxiv.org/abs/2602.10073}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3402.tex",
-    "link": "https://www.unsolvedmath.com/problems/3402",
-    "external_url": "https://www.unsolvedmath.com/problems/3402",
+    "link": "https://www.unsolvedmath.com/problems/OPG-36892",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-36892",
     "sources": [
       {
         "citation": "Walter S. Brainerd and Lawrence H. Landweber et al., Computability, Decidability, Complexity, third edition.",
@@ -893,6 +949,10 @@ var openProblems = {
   },
   "30006680": {
     "id": 30006680,
+    "problem_number": "LOCAL-30006680",
+    "legacy_ids": [
+      "problem.tate-conjecture-for-abelian-varieties-and-higher-dimensional-varieties"
+    ],
     "title": "Tate Conjecture for Algebraic Cycles",
     "collection": "ranked",
     "rank": 15,
@@ -953,6 +1013,10 @@ var openProblems = {
   },
   "30006681": {
     "id": 30006681,
+    "problem_number": "LOCAL-30006681",
+    "legacy_ids": [
+      "problem.bqp-versus-np"
+    ],
     "title": "BQP Versus NP: Complete Language-Class Relation",
     "collection": "ranked",
     "rank": 16,
@@ -1013,6 +1077,10 @@ var openProblems = {
   },
   "8400004": {
     "id": 8400004,
+    "problem_number": "AMR-083-0004",
+    "legacy_ids": [
+      "problem.polynomial-time-classical-integer-factorization"
+    ],
     "title": "O5a \u2014 Deterministic polynomial-time integer factorization",
     "collection": "ranked",
     "rank": 17,
@@ -1021,8 +1089,8 @@ var openProblems = {
     "exact_target": "Is there a deterministic classical method that factors every composite integer in time polynomial in its number of binary digits?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThe binary length of $N\\ge2$ is $\\ell(N)=\\lfloor\\log_2N\\rfloor+1$. A nontrivial factor is an integer $d$ with $1<d<N$ and $d\\mid N$. Ask whether there exist a deterministic classical algorithm $A$ and constants $C,k$ such that\n\\[\n \\forall N\\text{ composite},\\qquad A(N)=d\\text{ a nontrivial factor},\\qquad\n T_A(N)\\le C\\ell(N)^k.\n\\]\nThe promise is compositeness; the running-time bound is in the bit length, not in the value of $N$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/pii/S0022000015000768}{[S1]}.\n\n\\subsection{Short English statement}\nIs there a deterministic classical method that factors every composite integer in time polynomial in its number of binary digits?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Integer factoring and modular square roots.\n\\url{https://www.sciencedirect.com/science/article/pii/S0022000015000768}.\n\\textit{Formulation source.}\n\\item[S2]A number-theoretic conjecture implying faster algorithms for polynomial factorization and integer factorization \u2014 Chris Umans and Siki Wang (2025).\n\\url{https://arxiv.org/abs/2511.10851}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Improved Separation Between Quantum and Classical Computers for Sampling and Functional Tasks \u2014 Marshall, Aaronson and Dunjko, CCC 2025.\n\\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol339-ccc2025/LIPIcs.CCC.2025.5/LIPIcs.CCC.2025.5.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/8400004.tex",
-    "link": "https://www.unsolvedmath.com/problems/8400004",
-    "external_url": "https://www.unsolvedmath.com/problems/8400004",
+    "link": "https://www.unsolvedmath.com/problems/AMR-083-0004",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-083-0004",
     "sources": [
       {
         "citation": "Integer factoring and modular square roots.",
@@ -1069,6 +1137,10 @@ var openProblems = {
   },
   "30006682": {
     "id": 30006682,
+    "problem_number": "LOCAL-30006682",
+    "legacy_ids": [
+      "problem.hardy-littlewood-prime-k-tuple-conjecture"
+    ],
     "title": "Hardy-Littlewood Prime k-Tuple Conjecture",
     "collection": "ranked",
     "rank": 18,
@@ -1129,6 +1201,10 @@ var openProblems = {
   },
   "30006683": {
     "id": 30006683,
+    "problem_number": "LOCAL-30006683",
+    "legacy_ids": [
+      "problem.unconditional-separation-of-quantum-and-classical-bounded-error-polynomial-time-bqp-bpp"
+    ],
     "title": "Unconditional Separation of Quantum and Classical Bounded-Error Polynomial Time (BQP != BPP)",
     "collection": "ranked",
     "rank": 19,
@@ -1185,6 +1261,10 @@ var openProblems = {
   },
   "11": {
     "id": 11,
+    "problem_number": "NT-003",
+    "legacy_ids": [
+      "problem.twin-prime-conjecture"
+    ],
     "title": "Twin Prime Conjecture",
     "collection": "ranked",
     "rank": 20,
@@ -1193,8 +1273,8 @@ var openProblems = {
     "exact_target": "Are prime pairs separated by exactly two found arbitrarily far along the integers?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $\\mathcal P=\\{p\\in{\\mathbb{Z}}_{\\ge2}:p\\text{ has exactly two positive divisors}\\}$. The conjecture is\n\\[\n \\forall X>0\\ \\exists p>X:\\qquad p\\in\\mathcal P,\\quad p+2\\in\\mathcal P.\n\\]\nEquivalently, $\\#\\{p\\le x:p,p+2\\in\\mathcal P\\}\\to\\infty$. No particular asymptotic formula for this counting function is required.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/TwinPrimeConjecture.html}{[S1]}.\n\n\\subsection{Short English statement}\nAre prime pairs separated by exactly two found arbitrarily far along the integers?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Weisstein, E. W., Twin Prime Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.\n\\url{https://mathworld.wolfram.com/TwinPrimeConjecture.html}.\n\\textit{Formulation source.}\n\\item[S2]Elementary Number Theory \u2014 Henrik Bachmann, version 4, December 1, 2025.\n\\url{https://www.henrikbachmann.com/uploads/7/7/6/3/77634444/ent_2025_overviewnotes_v4.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]A New Look on the Twin-Prime Conjecture: The Proof of the Twin-Prime Conjecture \u2014 Woodward and Asheralieva.\n\\url{https://researchportal.hw.ac.uk/en/publications/a-new-look-on-the-twin-prime-conjecture-the-proof-of-the-twin-pri/}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Proof of the Hardy-Littlewood K-tuple Conjecture in the Distribution of Numbers Coprime with the Primorial \u2014 Tim Samshuijzen, May 2026 revision.\n\\url{https://rxiv.org/pdf/2501.0157v4.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S5]Twin Prime Conjecture 3rd Way \u2014 Taha Muhammad, June 19, 2026.\n\\url{https://www.cambridge.org/engage/coe/article-details/6a2d20d8d1922e37d572c5f8}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/11.tex",
-    "link": "https://www.unsolvedmath.com/problems/11",
-    "external_url": "https://www.unsolvedmath.com/problems/11",
+    "link": "https://www.unsolvedmath.com/problems/NT-003",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-003",
     "sources": [
       {
         "citation": "Weisstein, E. W., Twin Prime Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.",
@@ -1239,6 +1319,10 @@ var openProblems = {
   },
   "30006684": {
     "id": 30006684,
+    "problem_number": "LOCAL-30006684",
+    "legacy_ids": [
+      "problem.hilberts-tenth-problem-over-the-rationals"
+    ],
     "title": "Hilbert's Tenth Problem over the Rationals",
     "collection": "ranked",
     "rank": 21,
@@ -1295,6 +1379,10 @@ var openProblems = {
   },
   "18": {
     "id": 18,
+    "problem_number": "TOP-001",
+    "legacy_ids": [
+      "problem.smooth-four-dimensional-poincare-conjecture"
+    ],
     "title": "Smooth 4-Dimensional Poincar\u00e9 Conjecture",
     "collection": "ranked",
     "rank": 22,
@@ -1351,6 +1439,10 @@ var openProblems = {
   },
   "30006685": {
     "id": 30006685,
+    "problem_number": "LOCAL-30006685",
+    "legacy_ids": [
+      "problem.the-nc-versus-p-problem-for-efficient-parallel-computation"
+    ],
     "title": "The NC versus P Problem for Efficient Parallel Computation",
     "collection": "ranked",
     "rank": 23,
@@ -1407,6 +1499,10 @@ var openProblems = {
   },
   "30000968": {
     "id": 30000968,
+    "problem_number": "OWR-1971-001",
+    "legacy_ids": [
+      "problem.grothendiecks-generalized-hodge-conjecture"
+    ],
     "title": "Generalized Hodge Conjecture",
     "collection": "ranked",
     "rank": 24,
@@ -1415,8 +1511,8 @@ var openProblems = {
     "exact_target": "Does every part of cohomology whose Hodge types allow high-codimension support actually have such algebraic support?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA rational Hodge substructure $V\\subseteq H^k(X,{\\mathbb{Q}})$ has Hodge coniveau at least $c$ if $V^{a,b}=0$ whenever $a<c$ or $b<c$. Let $M^cH^k$ be the sum of all such substructures. Define geometric coniveau by\n\\[\n N^cH^k(X,{\\mathbb{Q}})=\\sum_{\\substack{Z\\subseteq X\\text{ closed algebraic}\\\\ \\operatorname{codim}Z\\ge c}}\n \\ker\\bigl(H^k(X,{\\mathbb{Q}})\\to H^k(X\\setminus Z,{\\mathbb{Q}})\\bigr).\n\\]\nThe conjecture is $M^cH^k(X,{\\mathbb{Q}})=N^cH^k(X,{\\mathbb{Q}})$ for every smooth projective complex $X$ and all relevant $k,c$. Finite sums can be supported on the union of their supporting algebraic sets.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://jomprob.org/index.php/jomp/article/view/Vol-1Issue-1Paper-2}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every part of cohomology whose Hodge types allow high-codimension support actually have such algebraic support?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Claire Voisin, Hodge and generalized Hodge conjectures, coniveau and algebraic cycles, Journal of Open Mathematical Problems 1(1) (2025), 16-51.\n\\url{https://jomprob.org/index.php/jomp/article/view/Vol-1Issue-1Paper-2}.\n\\textit{Formulation source.}\n\\item[S2]Incidence equivalence, a survey.\n\\url{https://arxiv.org/abs/2607.22233}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]On the Hodge and Tate conjectures for moduli spaces of curves.\n\\url{https://arxiv.org/html/2605.20453v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30000968.tex",
-    "link": "https://www.unsolvedmath.com/problems/30000968",
-    "external_url": "https://www.unsolvedmath.com/problems/30000968",
+    "link": "https://www.unsolvedmath.com/problems/OWR-1971-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-1971-001",
     "sources": [
       {
         "citation": "Claire Voisin, Hodge and generalized Hodge conjectures, coniveau and algebraic cycles, Journal of Open Mathematical Problems 1(1) (2025), 16-51.",
@@ -1463,6 +1559,10 @@ var openProblems = {
   },
   "12": {
     "id": 12,
+    "problem_number": "NT-004",
+    "legacy_ids": [
+      "problem.binary-goldbach-problem-for-even-integers"
+    ],
     "title": "Goldbach's Conjecture",
     "collection": "ranked",
     "rank": 25,
@@ -1471,8 +1571,8 @@ var openProblems = {
     "exact_target": "Can every even integer larger than two be written as the sum of two primes?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nWith $\\mathcal P$ denoting the positive primes, the statement is\n\\[\n \\forall n\\in2{\\mathbb{Z}},\\quad n>2\\quad\\Longrightarrow\\quad\n \\exists p,q\\in\\mathcal P\\text{ with }n=p+q.\n\\]\nThe primes are not required to be distinct, so $4=2+2$ is allowed. Every even integer is quantified, not merely all sufficiently large integers or a density-one subset.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://t5k.org/notes/conjectures/}{[S1]}.\n\n\\subsection{Short English statement}\nCan every even integer larger than two be written as the sum of two primes?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]C. K. Caldwell, \"Prime Conjectures and Open Questions,\" The PrimePages, https://t5k.org/notes/conjectures/.\n\\url{https://t5k.org/notes/conjectures/}.\n\\textit{Formulation source.}\n\\item[S2]The exceptional set of the Goldbach problem.\n\\url{https://arxiv.org/html/2607.27282v2}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Theorem (1+1.9) on the Goldbach Conjecture.\n\\url{https://arxiv.org/abs/2606.05224}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Restricted Goldbach Sums in Arithmetic Progressions: Local Obstructions, an Explicit Almost-All Framework, and a General-Modulus Extension.\n\\url{https://www.preprints.org/manuscript/202607.2077}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/12.tex",
-    "link": "https://www.unsolvedmath.com/problems/12",
-    "external_url": "https://www.unsolvedmath.com/problems/12",
+    "link": "https://www.unsolvedmath.com/problems/NT-004",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-004",
     "sources": [
       {
         "citation": "C. K. Caldwell, \"Prime Conjectures and Open Questions,\" The PrimePages, https://t5k.org/notes/conjectures/.",
@@ -1524,6 +1624,10 @@ var openProblems = {
   },
   "3100086": {
     "id": 3100086,
+    "problem_number": "AMR-030-0086",
+    "legacy_ids": [
+      "problem.asymptotic-exponent-of-matrix-multiplication-omega-2"
+    ],
     "title": "Is the exponent of matrix multiplication 2",
     "collection": "ranked",
     "rank": 26,
@@ -1532,8 +1636,8 @@ var openProblems = {
     "exact_target": "Can exact rational matrix multiplication be performed with an operation count arbitrarily close to quadratic?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThe rational bilinear rank $R_{{\\mathbb{Q}}}(n)$ is the least $r$ admitting rational linear forms $\\alpha_j,\\beta_j$ and fixed rational matrices $C_j$ with\n\\[\n AB=\\sum_{j=1}^r\\alpha_j(A)\\beta_j(B)C_j\\qquad(A,B\\in{\\mathbb{Q}}^{n\\times n}).\n\\]\nSet $\\omega_{{\\mathbb{Q}}}=\\inf\\{\\tau:R_{{\\mathbb{Q}}}(n)=O(n^\\tau)\\}$. The target is $\\omega_{{\\mathbb{Q}}}=2$, or equivalently the existence, for every $\\varepsilon>0$, of exact arithmetic circuits of size $O_\\varepsilon(n^{2+\\varepsilon})$. This counts arithmetic operations at unit cost. It neither bounds coefficient bit lengths nor asserts that the infimum is attained by an $O(n^2)$ algorithm.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://theoryofcomputing.org/articles/gs005/gs005.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan exact rational matrix multiplication be performed with an operation count arbitrarily close to quadratic?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Markus Bl\u00e4ser, Fast Matrix Multiplication, Theory of Computing Graduate Surveys 5 (2013).\n\\url{https://theoryofcomputing.org/articles/gs005/gs005.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Improving the matrix multiplication exponent with modern optimization and AlphaEvolve.\n\\url{https://arxiv.org/abs/2608.16884}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Finite Matrix Multiplication Algorithms from Infinite Groups.\n\\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol325-itcs2025/html/LIPIcs.ITCS.2025.18/LIPIcs.ITCS.2025.18.html}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3100086.tex",
-    "link": "https://www.unsolvedmath.com/problems/3100086",
-    "external_url": "https://www.unsolvedmath.com/problems/3100086",
+    "link": "https://www.unsolvedmath.com/problems/AMR-030-0086",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-030-0086",
     "sources": [
       {
         "citation": "Markus Bl\u00e4ser, Fast Matrix Multiplication, Theory of Computing Graduate Surveys 5 (2013).",
@@ -1581,6 +1685,10 @@ var openProblems = {
   },
   "3405": {
     "id": 3405,
+    "problem_number": "OPG-51618",
+    "legacy_ids": [
+      "problem.p-versus-bpp-does-bpp-p"
+    ],
     "title": "P vs. BPP",
     "collection": "ranked",
     "rank": 27,
@@ -1589,8 +1697,8 @@ var openProblems = {
     "exact_target": "Can randomness always be removed from an efficient bounded-error decision algorithm without losing polynomial-time efficiency?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA language $L$ is in $\\mathsf{BPP}$ if a randomized polynomial-time algorithm $A$ satisfies $\\Pr[A(x)=1_L(x)]\\ge2/3$ for every input $x$. Membership in $\\mathsf P$ requires a deterministic polynomial-time decision algorithm with no errors. Determine whether\n\\[\n \\forall L\\in\\mathsf{BPP},\\quad L\\in\\mathsf P.\n\\]\nThe simulation must work in the ordinary uniform model, not merely through nonuniform advice or for most inputs.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan randomness always be removed from an efficient bounded-error decision algorithm without losing polynomial-time efficiency?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]S. Vadhan, 'Pseudorandomness', Foundations and Trends in Theoretical Computer Science 7(1-3):1-336, 2012.\n\\url{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}.\n\\textit{Formulation source.}\n\\item[S2]CS 6810: Theory of Computing, Lecture 15, March 17, 2026.\n\\url{https://www.cs.cornell.edu/courses/cs6810/2026sp/lec15.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Pseudorandomness Beating the Hybrid Argument for Insensitive Algorithms.\n\\url{https://eccc.weizmann.ac.il/report/2026/082/}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3405.tex",
-    "link": "https://www.unsolvedmath.com/problems/3405",
-    "external_url": "https://www.unsolvedmath.com/problems/3405",
+    "link": "https://www.unsolvedmath.com/problems/OPG-51618",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-51618",
     "sources": [
       {
         "citation": "S. Vadhan, 'Pseudorandomness', Foundations and Trends in Theoretical Computer Science 7(1-3):1-336, 2012.",
@@ -1638,6 +1746,10 @@ var openProblems = {
   },
   "3367": {
     "id": 3367,
+    "problem_number": "OPG-1788",
+    "legacy_ids": [
+      "problem.schanuel-conjecture"
+    ],
     "title": "Schanuel's Conjecture",
     "collection": "ranked",
     "rank": 28,
@@ -1646,8 +1758,8 @@ var openProblems = {
     "exact_target": "Do linearly independent complex numbers, together with their exponentials, always contain at least as much algebraic independence as Schanuel predicts?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nNumbers $z_1,\\ldots,z_n$ are ${\\mathbb{Q}}$-linearly independent when $\\sum_jq_jz_j=0$ with $q_j\\in{\\mathbb{Q}}$ forces all $q_j=0$. The transcendence degree of a field extension is the maximum size of an algebraically independent subset. Schanuel's assertion is\n\\[\n \\dim_{{\\mathbb{Q}}}\\operatorname{span}_{{\\mathbb{Q}}}\\{z_1,\\ldots,z_n\\}=n\n \\quad\\Longrightarrow\\quad\n \\operatorname{trdeg}_{{\\mathbb{Q}}}{\\mathbb{Q}}(z_1,\\ldots,z_n,e^{z_1},\\ldots,e^{z_n})\\ge n.\n\\]\nIt is quantified over every $n\\ge1$ and every such complex tuple; the $z_j$ themselves need not be algebraic.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.mdpi.com/2227-7390/9/7/717}{[S1]}.\n\n\\subsection{Short English statement}\nDo linearly independent complex numbers, together with their exponentials, always contain at least as much algebraic independence as Schanuel predicts?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Schanuel's Conjecture and the Transcendence of Power Towers.\n\\url{https://www.mdpi.com/2227-7390/9/7/717}.\n\\textit{Formulation source.}\n\\item[S2]Combining the conjectures of Schanuel and Zilber-Pink.\n\\url{https://content.ems.press/assets/public/full-texts/serials/rlm/36/3/14299588/online/10.4171-rlm-1086.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Schanuel Property for Elliptic and Quasi-Elliptic Functions.\n\\url{https://webusers.imj-prg.fr/~michel.waldschmidt/articles/pdf/SchanuelPropertyAlmostAll.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3367.tex",
-    "link": "https://www.unsolvedmath.com/problems/3367",
-    "external_url": "https://www.unsolvedmath.com/problems/3367",
+    "link": "https://www.unsolvedmath.com/problems/OPG-1788",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-1788",
     "sources": [
       {
         "citation": "Schanuel's Conjecture and the Transcendence of Power Towers.",
@@ -1695,6 +1807,10 @@ var openProblems = {
   },
   "43": {
     "id": 43,
+    "problem_number": "CS-001",
+    "legacy_ids": [
+      "problem.khots-unique-games-conjecture"
+    ],
     "title": "The Unique Games Conjecture",
     "collection": "ranked",
     "rank": 29,
@@ -1703,8 +1819,8 @@ var openProblems = {
     "exact_target": "Is it computationally intractable to distinguish almost satisfiable permutation constraints from ones where almost none can be satisfied?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $[k]=\\{1,\\ldots,k\\}$, a unique game has a nonempty finite edge set and a permutation $\\pi_e$ of $[k]$ on each directed edge $e=(v,w)$. Its optimum is\n\\[\n \\operatorname{val}(G)=\\max_{L:V\\to[k]}\\frac{\\#\\{e=(v,w):\\pi_e(L(v))=L(w)\\}}{|E|}.\n\\]\nFor every fixed $\\varepsilon,\\delta>0$ with $\\varepsilon+\\delta<1$, some fixed $k$ makes distinguishing $\\operatorname{val}(G)\\ge1-\\varepsilon$ from $\\operatorname{val}(G)\\le\\delta$ NP-hard under deterministic polynomial-time many-one reductions. Intermediate values lie outside the promise. The alphabet size depends on the accuracy parameters, not on the growing input graph.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://cs.nyu.edu/~khot/papers/UGCSurvey.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs it computationally intractable to distinguish almost satisfiable permutation constraints from ones where almost none can be satisfied?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Subhash Khot, On the Unique Games Conjecture, author-hosted survey.\n\\url{https://cs.nyu.edu/~khot/papers/UGCSurvey.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Towards a Proof of the 2-to-1 Games Conjecture.\n\\url{https://theoryofcomputing.org/articles/v021a011/v021a011.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]An Approximate Solution to the Minimum Vertex Cover Problem: The Hallelujah Algorithm.\n\\url{https://www.preprints.org/manuscript/202510.2392}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Vertex Cover Might be Hard to Approximate to within 2-epsilon.\n\\url{https://cims.nyu.edu/~regev/papers/vc_hard.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S5]Sharp Hardness for MAX-3-CUT and Quantum MAX-CUT.\n\\url{https://arxiv.org/abs/2608.00333}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/43.tex",
-    "link": "https://www.unsolvedmath.com/problems/43",
-    "external_url": "https://www.unsolvedmath.com/problems/43",
+    "link": "https://www.unsolvedmath.com/problems/CS-001",
+    "external_url": "https://www.unsolvedmath.com/problems/CS-001",
     "sources": [
       {
         "citation": "Subhash Khot, On the Unique Games Conjecture, author-hosted survey.",
@@ -1760,6 +1876,10 @@ var openProblems = {
   },
   "9400078": {
     "id": 9400078,
+    "problem_number": "AMR-093-0078",
+    "legacy_ids": [
+      "problem.generalized-ramanujan-conjecture-for-gl-n"
+    ],
     "title": "Generalized Ramanujan conjecture for automorphic representations",
     "collection": "ranked",
     "rank": 30,
@@ -1768,8 +1888,8 @@ var openProblems = {
     "exact_target": "Must every local component of a unitary cuspidal automorphic representation satisfy the strongest expected temperedness bound?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nWrite a cuspidal automorphic representation as $\\pi=\\bigotimes'_v\\pi_v$. A unitary irreducible local representation is tempered if it is weakly contained in the regular representation; for the groups in question this also has the usual matrix-coefficient characterization modulo the center. The conjecture is\n\\[\n \\pi\\text{ cuspidal on }\\operatorname{GL}_n({\\mathbb{A}}_F),\\quad\n \\omega_\\pi\\text{ unitary}\\quad\\Longrightarrow\\quad\n \\pi_v\\text{ tempered for every place }v.\n\\]\nAt an unramified finite place, in unitary normalization, this asks that all Satake eigenvalues have absolute value one. The target includes ramified and archimedean places as well.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://web.math.princeton.edu/~sarnak/Preprints/SarnakFieldsNotes.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust every local component of a unitary cuspidal automorphic representation satisfy the strongest expected temperedness bound?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Peter Sarnak, Notes on the Generalized Ramanujan Conjectures, in Harmonic Analysis, the Trace Formula, and Shimura Varieties.\n\\url{https://web.math.princeton.edu/~sarnak/Preprints/SarnakFieldsNotes.pdf}.\n\\textit{Formulation source.}\n\\item[S2]A note on Sarnak's density hypothesis for Sp4.\n\\url{https://ems.press/content/serial-article-files/53056}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Regularized spectral expansion of a Rankin-Selberg period and moments.\n\\url{https://arxiv.org/abs/2609.01358}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400078.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400078",
-    "external_url": "https://www.unsolvedmath.com/problems/9400078",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0078",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0078",
     "sources": [
       {
         "citation": "Peter Sarnak, Notes on the Generalized Ramanujan Conjectures, in Harmonic Analysis, the Trace Formula, and Shimura Varieties.",
@@ -1817,6 +1937,10 @@ var openProblems = {
   },
   "7900001": {
     "id": 7900001,
+    "problem_number": "AMR-078-0001",
+    "legacy_ids": [
+      "problem.anderson-model-extended-states-dimension-at-least-three"
+    ],
     "title": "Extended States in the Anderson Model",
     "collection": "ranked",
     "rank": 31,
@@ -1825,8 +1949,8 @@ var openProblems = {
     "exact_target": "Can weak random disorder in a lattice of dimension at least three be proved to permit an extended-state spectral regime?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor independent identically distributed real random variables $V_x$, the standard lattice Anderson operator on $\\ell^2({\\mathbb{Z}}^d)$ has the form\n\\[\n (H_\\lambda\\psi)(x)=-\\sum_{|y-x|_1=1}\\psi(y)+\\lambda V_x\\psi(x).\n\\]\nFor a vector $\\psi$, its spectral measure is $\\mu_\\psi(B)=\\langle\\psi,1_B(H_\\lambda)\\psi\\rangle$; an absolutely continuous spectral component has density with respect to Lebesgue measure. The central target is a nonzero absolutely continuous spectral subspace in a weak-disorder regime in $d\\ge3$. The catalogue does not specify a probability law or exact energy interval. Those choices must be fixed in a full model-specific theorem. Its additional language about transport and a mobility edge is not, by definition alone, equivalent to existence of absolutely continuous spectrum.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/0709.3707}{[S1]}.\n\n\\subsection{Short English statement}\nCan weak random disorder in a lattice of dimension at least three be proved to permit an extended-state spectral regime?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]W. Kirsch, \"An Invitation to Random Schrodinger Operators\", in Random Schrodinger Operators, Panoramas et Syntheses 25, Societe Mathematique de France, 2008; arXiv:0709.3707.\n\\url{https://arxiv.org/abs/0709.3707}.\n\\textit{Formulation source.}\n\\item[S2]A Note on Extended States on the Bethe Lattice.\n\\url{https://arxiv.org/html/2609.06987v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Self-consistent equations and quantum diffusion for the Anderson model.\n\\url{https://arxiv.org/abs/2506.06468}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7900001.tex",
-    "link": "https://www.unsolvedmath.com/problems/7900001",
-    "external_url": "https://www.unsolvedmath.com/problems/7900001",
+    "link": "https://www.unsolvedmath.com/problems/AMR-078-0001",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-078-0001",
     "sources": [
       {
         "citation": "W. Kirsch, \"An Invitation to Random Schrodinger Operators\", in Random Schrodinger Operators, Panoramas et Syntheses 25, Societe Mathematique de France, 2008; arXiv:0709.3707.",
@@ -1874,6 +1998,10 @@ var openProblems = {
   },
   "30001375": {
     "id": 30001375,
+    "problem_number": "OWR-4135-004",
+    "legacy_ids": [
+      "problem.valiants-algebraic-p-versus-np-conjecture-vp-vnp"
+    ],
     "title": "Permanent\u2013Determinant Separation Through Geometric Complexity Theory",
     "collection": "ranked",
     "rank": 32,
@@ -1882,8 +2010,8 @@ var openProblems = {
     "exact_target": "Can one prove that the permanent requires more than polynomially many arithmetic operations in general algebraic circuits?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor variables $x_{ij}$ over a characteristic-zero field $K$, define\n\\[\n \\operatorname{per}_n(x)=\\sum_{\\sigma\\in S_n}\\prod_{i=1}^n x_{i,\\sigma(i)}.\n\\]\nAn algebraic circuit computes a polynomial using field constants, variables, addition, and multiplication. The class $\\mathsf{VP}$ has polynomially bounded numbers of variables, degrees, and circuit sizes; $\\mathsf{VNP}$ consists of polynomially long Boolean sums of such efficiently computable polynomials. The selected claim is that no polynomial bounds the arithmetic circuit sizes of $\\operatorname{per}_n$, equivalently $\\mathsf{VP}\\ne\\mathsf{VNP}$ in characteristic zero. This is a nonuniform algebraic-operation model, not a bit-complexity assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.prateekdwivedi.in/papers/symACT-confversion.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan one prove that the permanent requires more than polynomially many arithmetic operations in general algebraic circuits?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Dwivedi, Pago, and Seppelt, Lower Bounds in Algebraic Complexity via Symmetry and Homomorphism Polynomials, STOC 2026, Introduction.\n\\url{https://www.prateekdwivedi.in/papers/symACT-confversion.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Symmetric Algebraic Circuits and Homomorphism Polynomials.\n\\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol362-itcs2026/LIPIcs.ITCS.2026.46/LIPIcs.ITCS.2026.46.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Arithmetic circuit lower bounds from sumset expansion.\n\\url{https://eccc.weizmann.ac.il/report/2026/138/}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001375.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001375",
-    "external_url": "https://www.unsolvedmath.com/problems/30001375",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4135-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4135-004",
     "sources": [
       {
         "citation": "Dwivedi, Pago, and Seppelt, Lower Bounds in Algebraic Complexity via Symmetry and Homomorphism Polynomials, STOC 2026, Introduction.",
@@ -1931,6 +2059,10 @@ var openProblems = {
   },
   "30006686": {
     "id": 30006686,
+    "problem_number": "LOCAL-30006686",
+    "legacy_ids": [
+      "problem.basing-one-way-functions-on-np-hardness"
+    ],
     "title": "Basing One-Way Functions on NP-Hardness",
     "collection": "ranked",
     "rank": 33,
@@ -1992,6 +2124,10 @@ var openProblems = {
   },
   "30006687": {
     "id": 30006687,
+    "problem_number": "LOCAL-30006687",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-p-versus-np-conp"
+    ],
     "title": "P versus NP \u2229 coNP",
     "collection": "ranked",
     "rank": 34,
@@ -2049,6 +2185,10 @@ var openProblems = {
   },
   "30006688": {
     "id": 30006688,
+    "problem_number": "LOCAL-30006688",
+    "legacy_ids": [
+      "problem.unconditional-separation-of-bqp-from-the-polynomial-hierarchy"
+    ],
     "title": "Unconditional Separation of BQP from the Polynomial Hierarchy",
     "collection": "ranked",
     "rank": 35,
@@ -2110,6 +2250,10 @@ var openProblems = {
   },
   "45": {
     "id": 45,
+    "problem_number": "HIL-012",
+    "legacy_ids": [
+      "problem.extension-of-kroneckers-theorem-on-abelian-fields-to-any-algebraic-base-field"
+    ],
     "title": "Hilbert's 12th Problem: Extension of Kronecker-Weber Theorem",
     "collection": "ranked",
     "rank": 36,
@@ -2118,8 +2262,8 @@ var openProblems = {
     "exact_target": "Can all abelian number-field extensions be generated by explicit special values, generalizing roots of unity and complex multiplication?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finite extension $L/K$ is abelian if it is Galois and $\\operatorname{Gal}(L/K)$ is commutative. Hilbert's twelfth problem seeks an explicit function-theoretic construction of such extensions for every number field $K$, schematically\n\\[\n L=K\\bigl(f_1(a_1),\\ldots,f_r(a_r)\\bigr),\n\\]\nwhere the functions and allowed evaluation points are themselves explicitly specified from arithmetic data attached to $K$. Merely naming elements already known to generate $L$ is not such a construction. The catalogue records a broad construction program, not a uniquely specified function class or one fixed quantified theorem; admissible notions of explicitness must be stated in any proposed resolution.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://icms.ac.uk/archive/workshop/recent-progress-on-hilberts-12th-problem/}{[S1]}.\n\n\\subsection{Short English statement}\nCan all abelian number-field extensions be generated by explicit special values, generalizing roots of unity and complex multiplication?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]International Centre for Mathematical Sciences, Recent progress on Hilbert's 12th problem (2024).\n\\url{https://icms.ac.uk/archive/workshop/recent-progress-on-hilberts-12th-problem/}.\n\\textit{Formulation source.}\n\\item[S2]Brumer\u2013Stark Units and Explicit Class Field Theory.\n\\url{https://services.math.duke.edu/~dasgupta/papers/Integral-Gross-Stark.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/45.tex",
-    "link": "https://www.unsolvedmath.com/problems/45",
-    "external_url": "https://www.unsolvedmath.com/problems/45",
+    "link": "https://www.unsolvedmath.com/problems/HIL-012",
+    "external_url": "https://www.unsolvedmath.com/problems/HIL-012",
     "sources": [
       {
         "citation": "International Centre for Mathematical Sciences, Recent progress on Hilbert's 12th problem (2024).",
@@ -2152,6 +2296,10 @@ var openProblems = {
   },
   "30006689": {
     "id": 30006689,
+    "problem_number": "LOCAL-30006689",
+    "legacy_ids": [
+      "problem.prove-the-penrose-inequality-or-present-a-counterexample"
+    ],
     "title": "Prove the Penrose inequality or present a counterexample",
     "collection": "ranked",
     "rank": 37,
@@ -2198,6 +2346,10 @@ var openProblems = {
   },
   "30006573": {
     "id": 30006573,
+    "problem_number": "OWR-14299906-010",
+    "legacy_ids": [
+      "problem.higher-dimensional-euclidean-kakeya-conjecture"
+    ],
     "title": "Kakeya Conjecture in Dimensions Four and Higher",
     "collection": "ranked",
     "rank": 38,
@@ -2206,8 +2358,8 @@ var openProblems = {
     "exact_target": "Must a compact set containing a unit segment in every direction have full Hausdorff dimension in every dimension at least four?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $s\\ge0$, Hausdorff measure is obtained from covers by sets of diameter tending to zero, weighting each covering set by its diameter to power $s$. Hausdorff dimension is $\\dim_H E=\\inf\\{s:\\mathcal H^s(E)=0\\}$. A compact Kakeya set satisfies\n\\[\n \\forall v\\in S^{n-1}\\ \\exists a_v\\in{\\mathbb{R}}^n:\\quad\n \\{a_v+tv:0\\le t\\le1\\}\\subseteq E.\n\\]\nThe selected assertion is $\\dim_H E=n$ for every such $E$ and every integer $n\\ge4$. Positive Lebesgue measure is not required, and replacing Hausdorff dimension by a different dimension would change the statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ems.press/journals/rmi/articles/14299708}{[S1]}.\n\n\\subsection{Short English statement}\nMust a compact set containing a unit segment in every direction have full Hausdorff dimension in every dimension at least four?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Mukul Rai Choudhuri, Revista Matematica Iberoamericana 42 (2026), 1227-1256.\n\\url{https://ems.press/journals/rmi/articles/14299708}.\n\\textit{Formulation source.}\n\\item[S2]Fourier analytic properties of Kakeya sets in finite fields.\n\\url{https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/blms.70367}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Lifting curved Kakeya sets to linear Kakeya sets.\n\\url{https://arxiv.org/abs/2609.06299}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]A Unified Geometric Algebra Framework for the Kakeya Conjecture in All Dimensions and Links to the Riemann Zeta Function.\n\\url{https://www.preprints.org/manuscript/202602.1025}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30006573.tex",
-    "link": "https://www.unsolvedmath.com/problems/30006573",
-    "external_url": "https://www.unsolvedmath.com/problems/30006573",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14299906-010",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14299906-010",
     "sources": [
       {
         "citation": "Mukul Rai Choudhuri, Revista Matematica Iberoamericana 42 (2026), 1227-1256.",
@@ -2248,6 +2400,10 @@ var openProblems = {
   },
   "30006690": {
     "id": 30006690,
+    "problem_number": "LOCAL-30006690",
+    "legacy_ids": [
+      "problem.modularity-of-elliptic-curves-over-number-fields"
+    ],
     "title": "Modularity of Elliptic Curves over Number Fields (End_K(E)=Z)",
     "collection": "ranked",
     "rank": 39,
@@ -2298,6 +2454,10 @@ var openProblems = {
   },
   "1162": {
     "id": 1162,
+    "problem_number": "ALG-019",
+    "legacy_ids": [
+      "problem.hilbert-sixteenth-problem-second-part"
+    ],
     "title": "Hilbert's Sixteenth Problem",
     "collection": "ranked",
     "rank": 40,
@@ -2306,8 +2466,8 @@ var openProblems = {
     "exact_target": "How many isolated periodic motions can a planar polynomial differential equation have, and how can those cycles be arranged?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA planar polynomial vector field of degree at most $n$ is\n\\[\n \\dot x=P(x,y),\\qquad\\dot y=Q(x,y),\\qquad P,Q\\in{\\mathbb{R}}[x,y],\\quad\\max(\\deg P,\\deg Q)\\le n.\n\\]\nA limit cycle is an isolated periodic orbit, not an arbitrary member of a continuous family of periodic trajectories. Let $H(n)$ be the supremum of the number of limit cycles over this class. The problem asks for finiteness of $H(n)$, its maximal value, and the possible relative configurations of these cycles for each degree. A bound depending on the individual coefficients is not a uniform degree bound.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://recercat.cat/bitstream/handle/2072/532013/MelnikovMethod.pdf?sequence=1}{[S1]}.\n\n\\subsection{Short English statement}\nHow many isolated periodic motions can a planar polynomial differential equation have, and how can those cycles be arranged?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Luiz Fernando da Silva Gouveia and Joan Torregrosa, The local cyclicity problem. Melnikov method using Lyapunov constants, Proceedings of the Edinburgh Mathematical Society 65 (2022), 356-375, Introduction, p. 356.\n\\url{https://recercat.cat/bitstream/handle/2072/532013/MelnikovMethod.pdf?sequence=1}.\n\\textit{Formulation source.}\n\\item[S2]A note on a recent attempt to solve the second part of Hilbert's 16th Problem.\n\\url{https://arxiv.org/abs/2411.09594}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Pesquisadores da Unesp prop\u00f5em solu\u00e7\u00e3o para desafio matem\u00e1tico em aberto h\u00e1 mais de um s\u00e9culo.\n\\url{https://jornal.unesp.br/2024/09/24/pesquisadores-da-unesp-propoem-solucao-para-desafio-matematico-em-aberto-ha-mais-de-um-seculo/}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1162.tex",
-    "link": "https://www.unsolvedmath.com/problems/1162",
-    "external_url": "https://www.unsolvedmath.com/problems/1162",
+    "link": "https://www.unsolvedmath.com/problems/ALG-019",
+    "external_url": "https://www.unsolvedmath.com/problems/ALG-019",
     "sources": [
       {
         "citation": "Luiz Fernando da Silva Gouveia and Joan Torregrosa, The local cyclicity problem. Melnikov method using Lyapunov constants, Proceedings of the Edinburgh Mathematical Society 65 (2022), 356-375, Introduction, p. 356.",
@@ -2344,6 +2504,10 @@ var openProblems = {
   },
   "30006691": {
     "id": 30006691,
+    "problem_number": "LOCAL-30006691",
+    "legacy_ids": [
+      "problem.the-quantum-pcp-conjecture"
+    ],
     "title": "The Quantum PCP Conjecture",
     "collection": "ranked",
     "rank": 41,
@@ -2386,6 +2550,10 @@ var openProblems = {
   },
   "30006692": {
     "id": 30006692,
+    "problem_number": "LOCAL-30006692",
+    "legacy_ids": [
+      "problem.conformal-field-theory-limit-of-the-critical-three-dimensional-ising-model"
+    ],
     "title": "Conformal Field Theory Limit of the Critical Three-Dimensional Ising Model",
     "collection": "ranked",
     "rank": 42,
@@ -2436,6 +2604,10 @@ var openProblems = {
   },
   "1509": {
     "id": 1509,
+    "problem_number": "NUM-015",
+    "legacy_ids": [
+      "problem.nonexistence-of-landau-siegel-zeros-for-quadratic-dirichlet-l-functions"
+    ],
     "title": "Siegel Zeros",
     "collection": "ranked",
     "rank": 43,
@@ -2444,8 +2616,8 @@ var openProblems = {
     "exact_target": "Can one uniformly exclude exceptionally close real zeros of quadratic Dirichlet $L$-functions near one?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA primitive quadratic character $\\chi$ has minimal modulus, its conductor $q$, and values in $\\{0,\\pm1\\}$. Using its Dirichlet $L$-function, the uniform zero-free assertion is\n\\[\n \\exists\\delta>0\\ \\forall q\\ge3\\ \\forall\\chi\\text{ primitive quadratic of conductor }q,\n \\quad L(\\beta,\\chi)\\ne0\\quad\\bigl(1-\\delta/\\log q<\\beta<1\\bigr).\n\\]\nThe same $\\delta$ must work for all conductors, and only real $\\beta$ are quantified here. A separate positive zero-free radius for each individual character would not establish the target.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2602.03626v1}{[S1]}.\n\n\\subsection{Short English statement}\nCan one uniformly exclude exceptionally close real zeros of quadratic Dirichlet $L$-functions near one?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Rick F. Lu, Asif Zaman and Haonan Zhao, Numerical Computations Concerning Landau\u2013Siegel Zeros; arXiv2602.03626v1 February3,2026.\n\\url{https://arxiv.org/pdf/2602.03626v1}.\n\\textit{Formulation source.}\n\\item[S2]On the Extended, Generalized, and Grand Riemann Hypotheses: A Unified Approach via General Properties of L-Functions, v18.\n\\url{https://www.preprints.org/manuscript/202506.0481/v18}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Numerical Computations concerning Landau\u2013Siegel Zeros.\n\\url{https://arxiv.org/html/2602.03626v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Landau-Siegel zeros of Rankin-Selberg L-functions.\n\\url{https://arxiv.org/abs/2601.04189}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1509.tex",
-    "link": "https://www.unsolvedmath.com/problems/1509",
-    "external_url": "https://www.unsolvedmath.com/problems/1509",
+    "link": "https://www.unsolvedmath.com/problems/NUM-015",
+    "external_url": "https://www.unsolvedmath.com/problems/NUM-015",
     "sources": [
       {
         "citation": "Rick F. Lu, Asif Zaman and Haonan Zhao, Numerical Computations Concerning Landau\u2013Siegel Zeros; arXiv2602.03626v1 February3,2026.",
@@ -2486,6 +2658,10 @@ var openProblems = {
   },
   "30006693": {
     "id": 30006693,
+    "problem_number": "LOCAL-30006693",
+    "legacy_ids": [
+      "problem.grothendieck-standard-conjecture-d"
+    ],
     "title": "Grothendieck's Standard Conjecture D",
     "collection": "ranked",
     "rank": 44,
@@ -2532,6 +2708,10 @@ var openProblems = {
   },
   "30006694": {
     "id": 30006694,
+    "problem_number": "LOCAL-30006694",
+    "legacy_ids": [
+      "problem.the-exponential-time-hypothesis-for-3-sat"
+    ],
     "title": "The Exponential Time Hypothesis for 3-SAT",
     "collection": "ranked",
     "rank": 45,
@@ -2574,6 +2754,10 @@ var openProblems = {
   },
   "30003539": {
     "id": 30003539,
+    "problem_number": "OWR-15577-011",
+    "legacy_ids": [
+      "problem.fourier-restriction-conjecture"
+    ],
     "title": "Sharp Exponents in the Fourier Restriction Conjecture",
     "collection": "ranked",
     "rank": 46,
@@ -2582,8 +2766,8 @@ var openProblems = {
     "exact_target": "Does Fourier restriction to a sphere satisfy every norm estimate allowed by the standard sharp necessary conditions?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a Schwartz function on ${\\mathbb{R}}^d$, set $\\widehat f(\\xi)=\\int f(x)e^{-2\\pi i x\\cdot\\xi}\\,dx$, and let $d\\sigma$ be surface measure on $S^{d-1}$. The restriction estimate is\n\\[\n \\|\\widehat f|_{S^{d-1}}\\|_{L^q(d\\sigma)}\\le C_{d,p,q}\\|f\\|_{L^p({\\mathbb{R}}^d)}.\n\\]\nIn the usual range $1\\le p,q<\\infty$, the conjectured non-endpoint range is $p<2d/(d+1)$ and $q\\le (d-1)p'/(d+1)$, with $p'=p/(p-1)$ and the usual interpretation at $p=1$. The full target asks for the sharp range in every $d\\ge2$; endpoint conventions should be taken from the source, rather than inferred from a schematic inequality.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://cm.episciences.org/13778/pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDoes Fourier restriction to a sphere satisfy every norm estimate allowed by the standard sharp necessary conditions?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Diogo Oliveira e Silva, Communications in Mathematics 32 (2024).\n\\url{https://cm.episciences.org/13778/pdf}.\n\\textit{Formulation source.}\n\\item[S2]Smooth Alpert frames, version 5.\n\\url{https://arxiv.org/abs/2311.03145v5}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]A probabilistic analogue of the Fourier extension conjecture.\n\\url{https://arxiv.org/abs/2311.03145}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]A survey of Stein's restriction conjecture.\n\\url{https://mathematics.stanford.edu/events/survey-steins-restriction-conjecture}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003539.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003539",
-    "external_url": "https://www.unsolvedmath.com/problems/30003539",
+    "link": "https://www.unsolvedmath.com/problems/OWR-15577-011",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-15577-011",
     "sources": [
       {
         "citation": "Diogo Oliveira e Silva, Communications in Mathematics 32 (2024).",
@@ -2624,6 +2808,10 @@ var openProblems = {
   },
   "9400048": {
     "id": 9400048,
+    "problem_number": "AMR-093-0048",
+    "legacy_ids": [
+      "problem.the-fontaine-mazur-conjecture-on-geometric-galois-representations"
+    ],
     "title": "Fontaine\u2013Mazur geometric Galois-representation conjecture",
     "collection": "ranked",
     "rank": 47,
@@ -2632,8 +2820,8 @@ var openProblems = {
     "exact_target": "Must every irreducible Galois representation with the specified arithmetic and local geometric properties arise from algebraic geometry?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $G_K=\\operatorname{Gal}(\\bar K/K)$ and $\\rho:G_K\\to\\operatorname{GL}(V)$ be an irreducible continuous representation over a finite extension of ${\\mathbb{Q}}_\\ell$. Being unramified outside a finite set means inertia acts trivially at all remaining finite places. At $v\\mid\\ell$, being de Rham means the de Rham period module has the full dimension of $V$. The assertion is that\n\\[\n V\\text{ is a subquotient of }H^i_{\\mathrm{\\acute et}}(X_{\\bar K},{\\mathbb{Q}}_\\ell)\\otimes{\\mathbb{Q}}_\\ell(m)\n\\]\nwith coefficients extended to those of $V$, for some smooth projective $X/K$, $i\\ge0$, and $m\\in{\\mathbb{Z}}$. Arbitrary Tate twists are allowed; no nonnegative Hodge--Tate-weight condition is imposed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://math.berkeley.edu/~swshin/FieldRat.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust every irreducible Galois representation with the specified arithmetic and local geometric properties arise from algebraic geometry?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Sug Woo Shin and Nicolas Templier, On fields of rationality for automorphic representations, author version dated 2 July 2014.\n\\url{https://math.berkeley.edu/~swshin/FieldRat.pdf}.\n\\textit{Formulation source.}\n\\item[S2]James Newton, Modularity of Galois Representations and Langlands Functoriality.\n\\url{https://link.springer.com/article/10.1007/s41745-022-00305-0}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Jack A. Thorne, Towards the Fontaine\u2013Mazur conjecture for GL(2).\n\\url{https://arxiv.org/html/2608.07186v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400048.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400048",
-    "external_url": "https://www.unsolvedmath.com/problems/9400048",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0048",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0048",
     "sources": [
       {
         "citation": "Sug Woo Shin and Nicolas Templier, On fields of rationality for automorphic representations, author version dated 2 July 2014.",
@@ -2670,6 +2858,10 @@ var openProblems = {
   },
   "30006695": {
     "id": 30006695,
+    "problem_number": "LOCAL-30006695",
+    "legacy_ids": [
+      "problem.bqp-vs-qma"
+    ],
     "title": "BQP versus QMA",
     "collection": "ranked",
     "rank": 48,
@@ -2720,6 +2912,10 @@ var openProblems = {
   },
   "30006975": {
     "id": 30006975,
+    "problem_number": "LOCAL-30006975",
+    "legacy_ids": [
+      "problem.grothendieck-period-conjecture"
+    ],
     "title": "Grothendieck Period Conjecture",
     "collection": "ranked",
     "rank": 49,
@@ -2766,6 +2962,10 @@ var openProblems = {
   },
   "30006696": {
     "id": 30006696,
+    "problem_number": "LOCAL-30006696",
+    "legacy_ids": [
+      "problem.existence-of-one-way-permutations"
+    ],
     "title": "Existence of One-Way Permutations",
     "collection": "ranked",
     "rank": 50,
@@ -2812,6 +3012,10 @@ var openProblems = {
   },
   "30006697": {
     "id": 30006697,
+    "problem_number": "LOCAL-30006697",
+    "legacy_ids": [
+      "problem.non-perturbative-construction-and-non-triviality-of-4d-euclidean-phi4-quantum-field-theory"
+    ],
     "title": "Non-Perturbative Construction and Non-Triviality of 4D Euclidean Phi4 Quantum Field Theory",
     "collection": "ranked",
     "rank": 51,
@@ -2882,6 +3086,10 @@ var openProblems = {
   },
   "30006698": {
     "id": 30006698,
+    "problem_number": "LOCAL-30006698",
+    "legacy_ids": [
+      "problem.equivalence-of-worst-case-and-average-case-hardness-for-np-excluding-heuristica"
+    ],
     "title": "Equivalence of Worst-Case and Average-Case Hardness for NP (Excluding Heuristica)",
     "collection": "ranked",
     "rank": 52,
@@ -2944,6 +3152,10 @@ var openProblems = {
   },
   "1479": {
     "id": 1479,
+    "problem_number": "TOP-001",
+    "legacy_ids": [
+      "problem.the-baum-connes-conjecture-for-the-k-theory-of-reduced-group-c-algebras"
+    ],
     "title": "Baum-Connes Conjecture",
     "collection": "ranked",
     "rank": 53,
@@ -3010,6 +3222,10 @@ var openProblems = {
   },
   "1179": {
     "id": 1179,
+    "problem_number": "NT-028",
+    "legacy_ids": [
+      "problem.schinzel-s-hypothesis-h-on-simultaneous-prime-values-of-irreducible-polynomials"
+    ],
     "title": "Schinzel's Hypothesis H",
     "collection": "ranked",
     "rank": 54,
@@ -3018,8 +3234,8 @@ var openProblems = {
     "exact_target": "If irreducible integer polynomials have no fixed local obstruction, must they simultaneously take prime values infinitely often?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $f_1,\\ldots,f_r\\in{\\mathbb{Z}}[x]$ be nonconstant irreducible polynomials with positive leading coefficients. The local admissibility condition is\n\\[\n \\forall p\\text{ prime}\\ \\exists n\\in{\\mathbb{Z}}:\\quad p\\nmid\\prod_{i=1}^r f_i(n).\n\\]\nThe proposed conclusion is that $\\{n\\ge1:f_i(n)\\text{ is prime for every }i\\}$ is infinite. Irreducibility is over ${\\mathbb{Q}}$ for primitive integer polynomials; local admissibility excludes fixed prime divisors. No asymptotic frequency is included in this qualitative assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.lms.ac.uk/sites/default/files/inline-files/Scavia%20-%20Arithmetic%20Geometry%20and%20Algebraic%20Groups.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIf irreducible integer polynomials have no fixed local obstruction, must they simultaneously take prime values infinitely often?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Federico Scavia, Arithmetic Geometry and Algebraic Groups, Conjecture 3.1 (2026).\n\\url{https://www.lms.ac.uk/sites/default/files/inline-files/Scavia%20-%20Arithmetic%20Geometry%20and%20Algebraic%20Groups.pdf}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[S2] On The Schinzel\u2013W\u00f3jcik Problem Under Hypothesis H.\n\\url{https://www.cambridge.org/core/journals/mathematical-proceedings-of-the-cambridge-philosophical-society/article/abs/on-the-schinzelwojcik-problem-under-hypothesis-h/C75A7C818639ADA780DE2A47C8BCFA19}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S3] From Golomb to Schinzel.\n\\url{https://www.preprints.org/manuscript/202505.0651}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[E1] Alexei N.\\ Skorobogatov and Efthymios Sofos, \\emph{Schinzel Hypothesis on average and rational points}, Inventiones Mathematicae 231 (2023), 673--739; arXiv:2005.02998; DOI 10.1007/s00222-022-01153-6. Introduction and Theorems 1.1--1.2.\n\\url{https://arxiv.org/abs/2005.02998}.\n{\\small\\textit{Added research source: Fixed-family formulation and coefficient-averaged existence of a simultaneous prime value; the quantifier limitation is retained. Consulted 24 September 2026.}}\n\\item[E2] Tim Browning, Efthymios Sofos and Joni Ter\\\"av\\\"ainen, \\emph{Bateman--Horn, polynomial Chowla and the Hasse principle with probability 1}, arXiv:2212.10373v2, 21 May 2026, Theorems 1.2 and 1.4 and the introduction.\n\\url{https://arxiv.org/abs/2212.10373v2}.\n{\\small\\textit{Added research source: Averaged asymptotics and logarithmic exceptional-proportion savings in coefficient boxes; no result along every fixed affine orbit is assumed. Consulted 24 September 2026.}}\n\\item[E3] John Friedlander and Henryk Iwaniec, \\emph{Asymptotic sieve for primes}, Annals of Mathematics 148 (1998), 1041--1065; arXiv:math/9811186, Section 1.\n\\url{https://arxiv.org/abs/math/9811186}.\n{\\small\\textit{Added research source: Parity obstruction and the need for additional analytic information beyond ordinary congruence counts. Consulted 24 September 2026.}}\n\\item[E4] Huan Xiao, \\emph{From Golomb to Schinzel}, Preprints.org manuscript 202505.0651, version 2, posted 9 June 2025, Section 3, especially the transition from (3.8) to (3.9) and the paragraph following (3.14).\n\\url{https://www.preprints.org/manuscript/202505.0651}.\n{\\small\\textit{Added research source: Claimed solution, not endorsed. The attempt gives a coefficient-level counterexample to the displayed identity and an independent test of the limiting justification. Consulted 24 September 2026.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1179.tex",
-    "link": "https://www.unsolvedmath.com/problems/1179",
-    "external_url": "https://www.unsolvedmath.com/problems/1179",
+    "link": "https://www.unsolvedmath.com/problems/NT-028",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-028",
     "sources": [
       {
         "citation": "Federico Scavia, Arithmetic Geometry and Algebraic Groups, Conjecture 3.1 (2026).",
@@ -3072,6 +3288,10 @@ var openProblems = {
   },
   "9400081": {
     "id": 9400081,
+    "problem_number": "AMR-093-0081",
+    "legacy_ids": [
+      "problem.the-bombieri-lang-conjecture-for-varieties-of-general-type"
+    ],
     "title": "Bombieri\u2013Lang conjecture",
     "collection": "ranked",
     "rank": 55,
@@ -3080,8 +3300,8 @@ var openProblems = {
     "exact_target": "Must rational points on a number-field variety of general type lie in a proper algebraic subset?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a smooth projective variety $X$ of dimension $d$, general type means that its canonical divisor $K_X$ is big, or equivalently its Kodaira dimension $\\kappa(X)$ is $d$. For a general variety, this terminology is interpreted through a smooth projective birational model in the source's convention. The assertion is\n\\[\n \\overline{X(K)}^{\\rm Zar}\\subsetneq X\n\\]\nfor every number field $K$ and every general-type $X/K$ in the chosen scope. Zariski closure is the smallest algebraic closed subset containing the rational points. Non-density is weaker than finiteness in dimensions greater than one.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://doi.org/10.1090/S0273-0979-1986-15426-1}{[S1]}.\n\n\\subsection{Short English statement}\nMust rational points on a number-field variety of general type lie in a proper algebraic subset?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]S. Lang, Bull. Amer. Math. Soc. 14(2):159-205, 1986.\n\\url{https://doi.org/10.1090/S0273-0979-1986-15426-1}.\n\\textit{Formulation source.}\n\\item[S2]Recent progress on the geometric Bombieri\u2013Lang conjecture.\n\\url{https://arxiv.org/html/2607.02165v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]A counting argument for the geometric Bombieri-Lang conjecture on ramified covers of abelian varieties.\n\\url{https://arxiv.org/abs/2511.17010}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400081.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400081",
-    "external_url": "https://www.unsolvedmath.com/problems/9400081",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0081",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0081",
     "sources": [
       {
         "citation": "S. Lang, Bull. Amer. Math. Soc. 14(2):159-205, 1986.",
@@ -3118,6 +3338,10 @@ var openProblems = {
   },
   "30001499": {
     "id": 30001499,
+    "problem_number": "OWR-4341-001",
+    "legacy_ids": [
+      "problem.novikov-conjecture-on-homotopy-invariance-of-higher-signatures"
+    ],
     "title": "Novikov Homotopy Invariance Conjecture",
     "collection": "ranked",
     "rank": 56,
@@ -3126,8 +3350,8 @@ var openProblems = {
     "exact_target": "Are all higher signatures unchanged by orientation-preserving homotopy equivalence of closed manifolds?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $\\pi=\\pi_1(M)$ and let $B\\pi$ be a classifying space with contractible universal cover. A map $r:M\\to B\\pi$ classifies the universal covering. The Hirzebruch class $L(M)\\in\\bigoplus_jH^{4j}(M,{\\mathbb{Q}})$ is the characteristic class built from the Pontryagin classes of $TM$. For $u\\in H^*(B\\pi,{\\mathbb{Q}})$, its higher signature is\n\\[\n \\sigma_u(M,r)=\\langle L(M)\\smile r^*u,[M]\\rangle,\n\\]\nwhere only terms of total degree $\\dim M$ contribute. For every orientation-preserving homotopy equivalence $f:N\\to M$, require $\\sigma_u(N,r\\circ f)=\\sigma_u(M,r)$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aif.centre-mersenne.org/item/10.5802/aif.2049.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre all higher signatures unchanged by orientation-preserving homotopy equivalence of closed manifolds?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Eric Leichtnam and Paolo Piazza, Elliptic Operators and Higher Signatures, Question 1 (2004).\n\\url{https://aif.centre-mersenne.org/item/10.5802/aif.2049.pdf}.\n\\textit{Formulation source.}\n\\item[S2]Novikov's Conjecture.\n\\url{https://arxiv.org/abs/1506.05408}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Quantitative index, Novikov conjecture and coarse decomposability.\n\\url{https://arxiv.org/abs/2412.01314}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Embedding complexity into the universal Banach space and the strong Novikov conjecture.\n\\url{https://arxiv.org/abs/2605.12930}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001499.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001499",
-    "external_url": "https://www.unsolvedmath.com/problems/30001499",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4341-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4341-001",
     "sources": [
       {
         "citation": "Eric Leichtnam and Paolo Piazza, Elliptic Operators and Higher Signatures, Question 1 (2004).",
@@ -3168,6 +3392,10 @@ var openProblems = {
   },
   "30006699": {
     "id": 30006699,
+    "problem_number": "LOCAL-30006699",
+    "legacy_ids": [
+      "problem.permanent-versus-determinant-conjecture"
+    ],
     "title": "Permanent versus Determinant over C",
     "collection": "ranked",
     "rank": 57,
@@ -3214,6 +3442,10 @@ var openProblems = {
   },
   "30006700": {
     "id": 30006700,
+    "problem_number": "LOCAL-30006700",
+    "legacy_ids": [
+      "problem.equivariant-tamagawa-number-conjecture"
+    ],
     "title": "Equivariant Tamagawa number conjecture: Burns-Flach Conjecture4 package",
     "collection": "ranked",
     "rank": 58,
@@ -3260,6 +3492,10 @@ var openProblems = {
   },
   "30006701": {
     "id": 30006701,
+    "problem_number": "LOCAL-30006701",
+    "legacy_ids": [
+      "problem.finiteness-of-the-tate-shafarevich-group-for-elliptic-curves"
+    ],
     "title": "Finiteness of the Tate-Shafarevich Group for Elliptic Curves",
     "collection": "ranked",
     "rank": 59,
@@ -3310,6 +3546,10 @@ var openProblems = {
   },
   "30006702": {
     "id": 30006702,
+    "problem_number": "LOCAL-30006702",
+    "legacy_ids": [
+      "problem.l-p-problem"
+    ],
     "title": "L = P Problem",
     "collection": "ranked",
     "rank": 60,
@@ -3356,6 +3596,10 @@ var openProblems = {
   },
   "20": {
     "id": 20,
+    "problem_number": "ALG-001",
+    "legacy_ids": [
+      "problem.inverse-galois-problem-over-the-rational-numbers"
+    ],
     "title": "Inverse Galois Problem",
     "collection": "ranked",
     "rank": 61,
@@ -3402,6 +3646,10 @@ var openProblems = {
   },
   "1293": {
     "id": 1293,
+    "problem_number": "NT-085",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-dickson-linear-prime-values"
+    ],
     "title": "Dickson's Conjecture",
     "collection": "ranked",
     "rank": 62,
@@ -3410,8 +3658,8 @@ var openProblems = {
     "exact_target": "Must every locally admissible finite family of positive-slope linear forms produce simultaneous primes arbitrarily often?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $f_i(n)=a_in+b_i$ with integers $a_i\\ge1$, define admissibility by the absence of a fixed prime divisor of $\\prod_i f_i(n)$. Explicitly,\n\\[\n \\forall p\\in\\mathcal P\\ \\exists n\\in{\\mathbb{Z}}:\\quad p\\nmid\\prod_i(a_in+b_i).\n\\]\nDickson's assertion is $\\forall X\\ \\exists n>X$ with all $a_in+b_i$ prime. The number of forms is finite and fixed for each assertion. Positivity for large $n$ follows from the positive slopes. The record does not require distinct forms or an asymptotic counting formula.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/0906.3850}{[S1]}.\n\n\\subsection{Short English statement}\nMust every locally admissible finite family of positive-slope linear forms produce simultaneous primes arbitrarily often?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Shaohua Zhang, Notes on Dickson's Conjecture, arXiv:0906.3850v3 (2009).\n\\url{https://arxiv.org/html/0906.3850}.\n\\textit{Formulation source.}\n\\item[S2]An exposition on the supersimplicity of certain expansions of the additive group of the integers.\n\\url{https://arxiv.org/html/2502.03915}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]From Golomb to Schinzel.\n\\url{https://www.preprints.org/manuscript/202505.0651}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1293.tex",
-    "link": "https://www.unsolvedmath.com/problems/1293",
-    "external_url": "https://www.unsolvedmath.com/problems/1293",
+    "link": "https://www.unsolvedmath.com/problems/NT-085",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-085",
     "sources": [
       {
         "citation": "Shaohua Zhang, Notes on Dickson's Conjecture, arXiv:0906.3850v3 (2009).",
@@ -3448,6 +3696,10 @@ var openProblems = {
   },
   "30006703": {
     "id": 30006703,
+    "problem_number": "LOCAL-30006703",
+    "legacy_ids": [
+      "problem.nexp-versus-p-poly"
+    ],
     "title": "NEXP versus P/poly",
     "collection": "ranked",
     "rank": 63,
@@ -3498,6 +3750,10 @@ var openProblems = {
   },
   "30005098": {
     "id": 30005098,
+    "problem_number": "OWR-10252929-011",
+    "legacy_ids": [
+      "problem.vojtas-main-conjecture-on-height-inequalities-in-diophantine-approximation"
+    ],
     "title": "Vojta's Diophantine Approximation Conjecture",
     "collection": "ranked",
     "rank": 64,
@@ -3506,8 +3762,8 @@ var openProblems = {
     "exact_target": "Can unusually close rational approximation to a divisor be uniformly bounded by Vojta's height inequality outside a proper exceptional set?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $h_A$ and $h_{K_X}$ be logarithmic Weil heights for the indicated divisors, defined up to bounded functions. For local Weil functions $\\lambda_{D,v}$, put $m_{D,S}(P)=\\sum_{v\\in S}\\lambda_{D,v}(P)$ with normalized local weights. A simple normal-crossings divisor has components meeting locally like distinct coordinate hyperplanes. For every $\\varepsilon>0$, the assertion is that some proper closed $Z\\subset X$ and constant $C$ satisfy\n\\[\n m_{D,S}(P)+h_{K_X}(P)<\\varepsilon h_A(P)+C\n \\qquad(P\\in X(k)\\setminus Z).\n\\]\nEnlarge $Z$ to include the support of $D$, where the proximity function is not finite. The constant and exceptional set may depend on the fixed data and $\\varepsilon$, but not on $P$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s00605-024-02018-1}{[S1]}.\n\n\\subsection{Short English statement}\nCan unusually close rational approximation to a divisor be uniformly bounded by Vojta's height inequality outside a proper exceptional set?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Yasufuku, GCD inequalities inspired by Vojta's conjecture, Conjecture 8 (2024).\n\\url{https://link.springer.com/article/10.1007/s00605-024-02018-1}.\n\\textit{Formulation source.}\n\\item[S2]Towards Lang--Vojta via Degeneration.\n\\url{https://arxiv.org/abs/2602.06956}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Lang-Vojta conjecture over function fields for very general log projective spaces.\n\\url{https://arxiv.org/abs/2606.14074}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005098.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005098",
-    "external_url": "https://www.unsolvedmath.com/problems/30005098",
+    "link": "https://www.unsolvedmath.com/problems/OWR-10252929-011",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-10252929-011",
     "sources": [
       {
         "citation": "Yasufuku, GCD inequalities inspired by Vojta's conjecture, Conjecture 8 (2024).",
@@ -3544,6 +3800,10 @@ var openProblems = {
   },
   "30006704": {
     "id": 30006704,
+    "problem_number": "LOCAL-30006704",
+    "legacy_ids": [
+      "problem.strong-exponential-time-hypothesis"
+    ],
     "title": "Strong Exponential Time Hypothesis (SETH)",
     "collection": "ranked",
     "rank": 65,
@@ -3590,6 +3850,10 @@ var openProblems = {
   },
   "30006705": {
     "id": 30006705,
+    "problem_number": "LOCAL-30006705",
+    "legacy_ids": [
+      "problem.artins-conjecture-on-the-holomorphy-of-non-abelian-artin-l-functions"
+    ],
     "title": "Artins Conjecture on the Holomorphy of Non-Abelian Artin L-Functions",
     "collection": "ranked",
     "rank": 66,
@@ -3636,6 +3900,10 @@ var openProblems = {
   },
   "30006706": {
     "id": 30006706,
+    "problem_number": "LOCAL-30006706",
+    "legacy_ids": [
+      "problem.modularity-of-elliptic-curves-over-totally-real-fields"
+    ],
     "title": "Modularity of Elliptic Curves over Totally Real Fields",
     "collection": "ranked",
     "rank": 67,
@@ -3682,6 +3950,10 @@ var openProblems = {
   },
   "1452": {
     "id": 1452,
+    "problem_number": "ALG-007",
+    "legacy_ids": [
+      "problem.the-farrell-jones-conjecture-in-algebraic-k-and-l-theory"
+    ],
     "title": "Farrell-Jones Conjecture",
     "collection": "ranked",
     "rank": 68,
@@ -3728,6 +4000,10 @@ var openProblems = {
   },
   "30006707": {
     "id": 30006707,
+    "problem_number": "LOCAL-30006707",
+    "legacy_ids": [
+      "problem.p-versus-nc-1"
+    ],
     "title": "P versus NC^1",
     "collection": "ranked",
     "rank": 69,
@@ -3774,6 +4050,10 @@ var openProblems = {
   },
   "30006708": {
     "id": 30006708,
+    "problem_number": "LOCAL-30006708",
+    "legacy_ids": [
+      "problem.derandomization-of-polynomial-identity-testing"
+    ],
     "title": "Derandomization of Polynomial Identity Testing",
     "collection": "ranked",
     "rank": 70,
@@ -3820,6 +4100,10 @@ var openProblems = {
   },
   "30002589": {
     "id": 30002589,
+    "problem_number": "OWR-12980-010",
+    "legacy_ids": [
+      "problem.deligne-conjecture-on-critical-values-of-motivic-l-functions"
+    ],
     "title": "Deligne's Conjecture for Critical Motive Values",
     "collection": "ranked",
     "rank": 71,
@@ -3828,8 +4112,8 @@ var openProblems = {
     "exact_target": "After normalization by the predicted periods, do all coefficient-field embeddings of a critical motivic $L$-value arise from one element of that field?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a pure motive $M/{\\mathbb{Q}}$ with coefficient field $E$, let $H_B^\\pm(M)$ be the complex-conjugation eigenspaces of its Betti realization and $d_\\pm$ their $E$-dimensions. The periods $c^\\pm(M)$ are determinants of the specified comparison maps to de Rham filtration quotients, defined modulo $E^\\times$. For a critical integer $n$, neither archimedean factor for $M$ at $n$ nor for $M^\\vee$ at $1-n$ has a pole. Put $s=(-1)^n$. The assertion is\n\\[\n \\frac{L(M,n)}{(2\\pi i)^{n d_s}c^s(M)}\\in E\n \\ \\subseteq\\ E\\otimes_{{\\mathbb{Q}}}{\\mathbb{C}}\\simeq\\prod_{\\sigma:E\\hookrightarrow{\\mathbb{C}}}{\\mathbb{C}}.\n\\]\nThe membership is diagonal across all embeddings. The finite $L$-values and compatible realizations are prerequisites; continuation and nonvanishing are not additional conclusions of this period law. The recorded scope fixes the period and sign conventions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ems.press/content/serial-article-files/46514?nt=1}{[S1]}.\n\n\\subsection{Short English statement}\nAfter normalization by the predicted periods, do all coefficient-field embeddings of a critical motivic $L$-value arise from one element of that field?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Kazuki Morimoto, On special values of L-functions for quaternion unitary groups of degree2 and GL(2), Oberwolfach Report22/2014; with Deligne's definitions and twist convention.\n\\url{https://ems.press/content/serial-article-files/46514?nt=1}.\n\\textit{Formulation source.}\n\\item[S2]Factorization of periods, construction of automorphic motives and Deligne's conjecture over CM-fields.\n\\url{https://arxiv.org/abs/2509.02303}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Motivic pieces of curves: L-functions and periods.\n\\url{https://arxiv.org/abs/2601.21934}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002589.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002589",
-    "external_url": "https://www.unsolvedmath.com/problems/30002589",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12980-010",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12980-010",
     "sources": [
       {
         "citation": "Kazuki Morimoto, On special values of L-functions for quaternion unitary groups of degree2 and GL(2), Oberwolfach Report22/2014; with Deligne's definitions and twist convention.",
@@ -3866,6 +4150,10 @@ var openProblems = {
   },
   "30006709": {
     "id": 30006709,
+    "problem_number": "LOCAL-30006709",
+    "legacy_ids": [
+      "problem.termination-of-flips-conjecture-in-the-minimal-model-program"
+    ],
     "title": "Termination of Flips Conjecture in the Minimal Model Program",
     "collection": "ranked",
     "rank": 72,
@@ -3916,6 +4204,10 @@ var openProblems = {
   },
   "30006710": {
     "id": 30006710,
+    "problem_number": "LOCAL-30006710",
+    "legacy_ids": [
+      "problem.non-triviality-of-the-three-dimensional-ising-model"
+    ],
     "title": "Non-Triviality of the Three-Dimensional Ising Model",
     "collection": "ranked",
     "rank": 73,
@@ -3970,6 +4262,10 @@ var openProblems = {
   },
   "1277": {
     "id": 1277,
+    "problem_number": "NT-070",
+    "legacy_ids": [
+      "problem.montgomerys-pair-correlation-conjecture-for-zeros-of-the-riemann-zeta-function"
+    ],
     "title": "Montgomery's Pair Correlation Conjecture",
     "collection": "ranked",
     "rank": 74,
@@ -3978,8 +4274,8 @@ var openProblems = {
     "exact_target": "Do pairs of zeta zeros have the universal repulsion statistics predicted by the sine-kernel law?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nList the positive ordinates $\\gamma$ of nontrivial zeta zeros with their multiplicities, and write $N(T)=\\#\\{0<\\gamma\\le T\\}$. A standard fixed-separation form of the conjecture is, for every $0<a<b$,\n\\[\n \\frac{1}{N(T)}\\#\\left\\{0<\\gamma,\\gamma'\\le T:\n a\\le\\frac{\\log T}{2\\pi}(\\gamma-\\gamma')\\le b\\right\\}\n \\longrightarrow\\int_a^b\\left(1-\\left(\\frac{\\sin\\pi u}{\\pi u}\\right)^2\\right)du.\n\\]\nOnly positive separation is counted, so diagonal terms are absent. The scale $2\\pi/\\log T$ is the mean vertical spacing near height $T$. This is a pair-statistics law, not a claim that consecutive spacings have this density.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2503.15449v4}{[S1]}.\n\n\\subsection{Short English statement}\nDo pairs of zeta zeros have the universal repulsion statistics predicted by the sine-kernel law?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Goldston, Lee, Schettler, and Suriajaya, Pair Correlation Conjecture for the zeros of the Riemann zeta-function I (version 4, 2026), Section 4, PCC.\n\\url{https://arxiv.org/html/2503.15449v4}.\n\\textit{Formulation source.}\n\\item[S2]Variations of the Hardy Z-Function and the Montgomery Pair Correlation Conjecture.\n\\url{https://arxiv.org/abs/2511.18275}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Pair correlation of zeros of Dirichlet L-functions: a possible path towards the conjectures of Chowla, Elliott-Halberstam and Montgomery.\n\\url{https://link.springer.com/article/10.1007/s00208-026-03383-y}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1277.tex",
-    "link": "https://www.unsolvedmath.com/problems/1277",
-    "external_url": "https://www.unsolvedmath.com/problems/1277",
+    "link": "https://www.unsolvedmath.com/problems/NT-070",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-070",
     "sources": [
       {
         "citation": "Goldston, Lee, Schettler, and Suriajaya, Pair Correlation Conjecture for the zeros of the Riemann zeta-function I (version 4, 2026), Section 4, PCC.",
@@ -4016,6 +4312,10 @@ var openProblems = {
   },
   "30006711": {
     "id": 30006711,
+    "problem_number": "LOCAL-30006711",
+    "legacy_ids": [
+      "problem.woodins-ultimate-l-conjecture-for-supercompact-cardinals"
+    ],
     "title": "Woodins Ultimate L Conjecture for Supercompact Cardinals",
     "collection": "ranked",
     "rank": 75,
@@ -4066,6 +4366,10 @@ var openProblems = {
   },
   "30006712": {
     "id": 30006712,
+    "problem_number": "LOCAL-30006712",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-fpt-versus-w1"
+    ],
     "title": "FPT versus W[1]",
     "collection": "ranked",
     "rank": 76,
@@ -4112,6 +4416,10 @@ var openProblems = {
   },
   "30006713": {
     "id": 30006713,
+    "problem_number": "LOCAL-30006713",
+    "legacy_ids": [
+      "problem.chowla-conjecture-on-correlations-of-the-liouville-function"
+    ],
     "title": "Chowla conjecture on correlations of the Liouville function",
     "collection": "ranked",
     "rank": 77,
@@ -4162,6 +4470,10 @@ var openProblems = {
   },
   "30006714": {
     "id": 30006714,
+    "problem_number": "LOCAL-30006714",
+    "legacy_ids": [
+      "problem.abundance-conjecture-for-the-minimal-model-program"
+    ],
     "title": "Abundance Conjecture for the minimal model program",
     "collection": "ranked",
     "rank": 78,
@@ -4212,6 +4524,10 @@ var openProblems = {
   },
   "30006715": {
     "id": 30006715,
+    "problem_number": "LOCAL-30006715",
+    "legacy_ids": [
+      "problem.graph-isomorphism-in-polynomial-time"
+    ],
     "title": "Graph Isomorphism in Polynomial Time",
     "collection": "ranked",
     "rank": 79,
@@ -4262,6 +4578,10 @@ var openProblems = {
   },
   "14": {
     "id": 14,
+    "problem_number": "GT-001",
+    "legacy_ids": [
+      "problem.hadwiger-conjecture"
+    ],
     "title": "Hadwiger Conjecture",
     "collection": "ranked",
     "rank": 80,
@@ -4270,8 +4590,8 @@ var openProblems = {
     "exact_target": "If a graph cannot contain a complete graph of order $t+1$ even after contractions, must $t$ colors suffice?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA graph minor is obtained by vertex deletions, edge deletions, and edge contractions. A proper $t$-coloring is a map $c:V(G)\\to\\{1,\\ldots,t\\}$ with different colors at adjacent vertices. Hadwiger's assertion is\n\\[\n K_{t+1}\\not\\preccurlyeq G\\quad\\Longrightarrow\\quad\\chi(G)\\le t\n\\]\nfor every finite simple graph $G$ and every $t\\ge1$. The complete graph is excluded as a \\emph{minor}, not merely as a subgraph or an induced subgraph.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2208.07338}{[S1]}.\n\n\\subsection{Short English statement}\nIf a graph cannot contain a complete graph of order $t+1$ even after contractions, must $t$ colors suffice?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Lafferty and Song, Every graph with no K\\_8\\textasciicircum{}\\{-4\\} minor is 7-colorable (2022), abstract.\n\\url{https://arxiv.org/abs/2208.07338}.\n\\textit{Formulation source.}\n\\item[S2]Beyond halfway to Hadwiger's conjecture.\n\\url{https://arxiv.org/abs/2609.06867v2}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Disproof of the Odd Hadwiger Conjecture.\n\\url{https://arxiv.org/abs/2512.20392}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/14.tex",
-    "link": "https://www.unsolvedmath.com/problems/14",
-    "external_url": "https://www.unsolvedmath.com/problems/14",
+    "link": "https://www.unsolvedmath.com/problems/GT-001",
+    "external_url": "https://www.unsolvedmath.com/problems/GT-001",
     "sources": [
       {
         "citation": "Lafferty and Song, Every graph with no K\\_8\\textasciicircum{}\\{-4\\} minor is 7-colorable (2022), abstract.",
@@ -4308,6 +4628,10 @@ var openProblems = {
   },
   "1274": {
     "id": 1274,
+    "problem_number": "NT-067",
+    "legacy_ids": [
+      "problem.the-lindeloef-hypothesis-on-the-growth-of-the-riemann-zeta-function"
+    ],
     "title": "Lindel\u00f6f Hypothesis",
     "collection": "ranked",
     "rank": 81,
@@ -4316,8 +4640,8 @@ var openProblems = {
     "exact_target": "Does the zeta function on the critical line grow more slowly than every fixed positive power of height?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $\\zeta$ be the meromorphically continued Riemann zeta function. The Lindel\u00f6f assertion is\n\\[\n \\forall\\varepsilon>0\\ \\exists C_\\varepsilon,T_\\varepsilon>0\\quad\n |\\zeta(\\tfrac12+it)|\\le C_\\varepsilon|t|^\\varepsilon\n \\quad(|t|\\ge T_\\varepsilon).\n\\]\nThus growth on the critical line is smaller than every fixed positive power, with a constant allowed to depend on that power. The statement is a pointwise growth bound, not merely a mean-value estimate.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/jlms.70376}{[S1]}.\n\n\\subsection{Short English statement}\nDoes the zeta function on the critical line grow more slowly than every fixed positive power of height?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Alexandra Florea, A survey of moment bounds for zeta(s): From Heath-Brown's work to the present, Journal of the London Mathematical Society (2026).\n\\url{https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/jlms.70376}.\n\\textit{Formulation source.}\n\\item[S2]Analogues of the Lindel\u00f6f Hypothesis for the Barnes multiple zeta function and related problems.\n\\url{https://arxiv.org/abs/2606.02407}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]An approach to the Lindel\u00f6f Hypothesis for Dirichlet L-functions.\n\\url{https://arxiv.org/abs/2602.05731}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Pseudodifferential arithmetic, Riemann and Lindel\u00f6f hypotheses.\n\\url{https://arxiv.org/abs/2208.12937}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S5]Pseudodifferential arithmetic, Riemann and Lindel\u00f6f hypotheses (withdrawn v48).\n\\url{https://arxiv.org/abs/2208.12937v48}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1274.tex",
-    "link": "https://www.unsolvedmath.com/problems/1274",
-    "external_url": "https://www.unsolvedmath.com/problems/1274",
+    "link": "https://www.unsolvedmath.com/problems/NT-067",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-067",
     "sources": [
       {
         "citation": "Alexandra Florea, A survey of moment bounds for zeta(s): From Heath-Brown's work to the present, Journal of the London Mathematical Society (2026).",
@@ -4373,6 +4697,10 @@ var openProblems = {
   },
   "30006716": {
     "id": 30006716,
+    "problem_number": "LOCAL-30006716",
+    "legacy_ids": [
+      "problem.zilber-pink-conjecture-on-unlikely-intersections"
+    ],
     "title": "Zilber-Pink Conjecture on Unlikely Intersections",
     "collection": "ranked",
     "rank": 82,
@@ -4430,6 +4758,10 @@ var openProblems = {
   },
   "30006717": {
     "id": 30006717,
+    "problem_number": "LOCAL-30006717",
+    "legacy_ids": [
+      "problem.bateman-horn-conjecture"
+    ],
     "title": "Bateman-Horn conjecture",
     "collection": "ranked",
     "rank": 83,
@@ -4487,6 +4819,10 @@ var openProblems = {
   },
   "30002209": {
     "id": 30002209,
+    "problem_number": "OWR-12173-005",
+    "legacy_ids": [
+      "problem.sarnak-s-mobius-randomness-conjecture-for-zero-entropy-systems"
+    ],
     "title": "Sarnak's M\u00f6bius Disjointness Conjecture",
     "collection": "ranked",
     "rank": 84,
@@ -4495,8 +4831,8 @@ var openProblems = {
     "exact_target": "Is the M\u00f6bius function asymptotically uncorrelated with every continuous observable of every zero-entropy dynamical system?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThe M\u00f6bius function is $\\mu(n)=0$ when a prime square divides $n$, and $\\mu(n)=(-1)^r$ when $n$ is a product of $r$ distinct primes. A compact metric system consists of a continuous map $T:X\\to X$; zero topological entropy means its orbit complexity has zero exponential growth rate. The assertion is\n\\[\n \\frac1N\\sum_{n=1}^{N}\\mu(n)f(T^nx)\\longrightarrow0\n \\qquad(f\\in C(X),\\ x\\in X).\n\\]\nEvery point is quantified, not just almost every point under a chosen invariant probability measure. The test functions may be complex-valued.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2603.11087}{[S1]}.\n\n\\subsection{Short English statement}\nIs the M\u00f6bius function asymptotically uncorrelated with every continuous observable of every zero-entropy dynamical system?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Q. Liu, J. Ma, and H. Wang, The Mobius Disjointness Conjecture on infinite-dimensional torus, Introduction (2026).\n\\url{https://arxiv.org/abs/2603.11087}.\n\\textit{Formulation source.}\n\\item[S2]Minimal zero entropy subshifts can be unrestricted along any sparse set.\n\\url{https://www.cambridge.org/core/journals/ergodic-theory-and-dynamical-systems/article/minimal-zero-entropy-subshifts-can-be-unrestricted-along-any-sparse-set/1357B8C6E5361EC6439CEA52634BD7A0}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002209.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002209",
-    "external_url": "https://www.unsolvedmath.com/problems/30002209",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12173-005",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12173-005",
     "sources": [
       {
         "citation": "Q. Liu, J. Ma, and H. Wang, The Mobius Disjointness Conjecture on infinite-dimensional torus, Introduction (2026).",
@@ -4540,6 +4876,10 @@ var openProblems = {
   },
   "30006718": {
     "id": 30006718,
+    "problem_number": "LOCAL-30006718",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-weight-monodromy-conjecture"
+    ],
     "title": "Weight\u2013Monodromy Conjecture",
     "collection": "ranked",
     "rank": 85,
@@ -4590,6 +4930,10 @@ var openProblems = {
   },
   "30006719": {
     "id": 30006719,
+    "problem_number": "LOCAL-30006719",
+    "legacy_ids": [
+      "problem.campana-specialness-potential-density"
+    ],
     "title": "Campana's Conjecture Characterizing Special Varieties by Potential Density of Rational Points",
     "collection": "ranked",
     "rank": 86,
@@ -4628,6 +4972,10 @@ var openProblems = {
   },
   "7800013": {
     "id": 7800013,
+    "problem_number": "AMR-077-0013",
+    "legacy_ids": [
+      "problem.bose-einstein-condensation-in-interacting-continuous-bose-gases"
+    ],
     "title": "Bose-Einstein Condensation in Continuum Models",
     "collection": "ranked",
     "rank": 87,
@@ -4636,8 +4984,8 @@ var openProblems = {
     "exact_target": "Can low-temperature condensation be rigorously established for a specified interacting three-dimensional continuum Bose gas in the thermodynamic limit?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $N$ identical bosons in a box $\\Lambda\\subset{\\mathbb{R}}^3$, a standard interacting Hamiltonian is\n\\[\n H_{N,\\Lambda}=\\sum_{i=1}^N-\\Delta_{x_i}+\\sum_{i<j}v(x_i-x_j)\n\\]\non symmetric wave functions. The one-particle density matrix is $\\gamma(x,y)=\\langle a^*(x)a(y)\\rangle$. Off-diagonal long-range order means that the thermodynamic-limit kernel retains a nonzero long-distance component; in translation-invariant situations this is expressed as $\\lim_{|x-y|\\to\\infty}\\gamma(x,y)>0$. The limit sends $N,|\\Lambda|\\to\\infty$ at fixed density before long-distance analysis. The catalogue does not specify the interaction class, ensemble, boundary conditions, or positive-temperature range. These are necessary additional model data, not grounds for claiming the assertion for every interaction.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://doi.org/10.1007/3-7643-7338-9}{[S1]}.\n\n\\subsection{Short English statement}\nCan low-temperature condensation be rigorously established for a specified interacting three-dimensional continuum Bose gas in the thermodynamic limit?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]E. H. Lieb, R. Seiringer, J. P. Solovej, J. Yngvason, The Mathematics of the Bose Gas, Birkh\u00e4user, 2005.\n\\url{https://doi.org/10.1007/3-7643-7338-9}.\n\\textit{Formulation source.}\n\\item[S2]Bose-Einstein condensation of interacting bosons: A two-step proof.\n\\url{https://arxiv.org/abs/2305.18959}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]The free energy of the interacting Bose gas: A variational description with loops and interlacements.\n\\url{https://www.wias-berlin.de/people/koenig/www/CondensateInterlace.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7800013.tex",
-    "link": "https://www.unsolvedmath.com/problems/7800013",
-    "external_url": "https://www.unsolvedmath.com/problems/7800013",
+    "link": "https://www.unsolvedmath.com/problems/AMR-077-0013",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-077-0013",
     "sources": [
       {
         "citation": "E. H. Lieb, R. Seiringer, J. P. Solovej, J. Yngvason, The Mathematics of the Bose Gas, Birkh\u00e4user, 2005.",
@@ -4674,6 +5022,10 @@ var openProblems = {
   },
   "30006720": {
     "id": 30006720,
+    "problem_number": "LOCAL-30006720",
+    "legacy_ids": [
+      "problem.grothendieck-standard-conjecture-hodge-type"
+    ],
     "title": "Grothendieck Standard Conjecture of Hodge Type",
     "collection": "ranked",
     "rank": 88,
@@ -4720,6 +5072,10 @@ var openProblems = {
   },
   "1296": {
     "id": 1296,
+    "problem_number": "NT-088",
+    "legacy_ids": [
+      "problem.elliott-halberstam-conjecture-on-the-level-of-distribution-of-primes"
+    ],
     "title": "Elliott-Halberstam Conjecture",
     "collection": "ranked",
     "rank": 89,
@@ -4728,8 +5084,8 @@ var openProblems = {
     "exact_target": "Are primes distributed among arithmetic progressions with the predicted strong averaged accuracy for moduli almost as large as the search range?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $\\Lambda(n)=\\log p$ if $n=p^m$ for a prime $p$ and $m\\ge1$, and zero otherwise. Put $\\psi(y;q,a)=\\sum_{n\\le y,\\,n\\equiv a\\ (q)}\\Lambda(n)$ and let $\\varphi(q)$ be Euler's totient. The assertion is\n\\[\n \\sum_{q\\le x^\\theta}\\max_{\\gcd(a,q)=1}\\ \\max_{2\\le y\\le x}\n \\left|\\psi(y;q,a)-\\frac{y}{\\varphi(q)}\\right|\n \\ll_{A,\\theta}\\frac{x}{(\\log x)^A}\n\\]\nfor every fixed $A>0$ and $0<\\theta<1$. The implicit constant is uniform in $x$, the residue class, and the modulus within the displayed range.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/Elliott-HalberstamConjecture.html}{[S1]}.\n\n\\subsection{Short English statement}\nAre primes distributed among arithmetic progressions with the predicted strong averaged accuracy for moduli almost as large as the search range?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Weisstein, E. W., Elliott-Halberstam Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.\n\\url{https://mathworld.wolfram.com/Elliott-HalberstamConjecture.html}.\n\\textit{Formulation source.}\n\\item[S2]Pair Correlation of zeros of Dirichlet L-Functions: A possible path towards the conjectures of Chowla, Elliott-Halberstam and Montgomery.\n\\url{https://arxiv.org/abs/2411.19762}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Primes in arithmetic progressions to large moduli III: Uniform residue classes.\n\\url{https://arxiv.org/html/2006.08250}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1296.tex",
-    "link": "https://www.unsolvedmath.com/problems/1296",
-    "external_url": "https://www.unsolvedmath.com/problems/1296",
+    "link": "https://www.unsolvedmath.com/problems/NT-088",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-088",
     "sources": [
       {
         "citation": "Weisstein, E. W., Elliott-Halberstam Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.",
@@ -4766,6 +5122,10 @@ var openProblems = {
   },
   "30006721": {
     "id": 30006721,
+    "problem_number": "LOCAL-30006721",
+    "legacy_ids": [
+      "problem.pspace-versus-exptime"
+    ],
     "title": "PSPACE versus EXPTIME",
     "collection": "ranked",
     "rank": 90,
@@ -4812,6 +5172,10 @@ var openProblems = {
   },
   "30006722": {
     "id": 30006722,
+    "problem_number": "LOCAL-30006722",
+    "legacy_ids": [
+      "problem.grothendieck-teichmuller-conjecture"
+    ],
     "title": "Grothendieck\u2013Teichm\u00fcller Conjecture",
     "collection": "ranked",
     "rank": 91,
@@ -4862,6 +5226,10 @@ var openProblems = {
   },
   "30006723": {
     "id": 30006723,
+    "problem_number": "LOCAL-30006723",
+    "legacy_ids": [
+      "problem.the-mumford-tate-conjecture-for-abelian-varieties-over-number-fields"
+    ],
     "title": "The Mumford-Tate Conjecture for Abelian Varieties over Number Fields",
     "collection": "ranked",
     "rank": 92,
@@ -4904,6 +5272,10 @@ var openProblems = {
   },
   "30006724": {
     "id": 30006724,
+    "problem_number": "LOCAL-30006724",
+    "legacy_ids": [
+      "problem.entanglement-area-law-for-2d-gapped-quantum-systems"
+    ],
     "title": "Entanglement Area Law for 2D Gapped Quantum Systems",
     "collection": "ranked",
     "rank": 93,
@@ -4946,6 +5318,10 @@ var openProblems = {
   },
   "30006725": {
     "id": 30006725,
+    "problem_number": "LOCAL-30006725",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-absolute-hodge-conjecture"
+    ],
     "title": "Deligne's Absolute Hodge Conjecture",
     "collection": "ranked",
     "rank": 94,
@@ -4984,6 +5360,10 @@ var openProblems = {
   },
   "1284": {
     "id": 1284,
+    "problem_number": "NT-076",
+    "legacy_ids": [
+      "problem.littlewood-conjecture"
+    ],
     "title": "Littlewood Conjecture",
     "collection": "ranked",
     "rank": 95,
@@ -4992,8 +5372,8 @@ var openProblems = {
     "exact_target": "Can any two real numbers be simultaneously approximated with a common denominator so that Littlewood's scaled error product becomes arbitrarily small?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $x\\in{\\mathbb{R}}$, write $\\|x\\|=\\min_{m\\in{\\mathbb{Z}}}|x-m|$, its distance to the nearest integer. The assertion is\n\\[\n \\forall\\alpha,\\beta\\in{\\mathbb{R}},\\qquad\n \\liminf_{q\\to\\infty,\\ q\\in{\\mathbb{Z}}_{>0}}q\\|q\\alpha\\|\\|q\\beta\\|=0.\n\\]\nEquivalently, for every $\\varepsilon>0$ and every threshold $Q$ there is $q>Q$ with the displayed product below $\\varepsilon$. Both numbers are approximated using the same denominator. No irrationality or independence hypothesis is imposed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2307.00955v3}{[S1]}.\n\n\\subsection{Short English statement}\nCan any two real numbers be simultaneously approximated with a common denominator so that Littlewood's scaled error product becomes arbitrarily small?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Steven Robertson, Combinatorics on Number Walls and the P(t)-adic Littlewood Conjecture, Section 1, 2025 revision.\n\\url{https://arxiv.org/html/2307.00955v3}.\n\\textit{Formulation source.}\n\\item[S2]Disproof of the uniform Littlewood conjecture.\n\\url{https://arxiv.org/abs/2603.12611}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]The uniform Littlewood conjecture fails on a set of positive Hausdorff dimension.\n\\url{https://arxiv.org/abs/2608.25059}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1284.tex",
-    "link": "https://www.unsolvedmath.com/problems/1284",
-    "external_url": "https://www.unsolvedmath.com/problems/1284",
+    "link": "https://www.unsolvedmath.com/problems/NT-076",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-076",
     "sources": [
       {
         "citation": "Steven Robertson, Combinatorics on Number Walls and the P(t)-adic Littlewood Conjecture, Section 1, 2025 revision.",
@@ -5030,6 +5410,10 @@ var openProblems = {
   },
   "30006726": {
     "id": 30006726,
+    "problem_number": "LOCAL-30006726",
+    "legacy_ids": [
+      "problem.green-griffiths-lang-conjecture-on-entire-curves-in-varieties-of-general-type"
+    ],
     "title": "Green-Griffiths-Lang Conjecture on entire curves in varieties of general type",
     "collection": "ranked",
     "rank": 96,
@@ -5080,6 +5464,10 @@ var openProblems = {
   },
   "30006474": {
     "id": 30006474,
+    "problem_number": "OWR-14299578-006",
+    "legacy_ids": [
+      "problem.effective-mordell-conjecture-for-curves-of-genus-at-least-two"
+    ],
     "title": "Effective Mordell Bounds for Rational Points",
     "collection": "ranked",
     "rank": 97,
@@ -5088,8 +5476,8 @@ var openProblems = {
     "exact_target": "Can all rational points on every number-field curve of genus at least two be computed with a guaranteed stopping certificate?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA logarithmic height on a projective curve can be fixed by an explicit embedding into projective space. For an explicitly given smooth projective curve $X/K$ of genus at least two, seek an effectively computable constant $B_X$ with\n\\[\n h(P)\\le B_X\\qquad(P\\in X(K)),\n\\]\nor a terminating algorithm returning the entire finite set $X(K)$. Inputs include effective equations and number-field data. A finiteness proof without computable stopping information is not an effective solution; nor is a search that keeps finding points without certifying that none remain.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2503.10443}{[S1]}.\n\n\\subsection{Short English statement}\nCan all rational points on every number-field curve of genus at least two be computed with a guaranteed stopping certificate?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Natalia Garcia-Fritz and Hector Pasten, \"Effective Mordell for curves with enough automorphisms\", arXiv:2503.10443 [math.NT], v1 dated 13 March 2025.\n\\url{https://arxiv.org/pdf/2503.10443}.\n\\textit{Formulation source.}\n\\item[S2]Effective Mordell for curves with enough automorphisms.\n\\url{https://arxiv.org/abs/2503.10443}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Computing genus 2 curves over Q whose Jacobian has good reduction away from 2.\n\\url{https://warwick.ac.uk/fac/sci/maths/people/staff/visser/bmc2024_slides.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30006474.tex",
-    "link": "https://www.unsolvedmath.com/problems/30006474",
-    "external_url": "https://www.unsolvedmath.com/problems/30006474",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14299578-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14299578-006",
     "sources": [
       {
         "citation": "Natalia Garcia-Fritz and Hector Pasten, \"Effective Mordell for curves with enough automorphisms\", arXiv:2503.10443 [math.NT], v1 dated 13 March 2025.",
@@ -5126,6 +5514,10 @@ var openProblems = {
   },
   "30004948": {
     "id": 30004948,
+    "problem_number": "OWR-8415364-006",
+    "legacy_ids": [
+      "problem.kannan-lovasz-simonovits-conjecture-on-isoperimetry-of-log-concave-measures"
+    ],
     "title": "Kannan\u2013Lov\u00e1sz\u2013Simonovits Isoperimetric Conjecture",
     "collection": "ranked",
     "rank": 98,
@@ -5134,8 +5526,8 @@ var openProblems = {
     "exact_target": "For log-concave distributions, are halfspaces always within a universal factor of the worst possible isoperimetric bottleneck?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a log-concave probability density $e^{-V}$ on its affine support, $V$ is convex. Define the outer boundary measure by $\\mu^+(B)=\\liminf_{\\varepsilon\\downarrow0}(\\mu(B_\\varepsilon)-\\mu(B))/\\varepsilon$, and\n\\[\n h(\\mu)=\\inf_{0<\\mu(B)<1}\\frac{\\mu^+(B)}{\\min(\\mu(B),1-\\mu(B))}.\n\\]\nThe halfspace form asks for $h(\\mu)\\ge c\\,h_{\\rm half}(\\mu)$, where the latter infimum is restricted to halfspaces and $c>0$ is universal. The dimension-free covariance formulation is $h(\\mu)\\ge c/\\sqrt{\\|\\operatorname{Cov}(\\mu)\\|_{\\rm op}}$. Work on the affine support for degenerate measures; point masses require the corresponding trivial convention.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2603.29571}{[S1]}.\n\n\\subsection{Short English statement}\nFor log-concave distributions, are halfspaces always within a universal factor of the worst possible isoperimetric bottleneck?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Afonso S. Bandeira, Daniil Dmitriev, Kevin Lucca, Petar Nizi\u0107-Nikolac, and Almut R\u00f6dder, \"Randomstrasse101: Open Problems of 2025,\" arXiv:2603.29571, 2026.\n\\url{https://arxiv.org/pdf/2603.29571}.\n\\textit{Formulation source.}\n\\item[S2]The KLS constant is O(log\\textasciicircum{}\\{1/4\\} n).\n\\url{https://arxiv.org/abs/2607.24164}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Spectral and Isoperimetric Bounds on Flat Tori.\n\\url{https://arxiv.org/html/2608.13052v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Digesting the proof of the sharp thin-shell inequality.\n\\url{https://www.weizmann.ac.il/math/klartag/sites/math.klartag/files/uploads/sharp_thin.pdf}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004948.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004948",
-    "external_url": "https://www.unsolvedmath.com/problems/30004948",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415364-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415364-006",
     "sources": [
       {
         "citation": "Afonso S. Bandeira, Daniil Dmitriev, Kevin Lucca, Petar Nizi\u0107-Nikolac, and Almut R\u00f6dder, \"Randomstrasse101: Open Problems of 2025,\" arXiv:2603.29571, 2026.",
@@ -5176,6 +5568,10 @@ var openProblems = {
   },
   "30006727": {
     "id": 30006727,
+    "problem_number": "LOCAL-30006727",
+    "legacy_ids": [
+      "problem.l-versus-nl"
+    ],
     "title": "L versus NL",
     "collection": "ranked",
     "rank": 99,
@@ -5214,6 +5610,10 @@ var openProblems = {
   },
   "30006728": {
     "id": 30006728,
+    "problem_number": "LOCAL-30006728",
+    "legacy_ids": [
+      "problem.grothendiecks-section-conjecture-in-anabelian-geometry"
+    ],
     "title": "Grothendiecks Section Conjecture in Anabelian Geometry",
     "collection": "ranked",
     "rank": 100,
@@ -5248,6 +5648,10 @@ var openProblems = {
   },
   "9400079": {
     "id": 9400079,
+    "problem_number": "AMR-093-0079",
+    "legacy_ids": [
+      "problem.selberg-1-4-conjecture"
+    ],
     "title": "Selberg's 1/4 conjecture",
     "collection": "ranked",
     "rank": 101,
@@ -5256,8 +5660,8 @@ var openProblems = {
     "exact_target": "Do all congruence hyperbolic surfaces have a spectral gap of at least one quarter above the constant functions?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThe upper half-plane $\\mathbb H=\\{x+iy:y>0\\}$ has hyperbolic metric $y^{-2}(dx^2+dy^2)$ and nonnegative Laplacian $\\Delta=-y^2(\\partial_x^2+\\partial_y^2)$. A congruence subgroup contains a principal subgroup $\\Gamma(N)$ for some $N$. On its finite-area quotient, the assertion excludes any nonconstant $L^2$ eigenfunction with\n\\[\n \\Delta f=\\lambda f,\\qquad0<\\lambda<\\tfrac14.\n\\]\nThis formulation remains meaningful for noncompact quotients, where a continuous spectrum is also present; ``first nonzero eigenvalue'' is understood as the bottom of the nonconstant spectral range when necessary.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ma.huji.ac.il/~alexlub/BOOKS/On%20property/On%20property.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDo all congruence hyperbolic surfaces have a spectral gap of at least one quarter above the constant functions?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Formal statement, Chapter 4, Selberg property.\n\\url{https://www.ma.huji.ac.il/~alexlub/BOOKS/On%20property/On%20property.pdf}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[S2] Asymptotic independence for random permutations from surface groups.\n\\url{https://link.springer.com/article/10.1007/s10711-025-01003-8}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[S3] Twist-minimal trace formulas and the Selberg eigenvalue conjecture.\n\\url{https://arxiv.org/abs/1803.06016}.\n{\\small\\textit{Catalogue research/status reference; not a proof endorsement.}}\n\\item[E1]\nA. Pascadi, \\emph{Large sieve inequalities for exceptional Maass forms and\nthe greatest prime factor of $n^2+1$}, Forum of Mathematics, Pi \\textbf{14}\n(2026), e8; arXiv:2404.04239v3, 15 January 2026. Introduction and Theorem C\n(the Kim--Sarnak $7/64$ bound), and the exceptional-spectrum large-sieve\nresults. \\url{https://arxiv.org/html/2404.04239v3}.\n\\url{https://doi.org/10.1017/fmp.2026.10025}.\n{\\small\\textit{Consulted 25 September 2026; weighted estimates are not an\nexclusion of exceptional eigenvalues.}}\n\\item[E2]\nG. Cherubini and M. S. Risager, \\emph{On the variance of the error term in\nthe hyperbolic circle problem}, Revista Matem\\'atica Iberoamericana\n\\textbf{34} (2018), no.~2, 655--685, DOI 10.4171/RMI/1000.\nSection 2, transform convention and pre-trace formula (2.2); equation (1.2)\nfor the main term including small eigenvalues; Section 4 for smoothing and\nabsolute convergence.\n\\url{https://ems.press/content/serial-article-files/38698}.\n{\\small\\textit{Consulted 25 September 2026.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400079.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400079",
-    "external_url": "https://www.unsolvedmath.com/problems/9400079",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0079",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0079",
     "sources": [
       {
         "citation": "Formal statement, Chapter 4, Selberg property.",
@@ -5302,6 +5706,10 @@ var openProblems = {
   },
   "1292": {
     "id": 1292,
+    "problem_number": "NT-084",
+    "legacy_ids": [
+      "problem.bunyakovsky-conjecture"
+    ],
     "title": "Bunyakovsky Conjecture",
     "collection": "ranked",
     "rank": 102,
@@ -5310,8 +5718,8 @@ var openProblems = {
     "exact_target": "Must every irreducible positive-leading integer polynomial without a fixed prime divisor produce infinitely many primes?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a nonconstant integer polynomial $f$, a fixed prime divisor is a prime $p$ dividing $f(n)$ for every integer $n$. Suppose $f$ is irreducible over ${\\mathbb{Q}}$, primitive, and has positive leading coefficient, with\n\\[\n \\forall p\\in\\mathcal P\\ \\exists n\\in{\\mathbb{Z}}:\\ p\\nmid f(n).\n\\]\nThe assertion is that the set $\\{n\\in{\\mathbb{Z}}_{>0}:f(n)\\in\\mathcal P\\}$ is infinite. Positive leading coefficient ensures that signs cannot obstruct eventual positive prime values. No explicit count or density is required.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/BouniakowskyConjecture.html}{[S1]}.\n\n\\subsection{Short English statement}\nMust every irreducible positive-leading integer polynomial without a fixed prime divisor produce infinitely many primes?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Eric W. Weisstein with Ed Pegg Jr., Bouniakowsky Conjecture, MathWorld--A Wolfram Resource.\n\\url{https://mathworld.wolfram.com/BouniakowskyConjecture.html}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[E1]\nR. J. Lemke Oliver, \\emph{Almost-primes represented by quadratic polynomials},\nActa Arithmetica \\textbf{151} (2012), no.~3, 241--261.\nTheorem 1 (squarefree $P_2$ values for admissible quadratics), and Section 2.2,\nLemma 2 (the linear-sieve functions and bilinear remainder).\n\\url{https://lemkeoliver.github.io/papers/04-Quadratic.pdf}.\n{\\small\\textit{Author's manuscript consulted 25 September 2026.}}\n\\item[E2]\nT. Browning, E. Sofos, and J. Ter\\\"av\\\"ainen,\n\\emph{Bateman--Horn, polynomial Chowla and the Hasse principle with\nprobability 1}, arXiv:2212.10373v2, 21 May 2026.\nTheorems 1.2 and 1.5, including the coefficient-box and exceptional-set\nquantifiers. \\url{https://arxiv.org/html/2212.10373v2}.\n{\\small\\textit{Consulted 25 September 2026; results averaged over\npolynomials are distinguished from an assertion for every fixed polynomial.}}\n\\item[E3]\nL. Grimmelt and J. Merikoski,\n\\emph{On the greatest prime factor and uniform equidistribution of quadratic\npolynomials}, arXiv:2505.00493 (2025), abstract and introduction,\nthe $n^{1.312}$ greatest-prime-factor bound for $n^2+1$.\n\\url{https://arxiv.org/abs/2505.00493}.\n{\\small\\textit{Consulted 25 September 2026; a greatest-prime-factor result,\nnot a prime-values theorem.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1292.tex",
-    "link": "https://www.unsolvedmath.com/problems/1292",
-    "external_url": "https://www.unsolvedmath.com/problems/1292",
+    "link": "https://www.unsolvedmath.com/problems/NT-084",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-084",
     "sources": [
       {
         "citation": "Eric W. Weisstein with Ed Pegg Jr., Bouniakowsky Conjecture, MathWorld--A Wolfram Resource.",
@@ -5352,6 +5760,10 @@ var openProblems = {
   },
   "30006729": {
     "id": 30006729,
+    "problem_number": "LOCAL-30006729",
+    "legacy_ids": [
+      "problem.two-dimensional-jacobian-conjecture-in-characteristic-zero"
+    ],
     "title": "Two-Dimensional Jacobian Conjecture in Characteristic Zero",
     "collection": "ranked",
     "rank": 103,
@@ -5402,6 +5814,10 @@ var openProblems = {
   },
   "30006730": {
     "id": 30006730,
+    "problem_number": "LOCAL-30006730",
+    "legacy_ids": [
+      "problem.superpolynomial-lower-bounds-for-frege-propositional-proof-systems"
+    ],
     "title": "Superpolynomial Lower Bounds for Frege Propositional Proof Systems",
     "collection": "ranked",
     "rank": 104,
@@ -5440,6 +5856,10 @@ var openProblems = {
   },
   "9400090": {
     "id": 9400090,
+    "problem_number": "AMR-093-0090",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-classical-szpiro-discriminantconductor-conjecture-over-q"
+    ],
     "title": "Szpiro's conjecture",
     "collection": "ranked",
     "rank": 105,
@@ -5448,8 +5868,8 @@ var openProblems = {
     "exact_target": "Can every elliptic curve's minimal discriminant be bounded uniformly by essentially the sixth power of its conductor?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an elliptic curve $E/{\\mathbb{Q}}$, $\\Delta_E\\in{\\mathbb{Z}}\\setminus\\{0\\}$ is the discriminant of a global minimal Weierstrass equation. Its conductor $N_E=\\prod_p p^{f_p}$ records the local conductor exponents of its Tate-module representation. The conjecture is\n\\[\n \\forall\\varepsilon>0\\ \\exists C_\\varepsilon>0\\ \\forall E/{\\mathbb{Q}}:\\qquad\n |\\Delta_E|\\le C_\\varepsilon N_E^{6+\\varepsilon}.\n\\]\nThe constant is independent of the curve. The selected exponent is the classical $6+\\varepsilon$ conductor--discriminant bound, not a differently normalized modified Szpiro assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2308.07114}{[S1]}.\n\n\\subsection{Short English statement}\nCan every elliptic curve's minimal discriminant be bounded uniformly by essentially the sixth power of its conductor?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]H. Pasten, Szpiro's conjecture when the denominator of the j-invariant is small, arXiv v2 (15 August 2023).\n\\url{https://arxiv.org/html/2308.07114}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400090.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400090",
-    "external_url": "https://www.unsolvedmath.com/problems/9400090",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0090",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0090",
     "sources": [
       {
         "citation": "H. Pasten, Szpiro's conjecture when the denominator of the j-invariant is small, arXiv v2 (15 August 2023).",
@@ -5478,6 +5898,10 @@ var openProblems = {
   },
   "1153": {
     "id": 1153,
+    "problem_number": "NT-022",
+    "legacy_ids": [
+      "problem.polignac-s-conjecture"
+    ],
     "title": "Polignac's Conjecture",
     "collection": "ranked",
     "rank": 106,
@@ -5486,8 +5910,8 @@ var openProblems = {
     "exact_target": "Choose any positive even gap. Must that exact spacing recur between neighboring primes arbitrarily far along the prime sequence?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nWrite $p_1<p_2<\\cdots$ for the increasing sequence of primes. Polignac's assertion is\n\\[\n \\forall k\\in{\\mathbb{Z}}_{>0}\\ \\forall N\\ \\exists n>N:\\qquad p_{n+1}-p_n=2k.\n\\]\nConsecutiveness means there is no other prime between the pair. Finding infinitely many pairs of primes at distance $2k$ without this condition would be a different and potentially weaker assertion for $k>1$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathoverflow.net/questions/416389/what-is-the-importance-of-polignac-s-conjecture}{[S1]}.\n\n\\subsection{Short English statement}\nChoose any positive even gap. Must that exact spacing recur between neighboring primes arbitrarily far along the prime sequence?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]MathOverflow contributors, What is the importance of Polignac's Conjecture? (2022).\n\\url{https://mathoverflow.net/questions/416389/what-is-the-importance-of-polignac-s-conjecture}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1153.tex",
-    "link": "https://www.unsolvedmath.com/problems/1153",
-    "external_url": "https://www.unsolvedmath.com/problems/1153",
+    "link": "https://www.unsolvedmath.com/problems/NT-022",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-022",
     "sources": [
       {
         "citation": "MathOverflow contributors, What is the importance of Polignac's Conjecture? (2022).",
@@ -5516,6 +5940,10 @@ var openProblems = {
   },
   "30006731": {
     "id": 30006731,
+    "problem_number": "LOCAL-30006731",
+    "legacy_ids": [
+      "problem.unbounded-ranks-of-elliptic-curves-over-q"
+    ],
     "title": "Unbounded Ranks of Elliptic Curves over Q",
     "collection": "ranked",
     "rank": 107,
@@ -5554,6 +5982,10 @@ var openProblems = {
   },
   "3034": {
     "id": 3034,
+    "problem_number": "OPG-36697",
+    "legacy_ids": [
+      "problem.invariant-subspace-problem-for-hilbert-space-operators"
+    ],
     "title": "Invariant subspace problem",
     "collection": "ranked",
     "rank": 108,
@@ -5562,8 +5994,8 @@ var openProblems = {
     "exact_target": "Must every bounded operator on a separable complex Hilbert space preserve some proper nonzero closed subspace?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA complex Hilbert space is separable if it has a countable dense subset. A bounded operator $T:H\\to H$ is linear and satisfies $\\|Tx\\|\\le C\\|x\\|$. A closed linear subspace $M$ is invariant if $T(M)\\subseteq M$. The assertion is\n\\[\n \\forall T\\in\\mathcal B(H)\\ \\exists M\\subset H:\\qquad\n M\\text{ closed},\\quad\\{0\\}\\ne M\\ne H,\\quad T(M)\\subseteq M.\n\\]\nThe subspace need not be reducing: invariance under the adjoint $T^*$ is not required. The field is complex and $H$ is infinite-dimensional.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2507.21834}{[S1]}.\n\n\\subsection{Short English statement}\nMust every bounded operator on a separable complex Hilbert space preserve some proper nonzero closed subspace?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]I. Chalendar and J. R. Partington, \"Recent perspectives on the Invariant Subspace Problem,\" arXiv:2507.21834 (29 Jul 2025).\n\\url{https://arxiv.org/pdf/2507.21834}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3034.tex",
-    "link": "https://www.unsolvedmath.com/problems/3034",
-    "external_url": "https://www.unsolvedmath.com/problems/3034",
+    "link": "https://www.unsolvedmath.com/problems/OPG-36697",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-36697",
     "sources": [
       {
         "citation": "I. Chalendar and J. R. Partington, \"Recent perspectives on the Invariant Subspace Problem,\" arXiv:2507.21834 (29 Jul 2025).",
@@ -5592,6 +6024,10 @@ var openProblems = {
   },
   "30006732": {
     "id": 30006732,
+    "problem_number": "LOCAL-30006732",
+    "legacy_ids": [
+      "problem.global-regularity-of-the-3d-incompressible-magnetohydrodynamic-equations"
+    ],
     "title": "Global Regularity of the 3D Incompressible Magnetohydrodynamic Equations",
     "collection": "ranked",
     "rank": 109,
@@ -5630,6 +6066,10 @@ var openProblems = {
   },
   "1369": {
     "id": 1369,
+    "problem_number": "GEOM-010",
+    "legacy_ids": [
+      "problem.coding-theory-and-combinatorics-problem-cc-8-exact-kissing-numbers-in-higher-dimensions-n-4"
+    ],
     "title": "Kissing Number Problem",
     "collection": "ranked",
     "rank": 110,
@@ -5638,8 +6078,8 @@ var openProblems = {
     "exact_target": "Exactly how many equal balls can simultaneously touch one equal central ball in each Euclidean dimension greater than four?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAfter scaling the centers of touching unit balls to the unit sphere, the kissing number has the equivalent finite-dimensional definition\n\\[\n \\tau_n=\\max\\bigl\\{|X|:X\\subset S^{n-1},\\ \\langle x,y\\rangle\\le\\tfrac12\n                                  \\text{ for distinct }x,y\\in X\\bigr\\}.\n\\]\nThe inner-product condition is equivalent to angular separation at least $\\pi/3$. The problem asks for the exact integer $\\tau_n$ for every $n>4$, not only asymptotic bounds or the best lattice configuration. Centers may be arranged arbitrarily, subject to nonoverlap.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/math/0309430}{[S1]}.\n\n\\subsection{Short English statement}\nExactly how many equal balls can simultaneously touch one equal central ball in each Euclidean dimension greater than four?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Musin, The kissing number in four dimensions.\n\\url{https://arxiv.org/abs/math/0309430}.\n\\textit{Formulation source.}\n\\item[S2]Status source for Exact Kissing Numbers in Higher Dimensions.\n\\url{https://arxiv.org/html/2412.00937v3}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1369.tex",
-    "link": "https://www.unsolvedmath.com/problems/1369",
-    "external_url": "https://www.unsolvedmath.com/problems/1369",
+    "link": "https://www.unsolvedmath.com/problems/GEOM-010",
+    "external_url": "https://www.unsolvedmath.com/problems/GEOM-010",
     "sources": [
       {
         "citation": "Musin, The kissing number in four dimensions.",
@@ -5672,6 +6112,10 @@ var openProblems = {
   },
   "30006733": {
     "id": 30006733,
+    "problem_number": "LOCAL-30006733",
+    "legacy_ids": [
+      "problem.the-haldane-conjecture-on-spectral-gaps-of-antiferromagnetic-quantum-spin-chains"
+    ],
     "title": "The Haldane Conjecture on Spectral Gaps of Antiferromagnetic Quantum Spin Chains",
     "collection": "ranked",
     "rank": 111,
@@ -5710,6 +6154,10 @@ var openProblems = {
   },
   "30001926": {
     "id": 30001926,
+    "problem_number": "OWR-11447-003",
+    "legacy_ids": [
+      "problem.quantum-unique-ergodicity-on-negatively-curved-manifolds"
+    ],
     "title": "Quantum Unique Ergodicity on Negatively Curved Manifolds",
     "collection": "ranked",
     "rank": 112,
@@ -5718,8 +6166,8 @@ var openProblems = {
     "exact_target": "Must every high-energy eigenfunction sequence on a compact negatively curved manifold become uniformly distributed in phase space?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $-\\Delta_g u_j=\\lambda_j^2u_j$, with $\\|u_j\\|_{L^2(M)}=1$ and $\\lambda_j\\to\\infty$. Semiclassical measures are weak limits of the distributions\n\\[\n a\\longmapsto\\langle\\operatorname{Op}_{1/\\lambda_j}(a)u_j,u_j\\rangle\n\\]\non the unit cosphere bundle $S^*M$. Liouville measure is its normalized canonical symplectic-volume measure. Quantum unique ergodicity requires every such limit to be Liouville for every compact negatively curved $M$. In particular, $|u_j|^2\\,d\\operatorname{vol}_g$ must tend to normalized volume. A density-one subsequence result does not exclude exceptional concentrating sequences.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://math.mit.edu/~dyatlov/files/2026/chyptalk.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust every high-energy eigenfunction sequence on a compact negatively curved manifold become uniformly distributed in phase space?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Dyatlov, Control of Eigenfunctions on Negatively Curved Manifolds, QUE and entropy bounds, slide 6 (2026).\n\\url{https://math.mit.edu/~dyatlov/files/2026/chyptalk.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001926.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001926",
-    "external_url": "https://www.unsolvedmath.com/problems/30001926",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11447-003",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11447-003",
     "sources": [
       {
         "citation": "Dyatlov, Control of Eigenfunctions on Negatively Curved Manifolds, QUE and entropy bounds, slide 6 (2026).",
@@ -5748,6 +6196,10 @@ var openProblems = {
   },
   "1904": {
     "id": 1904,
+    "problem_number": "EP-52",
+    "legacy_ids": [
+      "problem.erdos-szemeredi-sum-product-conjecture-for-integers"
+    ],
     "title": "Erd\u0151s Problem #52",
     "collection": "ranked",
     "rank": 113,
@@ -5756,8 +6208,8 @@ var openProblems = {
     "exact_target": "Must a finite integer set expand almost quadratically under either addition or multiplication?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a finite set $A\\subset{\\mathbb{Z}}$, write $A+A=\\{a+b:a,b\\in A\\}$ and $A\\cdot A=\\{ab:a,b\\in A\\}$. The conjecture is\n\\[\n \\forall\\varepsilon>0\\ \\exists c_\\varepsilon>0\\ \\forall A\\subset{\\mathbb{Z}}\\text{ finite}:\\qquad\n \\max(|A+A|,|A\\cdot A|)\\ge c_\\varepsilon|A|^{2-\\varepsilon}.\n\\]\nThe constant is uniform in the elements and cardinality of $A$. The assertion says that addition and multiplication cannot both produce exceptionally small image sets. It does not require both sets to have nearly quadratic size.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.math.tau.ac.il/~nogaa/PDFS/sumprod2.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust a finite integer set expand almost quadratically under either addition or multiplication?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Noga Alon, Omer Angel, Itai Benjamini, and Eyal Lubetzky, Sums and products along sparse graphs, Israel Journal of Mathematics 188 (2012), 353-384.\n\\url{https://www.math.tau.ac.il/~nogaa/PDFS/sumprod2.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1904.tex",
-    "link": "https://www.unsolvedmath.com/problems/1904",
-    "external_url": "https://www.unsolvedmath.com/problems/1904",
+    "link": "https://www.unsolvedmath.com/problems/EP-52",
+    "external_url": "https://www.unsolvedmath.com/problems/EP-52",
     "sources": [
       {
         "citation": "Noga Alon, Omer Angel, Itai Benjamini, and Eyal Lubetzky, Sums and products along sparse graphs, Israel Journal of Mathematics 188 (2012), 353-384.",
@@ -5786,6 +6238,10 @@ var openProblems = {
   },
   "30005168": {
     "id": 30005168,
+    "problem_number": "OWR-11101913-002",
+    "legacy_ids": [
+      "problem.iitaka-conjecture-c-n-m-on-subadditivity-of-kodaira-dimension"
+    ],
     "title": "Iitaka Subadditivity Conjecture for Kodaira Dimension",
     "collection": "ranked",
     "rank": 114,
@@ -5794,8 +6250,8 @@ var openProblems = {
     "exact_target": "Is the Kodaira dimension of a projective fibration at least the sum of those of its base and general fiber?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a smooth projective variety $Z$, its Kodaira dimension $\\kappa(Z)$ is the growth exponent of the spaces $H^0(Z,mK_Z)$, with value $-\\infty$ if all positive pluricanonical spaces vanish. For the surjective morphism and general fiber in the record, the target is\n\\[\n \\kappa(X)\\ge\\kappa(Y)+\\kappa(F).\n\\]\nThe usual fibration convention uses connected fibers and the characteristic-zero setting of the cited source; the catalogue's abbreviated sentence does not separately spell out those conventions. When one term on the right is $-\\infty$, the inequality is interpreted in the extended ordered sense.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/0806.4413}{[S1]}.\n\n\\subsection{Short English statement}\nIs the Kodaira dimension of a projective fibration at least the sum of those of its base and general fiber?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]C. Birkar, Iitaka conjecture C\\_\\{n,m\\} in dimension six, arXiv:0806.4413 [math.AG], 2008.\n\\url{https://arxiv.org/abs/0806.4413}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005168.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005168",
-    "external_url": "https://www.unsolvedmath.com/problems/30005168",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11101913-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11101913-002",
     "sources": [
       {
         "citation": "C. Birkar, Iitaka conjecture C\\_\\{n,m\\} in dimension six, arXiv:0806.4413 [math.AG], 2008.",
@@ -5824,6 +6280,10 @@ var openProblems = {
   },
   "30006734": {
     "id": 30006734,
+    "problem_number": "LOCAL-30006734",
+    "legacy_ids": [
+      "problem.the-borel-conjecture-on-topological-rigidity-of-aspherical-manifolds"
+    ],
     "title": "The Borel Conjecture on Topological Rigidity of Aspherical Manifolds",
     "collection": "ranked",
     "rank": 115,
@@ -5862,6 +6322,10 @@ var openProblems = {
   },
   "30006735": {
     "id": 30006735,
+    "problem_number": "LOCAL-30006735",
+    "legacy_ids": [
+      "problem.provisional-top500-omission-wave-001.009"
+    ],
     "title": "Cohen-Lenstra class-group distributions for quadratic number fields",
     "collection": "ranked",
     "rank": 116,
@@ -5900,6 +6364,10 @@ var openProblems = {
   },
   "30006736": {
     "id": 30006736,
+    "problem_number": "LOCAL-30006736",
+    "legacy_ids": [
+      "problem.prove-the-bkl-locality-conjecture-in-the-general-inhomogeneous-context"
+    ],
     "title": "Prove the BKL locality conjecture in the general inhomogeneous context",
     "collection": "ranked",
     "rank": 117,
@@ -5938,6 +6406,10 @@ var openProblems = {
   },
   "30006976": {
     "id": 30006976,
+    "problem_number": "LOCAL-30006976",
+    "legacy_ids": [
+      "problem.grothendieckkatz-p-curvature-conjecture"
+    ],
     "title": "Grothendieck\u2013Katz p-Curvature Conjecture",
     "collection": "ranked",
     "rank": 118,
@@ -5976,6 +6448,10 @@ var openProblems = {
   },
   "30006737": {
     "id": 30006737,
+    "problem_number": "LOCAL-30006737",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-serre-s-conjecture-on-the-congruence-subgroup-problem"
+    ],
     "title": "Serre's congruence subgroup conjecture",
     "collection": "ranked",
     "rank": 119,
@@ -6014,6 +6490,10 @@ var openProblems = {
   },
   "30006738": {
     "id": 30006738,
+    "problem_number": "LOCAL-30006738",
+    "legacy_ids": [
+      "problem.regular-inverse-galois-problem-over-q"
+    ],
     "title": "Regular Inverse Galois Problem over Q",
     "collection": "ranked",
     "rank": 120,
@@ -6052,6 +6532,10 @@ var openProblems = {
   },
   "34": {
     "id": 34,
+    "problem_number": "TOP-002",
+    "legacy_ids": [
+      "problem.volume-conjecture-for-knots"
+    ],
     "title": "The Volume Conjecture",
     "collection": "ranked",
     "rank": 121,
@@ -6090,6 +6574,10 @@ var openProblems = {
   },
   "30006739": {
     "id": 30006739,
+    "problem_number": "LOCAL-30006739",
+    "legacy_ids": [
+      "problem.qma-versus-qcma-problem"
+    ],
     "title": "QMA versus QCMA Problem",
     "collection": "ranked",
     "rank": 122,
@@ -6128,6 +6616,10 @@ var openProblems = {
   },
   "30005870": {
     "id": 30005870,
+    "problem_number": "OWR-14298364-004",
+    "legacy_ids": [
+      "problem.aspherical-manifolds-admit-no-metric-of-positive-scalar-curvature"
+    ],
     "title": "Positive Scalar Curvature on Aspherical Manifolds",
     "collection": "ranked",
     "rank": 123,
@@ -6136,8 +6628,8 @@ var openProblems = {
     "exact_target": "Does asphericity rule out every everywhere-positive scalar-curvature metric on a closed manifold?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA closed manifold is compact without boundary, and asphericity means its universal cover is contractible. The scalar curvature of a Riemannian metric is the trace of its Ricci curvature. The target is\n\\[\n M\\text{ closed and aspherical}\\quad\\Longrightarrow\\quad\n \\nexists g\\text{ on }M\\text{ with }\\operatorname{Scal}_g(x)>0\\text{ for every }x.\n\\]\nStrict pointwise positivity is intended. A prohibition only on positive \\emph{sectional} curvature is weaker, and additional spin or fundamental-group assumptions would restrict the conjecture.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2312.04698}{[S1]}.\n\n\\subsection{Short English statement}\nDoes asphericity rule out every everywhere-positive scalar-curvature metric on a closed manifold?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Simone Cecchini, Jianchun Chu, and Jintian Zhu, Positive scalar curvature metrics and aspherical summands, arXiv:2312.04698v3 (2025), introduction.\n\\url{https://arxiv.org/html/2312.04698}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005870.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005870",
-    "external_url": "https://www.unsolvedmath.com/problems/30005870",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14298364-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14298364-004",
     "sources": [
       {
         "citation": "Simone Cecchini, Jianchun Chu, and Jintian Zhu, Positive scalar curvature metrics and aspherical summands, arXiv:2312.04698v3 (2025), introduction.",
@@ -6166,6 +6658,10 @@ var openProblems = {
   },
   "1462": {
     "id": 1462,
+    "problem_number": "MOD-005",
+    "legacy_ids": [
+      "problem.tarski-s-exponential-function-problem"
+    ],
     "title": "Tarski's Exponential Function Problem",
     "collection": "ranked",
     "rank": 124,
@@ -6174,8 +6670,8 @@ var openProblems = {
     "exact_target": "Can a terminating algorithm decide every first-order statement about real arithmetic with the exponential function?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA first-order sentence in the real exponential field is built from real variables, the constants $0,1$, addition, multiplication, order, equality, and the usual real function $\\exp$, using Boolean operations and quantifiers over ${\\mathbb{R}}$. Let\n\\[\n \\operatorname{Th}({\\mathbb{R}}_{\\exp})=\\{\\ulcorner\\varphi\\urcorner:({\\mathbb{R}};0,1,+,\\cdot,\\exp,<)\\models\\varphi\\}.\n\\]\nThe question is whether this set of finite encodings is decidable by an algorithm halting on every input. It concerns arbitrary quantifier alternation, not only an existential fragment, and imposes no complexity bound.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://drops.dagstuhl.de/storage/00lipics/lipics-vol327-stacs2025/LIPIcs.STACS.2025.37/LIPIcs.STACS.2025.37.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan a terminating algorithm decide every first-order statement about real arithmetic with the exponential function?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Jorge Gallego-Hernandez, Alessio Mansutti, \"On the Existential Theory of the Reals Enriched with Integer Powers of a Computable Number,\" 42nd International Symposium on Theoretical Aspects of Computer Science (STACS 2025), LIPIcs vol. 327, Article 37, pp. 37:1-37:18.\n\\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol327-stacs2025/LIPIcs.STACS.2025.37/LIPIcs.STACS.2025.37.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1462.tex",
-    "link": "https://www.unsolvedmath.com/problems/1462",
-    "external_url": "https://www.unsolvedmath.com/problems/1462",
+    "link": "https://www.unsolvedmath.com/problems/MOD-005",
+    "external_url": "https://www.unsolvedmath.com/problems/MOD-005",
     "sources": [
       {
         "citation": "Jorge Gallego-Hernandez, Alessio Mansutti, \"On the Existential Theory of the Reals Enriched with Integer Powers of a Computable Number,\" 42nd International Symposium on Theoretical Aspects of Computer Science (STACS 2025), LIPIcs vol. 327, Article 37, pp. 37:1-37:18.",
@@ -6204,6 +6700,10 @@ var openProblems = {
   },
   "30006740": {
     "id": 30006740,
+    "problem_number": "LOCAL-30006740",
+    "legacy_ids": [
+      "problem.polynomial-bound-for-limit-cycles-of-planar-polynomial-vector-fields"
+    ],
     "title": "Polynomial Bound for Limit Cycles of Planar Polynomial Vector Fields",
     "collection": "ranked",
     "rank": 125,
@@ -6242,6 +6742,10 @@ var openProblems = {
   },
   "3281": {
     "id": 3281,
+    "problem_number": "OPG-162",
+    "legacy_ids": [
+      "problem.erdos-hajnal-conjecture"
+    ],
     "title": "The Erd\u00f6s-Hajnal Conjecture",
     "collection": "ranked",
     "rank": 126,
@@ -6250,8 +6754,8 @@ var openProblems = {
     "exact_target": "Does forbidding any fixed induced graph force a polynomially large clique or independent set?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn induced copy of $H$ in $G$ is a vertex subset whose inherited edges and nonedges agree with $H$. A clique has all pairwise edges, and an independent set has none. The conjecture is\n\\[\n \\forall H\\ \\exists c_H>0\\ \\forall G\\text{ with no induced }H:\\qquad\n \\max(\\omega(G),\\alpha(G))\\ge |V(G)|^{c_H}.\n\\]\nThe exponent may depend on the forbidden graph but not on the size of $G$. Excluding ordinary subgraphs or minors is not the same hypothesis.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.cambridge.org/core/journals/combinatorics-probability-and-computing/article/disperse-hypergraphs/49C68DA657349D5D7BAB81EE3E971729}{[S1]}.\n\n\\subsection{Short English statement}\nDoes forbidding any fixed induced graph force a polynomially large clique or independent set?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Lior Gishboliner and Ethan Honest, Disperse hypergraphs, Introduction (2025).\n\\url{https://www.cambridge.org/core/journals/combinatorics-probability-and-computing/article/disperse-hypergraphs/49C68DA657349D5D7BAB81EE3E971729}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3281.tex",
-    "link": "https://www.unsolvedmath.com/problems/3281",
-    "external_url": "https://www.unsolvedmath.com/problems/3281",
+    "link": "https://www.unsolvedmath.com/problems/OPG-162",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-162",
     "sources": [
       {
         "citation": "Lior Gishboliner and Ethan Honest, Disperse hypergraphs, Introduction (2025).",
@@ -6280,6 +6784,10 @@ var openProblems = {
   },
   "5300012": {
     "id": 5300012,
+    "problem_number": "AMR-052-0012",
+    "legacy_ids": [
+      "problem.local-connectivity-of-the-mandelbrot-set-mlc-conjecture"
+    ],
     "title": "Local connectivity of the Mandelbrot set",
     "collection": "ranked",
     "rank": 127,
@@ -6288,8 +6796,8 @@ var openProblems = {
     "exact_target": "Is the Mandelbrot set connected at every sufficiently local scale around each of its points?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $c\\in{\\mathbb{C}}$, let $f_c(z)=z^2+c$ and write $f_c^{\\circ n}$ for its $n$-fold iterate. The Mandelbrot set is\n\\[\n \\mathcal M=\\{c\\in{\\mathbb{C}}:\\sup_{n\\ge0}|f_c^{\\circ n}(0)|<\\infty\\}.\n\\]\nA space is locally connected at a point if every neighborhood contains a connected neighborhood of that point. The question is whether $\\mathcal M$ has this property at every $c\\in\\mathcal M$, particularly on its boundary. Connectedness of the whole set alone is not local connectedness.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1709.09869}{[S1]}.\n\n\\subsection{Short English statement}\nIs the Mandelbrot set connected at every sufficiently local scale around each of its points?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Anna Miriam Benini, A survey on MLC, Rigidity and related topics, Conformal Geometry and Dynamics 22 (2018).\n\\url{https://arxiv.org/abs/1709.09869}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/5300012.tex",
-    "link": "https://www.unsolvedmath.com/problems/5300012",
-    "external_url": "https://www.unsolvedmath.com/problems/5300012",
+    "link": "https://www.unsolvedmath.com/problems/AMR-052-0012",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-052-0012",
     "sources": [
       {
         "citation": "Anna Miriam Benini, A survey on MLC, Rigidity and related topics, Conformal Geometry and Dynamics 22 (2018).",
@@ -6318,6 +6826,10 @@ var openProblems = {
   },
   "30005276": {
     "id": 30005276,
+    "problem_number": "OWR-11695860-016",
+    "legacy_ids": [
+      "problem.density-hypothesis-for-zeroes-of-the-riemann-zeta-function"
+    ],
     "title": "Density Hypothesis for Riemann-Zeta Zeros",
     "collection": "ranked",
     "rank": 128,
@@ -6326,8 +6838,8 @@ var openProblems = {
     "exact_target": "Are zeta zeros to the right of any fixed vertical line as sparse as the density hypothesis predicts?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nCount zeta zeros with multiplicity by\n\\[\n N(\\sigma,T)=\\#\\{\\rho=\\beta+i\\gamma:\\zeta(\\rho)=0,\\ 0<\\beta<1,\n                                  \\beta\\ge\\sigma,\\ |\\gamma|\\le T\\}.\n\\]\nFor each fixed $1/2\\le\\sigma\\le1$ and $\\varepsilon>0$, the density hypothesis predicts\n\\[\n N(\\sigma,T)\\ll_{\\sigma,\\varepsilon}T^{2(1-\\sigma)+\\varepsilon}.\n\\]\nThe bound is uniform in large $T$, with dependence on $\\sigma,\\varepsilon$ permitted. It limits the number of off-line zeros rather than asserting that they do not exist.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://terrytao.wordpress.com/tag/riemann-zeta-function/}{[S1]}.\n\n\\subsection{Short English statement}\nAre zeta zeros to the right of any fixed vertical line as sparse as the density hypothesis predicts?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Terence Tao, \"A computation-outsourced discussion of zero density theorems for the Riemann zeta function\", What's new, 7 July 2024.\n\\url{https://terrytao.wordpress.com/tag/riemann-zeta-function/}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005276.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005276",
-    "external_url": "https://www.unsolvedmath.com/problems/30005276",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11695860-016",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11695860-016",
     "sources": [
       {
         "citation": "Terence Tao, \"A computation-outsourced discussion of zero density theorems for the Riemann zeta function\", What's new, 7 July 2024.",
@@ -6356,6 +6868,10 @@ var openProblems = {
   },
   "30006741": {
     "id": 30006741,
+    "problem_number": "LOCAL-30006741",
+    "legacy_ids": [
+      "problem.unconditional-single-prover-classical-verification-of-bqp-computations"
+    ],
     "title": "Unconditional Single-Prover Classical Verification of BQP Computations",
     "collection": "ranked",
     "rank": 129,
@@ -6394,6 +6910,10 @@ var openProblems = {
   },
   "1857": {
     "id": 1857,
+    "problem_number": "GUY-A5b",
+    "legacy_ids": [
+      "problem.erdos-problem-3-divergent-harmonic-series-and-long-arithmetic-progressions"
+    ],
     "title": "Erd\u0151s $3000 Conjecture on Arithmetic Progressions",
     "collection": "ranked",
     "rank": 130,
@@ -6402,8 +6922,8 @@ var openProblems = {
     "exact_target": "Does divergence of a set's reciprocal sum force it to contain arithmetic progressions of every finite length?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $A\\subseteq{\\mathbb{Z}}_{>0}$, divergence of its reciprocal sum means $\\sum_{a\\in A}1/a=\\infty$. A nonconstant arithmetic progression of length $k$ is $a,a+d,\\ldots,a+(k-1)d$ with integers $a,d\\ge1$. The question is whether\n\\[\n \\sum_{a\\in A}\\frac1a=\\infty\\quad\\Longrightarrow\\quad\n \\forall k\\ge1\\ \\exists a,d\\ge1:\\ \\{a+jd:0\\le j<k\\}\\subseteq A.\n\\]\nPositive density is not assumed, and the common difference can depend on the requested length.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://londmathsoc.onlinelibrary.wiley.com/doi/abs/10.1112/jlms.70483}{[S1]}.\n\n\\subsection{Short English statement}\nDoes divergence of a set's reciprocal sum force it to contain arithmetic progressions of every finite length?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]B. Green, Arithmetic progressions at the Journal of the LMS, Journal of the London Mathematical Society (2026).\n\\url{https://londmathsoc.onlinelibrary.wiley.com/doi/abs/10.1112/jlms.70483}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1857.tex",
-    "link": "https://www.unsolvedmath.com/problems/1857",
-    "external_url": "https://www.unsolvedmath.com/problems/1857",
+    "link": "https://www.unsolvedmath.com/problems/GUY-A5b",
+    "external_url": "https://www.unsolvedmath.com/problems/GUY-A5b",
     "sources": [
       {
         "citation": "B. Green, Arithmetic progressions at the Journal of the LMS, Journal of the London Mathematical Society (2026).",
@@ -6432,6 +6952,10 @@ var openProblems = {
   },
   "30006742": {
     "id": 30006742,
+    "problem_number": "LOCAL-30006742",
+    "legacy_ids": [
+      "problem.polynomial-pivot-rule-for-the-simplex-method"
+    ],
     "title": "Polynomial pivot rule for the simplex method",
     "collection": "ranked",
     "rank": 131,
@@ -6470,6 +6994,10 @@ var openProblems = {
   },
   "30006743": {
     "id": 30006743,
+    "problem_number": "LOCAL-30006743",
+    "legacy_ids": [
+      "problem.planted-clique-conjecture"
+    ],
     "title": "Planted Clique Conjecture",
     "collection": "ranked",
     "rank": 132,
@@ -6508,6 +7036,10 @@ var openProblems = {
   },
   "1259": {
     "id": 1259,
+    "problem_number": "NT-052",
+    "legacy_ids": [
+      "problem.borel-normal-number-conjecture-for-irrational-algebraic-numbers"
+    ],
     "title": "Normality of Irrational Algebraic Numbers",
     "collection": "ranked",
     "rank": 133,
@@ -6516,8 +7048,8 @@ var openProblems = {
     "exact_target": "Do the digits of every algebraic irrational have the uniform block frequencies of a normal number in every integer base?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nWrite the fractional part of a real number in base $b\\ge2$ as $0.d_1d_2\\ldots$. It is normal to base $b$ if for every length $k$ and every word $w\\in\\{0,\\ldots,b-1\\}^k$,\n\\[\n \\lim_{N\\to\\infty}\\frac{\\#\\{1\\le j\\le N:(d_j,\\ldots,d_{j+k-1})=w\\}}{N}=b^{-k}.\n\\]\nThe conjecture requires this for every real algebraic irrational number and every integer base. Algebraic means a root of a nonzero rational polynomial. Frequency of individual digits alone is weaker than normality of all blocks.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://webusers.imj-prg.fr/~michel.waldschmidt/articles/pdf/WordsTranscendence.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDo the digits of every algebraic irrational have the uniform block frequencies of a normal number in every integer base?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Michel Waldschmidt, Words and Transcendence, 2005.\n\\url{https://webusers.imj-prg.fr/~michel.waldschmidt/articles/pdf/WordsTranscendence.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1259.tex",
-    "link": "https://www.unsolvedmath.com/problems/1259",
-    "external_url": "https://www.unsolvedmath.com/problems/1259",
+    "link": "https://www.unsolvedmath.com/problems/NT-052",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-052",
     "sources": [
       {
         "citation": "Michel Waldschmidt, Words and Transcendence, 2005.",
@@ -6546,6 +7078,10 @@ var openProblems = {
   },
   "30006744": {
     "id": 30006744,
+    "problem_number": "LOCAL-30006744",
+    "legacy_ids": [
+      "problem.np-completeness-of-the-minimum-circuit-size-problem-mcsp"
+    ],
     "title": "NP-Completeness of the Minimum Circuit Size Problem (MCSP)",
     "collection": "ranked",
     "rank": 134,
@@ -6583,6 +7119,10 @@ var openProblems = {
   },
   "30006745": {
     "id": 30006745,
+    "problem_number": "LOCAL-30006745",
+    "legacy_ids": [
+      "problem.the-generalized-sato-tate-conjecture-for-higher-dimensional-abelian-varieties"
+    ],
     "title": "The Generalized Sato-Tate Conjecture for Higher-Dimensional Abelian Varieties",
     "collection": "ranked",
     "rank": 135,
@@ -6620,6 +7160,10 @@ var openProblems = {
   },
   "30006746": {
     "id": 30006746,
+    "problem_number": "LOCAL-30006746",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-no-slip-vanishing-viscosity-limit-in-the-energy-norm"
+    ],
     "title": "No-Slip Vanishing-Viscosity Limit in the Energy Norm",
     "collection": "ranked",
     "rank": 136,
@@ -6657,6 +7201,10 @@ var openProblems = {
   },
   "20003326": {
     "id": 20003326,
+    "problem_number": "AIM-OTHER-0133",
+    "legacy_ids": [
+      "problem.arithmetic-quantum-unique-ergodicity"
+    ],
     "title": "Arithmetic QUE through Hecke packets",
     "collection": "ranked",
     "rank": 137,
@@ -6665,8 +7213,8 @@ var openProblems = {
     "exact_target": "Do arithmetic high-energy joint eigenfunctions have only the uniform-volume distribution as a quantum limit?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn arithmetic locally symmetric space has the form $\\Gamma\\backslash G/K_0$, with $\\Gamma$ arithmetic and $K_0$ maximal compact. In the finite-volume source setting, take normalized joint Laplace/Hecke eigenfunctions $u_j$ with spectral parameters tending to high energy. Their probability densities are $|u_j|^2\\,d\\operatorname{vol}$. The stated conclusion is\n\\[\n |u_j|^2\\,d\\operatorname{vol}\\ \\rightharpoonup\\\n \\frac{d\\operatorname{vol}}{\\operatorname{vol}(\\Gamma\\backslash G/K_0)}.\n\\]\nThe phrase ``arithmetic quantum limit'' includes the specified joint-eigenfunction and spectral regime. The catalogue does not delimit all higher-rank or noncompact variants; those require source-specific hypotheses, including exclusion of escape of mass. It is not a blanket statement for arbitrary eigenfunctions on arbitrary arithmetic quotients.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aimath.org/WWN/measrigid/measrigid.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDo arithmetic high-energy joint eigenfunctions have only the uniform-volume distribution as a quantum limit?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]AIM workshop problem list, Emerging Applications of Measure Rigidity.\n\\url{https://aimath.org/WWN/measrigid/measrigid.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20003326.tex",
-    "link": "https://www.unsolvedmath.com/problems/20003326",
-    "external_url": "https://www.unsolvedmath.com/problems/20003326",
+    "link": "https://www.unsolvedmath.com/problems/AIM-OTHER-0133",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-OTHER-0133",
     "sources": [
       {
         "citation": "AIM workshop problem list, Emerging Applications of Measure Rigidity.",
@@ -6694,6 +7242,10 @@ var openProblems = {
   },
   "30006977": {
     "id": 30006977,
+    "problem_number": "LOCAL-30006977",
+    "legacy_ids": [
+      "problem.global-gan-gross-prasad-conjecture"
+    ],
     "title": "Global Gan\u2013Gross\u2013Prasad Conjecture (Fixed-Representation Form)",
     "collection": "ranked",
     "rank": 138,
@@ -6731,6 +7283,10 @@ var openProblems = {
   },
   "30006747": {
     "id": 30006747,
+    "problem_number": "LOCAL-30006747",
+    "legacy_ids": [
+      "problem.superlinear-circuit-lower-bounds-for-explicit-boolean-functions"
+    ],
     "title": "Superlinear Circuit Lower Bounds for Explicit Boolean Functions",
     "collection": "ranked",
     "rank": 139,
@@ -6768,6 +7324,10 @@ var openProblems = {
   },
   "30000030": {
     "id": 30000030,
+    "problem_number": "OWR-717-005",
+    "legacy_ids": [
+      "problem.cannon-s-conjecture"
+    ],
     "title": "Cannon's Conjecture",
     "collection": "ranked",
     "rank": 140,
@@ -6776,8 +7336,8 @@ var openProblems = {
     "exact_target": "Must a hyperbolic group with a two-sphere boundary come from a cocompact hyperbolic three-dimensional geometry?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finitely generated group is Gromov-hyperbolic if a Cayley graph has uniformly thin geodesic triangles. Its boundary consists of asymptotic classes of geodesic rays, with the standard visual topology. The conjecture is\n\\[\n \\partial G\\cong S^2\\quad\\Longrightarrow\\quad\n G\\curvearrowright\\mathbb H^3\\text{ properly, cocompactly, and isometrically}.\n\\]\nProperness allows finite stabilizers in the presence of torsion. Equivalently the group is virtually a cocompact Kleinian group in the source's convention. The hypothesis is about the boundary's topology, not merely its dimension.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ams.org/bookstore/pspdf/surv-225-prev.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust a hyperbolic group with a two-sphere boundary come from a cocompact hyperbolic three-dimensional geometry?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Expanding Thurston Maps.\n\\url{https://www.ams.org/bookstore/pspdf/surv-225-prev.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30000030.tex",
-    "link": "https://www.unsolvedmath.com/problems/30000030",
-    "external_url": "https://www.unsolvedmath.com/problems/30000030",
+    "link": "https://www.unsolvedmath.com/problems/OWR-717-005",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-717-005",
     "sources": [
       {
         "citation": "Expanding Thurston Maps.",
@@ -6805,6 +7365,10 @@ var openProblems = {
   },
   "30006748": {
     "id": 30006748,
+    "problem_number": "LOCAL-30006748",
+    "legacy_ids": [
+      "problem.torsion-conjecture-for-abelian-varieties-of-dimension-at-least-two"
+    ],
     "title": "Torsion Conjecture for Abelian Varieties of Dimension at Least Two",
     "collection": "ranked",
     "rank": 141,
@@ -6842,6 +7406,10 @@ var openProblems = {
   },
   "30006749": {
     "id": 30006749,
+    "problem_number": "LOCAL-30006749",
+    "legacy_ids": [
+      "problem.indistinguishability-obfuscation-from-constant-degree-homomorphic-assumptions"
+    ],
     "title": "Indistinguishability Obfuscation from Constant-Degree Homomorphic Assumptions",
     "collection": "ranked",
     "rank": 142,
@@ -6879,6 +7447,10 @@ var openProblems = {
   },
   "30006750": {
     "id": 30006750,
+    "problem_number": "LOCAL-30006750",
+    "legacy_ids": [
+      "problem.residual-finiteness-of-hyperbolic-groups"
+    ],
     "title": "Residual Finiteness of Hyperbolic Groups",
     "collection": "ranked",
     "rank": 143,
@@ -6916,6 +7488,10 @@ var openProblems = {
   },
   "30006402": {
     "id": 30006402,
+    "problem_number": "OWR-14299518-026",
+    "legacy_ids": [
+      "problem.log-rank-conjecture-communication-complexity"
+    ],
     "title": "The Log-Rank Conjecture",
     "collection": "ranked",
     "rank": 144,
@@ -6924,8 +7500,8 @@ var openProblems = {
     "exact_target": "Is deterministic communication complexity always bounded by a fixed power of the logarithm of the sign matrix's real rank?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $f:X\\times Y\\to\\{-1,1\\}$, Alice knows $x$, Bob knows $y$, and $D(f)$ is the minimum worst-case number of communicated bits in a deterministic protocol computing $f(x,y)$. Its sign matrix is $M_f=(f(x,y))$. The conjecture is\n\\[\n \\exists C\\ge1\\ \\forall f:\\qquad\n D(f)\\le C\\bigl(\\log_2\\max\\{2,\\operatorname{rank}_{{\\mathbb{R}}}M_f\\}\\bigr)^C.\n\\]\nThe same constant works for all nonempty finite $X,Y$. The rank is over ${\\mathbb{R}}$; it is not Boolean rank or nonnegative rank, and the communication is deterministic.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/1306.1877v2}{[S1]}.\n\n\\subsection{Short English statement}\nIs deterministic communication complexity always bounded by a fixed power of the logarithm of the sign matrix's real rank?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]S. Lovett, 'Communication is bounded by root of rank', arXiv:1306.1877, 2013; also in Proc. 29th IEEE Conf. on Computational Complexity (CCC), 2014.\n\\url{https://arxiv.org/html/1306.1877v2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30006402.tex",
-    "link": "https://www.unsolvedmath.com/problems/30006402",
-    "external_url": "https://www.unsolvedmath.com/problems/30006402",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14299518-026",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14299518-026",
     "sources": [
       {
         "citation": "S. Lovett, 'Communication is bounded by root of rank', arXiv:1306.1877, 2013; also in Proc. 29th IEEE Conf. on Computational Complexity (CCC), 2014.",
@@ -6953,6 +7529,10 @@ var openProblems = {
   },
   "30006751": {
     "id": 30006751,
+    "problem_number": "LOCAL-30006751",
+    "legacy_ids": [
+      "problem.binary-codes-above-gv"
+    ],
     "title": "Asymptotic tightness of the binary Gilbert\u2013Varshamov bound",
     "collection": "ranked",
     "rank": 145,
@@ -6990,6 +7570,10 @@ var openProblems = {
   },
   "8900008": {
     "id": 8900008,
+    "problem_number": "AMR-088-0008",
+    "legacy_ids": [
+      "problem.congruent-number-problem"
+    ],
     "title": "Congruent number decision problem",
     "collection": "ranked",
     "rank": 146,
@@ -6998,8 +7582,8 @@ var openProblems = {
     "exact_target": "Which positive integers occur as the areas of right triangles with entirely rational side lengths?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA positive integer $n$ is congruent if there exist $a,b,c\\in{\\mathbb{Q}}_{>0}$ with\n\\[\n a^2+b^2=c^2,\\qquad ab/2=n.\n\\]\nEquivalently, the elliptic curve $E_n:y^2=x^3-n^2x$ has a rational point with $y\\ne0$. For such a point one obtains side lengths $|x^2-n^2|/|y|$, $2n|x|/|y|$, and $(x^2+n^2)/|y|$. Multiplication of $n$ by a rational square does not change congruence, so positive integers reduce to squarefree parts. The problem seeks an unconditional exact characterization, not only a conditional criterion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nWhich positive integers occur as the areas of right triangles with entirely rational side lengths?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Keith Conrad, \"The Congruent Number Problem,\" expository notes, University of Connecticut, kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf.\n\\url{https://kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/8900008.tex",
-    "link": "https://www.unsolvedmath.com/problems/8900008",
-    "external_url": "https://www.unsolvedmath.com/problems/8900008",
+    "link": "https://www.unsolvedmath.com/problems/AMR-088-0008",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-088-0008",
     "sources": [
       {
         "citation": "Keith Conrad, \"The Congruent Number Problem,\" expository notes, University of Connecticut, kconrad.math.uconn.edu/blurbs/ugradnumthy/congnumber.pdf.",
@@ -7027,6 +7611,10 @@ var openProblems = {
   },
   "30006752": {
     "id": 30006752,
+    "problem_number": "LOCAL-30006752",
+    "legacy_ids": [
+      "problem.omission-w057061.uniform-subconvexity-standard-gl-n"
+    ],
     "title": "Uniform Subconvexity for Standard Automorphic L-Functions on GL(n)",
     "collection": "ranked",
     "rank": 147,
@@ -7064,6 +7652,10 @@ var openProblems = {
   },
   "30006753": {
     "id": 30006753,
+    "problem_number": "LOCAL-30006753",
+    "legacy_ids": [
+      "problem.global-regularity-of-solutions-to-the-inviscid-surface-quasi-geostrophic-equation"
+    ],
     "title": "Global Regularity of Solutions to the Inviscid Surface Quasi-Geostrophic Equation",
     "collection": "ranked",
     "rank": 148,
@@ -7101,6 +7693,10 @@ var openProblems = {
   },
   "30004916": {
     "id": 30004916,
+    "problem_number": "OWR-8415359-002",
+    "legacy_ids": [
+      "problem.erdos-rado-sunflower-conjecture"
+    ],
     "title": "The Erd\u0151s\u2013Rado Sunflower Conjecture",
     "collection": "ranked",
     "rank": 149,
@@ -7109,8 +7705,8 @@ var openProblems = {
     "exact_target": "Must every sufficiently large bounded-size set family contain a sunflower, with a threshold only exponential in the set size?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn $r$-petal sunflower is a collection of distinct sets $S_1,\\ldots,S_r$ with one fixed core $C$ satisfying $S_i\\cap S_j=C$ for every $i\\ne j$. Equivalently, their parts outside the core are pairwise disjoint; the core may be empty. The conjecture is\n\\[\n \\forall r\\ge3\\ \\exists C_r>0\\ \\forall k\\ge1:\\quad\n |\\mathcal F|>C_r^k,\\quad|S|\\le k\\ (S\\in\\mathcal F)\n \\Rightarrow\\mathcal F\\text{ contains an }r\\text{-sunflower}.\n\\]\nThe ground set is unrestricted and the exponential base may depend on $r$ but not on $k$.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://londmathsoc.onlinelibrary.wiley.com/doi/full/10.1112/jlms.70380}{[S1]}.\n\n\\subsection{Short English statement}\nMust every sufficiently large bounded-size set family contain a sunflower, with a threshold only exponential in the set size?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Ashwin Rao, The story of sunflowers, Journal of the London Mathematical Society, 2026.\n\\url{https://londmathsoc.onlinelibrary.wiley.com/doi/full/10.1112/jlms.70380}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004916.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004916",
-    "external_url": "https://www.unsolvedmath.com/problems/30004916",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415359-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415359-002",
     "sources": [
       {
         "citation": "Ashwin Rao, The story of sunflowers, Journal of the London Mathematical Society, 2026.",
@@ -7127,6 +7723,10 @@ var openProblems = {
   },
   "30006754": {
     "id": 30006754,
+    "problem_number": "LOCAL-30006754",
+    "legacy_ids": [
+      "problem.order-of-magnitude-of-maximum-3-term-ap-free-subsets-of-1-n"
+    ],
     "title": "Order of Magnitude of the Largest Three-Term-Progression-Free Sets",
     "collection": "ranked",
     "rank": 150,
@@ -7157,6 +7757,10 @@ var openProblems = {
   },
   "30003827": {
     "id": 30003827,
+    "problem_number": "OWR-16166-001",
+    "legacy_ids": [
+      "problem.colliot-thelene-conjecture-brauer-manin-obstruction-controls-rational-points-on-rationally-connected-varieties"
+    ],
     "title": "Brauer\u2013Manin Obstruction for Rationally Connected Varieties",
     "collection": "ranked",
     "rank": 151,
@@ -7165,8 +7769,8 @@ var openProblems = {
     "exact_target": "For a rationally connected variety over a number field, do the Brauer compatibility conditions account for every failure of rational points to exist or approximate local solutions?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a number field $k$, write ${\\mathbb{A}}_k$ for its ring of adeles and $\\operatorname{Br}(X)=H^2_{\\mathrm{et}}(X,\\mathbf G_m)_{\\mathrm{tors}}$. Evaluation of a Brauer class at local points, followed by the local invariant maps, defines\n\\[\n X({\\mathbb{A}}_k)^{\\operatorname{Br}}=\\{(x_v):\\ \\sum_v\\operatorname{inv}_v(b(x_v))=0\\text{ for every }b\\in\\operatorname{Br}(X)\\}.\n\\]\nA geometrically rationally connected variety has rational curves joining two general geometric points. For every smooth proper geometrically irreducible such $X$, the assertion is\n$\\overline{X(k)}=X({\\mathbb{A}}_k)^{\\operatorname{Br}}$ in the adelic topology. Thus a compatible adelic point should be approximable by rational points at any prescribed finite collection of places. The precise adelic convention, including archimedean factors, is that of the cited formulation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/1604.08543}{[S1]}.\n\n\\subsection{Short English statement}\nFor a rationally connected variety over a number field, do the Brauer compatibility conditions account for every failure of rational points to exist or approximate local solutions?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Olivier Wittenberg, \"Rational points and zero-cycles on rationally connected varieties over number fields,\" arXiv:1604.08543; Proc. Sympos. Pure Math. 97.2 (2018), 597-635.\n\\url{https://arxiv.org/pdf/1604.08543}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[E1] J.-L. Colliot-Th\\'el\\`ene and A. N. Skorobogatov, \\emph{Good reduction of the Brauer--Manin obstruction}, Transactions of the American Mathematical Society 365 (2013), 579--590; Lemmas 1.1 and 1.3, \\S1 and Theorem 3.1. \\url{https://arxiv.org/abs/1009.0247}.\n{\\small\\textit{Added research source; primary manuscript consulted 24 September 2026.}}\n\\item[E2] Yonatan Harpaz and Olivier Wittenberg, \\emph{On the fibration method for zero-cycles and rational points}, Annals of Mathematics 183 (2016), 229--295; Theorems 1.3, 1.5--1.6, Conjecture 9.1 and Corollary 9.25. \\url{https://arxiv.org/abs/1409.0993}.\n{\\small\\textit{Added research source; the rational-point theorem is used with its explicit conditional hypotheses. Consulted 24 September 2026.}}\n\\item[E3] Nguyen Manh Linh, \\emph{On the descent conjecture for rational points and zero-cycles}, Journal of the Institute of Mathematics of Jussieu 25(1) (2026), 515--563, published online 19 November 2025; Theorem A and \\S3.4. \\url{https://doi.org/10.1017/S1474748025101400}. Author manuscript: \\url{https://arxiv.org/html/2305.13228v3}.\n{\\small\\textit{Added research source; publication metadata and author manuscript consulted 24 September 2026.}}\n\\item[E4] Yisheng Tian, \\emph{A Simpler Approach to a Descent Conjecture of Wittenberg}, arXiv:2604.08146 (2026), consulted HTML version, abstract and Theorem 1.4. \\url{https://arxiv.org/html/2604.08146}.\n{\\small\\textit{Added frontier reference; preprint, not an independent proof endorsement. The consulted abstract restricts the result to certain connected-group torsors. Consulted 24 September 2026.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003827.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003827",
-    "external_url": "https://www.unsolvedmath.com/problems/30003827",
+    "link": "https://www.unsolvedmath.com/problems/OWR-16166-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-16166-001",
     "sources": [
       {
         "citation": "Olivier Wittenberg, \"Rational points and zero-cycles on rationally connected varieties over number fields,\" arXiv:1604.08543; Proc. Sympos. Pure Math. 97.2 (2018), 597-635.",
@@ -7211,6 +7815,10 @@ var openProblems = {
   },
   "1357": {
     "id": 1357,
+    "problem_number": "ST-011",
+    "legacy_ids": [
+      "problem.consistency-of-reinhardt-cardinals-without-choice"
+    ],
     "title": "Reinhardt Cardinals without Choice",
     "collection": "ranked",
     "rank": 152,
@@ -7219,8 +7827,8 @@ var openProblems = {
     "exact_target": "Can set theory without the axiom of choice consistently admit a nontrivial elementary self-embedding of the entire universe, with the axiom schemes specified in ZFR?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nUse the first-order language of set theory enlarged by a unary function symbol $j$. The theory $\\mathrm{ZF}(j)$ includes the indicated ZF axiom schemes in that expanded language; this choice matters because formulas may mention $j$. Require $j$ to be nontrivial and $\\Sigma_1$-elementary:\n\\[\n \\varphi(a_1,\\ldots,a_m)\\ \\longleftrightarrow\\\n \\varphi(j(a_1),\\ldots,j(a_m))\n\\]\nfor each $\\Sigma_1$ formula in the membership language. The theory specified by the source derives the full elementarity scheme. Its critical point, the least ordinal moved by $j$, is a Reinhardt cardinal. The target is the consistency of this exact theory, denoted ZFR, not a theory with the axiom of choice added. Consistency means that no contradiction is derivable by a finite formal proof; a relative-consistency result must state its additional assumptions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2002.01215}{[S1]}.\n\n\\subsection{Short English statement}\nCan set theory without the axiom of choice consistently admit a nontrivial elementary self-embedding of the entire universe, with the axiom schemes specified in ZFR?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] F. Schlutzenberg, Reinhardt cardinals and iterates of V, Ann. Pure Appl. Logic 173 (2022).\n\\url{https://arxiv.org/abs/2002.01215}.\n{\\small\\textit{Catalogue formulation source.}}\n\\item[E1] Marwan Salam Mohammd,\n\\emph{Reinhardt cardinals and eventually dominating functions},\nArchive for Mathematical Logic 65 (2026), 691--699.\n\\url{https://doi.org/10.1007/s00153-026-01018-2}.\nAuthor manuscript: \\url{https://arxiv.org/html/2505.00637v1} (1 May 2025),\nTheorem 2.2 and \\S\\S3,5.\n{\\small\\textit{Manuscript consulted and publication metadata checked\n24 September 2026; the Choice-dependent argument in \\S5 is not applied to ZFR.}}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1357.tex",
-    "link": "https://www.unsolvedmath.com/problems/1357",
-    "external_url": "https://www.unsolvedmath.com/problems/1357",
+    "link": "https://www.unsolvedmath.com/problems/ST-011",
+    "external_url": "https://www.unsolvedmath.com/problems/ST-011",
     "sources": [
       {
         "citation": "F. Schlutzenberg, Reinhardt cardinals and iterates of V, Ann. Pure Appl. Logic 173 (2022).",
@@ -7253,6 +7861,10 @@ var openProblems = {
   },
   "30006755": {
     "id": 30006755,
+    "problem_number": "LOCAL-30006755",
+    "legacy_ids": [
+      "problem.murres-chow-kunneth-conjectures"
+    ],
     "title": "Murre's Chow-Kunneth Conjectures",
     "collection": "ranked",
     "rank": 153,
@@ -7303,6 +7915,10 @@ var openProblems = {
   },
   "30006756": {
     "id": 30006756,
+    "problem_number": "LOCAL-30006756",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-hyperlinearity-of-every-group"
+    ],
     "title": "Hyperlinearity of Every Group",
     "collection": "ranked",
     "rank": 154,
@@ -7341,6 +7957,10 @@ var openProblems = {
   },
   "30006757": {
     "id": 30006757,
+    "problem_number": "LOCAL-30006757",
+    "legacy_ids": [
+      "problem.density-of-hyperbolicity-for-rational-maps"
+    ],
     "title": "Density of Hyperbolicity for Rational Maps",
     "collection": "ranked",
     "rank": 155,
@@ -7379,6 +7999,10 @@ var openProblems = {
   },
   "1273": {
     "id": 1273,
+    "problem_number": "NT-066",
+    "legacy_ids": [
+      "problem.leopoldt-s-conjecture"
+    ],
     "title": "Leopoldt's Conjecture",
     "collection": "ranked",
     "rank": 156,
@@ -7387,8 +8011,8 @@ var openProblems = {
     "exact_target": "Do independent global units remain linearly independent when measured by their logarithms in all completions above any chosen prime?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $\\mathcal O_K^\\times$ be the units of a number field $K$, of rank $r_1+r_2-1$. For a prime $p$, use the local $p$-adic logarithms to define\n\\[\n \\ell_p:\\mathcal O_K^\\times\\otimes_{{\\mathbb{Z}}}{\\mathbb{Q}}_p\\longrightarrow\\prod_{v\\mid p}K_v,\n \\qquad u\\longmapsto(\\log_v u)_v.\n\\]\nThe logarithm on units is extended from principal units and kills torsion. The Leopoldt defect is\n$\\delta_{K,p}=r_1+r_2-1-\\dim_{{\\mathbb{Q}}_p}\\operatorname{im}\\ell_p$.\nLeopoldt's conjecture asserts $\\delta_{K,p}=0$ for every $K,p$, equivalently injectivity of $\\ell_p$. This is the full-rank assertion behind the $p$-adic regulator, not a statement that the ordinary real regulator vanishes or that local logarithms are algebraically independent.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s40993-026-00717-2}{[S1]}.\n\n\\subsection{Short English statement}\nDo independent global units remain linearly independent when measured by their logarithms in all completions above any chosen prime?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Fabio Ferri and Henri Johnston, Research in Number Theory 12 (2026), article 32.\n\\url{https://link.springer.com/article/10.1007/s40993-026-00717-2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1273.tex",
-    "link": "https://www.unsolvedmath.com/problems/1273",
-    "external_url": "https://www.unsolvedmath.com/problems/1273",
+    "link": "https://www.unsolvedmath.com/problems/NT-066",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-066",
     "sources": [
       {
         "citation": "Fabio Ferri and Henri Johnston, Research in Number Theory 12 (2026), article 32.",
@@ -7417,6 +8041,10 @@ var openProblems = {
   },
   "30006758": {
     "id": 30006758,
+    "problem_number": "LOCAL-30006758",
+    "legacy_ids": [
+      "problem.grothendieck-variational-hodge-conjecture"
+    ],
     "title": "Grothendieck's Variational Hodge Conjecture",
     "collection": "ranked",
     "rank": 157,
@@ -7455,6 +8083,10 @@ var openProblems = {
   },
   "30006759": {
     "id": 30006759,
+    "problem_number": "LOCAL-30006759",
+    "legacy_ids": [
+      "problem.np-versus-existential-theory-of-reals"
+    ],
     "title": "NP versus the Existential Theory of the Reals",
     "collection": "ranked",
     "rank": 158,
@@ -7493,6 +8125,10 @@ var openProblems = {
   },
   "30006760": {
     "id": 30006760,
+    "problem_number": "LOCAL-30006760",
+    "legacy_ids": [
+      "problem.manins-conjecture-on-the-asymptotic-density-of-rational-points-on-fano-varieties"
+    ],
     "title": "Manins Conjecture on the Asymptotic Density of Rational Points on Fano Varieties",
     "collection": "ranked",
     "rank": 159,
@@ -7535,6 +8171,10 @@ var openProblems = {
   },
   "30006761": {
     "id": 30006761,
+    "problem_number": "LOCAL-30006761",
+    "legacy_ids": [
+      "problem.cramer-conjecture-prime-gaps"
+    ],
     "title": "Cramer Conjecture on the Limsup of Normalized Prime Gaps",
     "collection": "ranked",
     "rank": 160,
@@ -7573,6 +8213,10 @@ var openProblems = {
   },
   "30006762": {
     "id": 30006762,
+    "problem_number": "LOCAL-30006762",
+    "legacy_ids": [
+      "problem.3sum-conjecture"
+    ],
     "title": "Randomized Integer Word-RAM 3SUM Conjecture",
     "collection": "ranked",
     "rank": 161,
@@ -7611,6 +8255,10 @@ var openProblems = {
   },
   "30006978": {
     "id": 30006978,
+    "problem_number": "LOCAL-30006978",
+    "legacy_ids": [
+      "problem.keating-snaith-conjecture-on-moments-of-the-riemann-zeta-function"
+    ],
     "title": "Keating-Snaith Conjecture on Moments of the Riemann Zeta Function",
     "collection": "ranked",
     "rank": 162,
@@ -7649,6 +8297,10 @@ var openProblems = {
   },
   "30004922": {
     "id": 30004922,
+    "problem_number": "OWR-8415359-010",
+    "legacy_ids": [
+      "problem.bpl-l-derandomizing-bounded-error-logspace"
+    ],
     "title": "Derandomizing Space-Bounded Computation",
     "collection": "ranked",
     "rank": 163,
@@ -7657,8 +8309,8 @@ var openProblems = {
     "exact_target": "Can randomness always be removed from a polynomial-time decision procedure using logarithmic memory without increasing its memory requirement beyond a constant factor?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA probabilistic logarithmic-space machine has read-only input, $O(\\log n)$ work bits, random bits, and polynomial running time. The class $\\mathrm{BPL}$ consists of languages it decides with acceptance probability at least $2/3$ on yes inputs and at most $1/3$ on no inputs. The deterministic class $\\mathrm L$ uses the same logarithmic workspace without randomness. Determine whether\n\\[\n \\mathrm{BPL}=\\mathrm L.\n\\]\nAll bounds are uniform over inputs of each length. Space counts writable working storage, not the read-only input or the number of random bits ever read. The question is exact derandomization of the language class, not merely a small increase in the workspace bound.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2502.08272v5}{[S1]}.\n\n\\subsection{Short English statement}\nCan randomness always be removed from a polynomial-time decision procedure using logarithmic memory without increasing its memory requirement beyond a constant factor?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Kuan Cheng and Ruiyang Wu, Weighted Pseudorandom Generators for Read-Once Branching Programs via Weighted Pseudorandom Reductions, Introduction.\n\\url{https://arxiv.org/html/2502.08272v5}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004922.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004922",
-    "external_url": "https://www.unsolvedmath.com/problems/30004922",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415359-010",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415359-010",
     "sources": [
       {
         "citation": "Kuan Cheng and Ruiyang Wu, Weighted Pseudorandom Generators for Read-Once Branching Programs via Weighted Pseudorandom Reductions, Introduction.",
@@ -7687,6 +8339,10 @@ var openProblems = {
   },
   "30006763": {
     "id": 30006763,
+    "problem_number": "LOCAL-30006763",
+    "legacy_ids": [
+      "problem.uniform-boundedness-conjecture-for-rational-points-on-curves"
+    ],
     "title": "Uniform Boundedness Conjecture for Rational Points on Curves",
     "collection": "ranked",
     "rank": 164,
@@ -7725,6 +8381,10 @@ var openProblems = {
   },
   "3410": {
     "id": 3410,
+    "problem_number": "OPG-37123",
+    "legacy_ids": [
+      "problem.smooth-four-dimensional-schoenflies-problem"
+    ],
     "title": "Smooth 4-dimensional Schoenflies problem",
     "collection": "ranked",
     "rank": 165,
@@ -7733,8 +8393,8 @@ var openProblems = {
     "exact_target": "Does every smoothly embedded three-sphere in the standard four-sphere bound a standard smooth four-ball on each side?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA smooth embedding $e:S^3\\hookrightarrow S^4$ has two complementary components; write $W_+$ and $W_-$ for their closures, regarded as smooth manifolds with boundary using collars along $e(S^3)$. The selected Schoenflies statement asks whether\n\\[\n W_+\\cong_{\\mathrm{diff}}B^4\\quad\\text{and}\\quad W_-\\cong_{\\mathrm{diff}}B^4\n\\]\nfor every such embedding. Here $B^4=\\{x\\in{\\mathbb{R}}^4:\\|x\\|\\le1\\}$ has its standard smooth structure. The equivalence to smooth unknottedness is the one in the cited statement. Replacing diffeomorphism by homeomorphism, or assuming an extension of the boundary embedding in advance, changes the problem.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2104.02003}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every smoothly embedded three-sphere in the standard four-sphere bound a standard smooth four-ball on each side?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Peter Lambert-Cole, \"Stein trisections and homotopy 4-balls,\" arXiv:2104.02003 [math.GT], April 2021.\n\\url{https://arxiv.org/abs/2104.02003}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3410.tex",
-    "link": "https://www.unsolvedmath.com/problems/3410",
-    "external_url": "https://www.unsolvedmath.com/problems/3410",
+    "link": "https://www.unsolvedmath.com/problems/OPG-37123",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-37123",
     "sources": [
       {
         "citation": "Peter Lambert-Cole, \"Stein trisections and homotopy 4-balls,\" arXiv:2104.02003 [math.GT], April 2021.",
@@ -7763,6 +8423,10 @@ var openProblems = {
   },
   "30006764": {
     "id": 30006764,
+    "problem_number": "LOCAL-30006764",
+    "legacy_ids": [
+      "problem.tates-rational-leading-term-stark-conjecture"
+    ],
     "title": "Tate's rational leading-term Stark conjecture",
     "collection": "ranked",
     "rank": 166,
@@ -7801,6 +8465,10 @@ var openProblems = {
   },
   "30006765": {
     "id": 30006765,
+    "problem_number": "LOCAL-30006765",
+    "legacy_ids": [
+      "problem.capacity-of-the-general-discrete-memoryless-relay-channel"
+    ],
     "title": "Capacity of the General Discrete Memoryless Relay Channel",
     "collection": "ranked",
     "rank": 167,
@@ -7843,6 +8511,10 @@ var openProblems = {
   },
   "3349": {
     "id": 3349,
+    "problem_number": "OPG-1786",
+    "legacy_ids": [
+      "problem.algebraic-independence-of-e-and-pi"
+    ],
     "title": "Algebraic independence of pi and e",
     "collection": "ranked",
     "rank": 168,
@@ -7851,8 +8523,8 @@ var openProblems = {
     "exact_target": "Are the constants e and pi free of every nontrivial polynomial relation with rational coefficients?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nDefine $e=\\sum_{n=0}^{\\infty}1/n!$ and let $\\pi$ be the positive half-period of the usual sine function. Algebraic independence of $e$ and $\\pi$ over ${\\mathbb{Q}}$ means\n\\[\n \\forall P\\in{\\mathbb{Q}}[X,Y]\\setminus\\{0\\},\\qquad P(e,\\pi)\\ne0.\n\\]\nEquivalently, the evaluation homomorphism ${\\mathbb{Q}}[X,Y]\\to{\\mathbb{R}}$ is injective, or the transcendence degree of ${\\mathbb{Q}}(e,\\pi)$ over ${\\mathbb{Q}}$ is two. This is stronger than showing either number individually transcendental or showing just $e+\\pi$ irrational. A counterexample would require a nonzero polynomial relation with rational coefficients, not a numerical near-equality.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://people.maths.ox.ac.uk/pila/LMSNotes.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre the constants e and pi free of every nontrivial polynomial relation with rational coefficients?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Jonathan Pila, Functional transcendence via o-minimality, edited LMS-EPSRC 2013 lecture notes.\n\\url{https://people.maths.ox.ac.uk/pila/LMSNotes.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3349.tex",
-    "link": "https://www.unsolvedmath.com/problems/3349",
-    "external_url": "https://www.unsolvedmath.com/problems/3349",
+    "link": "https://www.unsolvedmath.com/problems/OPG-1786",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-1786",
     "sources": [
       {
         "citation": "Jonathan Pila, Functional transcendence via o-minimality, edited LMS-EPSRC 2013 lecture notes.",
@@ -7881,6 +8553,10 @@ var openProblems = {
   },
   "1141": {
     "id": 1141,
+    "problem_number": "DYN-001",
+    "legacy_ids": [
+      "problem.weinstein-conjecture-on-periodic-orbits-of-reeb-flows"
+    ],
     "title": "The Weinstein Conjecture",
     "collection": "ranked",
     "rank": 169,
@@ -7889,8 +8565,8 @@ var openProblems = {
     "exact_target": "Must every Reeb flow on a compact contact manifold without boundary have at least one closed trajectory?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nOn a closed smooth $(2n+1)$-manifold $M$, a contact form is a one-form $\\alpha$ with $\\alpha\\wedge({\\,\\mathrm{d}}\\alpha)^n$ nowhere zero. Its Reeb vector field $R_\\alpha$ is uniquely specified by\n\\[\n \\alpha(R_\\alpha)=1,\\qquad \\iota_{R_\\alpha}{\\,\\mathrm{d}}\\alpha=0.\n\\]\nA periodic orbit is a smooth map $\\gamma:{\\mathbb{R}}/T{\\mathbb{Z}}\\to M$, $T>0$, satisfying $\\dot\\gamma=R_\\alpha(\\gamma)$. The conjecture asserts the existence of such an orbit for every closed contact manifold and every contact form in all dimensions. Here closed means compact without boundary. No nondegeneracy, contractibility, or uniform bound on the period is imposed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2005.09568}{[S1]}.\n\n\\subsection{Short English statement}\nMust every Reeb flow on a compact contact manifold without boundary have at least one closed trajectory?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Eva Miranda and Cedric Oms, The singular Weinstein conjecture, Advances in Mathematics 389 (2021), Section 5.1, Conjecture 5.1.\n\\url{https://arxiv.org/pdf/2005.09568}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1141.tex",
-    "link": "https://www.unsolvedmath.com/problems/1141",
-    "external_url": "https://www.unsolvedmath.com/problems/1141",
+    "link": "https://www.unsolvedmath.com/problems/DYN-001",
+    "external_url": "https://www.unsolvedmath.com/problems/DYN-001",
     "sources": [
       {
         "citation": "Eva Miranda and Cedric Oms, The singular Weinstein conjecture, Advances in Mathematics 389 (2021), Section 5.1, Conjecture 5.1.",
@@ -7919,6 +8595,10 @@ var openProblems = {
   },
   "1278": {
     "id": 1278,
+    "problem_number": "NT-071",
+    "legacy_ids": [
+      "problem.dirichlet-divisor-problem"
+    ],
     "title": "Dirichlet's Divisor Problem",
     "collection": "ranked",
     "rank": 170,
@@ -7927,8 +8607,8 @@ var openProblems = {
     "exact_target": "How small can the exponent in a uniform pointwise error estimate for the summatory divisor function be?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor real $x\\ge2$, let $d(n)=\\sum_{a\\mid n}1$ and\n\\[\n \\Delta(x)=\\sum_{1\\le n\\le x}d(n)-x\\log x-(2\\gamma-1)x,\n \\qquad \\gamma=\\lim_{N\\to\\infty}\\left(\\sum_{n=1}^N\\frac1n-\\log N\\right).\n\\]\nThe exact selected problem is to determine\n$\\alpha_2=\\inf\\{a\\in{\\mathbb{R}}:\\forall{\\varepsilon}>0,\\ \\Delta(x)=O_{\\varepsilon}(x^{a+{\\varepsilon}})\\}$.\nThus the implied constant may depend on ${\\varepsilon}$ but not on $x$. Specifying this infimum is not the same as proving a bound with no ${\\varepsilon}$ loss at its endpoint, nor is a mean-square bound a pointwise bound. The catalogue asks for the optimal exponent rather than explicitly adding an endpoint estimate.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2506.22587v1}{[S1]}.\n\n\\subsection{Short English statement}\nHow small can the exponent in a uniform pointwise error estimate for the summatory divisor function be?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Karak and Mahatab, The Piltz divisor Problem in Number Fields Using The Resonance Method (2025; journal 2026).\n\\url{https://arxiv.org/html/2506.22587v1}.\n\\textit{Formulation source.}\n\\item[S2]Status source for Dirichlet Divisor Problem.\n\\url{https://arxiv.org/html/2601.01905v2}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S3]Status source for Dirichlet Divisor Problem.\n\\url{https://arxiv.org/pdf/1105.6155}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S4]Status source for Dirichlet Divisor Problem.\n\\url{https://arxiv.org/html/2604.18624v2}.\n\\textit{Further reference; not a proof endorsement.}\n\\item[S5]Status source for Dirichlet Divisor Problem.\n\\url{https://arxiv.org/html/2605.21476v1}.\n\\textit{Further reference; not a proof endorsement.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1278.tex",
-    "link": "https://www.unsolvedmath.com/problems/1278",
-    "external_url": "https://www.unsolvedmath.com/problems/1278",
+    "link": "https://www.unsolvedmath.com/problems/NT-071",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-071",
     "sources": [
       {
         "citation": "Karak and Mahatab, The Piltz divisor Problem in Number Fields Using The Resonance Method (2025; journal 2026).",
@@ -7973,6 +8653,10 @@ var openProblems = {
   },
   "30006766": {
     "id": 30006766,
+    "problem_number": "LOCAL-30006766",
+    "legacy_ids": [
+      "problem.simplicity-of-nontrivial-zeros-of-the-riemann-zeta-function"
+    ],
     "title": "Simplicity of the Nontrivial Zeros of the Riemann Zeta Function",
     "collection": "ranked",
     "rank": 171,
@@ -8011,6 +8695,10 @@ var openProblems = {
   },
   "30006767": {
     "id": 30006767,
+    "problem_number": "LOCAL-30006767",
+    "legacy_ids": [
+      "problem.separation-of-p-r-from-np-r-in-the-blum-shub-smale-model"
+    ],
     "title": "Separation of P_R from NP_R in the Blum\u2013Shub\u2013Smale Model",
     "collection": "ranked",
     "rank": 172,
@@ -8049,6 +8737,10 @@ var openProblems = {
   },
   "30006768": {
     "id": 30006768,
+    "problem_number": "LOCAL-30006768",
+    "legacy_ids": [
+      "problem.conformal-invariance-of-the-critical-random-cluster-model-with-q-4"
+    ],
     "title": "Conformal Invariance of the Critical Random-Cluster Model with q <= 4",
     "collection": "ranked",
     "rank": 173,
@@ -8091,6 +8783,10 @@ var openProblems = {
   },
   "30001752": {
     "id": 30001752,
+    "problem_number": "OWR-4807-012",
+    "legacy_ids": [
+      "problem.the-free-group-factor-isomorphism-problem"
+    ],
     "title": "Isomorphism of Free Group Factors",
     "collection": "ranked",
     "rank": 174,
@@ -8099,8 +8795,8 @@ var openProblems = {
     "exact_target": "Can free groups with different numbers of generators produce isomorphic von Neumann algebras, especially at ranks two and three?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a discrete group $G$, the left regular representation on $\\ell^2(G)$ is $\\lambda(g)\\delta_h=\\delta_{gh}$. Its group von Neumann algebra is\n$L(G)=\\{\\lambda(g):g\\in G\\}''$, the double commutant in bounded operators. Let $F_m$ be the free group on $m$ generators. Determine the isomorphism relation among $L(F_m)$ for distinct ranks in the nonabelian range, particularly\n\\[\n L(F_2)\\stackrel{?}{\\cong}L(F_3).\n\\]\nIsomorphism here means a von Neumann algebra $*$-isomorphism, not an isomorphism between the underlying free groups. For these finite factors the normalized trace is intrinsic. The issue is whether the operator algebra remembers the number of generators.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2510.12520v1}{[S1]}.\n\n\\subsection{Short English statement}\nCan free groups with different numbers of generators produce isomorphic von Neumann algebras, especially at ranks two and three?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Ramon van Handel, Strong Convergence: A Short Survey (2025), section 2.2.\n\\url{https://arxiv.org/html/2510.12520v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001752.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001752",
-    "external_url": "https://www.unsolvedmath.com/problems/30001752",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4807-012",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4807-012",
     "sources": [
       {
         "citation": "Ramon van Handel, Strong Convergence: A Short Survey (2025), section 2.2.",
@@ -8129,6 +8825,10 @@ var openProblems = {
   },
   "30006769": {
     "id": 30006769,
+    "problem_number": "LOCAL-30006769",
+    "legacy_ids": [
+      "problem.berman-hartmanis-isomorphism-conjecture"
+    ],
     "title": "Berman-Hartmanis Isomorphism Conjecture",
     "collection": "ranked",
     "rank": 175,
@@ -8167,6 +8867,10 @@ var openProblems = {
   },
   "30006770": {
     "id": 30006770,
+    "problem_number": "LOCAL-30006770",
+    "legacy_ids": [
+      "problem.anisotropic-calderon-conjecture-for-smooth-riemannian-manifolds"
+    ],
     "title": "Smooth anisotropic Calder\u00f3n uniqueness from full boundary data",
     "collection": "ranked",
     "rank": 176,
@@ -8205,6 +8909,10 @@ var openProblems = {
   },
   "30006771": {
     "id": 30006771,
+    "problem_number": "LOCAL-30006771",
+    "legacy_ids": [
+      "problem.soliton-resolution-for-the-focusing-energy-critical-wave-equation-without-radial-symmetry"
+    ],
     "title": "Soliton Resolution for the Focusing Energy-Critical Wave Equation without Radial Symmetry",
     "collection": "ranked",
     "rank": 177,
@@ -8243,6 +8951,10 @@ var openProblems = {
   },
   "30006772": {
     "id": 30006772,
+    "problem_number": "LOCAL-30006772",
+    "legacy_ids": [
+      "problem.arnold-conjecture-on-hamiltonian-fixed-points"
+    ],
     "title": "Arnold Conjecture on Hamiltonian Fixed Points",
     "collection": "ranked",
     "rank": 178,
@@ -8281,6 +8993,10 @@ var openProblems = {
   },
   "30006773": {
     "id": 30006773,
+    "problem_number": "LOCAL-30006773",
+    "legacy_ids": [
+      "problem.global-regularity-for-the-spatially-inhomogeneous-landau-coulomb-equation"
+    ],
     "title": "Inhomogeneous Landau\u2013Coulomb Global Regularity (HST All-Moment Data)",
     "collection": "ranked",
     "rank": 179,
@@ -8319,6 +9035,10 @@ var openProblems = {
   },
   "30006774": {
     "id": 30006774,
+    "problem_number": "LOCAL-30006774",
+    "legacy_ids": [
+      "problem.bochner-riesz-conjecture"
+    ],
     "title": "Bochner-Riesz conjecture",
     "collection": "ranked",
     "rank": 180,
@@ -8357,6 +9077,10 @@ var openProblems = {
   },
   "30006775": {
     "id": 30006775,
+    "problem_number": "LOCAL-30006775",
+    "legacy_ids": [
+      "problem.l-space-conjecture"
+    ],
     "title": "L-space Conjecture",
     "collection": "ranked",
     "rank": 181,
@@ -8395,6 +9119,10 @@ var openProblems = {
   },
   "30006776": {
     "id": 30006776,
+    "problem_number": "LOCAL-30006776",
+    "legacy_ids": [
+      "problem.voevodsky-smash-nilpotence-conjecture"
+    ],
     "title": "Voevodsky's Smash-Nilpotence Conjecture",
     "collection": "ranked",
     "rank": 182,
@@ -8433,6 +9161,10 @@ var openProblems = {
   },
   "30006777": {
     "id": 30006777,
+    "problem_number": "LOCAL-30006777",
+    "legacy_ids": [
+      "problem.furstenberg-times-two-times-three-invariant-measures"
+    ],
     "title": "Furstenberg's x2 x3 conjecture on invariant measures",
     "collection": "ranked",
     "rank": 183,
@@ -8471,6 +9203,10 @@ var openProblems = {
   },
   "1283": {
     "id": 1283,
+    "problem_number": "NT-075",
+    "legacy_ids": [
+      "problem.transcendence-of-apery-s-constant"
+    ],
     "title": "Transcendence of Ap\u00e9ry's Constant",
     "collection": "ranked",
     "rank": 184,
@@ -8479,8 +9215,8 @@ var openProblems = {
     "exact_target": "Is the sum of the reciprocal cubes of the positive integers transcendental, rather than merely irrational?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAp\\'ery's constant is the absolutely convergent series\n\\[\n \\zeta(3)=\\sum_{n=1}^{\\infty}\\frac1{n^3}.\n\\]\nA real or complex number $z$ is algebraic over ${\\mathbb{Q}}$ if some nonzero polynomial in ${\\mathbb{Q}}[T]$ vanishes at $z$, and transcendental otherwise. Thus the selected assertion is\n$P(\\zeta(3))\\ne0$ for every $P\\in{\\mathbb{Q}}[T]\\setminus\\{0\\}$.\nA negative resolution would give algebraicity, not necessarily rationality. Irrationality excludes only polynomial relations of degree one; it does not by itself settle this transcendence question. The target concerns this single value, not algebraic independence of a collection of odd zeta values.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/math/0206176}{[S1]}.\n\n\\subsection{Short English statement}\nIs the sum of the reciprocal cubes of the positive integers transcendental, rather than merely irrational?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]W. Zudilin, Arithmetic of linear forms involving odd zeta values, J. Theor. Nombres Bordeaux 16 (2004).\n\\url{https://arxiv.org/abs/math/0206176}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1283.tex",
-    "link": "https://www.unsolvedmath.com/problems/1283",
-    "external_url": "https://www.unsolvedmath.com/problems/1283",
+    "link": "https://www.unsolvedmath.com/problems/NT-075",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-075",
     "sources": [
       {
         "citation": "W. Zudilin, Arithmetic of linear forms involving odd zeta values, J. Theor. Nombres Bordeaux 16 (2004).",
@@ -8509,6 +9245,10 @@ var openProblems = {
   },
   "30006778": {
     "id": 30006778,
+    "problem_number": "LOCAL-30006778",
+    "legacy_ids": [
+      "problem.polynomial-time-quantum-algorithm-for-symmetric-group-hidden-subgroups"
+    ],
     "title": "Polynomial-Time Quantum Algorithm for Symmetric-Group Hidden Subgroups",
     "collection": "ranked",
     "rank": 185,
@@ -8547,6 +9287,10 @@ var openProblems = {
   },
   "30006779": {
     "id": 30006779,
+    "problem_number": "LOCAL-30006779",
+    "legacy_ids": [
+      "problem.beilinson-soule-vanishing-conjecture-for-rational-motivic-cohomology"
+    ],
     "title": "Beilinson-Soule Vanishing Conjecture for Rational Motivic Cohomology",
     "collection": "ranked",
     "rank": 186,
@@ -8585,6 +9329,10 @@ var openProblems = {
   },
   "30006780": {
     "id": 30006780,
+    "problem_number": "LOCAL-30006780",
+    "legacy_ids": [
+      "problem.polyakov-conjecture-absence-of-a-phase-transition-for-planar-o-n-models-with-n-3"
+    ],
     "title": "Polyakov Conjecture: Absence of a Phase Transition for Planar O(n) Models with n >= 3",
     "collection": "ranked",
     "rank": 187,
@@ -8623,6 +9371,10 @@ var openProblems = {
   },
   "9": {
     "id": 9,
+    "problem_number": "NT-002",
+    "legacy_ids": [
+      "problem.collatz-conjecture"
+    ],
     "title": "Collatz Conjecture",
     "collection": "ranked",
     "rank": 188,
@@ -8631,8 +9383,8 @@ var openProblems = {
     "exact_target": "Does repeatedly halving even integers and replacing odd integers by three times the number plus one always eventually reach one?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nDefine $T:{\\mathbb{N}}_{>0}\\to{\\mathbb{N}}_{>0}$ by\n\\[\n T(n)=\\begin{cases}n/2,&2\\mid n,\\\\3n+1,&2\\nmid n.\\end{cases}\n\\]\nThe Collatz assertion is $\\forall n\\ge1\\ \\exists k\\ge0$ such that $T^k(n)=1$, where $T^0$ is the identity. Reaching one enters the cycle $1,4,2,1$. The iteration here uses the unaccelerated map; no division by an additional power of two is included in an odd step. A negative resolution may be an orbit entering a different cycle or one that never repeats and never reaches one. Verifying any finite initial range does not decide the universal assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1909.03562}{[S1]}.\n\n\\subsection{Short English statement}\nDoes repeatedly halving even integers and replacing odd integers by three times the number plus one always eventually reach one?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Terence Tao, Forum of Mathematics, Pi 10 (2022), e12.\n\\url{https://arxiv.org/abs/1909.03562}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9.tex",
-    "link": "https://www.unsolvedmath.com/problems/9",
-    "external_url": "https://www.unsolvedmath.com/problems/9",
+    "link": "https://www.unsolvedmath.com/problems/NT-002",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-002",
     "sources": [
       {
         "citation": "Terence Tao, Forum of Mathematics, Pi 10 (2022), e12.",
@@ -8661,6 +9413,10 @@ var openProblems = {
   },
   "30006781": {
     "id": 30006781,
+    "problem_number": "LOCAL-30006781",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-integer-multiplication-circuit-lower-bound"
+    ],
     "title": "Omega(n log n) Boolean Circuit Lower Bound for Integer Multiplication",
     "collection": "ranked",
     "rank": 189,
@@ -8699,6 +9455,10 @@ var openProblems = {
   },
   "47": {
     "id": 47,
+    "problem_number": "LAN-004",
+    "legacy_ids": [
+      "problem.landau-s-fourth-problem-on-primes-of-the-form-n-2-1"
+    ],
     "title": "Landau's Fourth Problem: Primes of the Form n\u00b2 + 1",
     "collection": "ranked",
     "rank": 190,
@@ -8707,8 +9467,8 @@ var openProblems = {
     "exact_target": "Are there infinitely many primes that exceed a positive integer square by exactly one?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $x\\ge1$, set\n\\[\n Q(x)=\\#\\{n\\in{\\mathbb{N}}:1\\le n\\le x,\\ n^2+1\\text{ is prime}\\}.\n\\]\nThe selected conjecture is $Q(x)\\to\\infty$ as $x\\to\\infty$, equivalently\n$\\forall B\\ \\exists n>B$ such that $n^2+1$ is prime. Prime means an integer greater than one having no positive divisors other than one and itself. The problem asks only infinitude, not an asymptotic formula for $Q(x)$, a positive density among integers, or primality for every $n$. In particular, parity restrictions on $n$ do not negate the infinitude formulation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/LandausProblems.html}{[S1]}.\n\n\\subsection{Short English statement}\nAre there infinitely many primes that exceed a positive integer square by exactly one?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Weisstein, Eric W. \"Landau's Problems.\" From MathWorld--A Wolfram Web Resource.\n\\url{https://mathworld.wolfram.com/LandausProblems.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/47.tex",
-    "link": "https://www.unsolvedmath.com/problems/47",
-    "external_url": "https://www.unsolvedmath.com/problems/47",
+    "link": "https://www.unsolvedmath.com/problems/LAN-004",
+    "external_url": "https://www.unsolvedmath.com/problems/LAN-004",
     "sources": [
       {
         "citation": "Weisstein, Eric W. \"Landau's Problems.\" From MathWorld--A Wolfram Web Resource.",
@@ -8737,6 +9497,10 @@ var openProblems = {
   },
   "30006782": {
     "id": 30006782,
+    "problem_number": "LOCAL-30006782",
+    "legacy_ids": [
+      "problem.kimura-osullivan-finite-dimensionality-conjecture"
+    ],
     "title": "Kimura\u2013O'Sullivan Finite-Dimensionality Conjecture",
     "collection": "ranked",
     "rank": 191,
@@ -8775,6 +9539,10 @@ var openProblems = {
   },
   "30002360": {
     "id": 30002360,
+    "problem_number": "OWR-12494-006",
+    "legacy_ids": [
+      "problem.grothendieck-serre-conjecture-on-principal-bundles-over-regular-local-rings"
+    ],
     "title": "Grothendieck\u2013Serre Conjecture for Regular Local Rings",
     "collection": "ranked",
     "rank": 192,
@@ -8783,8 +9551,8 @@ var openProblems = {
     "exact_target": "If a principal bundle under a reductive group over a regular local ring is trivial over the fraction field, must it already be trivial over the ring?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA Noetherian local ring $(R,\\mathfrak m)$ is regular when\n$\\dim R=\\dim_{R/\\mathfrak m}\\mathfrak m/\\mathfrak m^2$; it is a domain here, with fraction field $K$. A reductive $R$-group scheme is smooth affine with connected reductive geometric fibers. A $G$-torsor is a principal homogeneous space locally trivial for the \\\"etale topology. The assertion is\n\\[\n \\ker\\bigl(H^1_{\\mathrm{et}}(R,G)\\to H^1_{\\mathrm{et}}(K,G)\\bigr)=\\{1\\},\n\\]\nwhere these are pointed sets and the kernel is the preimage of the trivial torsor. Thus generic triviality forces triviality over $R$. The exact statement does not impose a field inside $R$, excellence, isotropy, or a constant group scheme.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2201.06424v4}{[S1]}.\n\n\\subsection{Short English statement}\nIf a principal bundle under a reductive group over a regular local ring is trivial over the fraction field, must it already be trivial over the ring?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Problems about torsors over regular rings, with an appendix by Yifei Zhao; arXiv2201.06424v4,5May2025; HTML internal29March2023.\n\\url{https://arxiv.org/pdf/2201.06424v4}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002360.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002360",
-    "external_url": "https://www.unsolvedmath.com/problems/30002360",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12494-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12494-006",
     "sources": [
       {
         "citation": "Problems about torsors over regular rings, with an appendix by Yifei Zhao; arXiv2201.06424v4,5May2025; HTML internal29March2023.",
@@ -8813,6 +9581,10 @@ var openProblems = {
   },
   "30006783": {
     "id": 30006783,
+    "problem_number": "LOCAL-30006783",
+    "legacy_ids": [
+      "problem.exact-consistency-strength-of-the-proper-forcing-axiom-pfa"
+    ],
     "title": "Exact Consistency Strength of the Proper Forcing Axiom",
     "collection": "ranked",
     "rank": 193,
@@ -8855,6 +9627,10 @@ var openProblems = {
   },
   "30006784": {
     "id": 30006784,
+    "problem_number": "LOCAL-30006784",
+    "legacy_ids": [
+      "problem.nonvanishing-conjecture-for-projective-log-canonical-pairs"
+    ],
     "title": "Nonvanishing conjecture for projective log canonical pairs",
     "collection": "ranked",
     "rank": 194,
@@ -8893,6 +9669,10 @@ var openProblems = {
   },
   "30006785": {
     "id": 30006785,
+    "problem_number": "LOCAL-30006785",
+    "legacy_ids": [
+      "problem.polynomial-freiman-ruzsa-general-abelian-groups"
+    ],
     "title": "Polynomial Freiman-Ruzsa Conjecture for General Abelian Groups",
     "collection": "ranked",
     "rank": 195,
@@ -8931,6 +9711,10 @@ var openProblems = {
   },
   "30006786": {
     "id": 30006786,
+    "problem_number": "LOCAL-30006786",
+    "legacy_ids": [
+      "problem.parity-conjecture-for-elliptic-curves"
+    ],
     "title": "Parity conjecture for elliptic curves",
     "collection": "ranked",
     "rank": 196,
@@ -8969,6 +9753,10 @@ var openProblems = {
   },
   "1183": {
     "id": 1183,
+    "problem_number": "NT-029",
+    "legacy_ids": [
+      "problem.artin-s-primitive-root-conjecture"
+    ],
     "title": "Artin's Conjecture on Primitive Roots",
     "collection": "ranked",
     "rank": 197,
@@ -8977,8 +9765,8 @@ var openProblems = {
     "exact_target": "Does every admissible integer generate the multiplicative group modulo a positive proportion of primes, with precisely Artin's predicted density?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a prime $p\\nmid a$, let $\\operatorname{ord}_p(a)$ be the least $m>0$ with $a^m\\equiv1\\pmod p$. Then $a$ is a primitive root modulo $p$ exactly when $\\operatorname{ord}_p(a)=p-1$. For each integer $a\\ne-1$ which is not a square, the target requires a positive prime-relative density\n\\[\n \\lim_{x\\to\\infty}\\frac{\\#\\{p\\le x:\\operatorname{ord}_p(a)=p-1\\}}{\\pi(x)}=\\delta(a)>0.\n\\]\nThe Artin density is expressed in the usual inclusion-exclusion convention by\n$\\delta(a)=\\sum_{m\\ge1}\\mu(m)/[{\\mathbb{Q}}(\\zeta_m,a^{1/m}):{\\mathbb{Q}}]$, equivalently its corrected Artin-product form. The algebraic degrees encode dependencies between prime-power obstructions. The density is among primes, not among all positive integers.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/pii/S0022314X24000829}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every admissible integer generate the multiplicative group modulo a positive proportion of primes, with precisely Artin's predicted density?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Journal of Number Theory 262 (2024), 161-185.\n\\url{https://www.sciencedirect.com/science/article/pii/S0022314X24000829}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1183.tex",
-    "link": "https://www.unsolvedmath.com/problems/1183",
-    "external_url": "https://www.unsolvedmath.com/problems/1183",
+    "link": "https://www.unsolvedmath.com/problems/NT-029",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-029",
     "sources": [
       {
         "citation": "Journal of Number Theory 262 (2024), 161-185.",
@@ -9007,6 +9795,10 @@ var openProblems = {
   },
   "30001846": {
     "id": 30001846,
+    "problem_number": "OWR-11127-017",
+    "legacy_ids": [
+      "problem.rank-one-abelian-stark-conjecture"
+    ],
     "title": "The Abelian Rank-One Stark Conjecture",
     "collection": "ranked",
     "rank": 198,
@@ -9015,8 +9807,8 @@ var openProblems = {
     "exact_target": "Can all the relevant partial-zeta derivatives be realized by logarithms of conjugates of a single permitted unit whose root generates an abelian extension?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an abelian extension $K/F$ and $S$ as specified, the partial zeta function $\\zeta_{K/F,S}(\\sigma,s)$ sums $(N\\mathfrak a)^{-s}$ over ideals of $F$ prime to $S$ having Artin symbol $\\sigma$, continued to $s=0$. The group $U_{v,S}$ of permitted Stark units, its normalized local absolute values, and the Artin-symbol action convention are those of the cited notes; these conventions affect the displayed identity. If $w\\mid v$ and $e=|\\mu(K)|$, the requested unit satisfies\n\\[\n \\zeta'_{K/F,S}(\\sigma,0)=-e^{-1}\\log|u^\\sigma|_w\n \\quad(\\sigma\\in G),\\qquad K(u^{1/e})/F\\text{ abelian}.\n\\]\nThe last condition is part of the conjecture, not a consequence to be dropped from a regulator-only reformulation. The source definition of $U_{v,S}$ is retained rather than replacing it with unrestricted units.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://swc-math.github.io/aws/2011/2011DasguptaGreenbergNotes.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan all the relevant partial-zeta derivatives be realized by logarithms of conjugates of a single permitted unit whose root generates an abelian extension?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]S. Dasgupta and M. Greenberg, The Rank One Abelian Stark Conjecture, Arizona Winter School 2011 course notes, March 11, 2011.\n\\url{https://swc-math.github.io/aws/2011/2011DasguptaGreenbergNotes.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001846.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001846",
-    "external_url": "https://www.unsolvedmath.com/problems/30001846",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11127-017",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11127-017",
     "sources": [
       {
         "citation": "S. Dasgupta and M. Greenberg, The Rank One Abelian Stark Conjecture, Arizona Winter School 2011 course notes, March 11, 2011.",
@@ -9045,6 +9837,10 @@ var openProblems = {
   },
   "30006787": {
     "id": 30006787,
+    "problem_number": "LOCAL-30006787",
+    "legacy_ids": [
+      "problem.metric-tsp-subtour-lp-integrality-gap-conjecture"
+    ],
     "title": "Metric TSP Subtour LP Integrality Gap Conjecture",
     "collection": "ranked",
     "rank": 199,
@@ -9083,6 +9879,10 @@ var openProblems = {
   },
   "30006788": {
     "id": 30006788,
+    "problem_number": "LOCAL-30006788",
+    "legacy_ids": [
+      "problem.asymptotic-waring-function-gk"
+    ],
     "title": "Exact Asymptotic Waring Function G(k)",
     "collection": "ranked",
     "rank": 200,
@@ -9109,6 +9909,10 @@ var openProblems = {
   },
   "30004844": {
     "id": 30004844,
+    "problem_number": "OWR-8415348-002",
+    "legacy_ids": [
+      "problem.local-smoothing-conjecture-for-wave-equations"
+    ],
     "title": "Local Smoothing for the Euclidean Wave Equation",
     "collection": "ranked",
     "rank": 201,
@@ -9117,8 +9921,8 @@ var openProblems = {
     "exact_target": "Does averaging the wave evolution over time save almost one-over-p derivatives throughout the conjectured range of exponents?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a Schwartz function on ${\\mathbb{R}}^n$, the half-wave propagator is the Fourier multiplier\n\t$\\widehat{e^{it\\sqrt{-\\Delta}}f}(\\xi)=e^{it|\\xi|}\\widehat f(\\xi)$, using the Fourier convention in which $-\\Delta$ has symbol $|\\xi|^2$. Define the Bessel-potential norm\n\t$\\|f\\|_{W^{s,p}}=\\|(1-\\Delta)^{s/2}f\\|_{L^p}$ and put $s_p=(n-1)(1/2-1/p)$. The assertion is\n\t\\[\n\t\\left(\\int_1^2\\int_{{\\mathbb{R}}^n}|e^{it\\sqrt{-\\Delta}}f(x)|^p\\,\\mathrm d x\\,\\mathrm d t\\right)^{1/p}\n\t\\le C_{n,p,\\varepsilon}\\|f\\|_{W^{s_p-1/p+\\varepsilon,p}}\n\t\\]\n\tfor $n\\ge3$, $p>2n/(n-1)$, and every $\\varepsilon>0$. Constants are independent of $f$. This is a spacetime estimate with an arbitrarily small derivative loss; the excluded endpoint and a zero-loss bound are not asserted.\n\t\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/pii/S0022123623003786}{[S1]}.\n\n\\subsection{Short English statement}\nDoes averaging the wave evolution over time save almost one-over-p derivatives throughout the conjectured range of exponents?\n\n\\subsection{Sources}\n\\begin{itemize}\n\t\t\\item[S1] Formal statement, Introduction, local smoothing conjecture.\n\t\t\\url{https://www.sciencedirect.com/science/article/pii/S0022123623003786}.\n\t\t{\\small\\textit{Catalogue formulation source.}}\n\t\t\\item[E1]\n\t\tJ. Bourgain and C. Demeter, \\emph{The proof of the $\\ell^2$ Decoupling\n\t\t\tConjecture}, Annals of Mathematics (2) 182 (2015), no.~1, 351--389,\n\t\tTheorem 1.2 (cone decoupling) and the discussion immediately following it.\n\t\t\\url{https://annals.math.princeton.edu/2015/182-1/p09};\n\t\tauthor manuscript \\url{https://arxiv.org/pdf/1403.5335v3}.\n\t\t{\\small\\textit{Published result; consulted 24 September 2026.}}\n\t\t\\item[E2]\n\t\tS. Gan, D. He, X. Li, and S. Wu, \\emph{On local smoothing estimates for\n\t\t\twave equations}, arXiv:2502.05973v2, 4 January 2026, Theorem 1.3,\n\t\tequation (1.4), and Sections 1.1, 1.3, and 5.1.\n\t\t\\url{https://arxiv.org/html/2502.05973v2}.\n\t\t{\\small\\textit{Recent manuscript theorem, not independently audited here;\n\t\t\t\tversion 2 has four authors and an improved main result. Consulted\n\t\t\t\t24 September 2026.}}\n\t\t\\item[E3]\n\t\tD. Beltran, J. Roos, A. Rutar, and A. Seeger, \\emph{A fractal local\n\t\t\tsmoothing problem for the wave equation}, Bulletin of the London\n\t\tMathematical Society 57 (2025), no.~12, 3667--3690; author manuscript\n\t\tarXiv:2501.12805v1, 22 January 2025, Theorem 1.1, equation (1.6),\n\t\tand Section 5 (radial inputs).\n\t\t\\url{https://arxiv.org/html/2501.12805v1}.\n\t\t{\\small\\textit{The radial theorem, not its January 2025 general-frontier\n\t\t\t\tsummary, is used here. Consulted 24 September 2026.}}\n\t\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004844.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004844",
-    "external_url": "https://www.unsolvedmath.com/problems/30004844",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415348-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415348-002",
     "sources": [
       {
         "citation": "Formal statement, Introduction, local smoothing conjecture.",
@@ -9159,6 +9963,10 @@ var openProblems = {
   },
   "30006979": {
     "id": 30006979,
+    "problem_number": "LOCAL-30006979",
+    "legacy_ids": [
+      "problem.long-range-order-in-the-quantum-heisenberg-ferromagnet"
+    ],
     "title": "Long-Range Order in the Quantum Heisenberg Ferromagnet",
     "collection": "ranked",
     "rank": 202,
@@ -9217,6 +10025,10 @@ var openProblems = {
   },
   "30006980": {
     "id": 30006980,
+    "problem_number": "LOCAL-30006980",
+    "legacy_ids": [
+      "problem.uct-problem-for-nuclear-c-star-algebras"
+    ],
     "title": "UCT Problem for Separable Nuclear Complex C*-Algebras",
     "collection": "ranked",
     "rank": 203,
@@ -9255,6 +10067,10 @@ var openProblems = {
   },
   "30006789": {
     "id": 30006789,
+    "problem_number": "LOCAL-30006789",
+    "legacy_ids": [
+      "problem.kaplansky-s-zero-divisor-conjecture-for-torsion-free-groups"
+    ],
     "title": "Kaplansky's Zero-Divisor Conjecture for Torsion-Free Groups",
     "collection": "ranked",
     "rank": 204,
@@ -9293,6 +10109,10 @@ var openProblems = {
   },
   "3433": {
     "id": 3433,
+    "problem_number": "OPG-48770",
+    "legacy_ids": [
+      "problem.provisional-top500-omission-wave-004.018"
+    ],
     "title": "Jacob Palis Conjecture(Finitude of Attractors)(Dynamical Systems)",
     "collection": "ranked",
     "rank": 205,
@@ -9301,8 +10121,8 @@ var openProblems = {
     "exact_target": "Can every smooth dynamical system be approximated by one in which almost every initial point is attracted to one of finitely many transitive attractors?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a diffeomorphism $f$ of a compact manifold, let\n$B(A)=\\{x:\\operatorname{dist}(f^n(x),A)\\to0\\}$; for a flow replace $n$ by continuous positive time. In the selected Palis convention an attractor is a compact invariant transitive set with positive-volume basin, not necessarily an attractor defined by a trapping neighborhood. For each finite $r\\ge1$, the target is density in both $\\operatorname{Diff}^r(M)$ and the space of $C^r$ vector fields of systems with finitely many such sets $A_1,\\ldots,A_k$ satisfying\n\\[\n \\operatorname{vol}\\left(M\\setminus\\bigcup_{i=1}^k B(A_i)\\right)=0.\n\\]\nThe number $k$ may vary with the system. Both density assertions are required; physical measures and stochastic stability are not included in this selected part of the global conjecture.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ems.press/content/serial-article-files/15975}{[S1]}.\n\n\\subsection{Short English statement}\nCan every smooth dynamical system be approximated by one in which almost every initial point is attracted to one of finitely many transitive attractors?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]J. Palis, A global perspective for non-conservative dynamics, Ann. IHP AN 22 (2005), 485-507.\n\\url{https://ems.press/content/serial-article-files/15975}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3433.tex",
-    "link": "https://www.unsolvedmath.com/problems/3433",
-    "external_url": "https://www.unsolvedmath.com/problems/3433",
+    "link": "https://www.unsolvedmath.com/problems/OPG-48770",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-48770",
     "sources": [
       {
         "citation": "J. Palis, A global perspective for non-conservative dynamics, Ann. IHP AN 22 (2005), 485-507.",
@@ -9331,6 +10151,10 @@ var openProblems = {
   },
   "30003556": {
     "id": 30003556,
+    "problem_number": "OWR-15581-002",
+    "legacy_ids": [
+      "problem.lehmer-s-mahler-measure-problem"
+    ],
     "title": "Lehmer\u2019s Mahler Measure Problem",
     "collection": "ranked",
     "rank": 206,
@@ -9339,8 +10163,8 @@ var openProblems = {
     "exact_target": "Is there a universal gap above one among Mahler measures of monic integer polynomials, or can such measures approach one from above?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nIf a monic polynomial $P\\in{\\mathbb{Z}}[X]$ factors as\n$P(X)=\\prod_{j=1}^d(X-\\alpha_j)$ over ${\\mathbb{C}}$, its multiplicative Mahler measure is\n\\[\n M(P)=\\prod_{j=1}^d\\max\\{1,|\\alpha_j|\\}.\n\\]\nThe selected gap assertion is that an absolute ${\\varepsilon}_0>0$ exists with\n$M(P)>1\\Longrightarrow M(P)\\ge1+{\\varepsilon}_0$ for every monic integer polynomial of arbitrary degree. Equivalently, either establish a gap immediately above one or produce a sequence with $M(P_j)>1$ and $M(P_j)\\to1$. No fixed-degree bound can substitute for an absolute bound across all degrees, and the polynomials need not be irreducible.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/LehmersMahlerMeasureProblem.html}{[S1]}.\n\n\\subsection{Short English statement}\nIs there a universal gap above one among Mahler measures of monic integer polynomials, or can such measures approach one from above?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Lehmer's Mahler Measure Problem (MathWorld).\n\\url{https://mathworld.wolfram.com/LehmersMahlerMeasureProblem.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003556.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003556",
-    "external_url": "https://www.unsolvedmath.com/problems/30003556",
+    "link": "https://www.unsolvedmath.com/problems/OWR-15581-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-15581-002",
     "sources": [
       {
         "citation": "Lehmer's Mahler Measure Problem (MathWorld).",
@@ -9369,6 +10193,10 @@ var openProblems = {
   },
   "1482": {
     "id": 1482,
+    "problem_number": "TOP-004",
+    "legacy_ids": [
+      "problem.hilbert-smith-conjecture"
+    ],
     "title": "Hilbert-Smith Conjecture",
     "collection": "ranked",
     "rank": 207,
@@ -9407,6 +10235,10 @@ var openProblems = {
   },
   "30006790": {
     "id": 30006790,
+    "problem_number": "LOCAL-30006790",
+    "legacy_ids": [
+      "problem.effective-roth-theorem"
+    ],
     "title": "Effective Roth Theorem",
     "collection": "ranked",
     "rank": 208,
@@ -9445,6 +10277,10 @@ var openProblems = {
   },
   "30001063": {
     "id": 30001063,
+    "problem_number": "OWR-2090-014",
+    "legacy_ids": [
+      "problem.falconer-distance-set-conjecture"
+    ],
     "title": "Falconer Distance Conjecture",
     "collection": "ranked",
     "rank": 209,
@@ -9453,8 +10289,8 @@ var openProblems = {
     "exact_target": "Must a compact Euclidean set whose Hausdorff dimension exceeds half the ambient dimension determine a positive-measure set of distances?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor compact $E\\subset{\\mathbb{R}}^d$, define its Euclidean distance set\n$\\Delta(E)=\\{|x-y|:x,y\\in E\\}\\subset[0,\\infty)$. Hausdorff dimension is\n$\\dim_H E=\\inf\\{s:\\mathcal H^s(E)=0\\}$, with $\\mathcal H^s$ defined by arbitrarily fine covers and sums of $s$th powers of diameters. The conjecture is\n\\[\n \\dim_H E>d/2\\quad\\Longrightarrow\\quad \\mathcal L^1(\\Delta(E))>0\n \\qquad(d\\ge2).\n\\]\nThe threshold inequality is strict. Positive one-dimensional measure is stronger than merely uncountably many distances or a distance set of Hausdorff dimension one. The set need not carry positive $d$-dimensional volume.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.cambridge.org/core/journals/canadian-journal-of-mathematics/article/triangles-in-the-plane-and-arithmetic-progressions-in-thick-compact-subsets-of-mathbb-rd/B5F9FC2F5A15CA0577BEDC96031B84CB}{[S1]}.\n\n\\subsection{Short English statement}\nMust a compact Euclidean set whose Hausdorff dimension exceeds half the ambient dimension determine a positive-measure set of distances?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Krystal Taylor and Samantha Sandberg-Clark, Triangles in the plane and arithmetic progressions in thick compact subsets of R\\textasciicircum{}d, Introduction.\n\\url{https://www.cambridge.org/core/journals/canadian-journal-of-mathematics/article/triangles-in-the-plane-and-arithmetic-progressions-in-thick-compact-subsets-of-mathbb-rd/B5F9FC2F5A15CA0577BEDC96031B84CB}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001063.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001063",
-    "external_url": "https://www.unsolvedmath.com/problems/30001063",
+    "link": "https://www.unsolvedmath.com/problems/OWR-2090-014",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-2090-014",
     "sources": [
       {
         "citation": "Krystal Taylor and Samantha Sandberg-Clark, Triangles in the plane and arithmetic progressions in thick compact subsets of R\\textasciicircum{}d, Introduction.",
@@ -9483,6 +10319,10 @@ var openProblems = {
   },
   "30006791": {
     "id": 30006791,
+    "problem_number": "LOCAL-30006791",
+    "legacy_ids": [
+      "problem.brauer-manin-obstruction-for-curves"
+    ],
     "title": "Brauer-Manin obstruction for number-field curves: Hasse-principle form",
     "collection": "ranked",
     "rank": 210,
@@ -9521,6 +10361,10 @@ var openProblems = {
   },
   "30001953": {
     "id": 30001953,
+    "problem_number": "OWR-11568-006",
+    "legacy_ids": [
+      "problem.hopf-conjecture-for-positive-sectional-curvature"
+    ],
     "title": "Hopf Conjecture",
     "collection": "ranked",
     "rank": 211,
@@ -9529,8 +10373,8 @@ var openProblems = {
     "exact_target": "Must every closed even-dimensional manifold with everywhere positive sectional curvature have positive Euler characteristic?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $(M^{2m},g)$ be a closed Riemannian manifold. For a two-plane $\\sigma=\\operatorname{span}(u,v)\\subset T_xM$, sectional curvature is\n$K_g(\\sigma)=\\langle R(u,v)v,u\\rangle/(|u|^2|v|^2-\\langle u,v\\rangle^2)$, with the convention making the round sphere positive. The Euler characteristic is\n$\\chi(M)=\\sum_j(-1)^j\\dim H_j(M,{\\mathbb{Q}})$. The conjecture states\n\\[\n K_g(\\sigma)>0\\text{ for every }x,\\sigma\n \\quad\\Longrightarrow\\quad\\chi(M)>0.\n\\]\nNo symmetry or simple-connectedness hypothesis is imposed. Positivity of Ricci curvature or scalar curvature alone is a different and weaker curvature condition.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2507.16936}{[S1]}.\n\n\\subsection{Short English statement}\nMust every closed even-dimensional manifold with everywhere positive sectional curvature have positive Euler characteristic?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Lee Kennard, Lawrence Mouille, Jan Nienhaus. On Hopf's conjecture and positive second intermediate Ricci curvature. 2025.\n\\url{https://arxiv.org/abs/2507.16936}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001953.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001953",
-    "external_url": "https://www.unsolvedmath.com/problems/30001953",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11568-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11568-006",
     "sources": [
       {
         "citation": "Lee Kennard, Lawrence Mouille, Jan Nienhaus. On Hopf's conjecture and positive second intermediate Ricci curvature. 2025.",
@@ -9559,6 +10403,10 @@ var openProblems = {
   },
   "30006792": {
     "id": 30006792,
+    "problem_number": "LOCAL-30006792",
+    "legacy_ids": [
+      "problem.morton-silverman-uniform-boundedness-conjecture"
+    ],
     "title": "Morton\u2013Silverman Uniform Boundedness Conjecture",
     "collection": "ranked",
     "rank": 212,
@@ -9597,6 +10445,10 @@ var openProblems = {
   },
   "30001930": {
     "id": 30001930,
+    "problem_number": "OWR-11451-002",
+    "legacy_ids": [
+      "problem.polynomial-diameter-bound-for-polytopes"
+    ],
     "title": "Polynomial Diameter Bounds for Polyhedra",
     "collection": "ranked",
     "rank": 213,
@@ -9605,8 +10457,8 @@ var openProblems = {
     "exact_target": "Can the graph distance between any two vertices of a pointed polyhedron always be bounded by a polynomial in its dimension and number of facets?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA pointed polyhedron is an intersection of finitely many closed affine half-spaces in ${\\mathbb{R}}^d$ containing no affine line; assume its affine dimension is $d$. Its graph has vertices the zero-dimensional faces and edges joining pairs that share a bounded one-dimensional face. Graph diameter is the maximum shortest edge-path distance between vertices. The target is a single polynomial $p$ such that\n\\[\n \\operatorname{diam}(P)\\le p(n,d)\n\\]\nfor every pointed $d$-dimensional polyhedron with $n$ facets, including unbounded polyhedra. Coordinates and their bit lengths do not enter the bound. This asks for a polynomial diameter estimate, not the stronger historical linear bound nor a polynomial-time pivot rule.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.SoCG.2022.18}{[S1]}.\n\n\\subsection{Short English statement}\nCan the graph distance between any two vertices of a pointed polyhedron always be bounded by a polynomial in its dimension and number of facets?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Bonnet, Dadush, Grupel, Huiberts, and Livshyts, SoCG 2022.\n\\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.SoCG.2022.18}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001930.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001930",
-    "external_url": "https://www.unsolvedmath.com/problems/30001930",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11451-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11451-002",
     "sources": [
       {
         "citation": "Bonnet, Dadush, Grupel, Huiberts, and Livshyts, SoCG 2022.",
@@ -9635,6 +10487,10 @@ var openProblems = {
   },
   "30006039": {
     "id": 30006039,
+    "problem_number": "OWR-14298591-002",
+    "legacy_ids": [
+      "problem.global-existence-of-classical-solutions-to-the-relativistic-vlasov-maxwell-system"
+    ],
     "title": "Global Dynamics of the Vlasov\u2013Maxwell System",
     "collection": "ranked",
     "rank": 214,
@@ -9643,8 +10499,8 @@ var openProblems = {
     "exact_target": "Do all admissible sufficiently regular finite-energy data for the three-dimensional relativistic Vlasov\u2013Maxwell system evolve as classical solutions for all time?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nIn units with particle mass and light speed one, set $\\widehat v=v/\\sqrt{1+|v|^2}$. A conventional one-species relativistic Vlasov--Maxwell system is\n\\[\n \\partial_tf+\\widehat v\\cdot\\nabla_xf+(E+\\widehat v\\times B)\\cdot\\nabla_vf=0,\n \\quad \\partial_tE=\\nabla\\times B-4\\pi j,\\quad\\partial_tB=-\\nabla\\times E,\n\\]\nwith $\\nabla\\cdot E=4\\pi\\rho$, $\\nabla\\cdot B=0$, $\\rho=\\int f{\\,\\mathrm{d}} v$, and $j=\\int\\widehat v f{\\,\\mathrm{d}} v$. Finite energy means finiteness of\n$\\iint\\sqrt{1+|v|^2}f{\\,\\mathrm{d}} x{\\,\\mathrm{d}} v+(8\\pi)^{-1}\\int(|E|^2+|B|^2){\\,\\mathrm{d}} x$.\nThe question is global classical evolution from all compatible data in the cited regularity class. The catalogue's phrase ``sufficiently regular'' does not fix one complete function-space hypothesis; this exposition supplies the equations but does not silently promote a particular data class to the exact target.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1406.0165}{[S1]}.\n\n\\subsection{Short English statement}\nDo all admissible sufficiently regular finite-energy data for the three-dimensional relativistic Vlasov\u2013Maxwell system evolve as classical solutions for all time?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]arXiv:1406.0165, 'A new continuation criterion for the relativistic Vlasov-Maxwell system', 2014.\n\\url{https://arxiv.org/abs/1406.0165}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30006039.tex",
-    "link": "https://www.unsolvedmath.com/problems/30006039",
-    "external_url": "https://www.unsolvedmath.com/problems/30006039",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14298591-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14298591-002",
     "sources": [
       {
         "citation": "arXiv:1406.0165, 'A new continuation criterion for the relativistic Vlasov-Maxwell system', 2014.",
@@ -9673,6 +10529,10 @@ var openProblems = {
   },
   "30006793": {
     "id": 30006793,
+    "problem_number": "LOCAL-30006793",
+    "legacy_ids": [
+      "problem.density-of-hyperbolicity-for-complex-polynomials"
+    ],
     "title": "Density of Hyperbolicity for Complex Polynomials",
     "collection": "ranked",
     "rank": 215,
@@ -9711,6 +10571,10 @@ var openProblems = {
   },
   "30006794": {
     "id": 30006794,
+    "problem_number": "LOCAL-30006794",
+    "legacy_ids": [
+      "problem.polynomial-time-quantum-algorithm-for-the-dihedral-hidden-subgroup-problem"
+    ],
     "title": "Polynomial-Time Quantum Algorithm for the Dihedral Hidden Subgroup Problem",
     "collection": "ranked",
     "rank": 216,
@@ -9749,6 +10613,10 @@ var openProblems = {
   },
   "1268": {
     "id": 1268,
+    "problem_number": "NT-061",
+    "legacy_ids": [
+      "problem.skolem-problem-for-linear-recurrence-sequences"
+    ],
     "title": "Skolem Problem",
     "collection": "ranked",
     "rank": 217,
@@ -9757,8 +10625,8 @@ var openProblems = {
     "exact_target": "Can one always decide from a linear recurrence and its initial values whether any term of the resulting sequence is exactly zero?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA linear recurrence sequence of order $k$ is determined by coefficients $c_0,\\ldots,c_{k-1}$ and initial terms $u_0,\\ldots,u_{k-1}$ through\n\\[\n u_{n+k}=c_{k-1}u_{n+k-1}+\\cdots+c_0u_n\\quad(n\\ge0).\n\\]\nThe data are integers or algebraic numbers given by effective exact encodings. The Skolem problem asks for an algorithm that always halts and decides whether $\\exists n\\ge0$ with $u_n=0$. The order is part of the input and is unbounded. An algorithm for a fixed low order, or a description of the zero set without effective bounds on the exceptional indices, does not settle the general decision problem.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://theoretics.episciences.org/17020}{[S1]}.\n\n\\subsection{Short English statement}\nCan one always decide from a linear recurrence and its initial values whether any term of the resulting sequence is exactly zero?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Piotr Bacik, \"Completing the picture for the Skolem Problem on order-4 linear recurrence sequences,\" TheoretiCS, Volume 4 (published 2 December 2025), DOI 10.46298/theoretics.25.28; arXiv:2409.01221.\n\\url{https://theoretics.episciences.org/17020}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1268.tex",
-    "link": "https://www.unsolvedmath.com/problems/1268",
-    "external_url": "https://www.unsolvedmath.com/problems/1268",
+    "link": "https://www.unsolvedmath.com/problems/NT-061",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-061",
     "sources": [
       {
         "citation": "Piotr Bacik, \"Completing the picture for the Skolem Problem on order-4 linear recurrence sequences,\" TheoretiCS, Volume 4 (published 2 December 2025), DOI 10.46298/theoretics.25.28; arXiv:2409.01221.",
@@ -9787,6 +10655,10 @@ var openProblems = {
   },
   "30006795": {
     "id": 30006795,
+    "problem_number": "LOCAL-30006795",
+    "legacy_ids": [
+      "problem.sharp-erdos-distinct-distances-conjecture-plane"
+    ],
     "title": "Sharp Erdos Distinct-Distances Conjecture in the Plane",
     "collection": "ranked",
     "rank": 218,
@@ -9825,6 +10697,10 @@ var openProblems = {
   },
   "30006796": {
     "id": 30006796,
+    "problem_number": "LOCAL-30006796",
+    "legacy_ids": [
+      "problem.polynomial-time-distribution-free-pac-learning-of-dnf-formulas"
+    ],
     "title": "Polynomial-Time Distribution-Free PAC Learning of DNF Formulas",
     "collection": "ranked",
     "rank": 219,
@@ -9863,6 +10739,10 @@ var openProblems = {
   },
   "10": {
     "id": 10,
+    "problem_number": "COMB-001",
+    "legacy_ids": [
+      "problem.chromatic-number-of-the-plane-hadwiger-nelson-problem"
+    ],
     "title": "The Hadwiger-Nelson Problem",
     "collection": "ranked",
     "rank": 220,
@@ -9905,6 +10785,10 @@ var openProblems = {
   },
   "30006797": {
     "id": 30006797,
+    "problem_number": "LOCAL-30006797",
+    "legacy_ids": [
+      "problem.walls-poincare-duality-group-conjecture"
+    ],
     "title": "Wall's Poincare Duality Group Conjecture",
     "collection": "ranked",
     "rank": 221,
@@ -9943,6 +10827,10 @@ var openProblems = {
   },
   "7200016": {
     "id": 7200016,
+    "problem_number": "AMR-071-0016",
+    "legacy_ids": [
+      "problem.parshin-conjecture"
+    ],
     "title": "Parshin's conjecture",
     "collection": "ranked",
     "rank": 222,
@@ -9951,8 +10839,8 @@ var openProblems = {
     "exact_target": "Are all positive-degree algebraic K-groups of smooth projective varieties over finite fields torsion?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a smooth projective variety $X$ over a finite field ${\\mathbb{F}}_q$, let $K_n(X)$ denote its higher algebraic $K$-group. An abelian group is torsion when every element is killed by some positive integer, with the integer allowed to depend on the element. Parshin's assertion is\n\\[\n K_n(X)\\otimes_{{\\mathbb{Z}}}{\\mathbb{Q}}=0\\quad\\text{for all }n>0.\n\\]\nThis is equivalent to torsion, not necessarily finiteness of the integral group or a single bounded exponent. The group $K_0(X)$ is excluded, and properness and smoothness are part of the chosen scope. Passing to rational coefficients is the vanishing formulation, not an assertion of integral vanishing.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/pii/S0022404923002001}{[S1]}.\n\n\\subsection{Short English statement}\nAre all positive-degree algebraic K-groups of smooth projective varieties over finite fields torsion?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]On Parshin's conjecture.\n\\url{https://www.sciencedirect.com/science/article/pii/S0022404923002001}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200016.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200016",
-    "external_url": "https://www.unsolvedmath.com/problems/7200016",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0016",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0016",
     "sources": [
       {
         "citation": "On Parshin's conjecture.",
@@ -9981,6 +10869,10 @@ var openProblems = {
   },
   "30000952": {
     "id": 30000952,
+    "problem_number": "OWR-1965-006",
+    "legacy_ids": [
+      "problem.babais-diameter-conjecture-for-finite-simple-groups"
+    ],
     "title": "Babai's Diameter Conjecture for Finite Simple Groups",
     "collection": "ranked",
     "rank": 223,
@@ -9989,8 +10881,8 @@ var openProblems = {
     "exact_target": "Can every element of every nonabelian finite simple group be expressed in any generating set using only a polylogarithmic number of generators and inverses?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA nonabelian finite simple group has no nontrivial proper normal subgroup and is not commutative. For a generating set $X$, its undirected Cayley graph joins $g$ to $gx$ for $x\\in X\\cup X^{-1}$. Its diameter is the largest, over $g\\in G$, of the shortest word length representing $g$ in these steps. The conjecture asks for one absolute $c>0$ such that\n\\[\n \\operatorname{diam}\\operatorname{Cay}(G,X\\cup X^{-1})\\le(\\ln|G|)^c\n\\]\nfor every such $G$ and every generating set. Constants and the exponent may not depend on the group family, rank, or generators. Results requiring a special element in $X$ are subcases rather than the full assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2203.03323v1}{[S1]}.\n\n\\subsection{Short English statement}\nCan every element of every nonabelian finite simple group be expressed in any generating set using only a polylogarithmic number of generators and inverses?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Martino Garonzi, Zolt\u00e1n Halasi and G\u00e1bor Somlai, On the diameter of Cayley graphs of classical groups with generating sets containing a transvection; arXiv2203.03323v1 March7,2022.\n\\url{https://arxiv.org/pdf/2203.03323v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30000952.tex",
-    "link": "https://www.unsolvedmath.com/problems/30000952",
-    "external_url": "https://www.unsolvedmath.com/problems/30000952",
+    "link": "https://www.unsolvedmath.com/problems/OWR-1965-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-1965-006",
     "sources": [
       {
         "citation": "Martino Garonzi, Zolt\u00e1n Halasi and G\u00e1bor Somlai, On the diameter of Cayley graphs of classical groups with generating sets containing a transvection; arXiv2203.03323v1 March7,2022.",
@@ -10019,6 +10911,10 @@ var openProblems = {
   },
   "20002353": {
     "id": 20002353,
+    "problem_number": "AIM-LOGIC-0129",
+    "legacy_ids": [
+      "problem.shub-smale-conjecture-for-integer-zeros"
+    ],
     "title": "Sharp integer-root bound for binomial-product programs and a tau-convention audit",
     "collection": "ranked",
     "rank": 224,
@@ -10027,8 +10923,8 @@ var openProblems = {
     "exact_target": "Can a polynomial produced by a short constant-free arithmetic program have more than polynomially many distinct integer roots?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA constant-free straight-line program begins with registers $1$ and $X$ and successively creates registers by addition, subtraction, or multiplication of earlier registers. Let $\\tau(f)$ be the minimum number of these operations needed to output $f\\in{\\mathbb{Z}}[X]$. For $f\\ne0$, let $Z_{{\\mathbb{Z}}}(f)=\\{a\\in{\\mathbb{Z}}:f(a)=0\\}$. The conjecture asks for absolute $a>0,c\\ge1$ with\n\\[\n |Z_{{\\mathbb{Z}}}(f)|\\le a(1+\\tau(f))^c.\n\\]\nRoots are counted without multiplicity, and only integer roots are counted. Arbitrary integer constants cannot be inserted free of cost; allowing that changes the complexity measure. The degree can grow exponentially in program length, so a degree bound is not the requested polynomial estimate.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.fim.uni-passau.de/fileadmin/dokumente/fakultaeten/fim/lehrstuhl/muller/SmaleProblems1998.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan a polynomial produced by a short constant-free arithmetic program have more than polynomially many distinct integer roots?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Steve Smale, Mathematical Problems for the Next Century, 1998.\n\\url{https://www.fim.uni-passau.de/fileadmin/dokumente/fakultaeten/fim/lehrstuhl/muller/SmaleProblems1998.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20002353.tex",
-    "link": "https://www.unsolvedmath.com/problems/20002353",
-    "external_url": "https://www.unsolvedmath.com/problems/20002353",
+    "link": "https://www.unsolvedmath.com/problems/AIM-LOGIC-0129",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-LOGIC-0129",
     "sources": [
       {
         "citation": "Steve Smale, Mathematical Problems for the Next Century, 1998.",
@@ -10057,6 +10953,10 @@ var openProblems = {
   },
   "30006798": {
     "id": 30006798,
+    "problem_number": "LOCAL-30006798",
+    "legacy_ids": [
+      "problem.capacity-of-the-binary-deletion-channel"
+    ],
     "title": "Capacity of the Binary Deletion Channel",
     "collection": "ranked",
     "rank": 225,
@@ -10099,6 +10999,10 @@ var openProblems = {
   },
   "30006799": {
     "id": 30006799,
+    "problem_number": "LOCAL-30006799",
+    "legacy_ids": [
+      "problem.serre-s-conjecture-ii-on-galois-cohomology-of-simply-connected-semisimple-groups"
+    ],
     "title": "Serre's Conjecture II on Galois Cohomology of Simply Connected Semisimple Groups",
     "collection": "ranked",
     "rank": 226,
@@ -10137,6 +11041,10 @@ var openProblems = {
   },
   "30006800": {
     "id": 30006800,
+    "problem_number": "LOCAL-30006800",
+    "legacy_ids": [
+      "problem.deterministic-parallel-perfect-matching-in-nc"
+    ],
     "title": "Perfect-Matching Search in Deterministic NC (General Graphs)",
     "collection": "ranked",
     "rank": 227,
@@ -10175,6 +11083,10 @@ var openProblems = {
   },
   "30006981": {
     "id": 30006981,
+    "problem_number": "LOCAL-30006981",
+    "legacy_ids": [
+      "problem.breuil-mezard-conjecture-equality-of-the-galois-and-automorphic-sides"
+    ],
     "title": "Breuil-Mezard conjecture: equality of the Galois and automorphic sides",
     "collection": "ranked",
     "rank": 228,
@@ -10213,6 +11125,10 @@ var openProblems = {
   },
   "30006801": {
     "id": 30006801,
+    "problem_number": "LOCAL-30006801",
+    "legacy_ids": [
+      "problem.provisional-top500-omission-wave-002.004"
+    ],
     "title": "Berry random-wave conjecture: real negative-curvature BS formulation",
     "collection": "ranked",
     "rank": 229,
@@ -10251,6 +11167,10 @@ var openProblems = {
   },
   "30006802": {
     "id": 30006802,
+    "problem_number": "LOCAL-30006802",
+    "legacy_ids": [
+      "problem.shafarevich-freeness-conjecture"
+    ],
     "title": "Shafarevich Freeness Conjecture over Qab",
     "collection": "ranked",
     "rank": 230,
@@ -10289,6 +11209,10 @@ var openProblems = {
   },
   "1305": {
     "id": 1305,
+    "problem_number": "ALG-009",
+    "legacy_ids": [
+      "problem.zauners-conjecture-on-the-existence-of-sic-povms-in-all-dimensions"
+    ],
     "title": "Zauner's Conjecture (SIC-POVM)",
     "collection": "ranked",
     "rank": 231,
@@ -10327,6 +11251,10 @@ var openProblems = {
   },
   "30006803": {
     "id": 30006803,
+    "problem_number": "LOCAL-30006803",
+    "legacy_ids": [
+      "problem.all-pairs-shortest-paths-in-truly-subcubic-time"
+    ],
     "title": "All-Pairs Shortest Paths in Truly Subcubic Time",
     "collection": "ranked",
     "rank": 232,
@@ -10365,6 +11293,10 @@ var openProblems = {
   },
   "2891": {
     "id": 2891,
+    "problem_number": "KP-4.15",
+    "legacy_ids": [
+      "problem.11-8-conjecture-on-intersection-forms-of-spin-4-manifolds"
+    ],
     "title": "Kirby Problem 4.15",
     "collection": "ranked",
     "rank": 233,
@@ -10373,8 +11305,8 @@ var openProblems = {
     "exact_target": "Must the second Betti number of every smooth closed spin four-manifold be at least eleven-eighths the absolute value of its signature?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a smooth closed oriented four-manifold $M$, the intersection pairing on\n$H^2(M,{\\mathbb{R}})$ is $Q_M(a,b)=\\langle a\\smile b,[M]\\rangle$. Let $b_2$ be its dimension and $\\sigma(M)=b_2^+-b_2^-$ its signature. A spin structure exists precisely when the second Stiefel--Whitney class $w_2(TM)$ vanishes. The conjecture is\n\\[\n b_2(M)\\ge\\frac{11}{8}|\\sigma(M)|\n\\]\nfor every such spin manifold. No simple-connectedness assumption appears in the selected target. Smoothness is essential: the assertion is not a purely algebraic restriction on arbitrary unimodular bilinear forms or an unrestricted claim for topological four-manifolds.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://web.stanford.edu/~cm5/4D.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nMust the second Betti number of every smooth closed spin four-manifold be at least eleven-eighths the absolute value of its signature?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Ciprian Manolescu, Four-dimensional topology, Section 4.4 (2024).\n\\url{https://web.stanford.edu/~cm5/4D.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/2891.tex",
-    "link": "https://www.unsolvedmath.com/problems/2891",
-    "external_url": "https://www.unsolvedmath.com/problems/2891",
+    "link": "https://www.unsolvedmath.com/problems/KP-4.15",
+    "external_url": "https://www.unsolvedmath.com/problems/KP-4.15",
     "sources": [
       {
         "citation": "Ciprian Manolescu, Four-dimensional topology, Section 4.4 (2024).",
@@ -10391,6 +11323,10 @@ var openProblems = {
   },
   "30006804": {
     "id": 30006804,
+    "problem_number": "LOCAL-30006804",
+    "legacy_ids": [
+      "problem.kawamatas-k-equivalence-implies-d-equivalence-conjecture"
+    ],
     "title": "Kawamata's K-Equivalence Implies D-Equivalence Conjecture",
     "collection": "ranked",
     "rank": 234,
@@ -10417,6 +11353,10 @@ var openProblems = {
   },
   "30001256": {
     "id": 30001256,
+    "problem_number": "OWR-3476-002",
+    "legacy_ids": [
+      "problem.de-giorgi-conjecture-for-the-allen-cahn-equation-in-dimensions-4-to-8"
+    ],
     "title": "De Giorgi Conjecture for the Allen\u2013Cahn Equation",
     "collection": "ranked",
     "rank": 235,
@@ -10425,8 +11365,8 @@ var openProblems = {
     "exact_target": "In dimensions four through eight, must every bounded entire Allen\u2013Cahn solution that is strictly monotone in one direction depend on only one linear coordinate?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFix $4\\le N\\le8$ and let $u\\in C^2({\\mathbb{R}}^N)$ take values in $(-1,1)$. Assume\n\\[\n \\Delta u=u^3-u,\\qquad \\partial_eu>0\\text{ everywhere for some unit vector }e.\n\\]\nThe assertion is that $u$ is one-dimensional: there exist a unit vector $a$ and $g:{\\mathbb{R}}\\to(-1,1)$ with $u(x)=g(a\\cdot x)$. This describes solutions on all of Euclidean space, not a bounded domain, and strict directional monotonicity is the selected hypothesis. Limits $u\\to\\pm1$ in the monotone direction, energy-growth restrictions, and minimizing properties are not assumed unless independently derived. Adding them would restrict the conjecture.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2503.21245}{[S1]}.\n\n\\subsection{Short English statement}\nIn dimensions four through eight, must every bounded entire Allen\u2013Cahn solution that is strictly monotone in one direction depend on only one linear coordinate?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Hardy Chan, Xavier Fern\u00e1ndez-Real, Alessio Figalli, and Joaquim Serra, arXiv:2503.21245.\n\\url{https://arxiv.org/abs/2503.21245}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001256.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001256",
-    "external_url": "https://www.unsolvedmath.com/problems/30001256",
+    "link": "https://www.unsolvedmath.com/problems/OWR-3476-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-3476-002",
     "sources": [
       {
         "citation": "Hardy Chan, Xavier Fern\u00e1ndez-Real, Alessio Figalli, and Joaquim Serra, arXiv:2503.21245.",
@@ -10443,6 +11383,10 @@ var openProblems = {
   },
   "30002380": {
     "id": 30002380,
+    "problem_number": "OWR-12583-003",
+    "legacy_ids": [
+      "problem.serre-uniformity-question"
+    ],
     "title": "Serre's Uniformity Problem for Elliptic Curves",
     "collection": "ranked",
     "rank": 236,
@@ -10451,8 +11395,8 @@ var openProblems = {
     "exact_target": "Is there a single prime cutoff beyond which every non-CM elliptic curve over the rationals has the largest possible Galois action on its torsion points?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an elliptic curve $E/{\\mathbb{Q}}$ and a prime $p$, its geometric $p$-torsion is a two-dimensional ${\\mathbb{F}}_p$-vector space. Choosing a basis gives\n$\\rho_{E,p}:\\operatorname{Gal}(\\overline{{\\mathbb{Q}}}/{\\mathbb{Q}})\\to\\mathrm{GL}_2({\\mathbb{F}}_p)$, well defined up to conjugation. Non-CM means $\\operatorname{End}_{\\overline{{\\mathbb{Q}}}}(E)={\\mathbb{Z}}$. The question is\n\\[\n \\exists N>0\\quad\\forall E/{\\mathbb{Q}}\\text{ non-CM}\\quad\\forall p>N,\n \\qquad\\operatorname{im}\\rho_{E,p}=\\mathrm{GL}_2({\\mathbb{F}}_p).\n\\]\nThe bound must be independent of the curve, not merely finite for each fixed curve. It is surjectivity of the full residual representation, not just irreducibility or a condition on its determinant.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2305.17780}{[S1]}.\n\n\\subsection{Short English statement}\nIs there a single prime cutoff beyond which every non-CM elliptic curve over the rationals has the largest possible Galois action on its torsion points?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Formal statement, abstract.\n\\url{https://arxiv.org/abs/2305.17780}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002380.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002380",
-    "external_url": "https://www.unsolvedmath.com/problems/30002380",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12583-003",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12583-003",
     "sources": [
       {
         "citation": "Formal statement, abstract.",
@@ -10469,6 +11413,10 @@ var openProblems = {
   },
   "7200020": {
     "id": 7200020,
+    "problem_number": "AMR-071-0020",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-virasoro-gromov-witten-conjecture"
+    ],
     "title": "Virasoro conjecture",
     "collection": "ranked",
     "rank": 237,
@@ -10477,8 +11425,8 @@ var openProblems = {
     "exact_target": "Do the total descendant Gromov\u2013Witten invariants of every smooth projective complex variety satisfy all of the specified Virasoro differential constraints?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nChoose a homogeneous cohomology basis of $X$. Descendant Gromov--Witten correlators integrate products of evaluation classes and powers $\\psi_i^{a_i}$ of cotangent-line classes over the virtual fundamental classes of stable-map moduli spaces $\\overline{\\mathcal M}_{g,n}(X,\\beta)$. Their generating functions $F_g$ form\n\\[\n Z_X=\\exp\\left(\\sum_{g\\ge0}\\hbar^{g-1}F_g\\right)\n\\]\nas a formal series over the Novikov ring recording effective curve classes. The conjecture asserts $L_k^XZ_X=0$ for every $k\\ge-1$, where $L_k^X$ is exactly the Eguchi--Hori--Xiong--Katz operator in Getzler, Section 1.4, including constant terms and signs for odd cohomology. Those operator formulas are incorporated by reference rather than replaced by the Virasoro commutation relations alone. Equality is coefficientwise in all descendant variables, genera, and curve classes.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/math/9812026}{[S1]}.\n\n\\subsection{Short English statement}\nDo the total descendant Gromov\u2013Witten invariants of every smooth projective complex variety satisfy all of the specified Virasoro differential constraints?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]E. Getzler, The Virasoro conjecture for Gromov-Witten invariants, arXiv version 4 (1999).\n\\url{https://arxiv.org/pdf/math/9812026}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200020.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200020",
-    "external_url": "https://www.unsolvedmath.com/problems/7200020",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0020",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0020",
     "sources": [
       {
         "citation": "E. Getzler, The Virasoro conjecture for Gromov-Witten invariants, arXiv version 4 (1999).",
@@ -10495,6 +11443,10 @@ var openProblems = {
   },
   "20003353": {
     "id": 20003353,
+    "problem_number": "AIM-OTHER-0160",
+    "legacy_ids": [
+      "problem.equidistribution-of-galois-orbits-of-special-points-on-shimura-varieties"
+    ],
     "title": "Strict special-point sequences, Galois component weights, and the correct Haar target",
     "collection": "ranked",
     "rank": 238,
@@ -10503,8 +11455,8 @@ var openProblems = {
     "exact_target": "Do Galois orbits of special points become uniformly distributed when the sequence eventually avoids each fixed proper special subvariety?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA special point on a Shimura variety is a zero-dimensional special subvariety, equivalently a point represented by a Shimura datum with toric Mumford--Tate group. In the canonical-model and connected-component convention of the source, let $\\mathcal O_j$ be the finite Galois orbit of $x_j$ and set\n$\\mu_j=|\\mathcal O_j|^{-1}\\sum_{x\\in\\mathcal O_j}\\delta_x$. Assume that each fixed proper special subvariety contains only finitely many $x_j$. The assertion is weak convergence\n\\[\n \\mu_j\\Longrightarrow\\mu_{\\mathrm{Haar}},\n\\]\nwhere the ambient invariant measure is normalized to total mass one. The condition is not that a single finite exceptional set of indices excludes all special subvarieties simultaneously. The field of Galois action and component measure must follow the cited setup, especially for a disconnected ambient Shimura variety.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aimath.org/WWN/measrigid/measrigid.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDo Galois orbits of special points become uniformly distributed when the sequence eventually avoids each fixed proper special subvariety?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]AIM Workshop Participants, Open Problems from the Workshop Emerging Applications of Measure Rigidity, Conjecture 52, 2004.\n\\url{https://aimath.org/WWN/measrigid/measrigid.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20003353.tex",
-    "link": "https://www.unsolvedmath.com/problems/20003353",
-    "external_url": "https://www.unsolvedmath.com/problems/20003353",
+    "link": "https://www.unsolvedmath.com/problems/AIM-OTHER-0160",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-OTHER-0160",
     "sources": [
       {
         "citation": "AIM Workshop Participants, Open Problems from the Workshop Emerging Applications of Measure Rigidity, Conjecture 52, 2004.",
@@ -10521,6 +11473,10 @@ var openProblems = {
   },
   "30006982": {
     "id": 30006982,
+    "problem_number": "LOCAL-30006982",
+    "legacy_ids": [
+      "problem.zagier-mzv-dimension-conjecture"
+    ],
     "title": "Zagier's dimension conjecture for classical multiple zeta values",
     "collection": "ranked",
     "rank": 239,
@@ -10547,6 +11503,10 @@ var openProblems = {
   },
   "30001574": {
     "id": 30001574,
+    "problem_number": "OWR-4427-006",
+    "legacy_ids": [
+      "problem.morrison-kawamata-cone-conjecture"
+    ],
     "title": "Morrison\u2019s Cone Conjecture for Calabi\u2013Yau Pairs",
     "collection": "ranked",
     "rank": 240,
@@ -10555,8 +11515,8 @@ var openProblems = {
     "exact_target": "Do automorphisms and pseudo-automorphisms reduce the effective nef and movable cones of every klt Calabi\u2013Yau pair to rational polyhedral fundamental domains?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $(X,\\Delta)$ be a projective complex ${\\mathbb{Q}}$-factorial klt pair with $K_X+\\Delta\\equiv0$. Here ${\\mathbb{Q}}$-factorial means every Weil divisor has a Cartier multiple, and klt means discrepancies exceed $-1$. In $N^1(X)_{{\\mathbb{R}}}$, let $\\operatorname{Nef}^e$ be the effective nef cone and $\\operatorname{Mov}^e$ the effective movable cone in the cited convention. Automorphisms preserve the pair; pseudo-automorphisms are birational self-maps preserving it and isomorphic in codimension one. The two assertions ask that each relevant cone be covered by translates of a rational polyhedral cone under its indicated group, with interiors of distinct translates disjoint in the standard fundamental-domain sense. Rational polyhedral means generated by finitely many rational divisor classes. Both the nef and movable assertions are part of the target.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2406.07307}{[S1]}.\n\n\\subsection{Short English statement}\nDo automorphisms and pseudo-automorphisms reduce the effective nef and movable cones of every klt Calabi\u2013Yau pair to rational polyhedral fundamental domains?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]The effective cone conjecture for Calabi-Yau pairs.\n\\url{https://arxiv.org/abs/2406.07307}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001574.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001574",
-    "external_url": "https://www.unsolvedmath.com/problems/30001574",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4427-006",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4427-006",
     "sources": [
       {
         "citation": "The effective cone conjecture for Calabi-Yau pairs.",
@@ -10573,6 +11533,10 @@ var openProblems = {
   },
   "30006805": {
     "id": 30006805,
+    "problem_number": "LOCAL-30006805",
+    "legacy_ids": [
+      "problem.k-pi-1-conjecture-for-artin-groups"
+    ],
     "title": "K(pi,1) conjecture for Artin groups",
     "collection": "ranked",
     "rank": 241,
@@ -10599,6 +11563,10 @@ var openProblems = {
   },
   "1343": {
     "id": 1343,
+    "problem_number": "LOGIC-001",
+    "legacy_ids": [
+      "problem.vaught-s-conjecture"
+    ],
     "title": "Vaught Conjecture",
     "collection": "ranked",
     "rank": 242,
@@ -10607,8 +11575,8 @@ var openProblems = {
     "exact_target": "Must a complete theory in a countable language have either at most countably many countable models or as many as there are real numbers?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a complete first-order theory $T$ in a countable language, let $I(T,\\aleph_0)$ be the number of isomorphism classes of its countable models. Completeness means that for each sentence, $T$ decides it or its negation. Vaught's assertion is\n\\[\n I(T,\\aleph_0)\\le\\aleph_0\\quad\\text{or}\\quad I(T,\\aleph_0)=2^{\\aleph_0}.\n\\]\nThus no intermediate uncountable number of countable models is permitted. Models are compared by isomorphism, not elementary equivalence, which all models of $T$ already share. The statement is about arbitrary complete countable theories; a result for one relational signature or a selected structural class is only a subcase.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/abs/pii/S0168007224000083}{[S1]}.\n\n\\subsection{Short English statement}\nMust a complete theory in a countable language have either at most countably many countable models or as many as there are real numbers?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Sharp Vaught's conjecture for some classes of partial orders.\n\\url{https://www.sciencedirect.com/science/article/abs/pii/S0168007224000083}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1343.tex",
-    "link": "https://www.unsolvedmath.com/problems/1343",
-    "external_url": "https://www.unsolvedmath.com/problems/1343",
+    "link": "https://www.unsolvedmath.com/problems/LOGIC-001",
+    "external_url": "https://www.unsolvedmath.com/problems/LOGIC-001",
     "sources": [
       {
         "citation": "Sharp Vaught's conjecture for some classes of partial orders.",
@@ -10625,6 +11593,10 @@ var openProblems = {
   },
   "30006806": {
     "id": 30006806,
+    "problem_number": "LOCAL-30006806",
+    "legacy_ids": [
+      "problem.universal-optimality-of-hexagonal-lattice"
+    ],
     "title": "Universal Optimality of the Hexagonal Lattice in Dimension Two",
     "collection": "ranked",
     "rank": 243,
@@ -10651,6 +11623,10 @@ var openProblems = {
   },
   "30006807": {
     "id": 30006807,
+    "problem_number": "LOCAL-30006807",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-witten-s-asymptotic-expansion-conjecture-for-su-2-wrt-invariants"
+    ],
     "title": "Witten's Asymptotic Expansion Conjecture for SU(2) WRT Invariants",
     "collection": "ranked",
     "rank": 244,
@@ -10677,6 +11653,10 @@ var openProblems = {
   },
   "8": {
     "id": 8,
+    "problem_number": "NT-001",
+    "legacy_ids": [
+      "problem.existence-of-an-odd-perfect-number"
+    ],
     "title": "Odd Perfect Numbers",
     "collection": "ranked",
     "rank": 245,
@@ -10685,8 +11665,8 @@ var openProblems = {
     "exact_target": "Can an odd positive integer equal the sum of all its positive proper divisors?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an integer $N\\ge1$, let $\\sigma(N)=\\sum_{d\\mid N,\\ d>0}d$. A perfect number satisfies $\\sigma(N)=2N$, equivalently the sum of its positive proper divisors equals $N$. The question is\n\\[\n \\exists N\\in{\\mathbb{Z}}_{>0}\\quad N\\equiv1\\pmod2\\quad\\text{and}\\quad\\sigma(N)=2N\\ ?\n\\]\nFor a prime factorization $N=\\prod p_i^{a_i}$, the condition is\n$\\prod_i(1+p_i+\\cdots+p_i^{a_i})=2\\prod_i p_i^{a_i}$, with all $p_i$ odd. Either an example or an impossibility proof resolves the existence question; excluding any finite size range alone does not.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ams.org/mcom/2015-84-295/S0025-5718-2015-02941-X/S0025-5718-2015-02941-X.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nCan an odd positive integer equal the sum of all its positive proper divisors?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Pace P. Nielsen, Mathematics of Computation 84 (2015), 2549-2567.\n\\url{https://www.ams.org/mcom/2015-84-295/S0025-5718-2015-02941-X/S0025-5718-2015-02941-X.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/8.tex",
-    "link": "https://www.unsolvedmath.com/problems/8",
-    "external_url": "https://www.unsolvedmath.com/problems/8",
+    "link": "https://www.unsolvedmath.com/problems/NT-001",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-001",
     "sources": [
       {
         "citation": "Pace P. Nielsen, Mathematics of Computation 84 (2015), 2549-2567.",
@@ -10703,6 +11683,10 @@ var openProblems = {
   },
   "30006808": {
     "id": 30006808,
+    "problem_number": "LOCAL-30006808",
+    "legacy_ids": [
+      "problem.exact-satisfiability-threshold-for-random-k-sat-for-small-k-k-3"
+    ],
     "title": "Exact satisfiability threshold for random k-SAT for small k (k = 3)",
     "collection": "ranked",
     "rank": 246,
@@ -10729,6 +11713,10 @@ var openProblems = {
   },
   "30006809": {
     "id": 30006809,
+    "problem_number": "LOCAL-30006809",
+    "legacy_ids": [
+      "problem.hopf-conjecture-for-nonnegative-sectional-curvature"
+    ],
     "title": "Hopf conjecture for nonnegative sectional curvature",
     "collection": "ranked",
     "rank": 247,
@@ -10755,6 +11743,10 @@ var openProblems = {
   },
   "30006810": {
     "id": 30006810,
+    "problem_number": "LOCAL-30006810",
+    "legacy_ids": [
+      "problem.quantum-versus-classical-communication-complexity-of-total-functions"
+    ],
     "title": "Quantum versus Classical Communication Complexity of Total Functions",
     "collection": "ranked",
     "rank": 248,
@@ -10781,6 +11773,10 @@ var openProblems = {
   },
   "30006811": {
     "id": 30006811,
+    "problem_number": "LOCAL-30006811",
+    "legacy_ids": [
+      "problem.banach-mazur-rotation-problem"
+    ],
     "title": "Banach-Mazur Rotation Problem",
     "collection": "ranked",
     "rank": 249,
@@ -10819,6 +11815,10 @@ var openProblems = {
   },
   "30006812": {
     "id": 30006812,
+    "problem_number": "LOCAL-30006812",
+    "legacy_ids": [
+      "problem.binary-symmetric-channel-low-rate-reliability"
+    ],
     "title": "Reliability Function of the Binary Symmetric Channel Below the Critical Rate",
     "collection": "ranked",
     "rank": 250,
@@ -10857,6 +11857,10 @@ var openProblems = {
   },
   "30006813": {
     "id": 30006813,
+    "problem_number": "LOCAL-30006813",
+    "legacy_ids": [
+      "problem.dynamical-mordell-lang-conjecture"
+    ],
     "title": "Dynamical Mordell\u2013Lang Conjecture",
     "collection": "ranked",
     "rank": 251,
@@ -10895,6 +11899,10 @@ var openProblems = {
   },
   "30006814": {
     "id": 30006814,
+    "problem_number": "LOCAL-30006814",
+    "legacy_ids": [
+      "problem.kadison-similarity-problem-for-c-star-algebras"
+    ],
     "title": "Kadison Similarity Problem for C*-Algebras",
     "collection": "ranked",
     "rank": 252,
@@ -10933,6 +11941,10 @@ var openProblems = {
   },
   "30006815": {
     "id": 30006815,
+    "problem_number": "LOCAL-30006815",
+    "legacy_ids": [
+      "problem.rl-versus-l"
+    ],
     "title": "RL versus L",
     "collection": "ranked",
     "rank": 253,
@@ -10971,6 +11983,10 @@ var openProblems = {
   },
   "30006077": {
     "id": 30006077,
+    "problem_number": "OWR-14298795-017",
+    "legacy_ids": [
+      "problem.shafarevich-holomorphic-convexity-conjecture"
+    ],
     "title": "Holomorphic Convexity of Universal Covers",
     "collection": "ranked",
     "rank": 254,
@@ -10979,8 +11995,8 @@ var openProblems = {
     "exact_target": "Is the universal cover of every smooth complex projective variety holomorphically convex, so that holomorphic hulls of compact sets stay compact?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a complex manifold $Y$, its holomorphic hull of a compact set $K$ is\n\\[\n \\widehat K_{\\mathcal O(Y)}=\n \\{z\\in Y:|f(z)|\\le\\sup_{w\\in K}|f(w)|\\text{ for every }f\\in\\mathcal O(Y)\\}.\n\\]\nHolomorphic convexity means that every such hull is compact. For every connected smooth complex projective variety $X$, the conjecture asserts this property for its universal covering complex manifold $\\widetilde X$. The covering inherits the complex structure locally from $X$. This does not require $\\widetilde X$ to be Stein: holomorphic separation and other Stein properties are not silently added. A result assuming a linear fundamental group treats only a subcase of the selected universal statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://annals.math.princeton.edu/wp-content/uploads/annals-v176-n3-p04-p.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs the universal cover of every smooth complex projective variety holomorphically convex, so that holomorphic hulls of compact sets stay compact?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Linear Shafarevich conjecture, Annals176(2012),1545-1581.\n\\url{https://annals.math.princeton.edu/wp-content/uploads/annals-v176-n3-p04-p.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30006077.tex",
-    "link": "https://www.unsolvedmath.com/problems/30006077",
-    "external_url": "https://www.unsolvedmath.com/problems/30006077",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14298795-017",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14298795-017",
     "sources": [
       {
         "citation": "Linear Shafarevich conjecture, Annals176(2012),1545-1581.",
@@ -11009,6 +12025,10 @@ var openProblems = {
   },
   "20003265": {
     "id": 20003265,
+    "problem_number": "AIM-OTHER-0072",
+    "legacy_ids": [
+      "problem.anosov-diffeomorphism-classification-conjecture"
+    ],
     "title": "Conditional fiber collapse and periodic-data tests for the Anosov infranil conjecture",
     "collection": "ranked",
     "rank": 255,
@@ -11017,8 +12037,8 @@ var openProblems = {
     "exact_target": "Is every uniformly hyperbolic diffeomorphism topologically equivalent to an algebraic hyperbolic automorphism on an infranilmanifold?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn Anosov diffeomorphism $f:M\\to M$ of a closed smooth manifold has an invariant splitting $TM=E^s\\oplus E^u$ and constants $C>0$, $0<\\lambda<1$ with\n$\\|Df^nv^s\\|\\le C\\lambda^n\\|v^s\\|$ and\n$\\|Df^{-n}v^u\\|\\le C\\lambda^n\\|v^u\\|$ for $n\\ge0$.\nAn infranilmanifold is a compact quotient of a simply connected nilpotent Lie group by a torsion-free discrete affine group with finite holonomy. The conjecture asks for a homeomorphism $h$ and a hyperbolic infranil automorphism $A$, with no eigenvalue of its inducing differential on the unit circle, such that\n\\[\n h\\circ f=A\\circ h.\n\\]\nThe precise infranil automorphism convention follows the source; topological conjugacy, not differentiable conjugacy, is requested.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aimath.org/WWN/measrigid/measrigid.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs every uniformly hyperbolic diffeomorphism topologically equivalent to an algebraic hyperbolic automorphism on an infranilmanifold?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Open Problems from the Workshop 'Emerging Applications of Measure Rigidity' (AIM, 2004), Section 2.1, Conjecture 3.\n\\url{https://aimath.org/WWN/measrigid/measrigid.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20003265.tex",
-    "link": "https://www.unsolvedmath.com/problems/20003265",
-    "external_url": "https://www.unsolvedmath.com/problems/20003265",
+    "link": "https://www.unsolvedmath.com/problems/AIM-OTHER-0072",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-OTHER-0072",
     "sources": [
       {
         "citation": "Open Problems from the Workshop 'Emerging Applications of Measure Rigidity' (AIM, 2004), Section 2.1, Conjecture 3.",
@@ -11047,6 +12067,10 @@ var openProblems = {
   },
   "30006816": {
     "id": 30006816,
+    "problem_number": "LOCAL-30006816",
+    "legacy_ids": [
+      "problem.all-groups-are-good-disc-embedding-conjecture"
+    ],
     "title": "All groups are good: the four-dimensional disc-embedding conjecture",
     "collection": "ranked",
     "rank": 256,
@@ -11085,6 +12109,10 @@ var openProblems = {
   },
   "30006817": {
     "id": 30006817,
+    "problem_number": "LOCAL-30006817",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-frenkel-lepowsky-meurman-uniqueness-conjecture-for-the-moonshine-module"
+    ],
     "title": "Moonshine Uniqueness Conjecture (Strongly Rational Holomorphic VOA Form)",
     "collection": "ranked",
     "rank": 257,
@@ -11123,6 +12151,10 @@ var openProblems = {
   },
   "30006818": {
     "id": 30006818,
+    "problem_number": "LOCAL-30006818",
+    "legacy_ids": [
+      "problem.constant-query-locally-decodable-codes-polynomial-length"
+    ],
     "title": "Constant-Query Locally Decodable Codes with Polynomial Blocklength",
     "collection": "ranked",
     "rank": 258,
@@ -11161,6 +12193,10 @@ var openProblems = {
   },
   "30006819": {
     "id": 30006819,
+    "problem_number": "LOCAL-30006819",
+    "legacy_ids": [
+      "problem.the-singer-conjecture-on-vanishing-of-l2-cohomology-of-aspherical-manifolds"
+    ],
     "title": "The Singer Conjecture on Vanishing of L2-Cohomology of Aspherical Manifolds",
     "collection": "ranked",
     "rank": 259,
@@ -11199,6 +12235,10 @@ var openProblems = {
   },
   "1159": {
     "id": 1159,
+    "problem_number": "NT-025",
+    "legacy_ids": [
+      "problem.gauss-circle-problem"
+    ],
     "title": "The Gauss Circle Problem",
     "collection": "ranked",
     "rank": 260,
@@ -11207,8 +12247,8 @@ var openProblems = {
     "exact_target": "How closely does the number of lattice points in a large disk track its area, and is the error bounded by every power just above the square root of its radius?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $r\\ge0$, define\n\\[\n N(r)=\\#\\{(m,n)\\in{\\mathbb{Z}}^2:m^2+n^2\\le r^2\\},\\qquad E(r)=N(r)-\\pi r^2.\n\\]\nThe main selected estimate asks whether, for every ${\\varepsilon}>0$, there are constants $C_{\\varepsilon},r_{\\varepsilon}$ with\n$|E(r)|\\le C_{\\varepsilon} r^{1/2+{\\varepsilon}}$ for all $r\\ge r_{\\varepsilon}$.\nThe broader request is the sharp order of this lattice-counting error. Radius, not squared radius, is the variable; changing variables changes the numerical exponent. The conjectured estimate does not assert the endpoint bound $O(r^{1/2})$ or a fixed sign of the discrepancy.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/GausssCircleProblem.html}{[S1]}.\n\n\\subsection{Short English statement}\nHow closely does the number of lattice points in a large disk track its area, and is the error bounded by every power just above the square root of its radius?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Formal statement, Bounds on a solution and conjecture.\n\\url{https://mathworld.wolfram.com/GausssCircleProblem.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1159.tex",
-    "link": "https://www.unsolvedmath.com/problems/1159",
-    "external_url": "https://www.unsolvedmath.com/problems/1159",
+    "link": "https://www.unsolvedmath.com/problems/NT-025",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-025",
     "sources": [
       {
         "citation": "Formal statement, Bounds on a solution and conjecture.",
@@ -11237,6 +12277,10 @@ var openProblems = {
   },
   "26": {
     "id": 26,
+    "problem_number": "NT-007",
+    "legacy_ids": [
+      "problem.infinitude-of-mersenne-primes"
+    ],
     "title": "Are there infinitely many Mersenne primes?",
     "collection": "ranked",
     "rank": 261,
@@ -11245,8 +12289,8 @@ var openProblems = {
     "exact_target": "Are there infinitely many primes of the form $2^p-1$ with $p$ prime, equivalently infinitely many even perfect numbers?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA Mersenne number is $M_p=2^p-1$. The selected infinitude question is\n\\[\n \\forall B>0\\quad\\exists p>B\\quad\n p\\text{ prime and }2^p-1\\text{ prime}.\n\\]\nPrimality of the exponent is necessary, but not sufficient, for a Mersenne number to be prime. The catalogue's equivalent even-perfect-number formulation uses the Euclid--Euler correspondence\n$N=2^{p-1}(2^p-1)$ between Mersenne primes and even perfect numbers. The question requires neither a density prediction nor an efficient procedure guaranteed to find the next example. Arbitrarily large verified examples alone do not prove infinitude without a general argument.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://t5k.org/mersenne/index.html}{[S1]}.\n\n\\subsection{Short English statement}\nAre there infinitely many primes of the form $2^p-1$ with $p$ prime, equivalently infinitely many even perfect numbers?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]\"Mersenne Primes: History, Theorems and Lists,\" The PrimePages (t5k.org), maintained curated reference; printed from the PrimePages, (c) Reginald McLean.\n\\url{https://t5k.org/mersenne/index.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/26.tex",
-    "link": "https://www.unsolvedmath.com/problems/26",
-    "external_url": "https://www.unsolvedmath.com/problems/26",
+    "link": "https://www.unsolvedmath.com/problems/NT-007",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-007",
     "sources": [
       {
         "citation": "\"Mersenne Primes: History, Theorems and Lists,\" The PrimePages (t5k.org), maintained curated reference; printed from the PrimePages, (c) Reginald McLean.",
@@ -11275,6 +12319,10 @@ var openProblems = {
   },
   "30006820": {
     "id": 30006820,
+    "problem_number": "LOCAL-30006820",
+    "legacy_ids": [
+      "problem.the-k-server-conjecture-for-general-metric-spaces"
+    ],
     "title": "The k-Server Conjecture for General Metric Spaces",
     "collection": "ranked",
     "rank": 262,
@@ -11313,6 +12361,10 @@ var openProblems = {
   },
   "30006821": {
     "id": 30006821,
+    "problem_number": "LOCAL-30006821",
+    "legacy_ids": [
+      "problem.equivalence-or-strict-containment-of-qma-and-qma-2"
+    ],
     "title": "Equivalence or Strict Containment of QMA and QMA(2)",
     "collection": "ranked",
     "rank": 263,
@@ -11351,6 +12403,10 @@ var openProblems = {
   },
   "30006822": {
     "id": 30006822,
+    "problem_number": "LOCAL-30006822",
+    "legacy_ids": [
+      "problem.classical-worst-case-hardness-reduction-for-lwe"
+    ],
     "title": "Classical Worst-Case Hardness Reduction for LWE",
     "collection": "ranked",
     "rank": 264,
@@ -11389,6 +12445,10 @@ var openProblems = {
   },
   "30003139": {
     "id": 30003139,
+    "problem_number": "OWR-14604-021",
+    "legacy_ids": [
+      "problem.sidorenko-conjecture-on-bipartite-homomorphism-densities"
+    ],
     "title": "Sidorenko's Conjecture for Bipartite Graphons",
     "collection": "ranked",
     "rank": 265,
@@ -11397,8 +12457,8 @@ var openProblems = {
     "exact_target": "Among graph limits with a fixed edge density, does the constant graphon minimize the homomorphism density of every bipartite graph?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA graphon is a symmetric measurable function $W:[0,1]^2\\to[0,1]$. For a finite simple graph $H=(V,E)$, define its homomorphism density by\n\\[\n t(H,W)=\\int_{[0,1]^{V}}\\prod_{\\{u,v\\}\\in E}W(x_u,x_v)\\prod_{u\\in V}{\\,\\mathrm{d}} x_u.\n\\]\nSidorenko's assertion is\n$t(H,W)\\ge t(K_2,W)^{|E(H)|}$ for every bipartite $H$ and every graphon. For the constant graphon $W\\equiv p$ there is equality, explaining the quasirandom comparison. Homomorphisms may identify vertices; replacing their density by the density of induced copies or injective embeddings changes the finite-object statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2108.06599}{[S1]}.\n\n\\subsection{Short English statement}\nAmong graph limits with a fixed edge density, does the constant graphon minimize the homomorphism density of every bipartite graph?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]D. Conlon, J. Lee, A. Sidorenko, 'Biregularity in Sidorenko's Conjecture', arXiv:2108.06599 (2021).\n\\url{https://arxiv.org/pdf/2108.06599}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003139.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003139",
-    "external_url": "https://www.unsolvedmath.com/problems/30003139",
+    "link": "https://www.unsolvedmath.com/problems/OWR-14604-021",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-14604-021",
     "sources": [
       {
         "citation": "D. Conlon, J. Lee, A. Sidorenko, 'Biregularity in Sidorenko's Conjecture', arXiv:2108.06599 (2021).",
@@ -11427,6 +12487,10 @@ var openProblems = {
   },
   "30006823": {
     "id": 30006823,
+    "problem_number": "LOCAL-30006823",
+    "legacy_ids": [
+      "problem.majority-not-in-acc0"
+    ],
     "title": "MAJORITY is not in ACC0",
     "collection": "ranked",
     "rank": 266,
@@ -11465,6 +12529,10 @@ var openProblems = {
   },
   "30004467": {
     "id": 30004467,
+    "problem_number": "OWR-1703866-001",
+    "legacy_ids": [
+      "problem.kuznetsov-rationality-conjecture-for-cubic-fourfolds"
+    ],
     "title": "Rational Cubic Fourfolds and K3 Categories",
     "collection": "ranked",
     "rank": 267,
@@ -11473,8 +12541,8 @@ var openProblems = {
     "exact_target": "Is a smooth cubic fourfold rational exactly when its Kuznetsov component is the ordinary derived category of a projective K3 surface?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a smooth cubic hypersurface $X\\subset{\\mathbb{P}}^5_{{\\mathbb{C}}}$, define\n\\[\n \\operatorname{Ku}(X)=\\{E\\in D^b\\operatorname{Coh}(X):\n \\operatorname{Hom}(\\mathcal O_X(i),E[j])=0\\text{ for }i=0,1,2,\\ j\\in{\\mathbb{Z}}\\}.\n\\]\nThe conjecture equates rationality of $X$, meaning birationality to ${\\mathbb{P}}^4$, with existence of an exact ${\\mathbb{C}}$-linear equivalence\n$\\operatorname{Ku}(X)\\simeq D^b\\operatorname{Coh}(S)$ for a smooth projective K3 surface $S$. A K3 surface has trivial canonical bundle and $H^1(S,\\mathcal O_S)=0$. The category on the right is untwisted: a nonzero selected Brauer twist is not allowed, although $\\operatorname{Br}(S)$ itself need not vanish. The assertion covers every smooth cubic fourfold.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/0808.3351v1}{[S1]}.\n\n\\subsection{Short English statement}\nIs a smooth cubic fourfold rational exactly when its Kuznetsov component is the ordinary derived category of a projective K3 surface?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Alexander Kuznetsov, Derived Categories of Cubic Fourfolds, arXiv0808.3351v1,25August2008,18pages.\n\\url{https://arxiv.org/pdf/0808.3351v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004467.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004467",
-    "external_url": "https://www.unsolvedmath.com/problems/30004467",
+    "link": "https://www.unsolvedmath.com/problems/OWR-1703866-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-1703866-001",
     "sources": [
       {
         "citation": "Alexander Kuznetsov, Derived Categories of Cubic Fourfolds, arXiv0808.3351v1,25August2008,18pages.",
@@ -11503,6 +12571,10 @@ var openProblems = {
   },
   "30006824": {
     "id": 30006824,
+    "problem_number": "LOCAL-30006824",
+    "legacy_ids": [
+      "problem.zarankiewicz-problem-on-k-t-t-free-bipartite-graphs"
+    ],
     "title": "Zarankiewicz Problem for K_{t,t}-Free Bipartite Graphs",
     "collection": "ranked",
     "rank": 268,
@@ -11541,6 +12613,10 @@ var openProblems = {
   },
   "30006825": {
     "id": 30006825,
+    "problem_number": "LOCAL-30006825",
+    "legacy_ids": [
+      "problem.polynomial-time-decidability-of-semidefinite-programming-feasibility"
+    ],
     "title": "Polynomial-Time Decidability of Semidefinite Programming Feasibility",
     "collection": "ranked",
     "rank": 269,
@@ -11579,6 +12655,10 @@ var openProblems = {
   },
   "11300005": {
     "id": 11300005,
+    "problem_number": "AMR-112-0005",
+    "legacy_ids": [
+      "problem.nearby-lagrangian-conjecture"
+    ],
     "title": "Nearby Lagrangian conjecture",
     "collection": "ranked",
     "rank": 270,
@@ -11587,8 +12667,8 @@ var openProblems = {
     "exact_target": "Is every closed exact Lagrangian in a cotangent bundle obtainable from its zero section by a Hamiltonian isotopy?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor the smooth base manifold $N$ in the standard closed-base cotangent formulation, $T^*N$ has canonical one-form $\\lambda$ and symplectic form ${\\,\\mathrm{d}}\\lambda$. A closed embedded submanifold $L$ is Lagrangian when $\\dim L=\\dim N$ and $({\\,\\mathrm{d}}\\lambda)|_L=0$, and exact when $\\lambda|_L={\\,\\mathrm{d}} f$ for some function $f:L\\to{\\mathbb{R}}$. The conjecture asserts that there is a Hamiltonian isotopy $\\Phi_t$ of $T^*N$ with\n\\[\n \\Phi_1(L)=\\text{the zero section }N.\n\\]\nThe isotopy is generated by a time-dependent Hamiltonian in the source's support convention. Homotopy equivalence of the projection $L\\to N$, or abstract diffeomorphism of $L$ and $N$, is weaker than this ambient Hamiltonian-isotopy conclusion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.math.stonybrook.edu/~fzheng/seminar-f24/notes/week-1-2.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs every closed exact Lagrangian in a cotangent bundle obtainable from its zero section by a Hamiltonian isotopy?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Formal statement, Conjecture 1.5.\n\\url{https://www.math.stonybrook.edu/~fzheng/seminar-f24/notes/week-1-2.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/11300005.tex",
-    "link": "https://www.unsolvedmath.com/problems/11300005",
-    "external_url": "https://www.unsolvedmath.com/problems/11300005",
+    "link": "https://www.unsolvedmath.com/problems/AMR-112-0005",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-112-0005",
     "sources": [
       {
         "citation": "Formal statement, Conjecture 1.5.",
@@ -11617,6 +12697,10 @@ var openProblems = {
   },
   "30006826": {
     "id": 30006826,
+    "problem_number": "LOCAL-30006826",
+    "legacy_ids": [
+      "problem.zagier-conjecture-on-dedekind-zeta-values"
+    ],
     "title": "Zagier Conjecture on Dedekind Zeta Values",
     "collection": "ranked",
     "rank": 271,
@@ -11655,6 +12739,10 @@ var openProblems = {
   },
   "7500006": {
     "id": 7500006,
+    "problem_number": "AMR-074-0006",
+    "legacy_ids": [
+      "problem.asser-finite-spectrum-complement-problem"
+    ],
     "title": "Finite Spectrum Problem",
     "collection": "ranked",
     "rank": 272,
@@ -11663,8 +12751,8 @@ var openProblems = {
     "exact_target": "Is the set of finite sizes excluded by a first-order sentence always exactly the set of finite sizes admitted by some other sentence?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a first-order sentence $\\varphi$ in a finite vocabulary, define its finite spectrum by\n\\[\n \\operatorname{Spec}(\\varphi)=\\{n\\in{\\mathbb{Z}}_{>0}:\\exists\\text{ a structure }\\mathcal A,\n \\ |\\mathcal A|=n,\\ \\mathcal A\\models\\varphi\\}.\n\\]\nThe question asks whether for every such sentence there is another first-order sentence $\\psi$ with\n$\\operatorname{Spec}(\\psi)={\\mathbb{Z}}_{>0}\\setminus\\operatorname{Spec}(\\varphi)$. The new sentence may use a different finite vocabulary. This is complementation of the set of \\emph{possible cardinalities}; simply negating $\\varphi$ does not do this, because structures of a fixed size can satisfy $\\varphi$ and $\\neg\\varphi$ simultaneously in different interpretations.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/0907.5495}{[S1]}.\n\n\\subsection{Short English statement}\nIs the set of finite sizes excluded by a first-order sentence always exactly the set of finite sizes admitted by some other sentence?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A spectrum hierarchy. Submitted scholarly source, accessed 2026-08-31.\n\\url{https://arxiv.org/abs/0907.5495}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7500006.tex",
-    "link": "https://www.unsolvedmath.com/problems/7500006",
-    "external_url": "https://www.unsolvedmath.com/problems/7500006",
+    "link": "https://www.unsolvedmath.com/problems/AMR-074-0006",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-074-0006",
     "sources": [
       {
         "citation": "A spectrum hierarchy. Submitted scholarly source, accessed 2026-08-31.",
@@ -11693,6 +12781,10 @@ var openProblems = {
   },
   "30006827": {
     "id": 30006827,
+    "problem_number": "LOCAL-30006827",
+    "legacy_ids": [
+      "problem.depolarizing-channel-capacity"
+    ],
     "title": "Exact Unassisted Quantum Capacity of the Qubit Depolarizing Channel",
     "collection": "ranked",
     "rank": 273,
@@ -11731,6 +12823,10 @@ var openProblems = {
   },
   "30006828": {
     "id": 30006828,
+    "problem_number": "LOCAL-30006828",
+    "legacy_ids": [
+      "problem.cartan-hadamard-isoperimetric-conjecture"
+    ],
     "title": "Cartan-Hadamard isoperimetric conjecture",
     "collection": "ranked",
     "rank": 274,
@@ -11769,6 +12865,10 @@ var openProblems = {
   },
   "30006829": {
     "id": 30006829,
+    "problem_number": "LOCAL-30006829",
+    "legacy_ids": [
+      "problem.michel-boundary-rigidity-conjecture-for-simple-manifolds"
+    ],
     "title": "Michel Boundary Rigidity Conjecture for Simple Manifolds",
     "collection": "ranked",
     "rank": 275,
@@ -11807,6 +12907,10 @@ var openProblems = {
   },
   "8200004": {
     "id": 8200004,
+    "problem_number": "AMR-081-0004",
+    "legacy_ids": [
+      "problem.npt-bound-entanglement-existence"
+    ],
     "title": "Bound Entanglement with Negative Partial Transpose",
     "collection": "ranked",
     "rank": 276,
@@ -11815,8 +12919,8 @@ var openProblems = {
     "exact_target": "Can a quantum state have a negative partial transpose yet yield no distillable entanglement, even when arbitrarily many copies and two-way classical communication are available?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finite-dimensional bipartite state is a positive semidefinite trace-one operator $\\rho$ on $H_A\\otimes H_B$. It is entangled if it is not a convex combination of product states. Partial transpose $\\rho^{T_B}$ transposes the second subsystem in an orthonormal basis; having a negative eigenvalue is basis independent. LOCC consists of local quantum operations with classical communication. The target asks for $\\rho^{T_B}\\not\\succeq0$ but zero asymptotic rate of distilling maximally entangled pairs from $\\rho^{\\otimes n}$. Equivalently, in the standard finite-dimensional distillability criterion, seek an NPT state with\n\\[\n \\langle\\psi|(\\rho^{T_B})^{\\otimes n}|\\psi\\rangle\\ge0\n\\]\nfor every $n\\ge1$ and every vector $\\psi$ of Schmidt rank at most two across $A^n:B^n$. This is not merely failure of single-copy distillation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2002.03233}{[S1]}.\n\n\\subsection{Short English statement}\nCan a quantum state have a negative partial transpose yet yield no distillable entanglement, even when arbitrarily many copies and two-way classical communication are available?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]P. Horodecki, L. Rudnicki, and K. Zyczkowski, Five Open Problems in Quantum Information Theory, PRX Quantum 3 (2022).\n\\url{https://arxiv.org/pdf/2002.03233}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/8200004.tex",
-    "link": "https://www.unsolvedmath.com/problems/8200004",
-    "external_url": "https://www.unsolvedmath.com/problems/8200004",
+    "link": "https://www.unsolvedmath.com/problems/AMR-081-0004",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-081-0004",
     "sources": [
       {
         "citation": "P. Horodecki, L. Rudnicki, and K. Zyczkowski, Five Open Problems in Quantum Information Theory, PRX Quantum 3 (2022).",
@@ -11845,6 +12949,10 @@ var openProblems = {
   },
   "30006830": {
     "id": 30006830,
+    "problem_number": "LOCAL-30006830",
+    "legacy_ids": [
+      "problem.sharp-upper-bound-in-yau-s-conjecture-on-nodal-sets-of-laplace-eigenfunctions"
+    ],
     "title": "Sharp Upper Bound in Yau's Conjecture on Nodal Sets of Laplace Eigenfunctions",
     "collection": "ranked",
     "rank": 277,
@@ -11883,6 +12991,10 @@ var openProblems = {
   },
   "30005505": {
     "id": 30005505,
+    "problem_number": "OWR-13750328-009",
+    "legacy_ids": [
+      "problem.alperin-mckay-conjecture"
+    ],
     "title": "Alperin\u2013McKay Conjecture",
     "collection": "ranked",
     "rank": 278,
@@ -11891,8 +13003,8 @@ var openProblems = {
     "exact_target": "Does each finite-group block contain exactly as many height-zero ordinary characters as its Brauer correspondent in the normalizer of a defect group?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA $p$-block groups ordinary irreducible characters according to a primitive central idempotent in modular representation theory; its defect group $D$ is the associated maximal local $p$-subgroup, defined up to conjugacy. Let $b$ be the Brauer correspondent of a block $B$ in $N_G(D)$. For a positive integer $a$, write $a_p$ for its largest dividing power of $p$. Define\n\\[\n k_0(B)=\\#\\{\\chi\\in\\operatorname{Irr}(B):\\chi(1)_p=|G:D|_p\\}.\n\\]\nDefine $k_0(b)$ by the same formula with ambient group $N_G(D)$. The Alperin--McKay assertion is $k_0(B)=k_0(b)$ for every finite $G$, every prime, and every block. It compares height-zero characters only, not all characters of the two blocks.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://doi.org/10.1017/fms.2022.36}{[S1]}.\n\n\\subsection{Short English statement}\nDoes each finite-group block contain exactly as many height-zero ordinary characters as its Brauer correspondent in the normalizer of a defect group?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Lucas Ruhstorfer, Quasi-isolated blocks and the Alperin\u2013McKay conjecture, introduction; height-zero convention from The Alperin\u2013McKay conjecture for the prime2, introduction.\n\\url{https://doi.org/10.1017/fms.2022.36}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005505.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005505",
-    "external_url": "https://www.unsolvedmath.com/problems/30005505",
+    "link": "https://www.unsolvedmath.com/problems/OWR-13750328-009",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-13750328-009",
     "sources": [
       {
         "citation": "Lucas Ruhstorfer, Quasi-isolated blocks and the Alperin\u2013McKay conjecture, introduction; height-zero convention from The Alperin\u2013McKay conjecture for the prime2, introduction.",
@@ -11921,6 +13033,10 @@ var openProblems = {
   },
   "30006831": {
     "id": 30006831,
+    "problem_number": "LOCAL-30006831",
+    "legacy_ids": [
+      "problem.mumford-shah-conjecture-on-the-jump-set-of-planar-minimizers"
+    ],
     "title": "Planar homogeneous Mumford\u2013Shah local-structure conjecture",
     "collection": "ranked",
     "rank": 279,
@@ -11959,6 +13075,10 @@ var openProblems = {
   },
   "30006832": {
     "id": 30006832,
+    "problem_number": "LOCAL-30006832",
+    "legacy_ids": [
+      "problem.polynomial-time-explicit-logarithmic-ramsey-graphs"
+    ],
     "title": "Polynomial-time explicit logarithmic Ramsey graphs",
     "collection": "ranked",
     "rank": 280,
@@ -11997,6 +13117,10 @@ var openProblems = {
   },
   "30006983": {
     "id": 30006983,
+    "problem_number": "LOCAL-30006983",
+    "legacy_ids": [
+      "problem.linearity-of-mapping-class-groups"
+    ],
     "title": "Complex linearity of closed-surface mapping class groups by genus",
     "collection": "ranked",
     "rank": 281,
@@ -12035,6 +13159,10 @@ var openProblems = {
   },
   "30006833": {
     "id": 30006833,
+    "problem_number": "LOCAL-30006833",
+    "legacy_ids": [
+      "problem.grigorchuk-gap-conjecture-on-growth-of-groups"
+    ],
     "title": "Grigorchuk Gap Conjecture",
     "collection": "ranked",
     "rank": 282,
@@ -12073,6 +13201,10 @@ var openProblems = {
   },
   "30006834": {
     "id": 30006834,
+    "problem_number": "LOCAL-30006834",
+    "legacy_ids": [
+      "problem.hilbert-13-resolvent-degree-seven"
+    ],
     "title": "Resolvent Degree of the General Degree-Seven Polynomial (Algebraic Form of Hilbert's Thirteenth Problem)",
     "collection": "ranked",
     "rank": 283,
@@ -12111,6 +13243,10 @@ var openProblems = {
   },
   "30006835": {
     "id": 30006835,
+    "problem_number": "LOCAL-30006835",
+    "legacy_ids": [
+      "problem.frey-mazur-conjecture"
+    ],
     "title": "Frey-Mazur Conjecture",
     "collection": "ranked",
     "rank": 284,
@@ -12149,6 +13285,10 @@ var openProblems = {
   },
   "30006836": {
     "id": 30006836,
+    "problem_number": "LOCAL-30006836",
+    "legacy_ids": [
+      "problem.kaplansky-s-idempotent-conjecture-for-torsion-free-groups"
+    ],
     "title": "Kaplansky's Idempotent Conjecture",
     "collection": "ranked",
     "rank": 285,
@@ -12187,6 +13327,10 @@ var openProblems = {
   },
   "1282": {
     "id": 1282,
+    "problem_number": "NT-074",
+    "legacy_ids": [
+      "problem.irrationality-of-euler-s-constant"
+    ],
     "title": "Irrationality of Euler's Constant",
     "collection": "ranked",
     "rank": 286,
@@ -12195,8 +13339,8 @@ var openProblems = {
     "exact_target": "Is the limiting difference between the harmonic sum and the natural logarithm an irrational number?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nEuler's constant is defined using natural logarithms by\n\\[\n \\gamma=\\lim_{n\\to\\infty}\\left(H_n-\\log n\\right),\n \\qquad H_n=\\sum_{j=1}^n\\frac1j.\n\\]\nThe selected question is whether $\\gamma\\notin{\\mathbb{Q}}$, equivalently whether\n$q\\gamma-p\\ne0$ for every $p\\in{\\mathbb{Z}}$ and integer $q\\ge1$. The sequence defining the limit, rather than a finite decimal expansion, specifies the constant exactly. This is not Euler's exponential constant $e$, and transcendence of $\\gamma$ would be a stronger conclusion than the requested irrationality.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ams.org/journals/bull/2013-50-04/S0273-0979-2013-01423-X/S0273-0979-2013-01423-X.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs the limiting difference between the harmonic sum and the natural logarithm an irrational number?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Jeffrey C. Lagarias, \"Euler's constant: Euler's work and modern developments,\" Bull. Amer. Math. Soc. 50 (2013), no. 4, 527-628.\n\\url{https://www.ams.org/journals/bull/2013-50-04/S0273-0979-2013-01423-X/S0273-0979-2013-01423-X.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1282.tex",
-    "link": "https://www.unsolvedmath.com/problems/1282",
-    "external_url": "https://www.unsolvedmath.com/problems/1282",
+    "link": "https://www.unsolvedmath.com/problems/NT-074",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-074",
     "sources": [
       {
         "citation": "Jeffrey C. Lagarias, \"Euler's constant: Euler's work and modern developments,\" Bull. Amer. Math. Soc. 50 (2013), no. 4, 527-628.",
@@ -12225,6 +13369,10 @@ var openProblems = {
   },
   "30006837": {
     "id": 30006837,
+    "problem_number": "LOCAL-30006837",
+    "legacy_ids": [
+      "problem.global-regularity-of-the-2d-inviscid-boussinesq-equations"
+    ],
     "title": "Global Regularity of the 2D Inviscid Boussinesq Equations",
     "collection": "ranked",
     "rank": 287,
@@ -12263,6 +13411,10 @@ var openProblems = {
   },
   "30006838": {
     "id": 30006838,
+    "problem_number": "LOCAL-30006838",
+    "legacy_ids": [
+      "problem.vassiliev-finite-type-invariant-separation-conjecture"
+    ],
     "title": "Vassiliev Separation by Abelian-Valued Finite-Type Invariants",
     "collection": "ranked",
     "rank": 288,
@@ -12301,6 +13453,10 @@ var openProblems = {
   },
   "30006839": {
     "id": 30006839,
+    "problem_number": "LOCAL-30006839",
+    "legacy_ids": [
+      "problem.exact-bipartite-matching-deterministic-polynomial-time"
+    ],
     "title": "Deterministic polynomial-time exact bipartite matching",
     "collection": "ranked",
     "rank": 289,
@@ -12339,6 +13495,10 @@ var openProblems = {
   },
   "3080": {
     "id": 3080,
+    "problem_number": "OPG-2400",
+    "legacy_ids": [
+      "problem.erdos-szekeres-convex-polygon-problem-happy-ending-problem"
+    ],
     "title": "Erd\u00f6s-Szekeres conjecture",
     "collection": "ranked",
     "rank": 290,
@@ -12347,8 +13507,8 @@ var openProblems = {
     "exact_target": "Is $2^{n-2}+1$ the exact number of general-position planar points needed to force $n$ of them into convex position?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA planar point set is in general position when no three points are collinear. A subset is in convex position when every one of its points is a vertex of its convex hull. Let $\\operatorname{ES}(n)$ be the least $N$ such that every $N$-point general-position set contains an $n$-point subset in convex position. The conjecture is\n\\[\n \\operatorname{ES}(n)=2^{n-2}+1\\qquad(n\\ge3).\n\\]\nThe selected polygon need not be empty of other points of the original set. Both the universal guarantee at this threshold and sharpness immediately below it are involved in the exact value; an asymptotic exponent alone is weaker.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.SoCG.2025.13}{[S1]}.\n\n\\subsection{Short English statement}\nIs $2^{n-2}+1$ the exact number of general-position planar points needed to force $n$ of them into convex position?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Baek and Balko, The Erdos-Szekeres Conjecture Revisited (SoCG 2025).\n\\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.SoCG.2025.13}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3080.tex",
-    "link": "https://www.unsolvedmath.com/problems/3080",
-    "external_url": "https://www.unsolvedmath.com/problems/3080",
+    "link": "https://www.unsolvedmath.com/problems/OPG-2400",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-2400",
     "sources": [
       {
         "citation": "Baek and Balko, The Erdos-Szekeres Conjecture Revisited (SoCG 2025).",
@@ -12377,6 +13537,10 @@ var openProblems = {
   },
   "30006840": {
     "id": 30006840,
+    "problem_number": "LOCAL-30006840",
+    "legacy_ids": [
+      "problem.griffiths-positivity-conjecture-for-ample-vector-bundles"
+    ],
     "title": "Griffiths Positivity Conjecture for Ample Vector Bundles",
     "collection": "ranked",
     "rank": 291,
@@ -12415,6 +13579,10 @@ var openProblems = {
   },
   "30006984": {
     "id": 30006984,
+    "problem_number": "LOCAL-30006984",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-bodirsky-pinsker-tractability-conjecture"
+    ],
     "title": "Bodirsky-Pinsker Tractability Conjecture for Infinite-Domain Constraint Satisfaction",
     "collection": "ranked",
     "rank": 292,
@@ -12453,6 +13621,10 @@ var openProblems = {
   },
   "30006841": {
     "id": 30006841,
+    "problem_number": "LOCAL-30006841",
+    "legacy_ids": [
+      "problem.sample-compression-conjecture-linear-size-in-vc-dimension"
+    ],
     "title": "Sample Compression Conjecture (Linear Size in VC Dimension)",
     "collection": "ranked",
     "rank": 293,
@@ -12491,6 +13663,10 @@ var openProblems = {
   },
   "30006985": {
     "id": 30006985,
+    "problem_number": "LOCAL-30006985",
+    "legacy_ids": [
+      "problem.huisken-s-generic-singularity-conjecture-for-mean-curvature-flow"
+    ],
     "title": "Huisken's Generic Singularity Conjecture for Mean Curvature Flow",
     "collection": "ranked",
     "rank": 294,
@@ -12529,6 +13705,10 @@ var openProblems = {
   },
   "30006842": {
     "id": 30006842,
+    "problem_number": "LOCAL-30006842",
+    "legacy_ids": [
+      "problem.montgomery-s-large-value-conjecture-for-dirichlet-polynomials"
+    ],
     "title": "Montgomery's Large Value Conjecture for Dirichlet Polynomials",
     "collection": "ranked",
     "rank": 295,
@@ -12567,6 +13747,10 @@ var openProblems = {
   },
   "30006843": {
     "id": 30006843,
+    "problem_number": "LOCAL-30006843",
+    "legacy_ids": [
+      "problem.positivity-problem-for-linear-recurrence-sequences"
+    ],
     "title": "Positivity Problem for Linear Recurrence Sequences",
     "collection": "ranked",
     "rank": 296,
@@ -12605,6 +13789,10 @@ var openProblems = {
   },
   "30006844": {
     "id": 30006844,
+    "problem_number": "LOCAL-30006844",
+    "legacy_ids": [
+      "problem.global-attractor-conjecture-complex-balanced-mass-action"
+    ],
     "title": "Global Attractor Conjecture for Complex-Balanced Mass-Action Systems",
     "collection": "ranked",
     "rank": 297,
@@ -12643,6 +13831,10 @@ var openProblems = {
   },
   "30004859": {
     "id": 30004859,
+    "problem_number": "OWR-8415350-011",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-zariski-multiplicity-conjecture-for-hypersurface-singularities"
+    ],
     "title": "Zariski's Multiplicity Conjecture",
     "collection": "ranked",
     "rank": 298,
@@ -12651,8 +13843,8 @@ var openProblems = {
     "exact_target": "Does the embedded topological shape of a reduced complex hypersurface singularity determine its multiplicity?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $f,g:({\\mathbb{C}}^n,0)\\to({\\mathbb{C}},0)$ be nonzero reduced holomorphic germs. Their multiplicities are their orders of vanishing, namely the least total degrees of nonzero terms in their Taylor expansions. Embedded topological equivalence means there is a germ of a homeomorphism of ambient neighborhoods, fixing zero, that maps $V(f)$ onto $V(g)$. The conjecture is\n\\[\n ({\\mathbb{C}}^n,V(f),0)\\cong_{\\mathrm{top}}({\\mathbb{C}}^n,V(g),0)\n \\quad\\Longrightarrow\\quad\\operatorname{mult}_0f=\\operatorname{mult}_0g.\n\\]\nReducedness is essential because taking a power preserves the zero set while changing the order of vanishing. No isolated-singularity or quasihomogeneity hypothesis is included in the full target.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2309.02624}{[S1]}.\n\n\\subsection{Short English statement}\nDoes the embedded topological shape of a reduced complex hypersurface singularity determine its multiplicity?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Zariski's multiplicity conjecture for quasihomogeneous hypersurfaces with non-isolated singularities. Accessed 2026-09-01.\n\\url{https://arxiv.org/html/2309.02624}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004859.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004859",
-    "external_url": "https://www.unsolvedmath.com/problems/30004859",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415350-011",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415350-011",
     "sources": [
       {
         "citation": "Zariski's multiplicity conjecture for quasihomogeneous hypersurfaces with non-isolated singularities. Accessed 2026-09-01.",
@@ -12681,6 +13873,10 @@ var openProblems = {
   },
   "1443": {
     "id": 1443,
+    "problem_number": "GRAPH-056",
+    "legacy_ids": [
+      "problem.tutte-5-flow-conjecture"
+    ],
     "title": "Tutte's 5-Flow Conjecture",
     "collection": "ranked",
     "rank": 299,
@@ -12689,8 +13885,8 @@ var openProblems = {
     "exact_target": "Can every bridgeless finite graph carry a nowhere-zero integer flow whose absolute edge values are at most four?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn edge is a bridge if removing it increases the number of connected components. For an orientation of a finite graph, an integer flow assigns $f(e)$ to each edge and satisfies Kirchhoff conservation\n\\[\n \\sum_{e\\text{ outgoing at }v}f(e)=\\sum_{e\\text{ incoming at }v}f(e)\n \\quad\\text{at every vertex }v.\n\\]\nThe conjecture says every bridgeless graph has such a flow with\n$f(e)\\in\\{-4,-3,-2,-1,1,2,3,4\\}$ on every edge. Negative values are interpreted relative to the chosen orientation. In the usual multigraph convention, loops contribute to both sides. No planarity or bounded-genus assumption is imposed; the empty edge set causes no obstruction.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ort.shu.edu.cn/EN/abstract/abstract21516.shtml}{[S1]}.\n\n\\subsection{Short English statement}\nCan every bridgeless finite graph carry a nowhere-zero integer flow whose absolute edge values are at most four?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Jiaao Li and Bo Su, Nowhere-zero 5-flows for graphs with bounded genus (2025), Abstract.\n\\url{https://www.ort.shu.edu.cn/EN/abstract/abstract21516.shtml}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1443.tex",
-    "link": "https://www.unsolvedmath.com/problems/1443",
-    "external_url": "https://www.unsolvedmath.com/problems/1443",
+    "link": "https://www.unsolvedmath.com/problems/GRAPH-056",
+    "external_url": "https://www.unsolvedmath.com/problems/GRAPH-056",
     "sources": [
       {
         "citation": "Jiaao Li and Bo Su, Nowhere-zero 5-flows for graphs with bounded genus (2025), Abstract.",
@@ -12719,6 +13915,10 @@ var openProblems = {
   },
   "30006845": {
     "id": 30006845,
+    "problem_number": "LOCAL-30006845",
+    "legacy_ids": [
+      "problem.secret-key-from-all-entangled-states"
+    ],
     "title": "Secret key from all entangled states",
     "collection": "ranked",
     "rank": 300,
@@ -12757,6 +13957,10 @@ var openProblems = {
   },
   "3412": {
     "id": 3412,
+    "problem_number": "OPG-37129",
+    "legacy_ids": [
+      "problem.slice-ribbon-conjecture"
+    ],
     "title": "Slice-ribbon problem",
     "collection": "ranked",
     "rank": 301,
@@ -12765,8 +13969,8 @@ var openProblems = {
     "exact_target": "Must every knot that bounds a smooth disk in four-dimensional space also bound a disk in three-dimensional space with only ribbon-type self-intersections?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA knot is a smooth embedding $K:S^1\\hookrightarrow S^3$, considered up to ambient isotopy. It is \\emph{smoothly slice} if it bounds a smooth properly embedded disk $D^2\\hookrightarrow B^4$. A \\emph{ribbon singularity} of an immersed disk in $S^3$ is a transverse double arc whose two preimage arcs consist of one interior arc and one properly embedded arc ending on the boundary. A ribbon knot bounds an immersed disk with only these singularities. The assertion is\n\\[\n K\\text{ smoothly slice}\\quad\\Longrightarrow\\quad K\\text{ ribbon}.\n\\]\nEquivalently, one asks whether every smoothly slice knot admits a slice disk with no interior local maxima for the radial Morse function, after choosing an appropriate disk. The category is smooth, not merely locally flat topological sliceness.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.openproblemgarden.org/op/slice_ribbon_problem_0}{[S1]}.\n\n\\subsection{Short English statement}\nMust every knot that bounds a smooth disk in four-dimensional space also bound a disk in three-dimensional space with only ribbon-type self-intersections?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Fox, R. H. \"Some problems in knot theory,\" in Topology of 3-manifolds and related topics (Proc. The Univ. of Georgia Institute, 1961), pp. 168-176, 1962.\n\\url{https://www.openproblemgarden.org/op/slice_ribbon_problem_0}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3412.tex",
-    "link": "https://www.unsolvedmath.com/problems/3412",
-    "external_url": "https://www.unsolvedmath.com/problems/3412",
+    "link": "https://www.unsolvedmath.com/problems/OPG-37129",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-37129",
     "sources": [
       {
         "citation": "Fox, R. H. \"Some problems in knot theory,\" in Topology of 3-manifolds and related topics (Proc. The Univ. of Georgia Institute, 1961), pp. 168-176, 1962.",
@@ -12795,6 +13999,10 @@ var openProblems = {
   },
   "30001387": {
     "id": 30001387,
+    "problem_number": "OWR-4136-014",
+    "legacy_ids": [
+      "problem.mahler-conjecture-on-the-volume-product-of-a-convex-body"
+    ],
     "title": "Mahler Volume Product Conjecture",
     "collection": "ranked",
     "rank": 302,
@@ -12803,8 +14011,8 @@ var openProblems = {
     "exact_target": "Is the product of a centrally symmetric convex body's volume and its polar's volume always at least the value attained by a cube?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA convex body $K\\subset{\\mathbb{R}}^n$ is compact, convex, and has nonempty interior. Assume $K=-K$ and define its polar by\n\\[\n K^\\circ=\\{y\\in{\\mathbb{R}}^n:\\langle x,y\\rangle\\le1\\text{ for every }x\\in K\\}.\n\\]\nWith $|\\cdot|$ denoting $n$-dimensional Lebesgue volume, the symmetric Mahler conjecture asserts\n\\[\n |K|\\,|K^\\circ|\\ge\\frac{4^n}{n!}\\qquad(n\\ge1).\n\\]\nFor $K=[-1,1]^n$, its polar is $\\{y:\\sum_i|y_i|\\le1\\}$, giving equality. The product is unchanged under invertible linear changes of coordinates. The selected statement concerns origin-symmetric bodies; it is not the different conjecture about general nonsymmetric bodies and simplices, nor a classification of every equality case.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/1902.08971}{[S1]}.\n\n\\subsection{Short English statement}\nIs the product of a centrally symmetric convex body's volume and its polar's volume always at least the value attained by a cube?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Karasev, R., 'Mahler's conjecture for some hyperplane sections', Israel J. Math. 241 (2021), 795-815.\n\\url{https://arxiv.org/pdf/1902.08971}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001387.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001387",
-    "external_url": "https://www.unsolvedmath.com/problems/30001387",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4136-014",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4136-014",
     "sources": [
       {
         "citation": "Karasev, R., 'Mahler's conjecture for some hyperplane sections', Israel J. Math. 241 (2021), 795-815.",
@@ -12833,6 +14041,10 @@ var openProblems = {
   },
   "30006846": {
     "id": 30006846,
+    "problem_number": "LOCAL-30006846",
+    "legacy_ids": [
+      "problem.woodin-s-hod-conjecture"
+    ],
     "title": "Woodin's HOD Conjecture",
     "collection": "ranked",
     "rank": 303,
@@ -12875,6 +14087,10 @@ var openProblems = {
   },
   "30001681": {
     "id": 30001681,
+    "problem_number": "OWR-4792-011",
+    "legacy_ids": [
+      "problem.amenability-of-thompson-s-group-f"
+    ],
     "title": "Amenability of Thompson's Group $F$",
     "collection": "ranked",
     "rank": 304,
@@ -12883,8 +14099,8 @@ var openProblems = {
     "exact_target": "Does Thompson's group admit an averaging operation invariant under all translations, or equivalently finite sets with arbitrarily small translation boundaries?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThompson's group $F$ consists of increasing piecewise-linear homeomorphisms of $[0,1]$ with finitely many breakpoints, all dyadic rational, and slopes in $\\{2^k:k\\in{\\mathbb{Z}}\\}$; its operation is composition. A discrete group is amenable if it has a left-invariant mean: a positive linear functional $m:\\ell^\\infty(F)\\to{\\mathbb{R}}$ with $m(1)=1$ and $m(f\\circ L_g)=m(f)$ for every $g\\in F$. Equivalently, its finite subsets satisfy the F\\o lner criterion\n\\[\n \\forall E\\subset F\\text{ finite}\\ \\forall{\\varepsilon}>0\\ \\exists A\\subset F,\n \\quad0<|A|<\\infty,\\quad |gA\\mathbin{\\triangle} A|<{\\varepsilon}|A|\\ (g\\in E).\n\\]\nDetermine whether $F$ is amenable. Absence of a nonabelian free subgroup alone is not the definition and would not settle this question.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2603.28228}{[S1]}.\n\n\\subsection{Short English statement}\nDoes Thompson's group admit an averaging operation invariant under all translations, or equivalently finite sets with arbitrarily small translation boundaries?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Anna Cascioli, Martin Gilabert Vio, Eduardo Silva, Stationary boundaries on the space of amenable subgroups and C*-simplicity, arXiv:2603.28228 (2026).\n\\url{https://arxiv.org/abs/2603.28228}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001681.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001681",
-    "external_url": "https://www.unsolvedmath.com/problems/30001681",
+    "link": "https://www.unsolvedmath.com/problems/OWR-4792-011",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-4792-011",
     "sources": [
       {
         "citation": "Anna Cascioli, Martin Gilabert Vio, Eduardo Silva, Stationary boundaries on the space of amenable subgroups and C*-simplicity, arXiv:2603.28228 (2026).",
@@ -12913,6 +14129,10 @@ var openProblems = {
   },
   "30006847": {
     "id": 30006847,
+    "problem_number": "LOCAL-30006847",
+    "legacy_ids": [
+      "problem.growth-rate-of-3-uniform-hypergraph-ramsey-numbers"
+    ],
     "title": "Growth Rate of 3-Uniform Hypergraph Ramsey Numbers",
     "collection": "ranked",
     "rank": 305,
@@ -12951,6 +14171,10 @@ var openProblems = {
   },
   "30006848": {
     "id": 30006848,
+    "problem_number": "LOCAL-30006848",
+    "legacy_ids": [
+      "problem.the-dynamic-optimality-conjecture-for-splay-trees"
+    ],
     "title": "The Dynamic Optimality Conjecture for Splay Trees",
     "collection": "ranked",
     "rank": 306,
@@ -12989,6 +14213,10 @@ var openProblems = {
   },
   "30006849": {
     "id": 30006849,
+    "problem_number": "LOCAL-30006849",
+    "legacy_ids": [
+      "problem.birkhoff-conjecture-for-integrable-convex-billiards"
+    ],
     "title": "Birkhoff Conjecture (Near-Boundary Continuous Invariant Foliation)",
     "collection": "ranked",
     "rank": 307,
@@ -13027,6 +14255,10 @@ var openProblems = {
   },
   "30006850": {
     "id": 30006850,
+    "problem_number": "LOCAL-30006850",
+    "legacy_ids": [
+      "problem.unrestricted-linear-circuit-fft-lower-bound"
+    ],
     "title": "Unrestricted Linear-Circuit Lower Bound for the Discrete Fourier Transform",
     "collection": "ranked",
     "rank": 308,
@@ -13065,6 +14297,10 @@ var openProblems = {
   },
   "30006851": {
     "id": 30006851,
+    "problem_number": "LOCAL-30006851",
+    "legacy_ids": [
+      "problem.marked-length-spectrum-rigidity-conjecture"
+    ],
     "title": "Marked Length Spectrum Rigidity Conjecture",
     "collection": "ranked",
     "rank": 309,
@@ -13103,6 +14339,10 @@ var openProblems = {
   },
   "2800803": {
     "id": 2800803,
+    "problem_number": "AMR-027-0803",
+    "legacy_ids": [
+      "problem.exact-real-grothendieck-constant"
+    ],
     "title": "10 Lectures and 42 Open Problems \u2014 The Grothendieck Constant",
     "collection": "ranked",
     "rank": 310,
@@ -13111,8 +14351,8 @@ var openProblems = {
     "exact_target": "What is the exact largest advantage that real unit-vector inner products can have over signs in a bilinear form?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a real $m\\times n$ matrix $A=(a_{ij})$, put\n\\[\n B(A)=\\max_{{\\varepsilon}_i,\\delta_j\\in\\{-1,1\\}}\n \\left|\\sum_{i,j}a_{ij}{\\varepsilon}_i\\delta_j\\right|.\n\\]\nThe real Grothendieck constant is the least $K$ such that, for every $m,n,A$ and all unit vectors $u_i,v_j$ in any real Hilbert space,\n\\[\n \\left|\\sum_{i,j}a_{ij}\\langle u_i,v_j\\rangle\\right|\\le K B(A).\n\\]\nDetermine this optimal universal constant $K_G^{{\\mathbb{R}}}$ exactly. The dimensions and the matrix are arbitrary, and the comparison is with independent signs on rows and columns. Neither a fixed-dimensional variant nor the complex Grothendieck constant is the selected quantity. An improved upper or lower estimate alone is not an exact determination.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1103.6161}{[S1]}.\n\n\\subsection{Short English statement}\nWhat is the exact largest advantage that real unit-vector inner products can have over signs in a bilinear form?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]1103.6161v3, The Grothendieck constant is strictly smaller than Krivine's bound.\n\\url{https://arxiv.org/abs/1103.6161}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/2800803.tex",
-    "link": "https://www.unsolvedmath.com/problems/2800803",
-    "external_url": "https://www.unsolvedmath.com/problems/2800803",
+    "link": "https://www.unsolvedmath.com/problems/AMR-027-0803",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-027-0803",
     "sources": [
       {
         "citation": "1103.6161v3, The Grothendieck constant is strictly smaller than Krivine's bound.",
@@ -13141,6 +14381,10 @@ var openProblems = {
   },
   "30006852": {
     "id": 30006852,
+    "problem_number": "LOCAL-30006852",
+    "legacy_ids": [
+      "problem.the-online-boolean-matrix-vector-multiplication-conjecture"
+    ],
     "title": "The Online Boolean Matrix-Vector Multiplication Conjecture",
     "collection": "ranked",
     "rank": 311,
@@ -13179,6 +14423,10 @@ var openProblems = {
   },
   "7200003": {
     "id": 7200003,
+    "problem_number": "AMR-071-0003",
+    "legacy_ids": [
+      "problem.bass-quillen-conjecture"
+    ],
     "title": "Bass\u2013Quillen conjecture",
     "collection": "ranked",
     "rank": 312,
@@ -13187,8 +14435,8 @@ var openProblems = {
     "exact_target": "Over a regular ring, must every finite-rank vector bundle on affine space come from a vector bundle on the base ring?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $R$ be a commutative regular Noetherian ring: each localization $R_{\\mathfrak p}$ is a regular local ring, whose maximal ideal needs $\\dim R_{\\mathfrak p}$ generators. A module is finitely generated projective if it is a direct summand of a finite free module. The Bass--Quillen assertion says that for every $d\\ge0$ and finitely generated projective $R[t_1,\\ldots,t_d]$-module $P$, there exists a finitely generated projective $R$-module $P_0$ with\n\\[\n P\\cong P_0\\otimes_R R[t_1,\\ldots,t_d].\n\\]\nOne may take $P_0=P/(t_1,\\ldots,t_d)P$. In geometric language, every vector bundle on affine $d$-space over $R$ is pulled back from $\\operatorname{Spec}R$. The Noetherian regular-ring convention is that of the cited formulation; a broader meaning of ``regular'' needs separate specification.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2201.06424v4}{[S1]}.\n\n\\subsection{Short English statement}\nOver a regular ring, must every finite-rank vector bundle on affine space come from a vector bundle on the base ring?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Kestutis Cesnavicius, Problems about torsors over regular rings with an appendix by Yifei Zhao, arXiv:2201.06424v4, 2025.\n\\url{https://arxiv.org/html/2201.06424v4}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200003.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200003",
-    "external_url": "https://www.unsolvedmath.com/problems/7200003",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0003",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0003",
     "sources": [
       {
         "citation": "Kestutis Cesnavicius, Problems about torsors over regular rings with an appendix by Yifei Zhao, arXiv:2201.06424v4, 2025.",
@@ -13217,6 +14465,10 @@ var openProblems = {
   },
   "30006853": {
     "id": 30006853,
+    "problem_number": "LOCAL-30006853",
+    "legacy_ids": [
+      "problem.tits-alternative-for-cat0-groups"
+    ],
     "title": "Tits Alternative for CAT(0) Groups",
     "collection": "ranked",
     "rank": 313,
@@ -13255,6 +14507,10 @@ var openProblems = {
   },
   "30006854": {
     "id": 30006854,
+    "problem_number": "LOCAL-30006854",
+    "legacy_ids": [
+      "problem.calderon-uniqueness-for-bounded-measurable-isotropic-conductivities-in-higher-dimensions"
+    ],
     "title": "Calder\u00f3n uniqueness for bounded measurable real isotropic conductivities",
     "collection": "ranked",
     "rank": 314,
@@ -13293,6 +14549,10 @@ var openProblems = {
   },
   "1289": {
     "id": 1289,
+    "problem_number": "NT-081",
+    "legacy_ids": [
+      "problem.fermat-catalan-conjecture-on-finiteness-of-coprime-power-triples"
+    ],
     "title": "Fermat-Catalan Conjecture",
     "collection": "ranked",
     "rank": 315,
@@ -13301,8 +14561,8 @@ var openProblems = {
     "exact_target": "Are there only finitely many coprime positive base triples whose powers satisfy an additive equation with reciprocal exponents summing to less than one?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor positive integers $x,y,z$ and integers $p,q,r>1$, consider\n\\[\n x^p+y^q=z^r,\\qquad\n \\gcd(x,y)=\\gcd(y,z)=\\gcd(z,x)=1,\n \\qquad\\frac1p+\\frac1q+\\frac1r<1.\n\\]\nThe recorded finiteness assertion concerns the set of base triples $(x,y,z)$ that admit at least one such exponent triple: this set is finite. The strict reciprocal-sum condition excludes the spherical and Euclidean exponent ranges. Ordering of $x,y$ is harmless for finiteness, but positivity and the coprimality restriction are essential. The exact source wording counts base triples; this must be distinguished from versions of Fermat--Catalan that count triples of powers $(x^p,y^q,z^r)$ or full sextuples. This entry does not silently identify those counting conventions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://home.cit.tum.de/~wvi/NT.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre there only finitely many coprime positive base triples whose powers satisfy an additive equation with reciprocal exponents summing to less than one?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Violetta Weger, Elementary Number Theory, Conjecture 11.24 (2024/25).\n\\url{https://home.cit.tum.de/~wvi/NT.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1289.tex",
-    "link": "https://www.unsolvedmath.com/problems/1289",
-    "external_url": "https://www.unsolvedmath.com/problems/1289",
+    "link": "https://www.unsolvedmath.com/problems/NT-081",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-081",
     "sources": [
       {
         "citation": "Violetta Weger, Elementary Number Theory, Conjecture 11.24 (2024/25).",
@@ -13331,6 +14591,10 @@ var openProblems = {
   },
   "30006855": {
     "id": 30006855,
+    "problem_number": "LOCAL-30006855",
+    "legacy_ids": [
+      "problem.provisional-top500-omission-wave-004.004"
+    ],
     "title": "Original Dubrovin conjecture for Fano manifolds",
     "collection": "ranked",
     "rank": 316,
@@ -13369,6 +14633,10 @@ var openProblems = {
   },
   "1331": {
     "id": 1331,
+    "problem_number": "TOP-001",
+    "legacy_ids": [
+      "problem.polynomial-time-unknot-recognition"
+    ],
     "title": "Unknotting Problem",
     "collection": "ranked",
     "rank": 317,
@@ -13407,6 +14675,10 @@ var openProblems = {
   },
   "53": {
     "id": 53,
+    "problem_number": "SMA-010",
+    "legacy_ids": [
+      "problem.c-r-closing-lemma"
+    ],
     "title": "Smale's 10th Problem: The Pugh Closing Lemma",
     "collection": "ranked",
     "rank": 318,
@@ -13415,8 +14687,8 @@ var openProblems = {
     "exact_target": "Can an arbitrarily small perturbation in the required differentiability topology turn any nonwandering point of a diffeomorphism into a periodic point?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $M$ be a compact smooth manifold and $\\operatorname{Diff}^r(M)$ the space of $C^r$ diffeomorphisms with its $C^r$ topology. A point $p$ is nonwandering for $f$ if every neighborhood $V$ of $p$ satisfies $f^n(V)\\cap V\\ne\\varnothing$ for some $n\\ge1$. The closing assertion at differentiability order $r$ is\n\\[\n \\forall f\\ \\forall p\\in\\Omega(f)\\ \\forall\\mathcal U\\ni f\n \\quad\\exists g\\in\\mathcal U\\ \\exists n\\ge1:\\ g^n(p)=p.\n\\]\nHere $\\mathcal U$ is a $C^r$ neighborhood and $\\Omega(f)$ the nonwandering set. The question asks for the allowed differentiability orders of the source, in particular arbitrarily high finite orders; an infinite-order version uses the usual smooth topology. It concerns perturbations of diffeomorphisms without an added volume-preserving or symplectic restriction. Closing a point merely near $p$ must not replace periodicity of $p$ in this selected wording.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2004.06855v2}{[S1]}.\n\n\\subsection{Short English statement}\nCan an arbitrarily small perturbation in the required differentiability topology turn any nonwandering point of a diffeomorphism into a periodic point?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Shaobo Gan and Yi Shi, C\\textasciicircum{}r-Closing lemma for partially hyperbolic diffeomorphisms with 1D-center bundle, Problem 1.\n\\url{https://arxiv.org/html/2004.06855v2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/53.tex",
-    "link": "https://www.unsolvedmath.com/problems/53",
-    "external_url": "https://www.unsolvedmath.com/problems/53",
+    "link": "https://www.unsolvedmath.com/problems/SMA-010",
+    "external_url": "https://www.unsolvedmath.com/problems/SMA-010",
     "sources": [
       {
         "citation": "Shaobo Gan and Yi Shi, C\\textasciicircum{}r-Closing lemma for partially hyperbolic diffeomorphisms with 1D-center bundle, Problem 1.",
@@ -13445,6 +14717,10 @@ var openProblems = {
   },
   "1195": {
     "id": 1195,
+    "problem_number": "ALG-031",
+    "legacy_ids": [
+      "problem.finiteness-of-finitely-presented-periodic-groups"
+    ],
     "title": "Finiteness of Finitely Presented Periodic Groups",
     "collection": "ranked",
     "rank": 319,
@@ -13453,8 +14729,8 @@ var openProblems = {
     "exact_target": "Can an infinite group have both a finite presentation and finite order for every one of its elements?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA group is finitely presented if it has a presentation $G=\\langle s_1,\\ldots,s_d\\mid r_1,\\ldots,r_m\\rangle$ with finitely many generators and relators. It is periodic, or torsion, if\n\\[\n \\forall g\\in G\\ \\exists n=n(g)\\ge1:\\ g^n=1.\n\\]\nDoes every finitely presented periodic group have finitely many elements? Equivalently, does an infinite finitely presented torsion group exist? There is no single exponent required to kill every element: demanding a uniform $n$ would impose a stronger condition. Finite generation alone is also weaker than finite presentability, so a construction specified by infinitely many relations does not answer this question.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://groupprops.subwiki.org/wiki/Finitely_presented_periodic_group}{[S1]}.\n\n\\subsection{Short English statement}\nCan an infinite group have both a finite presentation and finite order for every one of its elements?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Groupprops contributors, Finitely presented periodic group, Subwiki.\n\\url{https://groupprops.subwiki.org/wiki/Finitely_presented_periodic_group}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1195.tex",
-    "link": "https://www.unsolvedmath.com/problems/1195",
-    "external_url": "https://www.unsolvedmath.com/problems/1195",
+    "link": "https://www.unsolvedmath.com/problems/ALG-031",
+    "external_url": "https://www.unsolvedmath.com/problems/ALG-031",
     "sources": [
       {
         "citation": "Groupprops contributors, Finitely presented periodic group, Subwiki.",
@@ -13483,6 +14759,10 @@ var openProblems = {
   },
   "30006856": {
     "id": 30006856,
+    "problem_number": "LOCAL-30006856",
+    "legacy_ids": [
+      "problem.erdos-girth-conjecture"
+    ],
     "title": "Erd\u0151s Girth Conjecture",
     "collection": "ranked",
     "rank": 320,
@@ -13521,6 +14801,10 @@ var openProblems = {
   },
   "25": {
     "id": 25,
+    "problem_number": "NT-006",
+    "legacy_ids": [
+      "problem.legendres-conjecture"
+    ],
     "title": "Legendre's Conjecture",
     "collection": "ranked",
     "rank": 321,
@@ -13529,8 +14813,8 @@ var openProblems = {
     "exact_target": "Is there always a prime strictly between one positive integer's square and the next integer's square?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA prime is an integer $p>1$ whose only positive divisors are $1$ and $p$. Legendre's conjecture is\n\\[\n \\forall n\\in{\\mathbb{Z}}_{\\ge1}\\ \\exists p\\text{ prime},\n \\qquad n^2<p<(n+1)^2.\n\\]\nBoth inequalities are strict. Equivalently, if $\\pi(x)=\\#\\{p\\le x:p\\text{ prime}\\}$, one asks $\\pi((n+1)^2)-\\pi(n^2)\\ge1$ for every $n\\ge1$, since the upper endpoint is composite. The interval width is $2n+1$, but the assertion is a prime in every one of these specific intervals, not merely an average statement about intervals of this size.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/LegendresConjecture.html}{[S1]}.\n\n\\subsection{Short English statement}\nIs there always a prime strictly between one positive integer's square and the next integer's square?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Weisstein, E. W., Legendre's Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.\n\\url{https://mathworld.wolfram.com/LegendresConjecture.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/25.tex",
-    "link": "https://www.unsolvedmath.com/problems/25",
-    "external_url": "https://www.unsolvedmath.com/problems/25",
+    "link": "https://www.unsolvedmath.com/problems/NT-006",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-006",
     "sources": [
       {
         "citation": "Weisstein, E. W., Legendre's Conjecture, From MathWorld - A Wolfram Resource, updated 16 August 2026.",
@@ -13559,6 +14843,10 @@ var openProblems = {
   },
   "30006857": {
     "id": 30006857,
+    "problem_number": "LOCAL-30006857",
+    "legacy_ids": [
+      "problem.hartshorne-conjecture-on-complete-intersections-in-codimension-two"
+    ],
     "title": "Hartshorne Conjecture on complete intersections in codimension two",
     "collection": "ranked",
     "rank": 322,
@@ -13597,6 +14885,10 @@ var openProblems = {
   },
   "30006858": {
     "id": 30006858,
+    "problem_number": "LOCAL-30006858",
+    "legacy_ids": [
+      "problem.gromov-s-surface-subgroup-question-for-one-ended-hyperbolic-groups"
+    ],
     "title": "Gromov's Surface Subgroup Question for One-Ended Hyperbolic Groups",
     "collection": "ranked",
     "rank": 323,
@@ -13635,6 +14927,10 @@ var openProblems = {
   },
   "9400180": {
     "id": 9400180,
+    "problem_number": "AMR-093-0180",
+    "legacy_ids": [
+      "problem.iwasawa-mu-0-conjecture-for-cyclotomic-z-p-extensions"
+    ],
     "title": "Iwasawa mu-invariant conjecture for number fields",
     "collection": "ranked",
     "rank": 324,
@@ -13643,8 +14939,8 @@ var openProblems = {
     "exact_target": "In every cyclotomic prime-adic tower of number fields, is the fastest Iwasawa growth term in the prime part of the class numbers absent?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a number field $F$ and prime $p$, let $F_\\infty/F$ be its cyclotomic ${\\mathbb{Z}}_p$-extension and $F_n$ the layer of degree $p^n$. Let $A_n$ be the $p$-primary subgroup of the ideal class group of $F_n$. The Iwasawa invariants are characterized, for all sufficiently large $n$, by\n\\[\n |A_n|=p^{\\mu p^n+\\lambda n+\\nu},\n\\]\nwhere $\\mu,\\lambda$ are nonnegative integers and $\\nu$ an integer. Equivalently, $\\mu$ measures the powers of $p$ in the structure of the torsion module $\\varprojlim A_n$ over ${\\mathbb{Z}}_p[[\\operatorname{Gal}(F_\\infty/F)]]\\cong{\\mathbb{Z}}_p[[T]]$. The conjecture is $\\mu=0$ for every $F$ and every $p$. It eliminates the exponential-in-$p^n$ part of the class-group growth; it does not assert $\\lambda=0$ or bounded class numbers.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2408.07826v2}{[S1]}.\n\n\\subsection{Short English statement}\nIn every cyclotomic prime-adic tower of number fields, is the fastest Iwasawa growth term in the prime part of the class numbers absent?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Adithya Chakravarthy, The Iwasawa mu-invariants of Elliptic Curves over Q, arXiv:2408.07826v2 (2024), Introduction, Conjecture 1.1 and following paragraph.\n\\url{https://arxiv.org/html/2408.07826v2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400180.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400180",
-    "external_url": "https://www.unsolvedmath.com/problems/9400180",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0180",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0180",
     "sources": [
       {
         "citation": "Adithya Chakravarthy, The Iwasawa mu-invariants of Elliptic Curves over Q, arXiv:2408.07826v2 (2024), Introduction, Conjecture 1.1 and following paragraph.",
@@ -13673,6 +14969,10 @@ var openProblems = {
   },
   "30006859": {
     "id": 30006859,
+    "problem_number": "LOCAL-30006859",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-n-el-order-for-the-spin-1-2-heisenberg-antiferromagnet-on-the-square-lattice"
+    ],
     "title": "N\u00e9el Order for the Spin-1/2 Square-Lattice Heisenberg Antiferromagnet (Averaged Ground-State Order)",
     "collection": "ranked",
     "rank": 325,
@@ -13711,6 +15011,10 @@ var openProblems = {
   },
   "30006860": {
     "id": 30006860,
+    "problem_number": "LOCAL-30006860",
+    "legacy_ids": [
+      "problem.chowla-non-vanishing-conjecture-for-dirichlet-l-functions-at-the-central-point"
+    ],
     "title": "Chowla Non-Vanishing Conjecture for Dirichlet L-Functions at the Central Point",
     "collection": "ranked",
     "rank": 326,
@@ -13749,6 +15053,10 @@ var openProblems = {
   },
   "30006861": {
     "id": 30006861,
+    "problem_number": "LOCAL-30006861",
+    "legacy_ids": [
+      "problem.irrationality-of-zeta-5"
+    ],
     "title": "Irrationality of zeta(5)",
     "collection": "ranked",
     "rank": 327,
@@ -13787,6 +15095,10 @@ var openProblems = {
   },
   "30006862": {
     "id": 30006862,
+    "problem_number": "LOCAL-30006862",
+    "legacy_ids": [
+      "problem.nirenberg-problem-on-the-two-sphere"
+    ],
     "title": "Nirenberg Problem on the Two-Sphere",
     "collection": "ranked",
     "rank": 328,
@@ -13829,6 +15141,10 @@ var openProblems = {
   },
   "30006863": {
     "id": 30006863,
+    "problem_number": "LOCAL-30006863",
+    "legacy_ids": [
+      "problem.lions-open-problem-on-small-time-global-exact-null-controllability-of-the-navier-stokes-equations-with-dirichlet-boundary-conditions"
+    ],
     "title": "Lions' Open Problem on Small-Time Global Exact Null Controllability of the Navier-Stokes Equations with Dirichlet Boundary Conditions",
     "collection": "ranked",
     "rank": 329,
@@ -13867,6 +15183,10 @@ var openProblems = {
   },
   "30006864": {
     "id": 30006864,
+    "problem_number": "LOCAL-30006864",
+    "legacy_ids": [
+      "problem.worst-case-to-average-case-hardness-reduction-for-the-learning-parity-with-noise-problem"
+    ],
     "title": "Worst-case to average-case hardness reduction for the Learning Parity with Noise problem",
     "collection": "ranked",
     "rank": 330,
@@ -13905,6 +15225,10 @@ var openProblems = {
   },
   "30006865": {
     "id": 30006865,
+    "problem_number": "LOCAL-30006865",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-arnold-chord-conjecture-in-higher-dimensions"
+    ],
     "title": "Arnold Chord Conjecture in Higher Dimensions",
     "collection": "ranked",
     "rank": 331,
@@ -13943,6 +15267,10 @@ var openProblems = {
   },
   "30006866": {
     "id": 30006866,
+    "problem_number": "LOCAL-30006866",
+    "legacy_ids": [
+      "problem.sinai-s-positive-metric-entropy-conjecture-for-the-chirikov-standard-map"
+    ],
     "title": "Sinai's Positive Metric Entropy Conjecture for the Chirikov Standard Map",
     "collection": "ranked",
     "rank": 332,
@@ -13981,6 +15309,10 @@ var openProblems = {
   },
   "30006867": {
     "id": 30006867,
+    "problem_number": "LOCAL-30006867",
+    "legacy_ids": [
+      "problem.discontinuity-of-the-q-state-potts-phase-transition-on-z-d-for-d-3-and-q-3"
+    ],
     "title": "Discontinuity of the q-State Potts Phase Transition on Z^d for d >= 3 and q >= 3",
     "collection": "ranked",
     "rank": 333,
@@ -14019,6 +15351,10 @@ var openProblems = {
   },
   "30000209": {
     "id": 30000209,
+    "problem_number": "OWR-820-003",
+    "legacy_ids": [
+      "problem.the-atiyah-conjecture-on-the-integrality-of-l2-betti-numbers"
+    ],
     "title": "Atiyah Conjecture on $L^2$-Betti Numbers",
     "collection": "ranked",
     "rank": 334,
@@ -14027,8 +15363,8 @@ var openProblems = {
     "exact_target": "For every finite cell complex with torsion-free fundamental group, must all von Neumann dimensions of its square-integrable homology be integers?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $X$ be a finite CW-complex and $G=\\pi_1(X)$ torsion-free. Lifting cells to its universal cover gives a Hilbert chain complex with spaces $C_i^{(2)}(\\widetilde X)\\cong\\ell^2(G)^{c_i}$ and bounded cellular boundary maps $d_i$. Its reduced $L^2$ homology is\n\\[\n \\mathcal H_i^{(2)}=\\ker d_i\\big/\\overline{\\operatorname{im}d_{i+1}},\n \\qquad b_i^{(2)}(\\widetilde X)=\\dim_{\\mathcal N(G)}\\mathcal H_i^{(2)}.\n\\]\nThe von Neumann dimension is computed using the canonical group trace on the orthogonal projection representing this Hilbert module, not an ordinary vector-space dimension. The selected Atiyah assertion is $b_i^{(2)}(\\widetilde X)\\in{\\mathbb{Z}}_{\\ge0}$ for every $i$ and every such $X$. No assertion about groups with torsion or denominator bounds for their invariants is substituted.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/math/0001101}{[S1]}.\n\n\\subsection{Short English statement}\nFor every finite cell complex with torsion-free fundamental group, must all von Neumann dimensions of its square-integrable homology be integers?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]T. Schick, Math. Ann. 317 (2000), 727-750.\n\\url{https://arxiv.org/abs/math/0001101}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30000209.tex",
-    "link": "https://www.unsolvedmath.com/problems/30000209",
-    "external_url": "https://www.unsolvedmath.com/problems/30000209",
+    "link": "https://www.unsolvedmath.com/problems/OWR-820-003",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-820-003",
     "sources": [
       {
         "citation": "T. Schick, Math. Ann. 317 (2000), 727-750.",
@@ -14057,6 +15393,10 @@ var openProblems = {
   },
   "15": {
     "id": 15,
+    "problem_number": "GT-002",
+    "legacy_ids": [
+      "problem.graph-reconstruction-conjecture"
+    ],
     "title": "Reconstruction Conjecture",
     "collection": "ranked",
     "rank": 335,
@@ -14065,8 +15405,8 @@ var openProblems = {
     "exact_target": "Can every graph with at least three vertices be recovered up to isomorphism from the multiset of graphs obtained by deleting one vertex?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a finite simple undirected graph $G=(V,E)$, its \\emph{deck} is the multiset of unlabelled isomorphism classes\n\\[\n \\mathcal D(G)=\\bigl\\{\\!\\bigl\\{[G-v]:v\\in V\\bigr\\}\\!\\bigr\\},\n\\]\nwhere $G-v$ is the induced graph obtained by deleting $v$ and all incident edges. The reconstruction conjecture asserts that for graphs $G,H$ on at least three vertices,\n\\[\n \\mathcal D(G)=\\mathcal D(H)\\quad\\Longrightarrow\\quad G\\cong H.\n\\]\nMultiplicity matters: equal-looking vertex-deleted graphs can occur several times in the deck. The vertices removed are not labelled or matched in advance. Edge-deletion reconstruction and reconstruction from only some cards are different questions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.sciencedirect.com/science/article/abs/pii/S0012365X26000828}{[S1]}.\n\n\\subsection{Short English statement}\nCan every graph with at least three vertices be recovered up to isomorphism from the multiset of graphs obtained by deleting one vertex?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Yaxin Qi, Discrete Mathematics 349 (2026), 115058.\n\\url{https://www.sciencedirect.com/science/article/abs/pii/S0012365X26000828}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/15.tex",
-    "link": "https://www.unsolvedmath.com/problems/15",
-    "external_url": "https://www.unsolvedmath.com/problems/15",
+    "link": "https://www.unsolvedmath.com/problems/GT-002",
+    "external_url": "https://www.unsolvedmath.com/problems/GT-002",
     "sources": [
       {
         "citation": "Yaxin Qi, Discrete Mathematics 349 (2026), 115058.",
@@ -14095,6 +15435,10 @@ var openProblems = {
   },
   "30006868": {
     "id": 30006868,
+    "problem_number": "LOCAL-30006868",
+    "legacy_ids": [
+      "problem.dixmier-conjecture"
+    ],
     "title": "Dixmier Conjecture",
     "collection": "ranked",
     "rank": 336,
@@ -14133,6 +15477,10 @@ var openProblems = {
   },
   "30002013": {
     "id": 30002013,
+    "problem_number": "OWR-11583-002",
+    "legacy_ids": [
+      "problem.broues-abelian-defect-group-conjecture"
+    ],
     "title": "Brou\u00e9's Abelian Defect Group Conjecture",
     "collection": "ranked",
     "rank": 337,
@@ -14141,8 +15489,8 @@ var openProblems = {
     "exact_target": "When a block has an abelian defect group, is its derived representation theory equivalent to that of its corresponding block in the defect group's normalizer?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFix a splitting field $k$ of characteristic $p$ for a finite group $G$. A $p$-block algebra is $B=kGe$ for a primitive central idempotent $e$; its defect group $D$ is the associated maximal $p$-subgroup in Brauer's local block theory, defined up to conjugacy. Let $b$ be the Brauer correspondent of $B$ in $kN_G(D)$. If $D$ is abelian, Brou\\'e's conjecture asks for a triangulated equivalence\n\\[\n D^b(B\\text{-}\\mathrm{mod})\\simeq D^b(b\\text{-}\\mathrm{mod}).\n\\]\nThese bounded derived categories consist of bounded complexes of finitely generated modules, with quasi-isomorphisms inverted. The target is an equivalence of derived categories, not merely equality of character counts or a bijection between simple modules. Stronger refinements concerning a splendid equivalence are not imposed by the recorded statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{http://www.numdam.org/item/AST_1990__181-182__61_0/}{[S1]}.\n\n\\subsection{Short English statement}\nWhen a block has an abelian defect group, is its derived representation theory equivalent to that of its corresponding block in the defect group's normalizer?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]M. Broue, Asterisque 181-182:61-92, 1990.\n\\url{http://www.numdam.org/item/AST_1990__181-182__61_0/}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002013.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002013",
-    "external_url": "https://www.unsolvedmath.com/problems/30002013",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11583-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11583-002",
     "sources": [
       {
         "citation": "M. Broue, Asterisque 181-182:61-92, 1990.",
@@ -14171,6 +15519,10 @@ var openProblems = {
   },
   "1454": {
     "id": 1454,
+    "problem_number": "ALG-009",
+    "legacy_ids": [
+      "problem.the-hadamard-matrix-existence-conjecture"
+    ],
     "title": "Hadamard Matrix Conjecture",
     "collection": "ranked",
     "rank": 338,
@@ -14209,6 +15561,10 @@ var openProblems = {
   },
   "30006869": {
     "id": 30006869,
+    "problem_number": "LOCAL-30006869",
+    "legacy_ids": [
+      "problem.jones-unknot-conjecture"
+    ],
     "title": "Jones Unknot Conjecture",
     "collection": "ranked",
     "rank": 339,
@@ -14247,6 +15603,10 @@ var openProblems = {
   },
   "30002235": {
     "id": 30002235,
+    "problem_number": "OWR-12177-002",
+    "legacy_ids": [
+      "problem.koiran-real-tau-conjecture"
+    ],
     "title": "Real $\\tau$-Conjecture for Sparse Polynomial Sums and Products",
     "collection": "ranked",
     "rank": 340,
@@ -14255,8 +15615,8 @@ var openProblems = {
     "exact_target": "Is the number of distinct real zeros of any nonzero sum of products of sparse polynomials bounded by a universal polynomial in its representation parameters?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA univariate polynomial is $t$-sparse if at most $t$ of its monomial coefficients are nonzero. Consider any nonzero $f\\in{\\mathbb{R}}[x]$ admitting a representation\n\\[\n f(x)=\\sum_{i=1}^{m}\\prod_{j=1}^{k}f_{ij}(x),\n \\qquad \\#\\operatorname{supp}(f_{ij})\\le t.\n\\]\nThe real $\\tau$-conjecture in this form seeks universal constants $A>0$, $c\\ge1$ for which the number of distinct real roots is at most $A(mkt)^c$, for all positive integers $m,k,t$. Exponents are nonnegative integers, while coefficients are arbitrary reals. The bound is independent of the degrees, coefficient magnitudes, and root multiplicities. The nonzero condition excludes the zero polynomial, which vanishes at every real number.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/1806.00417}{[S1]}.\n\n\\subsection{Short English statement}\nIs the number of distinct real zeros of any nonzero sum of products of sparse polynomials bounded by a universal polynomial in its representation parameters?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]The real tau-conjecture is true on average.\n\\url{https://arxiv.org/pdf/1806.00417}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002235.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002235",
-    "external_url": "https://www.unsolvedmath.com/problems/30002235",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12177-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12177-002",
     "sources": [
       {
         "citation": "The real tau-conjecture is true on average.",
@@ -14285,6 +15645,10 @@ var openProblems = {
   },
   "30006870": {
     "id": 30006870,
+    "problem_number": "LOCAL-30006870",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-shelah-s-conjecture-on-nip-fields"
+    ],
     "title": "Shelah's Conjecture on NIP Fields",
     "collection": "ranked",
     "rank": 341,
@@ -14323,6 +15687,10 @@ var openProblems = {
   },
   "30006871": {
     "id": 30006871,
+    "problem_number": "LOCAL-30006871",
+    "legacy_ids": [
+      "problem.alperins-weight-conjecture-for-modular-representations-of-finite-groups"
+    ],
     "title": "Alperins Weight Conjecture for Modular Representations of Finite Groups",
     "collection": "ranked",
     "rank": 342,
@@ -14361,6 +15729,10 @@ var openProblems = {
   },
   "30006986": {
     "id": 30006986,
+    "problem_number": "LOCAL-30006986",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-congruence-subgroup-property-for-mapping-class-groups-of-surfaces-of-genus-at-least-three"
+    ],
     "title": "Congruence Subgroup Property for Mapping Class Groups of Surfaces of Genus at Least Three",
     "collection": "ranked",
     "rank": 343,
@@ -14399,6 +15771,10 @@ var openProblems = {
   },
   "30006872": {
     "id": 30006872,
+    "problem_number": "LOCAL-30006872",
+    "legacy_ids": [
+      "problem.koebe-circle-domain-uniformization-conjecture"
+    ],
     "title": "Koebe circle-domain uniformization conjecture",
     "collection": "ranked",
     "rank": 344,
@@ -14437,6 +15813,10 @@ var openProblems = {
   },
   "30006873": {
     "id": 30006873,
+    "problem_number": "LOCAL-30006873",
+    "legacy_ids": [
+      "problem.log-brunn-minkowski-inequality-for-symmetric-convex-bodies"
+    ],
     "title": "Log-Brunn-Minkowski Inequality for Symmetric Convex Bodies",
     "collection": "ranked",
     "rank": 345,
@@ -14475,6 +15855,10 @@ var openProblems = {
   },
   "11300003": {
     "id": 11300003,
+    "problem_number": "AMR-112-0003",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-mazur-rational-points-real-topology"
+    ],
     "title": "Mazur's finite-components conjecture for rational points",
     "collection": "ranked",
     "rank": 346,
@@ -14483,8 +15867,8 @@ var openProblems = {
     "exact_target": "For every variety over the rationals, does the real-topological closure of its rational points have only finitely many connected components?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $V$ be an algebraic variety over ${\\mathbb{Q}}$. Its real points $V({\\mathbb{R}})$ carry the usual analytic topology, obtained in affine charts from Euclidean topology and glued across charts. Rational points embed naturally into real points. Mazur's conjecture in this form asserts\n\\[\n \\#\\pi_0\\!\\left(\\overline{V({\\mathbb{Q}})}^{\\,V({\\mathbb{R}})}\\right)<\\infty,\n\\]\nwhere $\\pi_0$ denotes connected components and the bar is closure in that real topology. The closure is not Zariski closure, and the rational points themselves need not be connected or finite. The assertion ranges over all varieties in the catalogue's algebraic convention; it imposes no effectiveness or uniform bound on the number of components as $V$ varies.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ar5iv.labs.arxiv.org/html/math/0006140}{[S1]}.\n\n\\subsection{Short English statement}\nFor every variety over the rationals, does the real-topological closure of its rational points have only finitely many connected components?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Gunther Cornelissen and Karim Zahidi, Topology of Diophantine Sets: Remarks on Mazur's Conjectures (2000).\n\\url{https://ar5iv.labs.arxiv.org/html/math/0006140}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/11300003.tex",
-    "link": "https://www.unsolvedmath.com/problems/11300003",
-    "external_url": "https://www.unsolvedmath.com/problems/11300003",
+    "link": "https://www.unsolvedmath.com/problems/AMR-112-0003",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-112-0003",
     "sources": [
       {
         "citation": "Gunther Cornelissen and Karim Zahidi, Topology of Diophantine Sets: Remarks on Mazur's Conjectures (2000).",
@@ -14513,6 +15897,10 @@ var openProblems = {
   },
   "30006874": {
     "id": 30006874,
+    "problem_number": "LOCAL-30006874",
+    "legacy_ids": [
+      "problem.hopf-conjecture-no-metric-of-positive-sectional-curvature-on-s-2-x-s-2"
+    ],
     "title": "Hopf Conjecture: no metric of positive sectional curvature on S^2 x S^2",
     "collection": "ranked",
     "rank": 347,
@@ -14551,6 +15939,10 @@ var openProblems = {
   },
   "30006875": {
     "id": 30006875,
+    "problem_number": "LOCAL-30006875",
+    "legacy_ids": [
+      "problem.bott-conjecture-nonnegatively-curved-simply-connected-manifolds-are-rationally-elliptic"
+    ],
     "title": "Bott Conjecture: nonnegatively curved simply connected manifolds are rationally elliptic",
     "collection": "ranked",
     "rank": 348,
@@ -14589,6 +15981,10 @@ var openProblems = {
   },
   "30006876": {
     "id": 30006876,
+    "problem_number": "LOCAL-30006876",
+    "legacy_ids": [
+      "problem.corona-problem-for-the-unit-polydisc"
+    ],
     "title": "Corona problem for the unit polydisc",
     "collection": "ranked",
     "rank": 349,
@@ -14627,6 +16023,10 @@ var openProblems = {
   },
   "3216": {
     "id": 3216,
+    "problem_number": "OPG-128",
+    "legacy_ids": [
+      "problem.tuttes-3-flow-conjecture"
+    ],
     "title": "3-flow conjecture",
     "collection": "ranked",
     "rank": 350,
@@ -14635,8 +16035,8 @@ var openProblems = {
     "exact_target": "Does every four-edge-connected loopless multigraph admit a nonzero integer flow using only magnitudes one and two?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finite loopless multigraph is $4$-edge-connected if deleting any set of at most three edges leaves it connected. A nowhere-zero integer $3$-flow consists of an orientation and edge values $f(e)\\in\\{-2,-1,1,2\\}$ obeying conservation at every vertex:\n\\[\n \\sum_{e\\text{ enters }v} f(e)=\\sum_{e\\text{ leaves }v}f(e).\n\\]\nTutte's conjecture says every such graph has this flow. Parallel edges are allowed, and the one-vertex loopless case has the empty flow. Negative values can equivalently be made positive by reversing their edges. The requirement is ordinary zero-boundary conservation; it does not ask that every prescribed admissible boundary modulo three can be realized.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/1406.1554}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every four-edge-connected loopless multigraph admit a nonzero integer flow using only magnitudes one and two?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Chen and Ning, A note on nowhere-zero 3-flow and Z3-connectivity, Definition1.1 and Conjecture1.2, PDF printed p2.\n\\url{https://arxiv.org/pdf/1406.1554}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3216.tex",
-    "link": "https://www.unsolvedmath.com/problems/3216",
-    "external_url": "https://www.unsolvedmath.com/problems/3216",
+    "link": "https://www.unsolvedmath.com/problems/OPG-128",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-128",
     "sources": [
       {
         "citation": "Chen and Ning, A note on nowhere-zero 3-flow and Z3-connectivity, Definition1.1 and Conjecture1.2, PDF printed p2.",
@@ -14665,6 +16065,10 @@ var openProblems = {
   },
   "30006877": {
     "id": 30006877,
+    "problem_number": "LOCAL-30006877",
+    "legacy_ids": [
+      "problem.arithmeticity-of-lattices-in-pu-n-1-for-n-at-least-4"
+    ],
     "title": "Arithmeticity of Lattices in PU(n,1) for n at Least 4",
     "collection": "ranked",
     "rank": 351,
@@ -14703,6 +16107,10 @@ var openProblems = {
   },
   "30006878": {
     "id": 30006878,
+    "problem_number": "LOCAL-30006878",
+    "legacy_ids": [
+      "problem.brauers-kb-conjecture"
+    ],
     "title": "Brauer's k(B) Conjecture",
     "collection": "ranked",
     "rank": 352,
@@ -14741,6 +16149,10 @@ var openProblems = {
   },
   "9400055": {
     "id": 9400055,
+    "problem_number": "AMR-093-0055",
+    "legacy_ids": [
+      "problem.kummer-vandiver-conjecture-on-cyclotomic-class-numbers"
+    ],
     "title": "Kummer\u2013Vandiver conjecture",
     "collection": "ranked",
     "rank": 353,
@@ -14749,8 +16161,8 @@ var openProblems = {
     "exact_target": "Does a prime never divide the class number of the maximal real subfield of the cyclotomic field generated by its roots of unity?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a prime $p$, let $\\zeta_p=e^{2\\pi i/p}$ and let\n\\[\n K_p^+={\\mathbb{Q}}(\\zeta_p+\\zeta_p^{-1})\n\\]\nbe the maximal real subfield of the $p$-th cyclotomic field. Its ideal class group is the group of nonzero fractional ideals of its ring of integers modulo principal fractional ideals; its finite order is the class number $h_p^+$. The conjecture is $p\\nmid h_p^+$ for every prime $p$, equivalently that the $p$-primary part of this class group is trivial. The case $p=2$ gives $K_p^+={\\mathbb{Q}}$. It does not say $h_p^+=1$ or forbid divisibility by other primes. The catalogue's named 2024 reference is paired with a January 2019 Notices issue URL; that bibliographic mismatch is retained visibly, and Ghate's direct formulation is supplied as an additional source.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.ams.org/journals/notices/201901/201901FullIssue.pdf}{[S1]}, \\href{https://mathweb.tifr.res.in/~eghate/vandiver.pdf}{[E1]}.\n\n\\subsection{Short English statement}\nDoes a prime never divide the class number of the maximal real subfield of the cyclotomic field generated by its roots of unity?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Hou Rong Qin, The Vandiver Conjecture and a New Conjecture on the Distribution of Irregular Primes, Acta Mathematica Sinica, Chinese Series 67(2) (2024), 341-346.\n\\url{https://www.ams.org/journals/notices/201901/201901FullIssue.pdf}.\n\\textit{Formulation source.}\n\\item[E1]Eknath Ghate, Vandiver\u2019s Conjecture via K-theory, Summer School on Cyclotomic Fields, Pune, 7\u201330 June 1999, Conjecture 1.\n\\url{https://mathweb.tifr.res.in/~eghate/vandiver.pdf}.\n\\textit{Added primary source: Direct statement for the class number of the maximal real cyclotomic subfield; added because the catalogue citation and URL do not match.. Consulted 24 September 2026.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400055.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400055",
-    "external_url": "https://www.unsolvedmath.com/problems/9400055",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0055",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0055",
     "sources": [
       {
         "citation": "Hou Rong Qin, The Vandiver Conjecture and a New Conjecture on the Distribution of Irregular Primes, Acta Mathematica Sinica, Chinese Series 67(2) (2024), 341-346.",
@@ -14783,6 +16195,10 @@ var openProblems = {
   },
   "30006879": {
     "id": 30006879,
+    "problem_number": "LOCAL-30006879",
+    "legacy_ids": [
+      "problem.constant-parameter-quantum-locally-testable-codes"
+    ],
     "title": "Constant-Parameter Quantum Locally Testable Codes",
     "collection": "ranked",
     "rank": 354,
@@ -14825,6 +16241,10 @@ var openProblems = {
   },
   "30006880": {
     "id": 30006880,
+    "problem_number": "LOCAL-30006880",
+    "legacy_ids": [
+      "problem.existence-of-a-p-optimal-propositional-proof-system"
+    ],
     "title": "Existence of a p-Optimal Propositional Proof System",
     "collection": "ranked",
     "rank": 355,
@@ -14863,6 +16283,10 @@ var openProblems = {
   },
   "3100069": {
     "id": 3100069,
+    "problem_number": "AMR-030-0069",
+    "legacy_ids": [
+      "problem.vinogradov-conjecture-on-the-least-quadratic-non-residue"
+    ],
     "title": "Is the least quadratic residue modulo p at most p^(\u013e)^( )for any \u013e > 0",
     "collection": "ranked",
     "rank": 356,
@@ -14871,8 +16295,8 @@ var openProblems = {
     "exact_target": "Is the least quadratic nonresidue modulo a prime smaller, up to a constant, than every fixed positive power of that prime?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an odd prime $p$, a quadratic nonresidue is an integer $a$ not divisible by $p$ for which $x^2\\equiv a\\pmod p$ has no solution. Let $n_p$ be the least positive such integer. Vinogradov's conjecture in the selected form asserts\n\\[\n \\forall{\\varepsilon}>0\\ \\exists C_{\\varepsilon}>0\\ \\forall p\\text{ odd prime},\n \\qquad n_p\\le C_{\\varepsilon} p^{\\varepsilon}.\n\\]\nThe constant depends only on ${\\varepsilon}$, not on $p$. Equivalently, $n_p=p^{o(1)}$ as primes tend to infinity. The requirement is unconditional, without assuming a Riemann hypothesis. No computable dependence of $C_{\\varepsilon}$ on ${\\varepsilon}$ or uniform numerical bound is demanded by this notation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2404.08380}{[S1]}.\n\n\\subsection{Short English statement}\nIs the least quadratic nonresidue modulo a prime smaller, up to a constant, than every fixed positive power of that prime?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]E. Carneiro, M. B. Milinovich, E. Quesada-Herrera and A. P. Ramos, \"Fourier optimization, the least quadratic non-residue, and the least prime in an arithmetic progression\", arXiv:2404.08380 [math.NT], version dated 13 August 2025.\n\\url{https://arxiv.org/pdf/2404.08380}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3100069.tex",
-    "link": "https://www.unsolvedmath.com/problems/3100069",
-    "external_url": "https://www.unsolvedmath.com/problems/3100069",
+    "link": "https://www.unsolvedmath.com/problems/AMR-030-0069",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-030-0069",
     "sources": [
       {
         "citation": "E. Carneiro, M. B. Milinovich, E. Quesada-Herrera and A. P. Ramos, \"Fourier optimization, the least quadratic non-residue, and the least prime in an arithmetic progression\", arXiv:2404.08380 [math.NT], version dated 13 August 2025.",
@@ -14901,6 +16325,10 @@ var openProblems = {
   },
   "30006881": {
     "id": 30006881,
+    "problem_number": "LOCAL-30006881",
+    "legacy_ids": [
+      "problem.iwaniec-conjecture-for-the-beurling-ahlfors-transform-norm"
+    ],
     "title": "Iwaniec Conjecture for the Beurling-Ahlfors Transform Norm",
     "collection": "ranked",
     "rank": 357,
@@ -14939,6 +16367,10 @@ var openProblems = {
   },
   "30006882": {
     "id": 30006882,
+    "problem_number": "LOCAL-30006882",
+    "legacy_ids": [
+      "problem.strong-hyperplane-conjecture-isotropic-constants"
+    ],
     "title": "Strong Hyperplane Conjecture for Isotropic Constants",
     "collection": "ranked",
     "rank": 358,
@@ -14977,6 +16409,10 @@ var openProblems = {
   },
   "30006883": {
     "id": 30006883,
+    "problem_number": "LOCAL-30006883",
+    "legacy_ids": [
+      "problem.word-problem-one-relation-monoids"
+    ],
     "title": "The Word Problem for One-Relation Monoids",
     "collection": "ranked",
     "rank": 359,
@@ -15015,6 +16451,10 @@ var openProblems = {
   },
   "30006884": {
     "id": 30006884,
+    "problem_number": "LOCAL-30006884",
+    "legacy_ids": [
+      "problem.benjamini-schramm-conjecture-p-c-p-u-for-non-amenable-cayley-graphs"
+    ],
     "title": "Benjamini-Schramm conjecture p_c<p_u for non-amenable Cayley graphs",
     "collection": "ranked",
     "rank": 360,
@@ -15053,6 +16493,10 @@ var openProblems = {
   },
   "1354": {
     "id": 1354,
+    "problem_number": "ST-008",
+    "legacy_ids": [
+      "problem.strong-compactness-versus-supercompactness-equiconsistency-problem"
+    ],
     "title": "Strongly Compact vs Supercompact Cardinals",
     "collection": "ranked",
     "rank": 361,
@@ -15061,8 +16505,8 @@ var openProblems = {
     "exact_target": "Are the existence of a strongly compact cardinal and the existence of a supercompact cardinal equally strong consistency assumptions?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA cardinal $\\kappa$ is strongly compact if every $\\kappa$-complete filter extends to a $\\kappa$-complete ultrafilter. It is supercompact if for every $\\lambda\\ge\\kappa$ there is an elementary embedding $j:V\\to M$ with critical point $\\kappa$, $j(\\kappa)>\\lambda$, and $M^\\lambda\\subseteq M$, in the standard class-embedding formulation. Write $\\operatorname{Con}(T)$ for the arithmetical assertion that the formal theory $T$ has no proof of contradiction. The requested reverse consistency implication is\n\\[\n \\operatorname{Con}(\\mathrm{ZFC}+\\exists\\text{ strongly compact cardinal})\n \\ \\Longrightarrow\\\n \\operatorname{Con}(\\mathrm{ZFC}+\\exists\\text{ supercompact cardinal}).\n\\]\nThe forward large-cardinal implication supplies the other direction. The issue is equiconsistency, not whether every strongly compact cardinal in a given universe is supercompact. A precise strict-strength result also requires the usual specified metatheory for comparing consistency assertions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1810.05058}{[S1]}.\n\n\\subsection{Short English statement}\nAre the existence of a strongly compact cardinal and the existence of a supercompact cardinal equally strong consistency assumptions?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]G. Goldberg, The Ultrapower Axiom and the equivalence between strong compactness and supercompactness, arXiv:1810.05058 (2018).\n\\url{https://arxiv.org/abs/1810.05058}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1354.tex",
-    "link": "https://www.unsolvedmath.com/problems/1354",
-    "external_url": "https://www.unsolvedmath.com/problems/1354",
+    "link": "https://www.unsolvedmath.com/problems/ST-008",
+    "external_url": "https://www.unsolvedmath.com/problems/ST-008",
     "sources": [
       {
         "citation": "G. Goldberg, The Ultrapower Axiom and the equivalence between strong compactness and supercompactness, arXiv:1810.05058 (2018).",
@@ -15091,6 +16535,10 @@ var openProblems = {
   },
   "30006885": {
     "id": 30006885,
+    "problem_number": "LOCAL-30006885",
+    "legacy_ids": [
+      "problem.asymptotic-turan-numbers-of-even-cycles"
+    ],
     "title": "Asymptotic Turan Numbers of Even Cycles",
     "collection": "ranked",
     "rank": 362,
@@ -15129,6 +16577,10 @@ var openProblems = {
   },
   "30006886": {
     "id": 30006886,
+    "problem_number": "LOCAL-30006886",
+    "legacy_ids": [
+      "problem.fujita-freeness-conjecture"
+    ],
     "title": "Fujita Freeness Conjecture",
     "collection": "ranked",
     "rank": 363,
@@ -15167,6 +16619,10 @@ var openProblems = {
   },
   "30006887": {
     "id": 30006887,
+    "problem_number": "LOCAL-30006887",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-kobayashi-canonical-ampleness"
+    ],
     "title": "Kobayashi Conjecture: Hyperbolic Compact K\u00e4hler Manifolds Have Ample Canonical Bundle",
     "collection": "ranked",
     "rank": 364,
@@ -15205,6 +16661,10 @@ var openProblems = {
   },
   "30006987": {
     "id": 30006987,
+    "problem_number": "LOCAL-30006987",
+    "legacy_ids": [
+      "problem.nagata-conjecture-on-plane-curve-linear-systems"
+    ],
     "title": "Nagata Conjecture on Plane Curve Linear Systems",
     "collection": "ranked",
     "rank": 365,
@@ -15243,6 +16703,10 @@ var openProblems = {
   },
   "1286": {
     "id": 1286,
+    "problem_number": "NT-078",
+    "legacy_ids": [
+      "problem.beal-s-conjecture-tijdeman-zagier-conjecture"
+    ],
     "title": "Beal's Conjecture",
     "collection": "ranked",
     "rank": 366,
@@ -15251,8 +16715,8 @@ var openProblems = {
     "exact_target": "Whenever the sum of two positive perfect powers equals a third and all exponents exceed two, must their bases share a prime factor?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nBeal's conjecture asserts that for positive integers $A,B,C$ and exponents $x,y,z>2$,\n\\[\n A^x+B^y=C^z\\quad\\Longrightarrow\\quad\\gcd(A,B,C)>1.\n\\]\nEquivalently, some prime must divide all three bases. If a prime divides two bases in such an equation, it divides the third, so excluding a common prime also enforces pairwise coprimality. The exponents may be different and need not be prime. Positivity excludes zero and signed degeneracies. Unlike a finiteness statement for exceptional solutions, the assertion prohibits every coprime solution in this exponent range.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://sites.math.unt.edu/~mauldin/beal.html}{[S1]}.\n\n\\subsection{Short English statement}\nWhenever the sum of two positive perfect powers equals a third and all exponents exceed two, must their bases share a prime factor?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]R. D. Mauldin, The Beal Conjecture and Prize, University of North Texas; announced in Notices Amer. Math. Soc. 44 (1997), 1436-1437.\n\\url{https://sites.math.unt.edu/~mauldin/beal.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1286.tex",
-    "link": "https://www.unsolvedmath.com/problems/1286",
-    "external_url": "https://www.unsolvedmath.com/problems/1286",
+    "link": "https://www.unsolvedmath.com/problems/NT-078",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-078",
     "sources": [
       {
         "citation": "R. D. Mauldin, The Beal Conjecture and Prize, University of North Texas; announced in Notices Amer. Math. Soc. 44 (1997), 1436-1437.",
@@ -15281,6 +16745,10 @@ var openProblems = {
   },
   "30006888": {
     "id": 30006888,
+    "problem_number": "LOCAL-30006888",
+    "legacy_ids": [
+      "problem.igusa-p-adic-monodromy-conjecture"
+    ],
     "title": "Igusa\u2019s Standard p-Adic Monodromy Conjecture",
     "collection": "ranked",
     "rank": 367,
@@ -15319,6 +16787,10 @@ var openProblems = {
   },
   "30002415": {
     "id": 30002415,
+    "problem_number": "OWR-12723-001",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-optimal-star-discrepancy"
+    ],
     "title": "Sharp Multidimensional Star-Discrepancy Asymptotics",
     "collection": "ranked",
     "rank": 368,
@@ -15327,8 +16799,8 @@ var openProblems = {
     "exact_target": "How small can the worst counting error in origin-anchored boxes be for an optimally placed $N$-point set in each fixed dimension at least three?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an $N$-point set $P\\subset[0,1)^d$, its unnormalized star discrepancy is\n\\[\n D^*(P)=\\sup_{x\\in[0,1]^d}\n \\left|\\#\\left(P\\cap\\prod_{j=1}^d[0,x_j)\\right)-N\\prod_{j=1}^dx_j\\right|.\n\\]\nLet $\\Delta_d(N)=\\inf_{|P|=N}D^*(P)$. For every fixed $d\\ge3$, determine a function $f_d(N)$ for which $c_df_d(N)\\le\\Delta_d(N)\\le C_df_d(N)$ for all sufficiently large $N$, with positive constants depending only on $d$. The boxes are anchored at the origin and half-open. This convention omits the factor $1/N$ used in normalized discrepancy, so any proposed asymptotic must match this normalization. The dimension is fixed while the number of points grows.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www-users.cse.umn.edu/~dbilyk/bilyk-research.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nHow small can the worst counting error in origin-anchored boxes be for an optimally placed $N$-point set in each fixed dimension at least three?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Dmitriy Bilyk, Research Statement, Section 1.1.\n\\url{https://www-users.cse.umn.edu/~dbilyk/bilyk-research.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002415.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002415",
-    "external_url": "https://www.unsolvedmath.com/problems/30002415",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12723-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12723-001",
     "sources": [
       {
         "citation": "Dmitriy Bilyk, Research Statement, Section 1.1.",
@@ -15357,6 +16829,10 @@ var openProblems = {
   },
   "7200010": {
     "id": 7200010,
+    "problem_number": "AMR-071-0010",
+    "legacy_ids": [
+      "problem.hilbert-s-third-problem-for-spherical-and-hyperbolic-scissors-congruence"
+    ],
     "title": "In spherical or hyperbolic geometry, must polyhedra with the same volume and Dehn invariant be scissors-congruent",
     "collection": "ranked",
     "rank": 369,
@@ -15365,8 +16841,8 @@ var openProblems = {
     "exact_target": "In spherical and hyperbolic three-dimensional geometry, do volume and the Dehn invariant together completely determine scissors congruence?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nTwo three-dimensional polyhedra in $X=\\mathbb H^3$ or $S^3$ are scissors congruent if finite decompositions into polyhedral pieces can be matched by isometries. Their classes form the scissors group $\\mathcal P(X)$, imposing additivity under cuts. The Dehn invariant is the additive invariant represented, in the source's angular convention, by\n\\[\n D(P)=\\sum_{e}\\ell(e)\\otimes(\\theta_e\\bmod\\pi{\\mathbb{Q}}).\n\\]\nHere $\\ell(e)$ and $\\theta_e$ are edge lengths and dihedral angles; the precise target group and spherical relations are those of Neumann's formulation. The task, separately for both geometries, is injectivity of volume on $\\ker D$. Equivalently, equal volume and equal Dehn invariant should imply scissors congruence. In the spherical scissors group volume uses its stated full-sphere convention; one must not replace the group or allow ideal pieces without checking those conventions.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/math/9712226}{[S1]}.\n\n\\subsection{Short English statement}\nIn spherical and hyperbolic three-dimensional geometry, do volume and the Dehn invariant together completely determine scissors congruence?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Neumann, Hilbert's 3rd Problem and invariants of 3-manifolds, Geom. Topol. Monogr. 1 (1998), 383-411.\n\\url{https://arxiv.org/pdf/math/9712226}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200010.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200010",
-    "external_url": "https://www.unsolvedmath.com/problems/7200010",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0010",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0010",
     "sources": [
       {
         "citation": "Neumann, Hilbert's 3rd Problem and invariants of 3-manifolds, Geom. Topol. Monogr. 1 (1998), 383-411.",
@@ -15395,6 +16871,10 @@ var openProblems = {
   },
   "30006889": {
     "id": 30006889,
+    "problem_number": "LOCAL-30006889",
+    "legacy_ids": [
+      "problem.shelah-s-categoricity-conjecture-for-l-omega1-omega"
+    ],
     "title": "Shelah's Categoricity Conjecture for L_omega1,omega",
     "collection": "ranked",
     "rank": 370,
@@ -15433,6 +16913,10 @@ var openProblems = {
   },
   "30006890": {
     "id": 30006890,
+    "problem_number": "LOCAL-30006890",
+    "legacy_ids": [
+      "problem.corona-problem-for-the-unit-ball-in-several-complex-variables"
+    ],
     "title": "Corona Problem for the Unit Ball in Several Complex Variables",
     "collection": "ranked",
     "rank": 371,
@@ -15471,6 +16955,10 @@ var openProblems = {
   },
   "30006891": {
     "id": 30006891,
+    "problem_number": "LOCAL-30006891",
+    "legacy_ids": [
+      "problem.top500-omission-w055056-hyperkahler-syz"
+    ],
     "title": "Hyperk\u00e4hler SYZ (Lagrangian Fibration) Conjecture",
     "collection": "ranked",
     "rank": 372,
@@ -15509,6 +16997,10 @@ var openProblems = {
   },
   "1281": {
     "id": 1281,
+    "problem_number": "NT-073",
+    "legacy_ids": [
+      "problem.four-exponentials-conjecture"
+    ],
     "title": "Four Exponentials Conjecture",
     "collection": "ranked",
     "rank": 373,
@@ -15517,8 +17009,8 @@ var openProblems = {
     "exact_target": "For two pairs of rationally independent complex numbers, must at least one exponential of a cross-product be transcendental?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $x_1,x_2,y_1,y_2\\in{\\mathbb{C}}$ with $x_1,x_2$ linearly independent over ${\\mathbb{Q}}$ and $y_1,y_2$ linearly independent over ${\\mathbb{Q}}$. Thus each rational relation within either pair is trivial. The four exponentials conjecture asserts\n\\[\n \\{e^{x_1y_1},e^{x_1y_2},e^{x_2y_1},e^{x_2y_2}\\}\n \\not\\subset\\overline{{\\mathbb{Q}}}.\n\\]\nHere $\\overline{{\\mathbb{Q}}}$ denotes the algebraic complex numbers, so at least one of the four values must be transcendental. The pairs need not consist of real numbers, and no independence between the two pairs is assumed. The assertion does not identify which value is transcendental or demand algebraic independence of the four values.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/FourExponentialsConjecture.html}{[S1]}.\n\n\\subsection{Short English statement}\nFor two pairs of rationally independent complex numbers, must at least one exponential of a cross-product be transcendental?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Four Exponentials Conjecture (MathWorld).\n\\url{https://mathworld.wolfram.com/FourExponentialsConjecture.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1281.tex",
-    "link": "https://www.unsolvedmath.com/problems/1281",
-    "external_url": "https://www.unsolvedmath.com/problems/1281",
+    "link": "https://www.unsolvedmath.com/problems/NT-073",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-073",
     "sources": [
       {
         "citation": "Four Exponentials Conjecture (MathWorld).",
@@ -15547,6 +17039,10 @@ var openProblems = {
   },
   "3329": {
     "id": 3329,
+    "problem_number": "OPG-702",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-finitely-presented-intermediate-growth"
+    ],
     "title": "Growth of finitely presented groups",
     "collection": "ranked",
     "rank": 374,
@@ -15555,8 +17051,8 @@ var openProblems = {
     "exact_target": "Does a finitely presented group exist whose growth is slower than exponential but faster than every polynomial bound?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a finitely generated group $G$ with finite symmetric generating set $S$, let\n\\[\n \\gamma_{G,S}(n)=\\#\\{g\\in G:|g|_S\\le n\\},\n\\]\nwhere $|g|_S$ is the minimum word length. Intermediate growth means simultaneously\n\\[\n \\lim_{n\\to\\infty}\\frac{\\log\\gamma_{G,S}(n)}n=0,\n \\qquad\\text{and}\\qquad\n \\nexists C,d:\\gamma_{G,S}(n)\\le C(n+1)^d\\text{ for all }n.\n\\]\nThe existence problem asks for such a $G$ that also has a finite presentation, with finitely many defining relations. These growth properties are unchanged on changing the finite generating set. No precise intermediate rate is prescribed, and an infinitely related finitely generated construction does not meet the extra finite-presentation requirement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ar5iv.labs.arxiv.org/html/1111.0512}{[S1]}.\n\n\\subsection{Short English statement}\nDoes a finitely presented group exist whose growth is slower than exponential but faster than every polynomial bound?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]R. Grigorchuk, Milnor's Problem on the Growth of Groups and its Consequences, arXiv:1111.0512 (2011, revised 2013).\n\\url{https://ar5iv.labs.arxiv.org/html/1111.0512}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3329.tex",
-    "link": "https://www.unsolvedmath.com/problems/3329",
-    "external_url": "https://www.unsolvedmath.com/problems/3329",
+    "link": "https://www.unsolvedmath.com/problems/OPG-702",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-702",
     "sources": [
       {
         "citation": "R. Grigorchuk, Milnor's Problem on the Growth of Groups and its Consequences, arXiv:1111.0512 (2011, revised 2013).",
@@ -15585,6 +17081,10 @@ var openProblems = {
   },
   "3200011": {
     "id": 3200011,
+    "problem_number": "AMR-031-0011",
+    "legacy_ids": [
+      "problem.positive-combinatorial-rule-for-kronecker-coefficients"
+    ],
     "title": "Combinatorial interpretation of Kronecker coefficients",
     "collection": "ranked",
     "rank": 375,
@@ -15593,8 +17093,8 @@ var openProblems = {
     "exact_target": "Can every Kronecker coefficient be computed by directly counting explicitly described combinatorial objects, without subtracting cancelling contributions?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA partition $\\lambda\\vdash n$ is a nonincreasing sequence of positive integers summing to $n$, and $S^\\lambda$ denotes the corresponding irreducible complex representation of the symmetric group $S_n$. The Kronecker coefficients are defined by\n\\[\n S^\\lambda\\otimes S^\\mu\\cong\n \\bigoplus_{\\nu\\vdash n}(S^\\nu)^{\\oplus g_{\\lambda,\\mu,\\nu}},\n \\qquad\n g_{\\lambda,\\mu,\\nu}=\\dim\\operatorname{Hom}_{S_n}\n (S^\\nu,S^\\lambda\\otimes S^\\mu).\n\\]\nFind a uniform positive combinatorial rule, for example explicit finite combinatorial sets $\\mathcal C_{\\lambda,\\mu,\\nu}$ whose cardinalities give these coefficients without cancellation. The catalogue does not impose a runtime bound or a formal class of allowed combinatorial rules. Merely naming a basis of the above Hom space, or declaring a set of that unknown cardinality, is a tautology rather than the intended interpretation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2604.23286}{[S1]}.\n\n\\subsection{Short English statement}\nCan every Kronecker coefficient be computed by directly counting explicitly described combinatorial objects, without subtracting cancelling contributions?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]John M. Campbell, Kronecker coefficients via the Giambelli identity for Schur functions, arXiv:2604.23286, 2026.\n\\url{https://arxiv.org/abs/2604.23286}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3200011.tex",
-    "link": "https://www.unsolvedmath.com/problems/3200011",
-    "external_url": "https://www.unsolvedmath.com/problems/3200011",
+    "link": "https://www.unsolvedmath.com/problems/AMR-031-0011",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-031-0011",
     "sources": [
       {
         "citation": "John M. Campbell, Kronecker coefficients via the Giambelli identity for Schur functions, arXiv:2604.23286, 2026.",
@@ -15623,6 +17123,10 @@ var openProblems = {
   },
   "30004208": {
     "id": 30004208,
+    "problem_number": "OWR-17133-004",
+    "legacy_ids": [
+      "problem.dixmier-unitarisability-problem"
+    ],
     "title": "The Dixmier Unitarisability Problem",
     "collection": "ranked",
     "rank": 376,
@@ -15631,8 +17135,8 @@ var openProblems = {
     "exact_target": "If every uniformly bounded Hilbert-space representation of a discrete group can be made unitary by a change of coordinates, must the group be amenable?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA discrete group $G$ is unitarisable if every homomorphism $\\pi:G\\to\\operatorname{GL}(\\mathcal H)$ on every complex Hilbert space, with $\\sup_g\\|\\pi(g)\\|<\\infty$, has a bounded invertible operator $S$ such that\n\\[\n (S\\pi(g)S^{-1})^*(S\\pi(g)S^{-1})=I\\qquad(g\\in G).\n\\]\nAmenability means existence of a positive normalized left-invariant mean on $\\ell^\\infty(G)$. The conjectured implication is that unitarisability forces amenability; equivalently, every nonamenable discrete group has at least one uniformly bounded representation not similar to a unitary representation. No countability assumption on $G$, separability assumption on $\\mathcal H$, or prescribed similarity bound on $S$ is included. Boundedness of each individual $\\pi(g)$ is weaker than the required uniform bound over the group.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/0902.4585v1}{[S1]}.\n\n\\subsection{Short English statement}\nIf every uniformly bounded Hilbert-space representation of a discrete group can be made unitary by a change of coordinates, must the group be amenable?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Nicolas Monod and Narutaka Ozawa, The Dixmier problem, lamplighters and Burnside groups, arXiv0902.4585v1 (26Feb2009).\n\\url{https://arxiv.org/pdf/0902.4585v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004208.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004208",
-    "external_url": "https://www.unsolvedmath.com/problems/30004208",
+    "link": "https://www.unsolvedmath.com/problems/OWR-17133-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-17133-004",
     "sources": [
       {
         "citation": "Nicolas Monod and Narutaka Ozawa, The Dixmier problem, lamplighters and Burnside groups, arXiv0902.4585v1 (26Feb2009).",
@@ -15661,6 +17165,10 @@ var openProblems = {
   },
   "30006892": {
     "id": 30006892,
+    "problem_number": "LOCAL-30006892",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-constant-factor-densest-k-subgraph-hardness"
+    ],
     "title": "NP-Hardness of Constant-Factor Approximation for Densest k-Subgraph",
     "collection": "ranked",
     "rank": 377,
@@ -15699,6 +17207,10 @@ var openProblems = {
   },
   "30006893": {
     "id": 30006893,
+    "problem_number": "LOCAL-30006893",
+    "legacy_ids": [
+      "problem.cerny-conjecture-on-shortest-reset-words-of-synchronizing-automata"
+    ],
     "title": "\u010cern\u00fd Conjecture on Shortest Reset Words of Synchronizing Automata",
     "collection": "ranked",
     "rank": 378,
@@ -15737,6 +17249,10 @@ var openProblems = {
   },
   "30006894": {
     "id": 30006894,
+    "problem_number": "LOCAL-30006894",
+    "legacy_ids": [
+      "problem.ivrii-conjecture-on-periodic-billiard-orbits"
+    ],
     "title": "Ivrii conjecture on periodic billiard orbits",
     "collection": "ranked",
     "rank": 379,
@@ -15775,6 +17291,10 @@ var openProblems = {
   },
   "30006895": {
     "id": 30006895,
+    "problem_number": "LOCAL-30006895",
+    "legacy_ids": [
+      "problem.toms-winter-strict-comparison-implies-z-stability"
+    ],
     "title": "Toms\u2013Winter: Strict Comparison Implies Z-Stability",
     "collection": "ranked",
     "rank": 380,
@@ -15813,6 +17333,10 @@ var openProblems = {
   },
   "30003641": {
     "id": 30003641,
+    "problem_number": "OWR-15956-007",
+    "legacy_ids": [
+      "problem.partition-regularity-of-pythagorean-triples"
+    ],
     "title": "Partition Regularity of Pythagorean Triples",
     "collection": "ranked",
     "rank": 381,
@@ -15821,8 +17345,8 @@ var openProblems = {
     "exact_target": "Does every finite colouring of the positive integers contain a single-coloured Pythagorean triple?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finite colouring of the positive integers is a function $c:{\\mathbb{Z}}_{\\ge1}\\to\\{1,\\ldots,r\\}$ for some finite $r\\ge1$. The Pythagorean equation is partition regular if\n\\[\n \\forall r\\ \\forall c\\ \\exists x,y,z\\in{\\mathbb{Z}}_{\\ge1},\n \\qquad x^2+y^2=z^2,\n \\qquad c(x)=c(y)=c(z).\n\\]\nDetermine whether this assertion holds. The triple need not be primitive, so a common divisor of its entries is allowed. Positivity excludes zero solutions. The number of colours is arbitrary and fixed for each colouring, not just two; a theorem for one specific number of colours does not settle the universal finite-colouring statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2411.17523}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every finite colouring of the positive integers contain a single-coloured Pythagorean triple?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Partition regularity of homogeneous quadratics: Current trends and challenges. Submitted scholarly source, accessed 2026-08-31.\n\\url{https://arxiv.org/abs/2411.17523}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003641.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003641",
-    "external_url": "https://www.unsolvedmath.com/problems/30003641",
+    "link": "https://www.unsolvedmath.com/problems/OWR-15956-007",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-15956-007",
     "sources": [
       {
         "citation": "Partition regularity of homogeneous quadratics: Current trends and challenges. Submitted scholarly source, accessed 2026-08-31.",
@@ -15851,6 +17375,10 @@ var openProblems = {
   },
   "30002259": {
     "id": 30002259,
+    "problem_number": "OWR-12329-008",
+    "legacy_ids": [
+      "problem.the-cherlin-zilber-algebraicity-conjecture-for-simple-groups-of-finite-morley-rank"
+    ],
     "title": "Bad Groups of Finite Morley Rank",
     "collection": "ranked",
     "rank": 382,
@@ -15859,8 +17387,8 @@ var openProblems = {
     "exact_target": "Must every infinite simple group of finite Morley rank come from a linear algebraic group over an algebraically closed field?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA definable set has Morley rank at least $\\alpha+1$ if it contains infinitely many pairwise disjoint definable subsets of rank at least $\\alpha$, with the usual transfinite limit rule; parameters are allowed in a sufficiently saturated elementary extension. A group has finite Morley rank when its underlying definable set has finite rank. The Cherlin--Zilber assertion says that every infinite simple group $G$ of finite Morley rank is abstractly isomorphic to\n\\[\n \\mathbf G(K)\n\\]\nfor a linear algebraic group $\\mathbf G$ over an algebraically closed field $K$. Here simple means no proper nontrivial normal subgroup, not merely no such definable subgroup. The conclusion is an algebraic realization of the group, rather than just similarities between its rank and algebraic dimension; no characteristic of $K$ is prescribed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2606.18207}{[S1]}.\n\n\\subsection{Short English statement}\nMust every infinite simple group of finite Morley rank come from a linear algebraic group over an algebraically closed field?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]K. Tent, From the Cherlin-Zilber Conjecture via sharply 2-transitive groups to the Burnside problem, Abstract (2026).\n\\url{https://arxiv.org/abs/2606.18207}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002259.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002259",
-    "external_url": "https://www.unsolvedmath.com/problems/30002259",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12329-008",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12329-008",
     "sources": [
       {
         "citation": "K. Tent, From the Cherlin-Zilber Conjecture via sharply 2-transitive groups to the Burnside problem, Abstract (2026).",
@@ -15889,6 +17417,10 @@ var openProblems = {
   },
   "30006896": {
     "id": 30006896,
+    "problem_number": "LOCAL-30006896",
+    "legacy_ids": [
+      "problem.skorobogatov-brauer-manin-conjecture-for-k3-surfaces"
+    ],
     "title": "Brauer-Manin obstruction to the Hasse principle for K3 surfaces",
     "collection": "ranked",
     "rank": 383,
@@ -15927,6 +17459,10 @@ var openProblems = {
   },
   "1209": {
     "id": 1209,
+    "problem_number": "GEO-018",
+    "legacy_ids": [
+      "problem.gromovs-filling-area-conjecture"
+    ],
     "title": "The Filling Area Conjecture",
     "collection": "ranked",
     "rank": 384,
@@ -15935,8 +17471,8 @@ var openProblems = {
     "exact_target": "Must every orientable surface filling a circle without shortening distances between boundary points have at least the area of a round hemisphere?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $M$ be a compact orientable Riemannian surface whose boundary is isometric to the circle $C$ of circumference $2\\pi$. Write $d_M$ for intrinsic distance allowing paths through $M$, and $d_C$ for the shorter-arc distance along the boundary circle. Suppose no interior path shortens any boundary distance:\n\\[\n d_M(x,y)=d_C(x,y)\\qquad(x,y\\in C).\n\\]\nGromov's filling area assertion is $\\operatorname{Area}(M)\\ge2\\pi$. The unit round hemisphere has this boundary distance and area, fixing the constant. The surface is not required to be a disk: arbitrary orientable topology is allowed. The equality of boundary distances is stronger than prescribing boundary length alone, which would permit very small-area fillings.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2602.17859}{[S1]}.\n\n\\subsection{Short English statement}\nMust every orientable surface filling a circle without shortening distances between boundary points have at least the area of a round hemisphere?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Joseph Briggs and Chris Wells, \u201cA Discrete View of Gromov's Filling Area Conjecture,\u201d arXiv:2602.17859 (2026).\n\\url{https://arxiv.org/abs/2602.17859}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1209.tex",
-    "link": "https://www.unsolvedmath.com/problems/1209",
-    "external_url": "https://www.unsolvedmath.com/problems/1209",
+    "link": "https://www.unsolvedmath.com/problems/GEO-018",
+    "external_url": "https://www.unsolvedmath.com/problems/GEO-018",
     "sources": [
       {
         "citation": "Joseph Briggs and Chris Wells, \u201cA Discrete View of Gromov's Filling Area Conjecture,\u201d arXiv:2602.17859 (2026).",
@@ -15965,6 +17501,10 @@ var openProblems = {
   },
   "30003897": {
     "id": 30003897,
+    "problem_number": "OWR-16408-002",
+    "legacy_ids": [
+      "problem.green-s-conjecture-on-syzygies-of-canonical-curves"
+    ],
     "title": "Green\u2019s Canonical Syzygy Conjecture for Arbitrary Curves",
     "collection": "ranked",
     "rank": 385,
@@ -15973,8 +17513,8 @@ var openProblems = {
     "exact_target": "For every smooth nonhyperelliptic complex curve, does its Clifford index determine exactly where the linear syzygies of its canonical embedding vanish?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nIn the complex characteristic-zero setting of the cited source, let $C$ be a smooth nonhyperelliptic curve of genus $g$, $V=H^0(C,K_C)$, and define $K_{p,1}(C,K_C)$ as the middle cohomology of the Koszul complex\n\\[\n \\bigwedge^{p+1}V\\otimes H^0(C,\\mathcal O_C)\n \\longrightarrow\\bigwedge^pV\\otimes H^0(C,K_C)\n \\longrightarrow\\bigwedge^{p-1}V\\otimes H^0(C,K_C^2).\n\\]\nThe maps alternate multiplication of sections. The Clifford index is the minimum of $\\deg L-2(h^0(L)-1)$ over line bundles with $h^0(L),h^1(L)\\ge2$, with the standard value one for a nonhyperelliptic genus-three curve. The selected Green equivalence is\n\\[\n [K_{\\ell,1}(C,K_C)=0\\text{ for every }\\ell\\ge p]\n \\quad\\Longleftrightarrow\\quad\\operatorname{Cliff}(C)>g-p-2.\n\\]\nThe catalogue does not name a ground field; the source setting is stated explicitly rather than extending this assertion silently to arbitrary positive characteristic.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://webusers.imj-prg.fr/~claire.voisin/Articlesweb/syzod.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nFor every smooth nonhyperelliptic complex curve, does its Clifford index determine exactly where the linear syzygies of its canonical embedding vanish?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Claire Voisin, Green's canonical syzygy conjecture for generic curves of odd genus, Compositio Mathematica, 2005.\n\\url{https://webusers.imj-prg.fr/~claire.voisin/Articlesweb/syzod.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30003897.tex",
-    "link": "https://www.unsolvedmath.com/problems/30003897",
-    "external_url": "https://www.unsolvedmath.com/problems/30003897",
+    "link": "https://www.unsolvedmath.com/problems/OWR-16408-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-16408-002",
     "sources": [
       {
         "citation": "Claire Voisin, Green's canonical syzygy conjecture for generic curves of odd genus, Compositio Mathematica, 2005.",
@@ -16003,6 +17543,10 @@ var openProblems = {
   },
   "30006897": {
     "id": 30006897,
+    "problem_number": "LOCAL-30006897",
+    "legacy_ids": [
+      "problem.lieb-thirring-conjecture-on-the-sharp-constant-for-riesz-means-of-order-one-in-three-dimensions"
+    ],
     "title": "Lieb-Thirring Conjecture on the Sharp Constant for Riesz Means of Order One in Three Dimensions",
     "collection": "ranked",
     "rank": 386,
@@ -16041,6 +17585,10 @@ var openProblems = {
   },
   "30006898": {
     "id": 30006898,
+    "problem_number": "LOCAL-30006898",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-bourgain-cubic-nls-unbounded-sobolev-orbit"
+    ],
     "title": "Bourgain's unbounded Sobolev orbit problem for cubic defocusing NLS on the square two-torus",
     "collection": "ranked",
     "rank": 387,
@@ -16079,6 +17627,10 @@ var openProblems = {
   },
   "30006899": {
     "id": 30006899,
+    "problem_number": "LOCAL-30006899",
+    "legacy_ids": [
+      "problem.pugh-shub-stable-ergodicity-conjecture"
+    ],
     "title": "Pugh\u2013Shub Stable Ergodicity (C^r Density in Partial Hyperbolicity)",
     "collection": "ranked",
     "rank": 388,
@@ -16117,6 +17669,10 @@ var openProblems = {
   },
   "1469": {
     "id": 1469,
+    "problem_number": "ALG-014",
+    "legacy_ids": [
+      "problem.serres-positivity-conjecture-for-intersection-multiplicities-over-regular-local-rings"
+    ],
     "title": "Serre's Positivity Conjecture",
     "collection": "ranked",
     "rank": 389,
@@ -16155,6 +17711,10 @@ var openProblems = {
   },
   "1137": {
     "id": 1137,
+    "problem_number": "NT-019",
+    "legacy_ids": [
+      "problem.infinitude-of-sophie-germain-primes"
+    ],
     "title": "Are There Infinitely Many Sophie Germain Primes?",
     "collection": "ranked",
     "rank": 390,
@@ -16163,8 +17723,8 @@ var openProblems = {
     "exact_target": "Are there arbitrarily large primes $p$ for which $2p+1$ is also prime?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA Sophie Germain prime is a positive prime $p$ for which $2p+1$ is also prime. The infinitude question is\n\\[\n \\forall X>0\\ \\exists p>X:\\quad p\\text{ and }2p+1\\text{ are prime}.\n\\]\nEquivalently, the number of such $p\\le x$ should tend to infinity as $x\\to\\infty$. No asymptotic counting formula, density constant, or effective bound for the next example is required. Primality of both linear expressions is essential; replacing one with an integer having two prime factors is only a weaker approximation to the question.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://mathworld.wolfram.com/SophieGermainPrime.html}{[S1]}.\n\n\\subsection{Short English statement}\nAre there arbitrarily large primes $p$ for which $2p+1$ is also prime?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Sophie Germain Prime (MathWorld).\n\\url{https://mathworld.wolfram.com/SophieGermainPrime.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1137.tex",
-    "link": "https://www.unsolvedmath.com/problems/1137",
-    "external_url": "https://www.unsolvedmath.com/problems/1137",
+    "link": "https://www.unsolvedmath.com/problems/NT-019",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-019",
     "sources": [
       {
         "citation": "Sophie Germain Prime (MathWorld).",
@@ -16193,6 +17753,10 @@ var openProblems = {
   },
   "7200088": {
     "id": 7200088,
+    "problem_number": "AMR-071-0088",
+    "legacy_ids": [
+      "problem.thomson-problem"
+    ],
     "title": "The Thomson problem",
     "collection": "ranked",
     "rank": 391,
@@ -16201,8 +17765,8 @@ var openProblems = {
     "exact_target": "For every number of equal charges, which arrangements on the unit sphere minimize their total Coulomb repulsion?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor $N\\ge1$, choose pairwise distinct points $x_1,\\ldots,x_N$ on the unit sphere $S^2\\subset{\\mathbb{R}}^3$. In units with equal unit charges and Coulomb constant one, the interaction energy is\n\\[\n E_N(x_1,\\ldots,x_N)=\\sum_{1\\le i<j\\le N}\\frac1{\\|x_i-x_j\\|_2}.\n\\]\nThe Thomson problem asks to determine minimizing configurations for every $N$, up to rigid motions and permutation of the charges. Distances are Euclidean chord distances, not spherical arc lengths. Coincident charges have infinite energy. Existence of a minimizer or a numerical configuration with low energy does not give its rigorous global characterization; degeneracy of minimizers is allowed, and no uniqueness claim is built into the question.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://web.cels.anl.gov/~zippy/publications/thomson/thomsonPRL.html}{[S1]}.\n\n\\subsection{Short English statement}\nFor every number of equal charges, which arrangements on the unit sphere minimize their total Coulomb repulsion?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Altschuler et al., The Thomson Problem, Physical Review Letters author manuscript page (1997).\n\\url{https://web.cels.anl.gov/~zippy/publications/thomson/thomsonPRL.html}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200088.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200088",
-    "external_url": "https://www.unsolvedmath.com/problems/7200088",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0088",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0088",
     "sources": [
       {
         "citation": "Altschuler et al., The Thomson Problem, Physical Review Letters author manuscript page (1997).",
@@ -16231,6 +17795,10 @@ var openProblems = {
   },
   "30006900": {
     "id": 30006900,
+    "problem_number": "LOCAL-30006900",
+    "legacy_ids": [
+      "problem.global-regularity-of-the-3d-incompressible-hall-mhd-equations-for-large-data"
+    ],
     "title": "Global Regularity of the 3D Incompressible Hall-MHD Equations for Large Data",
     "collection": "ranked",
     "rank": 392,
@@ -16269,6 +17837,10 @@ var openProblems = {
   },
   "20003307": {
     "id": 20003307,
+    "problem_number": "AIM-OTHER-0114",
+    "legacy_ids": [
+      "problem.margulis-bounded-diagonal-orbit-conjecture"
+    ],
     "title": "Multiplicative minimum and bounded diagonal orbits",
     "collection": "ranked",
     "rank": 393,
@@ -16277,8 +17849,8 @@ var openProblems = {
     "exact_target": "Must every relatively compact orbit of the full diagonal subgroup on the space of three-dimensional unimodular lattices already be closed?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $X=\\operatorname{SL}(3,{\\mathbb{R}})/\\operatorname{SL}(3,{\\mathbb{Z}})$, identified with unimodular lattices in ${\\mathbb{R}}^3$, and let $A$ be the determinant-one diagonal subgroup. For a lattice $\\Lambda$, the orbit $A\\Lambda$ is bounded here if its closure in $X$ is compact. Equivalently, there is ${\\varepsilon}>0$ such that every nonzero vector of every lattice $a\\Lambda$, $a\\in A$, has Euclidean length at least ${\\varepsilon}$. The conjecture is\n\\[\n \\overline{A\\Lambda}\\text{ compact}\\quad\\Longrightarrow\\quad\n A\\Lambda\\text{ closed in }X.\n\\]\nA closed bounded orbit is therefore compact. The statement concerns the whole diagonal-group orbit, not an orbit under one chosen diagonal matrix or one ray of matrices. ``Bounded'' is relative compactness, not boundedness for an arbitrary nonproper metric.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2504.17644v3}{[S1]}.\n\n\\subsection{Short English statement}\nMust every relatively compact orbit of the full diagonal subgroup on the space of three-dimensional unimodular lattices already be closed?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Qianlin Huang and Ronggang Shi, Bounded diagonal orbits in homogeneous spaces over function fields, Introduction.\n\\url{https://arxiv.org/html/2504.17644v3}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20003307.tex",
-    "link": "https://www.unsolvedmath.com/problems/20003307",
-    "external_url": "https://www.unsolvedmath.com/problems/20003307",
+    "link": "https://www.unsolvedmath.com/problems/AIM-OTHER-0114",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-OTHER-0114",
     "sources": [
       {
         "citation": "Qianlin Huang and Ronggang Shi, Bounded diagonal orbits in homogeneous spaces over function fields, Introduction.",
@@ -16307,6 +17879,10 @@ var openProblems = {
   },
   "30006901": {
     "id": 30006901,
+    "problem_number": "LOCAL-30006901",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-margulisplatonov-normal-subgroup-conjecture"
+    ],
     "title": "Margulis\u2013Platonov normal-subgroup conjecture",
     "collection": "ranked",
     "rank": 394,
@@ -16345,6 +17921,10 @@ var openProblems = {
   },
   "30006902": {
     "id": 30006902,
+    "problem_number": "LOCAL-30006902",
+    "legacy_ids": [
+      "problem.arnold-givental-lagrangian-intersection-conjecture"
+    ],
     "title": "Arnold-Givental Lagrangian intersection conjecture",
     "collection": "ranked",
     "rank": 395,
@@ -16383,6 +17963,10 @@ var openProblems = {
   },
   "30006903": {
     "id": 30006903,
+    "problem_number": "LOCAL-30006903",
+    "legacy_ids": [
+      "problem.rokhlin-problem-on-multiple-mixing"
+    ],
     "title": "Rokhlin problem on multiple mixing",
     "collection": "ranked",
     "rank": 396,
@@ -16421,6 +18005,10 @@ var openProblems = {
   },
   "1486": {
     "id": 1486,
+    "problem_number": "TOP-008",
+    "legacy_ids": [
+      "problem.whitehead-asphericity-conjecture"
+    ],
     "title": "Whitehead Conjecture",
     "collection": "ranked",
     "rank": 397,
@@ -16429,8 +18017,8 @@ var openProblems = {
     "exact_target": "Must every connected subcomplex of an aspherical two-dimensional cell complex also have contractible universal cover?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA connected CW-complex $X$ is aspherical if $\\pi_i(X)=0$ for all $i\\ge2$, equivalently its universal cover is contractible. A subcomplex is a union of cells closed under taking attaching boundaries. Whitehead's conjecture asks\n\\[\n X\\text{ aspherical},\\quad\\dim X\\le2,\\quad\n Y\\subseteq X\\text{ a connected subcomplex}\n \\quad\\Longrightarrow\\quad Y\\text{ aspherical}.\n\\]\nNeither finiteness of the complexes nor a special fundamental group is assumed in the recorded scope. In presentation language, a presentation complex has one two-cell per relator; removing relators gives the corresponding subpresentation version. Merely knowing that the inclusion induces an injection on fundamental groups would not by itself be a definition of asphericity.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.mathnet.ru/php/archive.phtml?jrnid=im&option_lang=rus&paperid=9597&wshow=paper}{[S1]}.\n\n\\subsection{Short English statement}\nMust every connected subcomplex of an aspherical two-dimensional cell complex also have contractible universal cover?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A. M. Mikhovich, Rational and p-adic analogues of J. H. C. Whitehead's conjecture, Izvestiya: Mathematics 89:2 (2025), section 1.\n\\url{https://www.mathnet.ru/php/archive.phtml?jrnid=im&option_lang=rus&paperid=9597&wshow=paper}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1486.tex",
-    "link": "https://www.unsolvedmath.com/problems/1486",
-    "external_url": "https://www.unsolvedmath.com/problems/1486",
+    "link": "https://www.unsolvedmath.com/problems/TOP-008",
+    "external_url": "https://www.unsolvedmath.com/problems/TOP-008",
     "sources": [
       {
         "citation": "A. M. Mikhovich, Rational and p-adic analogues of J. H. C. Whitehead's conjecture, Izvestiya: Mathematics 89:2 (2025), section 1.",
@@ -16459,6 +18047,10 @@ var openProblems = {
   },
   "30006904": {
     "id": 30006904,
+    "problem_number": "LOCAL-30006904",
+    "legacy_ids": [
+      "problem.bartnik-cosmological-splitting-conjecture"
+    ],
     "title": "Bartnik's cosmological splitting conjecture",
     "collection": "ranked",
     "rank": 398,
@@ -16497,6 +18089,10 @@ var openProblems = {
   },
   "30006905": {
     "id": 30006905,
+    "problem_number": "LOCAL-30006905",
+    "legacy_ids": [
+      "problem.clemens-conjecture-for-rational-curves-on-a-general-quintic-threefold"
+    ],
     "title": "Clemens Conjecture for Rational Curves on a General Quintic Threefold",
     "collection": "ranked",
     "rank": 399,
@@ -16535,6 +18131,10 @@ var openProblems = {
   },
   "30006906": {
     "id": 30006906,
+    "problem_number": "LOCAL-30006906",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-gromov-lawson-rosenberg-conjecture-for-finite-fundamental-groups"
+    ],
     "title": "Gromov-Lawson-Rosenberg Conjecture for Finite Fundamental Groups",
     "collection": "ranked",
     "rank": 400,
@@ -16573,6 +18173,10 @@ var openProblems = {
   },
   "30006907": {
     "id": 30006907,
+    "problem_number": "LOCAL-30006907",
+    "legacy_ids": [
+      "problem.long-time-existence-of-the-calabi-flow-on-compact-kaehler-manifolds"
+    ],
     "title": "Long-Time Existence of the Calabi Flow on Compact Kaehler Manifolds",
     "collection": "ranked",
     "rank": 401,
@@ -16611,6 +18215,10 @@ var openProblems = {
   },
   "30006908": {
     "id": 30006908,
+    "problem_number": "LOCAL-30006908",
+    "legacy_ids": [
+      "problem.polya-s-conjecture-for-dirichlet-eigenvalues"
+    ],
     "title": "P\u00f3lya's Conjecture for Dirichlet Eigenvalues",
     "collection": "ranked",
     "rank": 402,
@@ -16649,6 +18257,10 @@ var openProblems = {
   },
   "30006909": {
     "id": 30006909,
+    "problem_number": "LOCAL-30006909",
+    "legacy_ids": [
+      "problem.coleman-oort-conjecture-on-shimura-subvarieties-of-the-torelli-locus"
+    ],
     "title": "Coleman-Oort conjecture: eventual special-subvariety exclusion",
     "collection": "ranked",
     "rank": 403,
@@ -16687,6 +18299,10 @@ var openProblems = {
   },
   "30006910": {
     "id": 30006910,
+    "problem_number": "LOCAL-30006910",
+    "legacy_ids": [
+      "problem.coding-theory-and-combinatorics-problem-cc-6-existence-of-finite-projective-planes-of-non-prime-power-orders"
+    ],
     "title": "Coding Theory and Combinatorics Problem CC-6: Existence of Finite Projective Planes of Non-Prime-Power Orders",
     "collection": "ranked",
     "rank": 404,
@@ -16725,6 +18341,10 @@ var openProblems = {
   },
   "30006911": {
     "id": 30006911,
+    "problem_number": "LOCAL-30006911",
+    "legacy_ids": [
+      "problem.separable-quotient-problem-for-banach-spaces"
+    ],
     "title": "Separable Quotient Problem for Banach Spaces",
     "collection": "ranked",
     "rank": 405,
@@ -16763,6 +18383,10 @@ var openProblems = {
   },
   "30006912": {
     "id": 30006912,
+    "problem_number": "LOCAL-30006912",
+    "legacy_ids": [
+      "problem.turan-conjecture-on-the-turan-density-of-k-4-3"
+    ],
     "title": "Turan Conjecture on the Turan Density of K_4^{(3)}",
     "collection": "ranked",
     "rank": 406,
@@ -16801,6 +18425,10 @@ var openProblems = {
   },
   "1377": {
     "id": 1377,
+    "problem_number": "GEOM-018",
+    "legacy_ids": [
+      "problem.yau-s-first-eigenvalue-conjecture-for-minimal-hypersurfaces"
+    ],
     "title": "Yau's Conjecture on First Eigenvalue",
     "collection": "ranked",
     "rank": 407,
@@ -16809,8 +18437,8 @@ var openProblems = {
     "exact_target": "Is the first nonzero Laplace eigenvalue of every connected closed embedded minimal hypersurface in the unit sphere equal to its dimension?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $M^n\\hookrightarrow S^{n+1}$ be a connected closed smoothly embedded hypersurface in the unit round sphere, with zero mean curvature. Give $M$ the induced metric and write $\\lambda_1(M)$ for the smallest positive eigenvalue of $-\\Delta_M$. Equivalently,\n\\[\n \\lambda_1(M)=\\inf_{\\substack{f\\not\\equiv0\\\\\\int_Mf=0}}\n \\frac{\\int_M|\\nabla f|^2}{\\int_Mf^2}.\n\\]\nYau's conjecture is $\\lambda_1(M)=n$. Restricted ambient coordinate functions provide eigenfunctions of eigenvalue $n$, so the requested equality rules out any smaller positive eigenvalue. The sphere has radius one, which fixes the numerical normalization. Embeddedness and connectedness are part of the target, not optional assumptions to be dropped in favor of arbitrary immersed hypersurfaces.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://ems.press/journals/rmi/articles/14299110}{[S1]}.\n\n\\subsection{Short English statement}\nIs the first nonzero Laplace eigenvalue of every connected closed embedded minimal hypersurface in the unit sphere equal to its dimension?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A. Jimenez, C. Tapia Chinchay and D. Zhou, A lower bound for the first eigenvalue of a minimal hypersurface in the sphere, Rev. Mat. Iberoam. 42 (2026).\n\\url{https://ems.press/journals/rmi/articles/14299110}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1377.tex",
-    "link": "https://www.unsolvedmath.com/problems/1377",
-    "external_url": "https://www.unsolvedmath.com/problems/1377",
+    "link": "https://www.unsolvedmath.com/problems/GEOM-018",
+    "external_url": "https://www.unsolvedmath.com/problems/GEOM-018",
     "sources": [
       {
         "citation": "A. Jimenez, C. Tapia Chinchay and D. Zhou, A lower bound for the first eigenvalue of a minimal hypersurface in the sphere, Rev. Mat. Iberoam. 42 (2026).",
@@ -16839,6 +18467,10 @@ var openProblems = {
   },
   "30006913": {
     "id": 30006913,
+    "problem_number": "LOCAL-30006913",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-computability-of-the-shannon-capacity-of-finite-graphs"
+    ],
     "title": "Computability of the Shannon Capacity of Finite Graphs",
     "collection": "ranked",
     "rank": 408,
@@ -16877,6 +18509,10 @@ var openProblems = {
   },
   "1404": {
     "id": 1404,
+    "problem_number": "GRAPH-017",
+    "legacy_ids": [
+      "problem.gnrs-conjecture"
+    ],
     "title": "GNRS Conjecture",
     "collection": "ranked",
     "rank": 409,
@@ -16885,8 +18521,8 @@ var openProblems = {
     "exact_target": "Do graph families excluding a fixed minor have uniformly bounded distortion when their weighted shortest-path metrics are embedded into $L^1$?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA graph family is minor-closed if it is closed under vertex deletion, edge deletion, and edge contraction, and proper if it does not contain all finite graphs. Equip a connected graph in such a family with positive edge lengths and its shortest-path metric $d$. The GNRS conjecture asserts that for every proper minor-closed family there is a constant $C$ such that every such metric admits a map $f$ into an $L^1$ space and a scale $a>0$ with\n\\[\n a\\,d(x,y)\\le\\|f(x)-f(y)\\|_1\\le C a\\,d(x,y)\n \\qquad(x,y\\in V).\n\\]\nThe constant depends only on the family, not the graph size or edge lengths. This metric formulation is equivalent to the bounded multicommodity flow-cut gap in the source's capacities-and-demands convention. The statement does not assert isometric embedding or a dimension-independent Euclidean embedding.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2111.07974v1}{[S1]}.\n\n\\subsection{Short English statement}\nDo graph families excluding a fixed minor have uniformly bounded distortion when their weighted shortest-path metrics are embedded into $L^1$?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Kawarabayashi and Sidiropoulos, arXiv:2111.07974 (2021).\n\\url{https://arxiv.org/html/2111.07974v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1404.tex",
-    "link": "https://www.unsolvedmath.com/problems/1404",
-    "external_url": "https://www.unsolvedmath.com/problems/1404",
+    "link": "https://www.unsolvedmath.com/problems/GRAPH-017",
+    "external_url": "https://www.unsolvedmath.com/problems/GRAPH-017",
     "sources": [
       {
         "citation": "Kawarabayashi and Sidiropoulos, arXiv:2111.07974 (2021).",
@@ -16915,6 +18551,10 @@ var openProblems = {
   },
   "50": {
     "id": 50,
+    "problem_number": "SMA-006",
+    "legacy_ids": [
+      "problem.finiteness-of-central-configurations-for-the-n-body-problem-n-4"
+    ],
     "title": "Smale's 6th Problem: Finiteness of Central Configurations",
     "collection": "ranked",
     "rank": 410,
@@ -16923,8 +18563,8 @@ var openProblems = {
     "exact_target": "For fixed positive masses, are there only finitely many shapes of Newtonian central configurations after removing translation, rotation, and scaling freedoms?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor positive masses $m_1,\\ldots,m_n$, a collision-free Newtonian configuration $q_1,\\ldots,q_n\\in{\\mathbb{R}}^d$ is central if, with center of mass $c=\\sum_i m_iq_i/\\sum_i m_i$, there is $\\lambda>0$ such that\n\\[\n \\sum_{j\\ne i}m_j\\frac{q_j-q_i}{\\|q_j-q_i\\|^3}\n =-\\lambda(q_i-c)\\qquad(1\\le i\\le n).\n\\]\nThe standard finiteness question counts configurations modulo translation, rotation, and positive rescaling, equivalently after $c=0$ and $\\sum_i m_i|q_i|^2=1$, modulo orthogonal transformations. It asks for finiteness for every fixed mass vector and $n\\ge4$. Without this quotient the literal count is infinite by scaling. The catalogue and its short AIM question do not fix the planar versus spatial version; $d$ must be specified in applying the question, rather than silently conflating these configuration spaces.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aimath.org/WWN/varcelest/varcelest.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nFor fixed positive masses, are there only finitely many shapes of Newtonian central configurations after removing translation, rotation, and scaling freedoms?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]American Institute of Mathematics, Variational Methods in Celestial Mechanics problem list, Problem 24 (2004).\n\\url{https://aimath.org/WWN/varcelest/varcelest.pdf}.\n\\textit{Formulation source. Consulted 24 September 2026: Central-configuration finiteness problem and its stated scope.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/50.tex",
-    "link": "https://www.unsolvedmath.com/problems/50",
-    "external_url": "https://www.unsolvedmath.com/problems/50",
+    "link": "https://www.unsolvedmath.com/problems/SMA-006",
+    "external_url": "https://www.unsolvedmath.com/problems/SMA-006",
     "sources": [
       {
         "citation": "American Institute of Mathematics, Variational Methods in Celestial Mechanics problem list, Problem 24 (2004).",
@@ -16953,6 +18593,10 @@ var openProblems = {
   },
   "55": {
     "id": 55,
+    "problem_number": "COMB-005",
+    "legacy_ids": [
+      "problem.frankl-union-closed-sets-conjecture"
+    ],
     "title": "Frankl's Union-Closed Sets Conjecture",
     "collection": "ranked",
     "rank": 411,
@@ -16991,6 +18635,10 @@ var openProblems = {
   },
   "30006914": {
     "id": 30006914,
+    "problem_number": "LOCAL-30006914",
+    "legacy_ids": [
+      "problem.fourier-entropy-influence-conjecture"
+    ],
     "title": "Fourier Entropy-Influence Conjecture",
     "collection": "ranked",
     "rank": 412,
@@ -17029,6 +18677,10 @@ var openProblems = {
   },
   "30005093": {
     "id": 30005093,
+    "problem_number": "OWR-10252929-004",
+    "legacy_ids": [
+      "problem.irrationality-of-catalans-constant"
+    ],
     "title": "Irrationality of Catalan\u2019s Constant",
     "collection": "ranked",
     "rank": 413,
@@ -17037,8 +18689,8 @@ var openProblems = {
     "exact_target": "Is Catalan's constant, the alternating sum of reciprocal odd squares, irrational?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nCatalan's constant is the convergent alternating series\n\\[\n G=\\beta(2)=\\sum_{n=0}^{\\infty}\\frac{(-1)^n}{(2n+1)^2},\n\\]\nwhere $\\beta(s)=\\sum_{n\\ge0}(-1)^n(2n+1)^{-s}$ is the Dirichlet beta function in its region of convergence. Determine whether $G\\notin{\\mathbb{Q}}$, equivalently whether $bG-a\\ne0$ for every $a\\in{\\mathbb{Z}}$, $b\\ge1$. This is the value at two, not a general assertion about all beta values or an odd beta value with a different explicit formula. Proving transcendence is not necessary, and arbitrarily accurate decimal computation alone cannot exclude an unrestricted rational denominator.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2101.08308}{[S1]}.\n\n\\subsection{Short English statement}\nIs Catalan's constant, the alternating sum of reciprocal odd squares, irrational?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Tweaking the Beukers Integrals In Search of More Miraculous Irrationality Proofs A La Apery (Dougherty-Bliss, Koutschan, Zeilberger).\n\\url{https://arxiv.org/abs/2101.08308}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005093.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005093",
-    "external_url": "https://www.unsolvedmath.com/problems/30005093",
+    "link": "https://www.unsolvedmath.com/problems/OWR-10252929-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-10252929-004",
     "sources": [
       {
         "citation": "Tweaking the Beukers Integrals In Search of More Miraculous Irrationality Proofs A La Apery (Dougherty-Bliss, Koutschan, Zeilberger).",
@@ -17067,6 +18719,10 @@ var openProblems = {
   },
   "30006915": {
     "id": 30006915,
+    "problem_number": "LOCAL-30006915",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-stationary-integral-varifold-singular-set"
+    ],
     "title": "Measure-zero singular set of stationary integral varifolds",
     "collection": "ranked",
     "rank": 414,
@@ -17105,6 +18761,10 @@ var openProblems = {
   },
   "30006916": {
     "id": 30006916,
+    "problem_number": "LOCAL-30006916",
+    "legacy_ids": [
+      "problem.martin-s-conjecture-for-definable-turing-invariant-functions"
+    ],
     "title": "Martin's Conjecture for Definable Turing-Invariant Functions",
     "collection": "ranked",
     "rank": 415,
@@ -17143,6 +18803,10 @@ var openProblems = {
   },
   "20002352": {
     "id": 20002352,
+    "problem_number": "AIM-LOGIC-0128",
+    "legacy_ids": [
+      "problem.smallest-number-of-variables-for-undecidable-hilbert-s-tenth-problem-over-z"
+    ],
     "title": "Exact variable accounting for fixed-variable Hilbert's Tenth Problem over the integers",
     "collection": "ranked",
     "rank": 416,
@@ -17151,8 +18815,8 @@ var openProblems = {
     "exact_target": "What is the smallest fixed number of variables for which deciding existence of an integer root of an arbitrary integer polynomial becomes algorithmically impossible?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a fixed nonnegative integer $n$, let $\\mathrm{H10}_{{\\mathbb{Z}}}(n)$ be the decision problem whose input is an arbitrary finite integer-coefficient polynomial in at most $n$ variables and whose yes-instances are those with an integer zero:\n\\[\n f\\in{\\mathbb{Z}}[x_1,\\ldots,x_n],\\qquad\n \\exists (a_1,\\ldots,a_n)\\in{\\mathbb{Z}}^n:\\ f(a_1,\\ldots,a_n)=0.\n\\]\nDetermine the least $n$ for which this problem is undecidable, meaning no algorithm halts with the correct answer on every input. Coefficients and degree are unrestricted and part of the finite input. The number of variables is the parameter being minimized; fixing degree instead, allowing only nonnegative solutions, or replacing ${\\mathbb{Z}}$ by ${\\mathbb{Q}}$ changes the problem. To identify the threshold, both lower-variable decidability and undecidability at that threshold are needed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.cs.umd.edu/users/gasarch/open/hilbert10openproblems.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nWhat is the smallest fixed number of variables for which deciding existence of an integer root of an arbitrary integer polynomial becomes algorithmically impossible?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]William Gasarch, Hilbert's Tenth Problem: Refinements and Variants (2021), Notation 3.1 and Theorems 4.1-4.2.\n\\url{https://www.cs.umd.edu/users/gasarch/open/hilbert10openproblems.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20002352.tex",
-    "link": "https://www.unsolvedmath.com/problems/20002352",
-    "external_url": "https://www.unsolvedmath.com/problems/20002352",
+    "link": "https://www.unsolvedmath.com/problems/AIM-LOGIC-0128",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-LOGIC-0128",
     "sources": [
       {
         "citation": "William Gasarch, Hilbert's Tenth Problem: Refinements and Variants (2021), Notation 3.1 and Theorems 4.1-4.2.",
@@ -17181,6 +18845,10 @@ var openProblems = {
   },
   "30006917": {
     "id": 30006917,
+    "problem_number": "LOCAL-30006917",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-brown-erdos-sos-conjecture"
+    ],
     "title": "Brown-Erdos-Sos Conjecture on Sparse Triple Systems",
     "collection": "ranked",
     "rank": 417,
@@ -17219,6 +18887,10 @@ var openProblems = {
   },
   "30006918": {
     "id": 30006918,
+    "problem_number": "LOCAL-30006918",
+    "legacy_ids": [
+      "problem.uniqueness-of-tangent-cones-for-area-minimizing-integral-currents-in-higher-codimension"
+    ],
     "title": "Uniqueness of Tangent Cones for Area-Minimizing Integral Currents in Higher Codimension",
     "collection": "ranked",
     "rank": 418,
@@ -17257,6 +18929,10 @@ var openProblems = {
   },
   "30006919": {
     "id": 30006919,
+    "problem_number": "LOCAL-30006919",
+    "legacy_ids": [
+      "problem.zariski-cancellation-problem-characteristic-zero-dimension-3"
+    ],
     "title": "Zariski Cancellation Problem (characteristic zero, dimension \u2265 3)",
     "collection": "ranked",
     "rank": 419,
@@ -17295,6 +18971,10 @@ var openProblems = {
   },
   "30006920": {
     "id": 30006920,
+    "problem_number": "LOCAL-30006920",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-lebesgue-measure-of-the-boundary-of-the-mandelbrot-set"
+    ],
     "title": "Lebesgue measure of the boundary of the Mandelbrot set",
     "collection": "ranked",
     "rank": 420,
@@ -17333,6 +19013,10 @@ var openProblems = {
   },
   "30006921": {
     "id": 30006921,
+    "problem_number": "LOCAL-30006921",
+    "legacy_ids": [
+      "problem.hyperkahler-deformation-finiteness-in-fixed-dimension"
+    ],
     "title": "Boundedness of Compact Hyperkahler Manifolds: Finiteness of Deformation Types in Each Dimension",
     "collection": "ranked",
     "rank": 421,
@@ -17371,6 +19055,10 @@ var openProblems = {
   },
   "30006922": {
     "id": 30006922,
+    "problem_number": "LOCAL-30006922",
+    "legacy_ids": [
+      "problem.which-compact-convex-sets-are-realizable-as-limit-shapes-in-two-dimensional-first-passage-percolation"
+    ],
     "title": "Realizable Limit Shapes in Two-Dimensional First-Passage Percolation",
     "collection": "ranked",
     "rank": 422,
@@ -17409,6 +19097,10 @@ var openProblems = {
   },
   "30004890": {
     "id": 30004890,
+    "problem_number": "OWR-8415355-014",
+    "legacy_ids": [
+      "problem.combinatorial-invariance-of-kazhdan-lusztig-polynomials"
+    ],
     "title": "Combinatorial Invariance of Kazhdan\u2013Lusztig Polynomials",
     "collection": "ranked",
     "rank": 423,
@@ -17417,8 +19109,8 @@ var openProblems = {
     "exact_target": "Does the unlabelled directed Bruhat graph of an interval determine its Kazhdan--Lusztig polynomial, independently of the surrounding Coxeter group?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA Coxeter system $(W,S)$ has generators $s^2=1$ and relations $(st)^{m_{st}}=1$; let $\\ell$ be word length and $T$ the set of conjugates of simple reflections. Bruhat order is the subword order on reduced expressions. On an interval $[u,v]$, use the directed Bruhat graph with edges $x\\to y$ whenever $yx^{-1}\\in T$ and $\\ell(x)<\\ell(y)$, not just length-one covers. The Kazhdan--Lusztig polynomials $P_{x,y}(q)$ are the standard triangular coefficients of the bar-invariant basis of the Coxeter Hecke algebra, normalized by $P_{x,x}=1$ and $\\deg P_{x,y}\\le(\\ell(y)-\\ell(x)-1)/2$ for $x<y$. The conjecture says a directed-graph isomorphism $[u,v]\\cong[w,z]$, even across different Coxeter systems, forces $P_{u,v}=P_{w,z}$. Reflection labels on edges are not supplied to the graph isomorphism.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s00029-024-00972-0}{[S1]}.\n\n\\subsection{Short English statement}\nDoes the unlabelled directed Bruhat graph of an interval determine its Kazhdan--Lusztig polynomial, independently of the surrounding Coxeter group?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Gurevich and Wang, Parabolic recursions for Kazhdan-Lusztig polynomials and the hypercube decomposition, Selecta Mathematica (2024), Conjecture 5.1.\n\\url{https://link.springer.com/article/10.1007/s00029-024-00972-0}.\n\\textit{Formulation source. Consulted 24 September 2026: Full directed reflection Bruhat graphs and their combinatorial invariance conjecture.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004890.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004890",
-    "external_url": "https://www.unsolvedmath.com/problems/30004890",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415355-014",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415355-014",
     "sources": [
       {
         "citation": "Gurevich and Wang, Parabolic recursions for Kazhdan-Lusztig polynomials and the hypercube decomposition, Selecta Mathematica (2024), Conjecture 5.1.",
@@ -17447,6 +19139,10 @@ var openProblems = {
   },
   "30006923": {
     "id": 30006923,
+    "problem_number": "LOCAL-30006923",
+    "legacy_ids": [
+      "problem.polynomial-time-p-matrix-linear-complementarity-problem"
+    ],
     "title": "Polynomial-Time P-Matrix Linear Complementarity Problem",
     "collection": "ranked",
     "rank": 424,
@@ -17485,6 +19181,10 @@ var openProblems = {
   },
   "30006924": {
     "id": 30006924,
+    "problem_number": "LOCAL-30006924",
+    "legacy_ids": [
+      "problem.top500-omission-w055056-luck-determinant"
+    ],
     "title": "L\u00fcck's Determinant Conjecture for Discrete Groups",
     "collection": "ranked",
     "rank": 425,
@@ -17523,6 +19223,10 @@ var openProblems = {
   },
   "30006925": {
     "id": 30006925,
+    "problem_number": "LOCAL-30006925",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-bernoulli-absolute-continuity-non-pisot"
+    ],
     "title": "Absolute continuity of Bernoulli convolutions outside reciprocal Pisot parameters",
     "collection": "ranked",
     "rank": 426,
@@ -17561,6 +19265,10 @@ var openProblems = {
   },
   "30006926": {
     "id": 30006926,
+    "problem_number": "LOCAL-30006926",
+    "legacy_ids": [
+      "problem.colmezs-conjecture-on-faltings-heights-of-cm-abelian-varieties"
+    ],
     "title": "Colmezs Conjecture on Faltings Heights of CM Abelian Varieties",
     "collection": "ranked",
     "rank": 427,
@@ -17603,6 +19311,10 @@ var openProblems = {
   },
   "9400050": {
     "id": 9400050,
+    "problem_number": "AMR-093-0050",
+    "legacy_ids": [
+      "problem.greenberg-s-conjecture-on-vanishing-of-iwasawa-invariants-of-totally-real-fields"
+    ],
     "title": "Greenberg's Iwasawa-invariants conjecture",
     "collection": "ranked",
     "rank": 428,
@@ -17611,8 +19323,8 @@ var openProblems = {
     "exact_target": "In a totally real field's cyclotomic tower, do the p-parts of the ideal class groups remain bounded in size?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $F$ be a totally real number field and $p$ a prime. Its cyclotomic ${\\mathbb{Z}}_p$-extension is the infinite extension $F_\\infty/F$ with Galois group ${\\mathbb{Z}}_p$ obtained from the cyclotomic tower. Let $F_n$ be its degree-$p^n$ layer and $A_n$ the $p$-primary subgroup of the ideal class group of $F_n$. The Iwasawa invariants $\\mu,\\lambda$ are the nonnegative integers in the eventual formula\n\\[\n \\log_p|A_n|=\\mu p^n+\\lambda n+\\nu\\qquad(n\\gg0),\n\\]\nwhere $\\nu$ is an integer. Greenberg's selected conjecture is $\\mu=\\lambda=0$ for every such $F,p$, equivalently $\\sup_n|A_n|<\\infty$. It asserts more than the vanishing of $\\mu$ alone, and the total-reality hypothesis is essential to this formulation.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2503.15727v2}{[S1]}.\n\n\\subsection{Short English statement}\nIn a totally real field's cyclotomic tower, do the p-parts of the ideal class groups remain bounded in size?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Mohamed Mahmoud Chems-Eddin et al., \"Greenberg's conjecture and Iwasawa module of Real biquadratic fields I,\" arXiv:2503.15727 (2025); companion published version in J. Number Theory (2025).\n\\url{https://arxiv.org/html/2503.15727v2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/9400050.tex",
-    "link": "https://www.unsolvedmath.com/problems/9400050",
-    "external_url": "https://www.unsolvedmath.com/problems/9400050",
+    "link": "https://www.unsolvedmath.com/problems/AMR-093-0050",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-093-0050",
     "sources": [
       {
         "citation": "Mohamed Mahmoud Chems-Eddin et al., \"Greenberg's conjecture and Iwasawa module of Real biquadratic fields I,\" arXiv:2503.15727 (2025); companion published version in J. Number Theory (2025).",
@@ -17641,6 +19353,10 @@ var openProblems = {
   },
   "30006927": {
     "id": 30006927,
+    "problem_number": "LOCAL-30006927",
+    "legacy_ids": [
+      "problem.minkowskis-conjecture-on-products-of-non-homogeneous-linear-forms"
+    ],
     "title": "Minkowski's conjecture on products of non-homogeneous linear forms",
     "collection": "ranked",
     "rank": 429,
@@ -17679,6 +19395,10 @@ var openProblems = {
   },
   "30006928": {
     "id": 30006928,
+    "problem_number": "LOCAL-30006928",
+    "legacy_ids": [
+      "problem.sums-of-three-cubes-representation-conjecture"
+    ],
     "title": "Sums of Three Cubes Representation Conjecture",
     "collection": "ranked",
     "rank": 430,
@@ -17717,6 +19437,10 @@ var openProblems = {
   },
   "30006929": {
     "id": 30006929,
+    "problem_number": "LOCAL-30006929",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-chen-yang-volume-conjecture-for-turaev-viro-invariants"
+    ],
     "title": "Chen-Yang Volume Conjecture for Turaev-Viro Invariants",
     "collection": "ranked",
     "rank": 431,
@@ -17755,6 +19479,10 @@ var openProblems = {
   },
   "30006930": {
     "id": 30006930,
+    "problem_number": "LOCAL-30006930",
+    "legacy_ids": [
+      "problem.matroid-secretary-conjecture"
+    ],
     "title": "Matroid Secretary Conjecture",
     "collection": "ranked",
     "rank": 432,
@@ -17793,6 +19521,10 @@ var openProblems = {
   },
   "30006931": {
     "id": 30006931,
+    "problem_number": "LOCAL-30006931",
+    "legacy_ids": [
+      "problem.exact-value-of-the-site-percolation-threshold-on-the-square-lattice"
+    ],
     "title": "Exact value of the site-percolation threshold on the square lattice",
     "collection": "ranked",
     "rank": 433,
@@ -17831,6 +19563,10 @@ var openProblems = {
   },
   "30006932": {
     "id": 30006932,
+    "problem_number": "LOCAL-30006932",
+    "legacy_ids": [
+      "problem.steins-conjecture-on-the-hilbert-transform-along-lipschitz-vector-fields"
+    ],
     "title": "Stein's Conjecture on the Hilbert Transform along Lipschitz Vector Fields",
     "collection": "ranked",
     "rank": 434,
@@ -17869,6 +19605,10 @@ var openProblems = {
   },
   "30004862": {
     "id": 30004862,
+    "problem_number": "OWR-8415352-004",
+    "legacy_ids": [
+      "problem.maximal-number-of-mutually-unbiased-bases-in-composite-dimensions"
+    ],
     "title": "Mutually Unbiased Bases in Non-Prime-Power Dimensions",
     "collection": "ranked",
     "rank": 435,
@@ -17877,8 +19617,8 @@ var openProblems = {
     "exact_target": "How many mutually unbiased complex bases can coexist in a non-prime-power dimension, particularly dimension six?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nTwo orthonormal bases $B=(b_1,\\ldots,b_D)$ and $C=(c_1,\\ldots,c_D)$ of ${\\mathbb{C}}^D$ are mutually unbiased if\n\\[\n |\\langle b_i,c_j\\rangle|^2=1/D\\qquad(1\\le i,j\\le D).\n\\]\nLet $M(D)$ be the greatest size of a collection of pairwise mutually unbiased orthonormal bases. The selected determination problem concerns composite dimensions that are not prime powers, especially $D=6$. In particular, decide whether $M(6)=7$ is possible, and determine the actual maximum. Bases are complex, with arbitrary entries; restricting entries to roots of unity or requiring a special construction would give only a subproblem. The standard general upper bound $M(D)\\le D+1$ describes the meaning of a complete collection in the cited source.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://quantum-journal.org/papers/q-2026-04-01-2051/}{[S1]}.\n\n\\subsection{Short English statement}\nHow many mutually unbiased complex bases can coexist in a non-prime-power dimension, particularly dimension six?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Daniel McNulty and Stefan Weigert, Mutually Unbiased Bases in Composite Dimensions - A Review, Quantum 10, 2051 (2026), Abstract and Popular summary.\n\\url{https://quantum-journal.org/papers/q-2026-04-01-2051/}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30004862.tex",
-    "link": "https://www.unsolvedmath.com/problems/30004862",
-    "external_url": "https://www.unsolvedmath.com/problems/30004862",
+    "link": "https://www.unsolvedmath.com/problems/OWR-8415352-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-8415352-004",
     "sources": [
       {
         "citation": "Daniel McNulty and Stefan Weigert, Mutually Unbiased Bases in Composite Dimensions - A Review, Quantum 10, 2051 (2026), Abstract and Popular summary.",
@@ -17907,6 +19647,10 @@ var openProblems = {
   },
   "3144": {
     "id": 3144,
+    "problem_number": "OPG-161",
+    "legacy_ids": [
+      "problem.lovasz-conjecture-on-hamiltonian-paths-in-vertex-transitive-graphs"
+    ],
     "title": "Hamiltonian paths and cycles in vertex transitive graphs",
     "collection": "ranked",
     "rank": 436,
@@ -17915,8 +19659,8 @@ var openProblems = {
     "exact_target": "Must every finite connected graph that looks the same at every vertex have a path visiting every vertex exactly once?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $G=(V,E)$ be a finite connected simple graph. It is vertex-transitive if for every $u,v\\in V$ an adjacency-preserving bijection of $V$ maps $u$ to $v$. A Hamiltonian path is an ordering $v_1,\\ldots,v_{|V|}$ of all vertices with $v_iv_{i+1}\\in E$ for every adjacent pair in the ordering. The conjecture is\n\\[\n G\\text{ connected and vertex-transitive}\n \\quad\\Longrightarrow\\quad G\\text{ has a Hamiltonian path}.\n\\]\nThe endpoints need not be adjacent. Thus the target is a path, not the stronger assertion of a Hamiltonian cycle. The one-vertex graph is allowed with its trivial path.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2606.09742}{[S1]}.\n\n\\subsection{Short English statement}\nMust every finite connected graph that looks the same at every vertex have a path visiting every vertex exactly once?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Bucic, Christoph, Pokrovskiy, and Steiner, Towards the Lovasz conjecture via sublinear expanders (2026), Abstract.\n\\url{https://arxiv.org/abs/2606.09742}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3144.tex",
-    "link": "https://www.unsolvedmath.com/problems/3144",
-    "external_url": "https://www.unsolvedmath.com/problems/3144",
+    "link": "https://www.unsolvedmath.com/problems/OPG-161",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-161",
     "sources": [
       {
         "citation": "Bucic, Christoph, Pokrovskiy, and Steiner, Towards the Lovasz conjecture via sublinear expanders (2026), Abstract.",
@@ -17945,6 +19689,10 @@ var openProblems = {
   },
   "30006933": {
     "id": 30006933,
+    "problem_number": "LOCAL-30006933",
+    "legacy_ids": [
+      "problem.deterministic-linear-time-minimum-spanning-tree-problem"
+    ],
     "title": "Deterministic Linear-Time Minimum Spanning Tree Problem",
     "collection": "ranked",
     "rank": 437,
@@ -17983,6 +19731,10 @@ var openProblems = {
   },
   "30006934": {
     "id": 30006934,
+    "problem_number": "LOCAL-30006934",
+    "legacy_ids": [
+      "problem.piltz-divisor-problem-for-k-fold-divisor-error-terms"
+    ],
     "title": "Piltz Divisor Problem for k-Fold Divisor Error Terms",
     "collection": "ranked",
     "rank": 438,
@@ -18029,6 +19781,10 @@ var openProblems = {
   },
   "30006935": {
     "id": 30006935,
+    "problem_number": "LOCAL-30006935",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-von-neumann-s-problem-for-ii-1-factors"
+    ],
     "title": "Von Neumann's Problem for II_1 Factors",
     "collection": "ranked",
     "rank": 439,
@@ -18067,6 +19823,10 @@ var openProblems = {
   },
   "30006936": {
     "id": 30006936,
+    "problem_number": "LOCAL-30006936",
+    "legacy_ids": [
+      "problem.kaplansky-s-direct-finiteness-conjecture"
+    ],
     "title": "Kaplansky's Direct Finiteness Conjecture",
     "collection": "ranked",
     "rank": 440,
@@ -18105,6 +19865,10 @@ var openProblems = {
   },
   "30005291": {
     "id": 30005291,
+    "problem_number": "OWR-11695862-013",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-exponential-algebraic-closedness"
+    ],
     "title": "Exponential-Algebraic Closedness",
     "collection": "ranked",
     "rank": 441,
@@ -18113,8 +19877,8 @@ var openProblems = {
     "exact_target": "Must every algebraic variety with the specified freedom and dimension conditions meet the graph of complex exponentiation?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nWork in ${\\mathbb{C}}^n\\times({\\mathbb{C}}^*)^n$. A variety $V$ is free if its additive projection is not contained in a translate of a proper rational linear subspace and its multiplicative projection is not contained in a translate of a proper algebraic subtorus. For a linear subspace $L\\subseteq{\\mathbb{C}}^n$ defined over ${\\mathbb{Q}}$, the coordinatewise exponential image $\\exp(L)$ is an algebraic subtorus. Write $\\pi_L$ for the quotient map to\n\\[\n ({\\mathbb{C}}^n/L)\\times(({\\mathbb{C}}^*)^n/\\exp(L)).\n\\]\nCall $V$ rotund if $\\dim\\pi_L(V)\\ge n-\\dim L$ for every such $L$. The conjecture asks that every irreducible free rotund $V$ contain an exponential point:\n\\[\n \\exists z\\in{\\mathbb{C}}^n:\\quad (z_1,\\ldots,z_n,e^{z_1},\\ldots,e^{z_n})\\in V.\n\\]\nOnly existence is requested, not genericity over a coefficient field or a prescribed transcendence degree.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s00029-023-00853-y}{[S1]}.\n\n\\subsection{Short English statement}\nMust every algebraic variety with the specified freedom and dimension conditions meet the graph of complex exponentiation?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]F. P. Gallinaro, Exponential sums equations and tropical geometry, Selecta Mathematica (2023).\n\\url{https://link.springer.com/article/10.1007/s00029-023-00853-y}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005291.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005291",
-    "external_url": "https://www.unsolvedmath.com/problems/30005291",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11695862-013",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11695862-013",
     "sources": [
       {
         "citation": "F. P. Gallinaro, Exponential sums equations and tropical geometry, Selecta Mathematica (2023).",
@@ -18143,6 +19907,10 @@ var openProblems = {
   },
   "30006937": {
     "id": 30006937,
+    "problem_number": "LOCAL-30006937",
+    "legacy_ids": [
+      "problem.lebrun-salamon-conjecture-positive-quaternion-kahler-manifolds-are-symmetric-spaces"
+    ],
     "title": "LeBrun-Salamon Conjecture: positive quaternion-Kahler manifolds are symmetric spaces",
     "collection": "ranked",
     "rank": 442,
@@ -18181,6 +19949,10 @@ var openProblems = {
   },
   "30006938": {
     "id": 30006938,
+    "problem_number": "LOCAL-30006938",
+    "legacy_ids": [
+      "problem.aaronson-ambainis-conjecture"
+    ],
     "title": "Aaronson-Ambainis Conjecture",
     "collection": "ranked",
     "rank": 443,
@@ -18219,6 +19991,10 @@ var openProblems = {
   },
   "30006939": {
     "id": 30006939,
+    "problem_number": "LOCAL-30006939",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-balanced-trilinear-hilbert-transform"
+    ],
     "title": "Balanced L4 boundedness of the trilinear Hilbert transform",
     "collection": "ranked",
     "rank": 444,
@@ -18257,6 +20033,10 @@ var openProblems = {
   },
   "30006940": {
     "id": 30006940,
+    "problem_number": "LOCAL-30006940",
+    "legacy_ids": [
+      "problem.shub-entropy-conjecture"
+    ],
     "title": "Shub entropy conjecture",
     "collection": "ranked",
     "rank": 445,
@@ -18295,6 +20075,10 @@ var openProblems = {
   },
   "30006941": {
     "id": 30006941,
+    "problem_number": "LOCAL-30006941",
+    "legacy_ids": [
+      "problem.provisional-top500-omission-waves-010-014.018"
+    ],
     "title": "Hilbert's Tenth Problem over C(t) with named t",
     "collection": "ranked",
     "rank": 446,
@@ -18333,6 +20117,10 @@ var openProblems = {
   },
   "30006942": {
     "id": 30006942,
+    "problem_number": "LOCAL-30006942",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-li-li-network-coding-conjecture"
+    ],
     "title": "Li-Li Undirected Multiple-Unicast Network Coding Conjecture",
     "collection": "ranked",
     "rank": 447,
@@ -18371,6 +20159,10 @@ var openProblems = {
   },
   "30006943": {
     "id": 30006943,
+    "problem_number": "LOCAL-30006943",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-deligne-drinfeld-grt-one-freeness"
+    ],
     "title": "Deligne\u2013Drinfeld Freeness Conjecture for grt_1",
     "collection": "ranked",
     "rank": 448,
@@ -18409,6 +20201,10 @@ var openProblems = {
   },
   "30006944": {
     "id": 30006944,
+    "problem_number": "LOCAL-30006944",
+    "legacy_ids": [
+      "problem.small-cohen-macaulay-conjecture"
+    ],
     "title": "Small Cohen-Macaulay Conjecture",
     "collection": "ranked",
     "rank": 449,
@@ -18447,6 +20243,10 @@ var openProblems = {
   },
   "30006945": {
     "id": 30006945,
+    "problem_number": "LOCAL-30006945",
+    "legacy_ids": [
+      "problem.erdos-matching-conjecture"
+    ],
     "title": "Erd\u0151s Matching Conjecture",
     "collection": "ranked",
     "rank": 450,
@@ -18485,6 +20285,10 @@ var openProblems = {
   },
   "30006946": {
     "id": 30006946,
+    "problem_number": "LOCAL-30006946",
+    "legacy_ids": [
+      "problem.uniform-epsilon-equilibrium-in-finite-multiplayer-stochastic-games"
+    ],
     "title": "Uniform epsilon-equilibrium in finite multiplayer stochastic games",
     "collection": "ranked",
     "rank": 451,
@@ -18523,6 +20327,10 @@ var openProblems = {
   },
   "30006947": {
     "id": 30006947,
+    "problem_number": "LOCAL-30006947",
+    "legacy_ids": [
+      "problem.uniqueness-of-the-kpz-fixed-point-among-scaling-covariant-local-fields"
+    ],
     "title": "Uniqueness of the KPZ Fixed Point Among Scaling-Covariant Local Fields",
     "collection": "ranked",
     "rank": 452,
@@ -18561,6 +20369,10 @@ var openProblems = {
   },
   "20000025": {
     "id": 20000025,
+    "problem_number": "AIM-ALGEBRAIC_GEOMETRY-0025",
+    "legacy_ids": [
+      "problem.greek-letter-redshift-conjecture-in-algebraic-k-theory"
+    ],
     "title": "Unit propagation and a trace-Bockstein reduction for Greek-letter redshift",
     "collection": "ranked",
     "rank": 453,
@@ -18569,8 +20381,8 @@ var openProblems = {
     "exact_target": "Does taking algebraic K-theory raise by one the Greek-letter family detected by a commutative ring spectrum?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFix a prime at which the $n$-th and $(n+1)$-st Greek-letter families in the source exist as nonzero stable homotopy classes. Let $S$ be the sphere spectrum, so $\\pi_jS$ is its $j$-th stable homotopy group. Greek-letter elements are the periodic families constructed from powers of chromatic periodicity classes and connecting maps, or equivalently the specified permanent cycles in the chromatic and $BP$-Adams spectral sequences; use Section 1 of Angelini-Knoll for the indexing.\n\nA commutative ring spectrum $R$ detects a family $\\{\\alpha_k^{(n)}\\}$ when every member remains nonzero under the unit:\n\\[\n \\pi_*S\\longrightarrow\\pi_*R.\n\\]\nWriting $K(R)$ for the algebraic K-theory spectrum of perfect $R$-modules, Conjecture 1.1 asks that detection of the $n$-th family by $R$ imply detection of the $(n+1)$-st by $K(R)$. The source's existence qualification on the families matters, especially at small primes. Detecting a single element or merely proving a height bound is not the entire assertion.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1810.10088}{[S1]}.\n\n\\subsection{Short English statement}\nDoes taking algebraic K-theory raise by one the Greek-letter family detected by a commutative ring spectrum?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]G. Angelini-Knoll, Detecting beta elements in iterated algebraic K-theory, Trans. AMS.\n\\url{https://arxiv.org/abs/1810.10088}.\n\\textit{Formulation source. Consulted 24 September 2026: Conjecture 1.1 and the family-detection definition in its full-text HTML version.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20000025.tex",
-    "link": "https://www.unsolvedmath.com/problems/20000025",
-    "external_url": "https://www.unsolvedmath.com/problems/20000025",
+    "link": "https://www.unsolvedmath.com/problems/AIM-ALGEBRAIC_GEOMETRY-0025",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-ALGEBRAIC_GEOMETRY-0025",
     "sources": [
       {
         "citation": "G. Angelini-Knoll, Detecting beta elements in iterated algebraic K-theory, Trans. AMS.",
@@ -18599,6 +20411,10 @@ var openProblems = {
   },
   "20003342": {
     "id": 20003342,
+    "problem_number": "AIM-OTHER-0149",
+    "legacy_ids": [
+      "problem.ergodicity-of-irrational-triangular-billiards"
+    ],
     "title": "Angular-factor dichotomy for triangular billiards",
     "collection": "ranked",
     "rank": 454,
@@ -18607,8 +20423,8 @@ var openProblems = {
     "exact_target": "Is the billiard flow in every triangle with angles irrational relative to pi ergodic on its full phase space?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $T\\subset{\\mathbb{R}}^2$ be a nondegenerate triangle with angles $\\alpha_1,\\alpha_2,\\alpha_3$. Interpret irrational angles in the standard billiards sense:\n\\[\n \\alpha_i/\\pi\\notin{\\mathbb{Q}}\\qquad(i=1,2,3).\n\\]\nA unit-speed billiard moves along straight lines inside $T$ and reflects at a side with angle of incidence equal to angle of reflection. Trajectories hitting vertices form the exceptional set excluded from the almost-everywhere flow. The phase space is $T\\times S^1$ with its reflection identifications and normalized Liouville measure, proportional to ${\\,\\mathrm{d}} x{\\,\\mathrm{d}}\\theta$.\n\nThe question is whether every such billiard flow is ergodic: every measurable set invariant under all flow times has measure zero or one. Ergodicity of a directional component in a rational polygon is a different formulation; here the full phase space of an irrational triangle is intended.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://aimath.org/WWN/measrigid/measrigid.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs the billiard flow in every triangle with angles irrational relative to pi ergodic on its full phase space?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]AIM workshop problem list, Emerging Applications of Measure Rigidity.\n\\url{https://aimath.org/WWN/measrigid/measrigid.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20003342.tex",
-    "link": "https://www.unsolvedmath.com/problems/20003342",
-    "external_url": "https://www.unsolvedmath.com/problems/20003342",
+    "link": "https://www.unsolvedmath.com/problems/AIM-OTHER-0149",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-OTHER-0149",
     "sources": [
       {
         "citation": "AIM workshop problem list, Emerging Applications of Measure Rigidity.",
@@ -18637,6 +20453,10 @@ var openProblems = {
   },
   "30006948": {
     "id": 30006948,
+    "problem_number": "LOCAL-30006948",
+    "legacy_ids": [
+      "problem.top500-omission-w050054-smooth-realization-of-finite-entropy-ergodic-transformations"
+    ],
     "title": "Smooth Realization of Finite-Entropy Ergodic Transformations",
     "collection": "ranked",
     "rank": 455,
@@ -18675,6 +20495,10 @@ var openProblems = {
   },
   "1108": {
     "id": 1108,
+    "problem_number": "ALG-008",
+    "legacy_ids": [
+      "problem.andrews-curtis-conjecture"
+    ],
     "title": "Andrews-Curtis Conjecture",
     "collection": "ranked",
     "rank": 456,
@@ -18713,6 +20537,10 @@ var openProblems = {
   },
   "30006949": {
     "id": 30006949,
+    "problem_number": "LOCAL-30006949",
+    "legacy_ids": [
+      "problem.exact-critical-exponents-of-oriented-percolation-in-1-1-dimensions"
+    ],
     "title": "Exact critical exponents of oriented percolation in 1+1 dimensions",
     "collection": "ranked",
     "rank": 457,
@@ -18751,6 +20579,10 @@ var openProblems = {
   },
   "30006950": {
     "id": 30006950,
+    "problem_number": "LOCAL-30006950",
+    "legacy_ids": [
+      "problem.capacity-region-of-general-3-receiver-discrete-memoryless-broadcast-channels"
+    ],
     "title": "Capacity Region of General 3-Receiver Discrete Memoryless Broadcast Channels",
     "collection": "ranked",
     "rank": 458,
@@ -18789,6 +20621,10 @@ var openProblems = {
   },
   "20001890": {
     "id": 20001890,
+    "problem_number": "AIM-GEOMETRY-0228",
+    "legacy_ids": [
+      "problem.katok-entropy-rigidity-conjecture"
+    ],
     "title": "Katok entropy rigidity and an exact time-change obstruction",
     "collection": "ranked",
     "rank": 459,
@@ -18797,8 +20633,8 @@ var openProblems = {
     "exact_target": "Does Liouville measure have maximal geodesic-flow entropy exactly when a closed negatively curved metric is locally symmetric?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $(M,g)$ be a closed negatively curved Riemannian manifold, and let $\\varphi_t$ be its geodesic flow on the unit tangent bundle $SM$. The Liouville probability measure $\\mu_L$ is the normalized invariant measure supplied by the Riemannian metric. Write $h_{\\mu_L}(\\varphi_1)$ for the metric entropy of the time-one map and $h_{\\rm top}(\\varphi_1)$ for its topological entropy.\n\nKatok's selected rigidity assertion is\n\\[\n h_{\\mu_L}(\\varphi_1)=h_{\\rm top}(\\varphi_1)\n \\quad\\Longleftrightarrow\\quad (M,g)\\text{ is locally symmetric}.\n\\]\nLocal symmetry means that the curvature tensor is parallel, $\\nabla\\operatorname{Rm}=0$, equivalently the universal covering metric is locally a symmetric-space metric. Equality is measured for the actual Liouville measure, not merely for some invariant measure of maximal entropy.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/2409.11197}{[S1]}.\n\n\\subsection{Short English statement}\nDoes Liouville measure have maximal geodesic-flow entropy exactly when a closed negatively curved metric is locally symmetric?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]T. Humbert, Katok's entropy conjecture near real and complex hyperbolic metrics, abstract, revised 2025.\n\\url{https://arxiv.org/abs/2409.11197}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/20001890.tex",
-    "link": "https://www.unsolvedmath.com/problems/20001890",
-    "external_url": "https://www.unsolvedmath.com/problems/20001890",
+    "link": "https://www.unsolvedmath.com/problems/AIM-GEOMETRY-0228",
+    "external_url": "https://www.unsolvedmath.com/problems/AIM-GEOMETRY-0228",
     "sources": [
       {
         "citation": "T. Humbert, Katok's entropy conjecture near real and complex hyperbolic metrics, abstract, revised 2025.",
@@ -18827,6 +20663,10 @@ var openProblems = {
   },
   "30006951": {
     "id": 30006951,
+    "problem_number": "LOCAL-30006951",
+    "legacy_ids": [
+      "problem.greenfield-wallach-katok-cohomology-free-vector-fields"
+    ],
     "title": "Greenfield-Wallach-Katok Conjecture for Cohomology-Free Vector Fields",
     "collection": "ranked",
     "rank": 460,
@@ -18865,6 +20705,10 @@ var openProblems = {
   },
   "30006952": {
     "id": 30006952,
+    "problem_number": "LOCAL-30006952",
+    "legacy_ids": [
+      "problem.leray-s-problem-for-stationary-navier-stokes-under-the-total-flux-condition-in-three-dimensions"
+    ],
     "title": "Leray's Problem for Stationary Navier-Stokes under the Total-Flux Condition in Three Dimensions",
     "collection": "ranked",
     "rank": 461,
@@ -18903,6 +20747,10 @@ var openProblems = {
   },
   "30006953": {
     "id": 30006953,
+    "problem_number": "LOCAL-30006953",
+    "legacy_ids": [
+      "problem.pisot-substitution-conjecture"
+    ],
     "title": "Pisot Substitution Conjecture",
     "collection": "ranked",
     "rank": 462,
@@ -18941,6 +20789,10 @@ var openProblems = {
   },
   "30006954": {
     "id": 30006954,
+    "problem_number": "LOCAL-30006954",
+    "legacy_ids": [
+      "problem.arveson-douglas-homogeneous-quotient-essential-normality"
+    ],
     "title": "Arveson-Douglas Essential Normality Conjecture for Homogeneous Quotient Modules",
     "collection": "ranked",
     "rank": 463,
@@ -18979,6 +20831,10 @@ var openProblems = {
   },
   "30006955": {
     "id": 30006955,
+    "problem_number": "LOCAL-30006955",
+    "legacy_ids": [
+      "problem.lusztig-p1-p15-bounded-weighted-coxeter-groups"
+    ],
     "title": "Lusztig's P1-P15 Conjectures for Bounded Weighted Coxeter Groups",
     "collection": "ranked",
     "rank": 464,
@@ -19017,6 +20873,10 @@ var openProblems = {
   },
   "1241": {
     "id": 1241,
+    "problem_number": "NT-034",
+    "legacy_ids": [
+      "problem.hall-s-conjecture-on-gaps-between-squares-and-cubes"
+    ],
     "title": "Hall's Conjecture",
     "collection": "ranked",
     "rank": 465,
@@ -19025,8 +20885,8 @@ var openProblems = {
     "exact_target": "Apart from equality, must an integer square stay at least a constant times a nearly square-root power of x away from the cube of x?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor positive integers $x,y$, exclude exact equality $y^2=x^3$. Hall's selected small-power-loss assertion is\n\\[\n \\forall{\\varepsilon}>0\\ \\exists c_{\\varepsilon}>0\\ \\forall x,y\\in{\\mathbb{N}}:\\quad\n y^2\\ne x^3\\Longrightarrow\n |y^2-x^3|>c_{\\varepsilon} x^{1/2-{\\varepsilon}}.\n\\]\nThe constant depends on ${\\varepsilon}$ only, not on the particular square and cube. The absolute value allows either one to be larger. This formulation retains the arbitrary ${\\varepsilon}$-loss; the claim with exponent exactly $1/2$ and one positive uniform constant is stronger and is not the displayed target. A finite collection of unusually close pairs cannot disprove a statement permitting an unspecified positive constant.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://doi.org/10.1007/BF01140190}{[S1]}.\n\n\\subsection{Short English statement}\nApart from equality, must an integer square stay at least a constant times a nearly square-root power of x away from the cube of x?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]M. Hall, The Diophantine equation x\\textasciicircum{}3-y\\textasciicircum{}2=k (1971).\n\\url{https://doi.org/10.1007/BF01140190}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1241.tex",
-    "link": "https://www.unsolvedmath.com/problems/1241",
-    "external_url": "https://www.unsolvedmath.com/problems/1241",
+    "link": "https://www.unsolvedmath.com/problems/NT-034",
+    "external_url": "https://www.unsolvedmath.com/problems/NT-034",
     "sources": [
       {
         "citation": "M. Hall, The Diophantine equation x\\textasciicircum{}3-y\\textasciicircum{}2=k (1971).",
@@ -19055,6 +20915,10 @@ var openProblems = {
   },
   "30006956": {
     "id": 30006956,
+    "problem_number": "LOCAL-30006956",
+    "legacy_ids": [
+      "problem.fujita-very-ampleness-conjecture"
+    ],
     "title": "Fujita Very Ampleness Conjecture",
     "collection": "ranked",
     "rank": 466,
@@ -19093,6 +20957,10 @@ var openProblems = {
   },
   "1103": {
     "id": 1103,
+    "problem_number": "ALG-003",
+    "legacy_ids": [
+      "problem.kothe-conjecture-on-nil-one-sided-ideals"
+    ],
     "title": "K\u00f6the Conjecture",
     "collection": "ranked",
     "rank": 467,
@@ -19131,6 +20999,10 @@ var openProblems = {
   },
   "30005487": {
     "id": 30005487,
+    "problem_number": "OWR-13750327-001",
+    "legacy_ids": [
+      "problem.campana-peternell-conjecture"
+    ],
     "title": "Campana\u2013Peternell Conjecture for Fano Manifolds",
     "collection": "ranked",
     "rank": 468,
@@ -19139,8 +21011,8 @@ var openProblems = {
     "exact_target": "Must a smooth Fano variety with numerically nonnegative tangent bundle be a rational homogeneous space?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA smooth complex projective variety $X$ is Fano when its anticanonical line bundle $K_X^{-1}$ is ample. A vector bundle $E$ is nef if the tautological quotient line bundle $\\mathcal O_{{\\mathbb{P}}(E)}(1)$ has nonnegative degree on every complete algebraic curve in ${\\mathbb{P}}(E)$. The conjecture states\n\\[\n X\\text{ Fano},\\quad T_X\\text{ nef}\n \\quad\\Longrightarrow\\quad X\\cong G/P,\n\\]\nwhere $G$ is a connected complex semisimple algebraic group and $P$ a parabolic subgroup, so $G/P$ is projective and homogeneous. The isomorphism is algebraic. Nefness is a numerical condition weaker than ampleness; assuming an ample tangent bundle would substantially narrow the problem.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1407.6483}{[S1]}.\n\n\\subsection{Short English statement}\nMust a smooth Fano variety with numerically nonnegative tangent bundle be a rational homogeneous space?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A survey on the Campana-Peternell Conjecture.\n\\url{https://arxiv.org/abs/1407.6483}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005487.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005487",
-    "external_url": "https://www.unsolvedmath.com/problems/30005487",
+    "link": "https://www.unsolvedmath.com/problems/OWR-13750327-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-13750327-001",
     "sources": [
       {
         "citation": "A survey on the Campana-Peternell Conjecture.",
@@ -19169,6 +21041,10 @@ var openProblems = {
   },
   "30005106": {
     "id": 30005106,
+    "problem_number": "OWR-10252930-015",
+    "legacy_ids": [
+      "problem.existence-of-the-diagonal-ramsey-growth-constant"
+    ],
     "title": "Existence of the Diagonal Ramsey Growth Limit",
     "collection": "ranked",
     "rank": 469,
@@ -19177,8 +21053,8 @@ var openProblems = {
     "exact_target": "Does the exponential growth rate of the diagonal two-color Ramsey numbers settle to a single constant?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $R(k,k)$ be the least $N$ such that every red--blue coloring of the edges of the complete graph $K_N$ contains a monochromatic $K_k$. The question is whether the sequence of exponential growth scales has a limit:\n\\[\n \\lim_{k\\to\\infty}R(k,k)^{1/k}.\n\\]\nEquivalently, ask whether $k^{-1}\\log R(k,k)$ converges. A proof need not identify the limit's exact value, but must rule out distinct subsequential limiting values. Bounds on the liminf and limsup, even improved exponential bounds, do not establish convergence unless the gap relevant to the limit is closed.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.erdosproblems.com/77}{[S1]}.\n\n\\subsection{Short English statement}\nDoes the exponential growth rate of the diagonal two-color Ramsey numbers settle to a single constant?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]T. F. Bloom (maintainer), Erd\u0151s Problems database, \\#77; Erd\u0151s source references cited there: [Er61], [Er69b], [Er71, p.99], [Er81], [Er88, p.83], [Er90b, p.17], [Er93, p.338], [Er95], [Er97c], [Er97d], [Va99, 3.50].\n\\url{https://www.erdosproblems.com/77}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005106.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005106",
-    "external_url": "https://www.unsolvedmath.com/problems/30005106",
+    "link": "https://www.unsolvedmath.com/problems/OWR-10252930-015",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-10252930-015",
     "sources": [
       {
         "citation": "T. F. Bloom (maintainer), Erd\u0151s Problems database, \\#77; Erd\u0151s source references cited there: [Er61], [Er69b], [Er71, p.99], [Er81], [Er88, p.83], [Er90b, p.17], [Er93, p.338], [Er95], [Er97c], [Er97d], [Va99, 3.50].",
@@ -19207,6 +21083,10 @@ var openProblems = {
   },
   "30006957": {
     "id": 30006957,
+    "problem_number": "LOCAL-30006957",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-david-semmes-riesz-transform"
+    ],
     "title": "David\u2013Semmes Riesz-transform problem in intermediate dimensions",
     "collection": "ranked",
     "rank": 470,
@@ -19245,6 +21125,10 @@ var openProblems = {
   },
   "1502": {
     "id": 1502,
+    "problem_number": "NUM-008",
+    "legacy_ids": [
+      "problem.normality-of-pi"
+    ],
     "title": "Pi Normality",
     "collection": "ranked",
     "rank": 471,
@@ -19253,8 +21137,8 @@ var openProblems = {
     "exact_target": "In every integer base, do all finite digit patterns appear in pi with exactly the frequencies expected from uniform random digits?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an integer base $b\\ge2$, write the fractional part of $\\pi$ as\n\\[\n \\pi-\\lfloor\\pi\\rfloor=\\sum_{j=1}^{\\infty}a_jb^{-j},\n \\qquad a_j\\in\\{0,\\ldots,b-1\\}.\n\\]\nFor a word $w=(w_1,\\ldots,w_k)$ of length $k$, count its overlapping occurrences starting at positions $1$ through $N$. Normality in base $b$ means\n\\[\n \\lim_{N\\to\\infty}\\frac1N\n \\#\\{1\\le j\\le N:(a_j,\\ldots,a_{j+k-1})=w\\}=b^{-k}\n\\]\nfor every $k$ and every word $w$. The selected conjecture asks for this in every integer base, often called absolute normality. Equal frequencies for individual digits alone are insufficient, as are finite computations of very many digits.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.claymath.org/library/annual_report/ar2006/06report_normalnumbers.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIn every integer base, do all finite digit patterns appear in pi with exactly the frequencies expected from uniform random digits?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Davar Khoshnevisan, \"Normal Numbers are Normal,\" Clay Mathematics Institute Annual Report 2006, pp. 15, 27-31.\n\\url{https://www.claymath.org/library/annual_report/ar2006/06report_normalnumbers.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1502.tex",
-    "link": "https://www.unsolvedmath.com/problems/1502",
-    "external_url": "https://www.unsolvedmath.com/problems/1502",
+    "link": "https://www.unsolvedmath.com/problems/NUM-008",
+    "external_url": "https://www.unsolvedmath.com/problems/NUM-008",
     "sources": [
       {
         "citation": "Davar Khoshnevisan, \"Normal Numbers are Normal,\" Clay Mathematics Institute Annual Report 2006, pp. 15, 27-31.",
@@ -19283,6 +21167,10 @@ var openProblems = {
   },
   "30002369": {
     "id": 30002369,
+    "problem_number": "OWR-12581-002",
+    "legacy_ids": [
+      "problem.auslander-conjecture-on-affine-crystallographic-groups"
+    ],
     "title": "Auslander Conjecture for Complete Affine Manifolds",
     "collection": "ranked",
     "rank": 472,
@@ -19291,8 +21179,8 @@ var openProblems = {
     "exact_target": "Are groups acting properly and cocompactly by affine transformations always virtually solvable, with the corresponding compact complete manifold groups virtually polycyclic?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn affine transformation of ${\\mathbb{R}}^n$ has the form $x\\mapsto Ax+b$ with $A\\in\\operatorname{GL}_n({\\mathbb{R}})$. An affine crystallographic group is a group of such transformations acting properly discontinuously and cocompactly on ${\\mathbb{R}}^n$. Virtually solvable means having a solvable subgroup of finite index. Auslander's conjecture asserts that every affine crystallographic group is virtually solvable.\n\nIn the manifold formulation, a complete affine manifold is a quotient by a free properly discontinuous affine action; completeness identifies its developing space with all of ${\\mathbb{R}}^n$. For compact such manifolds, the equivalent target in the record is that the fundamental group be virtually polycyclic, meaning that a finite-index subgroup admits a finite subnormal series with cyclic factors. No preserved positive-definite metric is assumed: restricting to Euclidean isometries would discard the essential affine difficulty.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.math.umd.edu/~wmg/gstom.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre groups acting properly and cocompactly by affine transformations always virtually solvable, with the corresponding compact complete manifold groups virtually polycyclic?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]William M. Goldman, \"Geometric Structures on Manifolds,\" AMS Graduate Studies in Mathematics 227 (2022), Conjecture 8.6.2; cf. H. Abels, G. Margulis, G. Soifer, arXiv:2011.12788 (Auslander conjecture for n < 7).\n\\url{https://www.math.umd.edu/~wmg/gstom.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002369.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002369",
-    "external_url": "https://www.unsolvedmath.com/problems/30002369",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12581-002",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12581-002",
     "sources": [
       {
         "citation": "William M. Goldman, \"Geometric Structures on Manifolds,\" AMS Graduate Studies in Mathematics 227 (2022), Conjecture 8.6.2; cf. H. Abels, G. Margulis, G. Soifer, arXiv:2011.12788 (Auslander conjecture for n < 7).",
@@ -19321,6 +21209,10 @@ var openProblems = {
   },
   "1123": {
     "id": 1123,
+    "problem_number": "GEO-003",
+    "legacy_ids": [
+      "problem.hadwiger-boltyanski-illumination-conjecture"
+    ],
     "title": "The Illumination Conjecture",
     "collection": "ranked",
     "rank": 473,
@@ -19359,6 +21251,10 @@ var openProblems = {
   },
   "30006958": {
     "id": 30006958,
+    "problem_number": "LOCAL-30006958",
+    "legacy_ids": [
+      "problem.polynomial-time-quasioptimal-logarithmic-energy-points-on-the-2-sphere"
+    ],
     "title": "Polynomial-Time Quasioptimal Logarithmic-Energy Points on the 2-Sphere",
     "collection": "ranked",
     "rank": 474,
@@ -19397,6 +21293,10 @@ var openProblems = {
   },
   "30005287": {
     "id": 30005287,
+    "problem_number": "OWR-11695862-009",
+    "legacy_ids": [
+      "problem.zilber-s-quasiminimality-conjecture-for-the-complex-exponential-field"
+    ],
     "title": "Zilber\u2019s Quasiminimality Conjecture for Complex Exponentiation",
     "collection": "ranked",
     "rank": 475,
@@ -19405,8 +21305,8 @@ var openProblems = {
     "exact_target": "Is every one-variable set definable using complex arithmetic and exponentiation either countable or the complement of a countable set?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nThe complex exponential field is the first-order structure\n\\[\n {\\mathbb{C}}_{\\exp}=({\\mathbb{C}};+ ,\\cdot,0,1,\\exp),\\qquad \\exp(z)=e^z.\n\\]\nA subset $D\\subseteq{\\mathbb{C}}$ is definable with parameters if some first-order formula $\\varphi(x,a_1,\\ldots,a_m)$ in this language, with finitely many parameters from ${\\mathbb{C}}$, satisfies $D=\\{z:{\\mathbb{C}}_{\\exp}\\models\\varphi(z,a_1,\\ldots,a_m)\\}$. Quantifiers range over all complex numbers.\n\nQuasiminimality asserts that every such one-variable definable set is countable or has countable complement. Countable includes finite. This is not the stronger claim that every definable set is finite or cofinite, nor a claim about arbitrary analytic subsets or arbitrary subsets of ${\\mathbb{C}}$. Parameters are allowed, which is part of the requested scope.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/pdf/2306.14562v1}{[S1]}.\n\n\\subsection{Short English statement}\nIs every one-variable set definable using complex arithmetic and exponentiation either countable or the complement of a countable set?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A. J. Wilkie, \"Analytic continuation and Zilber's quasiminimality conjecture,\" arXiv:2306.14562 (26 June 2023).\n\\url{https://arxiv.org/pdf/2306.14562v1}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30005287.tex",
-    "link": "https://www.unsolvedmath.com/problems/30005287",
-    "external_url": "https://www.unsolvedmath.com/problems/30005287",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11695862-009",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11695862-009",
     "sources": [
       {
         "citation": "A. J. Wilkie, \"Analytic continuation and Zilber's quasiminimality conjecture,\" arXiv:2306.14562 (26 June 2023).",
@@ -19435,6 +21335,10 @@ var openProblems = {
   },
   "3373": {
     "id": 3373,
+    "problem_number": "OPG-55812",
+    "legacy_ids": [
+      "problem.infinitude-of-fermat-primes"
+    ],
     "title": "Are there only finite Fermat Primes?",
     "collection": "ranked",
     "rank": 476,
@@ -19443,8 +21347,8 @@ var openProblems = {
     "exact_target": "Are there infinitely many prime Fermat numbers, or are only finitely many terms of this specific sequence prime?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor each integer $n\\ge0$, the Fermat number is\n\\[\n F_n=2^{2^n}+1.\n\\]\nA Fermat prime is a member of this sequence with no positive divisors other than one and itself. Determine whether the index set\n\\[\n \\{n\\in{\\mathbb{Z}}_{\\ge0}:F_n\\text{ is prime}\\}\n\\]\nis infinite or finite. This is a binary determination problem, not a requirement to prove infinitude in advance. Proving compositeness for any finite set of further terms does not establish eventual compositeness, and hence does not by itself establish finiteness of the prime terms.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://webusers.imj-prg.fr/~michel.waldschmidt/articles/pdf/NTchallengesVI.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nAre there infinitely many prime Fermat numbers, or are only finitely many terms of this specific sequence prime?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Michel Waldschmidt, \"Number theory: Challenges of the twenty-first century,\" Delhi University survey lecture, 12 October 2012.\n\\url{https://webusers.imj-prg.fr/~michel.waldschmidt/articles/pdf/NTchallengesVI.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/3373.tex",
-    "link": "https://www.unsolvedmath.com/problems/3373",
-    "external_url": "https://www.unsolvedmath.com/problems/3373",
+    "link": "https://www.unsolvedmath.com/problems/OPG-55812",
+    "external_url": "https://www.unsolvedmath.com/problems/OPG-55812",
     "sources": [
       {
         "citation": "Michel Waldschmidt, \"Number theory: Challenges of the twenty-first century,\" Delhi University survey lecture, 12 October 2012.",
@@ -19473,6 +21377,10 @@ var openProblems = {
   },
   "7200079": {
     "id": 7200079,
+    "problem_number": "AMR-071-0079",
+    "legacy_ids": [
+      "problem.voronoi-conjecture-on-parallelohedra"
+    ],
     "title": "Does every higher-dimensional tiling by translations of convex polytope tiles have an affine transformation taking it to a Voronoi diagram",
     "collection": "ranked",
     "rank": 477,
@@ -19481,8 +21389,8 @@ var openProblems = {
     "exact_target": "Can every convex polytope that tiles space by translation be transformed affinely into a lattice's nearest-point region?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA parallelohedron is a full-dimensional convex polytope $P\\subset{\\mathbb{R}}^d$ that tiles ${\\mathbb{R}}^d$ by translations, with disjoint interiors of distinct tiles. For a full-rank lattice $\\Lambda$, its Euclidean Dirichlet--Voronoi cell at zero is\n\\[\n V(\\Lambda)=\\{x\\in{\\mathbb{R}}^d:\\|x\\|\\le\\|x-v\\|\n                 \\text{ for every }v\\in\\Lambda\\}.\n\\]\nThe conjecture asks whether every parallelohedron is of the form $A V(\\Lambda)+b$ for some invertible linear map $A$, vector $b$, and lattice $\\Lambda$. An equivalent viewpoint allows a positive-definite quadratic form in place of the Euclidean norm. The requested equivalence is affine, not necessarily an isometry or a similarity. Finding a translational tiling alone does not identify it as a Voronoi cell after a linear change of coordinates.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/abs/1906.05193}{[S1]}.\n\n\\subsection{Short English statement}\nCan every convex polytope that tiles space by translation be transformed affinely into a lattice's nearest-point region?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A. Garber, Voronoi conjecture for five-dimensional parallelohedra, Inventiones Mathematicae (2025); arXiv:1906.05193.\n\\url{https://arxiv.org/abs/1906.05193}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/7200079.tex",
-    "link": "https://www.unsolvedmath.com/problems/7200079",
-    "external_url": "https://www.unsolvedmath.com/problems/7200079",
+    "link": "https://www.unsolvedmath.com/problems/AMR-071-0079",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-071-0079",
     "sources": [
       {
         "citation": "A. Garber, Voronoi conjecture for five-dimensional parallelohedra, Inventiones Mathematicae (2025); arXiv:1906.05193.",
@@ -19511,6 +21419,10 @@ var openProblems = {
   },
   "30006959": {
     "id": 30006959,
+    "problem_number": "LOCAL-30006959",
+    "legacy_ids": [
+      "problem.polynomial-time-solvability-of-condon-s-simple-stochastic-games"
+    ],
     "title": "Polynomial-Time Solvability of Condon's Simple Stochastic Games",
     "collection": "ranked",
     "rank": 478,
@@ -19549,6 +21461,10 @@ var openProblems = {
   },
   "5500007": {
     "id": 5500007,
+    "problem_number": "AMR-054-0007",
+    "legacy_ids": [
+      "problem.maximum-number-of-k-sets-and-complexity-of-k-levels"
+    ],
     "title": "$k$-sets",
     "collection": "ranked",
     "rank": 479,
@@ -19557,8 +21473,8 @@ var openProblems = {
     "exact_target": "What is the largest possible number of k-point subsets cut off by a line from an n-point planar set, across all values of n and k?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor an $n$-point set $P\\subset{\\mathbb{R}}^2$, a $k$-set is a subset $Q\\subset P$ with $|Q|=k$ that can be strictly separated from $P\\setminus Q$ by a line. Let\n\\[\n K(n,k)=\\max_{|P|=n}\\#\\{Q\\subset P:Q\\text{ is a }k\\text{-set}\n                                      \\},\\qquad1\\le k<n.\n\\]\nDetermine its extremal growth as a function of $n$ and $k$, with the general-position convention of the cited problem. In a simple arrangement of nonvertical lines, the $k$-level consists of points on the lines with exactly $k$ lines strictly below, with closures at vertices. Point--line duality relates the two extremal problems, with a possible index shift depending on convention.\n\nThe planar case corresponds to line arrangements. Arrangements of hyperplanes in higher dimensions introduce an additional dimension parameter; they are related generalizations, not literally the same planar function.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://topp.openproblem.net/p7}{[S1]}.\n\n\\subsection{Short English statement}\nWhat is the largest possible number of k-point subsets cut off by a line from an n-point planar set, across all values of n and k?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Formal statement, Problem 7: Statement.\n\\url{https://topp.openproblem.net/p7}.\n\\textit{Formulation source. Consulted 24 September 2026: Planar k-set definition and the line-arrangement comparison.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/5500007.tex",
-    "link": "https://www.unsolvedmath.com/problems/5500007",
-    "external_url": "https://www.unsolvedmath.com/problems/5500007",
+    "link": "https://www.unsolvedmath.com/problems/AMR-054-0007",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-054-0007",
     "sources": [
       {
         "citation": "Formal statement, Problem 7: Statement.",
@@ -19587,6 +21503,10 @@ var openProblems = {
   },
   "30006960": {
     "id": 30006960,
+    "problem_number": "LOCAL-30006960",
+    "legacy_ids": [
+      "problem.combinatorial-boolean-matrix-multiplication-in-near-linear-time"
+    ],
     "title": "Combinatorial Boolean Matrix Multiplication in Near-Linear Time",
     "collection": "ranked",
     "rank": 480,
@@ -19625,6 +21545,10 @@ var openProblems = {
   },
   "30006961": {
     "id": 30006961,
+    "problem_number": "LOCAL-30006961",
+    "legacy_ids": [
+      "problem.top500-omission-w041044-persistence-conjecture-for-weakly-reversible-mass-action-systems"
+    ],
     "title": "Persistence Conjecture for Weakly Reversible Mass-Action Systems",
     "collection": "ranked",
     "rank": 481,
@@ -19663,6 +21587,10 @@ var openProblems = {
   },
   "11100002": {
     "id": 11100002,
+    "problem_number": "AMR-110-0002",
+    "legacy_ids": [
+      "problem.freyd-s-generating-hypothesis"
+    ],
     "title": "Major problems 2 \u2014 The generating hypothesis, which asserts that the stable homotopy functor is faithful on the category\u2026",
     "collection": "ranked",
     "rank": 482,
@@ -19671,8 +21599,8 @@ var openProblems = {
     "exact_target": "Is a map between finite spectra necessarily null-homotopic when it acts as zero on every stable homotopy group?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nA finite spectrum is a spectrum built from finitely many cells, or equivalently an object of the finite stable homotopy category, with the usual retract convention. Write $[X,Y]$ for stable homotopy classes of maps and $\\pi_nX=[\\Sigma^nS,X]$. The graded group $\\pi_*X$ is a module over the stable homotopy ring $\\pi_*S$.\n\nFreyd's generating hypothesis says that for finite spectra $X,Y$,\n\\[\n \\bigl(\\pi_n(f)=0\\text{ for every }n\\in{\\mathbb{Z}}\\bigr)\n                  \\Longrightarrow f=0\\text{ in }[X,Y].\n\\]\nEquivalently, $[X,Y]\\to\\operatorname{Hom}_{\\pi_*S}(\\pi_*X,\\pi_*Y)$ is injective, with degree-zero graded homomorphisms on the right. The target is faithfulness, not surjectivity of this map. Allowing arbitrary infinite spectra changes the statement.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://math.uchicago.edu/~may/PEOPLE/AMB/Hovey_OnFreydsGenHyp.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIs a map between finite spectra necessarily null-homotopic when it acts as zero on every stable homotopy group?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Mark Hovey, On Freyd's Generating Hypothesis, Quarterly Journal of Mathematics 58 (2007), 31\u201345.\n\\url{https://math.uchicago.edu/~may/PEOPLE/AMB/Hovey_OnFreydsGenHyp.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/11100002.tex",
-    "link": "https://www.unsolvedmath.com/problems/11100002",
-    "external_url": "https://www.unsolvedmath.com/problems/11100002",
+    "link": "https://www.unsolvedmath.com/problems/AMR-110-0002",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-110-0002",
     "sources": [
       {
         "citation": "Mark Hovey, On Freyd's Generating Hypothesis, Quarterly Journal of Mathematics 58 (2007), 31\u201345.",
@@ -19701,6 +21629,10 @@ var openProblems = {
   },
   "30006962": {
     "id": 30006962,
+    "problem_number": "LOCAL-30006962",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-potential-density-on-k3-surfaces"
+    ],
     "title": "Potential Density of Rational Points on K3 Surfaces",
     "collection": "ranked",
     "rank": 483,
@@ -19739,6 +21671,10 @@ var openProblems = {
   },
   "30006963": {
     "id": 30006963,
+    "problem_number": "LOCAL-30006963",
+    "legacy_ids": [
+      "problem.top500-omission-w055056-zariski-dense-orbit"
+    ],
     "title": "Zariski Dense Orbit Conjecture",
     "collection": "ranked",
     "rank": 484,
@@ -19777,6 +21713,10 @@ var openProblems = {
   },
   "30006964": {
     "id": 30006964,
+    "problem_number": "LOCAL-30006964",
+    "legacy_ids": [
+      "problem.furstenberg-no-bigeodesics-conjecture-planar-fpp"
+    ],
     "title": "Furstenberg No-Bigeodesics (Planar FPP, Standard Minimum Moment)",
     "collection": "ranked",
     "rank": 485,
@@ -19815,6 +21755,10 @@ var openProblems = {
   },
   "30006965": {
     "id": 30006965,
+    "problem_number": "LOCAL-30006965",
+    "legacy_ids": [
+      "problem.koblitz-conjecture-for-prime-orders-of-elliptic-curves"
+    ],
     "title": "Koblitz Conjecture for Prime Orders of Elliptic Curves",
     "collection": "ranked",
     "rank": 486,
@@ -19853,6 +21797,10 @@ var openProblems = {
   },
   "30006966": {
     "id": 30006966,
+    "problem_number": "LOCAL-30006966",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-stationary-navier-stokes-d-solution-liouville"
+    ],
     "title": "Liouville problem for stationary Navier\u2013Stokes D-solutions in R^3",
     "collection": "ranked",
     "rank": 487,
@@ -19891,6 +21839,10 @@ var openProblems = {
   },
   "30006967": {
     "id": 30006967,
+    "problem_number": "LOCAL-30006967",
+    "legacy_ids": [
+      "problem.witsenhausen-counterexample-optimal-strategy-and-cost"
+    ],
     "title": "Witsenhausen Counterexample: Optimal Strategy and Cost",
     "collection": "ranked",
     "rank": 488,
@@ -19929,6 +21881,10 @@ var openProblems = {
   },
   "56": {
     "id": 56,
+    "problem_number": "GEO-005",
+    "legacy_ids": [
+      "problem.square-peg-problem-toeplitz-s-inscribed-square-conjecture"
+    ],
     "title": "Inscribed Square Problem (Toeplitz Conjecture)",
     "collection": "ranked",
     "rank": 489,
@@ -19967,6 +21923,10 @@ var openProblems = {
   },
   "30006968": {
     "id": 30006968,
+    "problem_number": "LOCAL-30006968",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-positive-type-a-schubert-counting-rule"
+    ],
     "title": "Positive Counting Rule for Type-A Schubert Structure Constants",
     "collection": "ranked",
     "rank": 490,
@@ -20005,6 +21965,10 @@ var openProblems = {
   },
   "30002424": {
     "id": 30002424,
+    "problem_number": "OWR-12724-004",
+    "legacy_ids": [
+      "problem.gottschalk-s-surjunctivity-conjecture"
+    ],
     "title": "Gottschalk Surjunctivity Problem",
     "collection": "ranked",
     "rank": 491,
@@ -20013,8 +21977,8 @@ var openProblems = {
     "exact_target": "On every group, must a finite-alphabet cellular automaton that never merges two configurations also reach every configuration?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $G$ be any group and $A$ a finite alphabet. Give $A^G$ the product topology with $A$ discrete, and let $G$ act by shifts $(g\\cdot x)(h)=x(g^{-1}h)$. A cellular automaton is a continuous shift-equivariant map $F:A^G\\to A^G$, equivalently a finite-memory rule: for some finite $D\\subset G$ and $\\mu:A^D\\to A$,\n\\[\n F(x)(g)=\\mu\\bigl((x(gh))_{h\\in D}\\bigr).\n\\]\nSurjunctivity asserts\n\\[\n F\\text{ injective}\\quad\\Longrightarrow\\quad F\\text{ surjective}\n\\]\nfor every $G,A,F$. The local rule is uniform over all sites. Results about non-uniform automata must therefore be related back to this uniform target rather than changing its definition. Neither finite generation nor countability of $G$ is imposed in the record.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://arxiv.org/html/2503.23435v2}{[S1]}.\n\n\\subsection{Short English statement}\nOn every group, must a finite-alphabet cellular automaton that never merges two configurations also reach every configuration?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Xuan Kien Phung, On Gottschalk's surjunctivity conjecture for non-uniform cellular automata, arXiv:2503.23435v2, 2026.\n\\url{https://arxiv.org/html/2503.23435v2}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002424.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002424",
-    "external_url": "https://www.unsolvedmath.com/problems/30002424",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12724-004",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12724-004",
     "sources": [
       {
         "citation": "Xuan Kien Phung, On Gottschalk's surjunctivity conjecture for non-uniform cellular automata, arXiv:2503.23435v2, 2026.",
@@ -20043,6 +22007,10 @@ var openProblems = {
   },
   "30006969": {
     "id": 30006969,
+    "problem_number": "LOCAL-30006969",
+    "legacy_ids": [
+      "problem.spectral-determination-of-convex-planar-domains"
+    ],
     "title": "Spectral Determination of Convex Planar Domains",
     "collection": "ranked",
     "rank": 492,
@@ -20081,6 +22049,10 @@ var openProblems = {
   },
   "30001233": {
     "id": 30001233,
+    "problem_number": "OWR-3471-007",
+    "legacy_ids": [
+      "problem.segreharbournegimiglianohirschowitz-conjecture"
+    ],
     "title": "SHGH Conjecture for Linear Systems on Blown-Up Planes",
     "collection": "ranked",
     "rank": 493,
@@ -20089,8 +22061,8 @@ var openProblems = {
     "exact_target": "Are unexpected dimensions of general plane-curve systems entirely explained by exceptional curves, so that every Cremona-reduced system has its expected dimension?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor distinct general points $p_1,\\ldots,p_r\\in{\\mathbb{P}}^2_{{\\mathbb{C}}}$, let $\\mathcal L(d;m_1,\\ldots,m_r)$ be the projective space of degree-$d$ curves vanishing to order at least $m_i$ at $p_i$. Its virtual and expected dimensions are\n\\[\n v=\\binom{d+2}{2}-1-\\sum_i\\binom{m_i+1}{2},\n \\qquad e=\\max\\{-1,v\\}.\n\\]\nThe system is special if its actual projective dimension exceeds $e$, with the empty system assigned dimension $-1$. On the blowup, a $(-1)$-curve is a smooth rational curve with self-intersection $-1$.\n\nAn exact reduced-form version of SHGH is that every Cremona-reduced system is nonspecial: for $m_1\\ge m_2\\ge\\cdots\\ge0$ and $d\\ge m_1+m_2+m_3$, padding missing multiplicities by zero,\n\\[\n h^0(\\mathcal L)=\\max\\left\\{0,\\binom{d+2}{2}\n                                  -\\sum_i\\binom{m_i+1}{2}\\right\\}.\n\\]\nHere $h^0(\\mathcal L)$ means the dimension of the vector space before projectivizing. For each degree/multiplicity choice, general means points in an appropriate nonempty Zariski-open set. The geometric formulation uses $(-1)$-speciality, not an undefined fixed-locus condition for empty systems. The catalogue's URL is a paper by Brambilla--Postinghel, not the authors named in its citation; see \\href{https://link.springer.com/article/10.1007/s40574-025-00468-5}{[E1]}.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s40574-025-00468-5}{[S1]}, \\href{https://link.springer.com/article/10.1007/s40574-025-00468-5}{[E1]}.\n\n\\subsection{Short English statement}\nAre unexpected dimensions of general plane-curve systems entirely explained by exceptional curves, so that every Cremona-reduced system has its expected dimension?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Antonio Laface and Luca Ugaglia, Bollettino dell'Unione Matematica Italiana (2025).\n\\url{https://link.springer.com/article/10.1007/s40574-025-00468-5}.\n\\textit{Formulation source. Consulted 24 September 2026: Authorship is Brambilla\u2013Postinghel, unlike the imported citation; Conjecture 3.1 is the SHGH statement.}\n\\item[E1]Maria Chiara Brambilla and Elisa Postinghel, Towards Good Postulation of Fat Points, One Step at a Time, Bollettino dell\u2019Unione Matematica Italiana 18 (2025), 737\u2013749, Sections 1 and 3.1, Conjecture 3.1.\n\\url{https://link.springer.com/article/10.1007/s40574-025-00468-5}.\n\\textit{Added primary source: Corrected bibliographic authorship and title for the URL already supplied by the catalogue; dimensions and the Cremona-reduced SHGH formulation. Consulted 24 September 2026.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30001233.tex",
-    "link": "https://www.unsolvedmath.com/problems/30001233",
-    "external_url": "https://www.unsolvedmath.com/problems/30001233",
+    "link": "https://www.unsolvedmath.com/problems/OWR-3471-007",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-3471-007",
     "sources": [
       {
         "citation": "Antonio Laface and Luca Ugaglia, Bollettino dell'Unione Matematica Italiana (2025).",
@@ -20123,6 +22095,10 @@ var openProblems = {
   },
   "30006970": {
     "id": 30006970,
+    "problem_number": "LOCAL-30006970",
+    "legacy_ids": [
+      "problem.ruzsa-szemeredi-6-3-problem-on-triple-systems"
+    ],
     "title": "Ruzsa-Szemeredi (6,3) Extremal-Order Problem",
     "collection": "ranked",
     "rank": 494,
@@ -20165,6 +22141,10 @@ var openProblems = {
   },
   "30006971": {
     "id": 30006971,
+    "problem_number": "LOCAL-30006971",
+    "legacy_ids": [
+      "problem.the-mckay-navarro-conjecture-for-finite-groups"
+    ],
     "title": "The McKay-Navarro Conjecture for Finite Groups",
     "collection": "ranked",
     "rank": 495,
@@ -20203,6 +22183,10 @@ var openProblems = {
   },
   "30006988": {
     "id": 30006988,
+    "problem_number": "LOCAL-30006988",
+    "legacy_ids": [
+      "problem.list-edge-coloring-conjecture"
+    ],
     "title": "List edge-coloring conjecture",
     "collection": "ranked",
     "rank": 496,
@@ -20241,6 +22225,10 @@ var openProblems = {
   },
   "30002059": {
     "id": 30002059,
+    "problem_number": "OWR-11786-012",
+    "legacy_ids": [
+      "problem.quillen-s-conjecture-on-posets-of-elementary-abelian-p-subgroups"
+    ],
     "title": "Quillen's $p$-Subgroup Conjecture",
     "collection": "ranked",
     "rank": 497,
@@ -20249,8 +22237,8 @@ var openProblems = {
     "exact_target": "If the complex of nontrivial elementary abelian p-subgroups contracts to a point, must the group contain a nontrivial normal p-subgroup?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nFor a finite group $G$ and prime $p$, let $\\mathcal A_p(G)$ be the partially ordered set, under inclusion, of nontrivial elementary abelian $p$-subgroups, that is, subgroups isomorphic to $({\\mathbb{Z}}/p{\\mathbb{Z}})^r$ for some $r\\ge1$. Its order complex has these subgroups as vertices and finite strict chains as simplices.\n\nLet $O_p(G)$ be the largest normal $p$-subgroup. Quillen's assertion is\n\\[\n |\\mathcal A_p(G)|\\text{ contractible}\n                   \\quad\\Longrightarrow\\quad O_p(G)\\ne1.\n\\]\nContractible means homotopy equivalent to a point; it is stronger than having vanishing reduced homology. The empty complex, which occurs when $p\\nmid|G|$, is not contractible under this convention and therefore supplies no counterexample.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://eprints.lancs.ac.uk/id/eprint/158837/1/dm_rev9.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nIf the complex of nontrivial elementary abelian p-subgroups contracts to a point, must the group contain a nontrivial normal p-subgroup?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]A. D\u00edaz Ramos, N. Mazza, A geometric approach to Quillen's conjecture, accepted manuscript, Lancaster University EPrints 158837.\n\\url{https://eprints.lancs.ac.uk/id/eprint/158837/1/dm_rev9.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002059.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002059",
-    "external_url": "https://www.unsolvedmath.com/problems/30002059",
+    "link": "https://www.unsolvedmath.com/problems/OWR-11786-012",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-11786-012",
     "sources": [
       {
         "citation": "A. D\u00edaz Ramos, N. Mazza, A geometric approach to Quillen's conjecture, accepted manuscript, Lancaster University EPrints 158837.",
@@ -20279,6 +22267,10 @@ var openProblems = {
   },
   "1206": {
     "id": 1206,
+    "problem_number": "GEO-015",
+    "legacy_ids": [
+      "problem.chern-conjecture-on-the-euler-characteristic-of-closed-affine-manifolds"
+    ],
     "title": "Chern's Affine Conjecture",
     "collection": "ranked",
     "rank": 498,
@@ -20287,8 +22279,8 @@ var openProblems = {
     "exact_target": "Must a closed positive-dimensional manifold admitting affine coordinate changes have Euler characteristic zero, even without completeness?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nAn affine structure on an $n$-manifold is an atlas whose transition maps are restrictions of affine transformations of ${\\mathbb{R}}^n$. Equivalently, its tangent bundle has a connection $\\nabla$ with zero curvature and zero torsion. A closed manifold is compact without boundary. Its Euler characteristic is\n\\[\n \\chi(M)=\\sum_{i=0}^n(-1)^i\\dim_{{\\mathbb{Q}}} H_i(M;{\\mathbb{Q}}).\n\\]\nChern's usual conjecture, in positive dimension, is that every closed affine manifold satisfies $\\chi(M)=0$. Completeness of the affine connection is not assumed; this distinguishes the question from compact complete affine manifolds.\n\nThe positive-dimensional convention needs to be explicit: if the catalogue's unqualified phrase every closed affine manifold includes dimension zero, a single point has a flat torsion-free tangent connection and Euler characteristic one. That degenerate literal extension is not the standard conjecture.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://link.springer.com/article/10.1007/s41884-026-00193-8}{[S1]}.\n\n\\subsection{Short English statement}\nMust a closed positive-dimensional manifold admitting affine coordinate changes have Euler characteristic zero, even without completeness?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]Emmanuel Gnandi, Michel Nguiffo Boyom, and Stephane Puechmorel, Canonical foliations of statistical manifolds with statistical models, Remark 2.4.\n\\url{https://link.springer.com/article/10.1007/s41884-026-00193-8}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/1206.tex",
-    "link": "https://www.unsolvedmath.com/problems/1206",
-    "external_url": "https://www.unsolvedmath.com/problems/1206",
+    "link": "https://www.unsolvedmath.com/problems/GEO-015",
+    "external_url": "https://www.unsolvedmath.com/problems/GEO-015",
     "sources": [
       {
         "citation": "Emmanuel Gnandi, Michel Nguiffo Boyom, and Stephane Puechmorel, Canonical foliations of statistical manifolds with statistical models, Remark 2.4.",
@@ -20317,6 +22309,10 @@ var openProblems = {
   },
   "30006972": {
     "id": 30006972,
+    "problem_number": "LOCAL-30006972",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-f-conjecture-mbar-zero-n"
+    ],
     "title": "F-Conjecture for the Nef Cone of Mbar_(0,n)",
     "collection": "ranked",
     "rank": 499,
@@ -20355,6 +22351,10 @@ var openProblems = {
   },
   "30002538": {
     "id": 30002538,
+    "problem_number": "OWR-12871-001",
+    "legacy_ids": [
+      "problem.top500-omission-w045049-artin-cat-zero-conjecture"
+    ],
     "title": "CAT(0) Actions of Artin Groups",
     "collection": "ranked",
     "rank": 500,
@@ -20363,8 +22363,8 @@ var openProblems = {
     "exact_target": "Does every finitely generated Artin group admit a proper cocompact isometric action on some CAT(0) space?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nLet $S$ be a finite set and $(m_{st})$ a Coxeter matrix with $m_{ss}=1$ and $m_{st}\\in\\{2,3,\\ldots,\\infty\\}$ for $s\\ne t$. Its Artin group is\n\\[\n A=\\langle S\\mid\n \\underbrace{sts\\cdots}_{m_{st}\\text{ letters}}=\n \\underbrace{tst\\cdots}_{m_{st}\\text{ letters}}\n \\text{ whenever }m_{st}<\\infty\\rangle.\n\\]\nFinite matrix means finitely many generators, not that the associated Coxeter group is finite. A geodesic metric space is CAT(0) when distances within every geodesic triangle are at most the corresponding Euclidean comparison distances.\n\nDoes every such Artin group act properly and cocompactly by isometries on a CAT(0) space, in Haettel's Conjecture 1.1 convention? Properness requires only finitely many group translates of a compact set to meet that set, and cocompactness requires compact quotient. No particular standard complex, cube-complex structure, or faithful linear representation is prescribed as the construction.\n\\par\\smallskip\\textit{Formulation and concept references:} \\href{https://www.numdam.org/item/10.5802/aif.3524.pdf}{[S1]}.\n\n\\subsection{Short English statement}\nDoes every finitely generated Artin group admit a proper cocompact isometric action on some CAT(0) space?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1]T. Haettel, XXL type Artin groups are CAT(0) and acylindrically hyperbolic, AIF 72 (2022), 2541\u20132555.\n\\url{https://www.numdam.org/item/10.5802/aif.3524.pdf}.\n\\textit{Formulation source.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/30002538.tex",
-    "link": "https://www.unsolvedmath.com/problems/30002538",
-    "external_url": "https://www.unsolvedmath.com/problems/30002538",
+    "link": "https://www.unsolvedmath.com/problems/OWR-12871-001",
+    "external_url": "https://www.unsolvedmath.com/problems/OWR-12871-001",
     "sources": [
       {
         "citation": "T. Haettel, XXL type Artin groups are CAT(0) and acylindrically hyperbolic, AIF 72 (2022), 2541\u20132555.",
@@ -20393,6 +22393,8 @@ var openProblems = {
   },
   "30006973": {
     "id": 30006973,
+    "problem_number": "LOCAL-30006973",
+    "legacy_ids": [],
     "title": "A certified bound of 236 for bounded prime gaps",
     "collection": "ranked",
     "rank": 501,
@@ -20451,6 +22453,8 @@ var openProblems = {
   },
   "10100001": {
     "id": 10100001,
+    "problem_number": "AMR-100-0001",
+    "legacy_ids": [],
     "title": "No percolation at the critical point on $\\mathbb{Z}^d$",
     "collection": "ranked",
     "rank": 502,
@@ -20459,8 +22463,8 @@ var openProblems = {
     "exact_target": "At the exact threshold where percolation first becomes possible, is the probability that the origin belongs to an infinite open cluster still zero?",
     "definition_tex": "\\subsection{Definitions and mathematical statement}\nConsider nearest-neighbour Bernoulli bond percolation on \\(\\mathbb Z^d\\). Each edge is independently open with probability \\(p\\in[0,1]\\). Let\n\\[\n\\theta(p)=\\mathbb P_p(0\\leftrightarrow\\infty),\n\\qquad\np_c=\\inf\\{p:\\theta(p)>0\\}.\n\\]\nThe conjecture is\n\\[\n\\boxed{\\theta(p_c)=0.}\n\\]\nEquivalently, at criticality there is almost surely no infinite open cluster.\n\nThis is often called the \\(\\theta(p_c)=0\\) conjecture, the critical percolation conjecture, the conjecture that there is no infinite cluster at criticality, or the continuity conjecture for the percolation probability at \\(p_c\\). There is no single universally fixed eponymous name.\n\nThe discussion below specializes to nearest-neighbour Bernoulli bond percolation on \\(\\mathbb Z^d\\). A status checkpoint cited during the conversation was that the conjecture is known in \\(d=2\\), known in sufficiently high dimension (in particular \\(d\\ge 11\\) in the cited 2026 source), and unresolved in dimensions \\(3\\le d\\le10\\); see \\href{https://arxiv.org/html/2608.23661v1}{[S1]}.\n\n\\subsection{Short English statement}\nAt the exact threshold where percolation first becomes possible, is the probability that the origin belongs to an infinite open cluster still zero?\n\n\\subsection{Sources}\n\\begin{itemize}\n\\item[S1] Rapha\\\"el Cerf, 2026 preprint on critical percolation and finite-cluster tails.\n\\url{https://arxiv.org/html/2608.23661v1}.\n\\textit{Used in the conversation for the 2026 status checkpoint and the finite-cluster-tail alternative.}\n\n\\item[S2] Gady Kozma and Asaf Nitzan, 2024 preprint on critical percolation and finite-graph connectivity inequalities.\n\\url{https://arxiv.org/html/2401.12397v1}.\n\\textit{Used for local uniqueness, shell constructions, the conjectural gluing inequality, and the line/half-space route.}\n\n\\item[S3] Thomas M. Liggett, Roberto H. Schonmann, and Alan M. Stacey, ``Domination by product measures,'' \\emph{Annals of Probability} 25 (1997).\n\\url{https://projecteuclid.org/journals/annals-of-probability/volume-25/issue-1/Domination-by-product-measures/10.1214/aop/1024404279.pdf}.\n\\textit{Used for finite-range dependent coarse-graining.}\n\n\\item[S4] Alexey Gladkov, 2024 preprint on decision-tree inequalities for percolation connectivity.\n\\url{https://arxiv.org/html/2408.08457v2}.\n\\textit{Used for the decision-tree mixing viewpoint and the adaptive-switching obstruction.}\n\n\\item[S5] Classical supercritical finite-cluster tail reference cited during the conversation.\n\\url{https://www.jstor.org/stable/2244302}.\n\\textit{Background for the distinction between strictly supercritical tail estimates and estimates needed from the weaker hypothesis \\(\\theta(p)>0\\).}\n\n\\item[S6] Slab/percolation reference cited during the final audit.\n\\url{https://arxiv.org/pdf/1401.7130}.\n\\textit{Used to illustrate how negative information from an exposed path can obstruct full-space gluing and how quasi-planar geometry can help in slab settings.}\n\\end{itemize}",
     "definition_file": "attacks/open_problems/top_problems/10100001.tex",
-    "link": "https://www.unsolvedmath.com/problems/10100001",
-    "external_url": "https://www.unsolvedmath.com/problems/10100001",
+    "link": "https://www.unsolvedmath.com/problems/AMR-100-0001",
+    "external_url": "https://www.unsolvedmath.com/problems/AMR-100-0001",
     "sources": [
       {
         "citation": "Rapha\\\"el Cerf, 2026 preprint on critical percolation and finite-cluster tails.",
@@ -20508,6 +22512,8 @@ var openProblems = {
   },
   "30006974": {
     "id": 30006974,
+    "problem_number": "LOCAL-30006974",
+    "legacy_ids": [],
     "title": "Irrationality of e+pi",
     "collection": "ranked",
     "rank": 503,

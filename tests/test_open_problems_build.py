@@ -12,6 +12,7 @@ import build_site
 def catalog_record(problem_id=1):
     return {
         'id': problem_id,
+        'problem_number': f'TEST-{problem_id}',
         'title': 'An example question',
         'exactTarget': 'Determine whether every example has the stated property.',
         'category': {'id': 3, 'name': 'number_theory', 'display_name': 'Number theory'},
@@ -43,6 +44,25 @@ class OpenCatalogValidationTests(unittest.TestCase):
     def load(self, snapshot):
         build_site.validate_open_problems_catalog(snapshot)
         return snapshot
+
+    def test_external_code_routes_and_legacy_aliases_preserve_identity(self):
+        snapshot = catalog()
+        first, second = snapshot['records']
+        first.update(problem_number='MPP-001', legacy_ids=['problem.p-versus-np'],
+                     external_url='https://www.unsolvedmath.com/problems/MPP-001')
+        self.load(snapshot)
+        for bad_url in ['https://www.unsolvedmath.com/problems/MPP-006',
+                        'https://www.unsolvedmath.com.evil/problems/MPP-001',
+                        'javascript:alert(1)']:
+            with self.subTest(url=bad_url), patch.dict(first, external_url=bad_url):
+                with self.assertRaisesRegex(ValueError, 'external URL'):
+                    self.load(snapshot)
+        second['legacy_ids'] = ['problem.p-versus-np']
+        with self.assertRaisesRegex(ValueError, 'Duplicate legacy ID'):
+            self.load(snapshot)
+        second['legacy_ids'] = ['../1']
+        with self.assertRaisesRegex(ValueError, 'Invalid legacy ID'):
+            self.load(snapshot)
 
     def test_shipped_catalog_has_unique_canonical_ids_and_complete_display_order(self):
         snapshot = build_site.load_open_problems_catalog()
@@ -464,6 +484,19 @@ A checked restricted case, with the general case missing.
             build_site.generate_js_data({}, {}, problems, snapshot)
             self.assertEqual(first, (self.root / 'docs/problem.html').read_text())
             problems['1']['definition_tex'] = 'Revised definition'
+            build_site.generate_js_data({}, {}, problems, snapshot)
+            self.assertNotEqual(first, (self.root / 'docs/problem.html').read_text())
+
+    def test_frontend_script_url_changes_when_routing_code_changes(self):
+        self.write('docs/problem.html', '<script src="app.js"></script>')
+        self.write('docs/app.js', 'var revision = 1;')
+        snapshot = catalog()
+        problems = build_site.build_open_problems_data({}, snapshot)
+        with patch.object(build_site, 'load_erdos_status', return_value={'problems': {}}):
+            build_site.generate_js_data({}, {}, problems, snapshot)
+            first = (self.root / 'docs/problem.html').read_text()
+            self.assertRegex(first, r'app\.js\?v=[0-9a-f]{16}')
+            self.write('docs/app.js', 'var revision = 2;')
             build_site.generate_js_data({}, {}, problems, snapshot)
             self.assertNotEqual(first, (self.root / 'docs/problem.html').read_text())
 

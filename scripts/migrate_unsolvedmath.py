@@ -329,6 +329,15 @@ def allocate_pinned_id(allocations, source_key, high_watermark):
     return high_watermark + 1, high_watermark + 1
 
 
+def upstream_problem_url(record, code_counts):
+    """Public codes are routes, but reused codes need the unique numeric route."""
+    if not record.get('published'):
+        return None
+    code = record['problem_number']
+    route = code if code_counts[code] == 1 else record['id']
+    return f'https://www.unsolvedmath.com/problems/{route}'
+
+
 def plan(args):
     source = args.source.resolve()
     registry_dir = args.registry.resolve()
@@ -336,11 +345,18 @@ def plan(args):
     audit.mkdir(parents=True, exist_ok=True)
     state_path = audit / 'allocation_state.json'
     state = read_json(state_path) if state_path.exists() else None
+    manifest_path = audit / 'migration_manifest.json'
+    # Publishing the migration adds these paths to Git history. Preserve the
+    # original import dates (including unknown dates), rather than importing
+    # the publication date on a subsequent validation run.
+    posted_at_import = {item['destination']: item['first_posted']
+                        for item in read_json(manifest_path)['files']} if state and manifest_path.exists() else {}
     registry_path = registry_dir / 'problems.json'
     current_registry = read_json(registry_path)
     original = (audit / 'original_problems.json').read_bytes() if state else registry_path.read_bytes()
     baseline = json.loads(original)
     by_id = {record['id']: record for record in baseline}
+    code_counts = collections.Counter(record['problem_number'] for record in baseline)
     if len(by_id) != len(baseline):
         raise ValueError('Duplicate existing UnsolvedMath IDs')
     maximum, max_sources = discover_maximum(registry_dir, baseline)
@@ -474,7 +490,8 @@ def plan(args):
             new_records.append(record)
         # This is a portable projection, never a copy of upstream statement prose.
         selected = {key: record[key] for key in ('id', 'problem_number', 'title', 'category_id', 'category', 'status')}
-        selected['external_url'] = f'https://www.unsolvedmath.com/problems/{canonical}' if canonical in by_id else None
+        selected['external_url'] = upstream_problem_url(record, code_counts) if canonical in by_id else None
+        selected['legacy_ids'] = [target['problemId']] if number else []
         clean_definition = transform(definition, record, number or int(definition_path.stem), mapping,
                                      statement_only=True)
         selected['statement'] = sections(clean_definition)['Short English statement']
@@ -495,7 +512,7 @@ def plan(args):
             old_repo_path = 'attacks/open_problems/top_problems/' + source_relative
             old_paths = [old_repo_path, old_repo_path.replace('/gpt_6_astra_ultra/', '/GPT_6_Astra_Ultra/')]
             known = [dates[p] for p in old_paths if p in dates]
-            posted = min(known) if known else None
+            posted = posted_at_import.get(str(dest.relative_to(REPO)), min(known) if known else None)
             old_number = number or int(path.stem)
             rendered = transform(content, record, old_number, mapping, posted=posted,
                                  statement_only=statement_only)

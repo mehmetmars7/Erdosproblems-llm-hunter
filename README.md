@@ -124,7 +124,10 @@ For example, Hodge has ID **6** and initially appears in display position **4**.
 Statements are `attacks/open_problems/top_problems/<unsolvedmath_id>.tex`;
 model attempts add `<model>/` before the same filename. IDs are sparse and are
 never used as array offsets. Established UnsolvedMath entries link to their
-problem page in External Links. Newly allocated local records have no public
+problem page in the **UnsolvedMath #** column, using their public problem code
+(for example, `MPP-001`). Reused codes use an unambiguous numeric URL.
+Previously published `problem.*` URLs resolve to the permanent numeric ID.
+Newly allocated local records have no public
 UnsolvedMath URL until published upstream; this migration does not publish to
 that third-party site. Their local detail pages remain available.
 

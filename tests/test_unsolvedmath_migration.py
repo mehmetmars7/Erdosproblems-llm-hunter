@@ -10,6 +10,16 @@ SPEC.loader.exec_module(migration)
 
 
 class IdentityMigrationTests(unittest.TestCase):
+    def test_public_codes_are_used_unless_reused_or_unpublished(self):
+        record = {'id': 6, 'problem_number': 'MPP-006', 'published': True}
+        self.assertEqual(migration.upstream_problem_url(record, {'MPP-006': 1}),
+                         'https://www.unsolvedmath.com/problems/MPP-006')
+        record.update(id=1479, problem_number='TOP-001')
+        self.assertEqual(migration.upstream_problem_url(record, {'TOP-001': 3}),
+                         'https://www.unsolvedmath.com/problems/1479')
+        record['published'] = False
+        self.assertIsNone(migration.upstream_problem_url(record, {'TOP-001': 3}))
+
     def test_later_approval_does_not_shift_existing_allocations(self):
         pinned = {'catalogue-49': None, 'catalogue-50': 30006699}
         new_id, watermark = migration.allocate_pinned_id(pinned, 'catalogue-49', 30006974)

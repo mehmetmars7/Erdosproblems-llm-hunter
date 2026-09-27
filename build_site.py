@@ -565,6 +565,7 @@ def validate_open_problems_catalog(snapshot):
     if type(count) is not int or count != len(records) or count < 1:
         raise ValueError('Open problems catalog recordCount does not match its records')
     ids = set()
+    legacy_ids = set()
     for record in records:
         if not isinstance(record, dict):
             raise ValueError('Malformed open problems catalog record')
@@ -584,8 +585,23 @@ def validate_open_problems_catalog(snapshot):
         ):
             raise ValueError(f'Open problem {problem_id} requires a canonical category')
         external_url = record.get('external_url')
-        if external_url is not None and external_url != f'https://www.unsolvedmath.com/problems/{problem_id}':
+        problem_number = record.get('problem_number')
+        if not isinstance(problem_number, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*', problem_number):
+            raise ValueError(f'Invalid UnsolvedMath problem number for {problem_id}')
+        if external_url is not None and external_url not in {
+            f'https://www.unsolvedmath.com/problems/{problem_number}',
+            f'https://www.unsolvedmath.com/problems/{problem_id}',
+        }:
             raise ValueError(f'Invalid UnsolvedMath external URL for {problem_id}')
+        aliases = record.get('legacy_ids', [])
+        if not isinstance(aliases, list):
+            raise ValueError(f'Invalid legacy IDs for {problem_id}')
+        for alias in aliases:
+            if not isinstance(alias, str) or not re.fullmatch(r'problem\.[a-z0-9][a-z0-9._-]*', alias):
+                raise ValueError(f'Invalid legacy ID for {problem_id}: {alias!r}')
+            if alias in legacy_ids:
+                raise ValueError(f'Duplicate legacy ID: {alias}')
+            legacy_ids.add(alias)
         sources = record.get('sources')
         if not isinstance(sources, list) or not sources or not all(
             isinstance(source, dict)
@@ -814,6 +830,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
         problem_id = str(canonical_id)
         problems[problem_id] = {
             'id': canonical_id,
+            'problem_number': record['problem_number'],
+            'legacy_ids': record.get('legacy_ids', []),
             'title': record['title'],
             'collection': 'ranked',
             'rank': rank,
@@ -997,11 +1015,15 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
 
     # Changing the generated content changes the URL, so a new page cannot
     # accidentally pair with a pre-TeX copy of the index in the browser cache.
-    data_version = hashlib.sha256((DATA_DIR / 'open_problems_data.js').read_bytes()).hexdigest()[:16]
+    assets = ['data/open_problems_data.js', 'app.js']
+    versions = {asset: hashlib.sha256((DATA_DIR.parent / asset).read_bytes()).hexdigest()[:16]
+                for asset in assets if (DATA_DIR.parent / asset).exists()}
     for page in DATA_DIR.parent.glob('*.html'):
         original = page.read_text(encoding='utf-8')
-        versioned = re.sub(r'(?<=src=")data/open_problems_data\.js(?:\?v=[a-zA-Z0-9_-]+)?(?=")',
-                           f'data/open_problems_data.js?v={data_version}', original)
+        versioned = original
+        for asset, version in versions.items():
+            versioned = re.sub(r'(?<=src=")' + re.escape(asset) + r'(?:\?v=[a-zA-Z0-9_-]+)?(?=")',
+                               f'{asset}?v={version}', versioned)
         if versioned != original:
             page.write_text(versioned, encoding='utf-8')
 

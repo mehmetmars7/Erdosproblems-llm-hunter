@@ -52,12 +52,13 @@ async function render(query, open = records, fetchRecord = async () => ({ ok: fa
     };
     const requests = [];
     const context = vm.createContext({
-        document, URLSearchParams, console,
+        document, URL, URLSearchParams, console,
         fetch: async (url, options) => {
             requests.push({ url, options });
             return fetchRecord(url, options);
         },
-        window: { location: { search: query }, OPEN_PROBLEMS_DATA: open,
+        window: { location: new URL(`https://example.org/problem.html${query}`),
+            history: { replaceState(state, title, url) { this.lastURL = url; } }, OPEN_PROBLEMS_DATA: open,
             OPEN_PROBLEMS_CATALOG: { edition_date: '2026-09-22' } },
         moProblems: { '42': { id: '42', title: 'Legacy question', score: 5, link: 'https://mathoverflow.net/questions/42', attacks: [] } },
         erdosProblems: erdos
@@ -259,6 +260,23 @@ assert.equal((notebook.match(/class="attempt"/g) || []).length, pnp.attacks.leng
 assert.match(notebook, /Current frontier and source audit/);
 assert.match(notebook, /unresolved gap/);
 assert.doesNotMatch(notebook, /No LLM attempts yet|Research notebook|\\[se]ref|hypertarget/);
+
+// Previously published name-based URLs load the same statement and attempts,
+// then replace the address with the permanent numeric ID, retaining fragments.
+const hodge = JSON.parse(fs.readFileSync(path.join(root, 'docs/data/top_problems/6.json'), 'utf8'));
+for (const [legacy, record] of [['problem.p-versus-np', pnp], ['problem.hodge-conjecture', hodge]]) {
+    page = await render(`?type=open_problems&id=${legacy}&view=all#llm-attempts-section`, { [record.id]: record });
+    assert.equal(page.element('page-title').textContent, record.title);
+    assert.equal(page.requests[0].url, `data/top_problems/${record.id}.json`);
+    assert.equal(page.context.window.history.lastURL.searchParams.get('id'), String(record.id));
+    assert.equal(page.context.window.history.lastURL.searchParams.get('view'), 'all');
+    assert.equal(page.context.window.history.lastURL.hash, '#llm-attempts-section');
+    assert.equal(page.element('.giscus').children[0].dataset.term, `OpenProblem-${record.id}`);
+    assert.ok(page.element('problem-statement-source').innerHTML.includes(record.external_url));
+    assert.ok(page.element('problem-statement-source').innerHTML.includes(`UnsolvedMath ${record.problem_number}`));
+    assert.equal((page.element('attempts-container').innerHTML.match(/class="attempt"/g) || []).length, record.attacks.length);
+    assert.equal(new URL(page.context.getReviewIssueUrl('open_problems', String(record.id))).searchParams.get('problem_id'), String(record.id));
+}
 console.log('Ranked TeX definitions, fresh data recovery, model attempts, citations and legacy detail routes passed.');
 }
 

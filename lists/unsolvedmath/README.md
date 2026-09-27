@@ -16,3 +16,15 @@ English statement summaries. Additional local records are distinguished by
 the absence of an upstream problem URL. `display_order.json` controls the
 website's ordering independently of problem identity. Extended `.tex`
 statements and LLM attempts are stored in `attacks/open_problems/top_problems/`.
+
+`id` is the permanent numeric identity used in our URLs and filenames.
+`problem_number` is UnsolvedMath's public code (for example, `MPP-001`), shown
+in the **UnsolvedMath #** column. `external_url` uses this code unless the
+full upstream registry reuses it for different records; those entries use
+UnsolvedMath's unambiguous numeric route. Unpublished local additions have no
+external link. Never derive a public code from an ID or display position.
+
+`legacy_ids` preserves the exact former `problem.*` identifiers as URL aliases.
+Old links resolve to the numeric ID and update the browser address while
+retaining other query parameters and fragments. These aliases do not affect
+ordering, filenames, or mathematical identity.

@@ -160,8 +160,8 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=d8ce0d278a8d25bb"></script>
-    <script src="app.js"></script>
+    <script src="data/open_problems_data.js?v=8aa37a75ca4e0093"></script>
+    <script src="app.js?v=d486bb839ff3f835"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
@@ -205,6 +205,13 @@
                 if (!allProblems) {
                     document.getElementById('problem-meta').innerHTML = '<p>Error loading Top Open Problems data</p>';
                     return;
+                }
+                const canonicalId = window.ProblemHunting.resolveOpenProblemId(allProblems, id);
+                if (canonicalId !== id) {
+                    id = canonicalId;
+                    const canonicalURL = new URL(window.location.href);
+                    canonicalURL.searchParams.set('id', id);
+                    window.history.replaceState(null, '', canonicalURL);
                 }
                 problem = allProblems[id];
                 problemNumbers = Object.values(allProblems)
@@ -350,8 +357,7 @@
                 const definitionLink = /^attacks\/open_problems\/top_problems\/[1-9]\d*\.tex$/.test(definitionFile)
                     ? `<a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/${definitionFile}" target="_blank" rel="noopener" aria-label="View TeX definition (${definitionFile.split('/').pop()})">source</a>`
                     : '';
-                const externalLink = /^https:\/\/www\.unsolvedmath\.com\/problems\/[1-9]\d*$/.test(problem.external_url || '')
-                    ? `<a href="${window.ProblemHunting.escapeHtml(problem.external_url)}" target="_blank" rel="noopener">UnsolvedMath</a>` : '';
+                const externalLink = window.ProblemHunting.getUnsolvedMathLink(problem, 'UnsolvedMath ');
                 document.getElementById('problem-statement-source').innerHTML = [definitionLink, externalLink].filter(Boolean).join(' · ');
                 if (problem.definition_tex) {
                     linksDiv.innerHTML = `
