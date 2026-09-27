@@ -94,7 +94,7 @@ assert.equal(page.element('.giscus').children[0].dataset.term, 'OpenProblem-2000
 assert.equal(page.requests.length, 1);
 assert.equal(page.requests[0].url, 'data/top_problems/20000601.json');
 assert.equal(page.requests[0].options.cache, 'no-store');
-assert.match(page.element('problem-meta').innerHTML, /UnsolvedMath #20000601/);
+assert.doesNotMatch(page.element('problem-meta').innerHTML, /UnsolvedMath #/);
 const reviewURL = new URL(page.context.getReviewIssueUrl('open_problems', '20000601'));
 assert.equal(reviewURL.searchParams.get('problem_type'), 'Open Problems');
 assert.equal(reviewURL.searchParams.get('problem_id'), '20000601');
