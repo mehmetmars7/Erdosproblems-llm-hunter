@@ -36,7 +36,7 @@ const records = {
         domain: 'algebra', domain_label: 'Algebra', exact_target: 'A special target about groups',
         status: 'open_with_solved_subcases', status_qualification: 'See "partial" result <not a resolution>.',
         status_reviewed_at: '2026-09-14', llm_status: 'solved', completion: 100,
-        external_url: 'https://www.unsolvedmath.com/problems/6',
+        problem_number: 'MPP-006', external_url: 'https://www.unsolvedmath.com/problems/MPP-006',
         sources: [{ citation: 'Source & "description"', url: 'https://example.org/?a=1&b=2' }],
         attacks: [{ ...attempt, status: 'solved' }] },
     'mo:23': { id: 'mo:23', mo_id: '23', title: 'MO question', collection: 'mo', rank: null, score: 23,
@@ -96,9 +96,25 @@ assert.equal(api.escapeHtml(null), '');
 assert.equal(api.escapeHtml('a"<&\''), 'a&quot;&lt;&amp;&#39;');
 const rendered = api.renderOpenProblemRows([records['6'], records['mo:23'], records['20000601']]);
 assert.match(rendered, /Beta &amp; &quot;target&quot;/);
-assert.match(rendered, /href="https:\/\/www\.unsolvedmath\.com\/problems\/6"[^>]*>UnsolvedMath<\/a>/);
+assert.match(rendered, /href="https:\/\/www\.unsolvedmath\.com\/problems\/MPP-006" target="_blank" rel="noopener noreferrer"[^>]*>MPP-006<\/a>/);
 assert.match(rendered, /<td>2<\/td>/);
-assert.match(rendered, />Source<\/a><\/td>\s*<td><a[^>]*>UnsolvedMath<\/a><\/td>/);
+assert.match(rendered, />Source<\/a><\/td>\s*<td><a[^>]*>MPP-006<\/a><\/td>/);
+assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'mpp-006' })), ['6']);
+const duplicateCode = { id: 1479, problem_number: 'TOP-001', external_url: 'https://www.unsolvedmath.com/problems/1479' };
+assert.match(api.getUnsolvedMathLink(duplicateCode), /problems\/1479"[^>]*>TOP-001<\/a>/);
+assert.equal(api.getUnsolvedMathLink({ ...duplicateCode, external_url: 'https://www.unsolvedmath.com/problems/18' }), '');
+assert.equal(api.getUnsolvedMathLink({ ...duplicateCode, external_url: 'javascript:alert(1)' }), '');
+assert.equal(api.getUnsolvedMathLink({ id: 30006988, problem_number: 'LOCAL-30006988', external_url: null }), '');
+const registry = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/problems.json'), 'utf8'));
+const canonicalRecords = Object.fromEntries(registry.map(record => [record.id, record]));
+assert.equal(registry.flatMap(record => record.legacy_ids).length, 500);
+for (const record of registry) {
+    assert.equal(api.getOpenProblemHref(record), `problem.html?type=open_problems&id=${record.id}`);
+    for (const legacy of record.legacy_ids) {
+        assert.equal(api.resolveOpenProblemId(canonicalRecords, legacy), String(record.id));
+    }
+}
+assert.match(fs.readFileSync(path.join(root, 'docs/open_problems.html'), 'utf8'), /<th scope="col">UnsolvedMath #<\/th>/);
 assert.doesNotMatch(rendered, /<td>20000601<\/td>/);
 assert.deepEqual(ids(api.filterOpenProblems(records, { search: '20000601' })), ['20000601']);
 assert.match(rendered, /title="See &quot;partial&quot; result &lt;not a resolution&gt;\."/);

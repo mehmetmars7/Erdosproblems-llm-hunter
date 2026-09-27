@@ -173,6 +173,22 @@ function getOpenProblemHref(problem) {
     return `problem.html?type=open_problems&id=${encodeURIComponent(problem.id)}`;
 }
 
+function resolveOpenProblemId(problems, id) {
+    if (Object.prototype.hasOwnProperty.call(problems, id)) return id;
+    const matches = Object.values(problems).filter(problem =>
+        Array.isArray(problem.legacy_ids) && problem.legacy_ids.includes(id));
+    return matches.length === 1 ? String(matches[0].id) : id;
+}
+
+function getUnsolvedMathLink(problem, prefix = '') {
+    if (getOpenProblemCollection(problem) === 'mo' || !problem.external_url) return '';
+    const code = problem.problem_number;
+    if (typeof code !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(code)) return '';
+    const base = 'https://www.unsolvedmath.com/problems/';
+    if (![base + code, base + problem.id].includes(problem.external_url)) return '';
+    return `<a href="${escapeHtml(problem.external_url)}" target="_blank" rel="noopener noreferrer" title="UnsolvedMath ${escapeHtml(code)} (ID ${escapeHtml(problem.id)})">${escapeHtml(prefix + code)}</a>`;
+}
+
 function sortOpenProblems(a, b) {
     const aIsMO = getOpenProblemCollection(a) === 'mo';
     const bIsMO = getOpenProblemCollection(b) === 'mo';
@@ -210,7 +226,7 @@ function filterOpenProblems(problems, filters = {}) {
         if (filters.withAttempts && !getMathematicalAttempts(problem.attacks).length) return false;
         if (!search) return true;
         const sourceText = (problem.sources || []).map(source => `${source.citation || ''} ${source.url || ''}`).join(' ');
-        return [problem.id, problem.mo_id, problem.rank, problem.title, problem.exact_target,
+        return [problem.id, problem.problem_number, problem.mo_id, problem.rank, problem.title, problem.exact_target,
             problem.definition_tex, problem.domain_label, ...(problem.aliases || []), sourceText]
             .filter(value => value !== null && value !== undefined).join(' ').toLowerCase().includes(search);
     });
@@ -250,8 +266,7 @@ function renderOpenProblemRows(problems) {
         const source = getOpenProblemSources(problem)[0];
         const sourceLink = source
             ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener" title="${escapeHtml(source.citation || 'Original source')}">Source</a>` : '—';
-        const externalLink = !isMO && /^https:\/\/www\.unsolvedmath\.com\/problems\/[1-9]\d*$/.test(problem.external_url || '')
-            ? `<a href="${escapeHtml(problem.external_url)}" target="_blank" rel="noopener">UnsolvedMath</a>` : '';
+        const externalLink = getUnsolvedMathLink(problem);
         return `<tr>
             <td>${rank}</td>
             <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
@@ -672,6 +687,8 @@ window.ProblemHunting = {
     countWithAttacks,
     getOpenProblemCollection,
     getOpenProblemHref,
+    resolveOpenProblemId,
+    getUnsolvedMathLink,
     sortOpenProblems,
     getOpenProblemDomains,
     filterOpenProblems,
