@@ -1,5 +1,5 @@
-// The ranked catalog stores ASCII mathematics, not TeX. Recognize complete
-// expressions without interpreting ordinary prose or changing the source data.
+// Recognize complete ASCII mathematical expressions in catalogue snippets
+// without interpreting ordinary prose or changing existing TeX/source data.
 (function (host) {
     const greek = new Set(('alpha beta gamma delta epsilon varepsilon zeta eta theta iota kappa lambda mu nu xi pi rho sigma tau upsilon phi chi psi omega Gamma Delta Theta Lambda Xi Pi Sigma Upsilon Phi Psi Omega').split(' '));
     const functions = new Set(('Re Im Gal char Aut Hom Ext Tor Spec Pic CH dim rank rad poly ord det gcd lcm log ln exp sin cos tan sup inf max min lim zeta').split(' '));

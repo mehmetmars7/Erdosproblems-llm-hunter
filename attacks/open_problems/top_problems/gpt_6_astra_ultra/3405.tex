@@ -1,0 +1,258 @@
+% TOP_PROBLEM: {"id": 3405, "title": "P vs. BPP", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{P vs. BPP}{P vs. BPP}}\label{3405}
+\subsection{Definitions and mathematical statement}
+A language $L$ is in $\mathsf{BPP}$ if a randomized polynomial-time algorithm $A$ satisfies $\Pr[A(x)=1_L(x)]\ge2/3$ for every input $x$. Membership in $\mathsf P$ requires a deterministic polynomial-time decision algorithm with no errors. Determine whether
+\[
+ \forall L\in\mathsf{BPP},\quad L\in\mathsf P.
+\]
+The simulation must work in the ordinary uniform model, not merely through nonuniform advice or for most inputs.
+\par\smallskip\textit{Formulation and concept references:} \href{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can randomness always be removed from an efficient bounded-error decision algorithm without losing polynomial-time efficiency?
+\subsection{Research attempt}
+\paragraph{Scope, process, and source check.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. The method was to isolate the randomness actually needed by a fixed
+bounded-error decider, derive sufficient replacement conditions, and test
+whether existential or limited-independence arguments meet those conditions.
+All inputs of a given length must be handled, and the deterministic simulator
+must be one finite uniform algorithm. Neither advice depending on the length
+nor an average-case guarantee is substituted for that requirement.
+
+The pseudorandomness framework in Vadhan [S1] distinguishes short seed length,
+fooling guarantees, and efficient construction. Adleman's classical
+nonuniform simulation [E1] supplies the relevant warning: bounded-error
+randomness can be fixed separately at each input length without giving a
+uniform derandomization. Impagliazzo--Wigderson [E2], Theorem 2, prove
+$\mathsf P=\mathsf{BPP}$ under the hypothesis that some language in
+$\mathsf E=\mathsf{DTIME}(2^{O(n)})$ has worst-case circuit complexity
+$2^{\Omega(n)}$. That hypothesis is not proved here. The catalogue's
+recent result [S3] treats insensitive algorithms; no unrestricted simulation
+is inferred from its restricted algorithm class.
+
+\paragraph{Attack plan and normalization.}
+Fix a BPP decider $A$ for a total language $L$. On inputs of length $n$, pad
+its random tape to a deterministic polynomial length $m(n)$; unused bits
+have no effect. Write $A(x;r)\in\{0,1\}$ for the resulting deterministic
+computation. Its time is polynomial for every $r$, not merely in expectation.
+A sufficiently good, uniformly generated polynomial-size collection of
+random tapes would permit deterministic enumeration. The main route is to
+state exactly what ``sufficiently good'' means, then compare that condition
+with what amplification and independence really provide.
+
+The containment $\mathsf P\subseteq\mathsf{BPP}$ follows by ignoring random
+bits. Thus an upper-bound solution needs the reverse containment for every
+fixed BPP decider, with a polynomial runtime allowed to depend on that decider.
+A negative solution needs one total bounded-error language outside every
+uniform deterministic polynomial-time bound.
+
+\paragraph{Lemma 27.1: a uniform short-seed condition is sufficient.}
+Suppose that for the fixed $A$ there is a deterministic algorithm computing
+\[
+ G_n:\{0,1\}^{d(n)}\longrightarrow\{0,1\}^{m(n)},
+ \qquad d(n)\le c\log_2(n+2),
+\]
+in time polynomial in $n$, where $d(n)$ is efficiently computable and $c$
+is a constant. Suppose also that, for every $x\in\{0,1\}^n$,
+\begin{equation}\label{a27:fooling}
+ \left|\Pr_{s}[A(x;G_n(s))=1]-\Pr_r[A(x;r)=1]\right|\le1/12.
+\end{equation}
+Then $L\in\mathsf P$.
+
+\emph{Proof.} Enumerate all $2^{d(n)}\le(n+2)^c$ seeds, compute their
+outputs, and count accepting simulations. On yes-inputs the fraction is
+at least $2/3-1/12=7/12$. On no-inputs it is at most
+$1/3+1/12=5/12$. Comparing the integer acceptance count with half the number
+of seeds therefore decides $L$ without error. The generator and each
+simulation take polynomial time, as does the number of seeds. Small input
+lengths are included by the displayed $(n+2)$ bound, or can be hardwired
+separately if the hypothesis begins only eventually.\hfill$\square$
+
+This lemma asks only to fool the tests $r\mapsto A(x;r)$ associated with one
+decider, not every Boolean function on the random tape. The generator may
+depend on $A$, but its algorithm is fixed before seeing $x$. It is the
+uniformity and simultaneous guarantee for all $x$ that will be missing below.
+A generator with seed length $(\log n)^2$ would instead give the enumeration
+cost $2^{O((\log n)^2)}$, which is not a polynomial bound. A short seed is
+also insufficient if evaluating one generator output takes superpolynomial
+time. These costs cannot be hidden inside the name ``pseudorandom.''
+
+\paragraph{Lemma 27.2: fixing randomness does give polynomial advice.}
+For each length $n$ there is a list of
+\[
+                       R=12(n+2)+1
+\]
+random tapes such that majority vote among the corresponding executions of
+$A$ is correct on every length-$n$ input.
+
+\emph{Proof.} Select the $R$ tapes independently and uniformly. Fix an input
+$x$ and let $X_i$ indicate an incorrect answer on tape $i$. The variables
+are independent and satisfy $\Pr[X_i=1]\le1/3$. Therefore
+\[
+ \mathbb E\,2^{\sum_i X_i}
+       =\prod_i\mathbb E\,2^{X_i}\le(4/3)^R.
+\]
+Markov's inequality gives
+\[
+ \Pr\left[\sum_iX_i\ge R/2\right]
+       \le\left(\frac4{3\sqrt2}\right)^R
+       <(8/9)^{6(n+2)}<2^{-(n+2)}.
+\]
+The last inequality uses $(8/9)^6<1/2$, or equivalently
+$2\cdot8^6<9^6$. As $R$ is odd, majority is unambiguous. There are $2^n$
+possible inputs, so the union bound makes the probability of any wrong
+majority less than $1/4$. At least one list has no wrong majority at all.
+Its length is $Rm(n)$, a polynomial in $n$.\hfill$\square$
+
+Hardwire such a list at each length and simulate the fixed algorithm by
+polynomial-size circuits. This proves the familiar containment
+$\mathsf{BPP}\subseteq\mathsf{P/poly}$. The displayed estimate was derived
+explicitly to make its exact scope visible. The list is independent of the
+particular input, but its existence proof does not tell a uniform algorithm
+which list to print. Brute-force enumeration of candidate lists followed by
+checking all $2^n$ inputs is not a polynomial-time construction; checking
+correctness also requires knowing the correct language answers. No efficient
+replacement for that verification is supplied here.
+
+The two lemmas consequently do not combine automatically. Lemma 27.1 has
+an effective generator hypothesis, while Lemma 27.2 provides only existential
+length-dependent data. Treating the latter as a subroutine would introduce
+precisely the nonuniform advice forbidden in the target statement.
+
+\paragraph{An exact test of the limited-independence repair.}
+One might try to construct replacement tapes by ensuring that all small sets
+of random bits are independent. The following example shows that even a
+very strong version of that property does not fool every polynomial-time
+algorithm.
+
+For $m\ge2$, let $D_m$ be uniform over pairs $(u,v)\in\{0,1\}^m\times
+\{0,1\}^m$ such that both blocks have even parity. It is efficiently sampled:
+choose the first $m-1$ bits of each block freely and set the last bit to
+their XOR. Every set of at most $m-1$ coordinates in the full $2m$-bit string
+is uniformly distributed. Indeed, in each block any prescribed values on
+fewer than $m$ coordinates have exactly $2^{m-t-1}$ even-parity completions,
+where $t$ coordinates were prescribed. The two blocks are independent,
+so the joint marginal is also uniform.
+
+Now consider the algorithm that accepts exactly when both blocks have even
+parity. With fully independent fair bits its acceptance probability is
+$1/4$. It is therefore a valid BPP decider for the empty language, with
+success $3/4$ on every input; choose $m$ polynomial in input length and
+ignore the input contents. Under $D_m$ it accepts with probability $1$ and
+is wrong on every input. Repeating executions with independently drawn
+$D_m$ tapes preserves this certain error.
+
+This is a counterexample to a proposed universal derandomization rule,
+not a hard language: the empty language has the trivial deterministic
+rejecting algorithm. It shows that many-wise independence constrains local
+marginals while a linear-time parity test can inspect a global correlation.
+The proof of a pseudorandom generator must control the actual computational
+tests in \eqref{a27:fooling}; replacing that proof by an independence count
+is invalid. Restricted algorithms that cannot detect such correlations may
+admit different positive results, with their hypotheses retained.
+
+\paragraph{Why an input-dependent seed search is not yet an algorithm.}
+There is a second quantifier trap in asking for one fixed logarithmic-seed
+generator to fool \emph{all} polynomial-time tests at once. Suppose its
+output length is $m(n)=n$ and its range has at most $(n+2)^c$ strings.
+The test ``is $r$ in the range of $G_n$?'' enumerates every seed and compares
+its generated output with $r$. If the generator is polynomial-time, this
+test is also polynomial-time. It accepts generator outputs with probability
+$1$, but accepts a uniform $n$-bit string with probability at most
+$(n+2)^c/2^n$, eventually less than $1/3$. On those lengths it is itself a
+valid randomized decider for the empty language; finitely many smaller
+lengths can simply reject. Thus that fixed generator fails this particular
+efficient test.
+
+This does not obstruct Lemma 27.1: its generator may depend on the decider
+or on a specified circuit-size bound. Increasing the test's polynomial
+exponent may require increasing the seed constant or the generator's work.
+The support-membership test proves that those dependencies cannot be erased
+by asserting one fixed polynomial budget that works for every polynomial
+budget. It is also another counterexample to a proposed universal replacement
+rule, not evidence that the empty language needs randomness.
+
+For a yes-input, many tapes lead to acceptance; for a no-input, many lead to
+rejection. Finding an accepting tape alone therefore does not identify the
+answer. A BPP machine may have accepting tapes on both sorts of input.
+Likewise, finding a tape on which repeated runs agree is insufficient unless
+that agreement is certified to reflect the true majority over all tapes.
+The two-sided error convention must remain in the argument.
+
+A useful exact restricted case is $m(n)=O(\log n)$: enumerate every original
+random tape and compare the true acceptance fraction with $1/2$. No generator
+is needed, and the result is a uniform polynomial-time decider. The missing
+step for arbitrary BPP is thus not amplification alone. It is a method of
+replacing polynomially many random bits by logarithmically many effectively
+enumerable bits while preserving the decision gap, or another simulation
+achieving the same effect.
+
+One cannot choose a successful tape list for each input by an unrestricted
+existential quantifier and then call that choice a deterministic computation.
+Nor can the list be fixed once for all input lengths: its tape lengths and
+coverage obligations change with $n$. Lemma 27.2 addresses each finite input
+length separately, as nonuniform circuit complexity allows.
+
+\paragraph{Verification, remaining gap, and outcome.}
+The companion script checks the amplification bound using exact rational
+binomial probabilities at the boundary failure probability $1/3$, verifies
+$2\cdot8^6<9^6$, and tests all coordinate marginals of $D_m$ through $m=5$.
+It confirms acceptance $1/4$ under uniform tapes and $1$ under the replacement.
+These are finite checks of the displayed claims; their all-length versions
+follow from the proofs. No heuristic randomness test is treated as a proof
+that a generator fools all polynomial-time computations.
+
+\textbf{UNRESOLVED.} The strongest uniform conclusion proved here is exact
+derandomization for logarithmic randomness, and the conditional short-seed
+lemma. The all-input tape-fixing argument remains nonuniform, and the proposed
+limited-independence replacement has an explicit failing decider. The first
+remaining gap is a uniform polynomial-time construction meeting the necessary
+all-input gap guarantee for an arbitrary BPP decider. A lower-bound solution
+would instead need one BPP language outside every deterministic polynomial
+bound. Neither is established, and no novelty is claimed for the elementary
+or classical calculations.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]S. Vadhan, 'Pseudorandomness', Foundations and Trends in Theoretical Computer Science 7(1-3):1-336, 2012.
+\url{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}.
+\textit{Formulation source.}
+\item[S2]CS 6810: Theory of Computing, Lecture 15, March 17, 2026.
+\url{https://www.cs.cornell.edu/courses/cs6810/2026sp/lec15.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Pseudorandomness Beating the Hybrid Argument for Insensitive Algorithms.
+\url{https://eccc.weizmann.ac.il/report/2026/082/}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Leonard M. Adleman, \emph{Two Theorems on Random Polynomial Time},
+Proceedings of FOCS 1978, pp. 75--83.
+\url{https://doi.org/10.1109/SFCS.1978.37}.
+\url{https://mikael-monet.net/share/papers/adleman1978.pdf}.
+\textit{Primary nonuniform-simulation reference; consulted 27 September 2026.
+The explicit amplification and tape-fixing calculation is given above.}
+\item[E2]Russell Impagliazzo and Avi Wigderson,
+\emph{P = BPP if E Requires Exponential Circuits: Derandomizing the XOR Lemma},
+Proceedings of STOC 1997, pp. 220--229, Theorem 2.
+\url{https://www.math.ias.edu/~avi/PUBLICATIONS/MYPAPERS/IW97/proc.pdf}.
+\url{https://doi.org/10.1145/258533.258590}.
+\textit{Conditional hardness-versus-randomness result; consulted
+27 September 2026. Its circuit-hardness assumption is not asserted here.}
+\end{itemize}
+\end{document}

@@ -1,0 +1,414 @@
+% TOP_PROBLEM: {"id": 30006959, "title": "Polynomial-Time Solvability of Condon's Simple Stochastic Games", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Polynomial-Time Solvability of Condon's Simple Stochastic Games}{Polynomial-Time Solvability of Condon's Simple Stochastic Games}}\label{30006959}
+\subsection{Definitions and mathematical statement}
+A simple stochastic game is a finite directed graph whose nonterminal vertices belong to a maximizing player, a minimizing player, or chance. Players choose the outgoing edge at their own vertices; chance vertices use the given rational probabilities. Success means reaching a designated target, with nonreaching plays counted as failures. For initial vertex $s$, the value is
+\[
+ v(s)=\sup_\sigma\inf_\tau
+ {\mathbb{P}}_s^{\sigma,\tau}(\text{eventually reach the target}).
+\]
+The question asks for a deterministic polynomial-time method to compute these values exactly, equivalently to decide whether $v(s)\ge q$ for a rational threshold $q$, in the standard finite rational-input convention. Binary decisions and transition encodings are part of the instance. An approximate answer with unspecified dependence on the precision or an algorithm exponential in input length does not settle the selected complexity question.
+\par\smallskip\textit{Formulation and concept references:} \href{https://dblp.org/rec/journals/iandc/Condon92.html}{[S1]}.
+
+\subsection{Short English statement}
+Can the exact optimal winning probabilities of finite simple stochastic reachability games be computed in polynomial time?
+\subsection{Research attempt}
+\paragraph{Scope, conventions, and source check.}
+This attempt by GPT-6 Astra Ultra was prepared on 27 September 2026.
+The target includes games that can run forever, arbitrary explicitly
+encoded rational chance probabilities, and the threshold relation
+$v(s)\geq q$, including equality. Infinite nonreaching plays have payoff
+zero. Make the target absorbing; make a dead end a failure self-loop.
+Neither modification changes the event being measured. All nonterminal
+vertices then have at least one outgoing transition.
+
+Condon's original paper [E1] is the publication identified by the catalogue's
+bibliographic link. Its abstract establishes the decision problem's
+$\mathrm{NP}\cap\mathrm{coNP}$ membership, not a polynomial-time
+algorithm. The primary algorithm paper [E2], Section 2, treats general
+turn-based reachability games, states deterministic memoryless optimality,
+and identifies the value as the least Bellman fixed point. It explicitly
+discusses nonstopping components and the failure of arbitrary locally
+optimal choices. The 2024 benchmark paper [E3] still introduces the
+polynomial-time question as unresolved; its stopping-game experiments
+are not a theorem for this full rational-input target. No general polynomial
+algorithm was located in the consulted sources.
+
+The attack first derives the least-fixed-point characterization with
+nontermination handled explicitly, then solves the game exactly when both
+stationary policies are fixed. A denominator bound shows that precision
+and output size are not the central obstruction. Explicit slow examples
+then defeat the attempt to obtain a polynomial algorithm by direct value
+iteration. Finally a one-player linear program is examined to locate what
+is lost when both strategic quantifiers are present.
+
+\paragraph{Lemma 478.1: the least fixed point, without a stopping assumption.}
+For a vector $x\in[0,1]^V$ with $x_t=1$ at the target, define
+\[
+ (Tx)_i=\begin{cases}
+ 1,&i=t,\\
+ \max_{j\in\operatorname{Succ}(i)}x_j,&i\text{ belongs to Max},\\
+ \min_{j\in\operatorname{Succ}(i)}x_j,&i\text{ belongs to Min},\\
+ \sum_jp_{ij}x_j,&i\text{ is a chance vertex}.
+ \end{cases}
+\]
+Failure terminals have value fixed at zero. Set $x^{(0)}_t=1$ and all
+other initial coordinates to zero, and put $x^{(h+1)}=Tx^{(h)}$.
+Then $x^{(h)}$ increases coordinatewise and
+\begin{equation}\label{a478:least}
+                         v=\lim_{h\to\infty}x^{(h)}
+\end{equation}
+is the least fixed point in this cube with the specified terminal values.
+
+\emph{Proof.} Backward induction shows that $x^{(h)}_i$ is the value of
+reaching the target within at most $h$ transitions: the last choice is a
+maximum, minimum, or expectation according to the vertex type. Finite
+action sets ensure each finite-horizon extremum is attained. The operator
+is monotone, $x^{(0)}\leq Tx^{(0)}$, and all its iterates remain in
+$[0,1]^V$. Thus they converge to a vector $z$. Finite maxima, minima,
+and linear averages are continuous, giving $Tz=z$. Any other fixed point
+$y$ in the cube dominates $x^{(0)}$ and therefore every iterate, so it
+dominates $z$.
+
+For each $h$, Max can use a finite-horizon optimal strategy for the first
+$h$ moves and then continue arbitrarily. Its infinite-horizon success
+probability against every Min strategy is at least $x^{(h)}_i$. Hence
+$v(i)\geq z_i$. For the opposite inequality, choose at every Min vertex
+a successor attaining the minimum in $Tz=z$, obtaining one stationary
+Min strategy $\tau$. Under $\tau$ and any possibly randomized,
+history-dependent Max strategy, $z$ of the current state is a bounded
+supermartingale. At Max states every successor has $z_j\leq z_i$;
+at the chosen Min transitions and at chance transitions its conditional
+expectation equals $z_i$. After reaching the absorbing target it stays
+equal to one. Thus the indicator of reaching the target by time $h$ is
+at most $z$ of the state at time $h$, and its expectation is at most
+$z_i$. Letting $h$ increase proves that the infinite-horizon reachability
+probability is at most $z_i$. Therefore $v=z$. No interchange of an
+infinite infimum with a probability limit is used.\hfill$\square$
+
+The word ``least'' is indispensable. A single chance vertex with a
+probability-one self-loop and no path to the target has equation $x=x$;
+every $x\in[0,1]$ is a fixed point, but its reachability value is zero.
+Similarly a Min vertex with actions ``stay here'' and ``go to target''
+has equation $x=\min(x,1)$ and value zero. Solving the polynomial or
+piecewise-linear equations without selecting the correct fixed point can
+return a wrong value even in one state.
+
+\paragraph{A polynomial graph computation of the zero-value region.}
+Start with $W_0=\{t\}$ and repeatedly add a Max vertex with some
+successor already present, a Min vertex with all successors present, or
+a chance vertex with some positive-probability successor present.
+Stop when no more vertices can be added, obtaining $W$. Then
+\begin{equation}\label{a478:zero}
+                          W=\{i:v(i)>0\}.
+\end{equation}
+To prove this, induction on the insertion round shows that every added
+state has positive value for some finite horizon: at a Min vertex a
+minimum of finitely many positive numbers remains positive, and at a
+chance vertex one positive-probability positive term suffices. Conversely,
+outside $W$, every Max successor stays outside, every positive chance
+successor stays outside, and Min has at least one successor outside.
+Choosing those Min successors keeps the play away from the target with
+probability one. This proves \eqref{a478:zero}. Each round adds a vertex
+or terminates, so the computation uses polynomial time in the explicit
+graph size.
+
+This qualitative computation is useful but does not find the positive
+values. A region with values arbitrarily close to one and a region with
+values exponentially small in the input length are both simply marked
+``positive''. Replacing the quantitative question by this attractor test
+would discard the rational threshold in the original target.
+
+\paragraph{Lemma 478.2: exact evaluation after fixing both policies.}
+Fix deterministic stationary policies $\sigma,\tau$, yielding a finite
+Markov chain. Its target-hitting probabilities can be computed exactly in
+polynomial bit complexity, including when the chain is not absorbing with
+probability one.
+
+\emph{Proof.} In the graph of positive-probability transitions, find the
+states $R$ with a directed path to the target. Every state outside $R$
+has hitting probability zero. Let $U=R\setminus\{t\}$, of size $r$,
+and let $Q$ be the transition submatrix within $U$. Let $b_i$ be the
+one-step probability of hitting $t$. The desired coordinates solve
+\begin{equation}\label{a478:linear}
+                             (I-Q)z=b.
+\end{equation}
+Transitions to states outside $R$ contribute zero rather than disappearing
+from the probability distribution.
+
+The matrix is nonsingular. Each state in $U$ has a simple positive path
+to $t$ of length at most $r$. The minimum, over finitely many chosen
+paths, of their probability products is some $\delta>0$. Therefore
+from every state of $U$ the probability of still being in $U$ after
+$r$ steps is at most $1-\delta$. Hence
+$\|Q^r\|_\infty\leq1-\delta$, the Neumann series
+$\sum_{h\geq0}Q^h$ converges, and it is the inverse of $I-Q$.
+This also verifies that the solution of \eqref{a478:linear} is the
+probabilistic one. The case $U=\varnothing$ requires no linear solve.
+
+Clear denominators row by row and use exact rational or fraction-free
+Gaussian elimination. The next lemma bounds the relevant minors by
+integers of polynomial bit length, so this is a polynomial-time bit
+algorithm, not merely a count of unit-cost operations on unbounded
+rationals. States outside $R$ were removed first; trying to invert the
+full matrix with an unreachable closed class would be incorrect.
+\hfill$\square$
+
+\paragraph{Lemma 478.3: a uniform denominator bound.}
+Let $m$ be the number of nonterminal vertices in the original game. Let
+$L$ be the sum of binary encoding lengths of all positive chance-transition
+denominators, including repeated occurrences in different rows. Put
+\begin{equation}\label{a478:denominator}
+ B=L+m\lceil\log_2(m+1)\rceil+1,\qquad D=2^B.
+\end{equation}
+Every fixed-policy value, and every game value, has a reduced rational
+denominator at most $D$. Numerators of values in $[0,1]$ are bounded by
+the same number. In particular exact output length is polynomial in the
+input length.
+
+\emph{Proof for a fixed pair.} In the system from Lemma 478.2 multiply
+row $i$ by $d_i$, the product of the denominators in its transition row;
+deterministic rows use $d_i=1$. Every resulting matrix entry has absolute
+value at most $d_i$, and the right-hand entry also has absolute value at
+most $d_i$, because all the underlying probabilities are in $[0,1]$.
+If the system has $r\leq m$ rows, Hadamard's determinant bound gives
+\[
+       1\leq|\det M|\leq r^{r/2}\prod_i d_i
+                     \leq m^{m/2}2^L\leq D
+\]
+for $r>0$, with trivial interpretation when $m=0$. Cramer's rule says
+that each reduced denominator divides the nonzero integer $\det M$.
+Replacing one column by the right-hand side gives the same bound for
+the numerator determinant. The bound also applies to minors encountered
+in fraction-free elimination, with smaller dimensions, proving the bit
+complexity assertion in the previous lemma.
+
+For the game-value conclusion, use the established deterministic
+memoryless optimality theorem for finite turn-based stochastic reachability
+games, stated in [E2], Section 2.2. Its hypotheses match this graph:
+finite state and action sets, observed turns, reachability objective, and
+fixed transition probabilities. It does not require all policy pairs
+to terminate. It supplies optimal stationary policies whose induced
+chain's hitting probabilities equal the game values. Applying the
+fixed-pair bound proves the assertion. Existence of those policies is an
+external theorem here, not an algorithm for discovering them.
+\hfill$\square$
+
+The determinant estimate deliberately uses a generous bound. It is enough
+that $B$ is polynomial in the actual rational input length; no claim of
+a strongly polynomial algorithm independent of probability bit lengths
+is being made. Large numerical denominators can occur with short binary
+encodings, and their \emph{bit lengths}, rather than their values, belong
+in the complexity accounting.
+
+\paragraph{Exact thresholds and approximation are linked only at controlled precision.}
+Two distinct reduced rationals in $[0,1]$ with denominators at most $D$
+differ by at least $D^{-2}$, since their cross-multiplied numerators differ
+by a nonzero integer. Consequently an oracle deciding $v(s)\geq q$
+can isolate a value in an interval of width less than $1/(2D^2)$ with
+$O(B)$ binary-search queries. The dyadic thresholds have $O(B)$ bits.
+If the oracle answers yes at a midpoint, retain that midpoint as the
+lower endpoint; otherwise retain it as the upper endpoint. Equality is
+handled by the yes branch, rather than being replaced by a strict test.
+
+The unique rational with denominator at most $D$ in the resulting interval
+can be recovered by continued fractions in polynomial bit complexity.
+For an explicit criterion, take its midpoint $z$, so
+$|z-v|<1/(4D^2)\leq1/(2\operatorname{den}(v)^2)$. The elementary
+continued-fraction approximation criterion then makes $v$ a convergent
+of $z$; list its convergents and choose the one inside the isolating
+interval with denominator at most $D$. The criterion follows from the
+best-approximation property of consecutive convergents: if a different
+$a/b$ were that close, the nonzero integer difference of the cross
+products with the last convergent of denominator at most $b$ would have
+absolute value less than one. The Euclidean algorithm uses polynomially
+many bit operations on the $O(B)$-bit endpoints. Values zero and one
+are included, or may be checked at the outset.
+
+Conversely an exact rational value immediately decides the threshold.
+For a threshold $q=a/b$ in lowest terms, a nonequal value differs from
+$q$ by at least $1/(Db)$. But an approximation alone cannot decide
+what to do in the equality case; rational reconstruction or a certified
+isolating procedure is needed. For example a fair chance between target
+and failure has $v=1/2$, so the statements $v\geq1/2$ and $v>1/2$
+have opposite answers. This distinction is not removed by saying that
+probabilities are approximated accurately.
+
+A uniform approximation algorithm polynomial in the input length and
+$\log(1/\varepsilon)$, with a certified error bound, would suffice:
+use $\varepsilon<1/(4D^2)$ and reconstruct the rational. A bound
+polynomial in $1/\varepsilon$ does not imply polynomial time at that
+precision. The denominator lemma identifies exactly why the two precision
+dependencies are different for this question.
+
+\paragraph{A concrete obstruction to direct value iteration.}
+Take one chance vertex with a self-loop of probability $1-2^{-b}$ and
+a transition to target of probability $2^{-b}$. Its rational encoding
+uses $O(b)$ bits. The exact value is one: the probability of avoiding
+the target for $h$ steps is $(1-2^{-b})^h$, which tends to zero.
+The iterates in Lemma 478.1 are exactly
+\begin{equation}\label{a478:rare}
+                        x^{(h)}=1-(1-2^{-b})^h.
+\end{equation}
+For $b\geq2$ and $h\leq2^{b-1}$, the union bound for success in
+one of $h$ trials gives $x^{(h)}\leq h2^{-b}\leq1/2$;
+at $h=2^{b-1}>1$ the inequality is strict because the success events
+overlap in the independent-trial representation. Thus exponentially many
+iterations may be needed even to exceed the constant threshold $1/2$.
+This chain is absorbing with probability one, so merely excluding
+nonstopping games does not repair the iteration count.
+
+The same issue occurs with only fair probabilities. Use states
+$0,1,\ldots,r$, with $r$ the target. From $i<r$, a fair head moves
+to $i+1$ and a fair tail resets to $0$. Hitting the target means observing
+$r$ consecutive heads. Its value is one: successive disjoint blocks of
+$r$ tosses independently have probability $2^{-r}$ of all heads, so
+the probability that no such block appears tends to zero. By time $h$
+there are at most $h$ candidate ending positions for a run, hence
+\begin{equation}\label{a478:fair}
+                    x^{(h)}_0\leq h2^{-r}.
+\end{equation}
+At $h=2^{r-1}$ this is at most $1/2$, despite all transition probabilities
+having constant bit length and the graph having only $r+1$ vertices.
+Lemma 478.2 solves this chain in polynomial time. The example defeats
+one iterative method, not the existence of some different polynomial
+algorithm for games.
+
+\paragraph{A complete one-player linear-programming benchmark.}
+If there are no Min vertices, consider the rational linear program
+\begin{equation}\label{a478:LP}
+ \begin{gathered}
+ \text{minimize }\sum_{i\ne t}z_i,\qquad 0\leq z_i\leq1,
+ \quad z_t=1,\\
+ z_i\geq z_j\quad(i\text{ a Max vertex},\ j\in\operatorname{Succ}(i)),\\
+ z_i\geq\sum_jp_{ij}z_j\quad(i\text{ a chance vertex}),
+ \end{gathered}
+\end{equation}
+with failure terminals fixed at zero. Every feasible vector satisfies
+$z\geq Tz$ and dominates the initial vector, so monotonicity gives
+$z\geq x^{(h)}$ for all $h$, hence $z\geq v$. The value vector is
+itself feasible by Lemma 478.1. Therefore it is the unique coordinatewise
+minimal feasible vector and the unique minimizing vector. There are
+polynomially many variables and constraints of polynomial rational bit
+length. The standard polynomial-time theorem for rational linear
+programming makes this a polynomial bit algorithm for this one-player
+subcase, including nonstopping components.
+
+Naively dualizing this program for Min is dangerous. At a Min vertex
+with self-loop and target actions, the inequalities $z\leq z$ and
+$z\leq1$, together with maximizing $z$, would choose one, whereas
+the actual value is zero. Correct one-player Min algorithms handle the
+zero-value region and recurrent components; the example shows why the
+unqualified reversed program is wrong.
+
+For two players, merely combining the Max lower inequalities with the
+Min upper inequalities does not select the Bellman solution. Even the
+acyclic chain $M\to N\to t$, with $M$ a Max vertex and $N$ a Min
+vertex and each having just one action, has true value one at both
+vertices. The mixed inequalities only say $z_M\geq z_N$ and
+$z_N\leq1$, and permit $z_M=z_N=0$. Conversely the deterministic
+chain from a Min vertex through a Max vertex to a failure terminal admits
+spurious positive vectors under the opposite objective. Local inequality
+feasibility is not a general certificate of the correct strategic value.
+
+There is an additional policy-selection trap even with the correct vector
+already in hand. At a Max vertex with self-loop and target actions the
+value is one, and both actions lead to a state of value one. Choosing
+the self-loop forever is locally maximizing but has success probability
+zero. The stationary optimality theorem guarantees a suitable choice,
+not that every arbitrary greedy tie choice is suitable. End-component
+control is essential.
+
+\paragraph{Exact finite verification.}
+The companion script exhaustively examines 3,375 five-vertex games with
+one Max vertex, one Min vertex, one fair-chance vertex, target, and failure.
+At each nonterminal vertex its two successor positions range over all
+15 unordered pairs with repetition from the five states. Self-loops and
+unreachable closed components are included. For every game the four
+stationary policy pairs are evaluated using rational Gaussian elimination
+after removing states with no positive path to target: 13,500 exact
+fixed-policy evaluations in total.
+
+For each game, componentwise max--min and min--max values agree, there
+is a common optimal stationary strategy for each player across all states,
+the Bellman equations hold, and the zero-region computation
+\eqref{a478:zero} agrees with the exact zero coordinates. The first eight
+finite-horizon iterates are checked to lie below those values. All
+denominators satisfy the conservative small-instance bound used by the
+script. These finite checks test the implementation and quantifier order;
+they do not replace the cited general stationary-optimality theorem.
+
+The rare-transition examples are checked exactly for $b=2,4,8,12$,
+including their values after $2^{b-1}$ steps. The fair-run chains are
+checked for $2\leq r\leq10$ after $2^{r-1}$ steps. In each case the
+exact infinite-horizon value is one while the iteration remains at most
+one half. No floating-point tolerance is used. Scripts, complete results,
+and source/review records are saved under
+\nolinkurl{_Local/top_problems/continuation_488_477_2026_09_27/algorithms/}.
+
+\paragraph{Outcome and first remaining gap.}
+\textbf{UNRESOLVED.} This attempt establishes the least-fixed-point
+characterization, a polynomial qualitative zero test, exact fixed-policy
+evaluation, an explicit polynomial bound on value bit lengths, and the
+precision needed to recover exact rational values. It proves a one-player
+linear-programming subcase and supplies two exponential-iteration families
+and several counterexamples to proposed local shortcuts.
+
+The missing step is a polynomial-time method to select or implicitly
+represent optimal choices for both players while retaining the least
+reachability solution. Enumerating all stationary policies is finite and
+correct using the cited optimality theorem, but the number of policy pairs
+can be exponential in the explicit graph size. Polynomial cost per pair
+does not make that enumeration polynomial. Nor does the short rational
+output supply a fast way to find it.
+
+Specific next targets are a globally valid potential bounding strategy
+changes, a polynomial-size convex formulation that enforces recurrence
+conditions, or an approximation method with polynomial dependence on
+$\log(1/\varepsilon)$. Each must be tested on the fair-run chain,
+the Min self-loop example, and games with both kinds of decisions.
+No such global bound or formulation is proved here, and neither the
+exact-value problem nor its non-strict threshold version is resolved.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Formal statement, dblp record header for journals/iandc/Condon92.
+\url{https://dblp.org/rec/journals/iandc/Condon92.html}.
+\textit{Formulation source.}
+\item[E1]Anne Condon, The Complexity of Stochastic Games,
+Information and Computation 96 (1992), 203--224.
+\url{https://www.sciencedirect.com/science/article/pii/089054019290048K}.
+\textit{Primary publication corresponding to [S1]; abstract and publication
+record consulted 27 September 2026.}
+\item[E2]Jan K\v{r}et\'{\i}nsk\'y, Emanuel Ramneantu, Alexander Slivinskiy,
+and Maximilian Weininger, Comparison of Algorithms for Simple Stochastic
+Games (Full Version), arXiv:2008.09465v3, 25 August 2020,
+Sections 2 and 3, and the discussion of end components.
+\url{https://arxiv.org/pdf/2008.09465}.
+\textit{Primary algorithm paper covering memoryless optimality, Bellman
+semantics, and nonstopping-game issues; consulted 27 September 2026.}
+\item[E3]Avi Rudich, Isaac Rudich, and Rachel Rue, Simple Stochastic
+Stopping Games: A Generator and Benchmark Library,
+arXiv:2402.02571 (2024).
+\url{https://arxiv.org/abs/2402.02571}.
+\textit{Primary benchmark paper's abstract used only for context on the
+unresolved algorithmic question, not as a worst-case algorithm theorem.
+Consulted 27 September 2026.}
+\end{itemize}
+\end{document}

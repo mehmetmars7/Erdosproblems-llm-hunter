@@ -13,14 +13,12 @@ from build_site import OPEN_PROBLEMS_PATH, parse_numbered_problem_tex
 
 
 MARKER = re.compile(r'^(?:[ \t]*% =+\r?\n)?[ \t]*% problemId: ([^\r\n]+)\r?\n', re.MULTILINE)
-RANK = re.compile(r'^[ \t]*% source releaseRank: ([1-9]\d*);[^\r\n]*$', re.MULTILINE)
 RESEARCH = re.compile(r'^[ \t]*\\subsection\{Research attempt(?:: [^}\n]+)?\}', re.MULTILINE)
 
 
 @dataclass(frozen=True)
 class AttemptSection:
-    rank: int
-    problem_id: str
+    problem_id: int
     preamble: str
     section: str
 
@@ -52,20 +50,17 @@ def extract_attempts(content):
         section = body[marker.start():stop]
         if not RESEARCH.search(section):
             continue
-        ranks = list(RANK.finditer(section.replace('\r\n', '\n')))
-        if len(ranks) != 1:
-            raise ValueError(f'Expected one releaseRank for {marker[1]}')
-        rank = int(ranks[0][1])
-        if not re.fullmatch(r'problem\.[a-z0-9.-]+', marker[1]):
-            raise ValueError(f'Invalid problemId: {marker[1]}')
+        if not re.fullmatch(r'[1-9]\d*', marker[1]):
+            raise ValueError(f'Invalid canonical problemId: {marker[1]}')
+        problem_id = int(marker[1])
         headings = re.findall(r'^[ \t]*\\section\*?\{', section, re.MULTILINE)
-        if len(headings) != 1 or not re.search(r'\\label\{' + str(rank) + r'\}', section):
-            raise ValueError(f'Expected one section labeled {rank}')
+        if len(headings) != 1 or not re.search(r'\\label\{' + str(problem_id) + r'\}', section):
+            raise ValueError(f'Expected one section labeled {problem_id}')
         document = preamble + '\\begin{document}\n' + section + '\\end{document}\n'
-        parsed = parse_numbered_problem_tex(document)
+        parsed = parse_numbered_problem_tex(document, require_source_urls=False)
         if not parsed['researchTeX']:
             raise ValueError(f'Empty Research attempt for {marker[1]}')
-        attempts.append(AttemptSection(rank, marker[1], preamble, section))
+        attempts.append(AttemptSection(problem_id, preamble, section))
     if not attempts:
         raise ValueError('No Research attempt subsections found')
     return attempts
@@ -94,17 +89,15 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
         except (OSError, UnicodeError, ValueError) as error:
             raise ValueError(f'{source}: {error}') from error
         for attempt in attempts:
-            root = catalog_dir / f'{attempt.rank}.tex'
+            root = catalog_dir / f'{attempt.problem_id}.tex'
             header = re.search(r'^% TOP_PROBLEM: (.+)$', read_exact(root), re.MULTILINE)
             if not header:
                 raise ValueError(f'Missing TOP_PROBLEM metadata: {root}')
             metadata = json.loads(header[1])
-            if (type(metadata.get('releaseRank')) is not int
-                    or metadata['releaseRank'] != attempt.rank
-                    or metadata.get('problemId') != attempt.problem_id):
+            if type(metadata.get('id')) is not int or metadata['id'] != attempt.problem_id:
                 raise ValueError(f'Identity mismatch between {source} and {root}')
             suffix = '' if version == 1 else f'_v{version}'
-            destination = catalog_dir / model / f'{attempt.rank}{suffix}.tex'
+            destination = catalog_dir / model / f'{attempt.problem_id}{suffix}.tex'
             key = section_key(attempt.section)
             if destination in seen:
                 if seen[destination] != key:
@@ -116,7 +109,6 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
                     existing = extract_attempts(read_exact(destination))
                     same = (len(existing) == 1
                             and existing[0].problem_id == attempt.problem_id
-                            and existing[0].rank == attempt.rank
                             and section_key(existing[0].section) == key)
                 except (OSError, UnicodeError, ValueError):
                     same = False
@@ -128,9 +120,9 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
             wrapper = ('% TOP_PROBLEM: ' + json.dumps(metadata, ensure_ascii=False) + '\n'
                        '% ATTEMPT_STATUS: unresolved\n'
                        + attempt.preamble + '\\begin{document}\n'
-                       + f'\\setcounter{{section}}{{{attempt.rank - 1}}}\n')
+                       + f'\\setcounter{{section}}{{{attempt.problem_id - 1}}}\n')
             content = wrapper + attempt.section + '\\end{document}\n'
-            parse_numbered_problem_tex(content)
+            parse_numbered_problem_tex(content, require_source_urls=False)
             planned[destination] = content
 
     for destination, content in planned.items():

@@ -1,0 +1,240 @@
+% TOP_PROBLEM: {"id": 8400004, "title": "O5a — Deterministic polynomial-time integer factorization", "category_id": 3, "category": {"id": 3, "name": "graph_theory", "display_name": "Graph Theory", "description": "Problems involving graphs, networks, and their properties.", "slug": "graph-theory", "order_index": 3, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: null
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Mathematical Research Notebook},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=3pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\usepackage{etoolbox}
+\AtBeginEnvironment{itemize}{\small}
+% Standalone entry; original section content is delimited for verification.
+\begin{document}
+\setcounter{section}{0}
+%% BEGIN ORIGINAL SECTION CONTAINER
+% ================================================================
+% problemId: 8400004
+% Canonical problem ID: 8400004
+% exactTarget SHA-256: b68294af298392bbad8a4ad4a1a50595e5be9a8ee232127d2e28950b3f8cb2bf
+\clearpage
+\section*{\texorpdfstring{O5a — Deterministic polynomial-time integer factorization}{O5a — Deterministic polynomial-time integer factorization}}\label{8400004}
+\subsection{Definitions and mathematical statement}
+The binary length of $N\ge2$ is $\ell(N)=\lfloor\log_2N\rfloor+1$. A nontrivial factor is an integer $d$ with $1<d<N$ and $d\mid N$. Ask whether there exist a deterministic classical algorithm $A$ and constants $C,k$ such that
+\[
+ \forall N\text{ composite},\qquad A(N)=d\text{ a nontrivial factor},\qquad
+ T_A(N)\le C\ell(N)^k.
+\]
+The promise is compositeness; the running-time bound is in the bit length, not in the value of $N$.
+\par\smallskip\textit{Formulation and concept references:} \sref{8400004}{1}.
+\cataloguescope{Determine whether there is a deterministic classical algorithm that, on input a composite integer N in binary, outputs a nontrivial factor of N in time polynomial in log N.}
+\subsection{Short English statement}
+Is there a deterministic classical method that factors every composite integer in time polynomial in its number of binary digits?
+%% BEGIN RESEARCH INSERTION
+\subsection{Research attempt}
+\paragraph{Current frontier.}
+\textit{Research check: 27 September 2026.}
+Harvey's deterministic algorithm has an exponent $1/5$ in the integer's
+\emph{value}, up to logarithmic factors, rather than polynomial complexity
+in its bit length. \eref{8400004}{1}. Umans--Wang's November 2025 manuscript
+proposes a number-theoretic hypothesis that could lower this exponent to
+$1/6$; it does not claim the polynomial-time algorithm asked for here.
+\sref{8400004}{2}. The research below isolates two distinct obstructions in an
+order-based route: computing an exponent and deterministically finding a
+base that separates prime-power components.
+
+\paragraph{Attack route.}
+Near-square search, smooth-order methods, and modular-square-root methods
+all find factors on structured inputs. A global solution needs a uniform
+coverage theorem for all composites. We investigate a modular-exponent
+certificate because its verification and its failure mechanism can both
+be written exactly. We also compare it with a geometric near-square
+criterion, rather than assuming that random-base success derandomizes.
+
+\paragraph{Attempt: factoring with a supplied exponent.}
+Let $N$ be odd, with at least two distinct prime divisors, and suppose a
+positive integer $M$ divisible by the Carmichael exponent $\lambda(N)$
+is supplied, with bit length polynomial in $\log N$. Write $M=2^su$,
+$u$ odd. For any base $a$, first compute $\gcd(a,N)$. A proper gcd is
+already a factor. For a unit, compute
+\[
+ b_0=a^u\pmod N,\qquad b_{j+1}=b_j^2\pmod N,
+ \qquad 0\leq j<s.
+ \tag{17.1}
+\]
+Test all $\gcd(b_j-1,N)$. These computations take polynomial time in
+$\log N+\log M$ by binary exponentiation and the Euclidean algorithm.
+
+To characterize success, factor $N=\prod_{i=1}^r p_i^{e_i}$ only for the
+\emph{analysis}, not as an algorithmic subroutine. Put
+$t_i=v_2(p_i-1)$ and
+$v_i=v_2(\operatorname{ord}_{p_i^{e_i}}(a))$. Since $u$ removes the odd
+part of every component order, $b_j\equiv1\pmod{p_i^{e_i}}$ exactly when
+$v_i\leq j$. If the $v_i$ are not all equal, choosing $j$ between their
+minimum and maximum yields a nontrivial gcd in (17.1). Conversely if all
+are equal, the chain simultaneously becomes one in every component and
+none of these gcds is proper. To exclude a partial prime-power gcd,
+note that each $b_j$ has two-power order: reduction from units modulo
+$p_i^{e_i}$ to units modulo $p_i$ has an odd-order kernel, so a nonidentity
+element of this two-primary subgroup cannot reduce to one. Thus this
+algorithm succeeds on a unit
+\emph{if and only if} its component two-adic order valuations differ.
+
+For a uniformly random unit, the CRT makes the components independent.
+The cyclic group of units modulo an odd prime power has two-primary
+part of order $2^{t_i}$. Consequently
+\[
+ \Pr(v_i=0)=2^{-t_i},\qquad
+ \Pr(v_i=j)=2^{j-1-t_i}\quad(1\leq j\leq t_i).
+ \tag{17.2}
+\]
+Each atom is at most $1/2$. For $r\geq2$,
+\[
+ \Pr(\hbox{failure}\mid a\text{ a unit})
+ =\sum_{j\geq0}\prod_{i=1}^r\Pr(v_i=j)\leq\frac12.
+ \tag{17.3}
+\]
+Indeed, bound one of the first two factors by $1/2$, sum the other, and
+bound all remaining factors by one. Sampling from $1,\ldots,N-1$ is also
+safe: a nonunit has a proper gcd immediately, so overall success is at
+least $1/2$. The argument establishes a randomized algorithm \emph{given}
+$M$. It establishes neither a deterministic base choice nor a way to
+compute $M$. The order/square-root mechanism is standard; the displayed
+probability calculation is supplied here in full. \eref{8400004}{2}.
+
+\paragraph{Attempt: the exact deterministic package still missing.}
+A sufficient deterministic package would provide, for every such $N$,
+in time polynomial in $\log N$, an exponent $M$ as above and a list
+$\mathcal A_N$ of polynomially many bases containing either a nonunit
+with proper gcd or a unit whose valuations $v_i$ differ. Equations
+(17.1)--(17.3) prove sufficiency, but a density lower bound does not
+construct this list: the successful set depends on the unknown factors.
+Trying the first $\operatorname{poly}(\log N)$ integers is an additional
+number-theoretic claim, not a consequence of (17.3).
+
+The input exceptions do not create a loophole. Even $N$ is immediate.
+Perfect powers can be recognized deterministically by testing all integer
+exponents $2\leq e\leq\lfloor\log_2N\rfloor$ and computing integer
+$e$-th roots by binary search; successful roots provide a factor. An odd
+composite that is not a perfect power has at least two distinct prime
+divisors, so the proposed package would cover all remaining inputs.
+Computing the exponents and a hitting list uniformly is precisely the
+unproved part of this attack.
+
+\paragraph{Attempt: comparison with near-square search.}
+For an odd semiprime $N=pq$, $p\leq q$, Fermat's method tests integers
+$a\geq\lceil\sqrt N\rceil$ until $a^2-N=b^2$. The pair
+\[
+ a_*=(p+q)/2,\qquad b_*=(q-p)/2
+\]
+works. The number of candidates through this pair is at most
+\[
+ 1+a_*-\sqrt N
+ =1+\frac{(\sqrt q-\sqrt p)^2}{2}
+ =1+\frac{(q-p)^2}{2(\sqrt q+\sqrt p)^2}.
+ \tag{17.4}
+\]
+All square and square-root tests have polynomial bit cost. Thus
+$q-p\leq N^{1/4}(\log N)^C$ gives polynomial time for fixed $C$, since
+$(\sqrt q+\sqrt p)^2\geq4\sqrt N$. This is a proven special-case
+criterion, not a generic factoring estimate. With very unequal primes,
+(17.4) can be exponential in $\log N$. Restricting attention to balanced
+semiprimes would silently weaken the target, and balancedness alone
+still does not give the $N^{1/4}$ difference bound.
+
+\paragraph{Stress test.}
+An exponent can be short without being efficiently obtainable:
+$\lambda(N)$ itself has $O(\log N)$ bits. Using its existence as though
+it were computed is invalid. The easily computable integer $N!$ is a
+multiple of the needed orders but has exponentially many bits in the
+input length; it cannot be inserted as a free certificate. All bounds
+above distinguish bit cost from arithmetic-operation count. The random
+unit calculation is checked on small composites in the supplied code,
+but those tests cannot certify a polynomial-size deterministic hitting
+set for every input. A polynomial-time solution would not by itself imply
+$\mathsf P=\mathsf{NP}$, and a negative deterministic result would not
+by itself give the randomized lower bound needed in UnsolvedMath problem 30006683.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+The attempt proves a complete success criterion and probability bound for
+an exponent-assisted algorithm, as well as a uniform near-square special
+case. It identifies exactly what a deterministic extension requires.
+Neither efficient exponent production nor the necessary deterministic
+coverage lemma is established. These auxiliary facts are not claimed to
+be historically novel, and no general factoring complexity conclusion is
+asserted.
+%% END RESEARCH INSERTION
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:8400004:1}{} Integer factoring and modular square roots.
+\url{https://www.sciencedirect.com/science/article/pii/S0022000015000768}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:8400004:2}{} A number-theoretic conjecture implying faster algorithms for polynomial factorization and integer factorization — Chris Umans and Siki Wang (2025).
+\url{https://arxiv.org/abs/2511.10851}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:8400004:3}{} Improved Separation Between Quantum and Classical Computers for Sampling and Functional Tasks — Marshall, Aaronson and Dunjko, CCC 2025.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol339-ccc2025/LIPIcs.CCC.2025.5/LIPIcs.CCC.2025.5.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+%% BEGIN RESEARCH REFERENCES
+\item[\textnormal{[E1]}]\hypertarget{extra:8400004:1}{} David Harvey, \emph{An exponent one-fifth algorithm for deterministic integer factorisation}, arXiv:2010.05450 (2020), main theorem.
+\url{https://arxiv.org/abs/2010.05450}.
+{\small\textit{Added research source. Deterministic value-exponent bound, not a polynomial bit-time algorithm. Consulted 27 September 2026.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:8400004:2}{} Peter W. Shor, \emph{Polynomial-Time Algorithms for Prime Factorization and Discrete Logarithms on a Quantum Computer}, SIAM Journal on Computing 26(5) (1997), 1484--1509; arXiv:quant-ph/9508027.
+\url{https://arxiv.org/abs/quant-ph/9508027}.
+{\small\textit{Added research source. Factoring through order and nontrivial square-root information; the exponent-assisted classical calculation is proved separately. Consulted 27 September 2026.}}
+%% END RESEARCH REFERENCES
+\end{itemize}
+
+%% END ORIGINAL SECTION CONTAINER
+\end{document}

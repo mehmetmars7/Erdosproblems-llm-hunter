@@ -1,0 +1,273 @@
+% TOP_PROBLEM: {"id": 30006687, "title": "P versus NP ∩ coNP", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Standalone notebook; compile twice: lualatex 30006687.tex
+% Original section preserved verbatim except for marked insertion blocks.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook: Problem 30006687},
+ pdfauthor={Open Problems Math research notebook},bookmarksnumbered=true}
+\usepackage{bookmark,titlesec,fancyhdr}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math\enspace|\enspace Research notebook}
+\fancyhead[R]{\small\sffamily Problem 30006687}
+\fancyfoot[L]{\small\sffamily 27 September 2026}
+\fancyfoot[R]{\small\sffamily \thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% BEGIN PRESERVED SECTION
+% ================================================================
+% problemId: 30006687
+% Canonical problem ID: 30006687
+% exactTarget SHA-256: 08f47bb409d1291266968f990686fc8b612ecc5632fbbc5bc0e36003c6c487cc
+\clearpage
+\section*{\texorpdfstring{P versus NP ∩ coNP}{P versus NP ∩ coNP}}\label{30006687}
+\subsection{Definitions and mathematical statement}
+A language lies in $\mathsf{NP}\cap\mathsf{coNP}$ when both membership and nonmembership have polynomial-length certificates verifiable in deterministic polynomial time. Thus there are verifiers $V_1,V_0$ and polynomial length bounds satisfying
+\[
+ x\in L\iff\exists y\,V_1(x,y)=1,\qquad
+ x\notin L\iff\exists z\,V_0(x,z)=1.
+\]
+Determine whether every such language belongs to $\mathsf P$, that is, $\mathsf P=\mathsf{NP}\cap\mathsf{coNP}$. Algorithms are uniform and unrelativized, and inputs are total languages rather than promise problems.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006687}{1}.
+\cataloguescope{Determine whether P = NP \ensuremath{\cap} coNP for ordinary uniform deterministic and nondeterministic polynomial-time Turing-machine classes of total languages over a finite alphabet; equivalently, whether every language with polynomially checkable certificates for both membership and nonmembership has a deterministic polynomial-time decision algorithm.}
+\subsection{Short English statement}
+When both answers have efficiently checkable certificates, must the answer itself be efficiently computable?
+% BEGIN RESEARCH 34
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The language-class question is exactly the dual-certification question in
+Aaronson's lecture, not a promise or search-class comparison.
+\sref{30006687}{1}. Hitchcock--Sekoni--Shafei obtain the corresponding separation
+relative to individually random permutation oracles; their Theorem~5.1 does
+not construct an ordinary polynomial-time permutation with a hard inverse.
+\sref{30006687}{3}, \eref{30006687}{1}. Recent work on total randomized search separates
+several black-box models and gives conditional white-box consequences, but
+it does not turn totality into deterministic polynomial-time search.
+\eref{30006687}{2}. The literature points to two distinct obstacles: certificates
+may be difficult to locate, and an oracle carrying the desired hard data is
+not an effective construction of those data. The recent theorem statements
+were inspected, not independently proof-audited in full.
+
+\paragraph{Attack route.}
+For a negative answer, a natural target is a uniquely determined object whose
+bits are efficiently certifiable in both directions, such as the inverse of
+a polynomial-time permutation. For a positive answer, one could try to
+combine the two certificate families into an efficient search. I pursue the
+common interface between these routes: unique \emph{outputs} versus unique
+\emph{certificates}, and the complexity of selecting a certificate consistent
+with partial information. These distinctions are essential to avoid assuming
+the answer in a canonicalization step.
+
+\paragraph{Attempt.}
+Call a relation $R(x,y,z)$ a \emph{total single-output verification scheme}
+if it is deterministic polynomial-time decidable, the lengths of $y,z$ are
+bounded by fixed polynomials in $|x|$, and for every $x$ there is exactly one
+string $y=f(x)$ for which some $z$ satisfies $R(x,y,z)$. Pad the output to a
+fixed polynomial length, with an encoded original length if necessary.
+There may be many valid $z$ for this one $y$.
+
+\textbf{Lemma 34.1 (an exact output-search formulation).}
+The equality $\mathsf P=\mathsf{NP}\cap\mathsf{coNP}$ holds if and only if
+every total single-output verification scheme has its output function in
+$\mathsf{FP}$.
+
+\emph{Proof.} Given such a scheme, let
+\[
+ B=\{\langle x,i\rangle:1\le i\le\ell(x),\ f(x)_i=1\}.
+\]
+On a valid input, a certificate for membership guesses $y,z$ with
+$R(x,y,z)$ and $y_i=1$; a certificate for nonmembership guesses a valid
+output with $y_i=0$. Uniqueness and totality prove both soundness and
+completeness. Malformed inputs are rejected deterministically and so also
+have a polynomial-time complementary verifier. Thus
+$B\in\mathsf{NP}\cap\mathsf{coNP}$. Under the stated equality, deciding
+its polynomially many bits computes $f$ in polynomial time.
+
+Conversely, for $L\in\mathsf{NP}\cap\mathsf{coNP}$ with verifiers $V_1,V_0$,
+let $R(x,b,z)=V_b(x,z)$ for the one-bit output $b\in\{0,1\}$. Exactly one
+value of $b$ has a certificate. An output algorithm for this scheme decides
+$L$. This proves the equivalence with all quantifiers over fixed uniform
+verifiers and fixed polynomial bounds intact.\hfill$\square$
+
+The lemma identifies the requisite search power, but does not establish it.
+For an arbitrary total polynomial-time relation, independently choosing each
+bit that appears in \emph{some} solution is invalid. With solution set
+$\{01,10\}$ the existential bit answers are $11$, not a solution. Sequential
+prefix extension repairs this consistency problem, but introduces the
+predicate
+\begin{equation}\label{r34:prefix}
+ E(x,u)\quad\Longleftrightarrow\quad
+ \exists y,z\,[R(x,y,z)\ \text{and }u\text{ is a prefix of }y].
+\end{equation}
+For multiple possible outputs, nonextendibility does not in general have a
+certificate obtained just by displaying another solution. For a unique output,
+a conflicting output does certify nonextendibility, so $E$ is again in
+$\mathsf{NP}\cap\mathsf{coNP}$. This recovers the same unresolved decision
+problem rather than eliminating it.
+
+\medskip
+\textbf{Trying to force a canonical certificate.}
+One might replace a verifier $V(x,w)$ by its lexicographically least valid
+witness. Correct verification would then require
+\[
+ V(x,w)=1\quad\text{and}\quad
+              \forall w'<w,\ V(x,w')=0.
+\]
+The second condition is universal. A polynomial-time verification algorithm
+for it has not been furnished merely by the existence of dual certificates
+for $x$. Even when $x$ is known to be a yes-instance, its no-verifier need
+not certify that a \emph{subcollection} of yes-certificates is empty.
+The following elementary decision-tree comparison makes the algorithmic
+cost of this missing operation explicit.
+
+\textbf{Lemma 34.2 (what a certificate-elimination argument actually uses).}
+Let $f:\{0,1\}^n\to\{0,1\}$ be total. A bit certificate is a partial
+assignment forcing an output. Suppose the largest minimum zero-certificate
+size is $c_0$ and the analogous one-size is $c_1$. Then a deterministic
+decision tree of depth at most $c_0c_1$ exists. This bound does not charge for
+finding the certificates defining the tree.
+
+\emph{Proof.} If $f$ is constant, no queries are needed. Otherwise choose
+a one-input and a one-certificate for it of size at most $c_1$, and query
+those positions. If every value matches, output one. On each other branch,
+consider a zero-input still consistent with the answers and one of its
+zero-certificates of size at most $c_0$. That certificate must conflict with
+the chosen one-certificate: otherwise a common completion would force both
+outputs. At least one of its positions has now been queried. Deleting the
+queried positions leaves a zero-certificate of size at most $c_0-1$ for the
+restricted function. Its one-certificate complexity is at most $c_1$.
+Induction proves the depth bound; if one output type disappears, the branch
+is constant.\hfill$\square$
+
+This attractive bound does not solve the Turing-machine problem. Selecting
+a consistent one-input can be difficult even when evaluating $f$ is easy.
+Given a Boolean circuit $C$ and a partial assignment $u$, the task of finding
+any $a$ extending $u$ with $C(a)=1$, or correctly reporting none, decides
+CircuitSAT by taking $u$ empty. In contrast, evaluating $C(a)$ on a given
+$a$ is polynomial time. Thus the decision-tree construction can hide an
+NP-hard \emph{selection} subroutine inside an argument about an easy decision
+function. Moreover arbitrary NP certificates are not necessarily partial
+assignments of input bits. Both mismatches must be repaired, not suppressed.
+The CircuitSAT formulation is given in \sref{30006687}{1}.
+
+\medskip
+\textbf{Testing the negative route.}
+Let $p_n$ be any uniformly polynomial-time bijection of $\{0,1\}^n$.
+The language
+\[
+ L_p=\{\langle1^n,y,i\rangle:(p_n^{-1}(y))_i=1\}
+\]
+uses the inverse $x$ as a certificate for either bit. It lies even in
+$\mathsf{UP}\cap\mathsf{coUP}$, because $x$ is unique. If $L_p$ has a
+deterministic polynomial-time algorithm, then $n$ bit queries invert $p_n$
+on every input. Conversely a polynomial-time inverse decides $L_p$.
+Therefore an explicit polynomial-time permutation without a polynomial-time
+inverse would separate the classes in this entry. Average-case one-wayness,
+as in UnsolvedMath problem~30006696, is more than this deduction needs; worst-case inverse
+hardness suffices. No such unconditional hardness is proved here. The
+oracle construction in \eref{30006687}{1} cannot replace it, since its forward
+permutation is supplied as an oracle rather than a uniform algorithm.
+
+\paragraph{Stress test.}
+Lemma~34.1 permits many auxiliary certificates for one output, so it does not
+silently replace $\mathsf{NP}\cap\mathsf{coNP}$ by its unambiguous subclass.
+Uniqueness concerns the entire output, not merely each separately selected
+bit. Totality is indispensable to the complementary bit verifier; for a
+partial function, an outputless input has neither bit certificate. Constant
+functions and malformed encodings have been treated explicitly.
+
+The accompanying script checks the inequality $D(f)\le C_0(f)C_1(f)$ for
+all Boolean functions of three variables, computing optimal decision-tree
+depth by recursion on partial assignments. It also checks the two-witness
+bit-selection failure. These finite checks say nothing about the uniform
+cost of constructing trees as the input length grows. A proof of separation
+here would imply $\mathsf P\ne\mathsf{NP}$; the exact-output equivalence
+cannot be used to obtain that implication without supplying the missing
+hard function.
+
+\Needspace{8\baselineskip}
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The attempt isolates an exact single-output search reformulation and verifies
+why two tempting positive strategies fail: independent witness-bit choice
+can be inconsistent, and canonical or decision-tree certificate selection
+can conceal a harder problem than the original decision task. The negative
+route is reduced to an explicit worst-case-hard permutation inverse, but
+no such construction is established. These are proved structural deductions,
+not a new class separation or a claim of historical novelty.
+
+% END RESEARCH 34
+
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006687:1}{} Scott Aaronson, PHYS771 Lecture 6: P, NP, and Friends.
+\url{https://www.scottaaronson.com/democritus/lec6.html}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:30006687:2}{} Very few problems are in NP intersect coNP but not known to be in P. What to make of that?.
+\url{https://blog.computationalcomplexity.org/2024/09/very-few-problems-are-in-np-intersect.html?m=0}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:30006687:3}{} Random Permutations in Computational Complexity.
+\url{https://arxiv.org/abs/2511.08786}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN ADDED REFERENCES 34
+\item[\textnormal{[E1]}]\hypertarget{extra:30006687:1}{} John M. Hitchcock,
+Adewale Sekoni and Hadi Shafei, \emph{Random Permutations in Computational
+Complexity}, arXiv:2511.08786v1 (2025), abstract and Theorem~5.1.
+\url{https://arxiv.org/abs/2511.08786v1}.
+{\small\textit{Version-specific supplement to [S3]; oracle-relative theorem,
+checked 27 September 2026.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:30006687:2}{} Noah Fleming, Stefan
+Grosser, Siddhartha Jain, Jiawei Li, Hanlin Ren, Morgan Shirley and
+Weiqiang Yuan, \emph{Total Search Problems in $\mathsf{ZPP}$},
+arXiv:2512.01138 (2025), abstract and scope of the total-search models.
+\url{https://arxiv.org/abs/2512.01138}.
+{\small\textit{Statement-level frontier comparison, checked
+27 September 2026; not used as a premise of the notebook lemmas.}}
+
+% END ADDED REFERENCES 34
+\end{itemize}
+
+% END PRESERVED SECTION
+\end{document}

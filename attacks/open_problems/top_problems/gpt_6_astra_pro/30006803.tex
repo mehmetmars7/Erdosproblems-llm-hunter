@@ -1,0 +1,288 @@
+% TOP_PROBLEM: {"id": 30006803, "title": "All-Pairs Shortest Paths in Truly Subcubic Time", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Compile twice: lualatex 30006803.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research Notebook: Section 30006803},pdfauthor={Research notebook},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems | Research notebook}
+\fancyhead[R]{\small 232 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Independently compilable extraction; original section text retained.
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% ================================================================
+% problemId: 30006803
+% Canonical problem ID: 30006803
+% exactTarget SHA-256: 46ce2b3fa756a88aa7a3d24bc455a35bf0b9901441592a17ed35094d5854e1bd
+\clearpage
+\section*{\texorpdfstring{All-Pairs Shortest Paths in Truly Subcubic Time}{All-Pairs Shortest Paths in Truly Subcubic Time}}\label{30006803}
+\subsection{Definitions and mathematical statement}
+For a weighted graph $G=(V,E,w)$, the distance $d(u,v)$ is the infimum of total edge weight over paths from $u$ to $v$, with $+\infty$ for unreachable pairs. In the conventional finite-distance formulation there are no relevant negative-weight cycles. Exact all-pairs shortest paths outputs the whole distance matrix, not approximations. The requested running-time improvement is
+\[
+ \exists\eps>0\quad T(n)=O(n^{3-\eps})\quad(n=|V|),
+\]
+with a fixed exponent saving. \textbf{Model qualification:} the catalogue does not pin down directionality, weight range or encoding, and the computational model. Those choices are necessary for a unique complexity assertion and must be fixed from the intended source; unrestricted bit-length input cannot have a bound depending only on $n$. Approximate distances do not satisfy the stated exact target.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006803}{1}.
+\cataloguescope{Determine whether exact all-pairs shortest paths on weighted n-vertex graphs can be computed in O(n\textasciicircum{}(3-epsilon)) time for some fixed epsilon greater than zero.}
+\subsection{Short English statement}
+Can exact distances between every pair of vertices be computed with a fixed polynomial improvement over cubic time, once the weighted-graph and machine conventions are fixed?
+% BEGIN RESEARCH ATTEMPT 232
+\subsection{Research attempt}
+
+\paragraph{Current frontier and model audit.}
+The full manuscript behind the catalogue citation treats approximation
+algorithms and explicitly contrasts exact weighted APSP with the easier
+unweighted and approximate settings. In particular, its Introduction
+already regards weighted \emph{undirected} graphs as part of the exact
+barrier. \sref{30006803}{1}; \eref{30006803}{1}, Abstract and Introduction.
+Its stated matrix-multiplication exponent is a date-specific value, not
+something this notebook treats as a current constant. The 2024--2026
+search in this pass did not provide a verified exact algorithm resolving
+the unrestricted weighted question.
+
+\textbf{Editorial scope note.} The original model qualification remains
+in force. Neither a claim for unrestricted bit strings in time depending
+only on $n$, nor a unit-cost operation on arbitrarily long integers, is
+silently selected as the intended target. The calculations below specify
+their own finite-integer auxiliary problems and show exactly which
+reductions they support. They do not repair the missing global convention
+by decree.
+
+\paragraph{Attack route.}
+One route is to encode min-plus multiplication inside ordinary matrix
+multiplication. It needs a representation whose size depends polynomially
+on the \emph{bit length} of weights rather than their magnitude. A second
+tries to round sufficiently accurate approximations to exact distances;
+it needs an error scale compatible with the running-time guarantee. A
+third seeks to exploit undirectedness. The attempt gives a positive-weight
+undirected gadget that still encodes unrestricted finite min-plus data,
+then quantifies the representation and rounding obstructions. This
+identifies a concrete missing step rather than confusing a logarithmic
+speedup, bounded-weight subcase, or approximation with the required fixed
+exponent saving.
+
+\paragraph{Attempt.}
+\textbf{1. An unavoidable encoding check.}
+In a bit-operation model, take a two-vertex graph whose only edge has a
+positive integer weight of $B$ bits. Its nonzero exact distance has $B$
+bits too, so writing the output alone takes $\Omega(B)$ bit operations.
+Allowing arbitrary $B$ excludes a running-time bound depending only on
+$n$. This observation is not a lower bound against the customary
+word-RAM or real-RAM APSP conjectures; it is a reason their weight and
+machine conventions must be specified. Outputting a symbolic pointer to
+an input weight would itself change the output encoding.
+
+For the next steps fix two $n\times n$ matrices $A,B$ with entries in
+$\{0,1,\ldots,W\}$ and define their exact min-plus product by
+\[
+ (A\star B)_{ij}=\min_{1\leq k\leq n}(A_{ik}+B_{kj}).
+\]
+All subsequent integers have their ordinary binary encoding unless an
+explicit unit-cost arithmetic interpretation is stated.
+
+\textbf{2. Undirected positive weights still encode min-plus products.}
+Create three disjoint vertex layers $I=\{i_1,\ldots,i_n\}$,
+$K=\{k_1,\ldots,k_n\}$ and $J=\{j_1,\ldots,j_n\}$. Let
+$H=2W+1$. Put undirected edges
+\[
+ w(i_i,k_k)=H+A_{ik},\qquad w(k_k,j_j)=H+B_{kj},
+\]
+and no others. Every two-edge $i_i$--$j_j$ path has weight
+$2H+A_{ik}+B_{kj}\leq2H+2W$. A path between those layers has an even
+number of edges. If it is not a two-edge path, it has at least four,
+and hence weight at least $4H>2H+2W$. All weights are positive, so
+removing cycles cannot increase path length. It follows exactly that
+\begin{equation}\label{30006803:gadget}
+ d(i_i,j_j)=2H+(A\star B)_{ij}.
+\end{equation}
+The graph has $3n$ vertices and $2n^2$ edges, and its weights use
+$O(1+\log(W+1))$ bits. Subtracting the known $2H$ recovers the entire
+min-plus product. Thus undirectedness does not eliminate the min-plus
+subproblem, even when all graph weights are positive. No negative cycle,
+approximate path, or implicit exponentially large graph is used.
+
+Conversely, if a min-plus product algorithm applies uniformly to the
+necessary weight range and to $+\infty$, take the minimum of the identity
+matrix (zero diagonal, $+\infty$ elsewhere) and a graph's adjacency
+matrix. Repeated min-plus squaring computes minimum weights of walks
+with at most $2^r$ edges. In a graph without negative cycles every finite
+shortest distance has a simple-path representative with at most $n-1$
+edges. Therefore $O(\log n)$ squarings suffice for APSP. The same argument
+applies in particular to positive-weight undirected graphs. For bounded
+integer inputs, intermediate finite weights need only $O(\log n+\log
+(W+1))$ bits when the relevant shortest paths are retained.
+A time bound $O(n^{3-\eta})$ for those products would give
+$O(n^{3-\eta}\log n)=O(n^{3-\eta/2})$ for fixed $\eta>0$ and
+sufficiently large $n$, after accounting for the same model's arithmetic
+costs. Infinity must be handled explicitly, for example by a sufficiently
+large sentinel in this nonnegative setting; it is not an ordinary
+integer exponent in the next encoding.
+
+\textbf{3. A correct algebraic encoding with the wrong size parameter.}
+Set $b=n+1$ and encode the finite matrices as
+\[
+ U_{ik}=b^{A_{ik}},\qquad V_{kj}=b^{B_{kj}}.
+\]
+Then their ordinary product satisfies
+\begin{equation}\label{30006803:base}
+ (UV)_{ij}=\sum_{s=0}^{2W}c_{ij,s}b^s,
+ \qquad c_{ij,s}=\#\{k:A_{ik}+B_{kj}=s\}\leq n<b.
+\end{equation}
+There are no carries. The least index of a nonzero base-$b$ digit is
+exactly $(A\star B)_{ij}$. This proves correctness of the reduction; it
+is not a probabilistic identity or an approximation.
+
+However the input encodings $b^{A_{ik}}$ may require
+$\Theta(W\log(n+1))$ bits, and outputs in \eqref{30006803:base} can require
+that order of bits as well. The original entries required only
+$O(\log(W+1))$ bits. If $W=2^B$, the representation has exponential
+size in the original weight bit length $B$. Counting each multiplication
+of those huge integers as one word operation suppresses precisely the
+cost that must be justified. Fast ordinary matrix multiplication can
+make this a useful bounded-magnitude method, but correctness of
+\eqref{30006803:base} alone is not a truly subcubic algorithm with the
+unrestricted intended weight convention.
+
+Replacing the large integers by residues introduces another issue. The
+first nonzero base digit is not generally determined by a few residues:
+a nonzero coefficient contribution can vanish modulo the chosen modulus,
+and its exponent can wrap around. A proof would need a deterministic
+or controlled-error recovery procedure with total cost polynomial in
+$\log W$ and the desired exponent in $n$. Such a recovery procedure is
+not constructed here. The companion finite computation checks
+\eqref{30006803:gadget} and \eqref{30006803:base} on exact small integer matrices;
+it does not establish a complexity bound by timing them.
+
+\textbf{4. Approximation-to-exact rounding loses the uniformity.}
+Suppose an approximation algorithm guarantees
+$D\leq\widetilde D\leq(1+\epsilon)D$ for an integer distance $D$.
+Rounding to the nearest integer is certainly valid when
+$\epsilon D<1/2$. In the gadget, $D\leq2H+2W=6W+2$,
+so the sufficient choice is
+\begin{equation}\label{30006803:rounding}
+ \epsilon<\frac1{12W+4}.
+\end{equation}
+A guarantee for fixed $\epsilon>0$ cannot simply be invoked at this
+input-dependent precision without rechecking the running time and bit
+costs. Conversely, at relative error comparable to $1/W$, the valid
+intervals for distances of order $W$ differing by one already begin to
+overlap. The difficulty is not lack of an integer output convention;
+it is the precision dependence. The approximation results in the
+catalogue source retain their approximation parameters and do not assert
+an exact algorithm after an arbitrary zero-error limit.
+\eref{30006803}{1}.
+
+A useful local stability observation does not remove the difficulty.
+If the smallest of the candidate sums $A_{ik}+B_{kj}$ is separated
+from every larger candidate by $\gamma>0$, and every candidate is
+estimated with absolute error less than $\gamma/2$, then a minimizer
+can be recovered by comparing estimates. This follows by subtracting
+the two error bounds. But in the unrestricted integer problem one
+may have ties, or a separation of only one next to entries of size
+$W$. No fixed relative margin is provided. Perturbing weights to force
+unique minimizers must also retain enough information to reconstruct
+the original exact distances; uniqueness alone is not a speedup.
+
+\paragraph{Stress test.}
+The gadget explicitly excludes longer undirected detours by a strict
+weight inequality. Using the naive three-layer graph without $H$ could
+allow such detours and invalidate the reduction. The exponent encoding
+uses base $n+1$, not base two; otherwise coefficient carries could change
+the first nonzero digit. Both repairs are correctness repairs, not a
+solution to the complexity obstacle.
+
+The repeated-squaring implication is stated only for a product algorithm
+that handles the enlarged weight range and unreachable pairs. It does
+not import a bounded-weight theorem outside its hypotheses. Likewise,
+$O(n^3/\log^c n)$ is not $O(n^{3-\eta})$ for any fixed $\eta>0$.
+The two-vertex bit-output example is an objection to an unspecified
+encoding, not a proof of a cubic lower bound in a standard RAM model.
+No assertion of such a lower bound is made.
+
+\needspace{15\baselineskip}
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The attempt supplies an exact undirected positive-weight min-plus gadget,
+an exact carry-free algebraic encoding, and explicit precision and
+bit-length calculations showing where two proposed speedups stop.
+These are reductions and diagnostics, not claimed new matrix-product
+algorithms or lower bounds. The source's missing global machine convention
+has been left visible throughout.
+
+A resolution requires a genuinely faster exact min-plus mechanism with
+the appropriate uniform weight/model guarantees, or an applicable lower
+bound after the intended model has been fixed. Neither is obtained here.
+The small exact checks verify only the displayed identities and gadgets.
+% END RESEARCH ATTEMPT 232
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006803:1}{} Barna Saha and Christopher Ye, Faster Approximate All Pairs Shortest Paths, SODA 2024, Abstract.
+\url{https://epubs.siam.org/doi/10.1137/1.9781611977912.170}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN ADDED REFERENCES 232
+\item[\textnormal{[E1]}]\hypertarget{extra:30006803:1}{}
+B. Saha and C. Ye, \emph{Faster Approximate All Pairs Shortest Paths},
+SODA 2024; full manuscript arXiv:2309.13225v1, 23 September 2023,
+Abstract, Introduction and the weighted-graph approximation sections.
+\url{https://arxiv.org/html/2309.13225v1}.
+Consulted 27 September 2026; the full manuscript supplements the
+catalogue's proceedings abstract. Its approximation results and
+historical matrix-multiplication exponent are not promoted to an exact
+current algorithm.
+% END ADDED REFERENCES 232
+\end{itemize}
+
+\end{document}

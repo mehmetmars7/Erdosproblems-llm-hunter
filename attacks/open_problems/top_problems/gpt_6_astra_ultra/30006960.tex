@@ -1,0 +1,339 @@
+% TOP_PROBLEM: {"id": 30006960, "title": "Combinatorial Boolean Matrix Multiplication in Near-Linear Time", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Combinatorial Boolean Matrix Multiplication in Near-Linear Time}{Combinatorial Boolean Matrix Multiplication in Near-Linear Time}}\label{30006960}
+\subsection{Definitions and mathematical statement}
+For Boolean matrices $A,B\in\{0,1\}^{n\times n}$, their Boolean product is
+\[
+ C_{ij}=\bigvee_{k=1}^n(A_{ik}\wedge B_{kj}).
+\]
+The target asks for a purely combinatorial algorithm computing all $n^2$ output bits in $O(n^{2+o(1)})$ time. Here the exponent loss tends to zero as $n\to\infty$, so for every fixed ${\varepsilon}>0$ the bound is eventually $O(n^{2+{\varepsilon}})$.
+
+The exclusion of algebraic Strassen-like tensor methods is part of the record. However, purely combinatorial is not itself a machine model or a universally formalized class of algorithms. A fully formal solution must specify allowed operations and justify that it meets the intended exclusion, using the cited computational convention. A generic fast algebraic matrix-multiplication algorithm is not silently counted as a solution to this restricted-method problem.
+\par\smallskip\textit{Formulation and concept references:} \href{https://doi.org/10.1109/FOCS.2015.19}{[S1]}.
+
+\subsection{Short English statement}
+Can Boolean matrix multiplication be performed in nearly quadratic time using a genuinely combinatorial rather than algebraic tensor-based method?
+\subsection{Research attempt}
+\paragraph{Scope, computational convention, and source audit.}
+This attempt by GPT-6 Astra Ultra was prepared on 27 September 2026.
+The requested time is nearly linear in the $2n^2$ input bits, not in the
+matrix dimension $n$. A bound $n^{3-o(1)}$ is still far from
+$n^{2+o(1)}$. Yu's author manuscript [E1], Theorem 2, supplies a
+combinatorial bound $\widehat O(n^3/\log^4 n)$, with logarithms of
+logarithms suppressed. The newer primary manuscript [E2], Theorem 1.2,
+gives a deterministic bound
+\[
+                       n^3/2^{\Omega((\log n)^{1/7})}.
+\]
+That saving exceeds every fixed power of $\log n$, but the resulting
+exponent is still $3-o(1)$, not the exponent two requested here.
+Section 1.1 of [E2] also explicitly discusses the absence of a universally
+accepted formal definition of ``combinatorial''. No source inspected here
+establishes the target. The publisher DOI in [S1] was not retrievable;
+the linked author text [E1] was used to verify the actual theorem.
+
+For the work below, use a deterministic word RAM with word size
+$w=4\lceil\log_2(n+2)\rceil$. The table algorithm restricts its block
+size to $b\leq\lfloor w/2\rfloor$, so its table of
+$2^b\lceil n/w\rceil$ words, its pointers, and the input and output
+matrices fit in the $2^w$-word address space. Fixed small dimensions may
+be handled directly. This explicit restriction is needed: a mask fitting
+in one word does not by itself imply that every vector indexed by that
+mask can be stored in addressable memory.
+Boolean operations, bounded shifts, comparisons, ordinary index arithmetic,
+and array accesses on one word cost constant time. An $n$-bit vector uses
+$W=\lceil n/w\rceil$ words. Reading an unpacked input or writing unpacked
+output costs an additional $O(n^2)$, which is included. The algorithms
+below use unions and intersections of represented sets, finite lookup
+tables, and explicit enumeration; they invoke no algebraic matrix product
+or tensor identity. This specifies the meaning of their stated bounds
+without purporting to formalize every algorithm that the literature calls
+combinatorial.
+
+The attack has three parts: account fully for subset-table preprocessing,
+separate output pairs from their potentially many witnesses, and investigate
+whether sampling makes the remaining witness search inexpensive. The last
+step produces a useful expectation bound but lacks the required reporting
+algorithm. Its missing cost cannot be charged just to the output size.
+
+\paragraph{Lemma 480.1: a fully accounted subset-table algorithm.}
+For every integer $1\leq b\leq\min(n,\lfloor w/2\rfloor)$, Boolean multiplication can
+be performed by the following combinatorial algorithm in
+\begin{equation}\label{a480:tablecost}
+ O\left(n^2+\left\lceil\frac nb\right\rceil
+                         (2^b+n)\left\lceil\frac nw\right\rceil\right)
+\end{equation}
+word operations, using
+$O(n^2/w+2^b\lceil n/w\rceil+n)$ words of working and matrix storage.
+
+\emph{Algorithm and proof.} Partition the witness indices $[n]$ into
+consecutive blocks $I$ of size at most $b$. For a fixed block, and each
+subset $S\subseteq I$, store the $n$-bit row vector
+\[
+                     T_I(S)=\bigvee_{k\in S}B_{k,*}.
+\]
+Start with the zero vector at the empty set. For a nonempty mask $S$,
+remove its least set bit $k$ and use
+\begin{equation}\label{a480:recurrence}
+                     T_I(S)=T_I(S\setminus\{k\})\vee B_{k,*}.
+\end{equation}
+The right side uses an already computed smaller mask. Each vector union
+costs $O(W)$, so the table costs $O(2^{|I|}W)$ operations, including
+initialization. Least-bit indices and table pointers can themselves be
+prepared for all masks in $O(2^{|I|})$ time; an unsupported constant-time
+operation on an arbitrarily large integer is not needed.
+
+For each row $i$ of $A$, form its mask
+$S_i=\{k\in I:A_{ik}=1\}$ and OR $T_I(S_i)$ into row $i$ of the
+output. This costs $O(nW)$ operations per block. Masks use at most one
+word; extraction from a packed row uses at most two adjacent words and
+shifts, or all masks may be formed by a single $O(n^2)$ scan of unpacked
+input. Repeat over all blocks. A bit $(i,j)$ is set exactly if some
+block contains a witness $k$ with $A_{ik}=B_{kj}=1$, which is precisely
+the Boolean product condition. This proves correctness.
+
+There are $\lceil n/b\rceil$ blocks, giving
+\eqref{a480:tablecost}. Tables can be discarded after every output row
+has used the current block, so only one block's table occupies memory.
+The last shorter block changes neither the recurrence nor the bound.
+The output and the two input matrices use $O(n^2/w+n)$ words.
+\hfill$\square$
+
+Taking $b=\lfloor\log_2 n\rfloor$ for $n\geq2$, which satisfies
+the stated mask and address-space restrictions, gives
+\begin{equation}\label{a480:fourrussians}
+                        O(n^2+n^3/\log^2 n).
+\end{equation}
+This rederives the classical Four Russians benchmark, not the stronger
+frontier of [E2]. Both preprocessing and queries appear in the accounting.
+Setting $b=n^{1-o(1)}$ in a symbolic query count
+$n^3/(bw)$ would almost reach the desired scale, but would violate the
+one-word mask convention and require $2^b$ stored vectors in this
+implementation. Treating that table as a free oracle invalidates the
+calculation. More generally, any polynomial-size table that stores all
+$2^b$ masks forces $b=O(\log n)$.
+
+\paragraph{An adaptive-table variant and its limitation.}
+One might store only masks actually requested by rows of $A$. Let $q_I$
+be their number in a block $I$. Close that family under repeatedly removing
+the least set bit. The closure has at most $1+|I|q_I$ members: each of
+the $q_I$ masks contributes a path of length at most $|I|$ to the empty
+set. Computing the recurrence only on this closure is correct, with
+\[
+ O\left(W\sum_I\min\{2^{|I|},1+|I|q_I\}+nW\#\{I\}+n^2\right)
+\]
+time, provided masks and their dictionary operations are also charged.
+For large masks, they require multiple words; the formula alone does not
+erase that additional representation cost.
+
+The hoped-for universal bound $q_I=n^{o(1)}$ is false. If $n=2^b$,
+take the rows of $A$ restricted to a chosen block of $b$ columns to be
+all $2^b$ masks. Then $q_I=n$. Repeating those bit patterns on many
+blocks defeats that particular pattern-count bound simultaneously. This
+does not prove a general lower bound: with $B$ the identity, the product
+is just $A$, and a different algorithm should exploit that. It only shows
+that fewer requested masks cannot be assumed without an additional
+structural decomposition.
+
+\paragraph{Lemma 480.2: an exact witness-sensitive algorithm.}
+For $k\in[n]$, define
+\[
+ L_k=\{i:A_{ik}=1\},\qquad R_k=\{j:B_{kj}=1\},\qquad
+ t_{ij}=|\{k:A_{ik}=B_{kj}=1\}|.
+\]
+Then the one-entries of $C$ form the union of the combinatorial rectangles
+$L_k\times R_k$. In particular they can be computed in
+\begin{equation}\label{a480:witnesscost}
+ O(n^2+T)\quad\text{time},\qquad
+ T=\sum_k|L_k||R_k|=\sum_{i,j}t_{ij}.
+\end{equation}
+
+\emph{Proof.} Build the incidence lists by scanning the input. For every
+$k$, enumerate all pairs in $L_k\times R_k$ and set the corresponding
+output bit. Every enumerated pair has a valid witness, and every positive
+pair is enumerated at least once. The equality of the two expressions for
+$T$ counts triples $(i,k,j)$ in two orders. Each update is constant time
+even in a packed representation, and output initialization costs $O(n^2)$
+or less.\hfill$\square$
+
+Thus the requested scale is achieved on any family with
+$T\leq n^{2+o(1)}$. This includes useful sparse configurations, but the
+bound cannot be inferred from the $n^2$ output positions. If $A=B=J$
+is the all-one matrix, $T=n^3$ although there are only $n^2$ positive
+positions. After the first rectangle, every later rectangle is redundant;
+the explicit pair-enumeration loop still executes its cubic number of
+iterations. Recognizing $J\cdot J=J$ is easy, so this is a stress test
+of the accounting rather than a hard instance for all algorithms.
+
+The complementary issue occurs with rare witnesses. If $A=I$, every
+positive output has exactly one witness and \eqref{a480:witnesscost} is
+quadratic, even if $B$ is dense. Sampling a few witness indices, however,
+misses most positive pairs. A correct combined approach needs to handle
+both repetition and rare witnesses; neither density of $C$ nor density
+of the individual input matrices determines which behavior occurs.
+
+\paragraph{A rigorous special case using duplicate row and column types.}
+Let $r$ be the number of distinct rows of $A$ and $c$ the number of
+distinct columns of $B$. There is a deterministic algorithm with time
+\begin{equation}\label{a480:types}
+                 O(n^2+rc\lceil n/w\rceil).
+\end{equation}
+To see this, classify the $n$ input rows and columns by binary tries,
+reading each of their $n$ bits once, for $O(n^2)$ total time and nodes.
+For each representative pair, compute whether the bitwise intersection
+is nonempty in $O(\lceil n/w\rceil)$ word operations. Its answer is
+valid for every pair of indices in those two classes. Expand the table
+of $rc$ answers to all $n^2$ positions. Storing the tries in an uncompressed
+form costs $O(n^2)$ words, still polynomial; their construction is not
+assumed free.
+
+For example, $rc\leq nw\,n^{o(1)}$ gives the desired time scale for
+this family. But both $r$ and $c$ can equal $n$. The all-one example has
+$r=c=1$ and is easy for this algorithm, illustrating why the preceding
+cubic enumeration example is not a complexity lower bound. A universal
+algorithm needs a stronger notion of repeated structure than equality
+of entire row or column vectors.
+
+\paragraph{Sampling track: a quantitative residual bound with a missing operation.}
+Temporarily allow independent uniform samples of witness indices, with
+replacement. This is an exploratory randomized subroutine; it is not
+presented as the deterministic solution. After $s\geq1$ samples, mark
+the union of their rectangles. A pair with $t$ witnesses remains
+unmarked with probability $(1-t/n)^s$. Therefore the expected number
+of still relevant witness triples is
+\begin{equation}\label{a480:residualmass}
+ \mathbb E T_{\rm rem}
+ =\sum_{i,j} t_{ij}(1-t_{ij}/n)^s
+ \leq\frac{n^3}{s+1}.
+\end{equation}
+Indeed the function $x(1-x)^s$ on $[0,1]$ has maximum
+$s^s/(s+1)^{s+1}\leq1/(s+1)$, found by differentiating or by
+checking its single critical point. Substitute $x=t_{ij}/n$ and sum
+over $n^2$ pairs. Pairs with no witness contribute zero, as they should.
+
+A second useful bound is
+\[
+ \Pr[\text{some pair with }t_{ij}\geq t\text{ is missed}]
+                         \leq n^2 e^{-st/n},
+\]
+by $(1-x)^s\leq e^{-sx}$ and a union bound. Thus high-witness pairs
+are covered by sufficiently many samples. This assertion makes no promise
+about the zero entries or about finding all the low-witness positive entries.
+
+Marking one sampled rectangle by OR-ing its column bitset into its
+designated rows costs at most $O(nW)$ operations. Suppose, as an
+\emph{unproved extra hypothesis}, that after marking we could enumerate
+only the residual triples in $O(n^2+T_{\rm rem})$ additional time.
+Then the expected bound would be
+\begin{equation}\label{a480:hypothetical}
+                  O(n^2+sn^2/w+n^3/(s+1)).
+\end{equation}
+Even this hypothetical combination optimizes at
+$s\asymp\sqrt{nw}$, giving $O(n^2+n^{5/2}/\sqrt w)$ rather than
+nearly quadratic time. More importantly, the extra hypothesis is not
+established. Iterating through every pair in every original rectangle and
+testing a mark still costs $T$, not $T_{\rm rem}$. The first missing
+algorithmic operation is reporting a rectangle's unmarked incidences
+without scanning its already marked area. Bounding the number reported
+does not bound the time to find them.
+
+This is also why ``every output bit is set at most once'' is not a valid
+runtime proof for a version that tests the same already-set bit many times.
+A valid amortization needs to charge those unsuccessful tests, the data
+structure updates, and any duplication of row or column lists caused by
+recursion. The regularity and decomposition results in [E2] contain real
+work of this kind; their efficiency is not automatically inherited by an
+unspecified rectangle union routine.
+
+\paragraph{Further stress points: certificates and the machine model.}
+For each positive entry, supplying one witness $k$ gives a certificate
+whose validity is checked by two input accesses. These certificates verify
+that the claimed one-entries are genuine, but do not certify that a claimed
+zero has no witness. Returning an arbitrary subset of the true one-entries
+would pass that incomplete test. Producing and certifying the entire
+product remain separate obligations.
+
+Likewise, an $n$-bit intersection is not one operation on the specified
+word RAM: it costs $\Theta(n/w)$ in the worst case. Taking $w=n$ would
+give a different machine. Lookup tables must be charged when constructed
+and stored, and a promise that their contents depend only on $n$ does
+not license superpolynomial advice in a uniform algorithm. None of the
+proofs above relies on that change of model. Their failure to reach the
+target does not establish impossibility for the broader, informal class
+of combinatorial algorithms.
+
+\paragraph{Exact finite verification.}
+The companion Python script compares the subset-table routine with direct
+Boolean multiplication for every pair of matrices of sizes one, two, and
+three, at every block size $1\leq b\leq n$. This is 262,404 matrix
+pairs. It also checks the witness-count double sum on every pair, and
+tests 80 further fixed-seed pairs in dimensions 4, 7, 16, and 31 with
+several block sizes, including incomplete final blocks. The inequality
+used in \eqref{a480:residualmass} is checked with exact rational arithmetic
+for $1\leq n\leq29$, all integer witness counts, and $1\leq s\leq8$.
+
+The implementation represents rows by Python integers to keep these small
+functional checks short. Those integers are not being charged as
+constant-time arbitrarily long words in the complexity proof: the proof
+explicitly charges $W$ machine words per vector. The script is a
+correctness diagnostic, not a performance benchmark or an empirical
+asymptotic claim. Scripts and results are retained in
+\nolinkurl{_Local/top_problems/continuation_488_477_2026_09_27/algorithms/}.
+
+\paragraph{Outcome and next concrete obligations.}
+\textbf{UNRESOLVED.} The completed work rederives the classical table
+algorithm with full preprocessing and storage costs, proves two input-sensitive
+algorithms, and quantifies what witness sampling leaves behind. It supplies
+explicit examples invalidating free-table, one-write-per-output, and
+few-distinct-pattern shortcuts. None of these results attains
+$O(n^{2+o(1)})$ for arbitrary inputs, nor disproves that such a
+combinatorial algorithm exists.
+
+For the pursued route, the first gap is a reporting mechanism whose cost
+depends on new rectangle incidences and controlled structural overhead,
+rather than all repeated incidences. A second gap remains even with the
+hypothetical reporting bound: the sampling tradeoff
+\eqref{a480:hypothetical} is too large. Specific next targets are a
+multiscale treatment of witness multiplicities, a proof bounding the
+total duplicated data across rectangle splits, and a structural certificate
+that detects dense easy pieces cheaply. Those bounds must be proved in
+the stated word model before any near-quadratic conclusion is warranted.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]H. Yu, FOCS 2015: 109-119, 2015.
+\url{https://doi.org/10.1109/FOCS.2015.19}.
+\textit{Formulation source.}
+\item[E1]Huacheng Yu, An Improved Combinatorial Algorithm for Boolean
+Matrix Multiplication, arXiv:1505.06811; author manuscript dated
+26 February 2017, Theorem 2 and Introduction.
+\url{https://arxiv.org/abs/1505.06811}.
+\url{https://www.cs.princeton.edu/~hy2/files/cbmm.pdf}.
+\textit{Author text consulted 27 September 2026; the original DOI was not
+retrievable in this session.}
+\item[E2]Amir Abboud, Nick Fischer, Zander Kelley, Shachar Lovett, and
+Raghu Meka, New Graph Decompositions and Combinatorial Boolean Matrix
+Multiplication Algorithms, arXiv:2311.09095v2, 27 May 2024,
+Theorem 1.2 and Sections 1.1 and 2.1.
+\url{https://arxiv.org/html/2311.09095v2}.
+\textit{Primary theorem and computational-convention source; consulted
+27 September 2026.}
+
+\end{itemize}
+\end{document}

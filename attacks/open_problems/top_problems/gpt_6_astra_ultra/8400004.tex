@@ -1,0 +1,257 @@
+% TOP_PROBLEM: {"id": 8400004, "title": "O5a — Deterministic polynomial-time integer factorization", "category_id": 3, "category": {"id": 3, "name": "graph_theory", "display_name": "Graph Theory", "description": "Problems involving graphs, networks, and their properties.", "slug": "graph-theory", "order_index": 3, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+% Research continuation by GPT_6_Astra_Ultra, 27 September 2026.
+% Catalogue statements and existing sources preserved verbatim.
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{O5a — Deterministic polynomial-time integer factorization}{O5a — Deterministic polynomial-time integer factorization}}\label{8400004}
+\subsection{Definitions and mathematical statement}
+The binary length of $N\ge2$ is $\ell(N)=\lfloor\log_2N\rfloor+1$. A nontrivial factor is an integer $d$ with $1<d<N$ and $d\mid N$. Ask whether there exist a deterministic classical algorithm $A$ and constants $C,k$ such that
+\[
+ \forall N\text{ composite},\qquad A(N)=d\text{ a nontrivial factor},\qquad
+ T_A(N)\le C\ell(N)^k.
+\]
+The promise is compositeness; the running-time bound is in the bit length, not in the value of $N$.
+\par\smallskip\textit{Formulation and concept references:} \href{https://www.sciencedirect.com/science/article/pii/S0022000015000768}{[S1]}.
+
+\subsection{Short English statement}
+Is there a deterministic classical method that factors every composite integer in time polynomial in its number of binary digits?
+\subsection{Research attempt}
+
+\paragraph{Scope and checked algorithmic context.}
+The input is promised composite, and the requested output is one proper
+divisor. Running time means bit operations in $\ell=\ell(N)$; a loop of
+length $N^{1/5}$ remains exponential in this parameter. An established
+deterministic result of Harvey--Hittmeir [E1] factors $N$ in
+$O(N^{1/5}\log^{16/5}N/(\log\log N)^{3/5})$ bit operations. It is
+substantially faster than trial division, but does not meet this target.
+Their 2026 manuscript [E2] improves the auxiliary problem of finding
+large-order elements; its stated alternatives include returning an element,
+so it is not a polynomial-time factorization theorem. No completeness
+claim about all current algorithms is needed here.
+
+The chosen route examines modular square roots. Je\v r\'abek [E3], the
+author manuscript of [S1], studies reductions involving factoring and
+square-root search, carefully distinguishing randomized reductions from
+deterministic ones. We give the elementary fiber calculation behind this
+connection, then test the tempting derandomization by a short fixed list
+of inputs. The calculation is classical; its purpose here is to expose
+the exact unsupplied algorithmic step rather than rebrand a reduction as
+a factorization algorithm. The conditional claims in catalogue source
+[S2] are not assumed.
+
+\paragraph{Elementary preprocessing is genuinely polynomial.}
+If $N$ is even, return $2$. Detect perfect powers by trying each integer
+$2\le k\le\ell$ and computing the integer $k$th root by binary search,
+with exact exponentiation and comparison to $N$. Intermediate products
+may be capped as soon as they exceed $N$, so the bit lengths remain
+$O(\ell)$. There are $O(\ell)$ exponents, $O(\ell)$ search steps per
+exponent, and polynomially many bit operations per step. If $N=a^k$,
+$a>1$, return $a$. This includes odd prime powers without needing to
+recognize their prime base. The unhandled promised inputs are odd and
+have at least two distinct prime factors.
+
+Write their unknown factorization, for analysis only, as
+$N=\prod_{i=1}^r p_i^{e_i}$, with $r\ge2$. This notation does not give
+the algorithm access to the factors. Let $U_N=(\mathbb Z/N\mathbb Z)^\times$
+and let $Q_N$ be the image of its squaring map. A hypothetical oracle
+$F_N$ takes $u\in Q_N$ and returns any $v$ satisfying $v^2\equiv u\pmod N$.
+Because $u$ is a unit, its returned root is automatically a unit. The
+oracle is not presumed to return a random root or a preferred CRT sign.
+
+\paragraph{Exact root fibers and extraction probability.}
+\textbf{Lemma 17.1.} Every $u\in Q_N$ has exactly $2^r$ square roots
+modulo $N$. For a fixed root $v$, exactly two roots $a$ fail to give a
+proper factor through $\gcd(a-v,N)$.
+
+\textit{Proof.}
+For an odd prime power $p^e$, a root $w$ of $w^2=1$ satisfies
+$p^e\mid(w-1)(w+1)$. Since $\gcd(w-1,w+1)$ divides two, the full
+prime power divides precisely one factor. Thus $w\equiv1$ or $-1$
+modulo $p^e$. Multiplication by any fixed root of $u$ bijects its roots
+with roots of one. The Chinese remainder theorem therefore gives $2^r$
+roots, one for each independent local sign.
+
+If $a$ uses the same sign as $v$ at every prime power, then $a=v$
+modulo $N$ and the gcd is $N$. If every sign is opposite, then $a=-v$
+and the gcd is one, since $2v$ is a unit. Any mixed sign pattern makes
+the gcd the product of a nonempty proper subset of the prime-power
+factors. This is a proper divisor, and there are exactly $2^r-2$ such
+patterns.\hfill$\square$
+
+Choose $a$ uniformly in $U_N$ and query $F_N(a^2)$. Conditional on the
+square $u=a^2$, the element $a$ is uniform in its $2^r$-element fiber.
+The oracle's chosen root depends on $u$, not on which preimage was
+sampled. Hence the success probability is exactly
+\begin{equation}\label{ra:17:probability}
+ 1-2^{1-r}\ge\tfrac12.
+\end{equation}
+This remains true for any fixed deterministic selection of one root
+per square. If the oracle itself is randomized independently of the
+sampled preimage, condition on its output and obtain the same result.
+
+An implementable sampler need not already know $U_N$. Sample uniformly
+from $1,\ldots,N-1$ and compute $g=\gcd(a,N)$. If $g>1$, it is already
+proper and succeeds. Otherwise the conditional distribution is uniform
+on $U_N$ and the lemma applies. Uniform bounded-integer sampling by
+rejection uses expected $O(\ell)$ random bits. Thus a polynomial-time
+square-root oracle would yield a randomized expected-polynomial-time
+factorization algorithm, with failure probability at most $2^{-t}$
+after $t$ independent trials. Every reported factor is checked by exact
+division. This is not the deterministic worst-case bound requested.
+
+\paragraph{Attempted derandomization and an exact obstruction.}
+A natural proposal is to replace the random $a$ by the first
+$\operatorname{poly}(\ell)$ integers, or another short deterministic
+list $H\subseteq U_N$. A success proportion of one half on the whole
+unit group does not imply that this particular list meets the successful
+half. Here the possible obstruction can be characterized exactly.
+
+\textbf{Lemma 17.2.} There exists a valid root selector $F_N$ for which
+every test $a\in H$ fails if and only if, in each squaring fiber, the
+elements of $H$ lie in a single pair $\{b,-b\}$.
+
+\textit{Proof.}
+If that condition holds, for each fiber meeting $H$ select one member
+$b$ of its represented sign pair as the oracle output. Then all tested
+preimages equal $b$ or $-b$, and Lemma 17.1 says they fail. Choose any
+root on unqueried fibers to complete a valid selector. Conversely, if
+a fiber contains tested elements $a,b$ with $a\not\equiv\pm b$, no
+selected root can have both of them in its single exceptional sign pair.
+At least one query succeeds.\hfill$\square$
+
+In fact, in the latter case the oracle is unnecessary:
+$a^2\equiv b^2\pmod N$ and $a\not\equiv\pm b$ already imply that
+$\gcd(a-b,N)$ is a proper divisor by the same local-sign argument.
+Consequently a short list guaranteed to defeat \emph{every} root selector
+must already contain a useful congruence of squares. Producing such lists
+deterministically in polynomial time would itself solve the remaining
+factoring instances. The random reduction has not made that construction
+automatic.
+
+The obstruction also applies to a finite adaptive transcript: when a
+previously unseen square is queried, an adversary can return the supplied
+preimage; when a previously queried square recurs in the same sign pair,
+the old response still causes failure. A new sign pair exposes precisely
+the factor-producing collision. This adversary can be extended to a
+valid selector after the transcript. Its implementation need not be
+efficient, so this is \emph{not} a complexity lower bound against efficient
+root algorithms, nor does it exclude exploiting the structure of a
+specific algorithm. It isolates the defect in an oracle-independent
+derandomization based only on the success fraction.
+
+\paragraph{A concrete failed list and a successful collision.}
+For $N=77$, the squares of $1,2,3,4,5,6$ are distinct modulo $77$,
+and all six inputs are units. A valid selector may return the respective
+input on those six squares; all six gcd tests then fail. Nevertheless
+there are four roots of one,
+$1,34,43,76$, and the mixed roots immediately yield
+$\gcd(34-1,77)=11$ and $\gcd(34+1,77)=7$.
+The roots exist in abundance relative to the two trivial choices, but
+their existence does not tell the deterministic procedure where to find
+one. This small example illustrates the logical failure of the proposed
+list argument, not an asymptotic hard instance: trial division already
+factors $77$ quickly.
+
+One can also defeat a proposed use of generic collision finding. The
+squaring map has $\varphi(N)/2^r$ images, and evaluating it is cheap.
+Enumerating enough preimages to force a collision by the pigeonhole
+principle can still require exponentially many in $\ell$. Moreover the
+automatic collision $a,-a$ gives no factor. A collision theorem must
+control both its search cost and its local sign pattern. Calling a
+collision algorithm polynomial in $N$, or counting arithmetic operations
+while allowing exponentially long integers, would not meet the stated
+bit-complexity target.
+
+\paragraph{Verification and edge cases.}
+The local script enumerates every unit and every squaring fiber for
+$N=15,45,77,105,315,1001$. For the selector choosing the smallest root,
+the exact success counts are
+\[
+\begin{array}{r|r|r|r}
+N&r&\varphi(N)&\text{successful units}\\\hline
+15&2&8&4\\45&2&24&12\\77&2&60&30\\
+105&3&48&36\\315&3&144&108\\1001&3&720&540
+\end{array}
+\]
+The repeated-prime cases $45$ and $315$ check that the lemma uses distinct
+prime factors, not the total number counted with multiplicity. For every
+unit it verifies both the gcd criterion and the exact fraction in
+\eqref{ra:17:probability}. The table-building oracle is implemented by
+exhaustive enumeration and has no claimed efficient running time.
+The script separately verifies the six-query failure setup for $77$.
+These are exact integer calculations, stored in \texttt{checks.py} and
+\texttt{results.json} under
+\texttt{\_Local/top\_problems/continuation\_15\_25\_2026\_09\_27/analytic/}.
+
+Even moduli were removed before the odd-prime-power argument. A pure
+prime power would have $r=1$ and success probability zero, which is why
+the perfect-power step is essential. On a prime input no proper divisor
+exists; the catalogue promises compositeness, and no total running-time
+claim on off-promise inputs is silently used. On the actual promised
+inputs, gcds, modular squaring, and output verification are polynomial;
+the missing operations are finding roots and removing randomness.
+
+\paragraph{Remaining gap and outcome.}
+The fully proved result is the exact fiber reduction and its sharp
+failure condition for a deterministic test set. A complete solution
+along this route needs an actual deterministic polynomial-time root
+procedure together with a polynomial-time way to force a mixed-sign
+collision, or a different direct divisor construction. Neither is
+provided. An impossibility claim would need a lower bound against all
+deterministic algorithms, far beyond the limited oracle observation.
+
+\textbf{Outcome: UNRESOLVED.} The randomized reduction and the oracle
+stress test are justified; no deterministic polynomial-time factoring
+algorithm or superpolynomial lower bound has been obtained. The process
+combined direct proof, primary-source checking, and exact finite tests;
+the results are not a claim of historical novelty or external certification.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Integer factoring and modular square roots.
+\url{https://www.sciencedirect.com/science/article/pii/S0022000015000768}.
+\textit{Formulation source.}
+\item[S2]A number-theoretic conjecture implying faster algorithms for polynomial factorization and integer factorization — Chris Umans and Siki Wang (2025).
+\url{https://arxiv.org/abs/2511.10851}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Improved Separation Between Quantum and Classical Computers for Sampling and Functional Tasks — Marshall, Aaronson and Dunjko, CCC 2025.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol339-ccc2025/LIPIcs.CCC.2025.5/LIPIcs.CCC.2025.5.pdf}.
+\textit{Further reference; not a proof endorsement.}
+
+\item[E1]David Harvey and Markus Hittmeir,
+\emph{A log-log speedup for exponent one-fifth deterministic integer
+factorisation}, Mathematics of Computation 91 (2022), 1367--1379;
+arXiv:2105.11105.
+\url{https://arxiv.org/abs/2105.11105}.
+\textit{Primary research reference for a proved deterministic bit-complexity
+bound, which is exponential in input length. Consulted 27 September 2026.}
+\item[E2]David Harvey and Markus Hittmeir,
+\emph{Deterministic methods for finding elements of large multiplicative order},
+arXiv:2601.11131v2 (5 June 2026).
+\url{https://arxiv.org/abs/2601.11131v2}.
+\textit{Recent manuscript: auxiliary order-search result, not a claimed
+polynomial-time factoring algorithm; not used in the proofs here.
+Consulted 27 September 2026.}
+\item[E3]Emil Je\v r\'abek, \emph{Integer factoring and modular square roots},
+arXiv:1207.5220v3 (28 July 2015), author manuscript of [S1].
+\url{https://arxiv.org/pdf/1207.5220v3}.
+\textit{Primary source on factoring and square-root search reductions;
+the elementary fiber reduction is proved explicitly above.
+Consulted 27 September 2026.}
+\end{itemize}
+\end{document}

@@ -1,0 +1,214 @@
+% TOP_PROBLEM: {"id": 30006685, "title": "The NC versus P Problem for Efficient Parallel Computation", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: null
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Mathematical Research Notebook},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=3pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\usepackage{etoolbox}
+\AtBeginEnvironment{itemize}{\small}
+% Standalone entry; original section content is delimited for verification.
+\begin{document}
+\setcounter{section}{0}
+%% BEGIN ORIGINAL SECTION CONTAINER
+% ================================================================
+% problemId: 30006685
+% Canonical problem ID: 30006685
+% exactTarget SHA-256: bea3b19fcb09535165e32fcae5202cfdb93deab559a53e4b8db5a81a1051494e
+\clearpage
+\section*{\texorpdfstring{The NC versus P Problem for Efficient Parallel Computation}{The NC versus P Problem for Efficient Parallel Computation}}\label{30006685}
+\subsection{Definitions and mathematical statement}
+For bounded-fan-in Boolean circuits, size is the number of gates and depth is the longest input-to-output path. In the standard uniform convention, $\mathsf{NC}=\bigcup_{k\ge1}\mathsf{NC}^k$, where $\mathsf{NC}^k$ has polynomial size and depth $O((\log n)^k)$. Uniformity requires an effective resource-bounded procedure generating the circuit family, rather than an arbitrary circuit for each length. The question is
+\[
+ \mathsf{NC}\stackrel{?}{=}\mathsf P.
+\]
+For precision, the conventional logspace-uniform interpretation is used; the catalogue does not choose among finer uniformity conventions.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006685}{1}.
+\cataloguescope{Determine whether NC equals P, where NC consists of decision problems solvable by uniform polynomial-size circuit families of polylogarithmic depth and P consists of decision problems solvable in deterministic polynomial time.}
+\subsection{Short English statement}
+Can every efficient sequential decision algorithm be replaced by a highly parallel one using only polylogarithmically many stages?
+%% BEGIN RESEARCH INSERTION
+\subsection{Research attempt}
+\paragraph{Current frontier.}
+\textit{Research check: 27 September 2026.}
+Circuit Value is P-complete under logarithmic-space reductions, so a
+logspace-uniform NC algorithm for it would settle the equality direction.
+P-completeness alone is not a lower bound. The formulation paper compares
+particular parallel automata algorithms; the 2025 freezing-majority
+manuscript separates NC subcases from P-complete variants, not NC from P.
+\sref{30006685}{1}, \sref{30006685}{3}, \eref{30006685}{1}.
+We investigate an explicit parallelization mechanism rather than treating
+sequential dependence in one algorithm as an inherent obstruction.
+
+\paragraph{Attack route.}
+One can try to balance arbitrary circuits, compose many transition maps
+at once, or prove a depth lower bound. Balancing needs control of shared
+subcomputations; transition composition needs a compact representation
+closed under composition; and an unrestricted depth lower bound must
+survive changes of algorithm. The selected route compiles intervals of a
+computation into exact finite-state maps, with all table costs exposed.
+
+\paragraph{Attempt: exact interface composition.}
+Consider a computation with $T$ steps and $w$ writable state bits. Its
+input $x$ is read-only; step $t$ updates the state by
+$F_{t,x}:\{0,1\}^w\to\{0,1\}^w$. Suppose the table of each $F_{t,x}$
+can be constructed by logspace-uniform circuits of size $S$ and depth $D$.
+There is a bounded-fan-in circuit computing its final state with
+\[
+ \operatorname{size}=O(TS+T w2^{2w}),\qquad
+ \operatorname{depth}=D+O(w\log(T+1)+\log(w+1)).
+ \tag{23.1}
+\]
+To prove this, write a map as $w2^w$ output bits, one $w$-bit word for each
+possible state. For two maps $A,B$, compute all entries of $B\circ A$ by
+\[
+ (B\circ A)(z)_j=
+ \bigvee_{u\in\{0,1\}^w}
+       \left([A(z)=u]\wedge B(u)_j\right).
+ \tag{23.2}
+\]
+Exactly one $u$ satisfies the equality. Equality testing has logarithmic
+bounded-fan-in depth in $w$, and the final OR has depth $w$. For all $z,j$
+this costs $O(w2^{2w})$ gates with depth $O(w+\log(w+1))$; the equality
+bits can be shared across $j$. Use a balanced binary tree of compositions,
+padding $T$ to a power of two by identity maps. There are fewer than $2T$
+internal and leaf positions. Selecting the initial-state entry gives
+(23.1). All wiring indices are counters of length
+$O(\log T+w)$; when $T$ is polynomial in input length $N$ and
+$w=O(\log N)$, these are logspace indices. An input-dependent initial
+state can be selected by one additional table lookup of the same depth.
+
+For $w=O(\log N)$, polynomial $T,S$ and polylogarithmic $D$, this is a
+polynomial-size polylogarithmic-depth simulation. In particular, it
+rederives a familiar finite-configuration parallel simulation rather than
+proving the conjectured equality. The exponent in the size bound depends
+on the constant multiplying $\log N$, as NC permits.
+
+\paragraph{Attempt: where an algebraic summary helps.}
+The table is unnecessary for affine state updates over $\F_2$:
+\[
+ F_t(z)=A_tz+b_t,
+ \qquad
+ \begin{pmatrix}A_B&b_B\\0&1\end{pmatrix}
+ \begin{pmatrix}A_A&b_A\\0&1\end{pmatrix}
+ =\begin{pmatrix}A_BA_A&A_Bb_A+b_B\\0&1\end{pmatrix}.
+ \tag{23.3}
+\]
+A balanced product of $(w+1)\times(w+1)$ matrices computes the whole
+trajectory's endpoint. Naive matrix multiplication over $\F_2$ uses
+$O(w^3)$ gates and $O(\log(w+1))$ depth. Thus even $w=N^{O(1)}$ gives
+polynomial size and depth $O(\log(T+1)\log(w+1))$, provided the step
+matrices are constructed with the stated uniformity. This is a genuine
+parallelization result for the affine subclass.
+
+Could bounded-degree polynomial summaries replace affine maps? Not with
+any fixed degree bound. Use state bits $a_1,\ldots,a_r,z$ and steps
+$z\leftarrow z a_t$, starting with $z=1$ and retaining the $a_i$.
+Every step has algebraic degree two, but the endpoint is
+$z=\prod_{t=1}^r a_t$, of degree $r$ in the unique multilinear polynomial
+representation of Boolean functions over $\F_2$. This proves failure of
+fixed-degree closure. It does not prove that the endpoint needs large
+circuits: this very product has an efficient balanced circuit.
+
+\paragraph{Stress test.}
+For unrestricted $w$ the table method has exponential size, violating NC's
+polynomial processor budget. Counting all state maps gives
+$(2^w)^{2^w}=2^{w2^w}$ possibilities, so a representation for every map
+must sometimes use $w2^w$ bits. But most such maps cannot arise from a
+short input-described program, so this counting fact does not exclude a
+compact representation for the relevant maps.
+A more drastic compression also fails: retaining only each wire's set of
+possible values loses correlations. The pairs $(u,v)=(x,x)$ and
+$(x,1-x)$ have identical marginal ranges, but $u\mathbin{\mathrm{XOR}}v$
+is constantly zero in one case and constantly one in the other.
+This is an explicit counterexample to marginal-range composition, not a
+lower bound for general parallel algorithms.
+
+The sought strengthening would assign every polynomial-size interval of
+a general computation a polynomial-size summary, construct summaries and
+compose them in NC, and evaluate them in NC. Merely proving that short
+summaries exist nonuniformly would not meet the stated uniform target.
+Also, a large live-state set in one circuit ordering is not a proof that
+all equivalent circuits require such a set.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+Exact state-table composition and affine-map composition give two rigorously
+costed simulations; fixed-degree and marginal-range compressions have
+explicit failure examples. No closure theorem for general succinct state
+maps and no unrestricted circuit-depth lower bound was obtained. The
+missing compact-composition theorem would be a sufficient mechanism for
+NC=P, not a consequence of the successful special cases.
+%% END RESEARCH INSERTION
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006685:1}{} J. Heemstra, J. Martens, and A. Wijs, Evaluating Massively Parallel Algorithms for DFA Minimisation, Equivalence Checking and Inclusion Checking, Introduction (2026).
+\url{https://arxiv.org/abs/2508.20735}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:30006685:2}{} Parallel Computation, Matt Williamson.
+\url{https://community.wvu.edu/~krsubramani/courses/sp09/cc/lecnotes/parallel.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:30006685:3}{} Complexity of the Freezing Majority Rule with L-shaped Neighborhoods.
+\url{https://arxiv.org/html/2509.16065v1}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+%% BEGIN RESEARCH REFERENCES
+\item[\textnormal{[E1]}]\hypertarget{extra:30006685:1}{} Stephen A. Cook, Yuval Filmus and Dai Tri Man Lê, \emph{The Complexity of the Comparator Circuit Value Problem}, author manuscript (2014), Section 1.2.
+\url{https://www.cs.toronto.edu/~sacook/homepage/lfmmToct.pdf}.
+{\small\textit{Added research source. General Circuit Value and P-completeness in the NC versus P setting; not a claim that comparator circuits are P-complete. Consulted 27 September 2026.}}
+%% END RESEARCH REFERENCES
+\end{itemize}
+
+%% END ORIGINAL SECTION CONTAINER
+\end{document}

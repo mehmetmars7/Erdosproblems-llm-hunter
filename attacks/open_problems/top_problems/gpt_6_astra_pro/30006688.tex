@@ -1,0 +1,279 @@
+% TOP_PROBLEM: {"id": 30006688, "title": "Unconditional Separation of BQP from the Polynomial Hierarchy", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Standalone notebook; compile twice: lualatex 30006688.tex
+% Original section preserved verbatim except for marked insertion blocks.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook: Problem 30006688},
+ pdfauthor={Open Problems Math research notebook},bookmarksnumbered=true}
+\usepackage{bookmark,titlesec,fancyhdr}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math\enspace|\enspace Research notebook}
+\fancyhead[R]{\small\sffamily Problem 30006688}
+\fancyfoot[L]{\small\sffamily 27 September 2026}
+\fancyfoot[R]{\small\sffamily \thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% BEGIN PRESERVED SECTION
+% ================================================================
+% problemId: 30006688
+% Canonical problem ID: 30006688
+% exactTarget SHA-256: 20b53bd662f45ba7cc0c2ed1b04f13e37f9c896eef637e3c1ac8e1eea9862a8d
+\clearpage
+\section*{\texorpdfstring{Unconditional Separation of BQP from the Polynomial Hierarchy}{Unconditional Separation of BQP from the Polynomial Hierarchy}}\label{30006688}
+\subsection{Definitions and mathematical statement}
+The polynomial hierarchy is $\mathsf{PH}=\bigcup_{k\ge0}\Sigma_k^{\mathsf P}$, where a language in $\Sigma_k^{\mathsf P}$ has a polynomial-time predicate preceded by $k$ alternating blocks of polynomially bounded existential and universal quantifiers, starting existentially. The target is
+\[
+ \exists L\in\mathsf{BQP}\quad L\notin\Sigma_k^{\mathsf P}\text{ for every fixed }k.
+\]
+This is a statement about ordinary uniform computation. Exhibiting an oracle relative to which the containment fails is a different statement.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006688}{1}.
+\cataloguescope{Prove in the standard unrelativized model that bounded-error quantum polynomial time BQP is not contained in the polynomial hierarchy PH.}
+\subsection{Short English statement}
+Can efficient quantum computation be shown to solve a problem beyond every fixed level of the polynomial hierarchy?
+% BEGIN RESEARCH 35
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The established Raz--Tal result is an oracle separation
+$\mathsf{BQP}^O\not\subseteq\mathsf{PH}^O$, obtained from a distributional
+query problem; deleting the superscripts is not a valid inference.
+\eref{30006688}{1}. Buzet--Chailloux's August 2026 version implements
+2-Forrelation with restricted IQP resources and strengthens an oracle
+separation, not the present unrelativized statement. \sref{30006688}{3},
+\eref{30006688}{2}. Miloschewsky--Podder--Rudolph's September 2026 manuscript
+constructs an oracle where quantum and deterministic language classes agree
+while their promise versions do not. Its abstract makes particularly clear
+why an oracle promise must not silently become a total language.
+\sref{30006688}{4}, \eref{30006688}{3}. The recent statements were checked; their full
+proofs were not independently audited. Aaronson's original formulation
+remains the target here. \sref{30006688}{1}.
+
+\paragraph{Attack route.}
+A plausible route is to replace the random oracle functions in Forrelation
+by uniformly evaluable, succinct functions, then prove that every fixed level
+of the polynomial hierarchy fails on the resulting total decision problem.
+This requires both a total gap convention and a lower bound that survives
+access to the functions' descriptions. Query hardness by itself supplies
+neither. I test two natural explicit replacements, Fourier-sparse functions
+and quadratic phases, before attempting a more ambitious derandomization.
+The calculations below are deductions in this notebook, not new claims about
+the published oracle construction.
+
+\paragraph{Attempt.}
+Set $N=2^m$, take $f,g:\F_2^m\to\{-1,1\}$, and use the normalization
+\begin{equation}\label{r35:phi}
+ \Phi(f,g)=N^{-3/2}\sum_{x,y\in\F_2^m}
+             f(x)(-1)^{x\cdot y}g(y).
+\end{equation}
+This is the inner product of two normalized states after a normalized
+Hadamard transform, so $|\Phi|\le1$. With reversible evaluation circuits for
+$f,g$, a Hadamard test estimates this real amplitude to fixed additive
+accuracy with polynomially many gates in the description lengths. This
+explains the attraction of a constant-gap promise; it does not define
+bounded-error answers for inputs arbitrarily close to a threshold. The
+Forrelation setup and its query interpretation are discussed in
+\sref{30006688}{1} and \eref{30006688}{1}.
+
+\textbf{Lemma 35.1 (a sparsity obstruction).}
+Define $\widehat f(y)=N^{-1}\sum_x f(x)(-1)^{x\cdot y}$. If at most $k$
+Fourier coefficients are nonzero, then
+\begin{equation}\label{r35:sparse}
+                    |\Phi(f,g)|\le\sqrt{k/N}.
+\end{equation}
+\emph{Proof.} Orthogonality gives $\sum_y\widehat f(y)^2=1$, and
+$\Phi=N^{-1/2}\sum_y\widehat f(y)g(y)$. Cauchy--Schwarz on its support
+proves the assertion. Thus $\Phi\ge c>0$ requires $k\ge c^2N$.
+A family with polynomially many Fourier coefficients in $m$ cannot produce
+constant positive Forrelation in this normalization. This says nothing
+against succinct functions with exponentially large Fourier support.
+
+\medskip
+\textbf{Lemma 35.2 (quadratic phases admit exact classical evaluation).}
+Suppose $f(x)=(-1)^{q(x)}$ and $g(y)=(-1)^{r(y)}$, with explicitly given
+multilinear quadratic polynomials over $\F_2$. Then $\Phi(f,g)$ can be
+computed exactly in time polynomial in $m$, including its sign.
+
+\emph{Proof.} The numerator of \eqref{r35:phi} is
+$S(Q)=\sum_{z\in\F_2^{2m}}(-1)^{Q(z)}$, where
+$Q(x,y)=q(x)+x\cdot y+r(y)$ is quadratic. Here is an elimination algorithm
+that does not enumerate the $2^{2m}$ points. If a cross term $uv$ occurs,
+write, with $z$ denoting the other variables,
+\[
+ Q(u,v,z)=uv+uA(z)+vB(z)+C(z),
+ \qquad \deg A,\deg B\le1,\quad\deg C\le2.
+\]
+For fixed $z$, direct summation gives
+\begin{equation}\label{r35:eliminate}
+ \sum_{u,v\in\F_2}(-1)^{uv+uA+vB+C}=2(-1)^{C+AB}.
+\end{equation}
+Replace $Q$ by $C+AB$, reducing $z_i^2=z_i$, and record a factor two.
+The degree remains at most two. If no cross term remains, an affine
+polynomial has sum zero when any linear coefficient is nonzero, and
+otherwise sum $(-1)^{Q(0)}2^{\#z}$. At most $m$ eliminations occur;
+coefficient bookkeeping uses polynomially many bit operations. The answer
+is an integer divided by $2^{3m/2}$, representable exactly in $\Q(\sqrt2)$.
+
+There is a useful independent magnitude check. Let
+$B(u,v)=Q(u+v)+Q(u)+Q(v)+Q(0)$ have rank $\rho$ on $\F_2^d$, $d=2m$.
+Changing variables from a pair of summation points to their difference gives
+\[
+ S(Q)^2=2^d\sum_{h\in\ker B}(-1)^{Q(h)+Q(0)}.
+\]
+The exponent restricts to a linear functional on $\ker B$. If it is
+nonzero the sum vanishes; otherwise $|S(Q)|=2^{d-\rho/2}$. The elimination
+algorithm supplies the sign that this square identity does not determine.
+\hfill$\square$
+
+The obstruction is not simply the absence of strongly correlated examples.
+For even $m$, put
+$q(x)=x_1x_2+\cdots+x_{m-1}x_m$. Summing separately over pairs shows
+$\widehat f(y)=N^{-1/2}f(y)$. Hence
+\[
+ \Phi(f,f)=1,\qquad
+ \Phi\bigl(f,\,y\mapsto f(y)(-1)^{y_1}\bigr)=0.
+\]
+These have maximally dense Fourier support and a large decision gap, but
+Lemma~35.2 evaluates both efficiently. Thus merely combining an explicit
+bent phase with an exact promise does not establish the desired hardness.
+
+\medskip
+\textbf{Where succinctness and totality intervene.}
+Supplying full tables has input length $2N$. The fast Walsh transform
+computes \eqref{r35:phi} in $O(N\log N)$ arithmetic operations on integers
+with polynomially bounded bit lengths, so the query lower bound does not
+become a superpolynomial bound in that encoding. Supplying small circuits
+instead avoids the table-size cost, but allows classical algorithms to
+exploit the circuit syntax, as in Lemma~35.2.
+
+For arbitrary circuit descriptions, the test $\Phi\ge a$ versus $\Phi\le b$
+with fixed $a>b$ is a promise problem. Defining the remaining inputs to be
+no-instances does not make the quantum tester a total bounded-error
+algorithm: amplitudes can lie arbitrarily close to the new yes/no boundary.
+A successful construction must specify a total language and show its
+algorithm has error at most $1/3$ on \emph{every} input, or provide a
+polynomial-time recognizable encoding whose valid descriptions have a
+proved gap and whose invalid descriptions receive deterministic answers.
+The oracle/promise distinction emphasized in \eref{30006688}{3} is therefore a
+live issue here, not a cosmetic qualification.
+
+The strongest plausible continuation is an explicit nonlinear family for
+which the gap is certified from syntax but no polynomial-hierarchy
+algorithm decides the associated label. To establish the target it would
+have to produce \emph{one} language outside every fixed level, not a
+sequence $L_k$ with no uniform method for assembling them. No such family
+or lower-bound argument has been found in this attempt.
+
+\paragraph{Stress test.}
+The elimination identity is checked in the accompanying script for all
+quadratic polynomials in four binary variables, against exhaustive summation.
+The dense examples are checked at even $m=2,4,6$. These are exact integer
+checks, not tests of a complexity-class separation. The exponent-sum
+algorithm is restricted to degree two; claiming its extension to arbitrary
+polynomial-size Boolean circuits would discard the essential invariant
+that $C+AB$ is still quadratic.
+
+An oracle may contain information with no efficient uniform description.
+Replacing it by a random seed without bounding both seed length and
+evaluation cost is not de-oracularization. Fixing a successful seed
+nonconstructively may introduce advice. Neither of those steps is used
+here. The desired conclusion would in particular exclude
+$\mathsf{BQP}\subseteq\mathsf{NP}$, since $\mathsf{NP}\subseteq\mathsf{PH}$.
+No such unrelativized exclusion follows from either of the lemmas.
+
+\Needspace{8\baselineskip}
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The attempt proves two explicit obstructions to simple replacements of the
+Forrelation oracle: Fourier sparsity rules out a constant signal, whereas
+quadratic phases allow a constant signal but admit exact polynomial-time
+classical evaluation. The remaining tasks are a uniform total-gap
+construction and a lower bound against all fixed hierarchy levels that
+uses more than oracle indistinguishability. Neither is supplied. The
+auxiliary calculations are not asserted to be historically new, and no
+complete separation candidate is claimed.
+
+% END RESEARCH 35
+
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006688:1}{} Scott Aaronson, BQP and the Polynomial Hierarchy, arXiv:0910.4698, Abstract (2009).
+\url{https://arxiv.org/abs/0910.4698}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:30006688:2}{} BQP and the Polynomial Hierarchy.
+\url{https://www.scottaaronson.com/papers/stoc114-aaronson.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:30006688:3}{} IQP circuits for 2-Forrelation.
+\url{https://arxiv.org/abs/2604.15248}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S4]}]\hypertarget{source:30006688:4}{} Promises should be taken seriously: On relativization with promise problems.
+\url{https://arxiv.org/abs/2609.07945}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN ADDED REFERENCES 35
+\item[\textnormal{[E1]}]\hypertarget{extra:30006688:1}{} Ran Raz and Avishay Tal,
+\emph{Oracle Separation of BQP and PH}, ECCC TR18-107 (2018);
+Journal of the ACM 69(4) (2022), article 30.
+\url{https://eccc.weizmann.ac.il/report/2018/107/}.
+\url{https://doi.org/10.1145/3530258}.
+{\small\textit{Oracle scope and distributional statement checked
+27 September 2026.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:30006688:2}{} Quentin Buzet and
+Andr\'e Chailloux, \emph{IQP circuits for 2-Forrelation},
+arXiv:2604.15248v2, 24 August 2026, abstract and resource statement.
+\url{https://arxiv.org/abs/2604.15248v2}.
+{\small\textit{Version-specific supplement to [S3]; not an unrelativized
+separation. Checked 27 September 2026.}}
+\item[\textnormal{[E3]}]\hypertarget{extra:30006688:3}{} David Miloschewsky,
+Supartha Podder and Dorian Rudolph, \emph{Promises should be taken
+seriously: On relativization with promise problems}, arXiv:2609.07945v1,
+7 September 2026, abstract and language/promise separation statement.
+\url{https://arxiv.org/abs/2609.07945v1}.
+{\small\textit{Recent manuscript, statement-level consultation
+27 September 2026; not a complete proof audit.}}
+
+% END ADDED REFERENCES 35
+\end{itemize}
+
+% END PRESERVED SECTION
+\end{document}

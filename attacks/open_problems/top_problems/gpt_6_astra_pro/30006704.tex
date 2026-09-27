@@ -1,0 +1,186 @@
+% TOP_PROBLEM: {"id": 30006704, "title": "Strong Exponential Time Hypothesis (SETH)", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Compile twice: lualatex 30006704.tex
+% Original entry retained; research subsection and [E] references added.
+% No external bibliography, image, data, or style file is required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,
+ urlcolor=MidnightBlue,bookmarksnumbered=true,
+ pdftitle={Research notebook - Problem 30006704},
+ pdfauthor={Research attempt; not independently refereed}}
+\usepackage{bookmark}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Research notebook}
+\fancyhead[R]{\small\sffamily Problem 30006704}
+\fancyfoot[L]{\scriptsize 27 September 2026}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\scriptsize Unrefereed research attempt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=2pt,topsep=3pt,parsep=0pt,before=\small}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\newtheorem{notebooklemma}{Lemma}[section]
+\newtheorem{notebookproposition}[notebooklemma]{Proposition}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% ================================================================
+% problemId: 30006704
+% Canonical problem ID: 30006704
+% exactTarget SHA-256: 8bdc5b4c3cb1d067fea4fcc50e54b743cc997245123f6803e8b04e611c08463f
+\clearpage
+\section*{\texorpdfstring{Strong Exponential Time Hypothesis (SETH)}{Strong Exponential Time Hypothesis (SETH)}}\label{30006704}
+\subsection{Definitions and mathematical statement}
+For each fixed $k$, let
+\[
+ s_k=\inf\{s\ge0:k\text{-SAT on }n\text{ variables is decidable in }
+ O(2^{sn}\operatorname{poly}(|F|))\text{ deterministic time}\}.
+\]
+The strong exponential time hypothesis is $\lim_{k\to\infty}s_k=1$. Equivalently, for every $\varepsilon>0$ some fixed clause width $k$ rules out a deterministic $O(2^{(1-\varepsilon)n}\operatorname{poly}(|F|))$ algorithm. The algorithm may depend on $k$; the claim is not that every fixed-width SAT problem has exponent one.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006704}{1}.
+\cataloguescope{Prove or disprove that the optimal exponent s\_k for k-SAT satisfies lim\_\{k to infinity\} s\_k = 1.}
+\subsection{Short English statement}
+As clause width grows, must the best deterministic SAT exponent approach exhaustive-search exponent one?
+% BEGIN RESEARCH INSERTION
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The target takes the limit of optimal deterministic exponents after fixing the clause width \sref{30006704}{1}. An exponent below one for each $k$ does not refute SETH if the saving tends to zero. Efremenko--Itsykson prove a strong lower bound for bounded-depth resolution over parities, not for every deterministic SAT algorithm \eref{30006704}{1}. The recent conditional applications in the catalogue likewise do not prove their SETH premise. We attempt a width-independent algorithmic saving and test its proposed representation of eliminated variables.
+
+\paragraph{Attack route.}
+A lower bound for every algorithm must go beyond a chosen branching or refutation model. An algorithmic route could eliminate a linear-size variable block while summarizing its influence on the remaining variables. The missing condition is not merely the ability to project constraints, but a sufficiently small total cost of building and using the projection. We derive that cost exactly and test a compact-CNF repair.
+
+\paragraph{Attempt: the easy fixed-width gain has the wrong limit.}
+For a $k$-CNF on $n\ge k$ variables, choose a nonempty clause and extend its variable set to $k$ variables. At least one of the $2^k$ assignments falsifies the clause. Branch on the other assignments, simplify, and stop at empty clauses or an empty conjunction. With polynomial work at each node, the recurrence has the form
+\[
+ T_k(n)\le(2^k-1)T_k(n-k)+\operatorname{poly}(|F|).
+\]
+Charging work to the search-tree nodes, rather than multiplying a new polynomial at every recursive level, gives
+\begin{equation}\label{r65:branch}
+ T_k(n)=O\!\left((2^k-1)^{n/k}\operatorname{poly}(|F|)\right),\qquad
+ \alpha_k=\frac{\log_2(2^k-1)}{k}<1.
+\end{equation}
+Here $\alpha_k=1+k^{-1}\log_2(1-2^{-k})\to1$. The $k=1$ case is directly polynomial. Thus this complete deterministic algorithm is consistent with SETH.
+
+\paragraph{A block-elimination bound with all boundary costs counted.}
+Choose a block $B$ of $t$ variables. Let $C$ consist of outside variables in clauses meeting $B$, and let $b=|C|$. Write $F_B$ for those clauses and $F_0$ for the others. Define
+\[
+ R_B(c)=1\quad\Longleftrightarrow\quad
+       \exists u\in\{0,1\}^{B}:F_B(u,c)=1.
+\]
+Then
+\begin{equation}\label{r65:projection}
+ F\text{ satisfiable}\ \Longleftrightarrow\
+ \exists x\in\{0,1\}^{V\setminus B}:F_0(x)=1\text{ and }R_B(x|_C)=1.
+\end{equation}
+A standard multitape implementation can stream through all $c$. For each, compute $R_B(c)$ by enumerating the $2^t$ internal assignments; when it is true, enumerate assignments of the remaining $n-t-b$ variables and test $F_0$. Thus no free random-access table lookup is assumed. The total time is
+\begin{equation}\label{r65:cost}
+ \operatorname{poly}(|F|)\bigl(2^{t+b}+2^{n-t}\bigr),
+\end{equation}
+and the enumerations themselves need only polynomial work space.
+
+\begin{notebookproposition}\label{r65:block}
+Suppose an absolute $\delta>0$ has the following property. For every fixed $k$, a polynomial-time procedure finds in each $k$-CNF a block with
+\[
+ t\ge\delta n,\qquad t+b\le(1-\delta)n,
+\]
+except on instances already decidable in time $O(2^{(1-\delta)n}\operatorname{poly}(|F|))$. Then SETH is false.
+\end{notebookproposition}
+\begin{proof}
+Both exponential terms in~\eqref{r65:cost} are at most $2^{(1-\delta)n}$. The procedure and polynomial factor may depend on fixed $k$, but $\delta$ does not. Therefore $s_k\le1-\delta$ for all $k$.
+\end{proof}
+
+No such decomposition theorem is proved. Dense primal graphs defeat a purely graph-based argument: when every pair of variables occurs in a clause, every nonempty proper block has $t+b=n$. Even easy positive 2-CNF examples have this graph. Thus the criterion is sufficient but not necessary; a proof cannot simply assume that hard instances have small boundaries.
+
+\paragraph{Attempted repair: exact projection as a short CNF.}
+Maybe a large boundary could still be summarized by a short CNF. Take boundary bits $x_1,\ldots,x_b$ and auxiliary bits $z_2,\ldots,z_b$. Enforce
+\[
+ z_2=x_1\oplus x_2,\qquad z_j=z_{j-1}\oplus x_j\ (3\le j\le b),
+ \qquad z_b=0.
+\]
+The constraint $w=u\oplus v$ is exactly the conjunction
+\[
+ (u\vee v\vee\neg w),\quad(u\vee\neg v\vee w),\quad
+ (\neg u\vee v\vee w),\quad(\neg u\vee\neg v\vee\neg w).
+\]
+This gives $O(b)$ clauses of width at most three. Existentially eliminating all auxiliary variables produces precisely even parity on the $b$ boundary bits.
+
+\begin{notebooklemma}\label{r65:parity}
+Every CNF on just the boundary variables that computes even parity has at least $2^{b-1}$ non-tautological clauses.
+\end{notebooklemma}
+\begin{proof}
+Delete duplicate literals and tautologies. A clause missing a variable can be falsified by a partial assignment that extends to an even-parity assignment, using the missing variable to choose parity. Such a clause cannot be an implicate. Every remaining clause must mention all $b$ variables, and therefore excludes exactly one assignment. Rejecting all $2^{b-1}$ odd-parity assignments requires at least that many clauses.
+\end{proof}
+
+So exact auxiliary-variable elimination can turn a linear-size 3-CNF into an exponentially large CNF on its boundary. This disproves the hoped-for general compact-CNF projection lemma. It does not prohibit a compact circuit or parity representation of the same relation; parity itself is easy. Nor does it show that every input defeating the block criterion is hard for SAT.
+
+\paragraph{Stress test.}
+The boundary variables are included in the construction cost, and the multitape implementation streams rather than assuming unit-cost access to an exponentially large array. A saving $\delta_k\to0$ would not contradict SETH. The parity lower bound concerns formulas after removing all auxiliaries; retaining auxiliary variables would invalidate its hypothesis. The verification script checks the four XOR clauses and all boundary/auxiliary assignments for $2\le b\le7$, and compares the projected truth table with even parity. The universal exponential lower bound follows from the proof, not from these finite checks.
+
+A uniform exponent improvement would refute SETH but would not automatically give $\mathsf P=\mathsf{NP}$. Conversely, failure of this elimination strategy or a lower bound in the resolution system of \eref{30006704}{1} would not establish SETH. The deterministic and unrestricted quantifiers in the target remain unchanged.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The attempt supplies a width-uniform sufficient block criterion for a SETH refutation and an exact exponential obstruction to one proposed projection representation. The missing step is a different representation with a uniform construction-and-evaluation bound, or another mechanism giving an absolute exponent saving. Neither a universal speedup nor a lower bound for all deterministic algorithms is established.
+
+% END RESEARCH INSERTION
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006704:1}{} C. Calabro, R. Impagliazzo, R. Paturi, J. Comput. System Sci. 74(3):367-381, 2008.
+\url{https://doi.org/10.1016/j.jcss.2007.07.007}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:30006704:2}{} Strong ETH Holds for Bounded-Depth Resolution over Parities.
+\url{https://eccc.weizmann.ac.il/report/2025/188/}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:30006704:3}{} Tight (S)ETH-based Lower Bounds for Pseudopolynomial Algorithms for Bin Packing and Multi-Machine Scheduling.
+\url{https://arxiv.org/abs/2603.12999}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+
+% BEGIN ADDED RESEARCH REFERENCES
+\item[\textnormal{[E1]}]\hypertarget{extra:30006704:1}{} Klim Efremenko and Dmitry Itsykson, \emph{Strong ETH Holds for Bounded-Depth Resolution over Parities}, ECCC TR25-188 (20 November 2025).
+\url{https://eccc.weizmann.ac.il/report/2025/188/}.
+{\small\textit{A lower bound for a specified proof system, not all deterministic SAT algorithms. Consulted 27 September 2026.}}
+% END ADDED RESEARCH REFERENCES
+\end{itemize}
+
+\end{document}

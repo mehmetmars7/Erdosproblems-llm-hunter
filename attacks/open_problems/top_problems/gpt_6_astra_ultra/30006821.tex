@@ -1,0 +1,229 @@
+% TOP_PROBLEM: {"id": 30006821, "title": "Equivalence or Strict Containment of QMA and QMA(2)", "category_id": 16, "category": {"id": 16, "name": "physics", "display_name": "Mathematical Physics", "description": "Problems at the intersection of mathematics and physics.", "slug": "physics", "order_index": 16, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% ATTEMPT_STATUS: unresolved
+% !TeX program = lualatex
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Equivalence or Strict Containment of QMA and QMA(2)}{Equivalence or Strict Containment of QMA and QMA(2)}}\label{30006821}
+\subsection{Definitions and mathematical statement}
+For a promise problem $(Y,N)$, a QMA verifier is a uniform polynomial-time quantum circuit given one polynomial-size quantum witness, with completeness at least $2/3$ and soundness at most $1/3$. QMA(2) instead receives two registers whose joint witness must be a product $\rho\otimes\sigma$. Each yes instance has an accepted product witness, while soundness is required for every product witness on a no instance. Determine whether
+\[
+ \mathrm{QMA}(2)=\mathrm{QMA}
+\]
+or the inclusion of QMA in QMA(2) is strict. No behavior is required outside the promise. The absence of entanglement is across the two witness registers, not within each register, and the model has no advice or oracle.
+\par\smallskip\textit{Formulation and concept references:} \href{https://theoryofcomputing.org/articles/v005a001/v005a001.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Does allowing two quantum witnesses promised to be unentangled give more verification power than allowing one unrestricted quantum witness?
+\subsection{Research attempt}
+\paragraph{Scope and current-source audit.}
+GPT-6 Astra Ultra prepared this unresolved attempt on 27 September 2026
+using the original verification model, primary-source inspection and
+explicit finite-dimensional operator calculations. The distinction is
+between unrelativized promise classes, with polynomial witness length
+and a constant completeness--soundness gap. A September 2026 manuscript
+[E2] reports a quantum-oracle separation and a no-disentanglers result.
+Its abstract was inspected, but its full proof is not independently
+verified or used below. In particular an oracle separation does not
+prove the strict inclusion asked for here. The original work [S1] and
+the product-test paper [E1] provide the context for analyzing why merely
+combining two registers into one does not preserve soundness.
+
+\paragraph{The acceptance operator makes the distinction exact.}
+Fix one input and absorb the initialized ancillas and verifier circuit
+into an acceptance effect $0\preceq M\preceq I$ on $A\otimes B$.
+The optimal acceptance probability with one unrestricted joint witness
+is $\|M\|$, its largest eigenvalue. With the two unentangled witnesses
+it is
+\[
+ h_{\rm prod}(M)=\max_{\|a\|=\|b\|=1}
+                   \langle a\otimes b|M|a\otimes b\rangle.
+\]
+Mixed product states do not enlarge this maximum: expand each density
+matrix spectrally, and their acceptance is a convex combination of
+pure-product acceptances. Taking the convex hull of products, namely
+all separable states, also leaves the maximum unchanged. Thus the
+soundness promise is equivalently an upper bound over separable states,
+but not an upper bound over all states.
+
+The obvious inclusion $\mathrm{QMA}\subseteq\mathrm{QMA}(2)$ is
+valid: the verifier ignores the second register. For a no instance,
+the reduced first register is among the witnesses for which the
+original verifier was sound. The converse argument cannot simply
+concatenate the two registers, because it replaces $h_{\rm prod}$
+by $\|M\|$ in the very condition that needs to be preserved.
+
+\paragraph{A maximal gap for one acceptance effect.}
+Let $A=B=\mathbb C^d$ and
+\[
+ |\Phi_d\rangle=d^{-1/2}\sum_{j=1}^d|j,j\rangle,
+ \qquad M=|\Phi_d\rangle\langle\Phi_d|.
+\]
+Then $\|M\|=1$, whereas
+\[
+ |\langle\Phi_d|a\otimes b\rangle|^2
+ =\frac1d\left|\sum_j a_jb_j\right|^2\le\frac1d
+\]
+by Cauchy--Schwarz, with equality for conjugate matching vectors.
+For $d=2^m$ this effect is implementable using Bell-basis operations
+on $m$ pairs and a classical conjunction of their outcomes. Thus the
+failure of the concatenation argument already occurs for efficiently
+implementable tests. On such a test every product witness has
+acceptance at most $1/d$, while an entangled joint witness passes
+with certainty.
+
+This is not a class separation. A complexity separation requires one
+uniform promise problem with no alternative QMA verifier of polynomial
+size; the example only refutes one proposed simulation of a verifier.
+A new verifier may change its checks, encoding, and witness length.
+Confusing an acceptance-effect gap with a lower bound against every
+verifier would change the quantifiers of the problem.
+
+\paragraph{Perfect single-copy product certification is impossible.}
+Suppose an effect $0\preceq T\preceq I$ accepted every pure product
+state with probability one. In particular, for each vector $e_i\otimes
+f_j$ in a product orthonormal basis,
+\[
+ \langle e_i\otimes f_j|(I-T)|e_i\otimes f_j\rangle=0.
+\]
+Since $I-T$ is positive, its square root annihilates each of these
+basis vectors. Hence $I-T=0$ and $T=I$. It also accepts every
+entangled state. This elementary obstruction rules out a perfect,
+universal productness test on one copy which leaves a nontrivial
+rejection space. It does not rule out tests with error or with additional
+independently supplied copies, and it does not itself establish a
+lower bound on QMA simulations.
+
+One cannot resolve the issue by demanding a classical description of
+the witnesses. An arbitrary $m$-qubit pure state has $2^m$ complex
+amplitudes before normalization, while the allowed certificate has
+only polynomially many qubits. Restricting both Merlins to states with
+short preparation descriptions would be an additional hypothesis, not
+an equivalent restatement of QMA(2). The following two-copy calculation
+shows more precisely what extra structure a product test uses.
+
+\paragraph{The two-copy product test under its actual hypothesis.}
+Assume the verifier receives two identical and independent copies of a
+pure state $|\psi\rangle_{AB}$. Let $S_A$ exchange $A$ and $A'$, and
+$S_B$ exchange $B$ and $B'$. The effect
+\[
+ T=\frac{I+S_A}{2}\frac{I+S_B}{2}
+\]
+tests symmetry on both pairs. Write $\rho_A=\operatorname{Tr}_B
+|\psi\rangle\langle\psi|$. The swap identity gives
+\[
+ \langle S_A\rangle=\operatorname{Tr}\rho_A^2,
+ \quad \langle S_B\rangle=\operatorname{Tr}\rho_B^2,
+ \quad \langle S_AS_B\rangle=1.
+\]
+The two reduced states have the same nonzero eigenvalues, so
+\begin{equation}\label{a263:producttest}
+ p_{\rm pass}=\frac{1+\operatorname{Tr}\rho_A^2}{2}.
+\end{equation}
+This is an exact calculation for a two-part pure state, consistent
+with the general product-test framework in [E1].
+
+If the squared Schmidt coefficients are $\lambda_i$, the largest
+squared overlap with a product state is $\lambda_{\max}$. Moreover
+$\sum_i\lambda_i^2\le\lambda_{\max}\sum_i\lambda_i
+=\lambda_{\max}$. Thus $p_{\rm pass}\ge1-\epsilon$ implies
+$\lambda_{\max}\ge1-2\epsilon$. The trace distance from
+$|\psi\rangle\langle\psi|$ to an appropriate pure product state is
+at most $\sqrt{2\epsilon}$, using the convention of half the trace
+norm. This supplies a dimension-independent quantitative conclusion,
+but only under the two-identical-independent-copy hypothesis just used.
+
+\paragraph{A joint witness can pass the same test with an entangled marginal.}
+That hypothesis cannot be assigned to an arbitrary QMA witness by
+writing four register names. Let $A,B,A',B'$ each be a qubit and give
+the verifier the four-qubit state
+\[
+ |W_4\rangle=\tfrac12
+ (|1000\rangle+|0100\rangle+|0010\rangle+|0001\rangle).
+\]
+It is invariant under every permutation of the four qubits. Therefore
+both pair swaps have eigenvalue $+1$ and the product-test effect accepts
+with probability one. But the retained $AB$ marginal is
+\[
+ \rho_{AB}=\tfrac12|00\rangle\langle00|
+              +\tfrac12|\psi^+\rangle\langle\psi^+|,
+ \qquad |\psi^+\rangle=(|01\rangle+|10\rangle)/\sqrt2.
+\]
+Its partial transpose contains the block
+\[
+ \begin{pmatrix}1/2&1/4\\1/4&0\end{pmatrix}
+\]
+on $\operatorname{span}\{|00\rangle,|11\rangle\}$.
+The eigenvalues of this block are $(1\pm\sqrt2)/4$, one negative.
+Every separable state has positive partial transpose, by transposing
+its product summands, so this marginal is entangled. A perfectly
+successful symmetry test on a joint adversarial witness has therefore
+not certified separability of the pair to be used by the original
+verifier.
+
+The example does not contradict \eqref{a263:producttest}: $|W_4\rangle$
+is not $|\psi\rangle_{AB}\otimes|\psi\rangle_{A'B'}$. It identifies
+exactly the promise missing from that attempted one-Merlin simulation.
+Likewise a swap test between two arbitrary registers tests their
+symmetry, not their independence. An error-reduction argument must
+handle the adversary's allowed correlations rather than silently
+apply a concentration inequality for independent samples.
+
+\paragraph{A sufficient simulation interface, and its limits.}
+A direct route to QMA equality would be a uniformly efficient map
+$\mathcal E$ from a polynomial-size single witness to $AB$ such that
+its entire output set is within trace distance $\eta$ of separable
+states, while every product witness needed for completeness is within
+trace distance $\eta$ of some output. Then every effect's acceptance
+changes by at most $\eta$. Applying the original verifier after
+$\mathcal E$ would preserve the completeness--soundness gap up to
+$2\eta$; for instance a fixed $\eta<1/6$ retains a positive constant
+gap. Such an interface needs both soundness for all inputs and coverage
+for the desired witnesses. A channel producing only one fixed product
+state satisfies the first requirement but fails the second.
+
+This describes a sufficient restricted route, not a necessary form of
+all QMA simulations. The recent no-disentanglers claim [E2] concerns
+this type of universal interface and therefore deserves attention,
+but even an established obstruction to that interface would not by
+itself prove the unrelativized separation. The verifier-specific
+question and the universal-state-conversion question have different
+quantifiers.
+
+\paragraph{Verification and outcome.}
+The maximally entangled acceptance gap, the swap expansion and the
+negative partial-transpose eigenvalue were checked by direct matrix
+calculation. The arguments preserve the product promise across the
+two Merlins and allow arbitrary entanglement inside each register.
+No simulation with adequate soundness, and no lower bound against all
+QMA verifiers, has been obtained. The precise first gap is how to
+control a single witness's adversarial joint correlations while
+retaining all needed product witnesses, or how to prove no general
+verifier can do so. The original equality-or-strictness question remains
+\textbf{UNRESOLVED}.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Scott Aaronson, Salman Beigi, Andrew Drucker, Bill Fefferman and Peter Shor, The Power of Unentanglement, Theory of Computing 5 (2009), 1-42, DOI 10.4086/toc.2009.v005a001.
+\url{https://theoryofcomputing.org/articles/v005a001/v005a001.pdf}.
+\textit{Formulation source.}
+\item[E1]Aram W. Harrow and Ashley Montanaro, \emph{Testing product states, quantum Merlin--Arthur games and tensor optimisation}, arXiv:1001.0017; Journal of the ACM 60 (2013).
+\url{https://arxiv.org/abs/1001.0017}.
+\textit{Primary source for the product test and its independent-copy hypotheses; consulted 27 September 2026.}
+\item[E2]John Bostanci, Sabee Grewal, Jonas Haferkamp, Andrew Huang, Yeongwoo Hwang, Anand Natarajan and Chinmay Nirkhe, \emph{A quantum oracle separation between QMA(2) and QMA}, arXiv:2609.02865, submitted 2 September 2026.
+\url{https://arxiv.org/abs/2609.02865}.
+\textit{Recent claim record inspected 27 September 2026. The abstract reports a quantum-oracle separation and a no-disentanglers result; its proof is not independently certified here, and no unrelativized separation is inferred.}
+\end{itemize}
+\end{document}

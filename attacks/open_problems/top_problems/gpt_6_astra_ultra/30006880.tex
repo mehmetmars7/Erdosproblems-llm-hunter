@@ -1,0 +1,308 @@
+% TOP_PROBLEM: {"id": 30006880, "title": "Existence of a p-Optimal Propositional Proof System", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Existence of a p-Optimal Propositional Proof System}{Existence of a p-Optimal Propositional Proof System}}\label{30006880}
+\subsection{Definitions and mathematical statement}
+Let $\mathrm{TAUT}$ be the set of encoded propositional tautologies. A Cook--Reckhow proof system is a polynomial-time computable surjection $P:\{0,1\}^*\to\mathrm{TAUT}$; a string $\pi$ proves the formula $P(\pi)$. A system $P$ \emph{polynomially simulates} $Q$ if there is a polynomial-time function $t_Q$ such that
+\[
+ P(t_Q(\pi))=Q(\pi)\qquad\text{for all proof strings }\pi.
+\]
+A $p$-optimal system is one that polynomially simulates every Cook--Reckhow system. Determine whether such a $P$ exists. The translator and its polynomial bound may depend on $Q$, but $P$ must be fixed. Merely having polynomially short translations without an efficient procedure is the weaker notion of optimality and is not this target.
+\par\smallskip\textit{Formulation and concept references:} \href{https://eccc.weizmann.ac.il/eccc-reports/1997/TR97-026/index.html}{[S1]}.
+
+\subsection{Short English statement}
+Is there one propositional proof system that can efficiently translate and simulate proofs from every other propositional proof system?
+\subsection{Research attempt}
+\paragraph{The target and current-source scope (27 September 2026).}
+A translator must run in polynomial time and output a proof, not merely
+certify that some short proof exists. Its polynomial can depend on the
+simulated system. There is no demand for a common exponent over all
+systems, and there is no promise that the verifier of the proposed
+universal system can decide whether arbitrary programs are sound.
+Those two distinctions drive the analysis below.
+
+The supplied Messner--Tor\'an report [S1] defines the efficient simulation
+question and states conditional existence results. A 2026 primary
+preprint by Egidy [E1] studies relativization barriers for both positive
+and negative answers. An oracle separation is not an unconditional
+answer about the unrelativized set $\mathrm{TAUT}$. No theorem inspected
+in this audit resolves the selected question.
+
+This attempt constructs a universal system for finitely many competitors,
+then for a suitably enumerable sound collection with explicit clocks.
+It proves exactly why enumerating all candidate polynomial-time programs
+fails, and separates the decision, short-proof, and proof-search routes.
+All inputs and outputs are finite binary strings under fixed effective
+encodings; malformed strings map to one fixed tautology $\tau$.
+
+\paragraph{A concrete baseline system avoids a hidden existence assumption.}
+Fix any polynomial-time syntax and evaluation algorithm for propositional
+formulas. For a formula $\varphi$ with $v$ distinct variables, its truth
+table can be checked in $2^v$ times a polynomial in $|\varphi|$.
+Define a proof to contain $\varphi$ and unary padding of length $N$.
+The baseline system $T$ parses this pair, checks that the truth-table
+calculation fits a fixed polynomial budget in the total input length,
+and, if so, executes it. It outputs $\varphi$ exactly when every
+assignment satisfies it, and otherwise outputs $\tau$.
+
+The budget can be implemented simply: run the evaluation loop for at
+most $N$ elementary machine steps, with a fixed universal-simulation
+polynomial overhead, and reject to $\tau$ if it has not finished.
+Thus $T$ is polynomial-time on every string. It is sound by exhaustive
+evaluation. For every tautology a sufficiently long padding allows its
+finite truth-table calculation to finish, so $T$ is onto $\mathrm{TAUT}$.
+No shortness guarantee is required for this baseline.
+
+This construction illustrates a recurring principle: a potentially
+expensive finite computation becomes polynomial in a \emph{padded proof}
+length, but producing that padding need not be polynomial in the original
+formula or competitor proof length. That second cost matters for
+$p$-simulation.
+
+\paragraph{Finite families have an explicit common upper bound.}
+\textbf{Lemma 355.1.} Given finitely many Cook--Reckhow systems
+$P_1,\ldots,P_s$, there is a system $R$ polynomially simulating all
+of them.
+
+\emph{Proof.} Encode a branch index $i$ followed by a proof $\pi$, and
+put $R(i,\pi)=P_i(\pi)$ on valid branches, using $\tau$ otherwise.
+A maximum of the finitely many runtime exponents is a constant, so
+$R$ is polynomial-time. Its outputs are tautologies, and any branch
+is already onto. The translator $\pi\mapsto(i,\pi)$ is linear-time
+for each fixed $i$.\hfill$\square$
+
+This construction also shows that simulation is a directed preorder:
+identities give reflexivity, compositions of polynomial-time translators
+give transitivity, and every finite set has an upper bound. A directed
+preorder need not have a greatest element. For example the natural
+numbers under their usual order have upper bounds for finite sets and
+no largest element. Taking successively stronger finite combinations
+therefore does not by itself produce a single polynomial-time limit.
+
+The technical difficulty with infinitely many branches is visible even
+before soundness: a branch with runtime $n^i$ cannot be executed by a
+single fixed polynomial bound when $i$ is part of the input. Unary
+clocks repair this timing problem; they do not repair unsound branches.
+
+\paragraph{A uniform enumerable sound collection can be combined with clocks.}
+Suppose an effective enumerator lists programs $Q_0,Q_1,\ldots$, each
+of which is a Cook--Reckhow system. No computable common runtime exponent
+is assumed. There is a single system $U$ that $p$-simulates every listed
+system.
+
+A proof for $U$ specifies an index $i$, a string $\pi$, and a unary
+clock of length $N$. Run the enumerator for at most $N$ steps to obtain
+its $i$th program. If it has not appeared, output $\tau$. If it has,
+simulate that program on $\pi$ for at most $N$ steps and output the
+result if the simulation terminates, otherwise output $\tau$.
+One can include the baseline $T$ as an additional branch to guarantee
+surjectivity even if the enumerated collection is empty.
+
+This verifier has polynomial runtime in its total input length, with
+fixed exponent: the simulations are clocked, the program description
+produced in $N$ steps has length at most $N$, and ordinary universal
+simulation has polynomial overhead. Soundness follows from the assumed
+soundness of every enumerated program, not from a test performed by $U$.
+
+For a fixed $i$, choose constants bounding the time until its description
+is enumerated and its polynomial runtime on length $n$. The translator
+outputs $(i,\pi,1^{N_i(|\pi|)})$, where $N_i$ is a polynomial exceeding
+both bounds. Printing the unary clock is polynomial-time for this fixed
+$i$. This proves the simulation with precisely the allowed dependence
+of the polynomial on the competitor. The construction is fully uniform
+as a verifier, even though its existence proof uses different clock
+polynomials for different listed systems.
+
+\paragraph{An exact cofinal-enumeration formulation.}
+Call a family of systems $p$-cofinal if every Cook--Reckhow system is
+$p$-simulated by some member of that family. The preceding argument and
+transitivity prove the following equivalent formulation:
+\[
+ \text{a $p$-optimal system exists}
+ \quad\Longleftrightarrow\quad
+ \text{there is an effectively enumerable $p$-cofinal family of sound systems}.
+ \tag{355.1}
+\]
+For the reverse implication combine the enumerable family with clocks.
+For the forward implication the singleton consisting of a $p$-optimal
+system is already an effectively enumerable cofinal family. The latter
+observation is logically enough and does not purport to recognize that
+singleton effectively from the property of optimality.
+
+One can also exhibit a richer enumerable family once a fixed sound
+system $P$ is given. Enumerate all clocked polynomial-time functions
+$f_e$, and define $Q_e$ to run $P(f_e(\pi))$ on one branch and $P(\pi)$
+on another. Each $Q_e$ is a sound surjection. If $P$ is $p$-optimal,
+then translators into $P$ are represented among these clocks. This
+construction never has to decide the soundness of an arbitrary external
+program, because all outputs are routed through an already sound $P$.
+It does not construct that $P$ in the first place.
+
+\paragraph{Why enumeration of all polynomial-time programs is unsound.}
+The syntax of polynomial-time programs can be effectively enumerated
+by supplying clocks. Their semantic property of always outputting
+tautologies cannot be enumerated in the same way. Here is a direct
+reduction demonstrating the obstruction, even when surjectivity is
+built into the candidate.
+
+Given a Turing machine index $e$, construct a clocked polynomial-time
+function $F_e$ with two input branches. On branch zero, run the baseline
+system $T$. On branch one with payload length $n$, simulate machine
+$e$ on its blank input for $n$ steps. If it halts within that time,
+output a fixed contradiction $\bot$; otherwise output $\tau$.
+For each fixed $e$ this is a polynomial-time function, with a clock
+that can be supplied effectively. It is onto the tautologies through
+its baseline branch regardless of $e$.
+
+If $e$ never halts, every output is a tautology, so $F_e$ is a valid
+proof system. If $e$ halts, a long enough branch-one input outputs
+$\bot$, so $F_e$ is not a proof system. Hence
+\[
+ F_e\text{ is a Cook--Reckhow system}
+   \quad\Longleftrightarrow\quad e\text{ does not halt}.
+ \tag{355.2}
+\]
+The set of nonhalting machine indices is not recursively enumerable:
+if both halting and nonhalting were enumerable, dovetailing the two
+lists would decide the halting problem, contradicting its diagonal
+undecidability proof. Thus the set of \emph{all program descriptions}
+that compute Cook--Reckhow systems is not recursively enumerable.
+
+This is not a proof that (355.1) fails. A cofinal enumerable collection
+need not contain every correct program description, or even compute
+every proof-system function. It only needs enough sound systems to
+simulate each competitor. Confusing exhaustive semantic recognition
+with cofinality would turn a valid undecidability observation into an
+invalid disproof of $p$-optimality.
+
+\paragraph{Truth-table guarding repairs soundness but loses the translator.}
+A universal verifier could execute a submitted clocked program on its
+submitted proof, obtain a formula, and check that formula by a padded
+truth table before outputting it. This is a sound construction and can
+be made polynomial in the total padded input size. But a formula with
+$v$ variables may require $2^v$ evaluations. A competitor may output
+such a formula from a proof of length polynomial in $v$.
+
+The proposed translator would then have to print exponentially many
+padding symbols. The fact that the target verifier is polynomial in
+its own proof length says nothing about this translation cost. One
+cannot remove the guard merely because the input claims that its
+program is sound: false assertions of soundness are still legal
+binary strings on which a Cook--Reckhow function must output a tautology.
+
+A finite soundness check is insufficient for the same reason as (355.2).
+The program there can agree with a valid system on every proof length
+up to an arbitrary bound, then output a contradiction when the simulated
+machine eventually halts. Testing finitely many proof strings cannot
+establish the universal soundness condition.
+
+\paragraph{A complete conditional construction under $P=NP$.}
+If $P=NP$, then $P=\mathrm{coNP}$ and tautology testing is polynomial-time.
+Define $P_*(x)$ to output $x$ if it is a well-formed tautology and $\tau$
+otherwise. This is a polynomial-time surjection onto $\mathrm{TAUT}$.
+For any proof system $Q$, the translator
+\[
+ t_Q(\pi)=Q(\pi)
+\]
+is polynomial-time and satisfies $P_*(t_Q(\pi))=Q(\pi)$.
+Thus $P=NP$ implies existence of a $p$-optimal system by a particularly
+transparent construction. It is a conditional implication, not an
+assumption available in the selected problem.
+
+More generally, it suffices to have a fixed sound system $P$ and a
+polynomial-time algorithm which, on every tautology $\varphi$, finds
+a $P$-proof of $\varphi$ with polynomial output length. Then composing
+that algorithm with $Q$ produces the required translator. An algorithm
+promised to work only on tautologies is enough for this composition,
+because every $Q(\pi)$ is a tautology. Such a proof-search hypothesis
+is additional substantive information, not a consequence of knowing
+that short proofs exist.
+
+\paragraph{Short proofs yield weaker optimality, not an efficient translation.}
+Call $P$ polynomially bounded when every tautology $\varphi$ has some
+$P$-proof of length at most a fixed polynomial in $|\varphi|$.
+Then for every $Q$, polynomially short translations exist as strings:
+$|Q(\pi)|$ is polynomial in $|\pi|$, since $Q$ must print its output,
+and the promised $P$-proof length is consequently polynomial in $|\pi|$.
+This establishes simulation in the proof-length sense only. Exhaustively
+searching all possible short $P$-proofs takes exponential time in their
+length bound. No efficient choice function follows from the existential
+length bound.
+
+For completeness, the standard equivalence with $NP=\mathrm{coNP}$
+can be verified directly. A polynomially bounded system gives an NP
+witness relation for tautology: guess the short proof and evaluate $P$.
+Since $\mathrm{TAUT}$ is coNP-complete, this yields $NP=\mathrm{coNP}$.
+Conversely, if tautology has an NP verifier $V(\varphi,z)$ with
+polynomially bounded certificates, define a system to output $\varphi$
+on accepted pairs and $\tau$ otherwise. It is sound, surjective, and
+polynomially bounded. The standard NP/coNP completeness facts are the
+only complexity-theoretic inputs in this equivalence.
+
+Accordingly, this argument from $NP=\mathrm{coNP}$ supplies a
+length-optimal system, but it does not on its own supply the
+polynomial-time translators required here. It also does not show that
+$p$-optimal systems must be polynomially bounded. A universal simulator
+may still give very long shortest proofs for some tautologies.
+
+\paragraph{Padding makes the last distinction especially concrete.}
+Starting from any system $P$, define a padded system $P^{\rm pad}$
+whose nondefault proofs encode $(\pi,1^{2^{|\pi|}})$ and whose output
+is $P(\pi)$. The verifier can check the padding length by comparing
+its binary length counter with $2^{|\pi|}$, and can run $P$ within a
+fixed polynomial in the padded length. It remains a sound surjection.
+A direct map from $\pi$ to that particular padded proof is exponential,
+although deleting the padding gives an efficient translator in the
+opposite direction.
+
+This example does not prove that no other short padded proof of the
+same formula exists; $P$ might have alternative proofs. Its limited
+purpose is to show concretely why a verifier's polynomial runtime and
+an explicit string-level translation are different requirements.
+A purported lower bound on all translations would need a proof-length
+lower bound for every alternative proof, which is not provided here.
+
+\paragraph{Adversarial checks and first gap.}
+The finite diagnostic implements the truth-table baseline on small
+formulas, finite branch combinations and a delayed-unsoundness program.
+It checks that every accepted baseline output is a tautology, that branch
+translations preserve outputs, and that a guard tested only below the
+delay misses the later contradiction. These are exact Boolean checks,
+not an experiment purporting to decide a universal semantic property.
+
+\textbf{Outcome: UNRESOLVED.} The construction for finite families and
+sound enumerable cofinal collections is complete, with simulation clocks
+and output lengths accounted for. The exact remaining gap is to obtain
+such a cofinal collection, or another universal sound verifier with
+efficient translators, without deciding the unenumerable semantic set
+in (355.2) and without paying truth-table padding costs. The conditional
+$P=NP$ proof, weak short-proof simulation, and 2026 oracle results do
+not close that gap unconditionally.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Optimal proof systems for propositional logic and complete sets.
+\url{https://eccc.weizmann.ac.il/eccc-reports/1997/TR97-026/index.html}.
+\textit{Formulation source.}
+\item[E1]Fabian Egidy, \emph{The SPARSE-Relativization Framework and
+Applications to Optimal Proof Systems}, arXiv:2602.02294 (2026).
+\url{https://arxiv.org/abs/2602.02294}.
+\textit{Primary abstract inspected 27 September 2026; oracle and
+relativization results are distinguished from an unrelativized resolution.}
+\end{itemize}
+\end{document}

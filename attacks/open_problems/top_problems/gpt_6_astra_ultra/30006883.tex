@@ -1,0 +1,329 @@
+% TOP_PROBLEM: {"id": 30006883, "title": "The Word Problem for One-Relation Monoids", "category_id": 4, "category": {"id": 4, "name": "algebra", "display_name": "Algebra", "description": "Group theory, ring theory, field theory, and algebraic structures.", "slug": "algebra", "order_index": 4, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{The Word Problem for One-Relation Monoids}{The Word Problem for One-Relation Monoids}}\label{30006883}
+\subsection{Definitions and mathematical statement}
+For a finite alphabet $A=\{a_1,\ldots,a_n\}$, the free monoid $A^*$ consists of finite words, including the empty word, with concatenation. A one-relation monoid is
+\[
+ M=\langle A\mid u=v\rangle=A^*/{\sim},
+\]
+where $\sim$ is the least equivalence relation compatible with concatenation and containing $u\sim v$. Its word problem is to decide, given $w,w'$, whether $w\sim w'$. The catalogue combines two formulations: decidability for every fixed one-relation presentation, and an algorithm taking the presentation itself as input. The latter is a uniform decision problem and is logically stronger than an unqualified assertion that each fixed presentation has some algorithm. Both interpretations should be kept distinct; an algorithm announced for the general case must specify which quantifiers it establishes.
+\par\smallskip\textit{Formulation and concept references:} \href{https://arxiv.org/abs/2105.02853}{[S1]}.
+
+\subsection{Short English statement}
+Can equality of words always be decided in monoids defined by one relation, and can this be done uniformly from the presentation?
+\subsection{Research attempt}
+\paragraph{Scope and literature audit (27 September 2026).}
+Equality means a finite sequence of substitutions inside arbitrary left
+and right contexts, using either direction of the single relation.
+The empty word is allowed. Cancellation, inversion and changes of
+presentation must be justified; they are not free operations on words
+in a monoid. The uniform version asks for one algorithm taking
+$(A,u,v,w,w')$, not a different unspecified algorithm for each pair
+$(u,v)$. Every positive algorithm below is uniform on its stated class.
+
+Nyberg-Brodda's primary survey [S1] explicitly treats the general problem
+as open and warns about inaccurate reductions in the literature. Its
+accepted version was inspected. Recent papers on Diophantine problems,
+submonoid membership and one-relator \emph{inverse} monoids address
+other decision problems; their titles do not supply an undecidable
+ordinary word problem for a one-relation monoid. The present attempt
+uses none of those claims as a general solution.
+
+The attack is to orient the relation and identify exactly when terminating
+reduction gives an equality test. This yields several complete classes,
+an effective sufficient confluence test, and explicit counterchecks of
+the two common shortcuts: canceling letters and choosing an arbitrary
+irreducible representative.
+
+\paragraph{The positive instances are uniformly enumerable.}
+Put an edge between words $p u q$ and $p v q$, for all $p,q\in A^*$.
+The connected components of this undirected graph are exactly the
+congruence classes. To see this, graph connectivity is an equivalence
+relation containing $u=v$ and is preserved by adding contexts. Conversely
+every edge belongs to the defining congruence. The two minimality
+statements establish equality of the relations.
+
+Each word has finitely many neighbors, effectively listable by scanning
+its possible occurrence positions. This remains true if a relation side
+is empty: a word of length $L$ has $L+1$ insertion positions. Breadth-first
+search starting from $w$ therefore eventually finds $w'$ if the two
+are congruent. It also returns a finite checkable substitution certificate.
+It need not halt when they are unequal. Running searches from both ends
+does not change that issue; two disjoint infinite components can each
+continue producing new vertices forever.
+
+If $u=v$ as literal strings, there are no nontrivial substitutions and
+free-word equality is the answer. Assume henceforth that the two sides
+differ. Alphabet symbols not occurring in the relation are still retained
+in every algorithm, rather than silently removed from the input.
+
+\paragraph{A complete uniform algorithm for length-preserving relations.}
+\textbf{Proposition 359.1.} If $|u|=|v|$, the word problem is uniformly
+decidable from the presentation.
+
+\emph{Proof.} Substitutions preserve length. Unequal input lengths
+therefore prove inequality immediately. If both lengths are $L$, the
+entire component of either input is contained in the finite set $A^L$.
+Enumerate this graph and run breadth-first search, stopping when its
+finite reachable set is exhausted. Membership of $w'$ in that set is
+exactly congruence, by the preceding graph characterization.
+\hfill$\square$
+
+For $a=|A|\ge2$ there are at most $a^L$ vertices. A direct implementation
+scans $O(L)$ possible positions per side, compares words and stores
+visited strings of length $L$. Thus a deliberately coarse bound is
+$a^L$ times a polynomial in $L+|u|+a$, both in time and in total stored
+bits. This is a decision theorem, not a polynomial-time claim. For a
+one-letter alphabet there is only one word of each length. The empty
+alphabet has just its empty word and is immediate as well.
+
+The proof depends on all paths preserving length. For unequal relation
+lengths, the existence of short endpoints does not bound intermediate
+lengths. Imposing an arbitrary length cutoff then changes a complete
+search into an incomplete one.
+
+\paragraph{Orienting one rule gives termination, but not automatically a normal form.}
+Fix an order on $A$ and use shortlex order on words: compare length
+first, then lexicographic order among words of equal length. Orient the
+larger relation side $l$ toward the smaller side $r$. A replacement
+$p l q\to p r q$ strictly decreases shortlex order. If lengths differ,
+the total length decreases; if they agree, the first changed letter
+lies inside the occurrence and decreases lexicographically.
+
+All descendants of a word of length $L$ lie in the finite set of words
+of length at most $L$. Consequently every forward reduction terminates.
+When $|l|>|r|$, there are at most $L/(|l|-|r|)$ steps; a naive rescan
+implementation is polynomial in the explicit input length. In the
+length-preserving case a strictly decreasing sequence can have
+exponentially many terms, and no polynomial bound follows merely
+from this order.
+
+A terminal word contains no occurrence of $l$ and is called irreducible.
+An arbitrary deterministic choice of occurrence computes \emph{an}
+irreducible word. To make it an equality invariant requires confluence:
+any two forward descendants of a common ancestor must have a common
+forward descendant. Termination and confluence together give a unique
+irreducible word, which we denote by $\operatorname{nf}(w)$.
+
+\paragraph{Why confluence makes reduction a complete decision procedure.}
+Suppose the oriented system is terminating and confluent. Every word
+has an irreducible descendant by termination; two such descendants must
+coincide by confluence. If $x\to y$ is one elementary reduction, then
+$x$ and $y$ have the same normal form. The same is true of its inverse.
+Along every finite congruence path the normal form is therefore unchanged.
+Conversely, reducing two inputs to a common word gives a congruence path
+between them by reversing one of the reductions. Hence
+\[
+ w\sim w'\quad\Longleftrightarrow\quad
+ \operatorname{nf}(w)=\operatorname{nf}(w').
+ \tag{359.1}
+\]
+This proof covers substitutions in either direction even though the
+algorithm itself only uses the decreasing direction.
+
+Here is the termination-to-confluence lemma in the form needed below.
+A terminating relation is confluent if every one-step peak
+$x\leftarrow z\to y$ has joinable endpoints. Prove this by well-founded
+induction on $z$. Two reduction paths either start with the same step,
+in which case the induction hypothesis below that step joins them, or
+start with a peak. Join its endpoints at $v$. Induct below each endpoint
+to join its given descendant with $v$; then induct below $v$ to join
+the resulting descendants. All applications are strictly below $z$.
+This is the usual proof of Newman's lemma; its decreasing hypothesis
+is available here, rather than assumed for an arbitrary completion.
+
+\paragraph{A complete class: the larger side has no proper self-overlap.}
+A nonempty word $l$ is unbordered if no nonempty proper prefix is also
+a suffix. This is decidable by comparing its at most $|l|-1$ possible
+border lengths.
+
+\textbf{Proposition 359.2.} If the shortlex-larger side $l$ is unbordered,
+the single-rule system $l\to r$ is confluent and uniformly decides
+the presented word problem by (359.1).
+
+\emph{Proof.} Consider two occurrences of $l$ in a word. If their
+intervals coincide, the two reductions agree. If they overlap properly,
+the overlap is a nonempty proper suffix and prefix of $l$, contradicting
+unborderedness. Otherwise they are disjoint. Replacing either occurrence
+leaves a corresponding occurrence of the other, and doing both replacements
+in either order gives the same word. New occurrences created by a
+replacement are irrelevant: the original other occurrence still gives
+this specific joining path. Thus all one-step peaks join, and termination
+plus the preceding lemma gives confluence.\hfill$\square$
+
+For example $ab\to1$ has an unbordered left side. So does any relation
+whose larger side has all letters distinct. The hypothesis is sufficient,
+not necessary: $aa\to a$ has an overlapping left side but plainly still
+has a unique irreducible word on each block of $a$'s.
+
+\paragraph{All remaining critical peaks can be checked effectively.}
+For a single rule, disjoint occurrences have already been handled.
+A proper overlap is described by
+\[
+ l=ab=bc,\qquad 0<|b|<|l|,
+\]
+where the word $abc$ contains the two overlapping occurrences of $l$.
+The two immediate descendants are $rc$ and $ar$. There are at most
+$|l|-1$ such overlaps. There are no proper containment peaks between
+two equal-length copies of the same left side.
+
+The descendants of each endpoint lie in a finite, explicitly bounded
+set of words, because our fixed rule is nonincreasing in length and
+terminating. Enumerate their forward descendants and test whether the
+two sets intersect. If every overlap pair joins, the same joins work
+inside arbitrary surrounding contexts. All one-step peaks then join,
+so the preceding proof establishes confluence. Conversely confluence
+requires each of these finitely many pairs to join.
+
+This gives a terminating algorithm to decide whether this particular
+one-rule orientation is confluent. If it is, it also supplies a uniform
+word-problem algorithm. A negative answer says only that this orientation
+has inadequate normal forms. It does not imply undecidability of the
+monoid, or rule out another finite or infinite effective rewriting system.
+
+\paragraph{An exact counterexample to the irreducible-word shortcut.}
+Take the relation $aba=ab$ and orient it as $aba\to ab$. It is strictly
+length reducing. The word $ababa$ has two overlapping occurrences:
+\[
+ ababa\longrightarrow abba,
+ \qquad
+ ababa\longrightarrow abab\longrightarrow abb.
+\]
+Both $abba$ and $abb$ contain no $aba$, so both are irreducible. They
+are different words but are congruent through the displayed ancestor.
+Thus comparing arbitrary irreducible reductions can report a false
+negative, even with only one defining relation and a strictly decreasing
+length measure.
+
+The finite critical-peak test detects precisely this failure. Adding
+an extra rule to join these two outputs is a possible next step, but
+that creates further overlaps requiring their own analysis. A promise
+that completion eventually stabilizes would be an additional theorem,
+not a consequence of having started with one relation.
+
+\paragraph{A worked noncancellative example: the bicyclic monoid.}
+For $M=\langle a,b\mid ab=1\rangle$, Proposition 359.2 proves that
+the unique irreducible words are
+\[
+ b^i a^j,\qquad i,j\ge0.
+\]
+Indeed, a word with no adjacent $ab$ has all its $b$'s before all its
+$a$'s: if some $a$ preceded some later $b$, the first transition from
+an $a$-block to a $b$-block would contain $ab$. Conversely the displayed
+words contain no reducible factor. Their multiplication is explicit:
+\[
+ (b^ia^j)(b^ka^l)=b^{i+k-t}a^{j+l-t},
+ \qquad t=\min(j,k).
+ \tag{359.2}
+\]
+Only the central $a^jb^k$ cancels, exactly $t$ times.
+
+This example refutes a reduction to the one-relator \emph{group}
+with the same relation. That group also has $ba=1$, but in the monoid
+$ba$ and the empty word are distinct irreducibles. An independent
+representation makes the failure concrete. On $\mathbb N$ let
+$a(n)=\max(n-1,0)$ and $b(n)=n+1$, composing maps right to left.
+Then $ab$ is the identity, whereas $ba(0)=1$. Hence the relation holds
+in this transformation monoid but $ba=1$ fails. No group-completion
+argument can preserve all monoid equalities and inequalities here.
+
+Nor can one cancel the outer $a$ from $aba=a$, although that equality
+is valid because $ab=1$. Left cancellation would incorrectly give
+$ba=1$. This is a concrete reason to check cancellativity before using
+cancellation in a proposed algorithm.
+
+\paragraph{The complete one-generator case, including an empty side.}
+Let the alphabet be $\{a\}$ and the relation be $a^r=a^s$, with
+$r>s\ge0$. Put $d=r-s>0$. Reducing $a^r$ to $a^s$ subtracts $d$
+from every length at least $r$. Define
+\[
+ f(L)=\begin{cases}
+ L,&L<s,\\
+ s+((L-s)\bmod d),&L\ge s.
+ \end{cases}
+\]
+Repeated reduction ends at $a^{f(L)}$: for $s\le L<r$ this formula
+already equals $L$, and for $L\ge r$ each step subtracts $d$ until
+that interval is reached. Every occurrence replacement has the same
+length effect, so every reduction path has this endpoint.
+
+A relation step in either direction preserves $f$. Indeed its two
+lengths are $r+h$ and $s+h$ for some $h\ge0$, both at least $s$ and
+congruent modulo $d$. Thus equality is equivalent to equality of these
+normal lengths. This proves a uniform decision algorithm, including
+$s=0$, when the monoid is cyclic of order $r$. If $r=s$, literal
+length equality is the answer instead. The arithmetic formula is not
+an assertion that arbitrary multi-letter words are determined by their
+lengths.
+
+\paragraph{Useful negative certificates and their limit.}
+Every assignment of weights $c_a\in\mathbb Z$ to letters for which
+$\sum_a c_a|u|_a=\sum_a c_a|v|_a$ gives a monoid homomorphism to
+$(\mathbb Z,+)$. Different total weights certify inequality. The same
+is true of any explicitly supplied finite monoid and any letter
+assignment satisfying the relation: evaluate both input words there.
+These are sound tests, and finite monoids and their multiplication
+tables can be exhaustively enumerated and checked for associativity.
+
+Running all such finite tests in parallel with congruence-path search
+would decide the problem for a presentation known to be residually
+finite. That hypothesis cannot be dropped. The bicyclic monoid already
+shows why: in every finite monoid $ab=1$ implies $ba=1$. To prove this,
+left multiplication by $a$ is surjective because $a(bx)=x$, hence
+injective on the finite set. Since $a(ba)=a=a1$, injectivity gives
+$ba=1$. Thus no finite-monoid homomorphism separates its distinct
+words $ba$ and $1$. Its word problem is nevertheless decidable by the
+normal forms above. Finite-quotient separation is a sufficient strategy,
+not an automatic property or a necessary route to decidability.
+
+\paragraph{Diagnostics and first unresolved step.}
+The companion exact checks enumerate overlap descendants, recover the
+two irreducibles for $aba=ab$, compare the bicyclic multiplication formula
+with actual reduction, and check the one-letter normal-length invariant.
+All calculations concern finite words and exact substitutions; no finite
+cutoff is interpreted as proving inequality in an unrestricted search.
+
+\textbf{Outcome: UNRESOLVED.} The attempt supplies uniform decision
+algorithms for length-preserving relations, unbordered decreasing sides,
+all presentations passing the finite one-rule confluence test, and the
+one-generator case. In the general unequal-length case the first gap
+is a complete effective way to control nonconfluent reductions or all
+possible expansions. Neither terminating one-way reduction, a finite
+quotient search, nor passing to a one-relator group supplies that step.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]The Word Problem for One-relation Monoids: A Survey (Carl-Fredrik Nyberg-Brodda).
+\url{https://arxiv.org/abs/2105.02853}.
+\textit{Formulation source.}
+\item[E1]Carl-Fredrik Nyberg-Brodda, \emph{Undecidability of the
+Diophantine problem for one-relator groups and one-relation monoids},
+arXiv:2608.01983v1, 3 August 2026.
+\url{https://arxiv.org/abs/2608.01983}.
+\textit{Primary abstract inspected 27 September 2026. Solving equations
+with unknowns is distinguished from equality of two specified words.}
+\item[E2]Robert D. Gray and Catherine Reilly, \emph{The word problem
+for two-generator one-relator inverse monoids}, arXiv:2608.04650v1,
+5 August 2026.
+\url{https://arxiv.org/abs/2608.04650}.
+\textit{Primary abstract inspected 27 September 2026. The inverse-monoid
+category and prefix-membership problem are not the ordinary monoid
+word problem of the catalogue.}
+\end{itemize}
+\end{document}

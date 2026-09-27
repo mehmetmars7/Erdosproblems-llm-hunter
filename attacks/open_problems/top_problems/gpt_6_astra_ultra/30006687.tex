@@ -1,0 +1,250 @@
+% TOP_PROBLEM: {"id": 30006687, "title": "P versus NP ∩ coNP", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{P versus NP ∩ coNP}{P versus NP ∩ coNP}}\label{30006687}
+\subsection{Definitions and mathematical statement}
+A language lies in $\mathsf{NP}\cap\mathsf{coNP}$ when both membership and nonmembership have polynomial-length certificates verifiable in deterministic polynomial time. Thus there are verifiers $V_1,V_0$ and polynomial length bounds satisfying
+\[
+ x\in L\iff\exists y\,V_1(x,y)=1,\qquad
+ x\notin L\iff\exists z\,V_0(x,z)=1.
+\]
+Determine whether every such language belongs to $\mathsf P$, that is, $\mathsf P=\mathsf{NP}\cap\mathsf{coNP}$. Algorithms are uniform and unrelativized, and inputs are total languages rather than promise problems.
+\par\smallskip\textit{Formulation and concept references:} \href{https://www.scottaaronson.com/democritus/lec6.html}{[S1]}.
+
+\subsection{Short English statement}
+When both answers have efficiently checkable certificates, must the answer itself be efficiently computable?
+\subsection{Research attempt}
+\paragraph{Scope, source check, and method.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. It examines the gap between verifying either answer and finding the
+answer, using an explicit total factor-threshold language and a careful
+analysis of certificate search. The two verifiers in the definition belong
+to a fixed language; their correctness and coverage hold on every input.
+No advice, oracle, or unmentioned promise is introduced.
+
+Aaronson's lecture [S1] gives the class-comparison context. The recent
+permutation paper [S3] explicitly obtains separations relative to random
+permutations and related randomness notions. These do not constitute the
+unrelativized separation requested here. The only substantial external
+algorithm used in the concrete certificate construction below is the
+deterministic polynomial-time primality test of Agrawal--Kayal--Saxena [E1].
+That theorem recognizes prime numbers; it does not output their factors.
+All reductions and certificate bookkeeping used here are proved explicitly.
+
+The easy containment $\mathsf P\subseteq\mathsf{NP}\cap\mathsf{coNP}$
+uses the deterministic decider itself as a verifier for each answer, with
+an empty witness. To prove strict containment one needs a total language
+having both certificate types but no deterministic polynomial-time decider.
+To prove equality one needs a uniform decider for every fixed pair of
+correct two-sided certificate relations. Neither task is accomplished by
+exhibiting an interesting pair of verifiers alone.
+
+\paragraph{Attack A: a fully total decision version of factoring.}
+Fix a standard, efficiently parsed binary encoding of pairs of nonnegative
+integers. Define
+\begin{equation}\label{a34:factorlanguage}
+ F=\{\langle N,K\rangle:N\ge2,\ \exists d\in\mathbb Z,
+                         \ 2\le d<N,\ d\le K,\ d\mid N\}.
+\end{equation}
+Malformed strings and pairs with $N<2$ are not in $F$. No promise of
+compositeness, semiprimality, or a restricted threshold is imposed. The bit
+length of a valid input is comparable to the sum of the bit lengths of
+$N$ and $K$, and polynomial means polynomial in that length.
+
+\paragraph{Lemma 34.1: both answers have short certificates.}
+The language $F$ belongs to $\mathsf{NP}\cap\mathsf{coNP}$.
+
+\emph{Yes-certificates.} A witness is the divisor $d$. Verify the bounds
+$2\le d<N$, $d\le K$, and compute $N\bmod d$. Its length is at most
+$O(\log(N+2))$, and ordinary integer arithmetic verifies it in polynomial
+time. No claim that $d$ itself is prime is needed.
+
+\emph{No-certificates.} Malformed inputs, $N<2$, and $K<2$ can be recognized
+and rejected by the language decider immediately, so their nonmembership
+certificates are a fixed tag. In the remaining cases provide a list of
+primes, repeated with multiplicity,
+\[
+                       p_1,\ldots,p_t,\qquad N=\prod_{i=1}^t p_i.
+\]
+Check the product exactly and check primality of each entry using [E1].
+The no-verifier then accepts if either $t=1$ or every $p_i>K$.
+The product condition with prime entries implies $t\le\log_2 N$, and the
+list has polynomial encoded length, for example $O((\log(N+2))^2)$ with
+simple delimiters.
+
+If $t=1$, $N$ is prime and has no proper divisor. If $t\ge2$, every prime
+factor is proper. A divisor $d\ge2$ of $N$ contains a prime factor $p_i$
+with $p_i\le d$. Thus all prime factors being greater than $K$ precludes
+an allowed divisor. Conversely, if $N$ is composite and has no allowed
+divisor, none of its prime factors can be at most $K$; its complete prime
+factorization is therefore an accepted no-certificate. This proves soundness
+and completeness for both sides, including $K\ge N$ and prime $N$.
+\hfill$\square$
+
+The distinction between existence and discovery is visible here. A complete
+factorization can be checked quickly even though no deterministic
+polynomial-time construction of such a list is supplied. The no-verifier
+must verify that the supplied prime factors multiply to all of $N$;
+an incomplete list would not rule out a smaller omitted factor.
+
+\paragraph{Lemma 34.2: deciding this language is equivalent to factoring.}
+The following are equivalent: $F\in\mathsf P$, and there is a deterministic
+polynomial-time algorithm outputting a complete prime factorization of every
+binary integer $N\ge2$.
+
+\emph{Proof, decision to factorization.} Given $N$, query $F$ at $(N,N-1)$.
+A no answer says $N$ is prime. A yes answer says it is composite, and the
+predicate $K\mapsto\mathbf1_F(N,K)$ is monotone. Binary search on
+$2\le K\le N-1$ finds its smallest true threshold using $O(\log N)$
+queries. That threshold is the smallest prime factor: the smallest proper
+divisor cannot be composite, since a prime divisor of it would be a smaller
+proper divisor of $N$. Output this prime, replace $N$ by its quotient, and
+repeat until the quotient is one or is declared prime.
+
+Every removal divides the current integer by at least two. There are at
+most $\log_2 N$ removals, and every query has $O(\log N)$ bits. Thus
+$O((\log N)^2)$ calls to a polynomial-time decider, together with polynomial
+integer arithmetic, suffice. The search uses binary thresholds and never
+loops through $N$ candidate integers.
+
+\emph{Proof, factorization to decision.} First reject malformed or out-of-range
+inputs. Factor $N$. If the list has one prime entry, answer no. Otherwise
+compare the smallest prime factor with $K$. The equivalence established
+in Lemma 34.1 proves this decides \eqref{a34:factorlanguage}. Polynomial
+time is measured in the binary input length in both directions.
+\hfill$\square$
+
+Consequently equality of the two classes in the target would imply
+deterministic polynomial-time factoring. A proof that this particular total
+language is outside P would give a negative answer to the target. Neither
+a lack of a known factoring algorithm nor success of quantum factoring is
+such a classical lower bound. Conversely, a classical factoring algorithm
+would settle this candidate language but would not establish the class
+equality for all two-sided certificate relations.
+
+\paragraph{Attack B: convert two certificates into a total search task.}
+Pad the witness bounds to a common polynomial $p(n)$, using an explicit
+length field if necessary. Define the polynomially checkable relation
+\[
+ R(x,b,w)\quad\Longleftrightarrow\quad
+      b\in\{0,1\},\quad |w|\le p(|x|),\quad V_b(x,w)=1.
+\]
+For every input $x$, some pair $(b,w)$ satisfies $R$, and all satisfying
+pairs have the same bit $b=1_L(x)$. A polynomial-time algorithm finding any
+such pair would decide $L$. This gives a sufficient search route, but
+totality alone does not supply the search algorithm.
+
+Exhaustive search through both types of witness does terminate, with an
+upper bound exponential in the polynomial witness length. If either side
+has witnesses of length at most $c\log(n+2)$, exhaustive search on that
+side alone is polynomial and decides the language: acceptance of one
+witness gives that side's answer, and absence of all witnesses gives the
+other. For a general polynomial bound $p(n)$, the same enumeration has
+$2^{\Theta(p(n))}$ candidates and proves no polynomial runtime.
+
+\paragraph{The prefix-extension gap in search-to-decision.}
+A natural strategy is to ask whether a desired witness can begin with a
+given prefix. For yes-certificates this predicate is
+\[
+ S=\{(x,u):\exists w\text{ extending }u,\ |w|\le p(|x|),\ V_1(x,w)=1\}.
+\]
+It is in NP. However a no answer need not be certified by $V_0$: there
+may be a valid yes-certificate for $x$ beginning with another prefix.
+For an explicit example take the trivial language of all strings and let
+$V_1(x,w)$ accept exactly when $w=0^{|x|}$, while $V_0$ always rejects.
+For $|x|\ge1$ the prefix $1$ has no extension, although no $V_0$ certificate
+exists. Thus the proposed complement verifier fails on a concrete input.
+This does not prove that $S$ is outside coNP; it proves that the original
+pair of verifiers does not automatically certify prefix nonextendibility.
+
+Accordingly, even assuming the equality asked in this problem would not
+justify invoking it on every NP prefix predicate. Under the stronger
+assumption $\mathsf P=\mathsf{NP}$, those queries could be answered and
+ordinary prefix search would work. Importing that stronger assumption here
+would change the problem.
+
+\paragraph{Why finding the presented witness can be a stronger demand.}
+Let $T(x,w)$ be any polynomial-time decidable, polynomially balanced relation
+with at least one witness for every input. These are the total NP search
+ relations commonly grouped under TFNP [E2]. Set $L=\{0,1\}^*$, let
+$V_1(x,w)=T(x,w)$, and let $V_0$ always reject. This is a valid two-sided
+certificate description of a language already in P. Yet finding a witness
+for this particular $V_1$ is exactly the original total search problem.
+Therefore a method that efficiently finds witnesses for \emph{every supplied}
+valid verifier pair would solve all such total search problems, even for
+constant-answer languages. The class-equality question only asks to decide
+the answer; it does not demand efficient search for arbitrary presented
+certificate systems. This construction identifies the additional obligation
+in the proposed search route, without asserting a separation for TFNP.
+
+There is a related promise trap in making the verifier pair itself part of
+the input. Arbitrary pairs of polynomial-time programs need not be sound,
+disjoint, or collectively total. Two always-rejecting verifiers leave every
+input uncovered; two always-accepting verifiers certify both answers. A
+universal problem restricted to well-behaved pairs therefore has a semantic
+promise unless one supplies a separate, sound way to enforce that condition.
+No total-language completeness result is obtained merely by writing down
+such program pairs.
+
+\paragraph{Verification, remaining gap, and outcome.}
+The companion exact checks compare the factor-threshold predicate with the
+prime-factor certificate criterion over small integers and every relevant
+threshold, including primes, squares, repeated factors, and thresholds
+outside $[2,N-1]$. They then implement the binary-search reduction and
+recover the complete factorizations in those cases. Small examples also
+test the prefix obstruction. Trial division is used only inside this finite
+verification script; the polynomial verifier in Lemma 34.1 invokes the
+established primality theorem, not trial division on binary integers.
+
+\textbf{UNRESOLVED.} The concrete progress is a total language with fully
+specified certificates on both sides and a proved deterministic equivalence
+to factoring. The general search route has exact missing steps: totality
+is not a polynomial search procedure, the complement of a prefix predicate
+is not supplied by the opposite-answer verifier, and arbitrary verifier
+pairs need not define total languages. A solution still requires either
+one unconditional lower bound for a genuine two-sided-certificate language,
+or a uniform decision method for every such language. No such bound or
+method is established, and no novelty is claimed for the standard reductions
+or elementary counterexamples.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Scott Aaronson, PHYS771 Lecture 6: P, NP, and Friends.
+\url{https://www.scottaaronson.com/democritus/lec6.html}.
+\textit{Formulation source.}
+\item[S2]Very few problems are in NP intersect coNP but not known to be in P. What to make of that?.
+\url{https://blog.computationalcomplexity.org/2024/09/very-few-problems-are-in-np-intersect.html?m=0}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Random Permutations in Computational Complexity.
+\url{https://arxiv.org/abs/2511.08786}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Manindra Agrawal, Neeraj Kayal, and Nitin Saxena,
+\emph{PRIMES is in P}, Annals of Mathematics 160(2) (2004), pp. 781--793.
+\url{https://annals.math.princeton.edu/2004/160-2/p12}.
+\url{https://annals.math.princeton.edu/wp-content/uploads/annals-v160-n2-p12.pdf}.
+\textit{Primary source for deterministic polynomial-time primality testing;
+consulted 27 September 2026. Used to verify supplied prime factors, not
+as an algorithm to discover a factorization.}
+\item[E2]Nimrod Megiddo and Christos H. Papadimitriou,
+\emph{On Total Functions, Existence Theorems and Computational Complexity},
+Theoretical Computer Science 81(2) (1991), pp. 317--324, Section 1.
+\url{https://theory.stanford.edu/~megiddo/pdf/papadimX.pdf}.
+\textit{Primary definition of total polynomially verifiable search relations;
+consulted 27 September 2026. No unproved search-class separation is used.}
+\end{itemize}
+\end{document}

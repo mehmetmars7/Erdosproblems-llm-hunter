@@ -250,6 +250,8 @@ function renderOpenProblemRows(problems) {
         const source = getOpenProblemSources(problem)[0];
         const sourceLink = source
             ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener" title="${escapeHtml(source.citation || 'Original source')}">Source</a>` : '—';
+        const externalLink = !isMO && /^https:\/\/www\.unsolvedmath\.com\/problems\/[1-9]\d*$/.test(problem.external_url || '')
+            ? `<a href="${escapeHtml(problem.external_url)}" target="_blank" rel="noopener">UnsolvedMath</a>` : '';
         return `<tr>
             <td>${rank}</td>
             <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
@@ -259,7 +261,7 @@ function renderOpenProblemRows(problems) {
             <td>${attempts.length ? escapeHtml(formatCompletion(problem.completion)) || '—' : '—'}</td>
             <td>${labels.length ? labels.map(escapeHtml).join(', ') : '—'}</td>
             <td>${sourceLink}</td>
-            <td></td>
+            <td>${externalLink}</td>
         </tr>`;
     }).join('');
 }
@@ -277,7 +279,7 @@ function getAttemptPreview(erdos, openProblems, limit = 10) {
     const openRows = Object.values(openProblems || {}).filter(problem => getMathematicalAttempts(problem.attacks).length)
         .sort(sortOpenProblems).map(problem => ({
             href: getOpenProblemHref(problem),
-            label: `${getOpenProblemCollection(problem) === 'mo' ? 'MathOverflow' : `Top Open Problem #${problem.rank}`}: ${problem.title || problem.id}`,
+            label: `${getOpenProblemCollection(problem) === 'mo' ? 'MathOverflow' : 'Top Open Problem'}: ${problem.title || problem.id}`,
             count: getMathematicalAttempts(problem.attacks).length
         }));
     const result = [];

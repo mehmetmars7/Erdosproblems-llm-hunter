@@ -1,0 +1,226 @@
+% TOP_PROBLEM: {"id": 30006678, "title": "NP versus P/poly", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{NP versus P/poly}{NP versus P/poly}}\label{30006678}
+\subsection{Definitions and mathematical statement}
+A Boolean circuit is a finite directed acyclic computation with binary AND/OR gates, unary NOT gates, input bits, constants, and one output. Define $\mathsf{P/poly}$ by
+\[
+ L\in\mathsf{P/poly}\ \Longleftrightarrow\ \exists C,k\ \forall n\ge0\ \exists C_n:
+ |C_n|\le C(n+1)^k,\quad C_n(x)=1_L(x)\ (|x|=n).
+\]
+All nodes are counted. No algorithm for generating $C_n$ is required. With $\mathsf{NP}$ defined by polynomially checkable witnesses, determine whether $\mathsf{NP}\subseteq\mathsf{P/poly}$. Different languages may have different size bounds.
+\par\smallskip\textit{Formulation and concept references:} \href{https://theory.cs.princeton.edu/complexity/book.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can every efficiently verifiable decision problem be solved by small circuits when a different circuit may be chosen separately for each input length?
+\subsection{Research attempt}
+\paragraph{Scope and literature check.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026 by checking the catalogue, deriving a counting construction, and then
+looking for the first place where it fails to yield an NP lower bound.
+The circuit basis and the convention that input and constant nodes count
+are retained. Unbounded search for the appropriate circuit is permitted in
+$\mathsf{P/poly}$; a lower bound on the time needed to \emph{find} circuits
+would not settle this question.
+
+The circuit/advice equivalence and Karp--Lipton implication in [S1],
+Sections 6.1--6.2, were checked. The latter says that
+$\mathsf{NP}\subseteq\mathsf{P/poly}$ collapses the polynomial hierarchy to
+its second level; a collapse is a consequence, not a contradiction already
+known to be impossible. The original nonuniform-to-uniform work is [E1].
+The counting argument below is deliberately elementary and self-contained;
+it is not claimed to improve known circuit lower bounds.
+
+Write $s_L(n)$ for the least number of nodes in a circuit for the length-$n$
+characteristic function of $L$. A negative answer needs
+\[
+ \exists L\in\mathsf{NP}\ \forall C>0\ \forall k\ge1\ \exists n:
+                       s_L(n)>C(n+1)^k.
+\]
+Equivalently, one fixed NP language must beat each fixed polynomial bound
+on infinitely many lengths. The word ``fixed'' applies to the language and
+its verifier before choosing the exponent to be defeated. A family of
+languages indexed by that exponent does not suffice.
+
+\paragraph{Attack plan: make the counting witness explicit.}
+There are $2^{2^n}$ Boolean functions on $n$ bits but only
+$2^{O(s\log(n+s))}$ circuits with at most $s$ gates. This proves that most
+functions require large circuits, but it does not place their truth tables
+inside a language with an NP verifier. A natural repair is to select the
+first missing truth table. The following construction makes that selection
+fully uniform, bounds its working storage, and identifies an additional
+failure: the selected language still has polynomial-size circuits.
+
+\paragraph{Lemma 12.1: an explicit fixed-exponent diagonalization.}
+For every fixed integer $k\ge1$, there is a language $L_k$ in
+$\mathsf{PSPACE}\cap\mathsf{P/poly}$ such that, for all sufficiently large
+$n$, no circuit of at most $n^k$ nodes computes its length-$n$ restriction.
+A deterministic decider can use $O(n^k\log(n+2))$ work bits and
+$2^{O(n^k\log(n+2))}$ time.
+
+\emph{Proof.} Put $s=n^k$ and $q=n+s+2$. Every circuit with at most $s$
+internal gates can be listed in topological order. For each gate allow at
+most four types and two source indices in a pool of size $q$; unused source
+slots and invalid choices only increase the count. There are at most $q$
+choices for the output. Summing over the possible number of gates yields
+the explicit upper bound
+\begin{equation}\label{a12:count}
+                 N=(s+1)q(4q^2)^s.
+\end{equation}
+Every circuit of at most $s$ \emph{total} nodes occurs in this larger class.
+Repeated encodings of the same circuit or function do not hurt the bound.
+The integer $N$ has
+\[
+                    B=\lceil\log_2(N+1)\rceil
+                       =O(n^k\log(n+2))
+\]
+bits. For all sufficiently large $n$, $B<2^n$.
+
+For each $j\in\{0,\ldots,N\}$, let $T_j$ be the $2^n$-bit binary expansion
+of $j$, padded by leading zeroes, regarded as a truth table in lexicographic
+input order. These $N+1$ tables are distinct. At most $N$ of them can be
+computed by the circuits being enumerated. Let $j_n$ be the smallest index
+whose table is not computed by any such circuit, and define
+\[
+                     1_{L_k}(x)=T_{j_n}[x]
+                    \qquad(|x|=n).
+\]
+Use the zero function at the finitely many lengths where $B\ge2^n$.
+The choice exists by counting and immediately gives the lower bound.
+
+To compute $j_n$, enumerate $j=0,\ldots,N$. For each $j$, enumerate the
+valid circuit descriptions and test whether each disagrees with $T_j$ on
+some input. Test equality by traversing all $2^n$ inputs, evaluating the
+circuit and one requested bit of $T_j$. Neither a circuit truth table nor
+the padded string $T_j$ is stored. The nonzero part of $T_j$ is contained
+in its last $B$ positions, so a requested bit is obtained from the $B$-bit
+integer $j$ and an $n$-bit position counter. A circuit description uses
+$O(s\log q)$ bits; its evaluation uses polynomially many additional bits,
+in fact $O(s+n)$ for gate values and the current input. Reuse this storage
+for the successive candidates. The circuit enumeration can likewise be
+implemented with $O(s\log q)$ counters and descriptions.
+
+There are at most $N+1$ candidates, at most $N$ circuit descriptions,
+and $2^n$ input evaluations per comparison. Thus the time is bounded by
+$(N+1)N2^n\operatorname{poly}(n,s)$, which is
+$2^{O(n^k\log(n+2))}$, and the work space is $O(B)$. Both exponents refer
+to the previously fixed integer $k$.
+
+Finally, $T_{j_n}$ contains at most $B$ ones. A circuit can hardwire all
+accepted strings of length $n$, test equality with each using $O(n)$ gates,
+and OR the results. Shared negated inputs and binary trees implement this
+with $O(nB+n)$ total nodes. Therefore
+\begin{equation}\label{a12:upper}
+                s_{L_k}(n)=O(n^{k+1}\log(n+2)),
+\end{equation}
+up to adjustment at finitely many lengths. This is a polynomial bound for
+fixed $k$, so $L_k\in\mathsf{P/poly}$. The enumeration algorithm gives
+$L_k\in\mathsf{PSPACE}$.\hfill$\square$
+
+This is more informative than saying that counting is nonconstructive.
+The counting witness here \emph{is} uniformly computable with a polynomial
+space bound, and nevertheless it provably fails the required nonuniform
+separation. The construction forces a bound larger than $n^k$, while its
+choice of small integer truth tables guarantees a somewhat larger polynomial
+upper bound. Both bounds hold for the same language without contradiction.
+
+\paragraph{Where an NP-certificate argument stalls.}
+For a candidate $j$ of polynomial bit length, its missing-table property is
+\begin{equation}\label{a12:quantifiers}
+ \forall\text{ circuits }C\text{ in the size bound}\quad
+ \exists x\in\{0,1\}^n:\ C(x)\ne T_j[x].
+\end{equation}
+Each individual disagreement is efficiently checked. But a list with one
+disagreement for every circuit can have exponential length. Guessing just
+$j$ does not verify the universal circuit condition. Guessing one circuit
+and one disagreement does not verify it either, because that reverses the
+quantifier pattern. Selecting the \emph{least} missing table additionally
+requires establishing that earlier candidates were not missing.
+
+Equation \eqref{a12:quantifiers} is a precise gap in this route, rather than
+a theorem that no NP verifier for $L_k$ could exist. The attempted verifier
+has not supplied a polynomial certificate for that universal condition.
+Even supplying one would still leave the upper bound \eqref{a12:upper} and
+the need to defeat every polynomial for a single language.
+
+\paragraph{Testing two repairs.}
+First, let $k$ grow slowly with $n$ and repeat the diagonalization. This can
+produce a single computable language whose slices eventually beat each
+fixed power. However its stored circuit descriptions have length
+$n^{k(n)}$ up to logarithmic factors. If $k(n)$ is unbounded, this is not
+bounded by any fixed polynomial. The particular decider above then has no
+polynomial-space guarantee, much less a polynomial NP witness bound.
+Scheduling a larger exponent at a sparse sequence of lengths does not
+change this worst-case requirement.
+
+Second, pad an input of length $n$ to length $N=n^d$, with $d$ fixed, hoping
+to pay for the search. A bound larger than $n^k$ then becomes only a bound
+larger than $N^{k/d}$, modulo the gates needed to hardwire padding. It still
+defeats a fixed exponent. If the padding is large enough to make an
+exponential search polynomial in the padded length, that same size change
+can make the inherited circuit bound much too small. Neither padding nor
+renaming the exponent repairs the quantifiers automatically.
+
+A positive answer would require polynomial circuits for an NP-complete
+language, such as SAT, with arbitrary dependence on input length allowed.
+No such circuit construction appears here. The absence of an efficient
+uniform circuit generator cannot be used as evidence against that answer.
+
+\paragraph{Verification.}
+The counting bound deliberately counts a larger gate model than the target,
+so the lower bound survives the convention that every node counts. The
+upper bound explicitly includes the $n$ input nodes, shared negations,
+equality tests, and output tree. Finitely many exceptional lengths can be
+hardwired into either description without affecting class membership.
+
+The companion script checks the finite core independently for $n=1,2,3$
+with one internal gate: it enumerates every permitted gate and source pair,
+forms the distinct truth tables, and finds the least omitted table when one
+exists. At one input every function already occurs; at larger inputs the
+missing-table selection is well defined. This checks the combinatorial
+selection, not the asymptotic resource analysis. In particular no experiment
+is presented as evidence that SAT needs large circuits.
+
+\paragraph{Outcome and next targets.}
+\textbf{UNRESOLVED.} A fully specified fixed-exponent diagonalization has been
+proved, together with a polynomial circuit upper bound for its own output.
+This decisively rejects that construction as a separation from
+$\mathsf{P/poly}$. Its mathematics is elementary; historical novelty is not
+claimed. The remaining target is one NP language with superpolynomial
+circuit complexity. Useful next steps would require a property specific to
+NP witness relations, a polynomial verifier surviving all exponent choices,
+and a lower-bound measure controlling unrestricted circuits rather than
+only one syntactic representation. None has been supplied here.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Arora and Barak, Computational Complexity: A Modern Approach, web draft January8,2007, Definitions6.1–6.3 and Theorem6.13; Aaronson, P ?= NP, Conjecture25.
+\url{https://theory.cs.princeton.edu/complexity/book.pdf}.
+\textit{Formulation source.}
+\item[S2]Boolean Circuits and P/poly, Cornell CS 6810, February 26, 2026.
+\url{https://www.cs.cornell.edu/courses/cs6810/2026sp/lec10.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Richard M. Karp and Richard J. Lipton,
+\emph{Some Connections between Nonuniform and Uniform Complexity Classes},
+Proceedings of STOC 1980, pp. 302--309.
+\url{https://doi.org/10.1145/800141.804678}.
+\textit{Original nonuniform-to-uniform reference. The precise second-level
+collapse used here was checked in [S1], Theorem 6.13, which credits
+improvements by Sipser; consulted 27 September 2026.}
+\end{itemize}
+\end{document}

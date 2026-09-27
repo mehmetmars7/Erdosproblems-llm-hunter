@@ -193,8 +193,8 @@ References: \\eqref{single}, \\ref{single}, \\eqref{unnumbered},
 \\eqref{row-one}, \\eqref{row-two}, \\ref{12}, \\ref{13}, \\ref{404}, \\eqref{12}.
 \`);
         const catalog = {
-            'problem.np-vs-ppoly': { id: 'problem.np-vs-ppoly', rank: 12, title: 'NP versus P/poly' },
-            'problem.np-versus-conp-problem': { id: 'problem.np-versus-conp-problem', rank: 13, title: 'NP versus coNP' }
+            '12': { id: 12, rank: 99, title: 'NP versus P/poly' },
+            '13': { id: 13, rank: 100, title: 'NP versus coNP' }
         };
         ProblemHunting.initTeXReferences(host, catalog);
         const before = attempt.querySelector('[data-tex-reference="single"]').textContent;
@@ -228,7 +228,7 @@ References: \\eqref{single}, \\ref{single}, \\eqref{unnumbered},
         assert.equal(reference(key).caption, `(${key})`, 'Unnumbered or ambiguous rows must not receive invented tags.');
         assert.match(reference(key).href, /^#tex-label-/, 'The source label must remain reachable.');
     }
-    assert.equal(reference('12', 'ref').href, 'problem.html?type=open_problems&id=problem.np-vs-ppoly');
+    assert.equal(reference('12', 'ref').href, 'problem.html?type=open_problems&id=12');
     assert.equal(reference('13', 'ref').caption, 'Local rank label');
     assert.match(reference('13', 'ref').href, /^#tex-label-/);
     assert.equal(reference('404', 'ref').href, null);

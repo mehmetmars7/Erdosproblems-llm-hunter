@@ -1,0 +1,18 @@
+# UnsolvedMath catalogue subset
+
+This directory contains selected catalogue metadata based on
+[UnsolvedMath](https://www.unsolvedmath.com/) by [Ulam AI](https://www.ulam.ai/)
+and the UnsolvedMath Contributors. The upstream dataset is available on
+[Hugging Face](https://huggingface.co/datasets/ulamai/UnsolvedMath).
+
+Imported curation and original metadata remain licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), not the software's
+Apache-2.0 licence. Referenced or incorporated source material may have separate
+terms. See [THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md) for attribution,
+changes, and source-specific licensing information.
+
+`problems.json` retains imported problem IDs and categories and includes our
+English statement summaries. Additional local records are distinguished by
+the absence of an upstream problem URL. `display_order.json` controls the
+website's ordering independently of problem identity. Extended `.tex`
+statements and LLM attempts are stored in `attacks/open_problems/top_problems/`.

@@ -26,11 +26,12 @@ for (const plain of [
 // Already-delimited TeX from the numbered definitions must stay unchanged.
 const definitions = path.join(root, 'attacks/open_problems/top_problems');
 let withMath = 0;
-for (let number = 1; number <= 500; number++) {
+const order = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/display_order.json'), 'utf8'));
+for (const number of order) {
     const source = fs.readFileSync(path.join(definitions, `${number}.tex`), 'utf8');
-    const fragments = source.match(/\\\[[\s\S]*?\\\]|(?<!\\)\$(?:\\.|[^$])*?\$/g) || [];
+    const fragments = source.replace(/^%[^\n]*$/gm, '').match(/\\\[[\s\S]*?\\\]|(?<!\\)\$(?:\\.|[^$\\])*?\$/g) || [];
     for (const fragment of fragments) assert.equal(prepare(fragment), fragment, `Definition ${number}`);
     if (fragments.length) withMath++;
 }
 assert.ok(withMath > 300);
-console.log(`Catalog notation tests passed; protected TeX checked in ${withMath}/500 definitions.`);
+console.log(`Catalog notation tests passed; protected TeX checked in ${withMath}/${order.length} definitions.`);

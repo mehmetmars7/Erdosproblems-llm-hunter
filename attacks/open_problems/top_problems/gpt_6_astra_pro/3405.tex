@@ -1,0 +1,284 @@
+% TOP_PROBLEM: {"id": 3405, "title": "P vs. BPP", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Standalone notebook; compile twice: lualatex 3405.tex
+% Original section preserved verbatim except for marked insertion blocks.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook: Problem 3405},
+ pdfauthor={Open Problems Math research notebook},bookmarksnumbered=true}
+\usepackage{bookmark,titlesec,fancyhdr}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math\enspace|\enspace Research notebook}
+\fancyhead[R]{\small\sffamily Problem 3405}
+\fancyfoot[L]{\small\sffamily 27 September 2026}
+\fancyfoot[R]{\small\sffamily \thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% BEGIN PRESERVED SECTION
+% ================================================================
+% problemId: 3405
+% Canonical problem ID: 3405
+% exactTarget SHA-256: 4dc5eb5c4530c8af4159767a2e6e06ac59a75b0bc2bb55658d4bf306465dfb54
+\clearpage
+\section*{\texorpdfstring{P vs. BPP}{P vs. BPP}}\label{3405}
+\subsection{Definitions and mathematical statement}
+A language $L$ is in $\mathsf{BPP}$ if a randomized polynomial-time algorithm $A$ satisfies $\Pr[A(x)=1_L(x)]\ge2/3$ for every input $x$. Membership in $\mathsf P$ requires a deterministic polynomial-time decision algorithm with no errors. Determine whether
+\[
+ \forall L\in\mathsf{BPP},\quad L\in\mathsf P.
+\]
+The simulation must work in the ordinary uniform model, not merely through nonuniform advice or for most inputs.
+\par\smallskip\textit{Formulation and concept references:} \sref{3405}{1}.
+\cataloguescope{Determine whether every language computable by a probabilistic polynomial-time algorithm with bounded two-sided error (BPP) can be computed by a deterministic polynomial-time algorithm, i.e., whether BPP = P.}
+\subsection{Short English statement}
+Can randomness always be removed from an efficient bounded-error decision algorithm without losing polynomial-time efficiency?
+% BEGIN RESEARCH 27
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+A central established conditional result is that exponential circuit
+hardness in $\mathsf E$ at all sufficiently large lengths suffices for
+$\mathsf{BPP}=\mathsf P$. The all-length and nonuniform-hardness
+qualifications cannot be removed from that implication. Vadhan gives
+this in Corollary~7.64 and discusses the infinitely-often distinction
+immediately afterward. \sref{3405}{1}. Doron--Moshkovitz--Oh--Zuckerman's
+May 2026 manuscript improves generator and hitting-set parameters for
+algorithms satisfying specified insensitivity properties, within the
+hardness-versus-randomness program; it does not establish unconditional
+derandomization of arbitrary BPP machines. \sref{3405}{3}, \eref{3405}{1}.
+The paper's abstract and parameter scope, and the recent course account
+\sref{3405}{2}, were checked. The argument below does not assume the hard
+function or the insensitivity property for every machine.
+
+\paragraph{Attack route.}
+The probabilistic method gives a short list of random tapes that is good
+for every input of a fixed length. The missing step is generating such a
+list uniformly. I combine this finite existence proof with a robust
+conditional-expectation selection rule, asking exactly what an efficiently
+computable pessimistic quantity would have to provide. The competing
+approach replaces the tapes with a bounded-independence distribution;
+an explicit BPP acceptance predicate tests whether that alone suffices.
+Nonuniform derandomization and conditional expectations are classical
+techniques treated separately in \sref{3405}{1}, Sections~3.2 and~3.4;
+the following calculation puts their computational gap in one place.
+
+\paragraph{Attempt.}
+Fix a BPP machine $A$ for a total language $L$. On inputs of length $n$,
+pad its randomness to exactly $r(n)\ge1$ bits, with $r(n)$ polynomially
+bounded and computable. Every input $x$ has error probability at most
+$1/3$. Take $k=24(n+2)+1$ independent tapes $R_1,\ldots,R_k$, so $k$ is
+odd, and let $A^{[k]}$ return their majority vote.
+
+\textbf{Lemma 27.1 (a simultaneously good polynomial-length tape list).}
+There is a fixed tuple $s_n=(R_1,\ldots,R_k)$ such that
+$A^{[k]}(x;s_n)=1_L(x)$ for every $x\in\{0,1\}^n$.
+
+\emph{Proof.} For fixed $x$, let $S$ count erroneous independent runs.
+Since each has error probability at most $1/3$,
+$\mathbb E2^S\le(4/3)^k$. Markov's inequality gives
+\[
+ \Pr[S\ge k/2]\le\left(\frac{2\sqrt2}{3}\right)^k=\rho^k.
+\]
+As $k$ is odd, majority error is included in this event. Also
+$\rho^2=8/9$ and $(8/9)^{12}<1/4$ (an exact rational inequality).
+The expected number of inputs on which the majority errs is at most
+\begin{equation}\label{r27:smallpotential}
+       2^n\rho^k<2^n4^{-(n+2)}\le1/16.
+\end{equation}
+If every tuple were bad on some input, that integer-valued count would
+always be at least one. Hence a tuple with no errors exists.\hfill$\square$
+
+The tuple has $kr(n)=\operatorname{poly}(n)$ bits. Hardwiring one such
+tuple for each $n$ proves a nonuniform circuit simulation, not the desired
+uniform algorithm. The proof has made no choice rule for $s_n$.
+
+\textbf{Lemma 27.2 (a robust conditional-expectation criterion).}
+Write $B=kr(n)$ and regard the tape tuple as a uniform $B$-bit string
+$S$. Let
+\[
+ Z(S)=\#\{x\in\{0,1\}^n:A^{[k]}(x;S)\ne1_L(x)\},
+ \qquad W(p)=\mathbb E[Z(S)\mid S\text{ extends }p].
+\]
+Suppose that, for this fixed machine, a uniform deterministic
+polynomial-time procedure computes on every prefix $p$ a rational number
+$\widetilde W(p)$ such that
+\begin{equation}\label{r27:estimate}
+             |\widetilde W(p)-W(p)|\le\frac1{8B}.
+\end{equation}
+Then $L\in\mathsf P$.
+
+\emph{Proof.} Starting at the empty prefix, compute the estimates for
+$p0,p1$ and append the bit with smaller estimated value. Since
+$W(p)=(W(p0)+W(p1))/2$, at least one true child value is at most $W(p)$.
+The chosen true value is at most this smaller true value plus $2/(8B)$.
+After $B$ choices the resulting string $s_n$ therefore satisfies
+\[
+          Z(s_n)=W(s_n)\le W(\varnothing)+1/4<1.
+\]
+The nonnegative integer $Z(s_n)$ must be zero. Generating the tuple takes
+$2B$ polynomial-time estimation calls; the majority of the $k$ runs is
+also polynomial time. The construction is uniform at every length,
+including small lengths, and uses no advice.\hfill$\square$
+
+This is a genuine sufficient algorithmic condition, but not an
+independently established estimator. In particular, $W$ is defined using
+the unknown correct language bits. On a full string it counts errors over
+$2^n$ inputs. Rewriting it as a finite sum does not make it polynomial-time
+computable. Replacing the language bits by majority over \emph{all}
+random tapes merely inserts further exponentially large sums. The
+conditional-expectation identity proves an advantageous child exists;
+it does not by itself identify that child efficiently.
+
+The absolute accuracy in \eqref{r27:estimate} is only inverse-polynomial
+for the unnormalized count $W$, but $W$ sums over $2^n$ inputs. An
+inverse-polynomial error for the \emph{normalized} average $2^{-n}W$
+is far too coarse for the same selection proof: after rescaling it could
+hide exponentially many bad inputs. This is another precise difference
+between an almost-everywhere simulation and the total-language target.
+
+\medskip
+\textbf{Testing whether bounded independence repairs the selection gap.}
+Let $r\ge2$ and let $D$ be uniform on the even-parity strings
+$u\in\{0,1\}^r$, with an additional independent uniform bit $b$.
+Any $r-1$ coordinates among the $u$ bits are uniform and independent:
+once they are fixed, exactly one last bit satisfies the parity equation.
+Consequently $(u,b)$ is $(r-1)$-wise independent. Nevertheless, the
+polynomial-time acceptance predicate
+\begin{equation}\label{r27:parity}
+                 A_*(u,b)=\operatorname{Parity}(u)\ \lor\ b
+\end{equation}
+has probability $3/4$ under fully uniform bits and probability $1/2$
+under $D$. As a machine ignoring its ordinary input, $A_*$ is a valid
+BPP decider for the all-yes language with error $1/4$. The bounded-
+independence replacement loses the required acceptance margin, even
+though its independence order grows linearly with the tape length.
+The companion script verifies the marginals and the two probabilities
+exactly for small $r$.
+
+This does not prove a separation: the all-yes language has a trivial
+deterministic decider. Nor does it refute bounded-independence generators
+for restricted circuit classes. It refutes the specific proposed
+universal inference that high independence of random coordinates alone
+preserves every BPP acceptance gap. Enumeration of that particular
+support and a tie rule is not a general replacement for a proof of
+pseudorandomness against the algorithm being simulated.
+
+\medskip
+\textbf{A second sufficient condition, with its seed length exposed.}
+Suppose instead that for every BPP machine $A$ there is a uniform
+polynomial-time computable map
+\[
+ G_{A,n}:\{0,1\}^{d(n)}\longrightarrow\{0,1\}^{r(n)},
+             \qquad d(n)\le C_A\log_2(n+2),
+\]
+whose output changes $A$'s acceptance probability by less than $1/12$
+on every input of length $n$. Enumerating all seeds then computes an
+acceptance fraction that is at least $7/12$ on yes-inputs and at most
+$5/12$ on no-inputs. Comparison with $1/2$ decides $L$ deterministically
+in polynomial time. This elementary conversion is the reason the
+logarithmic seed length and uniform generator evaluation matter.
+\sref{3405}{1}, Chapters~3 and~7. A polynomial-length seed yields an
+exponential enumeration, and a different hardwired generator for each
+length yields only advice unless uniformly generated.
+
+\paragraph{Stress test.}
+The existence proof and both conditional simulations handle a total
+language, not a promise on a favorable set of inputs. They permit the
+polynomial exponent to depend on $A$ but not on the individual input.
+The amplification probability uses independent runs of $A$; it is not
+applied to the parity-conditioned tapes as though they were independent.
+Lemma~27.2 explicitly budgets every approximation error, so no exact
+real-arithmetic oracle is hidden in the final selection rule. Its
+hypothetical estimator must output ordinary polynomial-bit rationals.
+
+The hard-function theorem in the frontier would imply the generator
+condition using much deeper machinery, but its circuit lower bound is
+not proved here. The insensitivity result also has additional hypotheses,
+not a theorem that every BPP machine meets them. \eref{3405}{1}.
+Neither the small good list nor failure of the parity replacement gives
+an unconditional class separation. The companion finite tests check the
+amplification constants and the parity example only; a numerical test
+cannot verify all BPP machines.
+
+\Needspace{8\baselineskip}
+\paragraph{Outcome.}
+\textbf{Outcome: Conditional reduction.}
+
+The attempt proves a uniform derandomization criterion based on an
+accurate conditional-error-count estimator, including a quantitative
+error budget, and records the short-generator alternative with every
+parameter explicit. It also demonstrates why nonconstructive short lists
+and high-order independence do not themselves meet these conditions.
+No polynomial-time estimator or general short generator is constructed
+unconditionally. The remaining gap is computational, not the existence
+of a good tuple. The constituent techniques are classical, and no
+historical novelty or complete resolution of $\mathsf P=\mathsf{BPP}$
+is claimed.
+
+% END RESEARCH 27
+
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:3405:1}{} S. Vadhan, 'Pseudorandomness', Foundations and Trends in Theoretical Computer Science 7(1-3):1-336, 2012.
+\url{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:3405:2}{} CS 6810: Theory of Computing, Lecture 15, March 17, 2026.
+\url{https://www.cs.cornell.edu/courses/cs6810/2026sp/lec15.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:3405:3}{} Pseudorandomness Beating the Hybrid Argument for Insensitive Algorithms.
+\url{https://eccc.weizmann.ac.il/report/2026/082/}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN ADDED REFERENCES 27
+\item[\textnormal{[E1]}]\hypertarget{extra:3405:1}{} Dean Doron, Dana Moshkovitz,
+Justin Oh and David Zuckerman, \emph{Pseudorandomness Beating the Hybrid
+Argument for Insensitive Algorithms}, ECCC TR26-082, revision~1,
+17 May 2026.
+\url{https://eccc.weizmann.ac.il/report/2026/082/}.
+{\small\textit{Version-specific supplement to [S3]. Abstract, generator
+parameters, and extra insensitivity hypotheses consulted 27 September 2026;
+not an unconditional BPP derandomization theorem.}}
+
+% END ADDED REFERENCES 27
+\end{itemize}
+
+% END PRESERVED SECTION
+\end{document}

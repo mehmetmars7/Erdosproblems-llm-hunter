@@ -21,9 +21,9 @@ class OpenProblemReviewTests(unittest.TestCase):
         self.lists.mkdir()
         self.definitions = self.root / "attacks/open_problems/top_problems"
         self.definitions.mkdir(parents=True)
-        for number, problem_id in enumerate(["problem.p-versus-np", "problem.example.with-period"], 1):
+        for number, problem_id in enumerate([1, 20000601], 1):
             (self.definitions / f"{number}.tex").write_text(
-                '% TOP_PROBLEM: ' + json.dumps({"problemId": problem_id}) + '\n', encoding="utf-8")
+                '% TOP_PROBLEM: ' + json.dumps({"id": problem_id}) + '\n', encoding="utf-8")
         (self.lists / "erdos_problems.csv").write_text("number\n665\n", encoding="utf-8")
         (self.lists / "erdos_status.json").write_text(
             json.dumps({"problems": {"665": {}, "1221": {}}}), encoding="utf-8")
@@ -33,7 +33,7 @@ class OpenProblemReviewTests(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def submit(self, problem_type="Open Problems", problem_id="problem.p-versus-np",
+    def submit(self, problem_type="Open Problems", problem_id="1",
                verdict="partial", citations="", explanation="The restricted case follows; the general case remains open."):
         fields = {
             "Problem type": problem_type,
@@ -52,15 +52,15 @@ class OpenProblemReviewTests(unittest.TestCase):
 
     def test_ranked_review_written_with_stable_id_and_issue_attribution(self):
         self.submit()
-        saved = json.loads((self.output / "open_problems/problem.p-versus-np.json").read_text())
+        saved = json.loads((self.output / "open_problems/1.json").read_text())
         self.assertEqual(saved["status"], "partial")
         self.assertEqual(saved["reviewed_by"], "reviewer")
         self.assertEqual(saved["reviewed_at"], "2026-09-24")
         self.assertEqual(saved["issue_number"], "42")
 
-    def test_catalog_ids_with_periods_and_normalized_type_are_supported(self):
-        self.submit(problem_type="open_problems", problem_id="problem.example.with-period")
-        self.assertTrue((self.output / "open_problems/problem.example.with-period.json").is_file())
+    def test_sparse_canonical_ids_and_normalized_type_are_supported(self):
+        self.submit(problem_type="open_problems", problem_id="20000601")
+        self.assertTrue((self.output / "open_problems/20000601.json").is_file())
 
     def test_legacy_review_paths_and_combined_listing_mo_ids(self):
         for problem_type, problem_id, expected in [
@@ -73,7 +73,7 @@ class OpenProblemReviewTests(unittest.TestCase):
                 self.assertTrue((self.output / expected).is_file())
 
     def test_unknown_or_historical_ids_are_not_published_reviews(self):
-        for problem_id in ["problem.missing", "problem.historical", "mo:456"]:
+        for problem_id in ["20000602", "999", "mo:456"]:
             with self.subTest(problem_id=problem_id), self.assertRaisesRegex(SystemExit, "not found"):
                 self.submit(problem_id=problem_id)
         self.assertFalse(self.output.exists())
@@ -86,7 +86,7 @@ class OpenProblemReviewTests(unittest.TestCase):
 
     def test_unsafe_ids_are_rejected_even_if_the_catalog_contains_them(self):
         for problem_id in ["../../outside", "problem../outside", "problem.bad\\path",
-                           "/tmp/outside", "problem.p-versus-np\nignored", "problem..dots"]:
+                           "/tmp/outside", "1\nignored", "problem..dots"]:
             with self.subTest(problem_id=problem_id), \
                     patch.object(reviews, "load_problem_ids", return_value={problem_id}), \
                     self.assertRaisesRegex(SystemExit, "Invalid problem id"):
@@ -105,7 +105,7 @@ class OpenProblemReviewTests(unittest.TestCase):
             self.submit(verdict="accepted", citations="https://example.org/proof", explanation="Checked.")
         self.assertFalse(self.output.exists())
         self.submit(verdict="accepted", citations="https://example.org/proof")
-        saved = json.loads((self.output / "open_problems/problem.p-versus-np.json").read_text())
+        saved = json.loads((self.output / "open_problems/1.json").read_text())
         self.assertEqual(saved["citations"], ["https://example.org/proof"])
 
 

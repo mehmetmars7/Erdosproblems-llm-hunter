@@ -1,0 +1,229 @@
+% TOP_PROBLEM: {"id": 3403, "title": "One-way functions exist", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{One-way functions exist}{One-way functions exist}}\label{3403}
+\subsection{Definitions and mathematical statement}
+A nonnegative function $\eta(n)$ is negligible if for every $c>0$ it is at most $n^{-c}$ for all sufficiently large $n$. The sought function family is uniformly computable in deterministic polynomial time and satisfies, for every probabilistic polynomial-time $A$,
+\[
+ \Pr_{x\leftarrow\{0,1\}^n,\,A}\!\bigl[A(1^n,f_n(x))\in f_n^{-1}(f_n(x))\bigr]
+ \le \eta_A(n)
+\]
+for some negligible $\eta_A$. An output of the wrong input length is a failed inversion. The probability includes both a uniformly random input and the inverter's internal randomness. The inverter only has to find \emph{some} preimage; recovering the originally sampled input is unnecessary.
+\par\smallskip\textit{Formulation and concept references:} \href{https://eprint.iacr.org/2024/1388.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Is there an efficiently computable function whose outputs no efficient randomized algorithm can usually reverse, even when any preimage counts?
+\subsection{Research attempt}
+\paragraph{Scope, quantifiers, and source check.}
+This is an unresolved attempt by GPT-6 Astra Ultra, prepared on 27 September
+2026. The method was to inspect the catalogue, consult the cited primary
+sources, derive explicit candidate tests, and attack the proposed implications.
+No cryptographic assumption is asserted to have been proved. All probabilities
+below use the input distribution in the definition above, rather than the
+uniform distribution on distinct outputs. These distributions differ whenever
+fiber sizes differ.
+
+The target quantifiers are: one fixed uniform polynomial-time family $f$;
+for every probabilistic polynomial-time inverter $A$ and every constant
+$c>0$, an $n_0(A,c)$ such that its success is at most $n^{-c}$ for all
+$n\ge n_0(A,c)$. Defeating each inverter on a different finite set of lengths
+is insufficient. The unary length parameter makes the permissible preimage
+length explicit.
+
+Hirahara--Lu--Oliveira [S1], Section 1.2, distinguish an average-case
+asymmetry characterization of ordinary one-way functions from a separate
+characterization involving infinitely-often one-way functions. Their
+worst-case-to-average-case implication has stated hypotheses; none is removed
+here. Liu--Pass [S3] give another characterization through boundary hardness
+of randomized time-bounded Kolmogorov complexity. A characterization relocates
+the missing hardness statement; it does not establish it automatically. This
+attempt instead tests what fiber size and simple embeddings can establish
+without an unproved assumption.
+
+\paragraph{Attack plan.}
+Three possible routes are counting the amount of information lost, embedding
+a hard search problem into an efficiently computable map, and amplifying the
+result by taking independent products. The first route admits an exact
+calculation. The second and third admit an explicit counterexample to the
+claim that merely retaining some hard outputs suffices. These tests concern
+candidate constructions, not a disproof of the existence question.
+
+\paragraph{Lemma 8.1: an exact resampling attack.}
+Fix $n$, put $Y=f_n(X)$ for uniform $X$, and write
+\[
+ p_y=\Pr[Y=y]=2^{-n}|f_n^{-1}(y)|,\qquad
+ M=|\operatorname{im}(f_n)|.
+\]
+An inverter samples $T$ independent uniform strings $Z_1,\ldots,Z_T$ of
+length $n$, evaluates $f_n$ on each, and returns the first one matching its
+target $y$. Its success probability is exactly
+\begin{equation}\label{a8:sampling}
+ S_T=\sum_y p_y\bigl(1-(1-p_y)^T\bigr).
+\end{equation}
+In particular,
+\begin{equation}\label{a8:bounds}
+ S_1=\sum_y p_y^2\ge\frac1M,
+ \qquad
+ 1-S_T\le\frac{M}{T+1}\quad(T\ge1).
+\end{equation}
+
+\emph{Proof.} Conditional on target $y$, a fresh sample succeeds with
+probability $p_y$, independently of the other samples. This gives
+\eqref{a8:sampling}. Cauchy--Schwarz applied to $\sum_y p_y=1$ gives the first
+bound. For the second, maximize $u(1-u)^T$ on $[0,1]$. Its derivative is
+$(1-u)^{T-1}(1-(T+1)u)$, so the maximum is
+$T^T/(T+1)^{T+1}\le1/(T+1)$. Summing this bound over the $M$ possible outputs
+proves the assertion. Every returned sample is an actual preimage of the
+required length.\hfill$\square$
+
+If $M(n)\le n^d$ for all sufficiently large $n$, taking
+$T=\lceil n^{d+a}\rceil$ gives failure at most $n^{-a}$, with polynomial
+running time for every fixed $a>0$. More strongly, if $M(n)\le n^d$ on
+infinitely many lengths, the one-sample inverter already succeeds with
+probability at least $n^{-d}$ on those lengths and violates negligibility.
+Thus any one-way family must have superpolynomial image size in the
+all-sufficiently-large sense. It must also have negligible collision
+probability $\sum_y p_y^2$, a sharper necessary test when the fibers are
+unbalanced. Neither condition is sufficient: the identity map has image size
+$2^n$ and collision probability $2^{-n}$, but the target itself is its
+preimage.
+
+This also resolves an elementary ambiguity in the information-loss approach.
+A constant map destroys nearly all information about the sampled input, yet
+is inverted by returning $0^n$. Predicting the original input and finding any
+input in its fiber are different tasks. Shannon entropy or a large fiber
+cannot by itself express the search difficulty needed here.
+
+\paragraph{Lemma 8.2: a hard branch can be negligible.}
+Let $h_m:\{0,1\}^m\to\{0,1\}^{\operatorname{poly}(m)}$ be any uniform
+polynomial-time family, with no assumption about its inversion complexity.
+For all sufficiently large $n$, put
+\[
+ k(n)=\left\lceil\log_2(n+2)\right\rceil^2<n,
+ \quad m=n-k(n),\quad x=(b,u),
+\]
+where $|b|=k(n)$ and $|u|=m$. Define
+\begin{equation}\label{a8:branch}
+ f_n(b,u)=
+ \begin{cases}
+ (0,h_m(u)),&b=0^{k(n)},\\
+ (1,b,u),&b\ne0^{k(n)}.
+ \end{cases}
+\end{equation}
+Use any explicit easy definition at the finitely many remaining lengths.
+The leading tags make the branches disjoint. A uniform inverter copies
+$(b,u)$ from every target with tag $1$ and declares failure on tag $0$.
+Therefore its success is exactly
+\[
+                    1-\delta_n,\qquad\delta_n=2^{-k(n)}.
+\]
+For each fixed $c$, eventually $k(n)\ge c\log_2 n$, so $\delta_n$ is
+negligible. On the other hand, inverting a tag-$0$ target necessarily finds a
+preimage under $h_m$: the tags prevent using an easy-branch input instead.
+Thus even a hypothetical hard $h_m$ survives on those specially selected
+outputs while the resulting family is almost always trivially invertible.
+
+This is a precise obstruction to a worst-case embedding argument. A reduction
+that supplies only selected difficult outputs gives no lower bound on their
+probability under $f_n(U_n)$. Hardness of deciding whether an arbitrary output
+has a preimage is also not enough: in the inversion experiment a preimage is
+guaranteed to exist. Any reduction using nonexistent outputs must account for
+this promise explicitly.
+
+\paragraph{Products do not repair this example.}
+For a positive integer $t=t(n)$ consider
+\[
+ F_{n,t}(x_1,\ldots,x_t)
+       =(f_n(x_1),\ldots,f_n(x_t)).
+\]
+Apply the tag-copying inverter coordinatewise. Independence gives success
+$(1-\delta_n)^t$, and the union bound gives
+\begin{equation}\label{a8:product}
+                    (1-\delta_n)^t\ge1-t\delta_n.
+\end{equation}
+For every polynomially bounded $t$, the right side is $1$ minus a negligible
+function of $n$. It is also negligible as a failure term in the total input
+length $N=nt$: if $N\le n^D$, apply negligibility with exponent $Dc$ for any
+requested exponent $c$ in $N$. Consequently polynomial repetition of this
+construction preserves its easy inversion. No independence assumption about
+the internal structure of $h_m$ was used.
+
+The missing premise in an amplification proposal is therefore a sufficiently
+frequent, computationally unavoidable failure of every inverter. The presence
+of a difficult special branch is not such a premise. The calculation does not
+contradict hardness-amplification theorems with their actual weak-hardness
+hypotheses; it shows why one cannot omit those hypotheses.
+
+\paragraph{A necessary complexity consequence, with the search step exposed.}
+Suppose $\mathsf P=\mathsf{NP}$. For any proposed $f$, define the language
+\[
+ D_f=\{(1^n,y,p):\text{there exists }z\in\{0,1\}^n
+                 \text{ extending }p\text{ with }f_n(z)=y\}.
+\]
+Membership has the length-$n$ witness $z$ and a polynomial-time verifier,
+so the assumption supplies a deterministic polynomial-time decider for
+$D_f$. Starting with the empty prefix, test the prefix extended by $0$;
+keep it if the answer is yes, and otherwise extend by $1$. On a target in
+the image, induction maintains existence of a completion. After $n$ queries
+the prefix is a preimage. Each query has polynomial length, and the number
+of queries is polynomial. Hence no family in the target definition is
+one-way under $\mathsf P=\mathsf{NP}$. This proves the familiar necessary
+implication, without identifying it with a converse. It uses exact decision
+on all queried prefixes, not an average-case decision routine that might fail
+on the adaptively chosen queries.
+
+\paragraph{Verification and remaining gap.}
+The companion exact-arithmetic checks evaluate \eqref{a8:sampling} on every
+positive integer partition of domain sizes $2,4,8$, for $T=1,2,3,4$.
+They verify both inequalities and the one-trial collision identity. Separate
+checks verify the product inequality for dyadic branch probabilities. These
+are checks of the finite calculations; the asymptotic claims use the proofs
+above. Boundary cases include $M=1$ (certain success), uniform fibers
+($S_T=1-(1-1/M)^T$), and singleton fibers (the resampling attack is weak even
+when an algebraic inverse is obvious).
+
+The first unproved step for a positive solution is an explicit uniform family
+with a lower bound on average-case inversion against \emph{every}
+probabilistic polynomial-time algorithm. None of image growth, collision
+entropy, selected hard outputs, or polynomial repetition provides this step.
+For a negative solution one would need a general inverter beyond the small
+image class treated here. Concrete next targets are a distribution-preserving
+search reduction, a proof of weak average-case hardness at all sufficiently
+large lengths, and an audit that the reduction permits finding any preimage.
+
+\paragraph{Outcome.}
+\textbf{UNRESOLVED.} The proved results are the exact resampling formula, its
+small-image consequence, and a construction for which a retained special
+branch and every polynomial independent product are almost always easy to
+invert. These are elementary candidate diagnostics, with no claim of novelty.
+No one-way function or general polynomial-time inversion algorithm has been
+established.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Shuichi Hirahara, Zhenjian Lu, and Igor C. Oliveira, One-Way Functions and pKt Complexity, IACR ePrint 2024/1388 (2024).
+\url{https://eprint.iacr.org/2024/1388.pdf}.
+\textit{Formulation source.}
+\item[S2]One-Way Functions and pKt Complexity — Hirahara, Lu and Oliveira.
+\url{https://wrap.warwick.ac.uk/id/eprint/187935/1/WRAP-One-way-functions-pKt-complexity-24.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]One-Way Functions and Boundary Hardness of Randomized Time-Bounded Kolmogorov Complexity — Liu and Pass.
+\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2026.97}.
+\textit{Further reference; not a proof endorsement.}
+\end{itemize}
+\end{document}

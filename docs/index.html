@@ -109,12 +109,12 @@
         <p>
             <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter">GitHub Repository</a> |
             <a href="about.html">About</a> |
-            <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/LICENSE">Apache License 2.0</a>
+            <a href="about.html#license">Licensing and third-party notices</a>
         </p>
     </footer>
 
     <script src="data/erdos_data.js"></script>
-    <script src="data/open_problems_data.js?v=b5b5eefeffc90be0"></script>
+    <script src="data/open_problems_data.js?v=d8ce0d278a8d25bb"></script>
     <script src="data/stats.js"></script>
     <script src="app.js"></script>
     <script>
@@ -129,7 +129,12 @@
                     document.getElementById('open-mo-total').textContent = siteStats.open_problems.mo_total;
                     document.getElementById('open-attacks').textContent = siteStats.open_problems.with_attacks;
                 }
-                const allModels = [...new Set([...siteStats.erdos.models, ...(siteStats.open_problems?.models || [])])];
+                const modelPriority = new Map([['gpt 6 astra pro', 0], ['gpt 6 astra ultra', 1]]);
+                const allModels = [...new Set([
+                    ...siteStats.erdos.models, ...(siteStats.open_problems?.models || [])
+                ].map(model => model.replace(/_/g, ' ').trim().replace(/\s+/g, ' ').toLowerCase()))]
+                    .sort((a, b) => (modelPriority.get(a) ?? 2) - (modelPriority.get(b) ?? 2)
+                        || a.localeCompare(b));
                 document.getElementById('models-list').innerHTML = allModels.map(model => `<li>${api.escapeHtml(model)}</li>`).join('');
             }
             const problems = api.getAttemptPreview(

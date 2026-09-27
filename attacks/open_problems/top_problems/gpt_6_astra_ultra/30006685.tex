@@ -1,0 +1,266 @@
+% TOP_PROBLEM: {"id": 30006685, "title": "The NC versus P Problem for Efficient Parallel Computation", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{The NC versus P Problem for Efficient Parallel Computation}{The NC versus P Problem for Efficient Parallel Computation}}\label{30006685}
+\subsection{Definitions and mathematical statement}
+For bounded-fan-in Boolean circuits, size is the number of gates and depth is the longest input-to-output path. In the standard uniform convention, $\mathsf{NC}=\bigcup_{k\ge1}\mathsf{NC}^k$, where $\mathsf{NC}^k$ has polynomial size and depth $O((\log n)^k)$. Uniformity requires an effective resource-bounded procedure generating the circuit family, rather than an arbitrary circuit for each length. The question is
+\[
+ \mathsf{NC}\stackrel{?}{=}\mathsf P.
+\]
+For precision, the conventional logspace-uniform interpretation is used; the catalogue does not choose among finer uniformity conventions.
+\par\smallskip\textit{Formulation and concept references:} \href{https://arxiv.org/abs/2508.20735}{[S1]}.
+
+\subsection{Short English statement}
+Can every efficient sequential decision algorithm be replaced by a highly parallel one using only polylogarithmically many stages?
+\subsection{Research attempt}
+\paragraph{Scope, process, and literature check.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. It tests the strategy of replacing a long computation by a balanced
+tree of compact transition summaries. Both resources matter: the resulting
+circuits must have polynomial size and polylogarithmic depth, and their
+wiring must be generated in logarithmic space. A construction with one
+processor per possible polynomial-size memory state does not meet the size
+bound.
+
+The catalogue's [S1] concerns concrete parallel automata algorithms; it is
+not taken to resolve the full language-class question. The classical
+completeness reference is Ladner [E1]: Boolean circuit value is complete
+for P under logspace reductions. This gives a concrete universal target.
+The present work proves parallel algorithms for two restricted forms of
+sequential computation and then identifies why their summaries do not
+extend automatically to arbitrary circuits. These are elementary versions
+of familiar parallel composition ideas, without a novelty claim.
+
+The easy inclusion is $\mathsf{NC}\subseteq\mathsf P$. Generate the
+polynomial-size circuit using its uniformity machine and evaluate it gate
+by gate in a topological order. Its size and encoding length are polynomial,
+so this takes polynomial time. A standard halting logspace generator with
+polynomial output can itself be simulated in polynomial time. Thus equality
+would follow from a uniform polynomial-size, polylogarithmic-depth evaluator
+for arbitrary polynomial-size Boolean circuits. Conversely, if NC equals P,
+such an evaluator exists because circuit value lies in P.
+
+\paragraph{Attack plan: summarize before balancing.}
+Associativity permits balancing a chain of compositions without changing
+its value. That alone does not bound the size of the objects being composed,
+or the parallel cost of composition. We first use explicit transition tables,
+where every bound can be counted. We then replace tables by affine maps,
+which can describe transitions on exponentially many states with polynomially
+many bits. The central question is whether arbitrary circuit computations
+admit an equally effective summary language.
+
+\paragraph{Lemma 23.1: explicit finite-state transitions.}
+Suppose $m$ deterministic transitions $f_1,\ldots,f_m$ act on a state set
+$[w]$. Given their tables and an initial state $a$, the final state
+$f_m\circ\cdots\circ f_1(a)$ is computable by bounded-fan-in circuits with
+\[
+ \text{size }O(mw^3+mw^2\log(w+2)),\qquad
+ \text{depth }O(\log(m+2)\log(w+2)).
+\]
+For standard padded table encodings, the circuit wiring is logspace-uniform
+as a function of the dimensions. In particular the result is in uniform
+NC when $m,w$ are polynomially bounded in the actual input length.
+
+\emph{Proof.} Represent $f_i$ by a Boolean matrix $M_i$ with
+$(M_i)_{u,v}=1$ exactly when $f_i(u)=v$. Form matrices for adjacent blocks
+by Boolean matrix multiplication:
+\[
+                (BC)_{u,v}=\bigvee_{z=1}^w(B_{u,z}\wedge C_{z,v}).
+\]
+If $B$ and $C$ represent successive deterministic transitions, their product
+represents their composition in that order. The formula also works for
+arbitrary binary relations, so no unproved algebraic identity is needed.
+Each entry takes $w$ AND gates and a balanced binary OR tree. A whole
+matrix product has $O(w^3)$ gates and depth $O(\log(w+2))$.
+
+Balance the $m$ matrices in a binary tree, padding with identities to the
+next power of two if necessary. There are fewer than $2m$ leaves and
+$O(m)$ internal products. The tree has $O(\log(m+2))$ levels. Converting
+binary table entries to the matrices uses parallel equality comparisons
+with $O(\log(w+2))$ gates per comparison. Reading the final row indexed by
+$a$ and encoding its unique nonzero column has smaller polynomial cost
+and at most $O(\log(w+2))$ additional depth.
+
+For uniformity, a gate is described by its tree level, block number,
+row, column, summation index, and position in an OR tree. Each field uses
+$O(\log(mw+2))$ bits. The source-gate labels are obtained by fixed index
+arithmetic on these fields. A generator loops through their polynomially
+many possible values using logarithmic workspace and prints the gates and
+wires. The equality-comparison and input-selection subcircuits have the
+same type of explicit indexing.\hfill$\square$
+
+When transition tables are the input, the bound is polynomial in their
+encoding length. When a succinct circuit describes a transition on $b$
+state bits, however, the table has $w=2^b$ states. Substitution into the
+lemma gives exponentially many gates in $b$, and its stated depth contains
+a factor $\log w=b$. For $b=\operatorname{poly}(n)$ this proves neither
+required NC bound. Succinctness of the input transition cannot be confused
+with explicit availability of its whole table.
+
+\paragraph{Lemma 23.2: affine summaries avoid state enumeration.}
+Let $m$ updates on $b$ bits have the form
+$f_i(v)=A_i v+c_i$ over $\mathbb F_2$, with their coefficients explicitly
+given. Their composition and its action on a given initial vector have
+logspace-uniform circuits of polynomial size and depth
+\[
+                     O(\log(m+2)\log(b+2)).
+\]
+This remains useful when $b$ itself is polynomial in the input length.
+
+\emph{Proof.} Augment $v$ by a final coordinate $1$. Then $f_i$ is represented
+by the $(b+1)\times(b+1)$ matrix
+\[
+                   \widetilde A_i=
+                   \begin{pmatrix}A_i&c_i\\0&1\end{pmatrix}.
+\]
+Composition is ordinary matrix multiplication over $\mathbb F_2$. Each
+matrix entry is the XOR of $b+1$ products of bits. A binary XOR is a
+constant-size AND/OR/NOT circuit, and balancing the XOR gives depth
+$O(\log(b+2))$ and size $O(b+1)$ per entry. A balanced product tree
+therefore has size $O(m(b+1)^3)$ and the stated depth. Multiplication by
+the initial augmented vector adds one more such layer. Gate labels and
+wiring are enumerated by the same logarithmic-space index scheme as in
+Lemma 23.1, replacing OR by XOR.\hfill$\square$
+
+The distinction between these lemmas is meaningful. The affine map can act
+on $2^b$ states, yet its summary uses only $O(b^2)$ bits and remains in the
+same format after composition. The exact formula
+\[
+ (A_2,c_2)\circ(A_1,c_1)
+       =(A_2A_1,A_2c_1+c_2)
+\]
+shows both closure and the cost of implementing it. An existential claim
+that each block has a short description would be weaker: NC also needs
+the descriptions and their combination to be computed uniformly in shallow
+circuits.
+
+\paragraph{A nonlinear example that still admits short summaries.}
+Affine maps do not capture all useful parallelism. In binary addition,
+let $a_i,b_i$ be the input bits, let $g_i=a_i\wedge b_i$ and
+$p_i=a_i\mathbin{\oplus}b_i$, and write the incoming carry as $c_i$.
+The next carry is
+\[
+                         c_{i+1}=g_i\vee(p_i\wedge c_i).
+\]
+Although this describes a sequential dependence through all positions,
+each block acts on its incoming carry by a map
+$T_{g,p}(c)=g\vee(p\wedge c)$. These maps satisfy
+\begin{equation}\label{a23:carry}
+ T_{g_2,p_2}\circ T_{g_1,p_1}
+  =T_{g_2\vee(p_2\wedge g_1),\,p_2\wedge p_1}.
+\end{equation}
+Distribute the second expression over the first to verify the identity.
+Associativity follows from function composition, even when distinct pairs
+represent the same constant function. Thus a block has only two summary bits
+and combines in constant depth.
+
+For each prefix, independently balance its sequence of pairs. This elementary
+construction uses at most $O(n^2)$ gates overall and depth $O(\log(n+2))$;
+sharing prefix computations can improve size but is unnecessary for NC.
+Each carry and then each sum bit is computed in parallel. The positions
+and balanced-tree gate labels are logspace-enumerable. Hence a linear chain
+of dependencies in a particular sequential algorithm is not a lower bound
+on the depth of all circuits computing its result.
+
+\paragraph{Two failed extensions to arbitrary circuits.}
+First, summarize a general block by its input-output truth table and apply
+Lemma 23.1. A block with $b$ live Boolean values can require a table with
+$2^b$ input rows, even if its gate description is short. An identity block
+already makes this tabular format exponentially larger than its simple
+symbolic description. This rejects the chosen representation bound, not the
+possibility of other compact summaries. The affine and carry examples show
+that suitable algebra can avoid tables; a general replacement has not been
+found here.
+
+Second, unfold all shared subcomputations into a formula and try to balance
+the resulting tree. Unfolding need not have polynomial size. Let
+$v_1=x$, $v_2=y$, and $v_i=v_{i-1}\wedge v_{i-2}$ for $i\ge3$.
+There are only linearly many gates. The numbers of leaves in the mechanically
+unfolded trees obey $\ell_i=\ell_{i-1}+\ell_{i-2}$, with
+$\ell_1=\ell_2=1$, and grow exponentially. Nevertheless $v_i=x\wedge y$
+for every $i\ge3$, by immediate induction. Thus the unfolded expression is
+large even though a constant-depth circuit computes the function.
+The blow-up disproves the efficiency of that preprocessing step, not NC
+membership of the problem. Recognizing simplifications in this easy example
+is not a general balancing algorithm for arbitrary shared circuits.
+
+\paragraph{Connection to the full target and uniformity audit.}
+Circuit value is in P by topological evaluation. For completeness, a fixed
+deterministic machine running for $n^k$ steps can be represented by a
+polynomial-size Boolean circuit: make gates for each local tape-cell update
+at each time, with the state and head information encoded in the cells.
+Gate positions use counters of $O(\log n)$ bits because $k$ is fixed.
+The reduction prints the local wiring and initial input values using these
+counters, yielding the logspace reduction underlying [E1].
+
+Logspace reductions do not obstruct the NC implication: their output bits
+can be computed in NC by the standard polynomial-configuration-graph
+construction. A logspace machine has polynomially many configurations;
+parallel Boolean matrix powering determines reachability with polynomial
+size and $O(\log^2 n)$ depth. For a polynomial-output transducer, include a
+logarithmic-size output-position counter and mark the transitions emitting
+the requested bit. Adjacency tests are local transition checks with input
+multiplexers, also uniformly shallow. Composing those circuits with an NC
+circuit-value algorithm preserves polynomial size, polylogarithmic depth,
+and logspace uniformity.
+
+It follows that the missing general block-summary construction would solve
+a P-complete target, not merely speed up one example. Its uniformity cannot
+be delegated to an unrestricted offline optimizer: selecting arbitrary small
+circuits separately at each length changes the class being studied.
+
+\paragraph{Verification and outcome.}
+The companion exact checks compare balanced and sequential composition for
+all triples of functions on a three-element state set, and for all pairs
+of affine maps on two bits. They exhaustively verify the carry-composition
+identity, including redundant pair encodings, and test small binary additions.
+The Fibonacci unfolding counts are checked separately from the constant-size
+functional simplification. These checks validate the displayed algebra;
+the resource bounds and uniformity rely on the explicit gate constructions.
+
+\textbf{UNRESOLVED.} The attempt supplies fully specified parallel algorithms
+for explicit finite-state updates, affine updates, and carry chains. It also
+exhibits exact counterexamples to inferring hardness from sequential depth
+or from an inefficient unfolding. The first remaining upper-bound gap is a
+polynomial-size summary for arbitrary computation blocks, closed under a
+uniform polylogarithmic-depth composition operation with polynomial total
+work. A separation would instead require a lower bound against every such
+uniform circuit family, beyond the particular representations examined here.
+Neither requirement has been met.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]J. Heemstra, J. Martens, and A. Wijs, Evaluating Massively Parallel Algorithms for DFA Minimisation, Equivalence Checking and Inclusion Checking, Introduction (2026).
+\url{https://arxiv.org/abs/2508.20735}.
+\textit{Formulation source.}
+\item[S2]Parallel Computation, Matt Williamson.
+\url{https://community.wvu.edu/~krsubramani/courses/sp09/cc/lecnotes/parallel.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Complexity of the Freezing Majority Rule with L-shaped Neighborhoods.
+\url{https://arxiv.org/html/2509.16065v1}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Richard E. Ladner,
+\emph{The Circuit Value Problem Is Log Space Complete for P},
+ACM SIGACT News 7(1) (1975), pp. 18--20.
+\url{https://doi.org/10.1145/990518.990519}.
+\url{https://homes.cs.washington.edu/~ladner/site/index.php/publications/}.
+\textit{Primary attribution for circuit-value completeness; author publication
+record consulted 27 September 2026. The reduction and its relevance to the
+uniform NC target are explained in the attempt.}
+\end{itemize}
+\end{document}

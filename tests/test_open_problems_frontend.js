@@ -32,29 +32,30 @@ const { api } = browser;
 const attempt = { model: 'GPT 6 Astra Ultra', status: 'unresolved' };
 const statement = { ...attempt, entry_kind: 'statement_only' };
 const records = {
-    'problem.beta': { id: 'problem.beta', title: 'Beta & "target"', collection: 'ranked', rank: 2,
+    '6': { id: 6, title: 'Beta & "target"', collection: 'ranked', rank: 2,
         domain: 'algebra', domain_label: 'Algebra', exact_target: 'A special target about groups',
         status: 'open_with_solved_subcases', status_qualification: 'See "partial" result <not a resolution>.',
         status_reviewed_at: '2026-09-14', llm_status: 'solved', completion: 100,
+        external_url: 'https://www.unsolvedmath.com/problems/6',
         sources: [{ citation: 'Source & "description"', url: 'https://example.org/?a=1&b=2' }],
         attacks: [{ ...attempt, status: 'solved' }] },
     'mo:23': { id: 'mo:23', mo_id: '23', title: 'MO question', collection: 'mo', rank: null, score: 23,
         domain: 'geometry', domain_label: 'Geometry', status: 'unreviewed', llm_status: 'unresolved',
         attacks: [attempt], sources: [{ citation: 'Question', url: 'https://mathoverflow.net/questions/23' }] },
-    'problem.alpha': { id: 'problem.alpha', title: 'Alpha', collection: 'ranked', rank: 1,
+    '20000601': { id: 20000601, title: 'Alpha', collection: 'ranked', rank: 1,
         domain: 'number_theory', domain_label: 'Number theory', exact_target: 'A target involving primes',
         aliases: ['Prime problem'], status: 'open', llm_status: 'none', attacks: [statement] },
     'mo:40': { id: 'mo:40', title: 'Older MO question', collection: 'mo', rank: null, score: 40,
         status: 'unreviewed', llm_status: 'none', attacks: [] }
 };
-const ids = rows => Array.from(rows, row => row.id);
-assert.deepEqual(ids(Object.values(records).sort(api.sortOpenProblems)), ['problem.alpha', 'problem.beta', 'mo:40', 'mo:23']);
-assert.deepEqual(ids(api.filterOpenProblems(records, { withAttempts: true })), ['problem.beta', 'mo:23']);
-assert.deepEqual(ids(api.filterOpenProblems(records, { source: 'ranked', withAttempts: true })), ['problem.beta']);
+const ids = rows => Array.from(rows, row => String(row.id));
+assert.deepEqual(ids(Object.values(records).sort(api.sortOpenProblems)), ['20000601', '6', 'mo:40', 'mo:23']);
+assert.deepEqual(ids(api.filterOpenProblems(records, { withAttempts: true })), ['6', 'mo:23']);
+assert.deepEqual(ids(api.filterOpenProblems(records, { source: 'ranked', withAttempts: true })), ['6']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { domain: 'geometry', source: 'mo' })), ['mo:23']);
-assert.deepEqual(ids(api.filterOpenProblems(records, { search: '  PRIME PROBLEM ' })), ['problem.alpha']);
-assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'special target' })), ['problem.beta']);
-assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'example.org' })), ['problem.beta']);
+assert.deepEqual(ids(api.filterOpenProblems(records, { search: '  PRIME PROBLEM ' })), ['20000601']);
+assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'special target' })), ['6']);
+assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'example.org' })), ['6']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'missing target' })), []);
 // Distinct source domain identifiers can name the same display category.
 const aliasRecords = [
@@ -76,9 +77,9 @@ assert.equal(aliasPage.elements['filter-domain'].value, 'geometry_topology');
 assert.equal((aliasPage.elements['filter-domain'].innerHTML.match(/Geometry &amp; topology/g) || []).length, 1);
 assert.match(aliasPage.elements['results-count'].textContent, /^3 of 4 entries/);
 assert.equal(api.countWithAttacks(records), 2);
-assert.equal(api.getOpenProblemClaim(records['problem.alpha']), 'no attempt');
-assert.equal(api.getOpenProblemClaim(records['problem.beta']), 'solved');
-assert.equal(api.getOpenProblemStatusLabel(records['problem.beta']), 'open with solved subcases');
+assert.equal(api.getOpenProblemClaim(records['20000601']), 'no attempt');
+assert.equal(api.getOpenProblemClaim(records['6']), 'solved');
+assert.equal(api.getOpenProblemStatusLabel(records['6']), 'open with solved subcases');
 assert.equal(api.getOpenProblemClaim({ status: 'solved', attacks: [attempt] }), 'unresolved');
 assert.equal(api.getOpenProblemClaim({ attacks: [{ model: 'unknown' }] }), 'not stated');
 assert.equal(api.getOpenProblemClaim({ attacks: [{ status: 'partial' }] }), 'unresolved');
@@ -89,15 +90,20 @@ assert.equal(api.getOverallClaim([{ entry_kind: 'statement_only', status: 'solve
 assert.equal(api.getOverallClaim([{ status: 'solved' }, { model: 'unknown' }]), 'not stated');
 assert.equal(api.getOpenProblemHref(records['mo:23']), 'problem.html?type=mo&id=23');
 assert.equal(api.getOpenProblemHref(records['mo:40']), 'problem.html?type=mo&id=40');
-assert.equal(api.getOpenProblemHref(records['problem.alpha']), 'problem.html?type=open_problems&id=problem.alpha');
+assert.equal(api.getOpenProblemHref(records['20000601']), 'problem.html?type=open_problems&id=20000601');
 assert.equal(api.getOpenProblemHref({ id: 'problem.a&b#c' }), 'problem.html?type=open_problems&id=problem.a%26b%23c');
 assert.equal(api.escapeHtml(null), '');
 assert.equal(api.escapeHtml('a"<&\''), 'a&quot;&lt;&amp;&#39;');
-const rendered = api.renderOpenProblemRows([records['problem.beta'], records['mo:23'], records['problem.alpha']]);
+const rendered = api.renderOpenProblemRows([records['6'], records['mo:23'], records['20000601']]);
 assert.match(rendered, /Beta &amp; &quot;target&quot;/);
+assert.match(rendered, /href="https:\/\/www\.unsolvedmath\.com\/problems\/6"[^>]*>UnsolvedMath<\/a>/);
+assert.match(rendered, /<td>2<\/td>/);
+assert.match(rendered, />Source<\/a><\/td>\s*<td><a[^>]*>UnsolvedMath<\/a><\/td>/);
+assert.doesNotMatch(rendered, /<td>20000601<\/td>/);
+assert.deepEqual(ids(api.filterOpenProblems(records, { search: '20000601' })), ['20000601']);
 assert.match(rendered, /title="See &quot;partial&quot; result &lt;not a resolution&gt;\."/);
 assert.match(rendered, /open with solved subcases/);
-assert.match(rendered, /class="claim-status"><a href="problem\.html\?type=open_problems&amp;id=problem\.beta">solved<\/a>/);
+assert.match(rendered, /class="claim-status"><a href="problem\.html\?type=open_problems&amp;id=6">solved<\/a>/);
 assert.match(rendered, /Reviewed 2026-09-14/);
 assert.match(rendered, /<td>—<\/td>/);
 assert.match(rendered, /no attempt/);
@@ -118,7 +124,7 @@ assert.equal(preview.length, 4);
 assert.equal(new Set(preview.map(row => row.href)).size, 4);
 assert.equal(preview.filter(row => row.href.includes('type=mo')).length, 1);
 assert.ok(preview.some(row => row.label.startsWith('MathOverflow:')));
-assert.ok(preview.some(row => row.label.startsWith('Top Open Problem #2:')));
+assert.ok(preview.some(row => row.label.startsWith('Top Open Problem:')));
 assert.ok(preview.every(row => !row.label.includes('#null')));
 assert.equal(api.getAttemptPreview(erdos, records, 2).length, 2);
 
@@ -154,7 +160,7 @@ const subset = loadPage(createBrowser('?source=ranked', true));
 assert.equal(subset.elements['filter-source'].value, 'mo');
 assert.equal(subset.elements['sort-by'].value, 'score');
 assert.match(subset.elements['results-count'].textContent, /^2 of 2/);
-assert.doesNotMatch(subset.elements['open-problems-tbody'].innerHTML, /problem\.alpha|problem\.beta/);
+assert.doesNotMatch(subset.elements['open-problems-tbody'].innerHTML, /id=20000601|id=6/);
 const unavailable = createBrowser();
 unavailable.api.initOpenProblemsPage();
 assert.equal(unavailable.elements['results-count'].textContent, 'Catalogue unavailable');

@@ -1,0 +1,230 @@
+% TOP_PROBLEM: {"id": 30006712, "title": "FPT versus W[1]", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Compile twice: lualatex 30006712.tex
+% Standalone research notebook; original section preserved.
+% Research additions: 27 September 2026. No external TeX input or BibTeX file.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook - Problem 30006712},pdfauthor={Open Problems Math},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small\sffamily Problem 30006712 | 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\numberwithin{equation}{section}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\begin{document}
+\setcounter{section}{0}
+\section*{\texorpdfstring{FPT versus W[1]}{FPT versus W[1]}}\label{30006712}
+\subsection{Definitions and mathematical statement}
+A parameterized decision problem is fixed-parameter tractable if it has a uniform algorithm taking time $f(k)n^c$, where $f$ is a total computable function and $c$ is independent of $k$. For the clique problem, $n=|V(G)|$ and a $k$-clique is a set of $k$ pairwise adjacent vertices. The equivalent concrete target is the nonexistence of
+\[
+ A,f,c\quad\text{with}\quad T_A(G,k)\le f(k)n^c
+\]
+for all finite simple $G$ and $1\le k\le n$. An $n^{g(k)}$ algorithm does not meet this condition. The conjectured separation is $\mathsf{FPT}\ne\mathsf{W[1]}$ in the standard uniform parameterized model.
+\par\smallskip\textit{Formulation and concept references:} \sref{30006712}{1}.
+\cataloguescope{Prove or disprove FPT!=W[1] in classical uniform parameterized complexity. Equivalently, determine whether there is a deterministic algorithm, a total computable function f:N->N and an absolute constant c such that on every finite simple n-vertex graph G and every integer 1<=k<=n it decides the existence of a k-clique within f(k)n\textasciicircum{}c steps. The conjecture asserts no such algorithm. The function and exponent are fixed with the algorithm; no input-length advice, oracle or nonuniform circuit family is allowed.}
+\subsection{Short English statement}
+Can the combinatorial difficulty of finding a clique be confined entirely to its requested size, leaving a fixed polynomial dependence on graph size?
+% BEGIN RESEARCH_ADDITION ATTEMPT_76
+\subsection{Research attempt}
+
+\paragraph{Current frontier and source-status note.}
+The source's formulation is uniform FPT for clique, not a bound whose
+polynomial exponent depends on $k$. Recent parameterized reductions retain
+that distinction \sref{30006712}{1}. The manuscript retained as \sref{30006712}{2}
+was withdrawn in version~2 on 10 May 2026, with the author's notice reporting
+fundamental inaccuracies; it is not used as a collapse theorem
+\eref{30006712}{1}. The conditional ETH connection below is kept separate from
+an unconditional separation. Its general background is the sparsification
+and exponential-time framework of \eref{30006712}{2}.
+
+\paragraph{Attack route.}
+Colour coding can ensure distinct selected vertices but cannot enforce
+all clique edges by itself. A natural dynamic program instead merges
+partial cliques with identical sets of possible continuations. If only
+$f(k)n^c$ states survived, it would be FPT. The first attempt tests that
+hope with an explicit graph family producing too many exact continuation
+sets. The second reconstructs a conditional SAT reduction, paying
+attention to the arbitrary computable parameter factor. Neither argument
+is a lower bound against all deterministic algorithms.
+
+\paragraph{Attempt: exact continuation states.}
+For a partial clique $S$ in a simple graph, put
+\[
+ C(S)=\bigcap_{v\in S}N(v).
+\]
+The possible extensions by $r$ more vertices are exactly the $r$-cliques
+in the induced graph on $C(S)$. This follows because a vertex in $C(S)$
+is adjacent to all of $S$, and edges within the new set must still be
+checked. Chosen vertices themselves do not belong to $C(S)$, since the
+graph has no loops. Thus two partial cliques of the same size with the
+same $C(S)$ can legitimately share this dynamic-program state.
+
+A sufficient algorithmic hypothesis would be a uniform bound
+\begin{equation}\label{eq76:states}
+ \#\{C(S):S\text{ a clique},\ |S|=i\}\leq f(k)n^c
+ \qquad(0\leq i\leq k),
+\end{equation}
+for one fixed $c$ and a total computable $f$.
+If such a bound held with fixed $c$ and computable $f$, generate states by
+$C(S\cup\{v\})=C(S)\cap N(v)$ for $v\in C(S)$ and deduplicate their
+$n$-bit representations. At most $n$ transitions per state and polynomial
+bit-set costs would give a uniform FPT algorithm. The issue is the number
+of exact states, not the validity of this merging rule.
+
+That count can be too large. Choose integers $t,m\geq2$ and disjoint sets
+$A_i=\{a_{i,1},\ldots,a_{i,m}\}$ for $1\leq i\leq t$. Join all pairs
+from different $A_i$, and no pairs inside an $A_i$. Add an independent
+witness set $B=\{b_{i,j}:1\leq i\leq t,1\leq j\leq m\}$.
+Join $b_{i,j}$ to every vertex of $\bigcup A_i$ except $a_{i,j}$.
+For each tuple $\mathbf j=(j_1,\ldots,j_t)$,
+$S_{\mathbf j}=\{a_{1,j_1},\ldots,a_{t,j_t}\}$ is a clique, and
+\begin{equation}\label{eq76:signature}
+ C(S_{\mathbf j})\cap B
+   =B\setminus\{b_{1,j_1},\ldots,b_{t,j_t}\}.
+\end{equation}
+Different tuples give different continuation sets. This graph has
+$n=2tm$ vertices and at least $m^t$ states at level $t$, relevant for
+parameter $k=t+1$. For any fixed $c$, choose $t>c$ and let $m\to\infty$.
+Then $m^t/[f(t+1)(2tm)^c]\to\infty$ for every fixed finite value
+$f(t+1)$. Hence \eqref{eq76:states} is false for this exact-state method.
+
+The graph is highly structured and its clique problem is easy. A symbolic
+representation could compress many of its states, so the example does
+not prove any general parameterized lower bound. It locates the precise
+failure in a particular FPT proposal. The companion script checks all
+$3^4=81$ signatures for $t=4,m=3$ directly from adjacency.
+
+\paragraph{Attempt: a conditional ETH consequence with the quantifiers intact.}
+Assume sparse 3-SAT has a positive exponential-time lower bound: there are
+constants $C,\eta>0$ such that formulas with $N$ variables and at most
+$CN$ clauses cannot all be decided in $O(2^{\eta N}\operatorname{poly}(N))$
+time. This is an unproved hardness hypothesis of the type obtained from
+ETH using sparsification \eref{30006712}{2}, not a theorem established here.
+Partition the clauses into $k$ blocks. For each block make one vertex for
+each truth assignment to the variables occurring in that block that
+satisfies all its clauses. There are at most
+$2^{3\lceil CN/k\rceil}$ such vertices per block. Join vertices in
+different blocks exactly when their assignments agree on shared variables.
+No edges are placed within a block.
+
+A $k$-clique picks exactly one assignment per block, and pairwise agreement
+makes their union a well-defined assignment satisfying every clause.
+Conversely any satisfying assignment supplies such a clique. Thus the
+reduction is correct, with graph size
+\[
+ n\leq k\,2^{3\lceil CN/k\rceil}.
+\]
+Enumerating assignments and checking pairs costs at most
+$2^{O(CN/k)}\operatorname{poly}(N,k)$, with an absolute constant in the
+exponent. An FPT clique algorithm of time $f(k)n^c$ would solve these
+formulas in
+\[
+ f(k)k^c2^{3c\lceil CN/k\rceil}
+       +2^{O(CN/k)}\operatorname{poly}(N,k).
+\]
+Choose one fixed integer $k$ sufficiently large that both exponential
+coefficients are below $\eta$. With that choice $f(k)$ is a fixed finite
+constant, however enormous. For sufficiently large $N$ this contradicts
+the assumed lower bound. Therefore sparse ETH implies the stated
+separation. This proof does not demand an unjustified effective estimate
+on the growth of the arbitrary total computable function $f$.
+
+\paragraph{Stress test.}
+The reduction uses a fixed $k$ chosen after the proposed exponent $c$ and
+hardness constant $\eta$, not $k=N$ with an uncontrolled factor $f(N)$.
+It also includes graph-construction time. Dropping that cost can produce
+a spurious subexponential algorithm. The conclusion is conditional on ETH;
+using it as an unconditional proof would simply assume a different major
+complexity separation.
+
+For colour coding, the probability that a fixed $k$-set receives distinct
+colours is $k!/k^k$. Repetition or perfect hash families can address that
+event but do not decide whether the selected vertices form a clique.
+In particular, colourful paths and colourful cliques impose different
+edge constraints. The exact-state example also cannot distinguish the
+power of an arbitrary compressed algebraic state or an entirely different
+algorithm. Uniformity, total computability of $f$, and a fixed exponent in
+$n$ remain part of the target throughout.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The naive common-neighbour state-count route is refuted by an explicit
+family, and the ETH-to-clique implication is proved with its size and
+parameter quantifiers exposed. Neither argument separates FPT from W[1]
+unconditionally or gives an FPT clique algorithm. A continuation needs a
+new compression mechanism escaping the explicit signatures, or a genuine
+unconditional hardness argument not supplied by ETH. No novelty claim is
+made for the standard conditional reduction.
+% END RESEARCH_ADDITION ATTEMPT_76
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30006712:1}{} Chen, Feng, Laekhanukit and Liu, Simple Combinatorial Construction, arXiv:2304.07516v2 (2024).
+\url{https://arxiv.org/html/2304.07516v2}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:30006712:2}{} Sharp-W[1] = FPT: Fixed-Parameter Tractable Exact Algorithms for the \#k-Matching Problem.
+\url{https://arxiv.org/abs/2604.16308}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:30006712:3}{} A Parameterized-Complexity Framework for Finding Local Optima.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol362-itcs2026/LIPIcs.ITCS.2026.66/LIPIcs.ITCS.2026.66.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN RESEARCH_ADDITION REFERENCES_76
+\item[\textnormal{[E1]}]\hypertarget{extra:30006712:1}{} Yongming Yi,
+\emph{Sharp-W[1] = FPT: Fixed-Parameter Tractable Exact Algorithms for the
+\#k-Matching Problem}, arXiv:2604.16308v2, withdrawal notice, 10 May 2026.
+\url{https://arxiv.org/abs/2604.16308v2}.
+{\small\textit{Inspected 27 September 2026; the withdrawn claim in [S2]
+is retained as provenance, not treated as a theorem.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:30006712:2}{} Russell Impagliazzo,
+Ramamohan Paturi and Francis Zane, \emph{Which Problems Have Strongly
+Exponential Complexity?}, Journal of Computer and System Sciences 63
+(2001), 512--530, sparsification framework and ETH consequences.
+\url{https://doi.org/10.1006/jcss.2001.1774}.
+{\small\textit{Sparse ETH is explicitly an extra assumption; the
+clause-block consistency reduction is proved in the notebook.}}
+% END RESEARCH_ADDITION REFERENCES_76
+\end{itemize}
+
+\end{document}

@@ -24,6 +24,8 @@ DATA_DIR = BASE_DIR / "docs" / "data"
 REVIEWS_DIR = BASE_DIR / "reviews"
 ERDOS_STATUS_PATH = LISTS_DIR / "erdos_status.json"
 OPEN_PROBLEMS_PATH = ATTACKS_DIR / "open_problems" / "top_problems"
+UNSOLVEDMATH_PATH = LISTS_DIR / "unsolvedmath" / "problems.json"
+DISPLAY_ORDER_PATH = LISTS_DIR / "unsolvedmath" / "display_order.json"
 # Tao's database includes independence results in its total solved count.
 RESOLVED_ERDOS_STATUSES = {'proved', 'disproved', 'solved', 'independent'}
 # Requested display rule for the Erdos LLM Claim column. This deliberately
@@ -488,7 +490,7 @@ def parse_numbered_problem_tex(content, *, require_source_urls=True):
 
         for command, prefix in [('sref', 'S'), ('eref', 'E')]:
             text = replace_tex_command(text, command, 2,
-                                       lambda rank, number, prefix=prefix: source_link(prefix + number))
+                                       lambda scope, number, prefix=prefix: source_link(prefix + number))
         for command in ('src', 'srcref'):
             text = replace_tex_command(text, command, 1, source_link)
         text = replace_tex_command(text, 'needspace', 1, lambda space: '')
@@ -512,69 +514,94 @@ def parse_numbered_problem_tex(content, *, require_source_urls=True):
 
 
 def load_open_problems_catalog():
-    """Build the ranked collection from its numbered, source-annotated TeX files."""
+    """Join the portable UnsolvedMath registry to our independently authored TeX.
+
+    The registry supplies identity, title and category. Only display_order.json
+    supplies ordering; neither filenames nor permanent IDs imply a rank.
+    """
+    registry = json.loads(UNSOLVEDMATH_PATH.read_text(encoding='utf-8'))
+    order = json.loads(DISPLAY_ORDER_PATH.read_text(encoding='utf-8'))
+    if not isinstance(registry, list):
+        raise ValueError('UnsolvedMath registry requires a records array')
     records = []
-    for path in sorted(OPEN_PROBLEMS_PATH.glob('*.tex')):
+    for canonical in registry:
+        if not isinstance(canonical, dict) or type(canonical.get('id')) is not int or canonical['id'] < 1:
+            raise ValueError('Malformed canonical UnsolvedMath ID')
+        path = OPEN_PROBLEMS_PATH / f"{canonical['id']}.tex"
+        if not path.is_file():
+            raise ValueError(f'Missing definition for UnsolvedMath {canonical["id"]}: {path}')
         content = path.read_text(encoding='utf-8')
         header = re.search(r'^% TOP_PROBLEM: (.+)$', content, re.MULTILINE)
         if not header:
             raise ValueError(f'Missing TOP_PROBLEM metadata: {path}')
-        record = json.loads(header[1])
-        if path.stem != str(record.get('releaseRank')):
-            raise ValueError(f'Definition filename must match its rank: {path}')
+        metadata = json.loads(header[1])
+        if type(metadata.get('id')) is not int or metadata['id'] != canonical['id']:
+            raise ValueError(f'Definition filename must match its canonical ID: {path}')
+        record = dict(canonical)
+        for key in ('statusStatement', 'statusQualification', 'statusReviewedAt'):
+            if key in metadata:
+                record[key] = metadata[key]
         try:
-            record.update(parse_numbered_problem_tex(content))
+            record.update(parse_numbered_problem_tex(content, require_source_urls=False))
         except ValueError as error:
             raise ValueError(f'{path}: {error}') from error
         record['definitionFile'] = f'attacks/open_problems/top_problems/{path.name}'
         records.append(record)
-    snapshot = {'records': records, 'recordCount': len(records)}
+    expected = {f'{record["id"]}.tex' for record in records}
+    extra = {path.name for path in OPEN_PROBLEMS_PATH.glob('*.tex')} - expected
+    if extra:
+        raise ValueError(f'Definitions missing from the UnsolvedMath registry: {sorted(extra)}')
+    snapshot = {'records': records, 'recordCount': len(records), 'displayOrder': order}
     validate_open_problems_catalog(snapshot)
-    if len(records) != 500:
-        raise ValueError('The ranked collection requires all 500 numbered definitions')
     return snapshot
 
 
 def validate_open_problems_catalog(snapshot):
-    """Validate identities, ranks, mathematical content and source links."""
+    """Reject invalid or colliding identities and dangling display-order entries."""
     if not isinstance(snapshot, dict) or not isinstance(snapshot.get('records'), list):
         raise ValueError('Open problems catalog requires a records array')
     records = snapshot['records']
     count = snapshot.get('recordCount')
     if type(count) is not int or count != len(records) or count < 1:
         raise ValueError('Open problems catalog recordCount does not match its records')
-    ids, ranks = set(), set()
+    ids = set()
     for record in records:
         if not isinstance(record, dict):
             raise ValueError('Malformed open problems catalog record')
-        problem_id = record.get('problemId')
-        if not isinstance(problem_id, str) or not re.fullmatch(
-            r'problem\.[a-z0-9]+(?:[.-][a-z0-9]+)*', problem_id
-        ):
+        problem_id = record.get('id')
+        if type(problem_id) is not int or not 1 <= problem_id <= 2**53 - 1:
             raise ValueError(f'Malformed open problem ID: {problem_id!r}')
         if problem_id in ids:
             raise ValueError(f'Duplicate open problem ID: {problem_id}')
         ids.add(problem_id)
-        rank = record.get('releaseRank')
-        if type(rank) is not int or rank < 1:
-            raise ValueError(f'Malformed open problem rank for {problem_id}: {rank!r}')
-        if rank in ranks:
-            raise ValueError(f'Duplicate open problem rank: {rank}')
-        ranks.add(rank)
-        for key in ('canonicalTitle', 'exactTarget', 'primaryDomain',
-                    'primaryDomainLabel', 'displayStatus', 'releaseStatus'):
+        for key in ('title', 'exactTarget', 'status'):
             if not isinstance(record.get(key), str) or not record[key].strip():
                 raise ValueError(f'Open problem {problem_id} requires {key}')
+        category = record.get('category')
+        if not isinstance(category, dict) or any(
+            not isinstance(category.get(key), str) or not category[key].strip()
+            for key in ('name', 'display_name')
+        ):
+            raise ValueError(f'Open problem {problem_id} requires a canonical category')
+        external_url = record.get('external_url')
+        if external_url is not None and external_url != f'https://www.unsolvedmath.com/problems/{problem_id}':
+            raise ValueError(f'Invalid UnsolvedMath external URL for {problem_id}')
         sources = record.get('sources')
         if not isinstance(sources, list) or not sources or not all(
-            isinstance(source, dict) and isinstance(source.get('url'), str)
-            and source['url'].startswith(('https://', 'http://'))
+            isinstance(source, dict)
+            and (source.get('url') is None or isinstance(source['url'], str)
+                 and source['url'].startswith(('https://', 'http://')))
             and isinstance(source.get('citation'), str) and source['citation'].strip()
             for source in sources
-        ):
+        ) or not any(source.get('url') for source in sources):
             raise ValueError(f'Open problem {problem_id} requires attributed sources')
-    if ranks != set(range(1, count + 1)):
-        raise ValueError('Open problems catalog ranks must be contiguous from 1 to recordCount')
+    order = snapshot.get('displayOrder')
+    if not isinstance(order, list) or any(type(value) is not int for value in order):
+        raise ValueError('Display order requires an array of canonical integer IDs')
+    if len(set(order)) != len(order):
+        raise ValueError('Duplicate open problem ID in display order')
+    if set(order) != ids:
+        raise ValueError('Display order must contain every catalogue ID exactly once')
 
 
 def load_review(problem_type, problem_id):
@@ -774,33 +801,31 @@ def summarize_open_problem_attempts(problem):
 
 
 def build_open_problems_data(mo_problems=None, snapshot=None):
-    """Join numbered definitions, their attempts, and the legacy MO collection.
-
-    Stable problem IDs preserve existing URLs and reviews. Numbered files in
-    top_problems/<model>/ follow the same convention as the Erdos collection.
-    """
+    """Join canonical definitions and attempts, then the historical MO subset."""
     if snapshot is None:
         snapshot = load_open_problems_catalog()
     if mo_problems is None:
         mo_problems = build_mo_data()
     problems = {}
-    for record in sorted(snapshot['records'], key=lambda item: item['releaseRank']):
-        problem_id = record['problemId']
-        formal_source = record.get('formalStatementSource') or {}
+    validate_open_problems_catalog(snapshot)
+    records_by_id = {record['id']: record for record in snapshot['records']}
+    for rank, canonical_id in enumerate(snapshot['displayOrder'], 1):
+        record = records_by_id[canonical_id]
+        problem_id = str(canonical_id)
         problems[problem_id] = {
-            'id': problem_id,
-            'title': record['canonicalTitle'],
+            'id': canonical_id,
+            'title': record['title'],
             'collection': 'ranked',
-            'rank': record['releaseRank'],
-            'domain': record['primaryDomain'],
-            'domain_label': record['primaryDomainLabel'],
+            'rank': rank,
+            'domain': record['category']['name'],
+            'domain_label': record['category']['display_name'],
             'exact_target': record['exactTarget'],
             'definition_tex': record.get('definitionTeX'),
             'definition_file': record.get('definitionFile'),
-            'link': formal_source.get('url') or record['sources'][0]['url'],
+            'link': record.get('external_url'),
+            'external_url': record.get('external_url'),
             'sources': record['sources'],
-            'status': record['displayStatus'],
-            'release_status': record['releaseStatus'],
+            'status': record['status'],
             'status_statement': record.get('statusStatement'),
             'status_qualification': record.get('statusQualification'),
             'status_reviewed_at': record.get('statusReviewedAt') or None,
@@ -826,29 +851,44 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
         if numbered_dir.exists():
             model_dirs.extend((directory, True) for directory in sorted(numbered_dir.iterdir())
                               if directory.is_dir() and not directory.name.startswith('.'))
-        ids_by_number = {str(problem['rank']): problem_id for problem_id, problem in problems.items()}
         for model_dir, numbered in model_dirs:
             for tex_file in sorted(model_dir.glob('*.tex')):
-                pattern = r'(?P<id>[1-9]\d*)' if numbered else r'(?P<id>problem\.[a-z0-9.-]+)'
+                pattern = r'(?P<id>[1-9]\d*)'
                 match = re.fullmatch(pattern + r'(?:_v(?P<ver>[1-9]\d*))?', tex_file.stem)
                 problem_id = match.group('id') if match else None
-                if numbered:
-                    problem_id = ids_by_number.get(problem_id)
                 if problem_id not in problems:
                     raise ValueError(
                         f'Unknown ranked open problem attempt: {tex_file}. '
-                        'Use a numbered file in top_problems/<model>/, or a stable problemId in <model>/.'
+                        'Use a canonical UnsolvedMath ID in top_problems/<model>/<id>.tex.'
                     )
                 content = read_tex_file(tex_file)
+                header = re.search(r'^% TOP_PROBLEM: (.+)$', content, re.MULTILINE)
+                if header:
+                    metadata = json.loads(header[1])
+                    if type(metadata.get('id')) is not int or str(metadata['id']) != problem_id:
+                        raise ValueError(f'Attempt filename must match its canonical ID: {tex_file}')
                 raw = content
                 if numbered and r'\subsection{Definitions and mathematical statement}' in content:
                     raw = parse_numbered_problem_tex(content, require_source_urls=False)['documentTeX']
-                parsed = parse_attack(raw, model_dir.name.replace('_', ' '), get_file_date(tex_file))
+                posted_marker = re.search(r'^% FIRST_POSTED: (.+)$', content, re.MULTILINE)
+                if posted_marker:
+                    posted_date = posted_marker[1].strip()
+                    if posted_date == 'null':
+                        posted_date = None
+                    else:
+                        datetime.strptime(posted_date, '%Y-%m-%d')
+                else:
+                    posted_date = get_file_date(tex_file)
+                parsed = parse_attack(raw, model_dir.name.replace('_', ' '), posted_date)
                 # Numbered documents lose comments during display conversion;
                 # read their declaration from the original source as well.
                 declared_status = declared_attempt_status(content)
                 if declared_status:
                     parsed['status'] = declared_status
+                if re.search(r'^% ENTRY_KIND: statement_only\s*$', content, re.MULTILINE):
+                    parsed['entry_kind'] = 'statement_only'
+                    parsed['status'] = 'unresolved'
+                    parsed.pop('completion', None)
                 parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
                 parsed['version'] = int(match.group('ver') or 1)
                 problems[problem_id]['attacks'].append(parsed)
@@ -935,7 +975,8 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
         f.write(f'var openProblems = {json.dumps(open_problems, indent=2)};\n')
         f.write('window.OPEN_PROBLEMS_DATA = openProblems;\n')
         catalog_info = {
-            'ranking_source': 'https://www.proofatlas.ai/',
+            'registry_path': 'lists/unsolvedmath/problems.json',
+            'display_order_path': 'lists/unsolvedmath/display_order.json',
             'source_path': 'attacks/open_problems/top_problems',
         }
         f.write(f'var openProblemsCatalog = {json.dumps(catalog_info, indent=2)};\n')
@@ -945,9 +986,13 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
     # data. Both formats are generated from the same TeX source in this build.
     detail_dir = DATA_DIR / 'top_problems'
     detail_dir.mkdir(exist_ok=True)
+    expected_details = {f"{p['id']}.json" for p in open_problems.values() if p.get('collection') == 'ranked'}
+    for stale in detail_dir.glob('*.json'):
+        if stale.name not in expected_details:
+            stale.unlink()
     for problem in open_problems.values():
         if problem.get('collection') == 'ranked':
-            (detail_dir / f"{problem['rank']}.json").write_text(
+            (detail_dir / f"{problem['id']}.json").write_text(
                 json.dumps(problem, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
     # Changing the generated content changes the URL, so a new page cannot

@@ -1,0 +1,116 @@
+% TOP_PROBLEM: {"id": 30006818, "title": "Constant-Query Locally Decodable Codes with Polynomial Blocklength", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Constant-Query Locally Decodable Codes with Polynomial Blocklength}{Constant-Query Locally Decodable Codes with Polynomial Blocklength}}\label{30006818}
+\subsection{Definitions and mathematical statement}
+Seek absolute constants $q,C\ge1$ and $\delta>0$ and encodings
+$\mathrm{Enc}_n:\{0,1\}^n\to\{0,1\}^{N(n)}$ with $N(n)\le n^C$ up to a fixed constant factor. A randomized local decoder, given an index $i$ and oracle access to a word $y$ with Hamming distance at most $\delta N(n)$ from $\mathrm{Enc}_n(x)$, must make at most $q$ queries and satisfy
+\[
+ \Pr[\mathrm{Dec}^y(i)=x_i]\ge2/3
+\]
+for every $x,i,y$ in scope. Constants do not depend on message length. The target is existence or impossibility of such a binary code family; it does not ask merely average recovery of a random bit or decoding from a random rather than adversarial corruption pattern.
+\par\smallskip\textit{Formulation and concept references:} \href{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can binary messages be encoded with polynomial overhead so that any chosen message bit remains recoverable from a constant number of probes despite a constant fraction of adversarial errors?
+\subsection{Research attempt}
+\paragraph{Scope, process, and first gap.}
+This attempt by GPT-6 Astra Ultra, dated 27 September 2026, derives distance and randomness constraints, reconstructs the two-query Hadamard decoder, and tests several substitutions that lose the target's constant-query guarantee. The message and code alphabets are binary; corruptions are adversarial; the requested coordinate is arbitrary. The source [S1] states the polynomial-length question. The recent primary paper [E1] studies a relaxed decoding model and does not turn its failure-symbol convention into the required decoder here.
+
+The first gap is achieving constant probes and constant adversarial error tolerance simultaneously with polynomial blocklength. The construction below has the first two properties and exponential length. None of the necessary conditions supplies an impossibility theorem for polynomial length.
+
+\paragraph{Decoding forces disjoint error balls.}
+Write $t=\lfloor\delta N\rfloor$. Distinct messages must have codewords at Hamming distance greater than $2t$. Otherwise split their differing coordinates into two groups of size at most $t$ and construct a word $y$ within distance $t$ of both codewords. Choose a message coordinate on which the messages differ. The same decoder, with the same input index and oracle $y$, would have to output each of two opposite bits with probability at least $2/3$, an impossibility.
+
+Consequently the encoding is injective, so $N\ge n$, and
+\[
+ d_{\min}(\operatorname{Enc})\ge2\lfloor\delta N\rfloor+1.
+ \tag{258.1}
+\]
+This argument does not count decoder queries; it applies to unrestricted decoding as well. Conversely disjoint error balls make the message information-theoretically identifiable, but do not make any particular bit locally recoverable.
+
+A basic binary averaging bound limits the possible error fraction. For $M=2^n$ codewords, let $a_j$ of them have a one in coordinate $j$. The sum of all unordered pairwise distances is
+\[
+ \sum_{j=1}^N a_j(M-a_j)\le NM^2/4.
+\]
+Its average is at most $NM/(2(M-1))$, so some pair has distance at most that value. Combining with (258.1), then taking $n\to\infty$ and using $N\ge n$, gives $\delta\le1/4$ for any family in this scope. This is only a coarse necessary condition; it does not say that tolerance $1/4$ is achievable.
+
+\paragraph{An exact two-query construction with the wrong length.}
+Index code coordinates by $r\in\mathbb F_2^n$ and put
+\[
+ \operatorname{Enc}(x)_r=\langle x,r\rangle.
+\]
+This Hadamard code has $N=2^n$. To decode $x_i$, choose uniform $r$, query coordinates $r$ and $r+e_i$, and output their sum modulo two. Without corruption,
+\[
+ \langle x,r\rangle+\langle x,r+e_i\rangle=x_i.
+\]
+If the corrupted set has size at most $\delta N$, each queried coordinate lands in it with probability at most $\delta$. The queries need not be independent for the union bound:
+\[
+ \Pr[\text{either query corrupted}]\le2\delta.
+\]
+When neither is corrupted the answer is correct, so the success probability is at least $1-2\delta$, meeting $2/3$ when $\delta\le1/6$.
+
+The argument works for every requested coordinate and every corruption pattern. It is not an average-bit assertion. The two queried positions are distinct, and their joint distribution has a strong algebraic dependence deliberately used by the decoder. Uniform single-coordinate marginals control corruption while the algebraic relation recovers the desired bit.
+
+For distinct messages the nonzero linear functional representing their difference is balanced on $\mathbb F_2^n$, so their codewords differ in exactly half the positions. This checks compatibility with the distance requirement. The unresolved parameter is length: $2^n$ is not bounded by $n^C$ for any fixed $C$.
+
+\paragraph{A deterministic local decoder cannot tolerate enough errors.}
+Suppose a deterministic decoder makes at most $q$ adaptive queries and is correct on all uncorrupted codewords. Pick messages $x,x'$ with $x_i\ne x'_i$. Run the decoder on the clean codeword of $x'$ and record every queried coordinate. Modify the codeword of $x$ at those at most $q$ coordinates so that its answers agree with the recorded answers from $x'$.
+
+Inductively the entire adaptive transcript is the same as on $x'$, so the decoder outputs $x'_i$. If $\lfloor\delta N\rfloor\ge q$, the modified word is an allowed corruption of the codeword of $x$, and the answer is wrong. Adaptivity has not saved this deterministic rule: the adversary follows one complete clean transcript.
+
+This establishes a restricted impossibility result. It does not apply directly to randomized decoding, because one corruption pattern has to defeat a sufficiently large fraction of its random choices simultaneously. Randomness spreads query locations, which is precisely what the Hadamard calculation uses.
+
+There is a quantitative extension for a decoder whose random choices have finite support of size $K$, with arbitrary positive probabilities. Record the clean $x'$ transcript for each supported choice and modify the union of their query coordinates. At most $qK$ positions are changed. The resulting output distribution is exactly the clean distribution for $x'$, so it outputs the wrong bit for $x$ with probability at least $2/3$. Thus
+\[
+ \lfloor\delta N\rfloor\ge qK
+\]
+is impossible for such a decoder. A decoder with many or infinitely many random choices is not excluded by this bound. Nor does this prove that its random seed must have a particular length without specifying its representation.
+
+\paragraph{Repeating bits gives the wrong adversarial guarantee.}
+Consider the code that repeats each of $n$ message bits in a separate block of length $R$, so $N=nR$. Sampling a few positions from the requested block works against random independent noise of low rate. Against the stated adversary, however, corrupt all $R$ positions in one block. This is within budget as soon as $\delta n\ge1$.
+
+The corrupted word can also be the clean encoding of a different message, so no decoder, local or global, can repair that coordinate consistently. The relative distance is only $1/n$, in agreement with (258.1). Increasing $R$ changes neither the relative distance nor this attack. The failure is concentration of adversarial errors, not an insufficient concentration inequality for the decoder's random samples.
+
+\paragraph{Even noiseless invertibility is not local accessibility.}
+An arbitrary invertible binary change of coordinates can encode $n$ bits into $n$ bits while making one original bit equal to the parity of all $n$ code bits. Such a map exists: take an invertible matrix whose first decoding row is the all-ones vector, completing it to a basis.
+
+For uniformly distributed messages the codeword is uniformly distributed. Any adaptive deterministic procedure querying fewer than $n$ distinct code bits leaves at least one unobserved uniform bit. Conditional on its complete transcript, the parity of all coordinates is still balanced. Its average success is therefore exactly $1/2$. Averaging also over the decoder's randomness preserves this bound, so some message has success at most $1/2$.
+
+Thus a bijective encoding and efficient global inversion do not by themselves give constant-query decoding even with no errors. This example is not claimed to have positive relative distance. Its purpose is to isolate the locality requirement from mere information preservation.
+
+\paragraph{Alphabet and success conventions cannot be discarded.}
+A constant number of queries to an alphabet of size $Q(n)$ is not automatically a constant number of binary probes: straightforward symbol retrieval uses $\lceil\log_2Q(n)\rceil$ bits per symbol. If $Q$ grows, the conversion changes the target. Similarly a relaxed decoder allowed to return a failure symbol has a different obligation from producing the requested bit with probability at least $2/3$ on every admissible word.
+
+Global distance, randomized noise recovery and local testing are each useful properties, but none is substituted for the precise local correction of message bits required here. An eventual construction must verify the binary length, fixed probe bound and worst-case quantifiers together.
+
+\paragraph{Verification and outcome.}
+The finite checks exhaust all messages and allowable small corruption sets for small Hadamard codes, and check the transcript-union obstruction on explicit repetition examples. The pairwise-distance calculation is exact. No finite search is used as evidence against codes of unbounded message length.
+
+\textbf{UNRESOLVED.} The distance bound, the deterministic and finite-random-support obstructions, and the exponential-length two-query construction are proved. A polynomial-length binary family meeting every stated requirement, or a general lower bound excluding all fixed query counts, remains missing.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]S. P. Vadhan, Pseudorandomness, Open Problem 7.53 (2012).
+\url{https://people.seas.harvard.edu/~salil/pseudorandomness/pseudorandomness-Aug12.pdf}.
+\textit{Formulation source.}
+\item[E1]Exponential Lower Bounds for 2-query Relaxed Locally Decodable Codes, arXiv:2602.20278 (2026).
+\url{https://arxiv.org/abs/2602.20278}.
+\textit{Primary contemporary source distinguishing relaxed decoding from the ordinary decoding target; consulted 27 September 2026.}
+\end{itemize}
+\end{document}

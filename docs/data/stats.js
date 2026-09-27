@@ -21,11 +21,11 @@ var siteStats = {
     ]
   },
   "open_problems": {
-    "total_problems": 600,
-    "ranked_total": 500,
+    "total_problems": 603,
+    "ranked_total": 503,
     "mo_total": 100,
-    "with_attacks": 558,
-    "ranked_with_attacks": 465,
+    "with_attacks": 564,
+    "ranked_with_attacks": 471,
     "models": [
       "gpt 6 astra pro",
       "gpt 6 astra ultra",

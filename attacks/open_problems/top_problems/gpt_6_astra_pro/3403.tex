@@ -1,0 +1,227 @@
+% TOP_PROBLEM: {"id": 3403, "title": "One-way functions exist", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: null
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Mathematical Research Notebook},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Open Problems Math | Research notebook}
+\fancyhead[R]{\small 27 September 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=3pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+\usepackage{etoolbox}
+\AtBeginEnvironment{itemize}{\small}
+% Standalone entry; original section content is delimited for verification.
+\begin{document}
+\setcounter{section}{0}
+%% BEGIN ORIGINAL SECTION CONTAINER
+% ================================================================
+% problemId: 3403
+% Canonical problem ID: 3403
+% exactTarget SHA-256: 9afb90e5fb1520e3a26583c1779c609dae28a39e36b697cf09190fc053e01c0a
+\clearpage
+\section*{\texorpdfstring{One-way functions exist}{One-way functions exist}}\label{3403}
+\subsection{Definitions and mathematical statement}
+A nonnegative function $\eta(n)$ is negligible if for every $c>0$ it is at most $n^{-c}$ for all sufficiently large $n$. The sought function family is uniformly computable in deterministic polynomial time and satisfies, for every probabilistic polynomial-time $A$,
+\[
+ \Pr_{x\leftarrow\{0,1\}^n,\,A}\!\bigl[A(1^n,f_n(x))\in f_n^{-1}(f_n(x))\bigr]
+ \le \eta_A(n)
+\]
+for some negligible $\eta_A$. An output of the wrong input length is a failed inversion. The probability includes both a uniformly random input and the inverter's internal randomness. The inverter only has to find \emph{some} preimage; recovering the originally sampled input is unnecessary.
+\par\smallskip\textit{Formulation and concept references:} \sref{3403}{1}.
+\cataloguescope{Prove or disprove that there exists a deterministic polynomial-time computable function family f\_n:\{0,1\}\textasciicircum{}n->\{0,1\}\textasciicircum{}\{poly(n)\} such that every probabilistic polynomial-time algorithm inverts f\_n on a uniformly random input with only negligible probability.}
+\subsection{Short English statement}
+Is there an efficiently computable function whose outputs no efficient randomized algorithm can usually reverse, even when any preimage counts?
+%% BEGIN RESEARCH INSERTION
+\subsection{Research attempt}
+\paragraph{Current frontier.}
+\textit{Research check: 27 September 2026.}
+The 2024 Hirahara--Lu--Oliveira manuscript gives characterizations of
+one-way functions through public-coin time-bounded Kolmogorov complexity;
+its Theorem 3 separately concerns \emph{infinitely-often} one-way
+functions. Those quantifiers cannot be exchanged for the eventual
+hardness required here. Liu--Pass (ITCS 2026, Theorems 4.1--4.2) gives a
+boundary-hardness characterization for randomized time-bounded
+complexity and a conditional characterization for its plain analogue.
+These are equivalences or conditional reductions, not unconditional
+constructions. \sref{3403}{2}, \sref{3403}{3}.
+The attempt below instead tests an explicit polynomial map, distinguishing
+its provable collision properties from its unproved inversion hardness.
+
+\paragraph{Attack route.}
+Three routes are natural: prove one of the meta-complexity hardness
+conditions, convert worst-case NP-hardness into planted average-case
+hardness, or analyze a concrete function directly. The first still needs
+a complexity lower bound; the second must control the actual output
+sampling distribution, not just arbitrary satisfiable instances.
+We pursue the third with random quadratic systems whose coefficients
+are part of the uniform input, not a separately generated secret key.
+
+\paragraph{Attempt: a fully uniform candidate on every length.}
+For $k\ge1$ let $m=3k$ and
+\[
+ q_k=1+k+\binom{k}{2},\qquad d_k=mq_k.
+ \tag{8.1}
+\]
+A seed $Q\in\F_2^{d_k}$ describes $m$ independent multilinear quadratic
+polynomials in $k$ variables, with all constant, linear and squarefree
+quadratic coefficients included. For input length $N\ge d_1+1$, let $k$
+be the largest integer with $d_k+k\le N$, and put $r=N-d_k-k$.
+Parse the input as $(Q,x,u)$ with lengths $d_k,k,r$, and define
+\[
+ f_N(Q,x,u)=(Q,Q(x),u).
+ \tag{8.2}
+\]
+For the finitely many smaller lengths use the identity map.
+The output length is $N+2k$, evaluation is deterministic polynomial
+time, and $k=\Theta(N^{1/3})$. Indeed, $d_k+k$ is a cubic polynomial
+with positive leading coefficient, and maximality bounds $N$ above by
+$d_{k+1}+k+1$. This is one algorithm on all lengths, with no advice.
+
+For fixed $x\ne y$, the difference of one row's evaluations is a nonzero
+linear functional of its coefficient vector: at least one linear
+monomial distinguishes $x$ and $y$. Consequently
+\[
+ \Pr_Q[Q(x)=Q(y)]=2^{-3k},\qquad
+ \Pr_Q[Q\text{ is not injective}]\le
+ \binom{2^k}{2}2^{-3k}<2^{-k-1}.
+ \tag{8.3}
+\]
+The second statement follows by a union bound over unordered pairs and
+requires no independence between different pairs. Different seeds cannot
+collide under (8.2), since the seed is copied to the output. For all but
+an exponentially small fraction of seeds, the $x$-preimage is therefore
+unique. This establishes a property of the proposed map, not one-wayness.
+
+The necessary next statement is genuinely distributional: for every PPT
+algorithm $A$, its probability of finding \emph{any} $x'$ with
+$Q(x')=Q(x)$, given $(Q,Q(x))$ for uniform independent $Q,x$, would have
+to be negligible in $k$. If this held, (8.2) would satisfy the target.
+To justify the padding step, a proposed inverter at lengths $N$ can be
+simulated at core length $k$ by sampling one of the
+$O(k^2)$ lengths whose maximal parameter is $k$ and then sampling $u$.
+Give each length probability at least the reciprocal of twice the
+number of lengths: use a fixed block of random bits and map surplus
+indices to the first length. This avoids unbounded rejection sampling.
+A success $N^{-c}$ on infinitely many $N$ would give success at least
+$k^{-3c-O(1)}$ on infinitely many $k$, contradicting the stated core
+hardness. Thus this implication handles arbitrary length-sensitive
+inverters, not merely an inverter that ignores padding. The core
+hardness statement itself is not proved.
+
+\paragraph{Stress test: injection is compatible with easy inversion.}
+Replace the quadratic rows by independent affine rows $Q(x)=Ax+b$, with
+$A\in\F_2^{3k\times k}$. The fixed-pair collision probability is
+\emph{the same} $2^{-3k}$, so (8.3) still holds. Yet Gaussian elimination
+finds a preimage in polynomial time on every output in the image, even
+when $A$ is rank deficient. Thus both the near-injectivity bound and
+its union-bound proof are incapable of distinguishing this easy family
+from the quadratic candidate.
+
+Nor is hardness on a uniform right-hand side the right hypothesis.
+For each seed the image has at most $2^k$ elements in a space of size
+$2^{3k}$, so an independent uniform $y$ lies in it with probability at
+most $2^{-2k}$. Failure to solve $Q(x)=y$ under that sampling law would
+usually mean that a preimage does not exist. In (8.2) it always exists.
+Linearizing the monomials also fails to settle the issue: set
+$z_{ij}=x_ix_j$, solve the resulting linear equations, and one must still
+enforce all the relations $z_{ij}=x_ix_j$. Counting the many formal
+linearized solutions neither proves these constraints hard nor supplies
+an algorithm. In particular, no claim of cryptographic security is
+inferred from degree two or from the number of equations.
+
+\paragraph{A complementary obstruction to overcompression.}
+For an arbitrary map $f$ on uniform inputs, put
+$p_y=\Pr[f(U_N)=y]$. An inverter that samples $T$ independent inputs and
+returns the first one matching a supplied output has failure probability
+\[
+ \sum_y p_y(1-p_y)^T\le \frac{|\operatorname{im}f|}{T+1}.
+ \tag{8.4}
+\]
+For $0\le p\le1$, the maximum of $p(1-p)^T$ is at $p=1/(T+1)$ and is
+at most $1/(T+1)$; summing proves the bound. A polynomial-size image is
+therefore incompatible with one-wayness: choose a polynomial number of
+trials larger than six times a polynomial upper bound for that image.
+The candidate (8.2) has a much larger image, so this is an obstruction
+to a different compression strategy, not its inverter.
+
+Finally, $\mathsf P=\mathsf{NP}$ would invert every polynomial-time
+family on its image by deciding successively whether a preimage extends
+a chosen prefix. The queried relation is in NP and has polynomial-size
+inputs. Establishing the missing hardness for (8.2) would thus already
+imply $\mathsf P\ne\mathsf{NP}$. The converse is not available: sparse
+worst-case difficulty need not be sampled with nonnegligible probability.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+The proposed family meets the exact uniformity, input-length and
+polynomial-output-length requirements, and its collision estimate and
+all-length padding reduction are proved above. Its planted inversion
+hardness has not been established. The affine countermodel shows why
+the strongest easy estimate obtained here is not evidence of that
+hardness. The map is a candidate to analyze, not a proved one-way
+function or a claim of a new cryptographic primitive.
+%% END RESEARCH INSERTION
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:3403:1}{} Shuichi Hirahara, Zhenjian Lu, and Igor C. Oliveira, One-Way Functions and pKt Complexity, IACR ePrint 2024/1388 (2024).
+\url{https://eprint.iacr.org/2024/1388.pdf}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:3403:2}{} One-Way Functions and pKt Complexity — Hirahara, Lu and Oliveira.
+\url{https://wrap.warwick.ac.uk/id/eprint/187935/1/WRAP-One-way-functions-pKt-complexity-24.pdf}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:3403:3}{} One-Way Functions and Boundary Hardness of Randomized Time-Bounded Kolmogorov Complexity — Liu and Pass.
+\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ITCS.2026.97}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\end{itemize}
+
+%% END ORIGINAL SECTION CONTAINER
+\end{document}

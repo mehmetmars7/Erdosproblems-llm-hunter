@@ -31,9 +31,9 @@ We focus on frontier models because they have shown the most promise in making m
 
 ### For Top Open Problems Attempts
 
-1. **Choose the Target**: Use the numbered definition in `attacks/open_problems/top_problems/<number>.tex`, preserving its mathematical scope and cited sources. The `TOP_PROBLEM` comment provides the stable ID used by URLs and reviews.
+1. **Choose the Target**: Use the numbered definition in `attacks/open_problems/top_problems/<unsolvedmath_id>.tex`, preserving its mathematical scope and cited sources. The `TOP_PROBLEM` comment provides the numerical `id` used by URLs and reviews. Display rank is independent of this ID.
 2. **File Location**: Place your TeX file in `attacks/open_problems/top_problems/<MODEL_NAME>/`.
-3. **File Naming**: Use `<number>.tex`, for example `1.tex` for P versus NP. Further versions use `1_v2.tex`, `1_v3.tex`, and so on. Keep the root definition file separate from model attempts. Existing stable-ID filenames in `attacks/open_problems/<MODEL_NAME>/` remain supported.
+3. **File Naming**: Use `<unsolvedmath_id>.tex`, for example `1.tex` for P versus NP. Further versions use `1_v2.tex`, `1_v3.tex`, and so on. Keep the root definition file separate from model attempts.
 4. **Mathematical Content**: Include a precise statement, definitions and conventions, a literature check, the actual mathematical attempt, verification, and a final status. Cite relevant sources for the definition and concepts as well as theorems, reductions, or prior work used during the attempt. Use identifiable bibliographic references and source URLs; do not invent citations.
 5. **Honest Scope**: Identify what is proved, what is known, and the first remaining gap. An unresolved attempt is welcome. Do not present a statement, generic plan, untested idea, or restatement of known results as a new solution.
 
@@ -46,9 +46,8 @@ python3 build_site.py
 
 You can supply multiple batch paths in one command. Each batch must be a complete
 TeX document, including `\begin{document}` and `\end{document}`. Each problem
-section starts with the catalogue's `% problemId: ...` and
-`% source releaseRank: N; ...` comments and contains a `\section` with
-`\label{N}`. An imported section must contain nonempty `Definitions and
+section starts with `% problemId: N`, where `N` is its canonical UnsolvedMath
+ID, and contains a `\section` with `\label{N}`. An imported section must contain nonempty `Definitions and
 mathematical statement`, `Short English statement`, `Research attempt`, and
 `Sources` subsections. Definition-only sections are skipped. Local source
 references must resolve to the section's source list.
@@ -179,7 +178,7 @@ PARTIAL formalization; the original problem remains UNRESOLVED.
 ## Community Reviews
 
 Use the repository's **Review an LLM claim** issue form. Select **Open Problems**
-for a ranked record and copy its stable ID (such as `problem.p-versus-np`) from the
+for a ranked record and copy its canonical UnsolvedMath ID (such as `6`) from the
 detail page. Select **MO** and its numeric question ID for the MathOverflow subset,
 or **Erdos** and its numeric problem number. An accepted review requires a citation
 and an explanation. Review changes pass through a pull request before publication.

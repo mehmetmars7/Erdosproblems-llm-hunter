@@ -1,0 +1,112 @@
+% TOP_PROBLEM: {"id": 30006930, "title": "Matroid Secretary Conjecture", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Matroid Secretary Conjecture}{Matroid Secretary Conjecture}}\label{30006930}
+\subsection{Definitions and mathematical statement}
+A finite matroid is a pair $M=(E,\mathcal I)$ whose independent sets are hereditary and satisfy exchange: if $I,J\in\mathcal I$ and $|I|<|J|$, some $e\in J\setminus I$ has $I\cup\{e\}\in\mathcal I$. The matroid is known, while nonnegative weights $w(e)$ are fixed adversarially. Elements arrive in a uniformly random order, each revealing its weight. An online algorithm must irrevocably accept or reject each arrival and keep its accepted set independent.
+
+The conjecture asks for an absolute $c>0$ and an algorithm satisfying, for every matroid and weight assignment,
+\[
+ {\mathbb{E}}\,w(I_{\rm alg})\ge c\max_{I\in\mathcal I}w(I),
+ \qquad w(I)=\sum_{e\in I}w(e).
+\]
+The expectation includes arrival order and internal randomness. The constant cannot depend on rank or ground-set size. The catalogue imposes no additional polynomial running-time requirement.
+\par\smallskip\textit{Formulation and concept references:} \href{https://drops.dagstuhl.de/storage/00lipics/lipics-vol215-itcs2022/LIPIcs.ITCS.2022.58/LIPIcs.ITCS.2022.58.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can an online selector capture a fixed fraction of the best possible matroid-independent weight, despite learning weights only as elements arrive?
+\subsection{Research attempt}
+\paragraph{Scope and first gap.}
+This attempt by GPT-6 Astra Ultra was developed on 27 September 2026 by analyzing rank-one sampling, applying it independently to partition blocks, and constructing weight assignments that defeat two tempting generalizations. The matroid is known, weights are adversarial but fixed before the random arrival order, and acceptance is irrevocable. The arguments are standard partial results, not a new constant-competitive algorithm for all matroids.
+
+Dughmi [S1] relates the general conjecture to contention resolution. That equivalence does not allow an arbitrary offline contention rule to be implemented online with unknown future weights. The catalogue asks only for existence of an algorithm, not polynomial running time; computational expense is therefore not the obstruction pursued here. The first gap is coordinating selections across arbitrary interacting matroid constraints without a loss depending on rank.
+
+\paragraph{A rank-one algorithm with an explicit constant.}
+For a rank-one matroid ignore loops, since they can never be accepted. Let $N$ be the known number of remaining elements. If $N=0$, the optimum is zero; if $N=1$, accept the element. Otherwise put $s=\lfloor N/2\rfloor$. Reject the first $s$ nonloop arrivals, remember the largest weight among them, and accept the first later element larger than that sample maximum. Break weight ties consistently using fixed element labels, so comparisons define a strict total order.
+
+Condition on the globally largest element arriving in position $j>s$. It is selected exactly when the largest of the first $j-1$ elements lies in the sample. By uniform random order, that has probability $s/(j-1)$. Thus
+\[
+ \mathbb P(\text{select the maximum})
+ =\frac{s}{N}\sum_{j=s+1}^{N}\frac1{j-1}
+ \ge\frac{s(N-s)}{N(N-1)}
+ \ge\frac14.
+ \tag{432.1}
+\]
+The last inequality follows directly for even and odd $N$ with $s=\lfloor N/2\rfloor$. Selected weights are nonnegative, so expected value is at least one-quarter of the maximum weight. Tie-breaking does not harm this weight guarantee: the greatest element in the refined order still has maximum numerical weight.
+
+This constant is chosen for a simple exact proof, not as the optimal classical secretary ratio. There is no dependence on $N$.
+
+\paragraph{A rank-independent result for partition matroids.}
+Suppose the matroid is a direct sum of rank-one blocks: its independent sets contain at most one element from each known block, with loops optionally excluded. Run the preceding rule independently within each block, counting only arrivals from that block and using its known size.
+
+The relative order of the elements in any fixed block is uniform, even though blocks are interleaved in the overall arrival order. Therefore (432.1) applies to every block. At most one element per block is accepted, so the final set is independent. If $W_j$ is the maximum weight in block $j$, the offline optimum is $\sum_j W_j$, and linearity of expectation gives
+\[
+ \mathbb E\,w(I_{\rm alg})\ge\frac14\sum_jW_j
+       =\frac14\,\operatorname{OPT}.
+ \tag{432.2}
+\]
+Independence between the success events is not needed. Nonnegative weights also make empty selections harmless for the lower bound.
+
+The key structural advantage is that accepting in one block never constrains acceptance in another. The proof is not an algorithm for arbitrary partition capacities or an arbitrary matroid merely because all those objects share an exchange axiom.
+
+\paragraph{A general but rank-dependent guarantee.}
+Let the rank be $r>0$. Ignore loops and run the rank-one rule on the entire remaining ground set, accepting at most one element. A singleton nonloop is independent. Since an optimal independent set has at most $r$ elements,
+\[
+ \max_{e\text{ nonloop}}w(e)\ge\operatorname{OPT}/r.
+\]
+Consequently this algorithm guarantees $\operatorname{OPT}/(4r)$ in expectation. Rank zero is already trivial.
+
+This proves that random arrival and a known matroid permit a simple guarantee for every instance. It also exposes the missing dependence: replacing $1/(4r)$ by an absolute constant cannot follow merely from selecting the single best element. Large optima can consist of many comparably valuable elements.
+
+\paragraph{Why accepting the first feasible elements fails.}
+Consider the uniform rank-$r$ matroid on $N$ elements, where every set of size at most $r$ is independent. Give one element weight $M$ and all others weight one. The rule accepting the first $r$ arrivals includes the heavy element with probability $r/N$. Its expected weight is
+\[
+ r+\frac rN(M-1),
+\]
+while the optimum is $M+r-1$. Letting $M$ grow makes the ratio tend to $r/N$, which can be arbitrarily small.
+
+This failure occurs in a very simple matroid and does not arise from computational difficulty. Every accepted light element is feasible when chosen, but feasibility says nothing about the value of later opportunities it consumes. The exchange axiom could replace an accepted light element offline; irrevocability disallows that repair.
+
+\paragraph{Why one global sample maximum also fails.}
+A natural modification is to sample half the elements, set one threshold equal to the largest sampled weight, and then accept feasible elements exceeding it. On the uniform matroid of rank $r$ with $N=2r$, give all elements distinct weights in $[1,2]$. The optimum is at least $r$.
+
+The sample is a uniformly random $r$-subset. In descending weight order, the sampled positions split the $r$ unsampled positions into $r+1$ gaps. These gaps are exchangeable: an $r$-subset is equivalent to a weak composition of $r$ into those gap sizes. Hence the expected number of unsampled elements above the highest sampled element is
+\[
+ \frac r{r+1}<1.
+\]
+Only those elements can pass the global threshold. Therefore expected accepted weight is less than two, even before feasibility could reject anything, and the competitive ratio is less than $2/r$.
+
+The rank-one secretary strategy succeeds by finding one valuable item. Its maximum threshold is excessively selective when the objective requires collecting many items of similar size. Partition blocks avoid the problem by using many local thresholds, but a general matroid does not come with independent blocks on which those decisions can be made.
+
+\paragraph{What an exchange-based extension would need.}
+One possible route is to compare each accepted element with a distinct element of an offline optimum, charging lost optimum weight to accepted weight. An offline basis-exchange map may exist after all weights are known. To obtain an online guarantee, however, the map must support a probabilistic argument using only revealed information at the decision time. It must also avoid charging the same accepted element an unbounded number of times.
+
+The two countertests show complementary failures. Immediate greedy acceptance makes room scarce before heavy elements arrive. A single sample-maximum rule leaves too much room unused when weights are comparable. A valid general mechanism has to balance both effects while respecting dependence among matroid elements. Merely proving that a partial accepted set extends to some basis does not establish a weight comparison with the optimal basis.
+
+\paragraph{Verification and outcome.}
+The finite checks enumerate every arrival permutation for small rank-one instances and compare success probabilities with (432.1). They verify the gap-count expectation for the half-sample rule and test the stated uniform-matroid examples exactly. Internal randomness is unnecessary for these particular rules; the expectation is over the uniform arrival permutation.
+
+\textbf{UNRESOLVED.} A one-quarter guarantee is proved for rank-one matroids and their direct sums, and a $1/(4r)$ guarantee for general rank $r$. The first remaining gap is a feasible online selection mechanism whose expected weight comparison loses no factor depending on rank or ground-set size.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]S. Dughmi, Matroid Secretary Is Equivalent to Contention Resolution, LIPIcs ITCS 2022, 58:1-58:23, doi:10.4230/LIPIcs.ITCS.2022.58.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol215-itcs2022/LIPIcs.ITCS.2022.58/LIPIcs.ITCS.2022.58.pdf}.
+\textit{Formulation source.}
+\end{itemize}
+\end{document}

@@ -1,0 +1,250 @@
+% TOP_PROBLEM: {"id": 30006474, "title": "Effective Mordell Bounds for Rational Points", "category_id": 1, "category": {"id": 1, "name": "number_theory", "display_name": "Number Theory", "description": "Properties of integers, prime numbers, Diophantine equations.", "slug": "number-theory", "order_index": 1, "created_at": "2026-07-31T15:26:25.670Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Effective Mordell Bounds for Rational Points}{Effective Mordell Bounds for Rational Points}}\label{30006474}
+\subsection{Definitions and mathematical statement}
+A logarithmic height on a projective curve can be fixed by an explicit embedding into projective space. For an explicitly given smooth projective curve $X/K$ of genus at least two, seek an effectively computable constant $B_X$ with
+\[
+ h(P)\le B_X\qquad(P\in X(K)),
+\]
+or a terminating algorithm returning the entire finite set $X(K)$. Inputs include effective equations and number-field data. A finiteness proof without computable stopping information is not an effective solution; nor is a search that keeps finding points without certifying that none remain.
+\par\smallskip\textit{Formulation and concept references:} \href{https://arxiv.org/pdf/2503.10443}{[S1]}.
+
+\subsection{Short English statement}
+Can all rational points on every number-field curve of genus at least two be computed with a guaranteed stopping certificate?
+\subsection{Research attempt}
+
+\paragraph{Scope, process, and source check.}
+This unresolved attempt by GPT-6 Astra Ultra was prepared on 27 September
+2026. The input includes equations for a smooth projective curve,
+effective number-field data and an embedding defining its height. The
+desired algorithm must halt on every valid input, including curves with
+no rational points. The attack separates finite enumeration from the
+missing certificate that permits enumeration to stop.
+
+Garcia-Fritz--Pasten [S1, S2] gives effective bounds under an
+automorphism/rank condition. In the inspected v1 text
+\href{https://arxiv.org/html/2503.10443v1}{[E3]}, Theorem 1.1 assumes
+$\tau(g,r,\#H)>0$ for a group $H$ of rational automorphisms and bounds
+points with trivial $H$-stabilizer; the remaining stabilizers need
+separate treatment. This is not a general bound for all curves. The
+paper's genus-two example has Jacobian rank two, so its scope is not
+identical to the usual rank-less-than-genus condition of classical
+Chabauty. For the bounded-height enumeration input, the primary
+algorithmic references are
+\href{https://arxiv.org/abs/1403.6501}{[E1]} and
+\href{https://arxiv.org/abs/1111.4963}{[E2]}.
+
+\paragraph{Lemma 97.1: a height bound is an actual stopping rule.}
+First let $K=\mathbb Q$, and write the fixed embedding as
+$X\hookrightarrow\mathbb P^m$. Every rational projective point has a
+unique primitive integer representative $(a_0,\ldots,a_m)$ whose first
+nonzero coordinate is positive. Its logarithmic height is
+\[
+                         h(P)=\log\max_i|a_i|.
+\]
+If an effective upper bound $B$ for $h$ is available, choose an integer
+$M>e^B$. Enumerate the finitely many integer tuples with
+$|a_i|\le M$, discard the zero tuple and those failing the primitive
+and sign conditions, and test the homogeneous equations exactly.
+The output is exactly $X(\mathbb Q)$. Indeed every output is a point
+on $X$, and the bound puts every rational point in the enumeration.
+There are at most $(2M+1)^{m+1}$ candidates, so the procedure terminates
+without making an efficiency claim.
+
+Conversely, if an algorithm returns the complete finite set, compute
+an upper bound for the height of each output and take their maximum,
+or zero for an empty output. Thus the two formulations are equivalent
+as effective tasks over $\mathbb Q$, with the embedding fixed.
+
+Over a number field the primitive-integer-tuple enumeration is not
+valid: ideals and units enter projective coordinates. Instead use an
+effective finite covering list for bounded-height points from [E1,
+E2], then test the equations exactly and remove duplicates. If those
+algorithms use relative multiplicative height, the normalization is
+$H_K(P)=\exp([K:\mathbb Q]h(P))$ for absolute logarithmic height.
+Choose a strictly larger certified cutoff and keep all possible
+boundary candidates in the finite list. Since the assumed height
+bound already covers every point on $X$, extra height candidates do
+not compromise completeness after the equation test. Numerical
+rounding at the cutoff must not discard a possible point.
+
+\paragraph{A useful but conditional Jacobian reduction.}
+Suppose a rational base point and explicit Abel--Jacobi embedding
+$j:X\hookrightarrow J$ are supplied, together with a certified full
+Mordell--Weil basis $G_1,\ldots,G_r$ modulo the known finite torsion
+subgroup $T$. Write the canonical height pairing matrix as $Q$ and
+assume that a positive rational $\lambda$ is certified to satisfy
+$Q\succeq\lambda I$. Finally suppose a proved bound
+$\widehat h(j(P))\le H$ is available for all $P\in X(K)$.
+
+For any such point there are integers $n_i$ and $t\in T$ with
+$j(P)=t+\sum_i n_iG_i$, so
+\begin{equation}\label{r97:lattice}
+ \lambda\sum_i n_i^2\le n^{\mathsf T}Qn
+       =\widehat h(j(P))\le H.
+\end{equation}
+It is enough to enumerate $|n_i|\le\lceil\sqrt{H/\lambda}\rceil$
+and all $t\in T$. For each resulting group element $R$, solve the
+algebraic equations $j(P)=R$ over $K$. Because $j$ is an embedding,
+the fibre has at most one geometric point; exact elimination and
+number-field arithmetic test it. In rank zero only the torsion
+enumeration remains. This is a finite algorithm under its stated
+inputs.
+
+The positivity certificate for $Q-\lambda I$ can use rational
+intervals for the pairing entries and rigorously bounded Cholesky
+pivots. Floating-point eigenvalues alone do not certify the cutoff.
+Likewise a collection of independent points is not necessarily a full
+Mordell--Weil basis: a missing finite-index coset can contain curve
+points. A certified index and a corresponding treatment of cosets
+would be needed to weaken that input.
+
+This reduction exposes the first failure of the elementary height
+route. Positive definiteness supplies a lower bound on the height in
+terms of the coordinates, not an upper bound $H$ for points lying on
+the curve. Replacing $H$ in \eqref{r97:lattice} by the largest height
+seen so far has no justification. Computing more group generators or
+improving the pairing precision does not resolve that missing upper
+bound. The reduction also assumes a rational base point; it does not
+silently choose one on an empty curve.
+
+\paragraph{A fully effective infinite family with empty output.}
+For every integer $g\ge2$ let $C_g$ be the smooth projective model of
+\[
+                        y^2=-(x^{2g+2}+1).
+\]
+The polynomial on the right is squarefree in characteristic zero:
+a common root with its derivative would have $x=0$, which is not a
+root. The degree-two map to $\mathbb P^1$ has $2g+2$ simple branch
+points and is unramified over infinity. Riemann--Hurwitz gives
+$2\operatorname{genus}(C_g)-2=-4+(2g+2)$, so the genus is $g$.
+
+There is no real affine point because the right side is strictly
+negative. Infinity must also be checked. In its chart put $u=1/x$
+and $v=y/x^{g+1}$; then
+\[
+                       v^2=-(1+u^{2g+2}).
+\]
+At $u=0$ the two geometric points require $v^2=-1$, and neither is
+real. The affine chart and this infinity chart cover the smooth
+double cover, so $C_g(\mathbb R)$ is empty. Consequently
+$C_g(K)=\varnothing$ for every number field $K$ with a real embedding.
+The empty list and the vacuous bound $B_{C_g}=0$ are a complete
+effective answer for these inputs, in any specified projective
+embedding. This is a classical local-obstruction argument, not a
+new general Mordell method.
+
+The real-embedding hypothesis cannot be removed from that argument.
+Over $\mathbb Q(i)$, for example, the affine points $(0,\pm i)$ and
+the two infinity points are already visible. The family tests both
+the number-field quantifier and the danger of inspecting only an
+affine chart.
+
+\paragraph{A nonempty arithmetic check with a declared finite range.}
+For comparison consider the genus-two example in [S1],
+\[
+                         D:\quad y^2=x^6+x^4+x^2+1.
+\]
+Substitution gives the six affine points $(0,\pm1)$ and
+$(\pm1,\pm2)$, and the infinity chart has two rational points with
+$v=\pm1$. To search reduced rational $x=a/b$, $b>0$, clear
+denominators:
+\[
+             (b^3y)^2=a^6+a^4b^2+a^2b^4+b^6.
+\]
+A rational number whose square is an integer is an integer: in a
+reduced fraction its denominator would otherwise divide the
+numerator. Hence an exact integer-square test on the right side is
+necessary and sufficient for rational $y$ at that $x$.
+
+The accompanying local check enumerates $|a|\le400$, $1\le b\le400$,
+$\gcd(a,b)=1$, and finds just those six affine points; it separately
+records the two infinity points. The paper proves completeness of its
+example using additional arithmetic information. This attempt's
+finite search does not reproduce that completeness proof, and the
+number 400 is a testing limit, not a derived Mordell bound.
+
+\paragraph{Why finiteness plus exhaustive search is insufficient.}
+A clean computability model makes the logical error precise. For each
+program $e$ on blank input define
+\[
+ S_e=\{t\ge0:e\text{ halts for the first time at step }t\}.
+\]
+Each $S_e$ has at most one element and has uniformly decidable
+membership: simulate for exactly $t$ steps. Yet a uniform algorithm
+returning an upper bound for all elements of $S_e$ would decide the
+halting problem by simulating to that bound. Such an algorithm cannot
+exist. This is not an encoding of programs into genus-two curves and
+does not prove effective Mordell false. It demonstrates why abstract
+finiteness of a uniformly searchable family does not itself supply a
+uniform computable height bound.
+
+For curves, a promising certificate search would dovetail point
+enumeration with attempts to prove exhaustion using local obstructions,
+height bounds or verified Jacobian computations. Every certificate
+must be sound. To prove the resulting algorithm total one must further
+show that every input eventually admits one of the searched
+certificates. Soundness of familiar certificates is not completeness
+of the certificate system.
+
+\paragraph{Verification and first unresolved step.}
+The rational-height enumeration has exact normalization and finite
+bounds; the number-field version explicitly imports its enumeration
+algorithm. The Jacobian lemma labels all extra inputs, including a
+base point, a full group basis and the upper height bound. The empty
+family checks smoothness, genus and both charts. The nonempty example
+uses exact integer arithmetic but only within the reported box.
+
+The first missing statement is a computable stopping certificate for
+an arbitrary input curve without the extra automorphism/rank or local
+obstruction assumptions. Concrete next targets are a certified upper
+bound $H$ for a further family, an effective comparison with the
+catalogue's embedding height, and a completeness theorem for a
+collection of arithmetic certificates. A curve with many unsuccessful
+finite searches is neither a counterexample nor evidence that its
+rational points cannot be computed.
+
+\paragraph{Final status.}
+\textbf{UNRESOLVED.} The height/enumeration equivalence, conditional
+Jacobian cutoff and empty real-obstruction family are established.
+The universally terminating algorithm requested by the catalogue is
+not obtained.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Natalia Garcia-Fritz and Hector Pasten, "Effective Mordell for curves with enough automorphisms", arXiv:2503.10443 [math.NT], v1 dated 13 March 2025.
+\url{https://arxiv.org/pdf/2503.10443}.
+\textit{Formulation source.}
+\item[S2]Effective Mordell for curves with enough automorphisms.
+\url{https://arxiv.org/abs/2503.10443}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Computing genus 2 curves over Q whose Jacobian has good reduction away from 2.
+\url{https://warwick.ac.uk/fac/sci/maths/people/staff/visser/bmc2024_slides.pdf}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]D. Krumm, Computing points of bounded height in projective space over a number field, Mathematics of Computation 85 (2016), 423--447, arXiv:1403.6501.
+\url{https://arxiv.org/abs/1403.6501}.
+\textit{Primary source for effective projective bounded-height enumeration; consulted 27 September 2026.}
+\item[E2]J. R. Doyle and D. Krumm, Computing algebraic numbers of bounded height, Mathematics of Computation 84 (2015), 2867--2891, arXiv:1111.4963.
+\url{https://arxiv.org/abs/1111.4963}.
+\textit{Primary algorithmic source, including numerical-boundary care; consulted 27 September 2026.}
+\item[E3]N. Garcia-Fritz and H. Pasten, Effective Mordell for curves with enough automorphisms, arXiv:2503.10443v1 (13 March 2025), HTML text, Theorem 1.1 and Section 6.2.
+\url{https://arxiv.org/html/2503.10443v1}.
+\textit{Version-specific theorem and example check; consulted 27 September 2026.}
+\end{itemize}
+\end{document}

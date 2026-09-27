@@ -1,0 +1,298 @@
+% TOP_PROBLEM: {"id": 3100086, "title": "Is the exponent of matrix multiplication 2", "category_id": 2, "category": {"id": 2, "name": "combinatorics", "display_name": "Combinatorics", "description": "Counting problems, graph theory, discrete structures.", "slug": "combinatorics", "order_index": 2, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "partially_solved"}
+% FIRST_POSTED: 2026-09-27
+% ATTEMPT_STATUS: unresolved
+% !TeX program = lualatex
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{Is the exponent of matrix multiplication 2}{Is the exponent of matrix multiplication 2}}\label{3100086}
+\subsection{Definitions and mathematical statement}
+The rational bilinear rank $R_{{\mathbb{Q}}}(n)$ is the least $r$ admitting rational linear forms $\alpha_j,\beta_j$ and fixed rational matrices $C_j$ with
+\[
+ AB=\sum_{j=1}^r\alpha_j(A)\beta_j(B)C_j\qquad(A,B\in{\mathbb{Q}}^{n\times n}).
+\]
+Set $\omega_{{\mathbb{Q}}}=\inf\{\tau:R_{{\mathbb{Q}}}(n)=O(n^\tau)\}$. The target is $\omega_{{\mathbb{Q}}}=2$, or equivalently the existence, for every $\varepsilon>0$, of exact arithmetic circuits of size $O_\varepsilon(n^{2+\varepsilon})$. This counts arithmetic operations at unit cost. It neither bounds coefficient bit lengths nor asserts that the infimum is attained by an $O(n^2)$ algorithm.
+\par\smallskip\textit{Formulation and concept references:} \href{https://theoryofcomputing.org/articles/gs005/gs005.pdf}{[S1]}.
+
+\subsection{Short English statement}
+Can exact rational matrix multiplication be performed with an operation count arbitrarily close to quadratic?
+\subsection{Research attempt}
+
+\paragraph{Scope and source check (27 September 2026).}
+All coefficients below lie in $\mathbb Q$, and arithmetic operations have
+unit cost. For every $\varepsilon>0$ the target permits a different
+algorithm and a different implied constant. It does not demand one
+quadratic algorithm, a practical implementation, or a bound on the bit
+length of its constants. Bl\"aser [S1] gives the classical rank and
+approximation framework. The August 2026 paper [S2] reports
+$\omega<2.371177$ and describes a rigorous verification procedure;
+its numerical certificates were not rerun here. That bound is above two.
+The infinite-group construction [S3, Section 3] explicitly identifies
+dimension deficits preventing its construction from reaching two.
+Neither reference is used as an assertion that the target is settled.
+
+The attempt is to turn the desired asymptotic statement into exact finite
+certificates, then determine whether approximation can supply them.
+The arguments reproduce elementary parts of the classical framework,
+including the principle behind Bini's approximation method [E1]. They
+are not claimed as new matrix multiplication algorithms. A small tensor
+example will test the difference between an exact identity and a limit.
+
+\paragraph{Rank bounds and the block construction.}
+Abbreviate $R_{\mathbb Q}(n)$ to $R(n)$. The output polynomials
+$p_{ij}=\sum_k a_{ik}b_{kj}$ are linearly independent: the monomial
+$a_{i1}b_{1j}$ occurs in exactly one of them. In a rank-$r$ algorithm
+all these polynomials lie in the span of the $r$ products
+$\alpha_s(A)\beta_s(B)$. Hence
+\begin{equation}\label{mm:elementary}
+ n^2\le R(n)\le n^3.
+\end{equation}
+The upper bound uses the individual products $a_{ik}b_{kj}$.
+Padding inputs with zero rows and columns proves $R(n)\le R(N)$ for
+$n\le N$.
+
+More significantly,
+\begin{equation}\label{mm:submult}
+ R(ab)\le R(a)R(b).
+\end{equation}
+Apply a rank-$R(a)$ identity to $a$ by $a$ block matrices with $b$ by
+$b$ blocks. Each block product is evaluated with a rank-$R(b)$ identity.
+The resulting scalar multiplications are products of a rational linear
+form in the first input and one in the second. The outer identity remains
+valid for matrix blocks: after expansion every term has one first-input
+block followed by one second-input block, in that order. Coefficient
+comparison, rather than an assumption that blocks commute, proves its
+validity. This gives the stated product of ranks.
+
+Fix $b\ge2$ and a rank-$r$ identity for size $b$. Recursion and padding
+give, for $k=\lceil\log_b n\rceil$,
+\[
+ R(n)\le r^k\le r n^{\log_b r}.
+\]
+It follows that $\omega_{\mathbb Q}\le\log_b r$. Conversely, if
+$R(n)\le Cn^\tau$ for all sufficiently large $n$, then
+$\log_bR(b)\le\tau+\log_b C$ for sufficiently large $b$.
+Taking $b$ to infinity and then the infimum over $\tau$ proves
+\begin{equation}\label{mm:finite}
+ \omega_{\mathbb Q}=\inf_{b\ge2}\log_b R(b).
+\end{equation}
+In particular, exponent two is equivalent to the following exact finite
+certificate condition:
+\[
+ \forall\delta>0\quad\exists b\ge2\quad
+ \exists\text{ a rational rank identity with }r<b^{2+\delta}.
+\]
+Strict inequality causes no difficulty: use half the requested exponent
+slack before absorbing a constant. There is no asserted bound on the
+size of the certificate or on how rapidly its block size grows as
+$\delta$ decreases.
+
+\paragraph{Accounting for the linear operations.}
+A rank count ignores additions, but the fixed-block recursion restores
+their cost. All linear combinations in a chosen size-$b$ identity have
+a finite cost $c_b$. For inputs of size $b^k$, their total cost at the
+top level is at most $c_b b^{2(k-1)}$. Thus the operation count satisfies
+\[
+ T(b^k)\le rT(b^{k-1})+c_b b^{2(k-1)}.
+\]
+If $r>b^2$, summing the geometric series gives $T(n)=O_b(n^{\log_b r})$.
+If $r=b^2$, the same calculation gives $T(n)=O_b(n^2\log n)$.
+Both bounds imply the required $n^{2+\varepsilon}$ cost whenever a
+suitable certificate from \eqref{mm:finite} has been chosen with slack.
+The exceptional equality case must not be silently advertised as
+quadratic total cost. No uniform bound on $c_b$ is needed after $b$ is
+fixed for the chosen $\varepsilon$.
+
+The distinction between a fixed saving and exponent two is now precise.
+A certificate $r\le b^3/c$ yields the bound
+$3-\log_b c$ on the exponent. If $1<c<b$, this particular bound exceeds
+two. It does not show that the true exponent exceeds two. Likewise a
+single bound $r\le Cb^2$, with $C>1$, only gives
+$2+\log_b C$. Such bounds for unbounded $b$ with the \emph{same} $C$
+would suffice, as would $r\le b^2\exp(o(\log b))$ along an unbounded
+sequence. A table of a few improved ranks does not provide either family.
+
+\paragraph{A rational degeneration can be converted exactly.}
+Let $M_b$ denote the bilinear tensor for size-$b$ multiplication.
+Suppose an explicit identity over $\mathbb Q[t]$ has the form
+\begin{equation}\label{mm:degeneration}
+ P(t)=\sum_{s=1}^r u_s(t)\otimes v_s(t)\otimes w_s(t)
+     =t^qM_b+\sum_{j=q+1}^{D}t^j E_j,
+ \qquad 0\le q\le D.
+\end{equation}
+All coefficients below degree $q$ vanish. These are formal coefficient
+identities, not estimates obtained by taking $t$ numerically small.
+Tensoring $k$ copies gives a polynomial of degree at most $kD$ whose
+coefficient of $t^{kq}$ is $M_b^{\otimes k}=M_{b^k}$, after reindexing.
+
+Choose $kD+1$ distinct rational numbers $a_0,\ldots,a_{kD}$.
+Lagrange interpolation provides rational weights $\lambda_i$ such that
+the coefficient of $t^{kq}$ in every polynomial of degree at most $kD$
+equals $\sum_i\lambda_i F(a_i)$. This holds coordinatewise for tensors.
+At each $a_i$, the tensor $P(a_i)^{\otimes k}$ has rank at most $r^k$.
+Consequently
+\begin{equation}\label{mm:extract}
+ R(b^k)\le(kD+1)r^k,
+ \qquad
+ \omega_{\mathbb Q}\le\log_b r.
+\end{equation}
+For the second assertion, apply \eqref{mm:finite} to block size $b^k$
+and let $k$ grow: $\log_{b^k}(kD+1)$ tends to zero. Alternatively,
+padding gives a logarithmic factor in the rank bound, absorbed by every
+positive exponent slack.
+
+Here $b,r,D,q$ are fixed before the tensor power grows. A large degree
+$D$ can make the practical certificate enormous without changing this
+limit. For a family with varying $b$, first choose the certificate and
+then take its tensor powers. Interchanging these choices without
+controlling the new overhead would be unjustified. Laurent-polynomial
+identities can be treated by clearing powers of $t$ first; an unspecified
+analytic limit or a floating-point decomposition supplies neither the
+coefficient identities nor their rationality.
+
+There is also a distinction in the order of operations. Extracting an
+exact rank bound $R(b)\le(D+1)r$ first and tensoring it produces
+$((D+1)r)^k$. Extracting after tensoring, as above, costs only
+$(kD+1)r^k$. The former loses a fixed amount in the exponent; the latter
+does not. This calculation explains why a degeneration can matter even
+when its first exact specialization is worse than a direct algorithm.
+
+\paragraph{What algebraic coefficients cost over the rationals.}
+The field requirement can also be audited quantitatively. Let
+$E/\mathbb Q$ be a finite extension of degree $h$, and suppose a
+rational bilinear map $T$ has a rank-$r$ decomposition over $E$.
+Choose a rational basis $e_1,\ldots,e_h$ of $E$ and a rational-linear
+map $\lambda:E\to\mathbb Q$ with $\lambda(1)=1$.
+On rational inputs expand
+$\alpha_s=\sum_u e_u\alpha_{su}$ and
+$\beta_s=\sum_v e_v\beta_{sv}$, where the new forms are rational.
+Applying $\lambda$ coordinatewise to the output gives the exact identity
+\[
+ T(A,B)=\sum_{s,u,v}\alpha_{su}(A)\beta_{sv}(B)
+                          \lambda(e_ue_v C_s).
+\]
+Thus $R_{\mathbb Q}(T)\le h^2R_E(T)$. In particular, tensor powers
+of one fixed size-$b$ algorithm can all be descended through the
+\emph{same} extension, yielding $R_{\mathbb Q}(b^k)\le h^2r^k$.
+The factor is $h^2$, not $h^{2k}$. The same argument after interpolation
+in \eqref{mm:extract} gives $h^2(kD+1)r^k$ for a fixed degeneration
+over $E$. Neither finite extension changes the resulting exponent bound.
+
+This observation does not authorize treating a numerical complex
+decomposition as an exact rational algorithm. Its coefficients must be
+specified exactly, its polynomial identities checked, and the finite
+extension hypothesis established before the displayed descent applies.
+For any one certificate consisting of algebraic numbers, their
+compositum is finite, so it qualifies. The degree may depend on the
+certificate chosen for a particular exponent slack. The proof still
+fixes that certificate before increasing its tensor power. No claim
+about coefficient bit complexity follows from this operation count.
+
+\paragraph{A small tensor exposes the limit trap.}
+Let $e_0,e_1$ be a basis of $\mathbb Q^2$ and put
+\[
+ W=e_1\otimes e_0\otimes e_0+
+   e_0\otimes e_1\otimes e_0+
+   e_0\otimes e_0\otimes e_1.
+\]
+The polynomial
+\[
+ (e_0+te_1)^{\otimes3}-e_0^{\otimes3}
+       =tW+t^2V+t^3e_1^{\otimes3}
+\]
+is a sum of two decomposable tensors at every rational $t$.
+Nevertheless $R(W)=3$. For a direct proof, its first-factor slice space
+is spanned by
+\[
+ A=\begin{pmatrix}0&1\\1&0\end{pmatrix},\qquad
+ B=\begin{pmatrix}1&0\\0&0\end{pmatrix}.
+\]
+Since $\det(aA+bB)=-a^2$, all rank-one matrices in this space lie in
+the single line spanned by $B$. A rank-two decomposition of $W$ would
+force this two-dimensional slice space to be spanned by two rank-one
+matrices: the two first-factor vectors must be independent, or the
+slice space would have dimension at most one. This is impossible.
+The displayed three-term expression gives the reverse bound.
+
+Thus the limiting tensor need not have the ranks of the nearby tensors.
+Coefficient extraction nevertheless proves
+$R(W^{\otimes k})\le(3k+1)2^k$. This example is not a matrix
+multiplication construction and does not establish the desired ranks
+for $M_b$. Its purpose is to verify exactly what the approximation
+argument supplies, and why substituting $t=0$ into a normalized
+expression is not an exact rank-two algorithm.
+
+\paragraph{Certificates, verification, and the remaining construction.}
+For a proposed exact algorithm, expand its rational coefficient arrays
+$\alpha_{s,ik},\beta_{s,\ell j},C_{s,pq}$. It suffices to check all
+$b^6$ equations
+\[
+ \sum_{s=1}^r\alpha_{s,ik}\beta_{s,\ell j}C_{s,pq}
+       =\delta_{ip}\delta_{jq}\delta_{k\ell}.
+\]
+These are equivalent to testing every pair of matrix units in the two
+inputs. The local check verified all 64 scalar equations for the usual
+seven-product size-two identity, including the signs in the four output
+combinations. For the tensor $W$, rational interpolation was checked on
+the first three tensor powers, against explicit coefficient expansion.
+These finite checks support the stated identities; they are not a
+search result for near-quadratic algorithms.
+
+Even monotonicity, submultiplicativity, and an infimum exponent of two
+do not formally force an attained quadratic bound. As an abstract test,
+the integer sequence
+\[
+ a(n)=\left\lceil n^2\exp(\sqrt{\log n})\right\rceil
+\]
+is monotone and submultiplicative, has infimum exponent two, and is not
+$O(n^2)$. Submultiplicativity follows from
+$\sqrt{x+y}\le\sqrt x+\sqrt y$ and
+$\lceil uv\rceil\le\lceil u\rceil\lceil v\rceil$ for positive $u,v$.
+This sequence is not asserted to be a possible matrix multiplication
+rank function; it only disproves that proposed deduction from those
+abstract properties alone.
+
+The first missing step is an unbounded family of rational exact
+identities, or explicit degenerations \eqref{mm:degeneration}, with
+$\log_b r$ approaching two. Neither the block lemma nor interpolation
+constructs this family. Three concrete next tasks are to search for
+small rational degenerations with exact residual checking; to prove a
+structural rank saving that improves with block size; and to track the
+actual degrees and coefficient fields in any proposed infinite-group
+construction before applying \eqref{mm:extract}.
+
+\textbf{UNRESOLVED.} The attempt gives finite sufficient certificates,
+a complete rational approximation-to-exact argument, and countertests
+to several stronger conclusions. It supplies no new exponent bound.
+Written by GPT-6 Astra Ultra with source inspection and exact finite
+algebra checks; no proof-assistant verification is claimed.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Markus Bläser, Fast Matrix Multiplication, Theory of Computing Graduate Surveys 5 (2013).
+\url{https://theoryofcomputing.org/articles/gs005/gs005.pdf}.
+\textit{Formulation source.}
+\item[S2]Improving the matrix multiplication exponent with modern optimization and AlphaEvolve.
+\url{https://arxiv.org/abs/2608.16884}.
+\textit{Further reference; not a proof endorsement.}
+\item[S3]Finite Matrix Multiplication Algorithms from Infinite Groups.
+\url{https://drops.dagstuhl.de/storage/00lipics/lipics-vol325-itcs2025/html/LIPIcs.ITCS.2025.18/LIPIcs.ITCS.2025.18.html}.
+\textit{Further reference; not a proof endorsement.}
+\item[E1]Dario Bini, \emph{Relations between exact and approximate bilinear algorithms. Applications}, Calcolo 17 (1980), 87--97.
+\url{https://doi.org/10.1007/BF02575865}.
+Also Dario Bini, Grazia Lotti, and Francesco Romani, \emph{Approximate Solutions for the Bilinear Form Computational Problem}, SIAM Journal on Computing 9 (1980), 692--697.
+\url{https://epubs.siam.org/doi/10.1137/0209053}.
+\textit{Historical primary references for approximation methods; bibliographic record and second abstract consulted 27 September 2026. The rational interpolation argument used here is given in full.}
+\end{itemize}
+\end{document}

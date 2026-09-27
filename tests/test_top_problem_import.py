@@ -15,8 +15,7 @@ PREAMBLE = (r'\documentclass[11pt]{article}' + '\n'
 
 def section(rank, research=True):
     text = (f'% ================================================================\n'
-            f'% problemId: problem.example-{rank}\n'
-            f'% source releaseRank: {rank}; source releaseStatus: open\n'
+            f'% problemId: {rank}\n'
             + r'\clearpage' + '\n'
             + rf'\section{{Example {rank}}}\label{{{rank}}}' + '\n'
             + r'\subsection{Definitions and mathematical statement}' + '\n'
@@ -49,7 +48,7 @@ class TopProblemImportTests(unittest.TestCase):
         self.catalog = self.folder / 'top_problems'
         self.catalog.mkdir()
         for rank in range(1, 4):
-            metadata = {'problemId': f'problem.example-{rank}', 'releaseRank': rank}
+            metadata = {'id': rank}
             (self.catalog / f'{rank}.tex').write_text(
                 '% TOP_PROBLEM: ' + json.dumps(metadata) + '\n', encoding='utf-8')
 
@@ -114,7 +113,8 @@ class TopProblemImportTests(unittest.TestCase):
 
     def test_late_identity_mismatch_creates_no_output(self):
         good = self.source(batch(section(1)))
-        wrong = self.source(batch(section(2).replace('problem.example-2', 'problem.wrong')), 'wrong.tex')
+        wrong = self.source(batch(section(2)), 'wrong.tex')
+        (self.catalog / '2.tex').write_text('% TOP_PROBLEM: {"id": 3}\n')
         with self.assertRaisesRegex(ValueError, 'Identity mismatch'):
             import_attempts([good, wrong], self.catalog)
         self.assertFalse((self.catalog / 'gpt_6_astra_ultra').exists())
@@ -139,7 +139,7 @@ class TopProblemImportTests(unittest.TestCase):
     def test_malformed_documents_and_sections_are_rejected(self):
         cases = [
             batch(section(1)).replace(r'\end{document}', ''),
-            batch(section(1)).replace('source releaseRank: 1;', 'source releaseRank: wrong;'),
+            batch(section(1)).replace('problemId: 1', 'problemId: wrong'),
             batch(section(1)).replace(r'\label{1}', r'\label{2}'),
             batch(section(1)).replace('Definitions and mathematical statement', 'Missing definition'),
             batch(section(1)).replace(r'\sref{1}{1}', r'\sref{1}{9}'),

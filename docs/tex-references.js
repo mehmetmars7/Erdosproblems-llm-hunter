@@ -15,9 +15,8 @@
     function initTeXReferences(container, rankedProblems = null) {
         const maps = new Map();
         const rankedTargets = new Map(Object.values(rankedProblems || {})
-            .filter(problem => Number.isInteger(problem.rank) && problem.rank > 0 &&
-                typeof problem.id === 'string' && problem.id.startsWith('problem.'))
-            .map(problem => [String(problem.rank), problem]));
+            .filter(problem => Number.isSafeInteger(problem.id) && problem.id > 0 && problem.collection !== 'mo')
+            .map(problem => [String(problem.id), problem]));
         const keyFor = node => `${node.dataset.texScope || '0'}:${node.dataset.texLabel || node.dataset.texReference}`;
         container.querySelectorAll('.attempt').forEach((attempt, index) => {
             const targets = new Map();
@@ -46,7 +45,7 @@
                     ? rankedTargets.get(link.dataset.texReference) : null;
                 if (ranked) {
                     link.href = `problem.html?type=open_problems&id=${encodeURIComponent(ranked.id)}`;
-                    link.title = `View ${ranked.title || `problem ${ranked.rank}`}`;
+                    link.title = `View ${ranked.title || `problem ${ranked.id}`}`;
                     return;
                 }
                 link.removeAttribute('href');

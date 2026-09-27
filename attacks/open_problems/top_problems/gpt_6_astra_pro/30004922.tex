@@ -1,0 +1,278 @@
+% TOP_PROBLEM: {"id": 30004922, "title": "Derandomizing Space-Bounded Computation", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={500 Mathematical Problem Statements},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+% Compile twice with: lualatex 30004922.tex
+\numberwithin{equation}{section}
+\hypersetup{pdftitle={Research attempt -- problem 30004922},pdfauthor={Research notebook; original compilation retained}}
+\fancyhead[L]{\small\sffamily Research notebook}
+\fancyhead[R]{\small\sffamily Problem 30004922 | 27 September 2026}
+\begin{document}
+\setcounter{section}{0}
+% ================================================================
+% problemId: 30004922
+% Canonical problem ID: 30004922
+% exactTarget SHA-256: 30bae69d2d4994611f4de40617344461d615b0d70538263d7b41fca724c6cf1d
+\clearpage
+\section*{\texorpdfstring{Derandomizing Space-Bounded Computation}{Derandomizing Space-Bounded Computation}}\label{30004922}
+\subsection{Definitions and mathematical statement}
+A probabilistic logarithmic-space machine has read-only input, $O(\log n)$ work bits, random bits, and polynomial running time. The class $\mathrm{BPL}$ consists of languages it decides with acceptance probability at least $2/3$ on yes inputs and at most $1/3$ on no inputs. The deterministic class $\mathrm L$ uses the same logarithmic workspace without randomness. Determine whether
+\[
+ \mathrm{BPL}=\mathrm L.
+\]
+All bounds are uniform over inputs of each length. Space counts writable working storage, not the read-only input or the number of random bits ever read. The question is exact derandomization of the language class, not merely a small increase in the workspace bound.
+\par\smallskip\textit{Formulation and concept references:} \sref{30004922}{1}.
+\cataloguescope{Prove or disprove that every language decidable by a probabilistic Turing machine using O(log n) workspace, polynomial time, and bounded two-sided error is decidable by a deterministic Turing machine using O(log n) workspace.}
+\subsection{Short English statement}
+Can randomness always be removed from a polynomial-time decision procedure using logarithmic memory without increasing its memory requirement beyond a constant factor?
+% BEGIN RESEARCH ADDITION ATTEMPT-163
+\subsection{Research attempt}
+
+\paragraph{Current frontier.}
+The exact target is a uniform $O(\log n)$ workspace bound. Hoza's general
+simulation improves the Saks--Zhou bound to
+$O(\log^{3/2}n/\sqrt{\log\log n})$, not to logarithmic space
+\eref{30004922}{1}. Cheng--Wu's newer weighted generators improve several
+parameter regimes, including short-wide and regular branching programs;
+those hypotheses do not cover all polynomial-length, polynomial-width
+programs arising from BPL \sref{30004922}{1}, Sections 1.1--1.4. Hitting sets
+can suffice for two-sided derandomization through a nontrivial reduction,
+as Cheng--Hoza prove \eref{30004922}{2}. None of these results licenses
+replacing an arbitrary acceptance probability by an easily computed
+unweighted average over a logarithmic seed.
+
+\paragraph{Attack route.}
+There are three plausible ways to avoid retaining a long random seed:
+compute an approximate backward value function, forget old randomness
+through contraction, or use a signed short-seed quadrature. The first
+requires a uniform way to generate local approximate values. The second
+requires quantitative loss of memory in the acceptance observable. The
+third requires both short descriptions and control of cancellation.
+I pursue a common error-budget formulation, then try to break each
+shortcut on elementary examples.
+
+\paragraph{Attempt: an occupancy-weighted residual identity.}
+Fix an input of length $n$ and pad the probabilistic machine to exactly
+$T\le n^c$ steps. Its configurations fit in $O(\log n)$ bits. By adding
+a layer index, it becomes a read-once branching program with stochastic
+transition matrices $P_0,\ldots,P_{T-1}$ on at most $n^c$ states; each
+row can be computed in logarithmic space. The terminal function $f$ is
+the indicator of acceptance. Let $X_i$ be the random state at layer $i$.
+
+For arbitrary real functions $v_i$ on the layers define
+\[
+ r_i(v)=v_i(v)-(P_iv_{i+1})(v),\qquad 0\le i<T.
+\]
+The following exact identity is useful:
+\begin{equation}\label{30004922:residual}
+ v_0(x_0)-\E f(X_T)
+ =\sum_{i=0}^{T-1}\E r_i(X_i)
+       +\E\bigl(v_T(X_T)-f(X_T)\bigr).
+\end{equation}
+It follows by summing
+$\E v_i(X_i)-\E v_{i+1}(X_{i+1})=\E r_i(X_i)$.
+Everything is finite. In particular,
+\begin{equation}\label{30004922:residual-bound}
+ |v_0(x_0)-\Pr(\mathrm{accept})|
+ \le\sum_{i<T}\|r_i\|_\infty+\|v_T-f\|_\infty.
+\end{equation}
+This distinguishes an exact occupancy-weighted error budget from a
+potentially much worse uniform local budget.
+
+\textbf{Sufficient value-generator lemma.} Suppose that, uniformly for
+every such program, a deterministic logarithmic-space algorithm outputs
+$v_i(v)$ as a dyadic rational with $O(\log n)$ bits, and that
+\[
+ \|v_T-f\|_\infty\le1/24,
+ \qquad\sum_{i<T}\|r_i\|_\infty\le1/24.
+\]
+Then BPL is contained in L: compute only $v_0(x_0)$ and compare it with
+$1/2$. The error at most $1/12$ separates acceptance probabilities at
+least $2/3$ from those at most $1/3$. The reverse inclusion is immediate.
+No table of all configurations is stored in this algorithm.
+
+The hypothesis is not obtained simply by rounding the true backward
+probabilities. Such rounding does show that suitable polynomial-size
+tables exist: with denominator $2^b$, $b=O(\log T)$, one can make each
+residual $O(1/T)$. It does \emph{not} supply a logspace generator for their
+entries. A polynomial-size table of dyadic values can be checked in
+logspace when provided on a separate read-only certificate tape, by
+looping over its rows. That is a different resource from computing the
+table deterministically. Treating the certificate as free advice would
+violate the target's uniformity.
+
+\paragraph{Attempt: a genuine contraction subclass.}
+Let $\ell\le C\log n$ be an explicitly specified number of final random
+steps. Suppose that the laws of the terminal state, started at any two
+states $u,v$ of layer $T-\ell$, differ in total variation by at most
+$1/12$. Then the acceptance probability is deterministically
+approximable within $1/12$ in logarithmic space: select any fixed state
+of that layer, enumerate the $2^\ell$ suffixes of random bits, simulate
+them, and count accepting suffixes. A suffix, a configuration, the loop
+index, and the counter each occupy $O(\log n)$ bits. Time is polynomial.
+The true distribution at layer $T-\ell$ is a mixture of the possible
+starting states, and the total-variation hypothesis bounds its difference
+from this fixed-state computation.
+
+This criterion is slightly stronger than needed: it suffices that the
+\emph{acceptance probabilities} from those states differ by at most
+$1/12$, rather than their full terminal laws. However, certifying that
+weaker condition by first computing all acceptance probabilities is
+circular. The criterion is a solved subclass, not an argument that every
+branching program has a rapidly contracting suffix.
+
+\paragraph{Attempt: signed quadrature and bit complexity.}
+Here is another precise sufficient input. Suppose a uniform logarithmic-
+space procedure generates, for $r\in\{0,1\}^d$, a $T$-bit string $G(r)$
+one bit at a time and a weight $w_r=z_r2^{-b}$, where
+\[
+ d,b\le C\log n,\qquad |z_r|\le n^C,
+ \qquad
+ \left|\Pr(\mathrm{accept})-\sum_r w_r f(G(r))\right|<1/12.
+\]
+Enumerating all seeds and accumulating the integers $z_rf(G(r))$ uses
+only $O(\log n)$ space: the absolute numerator is at most
+$2^d n^C$, and the common denominator has $O(\log n)$ bits. The generated
+bits can be recomputed whenever needed. This would again yield BPL=L.
+The inclusion of the weight encoding is essential; a short seed alone
+does not bound the space needed for exponentially precise signed weights.
+Weighted generators are an established framework \sref{30004922}{1}; the
+specific unrestricted logarithmic parameters above are the missing input,
+not an application of a cited theorem.
+
+Can local signed compressions be composed without increasing that cost?
+For matrices with the operator norm induced by $\ell^\infty$, telescoping
+products gives
+\begin{equation}\label{30004922:product-error}
+ \|P_0\cdots P_{T-1}-Q_0\cdots Q_{T-1}\|_\infty
+ \le\sum_{i=0}^{T-1}
+       \|P_i-Q_i\|_\infty
+       \prod_{j<i}\|Q_j\|_\infty.
+\end{equation}
+Indeed, insert $Q_0, Q_1,\ldots$ successively on the left and keep the
+remaining $P$ matrices on the right; stochastic matrices have norm one.
+Thus a controlled sum of local errors is insufficient when signed
+intermediate matrices have large absolute row sums.
+
+\paragraph{Stress test: three explicit failures.}
+First, an absorbing accepting state and an absorbing rejecting state
+never mix: their terminal laws remain at total-variation distance one.
+This can happen in a deterministic logspace computation. Therefore
+rapid mixing is not even a necessary structural property of problems in
+L, and cannot be asserted for all BPL computations without a further
+transformation that preserves the answer.
+
+Second, preservation of constants is not the same as norm stability.
+For $a>0$,
+\[
+ Q=\begin{pmatrix}1+a&-a\\-a&1+a\end{pmatrix}
+ \quad\text{satisfies}\quad
+ Q\binom11=\binom11,
+ \qquad Q^t\binom1{-1}=(1+2a)^t\binom1{-1}.
+\]
+Every row sums to one, yet errors in the antisymmetric direction are
+exponentially amplified. At $a=1/4$, twelve applications amplify that
+direction by $(3/2)^{12}$, verified exactly in the script. This is a
+counterexample to the proposed \emph{stability lemma}, not to BPL=L.
+
+Third, even a recursion of only $O(\log n)$ levels can multiply
+polynomial absolute-weight budgets into $n^{O(\log n)}$. Directly
+accumulating such numerators may require $\Theta(\log^2 n)$ bits.
+Avoiding this cost would need a compensated composition, a norm in which
+the intermediate operators remain controlled, or a different use of
+hitting sets such as the framework of \eref{30004922}{2}. I have not derived
+such a uniform composition rule with logarithmic workspace.
+
+The value-generator lemma is also adversarially checked for rounding:
+per-layer errors of a fixed constant would sum to order $T$, and so
+cannot be used. The required $O(1/T)$ scale is cheap to \emph{encode},
+but not thereby cheap to \emph{compute}. That is the exact point where
+the attempted conversion of local verification into a deterministic
+simulation stops.
+
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+
+The residual identity, the contraction-subclass simulation, the signed-
+quadrature bit bound, and the product-error estimate are proved. They
+provide compatible tests for a proposed derandomization mechanism and
+exhibit concrete failures of memory erasure and signed-weight stability.
+No general logspace value generator or stable logarithmic-seed quadrature
+has been constructed. The additional input needed for either would
+already imply the full language-class equality, not merely a small
+improvement in workspace.
+
+% Keep the local source heading and initial references together.
+\Needspace{12\baselineskip}
+% END RESEARCH ADDITION ATTEMPT-163
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:30004922:1}{} Kuan Cheng and Ruiyang Wu, Weighted Pseudorandom Generators for Read-Once Branching Programs via Weighted Pseudorandom Reductions, Introduction.
+\url{https://arxiv.org/html/2502.08272v5}.
+{\small\textit{Catalogue formulation source.}}
+% BEGIN RESEARCH ADDITION SOURCES-163
+\item[\textnormal{[E1]}]\hypertarget{extra:30004922:1}{} William M. Hoza, ``Better Pseudodistributions and Derandomization for Space-Bounded Computation,'' \emph{APPROX/RANDOM 2021}, LIPIcs 207, article 28, 28:1--28:23. Main generator and deterministic-space consequences.
+\url{https://doi.org/10.4230/LIPIcs.APPROX/RANDOM.2021.28}.
+{\small\textit{Author summary and proceedings version distinguish the improved bound from logarithmic space.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:30004922:2}{} Kuan Cheng and William M. Hoza, ``Hitting Sets Give Two-Sided Derandomization of Small Space,'' \emph{Theory of Computing} 18 (2022), article 1, 1--32. Main derandomization theorem.
+\url{https://williamhoza.com/research/papers/CH/}.
+{\small\textit{A two-sided hitting-set framework, not an unrestricted logarithmic-seed construction.}}
+% END RESEARCH ADDITION SOURCES-163
+\end{itemize}
+
+\end{document}

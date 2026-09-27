@@ -9,33 +9,26 @@ from unittest.mock import patch
 import build_site
 
 
-def catalog_record(problem_id='problem.example', rank=1):
+def catalog_record(problem_id=1):
     return {
-        'problemId': problem_id,
-        'canonicalTitle': 'An example question',
+        'id': problem_id,
+        'title': 'An example question',
         'exactTarget': 'Determine whether every example has the stated property.',
-        'primaryDomain': 'number_theory',
-        'primaryDomainLabel': 'Number theory',
-        'releaseRank': rank,
-        'releaseStatus': 'open',
-        'displayStatus': 'open_disputed_claim',
+        'category': {'id': 3, 'name': 'number_theory', 'display_name': 'Number theory'},
+        'status': 'open_disputed_claim',
         'statusStatement': 'open',
         'statusQualification': 'The cited claim remains disputed.',
         'statusReviewedAt': '2026-09-22',
         'sources': [{'citation': 'Original statement', 'url': 'https://example.org/statement'}],
-        'formalStatementSource': {'citation': 'Formal definition', 'url': 'https://example.org/formal'},
-        'rankingEvidence': {'rankBand90': [1, 2]},
+        'external_url': f'https://www.unsolvedmath.com/problems/{problem_id}',
     }
 
 
 def catalog():
     return {
-        'records': [catalog_record(), catalog_record('problem.example.second', 2)],
+        'records': [catalog_record(), catalog_record(20000601)],
         'recordCount': 2,
-        'publicationId': 'example.v22',
-        'releaseVersion': 22,
-        'editionDate': '2026-09-22',
-        'publicBoundary': 'Ranks are editorial importance, not proof evidence.',
+        'displayOrder': [1, 20000601],
     }
 
 
@@ -51,12 +44,14 @@ class OpenCatalogValidationTests(unittest.TestCase):
         build_site.validate_open_problems_catalog(snapshot)
         return snapshot
 
-    def test_shipped_catalog_has_500_unique_stable_ids_and_complete_ranks(self):
+    def test_shipped_catalog_has_unique_canonical_ids_and_complete_display_order(self):
         snapshot = build_site.load_open_problems_catalog()
-        self.assertEqual(snapshot['recordCount'], 500)
+        registry = json.loads(build_site.UNSOLVEDMATH_PATH.read_text())
+        self.assertEqual(snapshot['recordCount'], len(registry))
         self.assertTrue(all(r['definitionTeX'] and r['definitionFile'].endswith('.tex') for r in snapshot['records']))
-        self.assertEqual({r['releaseRank'] for r in snapshot['records']}, set(range(1, 501)))
-        self.assertEqual(len({r['problemId'] for r in snapshot['records']}), 500)
+        self.assertEqual(len(set(snapshot['displayOrder'])), snapshot['recordCount'])
+        self.assertEqual(snapshot['displayOrder'][3], 6)
+        self.assertEqual(len({r['id'] for r in snapshot['records']}), snapshot['recordCount'])
 
     def test_missing_definitions_mismatched_numbers_and_incomplete_documents_fail(self):
         original = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
@@ -69,6 +64,47 @@ class OpenCatalogValidationTests(unittest.TestCase):
                 (folder / filename).write_text(content)
                 with patch.object(build_site, 'OPEN_PROBLEMS_PATH', folder), self.assertRaises(ValueError):
                     build_site.load_open_problems_catalog()
+
+    def test_registry_titles_categories_and_sparse_order_are_authoritative(self):
+        with TemporaryDirectory() as directory:
+            folder = Path(directory)
+            registry = [catalog_record(6), catalog_record(20000601)]
+            registry[0].update(title='Hodge Conjecture', statement='UPSTREAM TEXT MUST NOT BE COPIED')
+            registry[1]['external_url'] = None
+            (folder / 'problems.json').write_text(json.dumps(registry))
+            (folder / 'display_order.json').write_text('[20000601, 6]')
+            for record in registry:
+                text = ('% TOP_PROBLEM: ' + json.dumps({'id': record['id'], 'title': 'Old title'})
+                        + '\n' + r'''\begin{document}
+\section{Own exposition}
+\subsection{Definitions and mathematical statement}
+Our independently authored mathematical statement.
+\subsection{Short English statement}
+Our own summary.
+\subsection{Sources}
+\begin{itemize}
+\item[S1] Primary source. \url{https://example.org/statement}
+\item[P1] Printed source with no public URL.
+\end{itemize}
+\end{document}
+''')
+                (folder / f"{record['id']}.tex").write_text(text)
+            with patch.object(build_site, 'OPEN_PROBLEMS_PATH', folder), \
+                    patch.object(build_site, 'UNSOLVEDMATH_PATH', folder / 'problems.json'), \
+                    patch.object(build_site, 'DISPLAY_ORDER_PATH', folder / 'display_order.json'), \
+                    patch.object(build_site, 'ATTACKS_DIR', folder / 'absent'):
+                snapshot = build_site.load_open_problems_catalog()
+                result = build_site.build_open_problems_data({}, snapshot)
+            self.assertEqual(list(result), ['20000601', '6'])
+            self.assertEqual(result['6']['id'], 6)
+            self.assertEqual(result['6']['rank'], 2)
+            self.assertEqual(result['6']['title'], 'Hodge Conjecture')
+            self.assertEqual(result['6']['domain'], 'number_theory')
+            self.assertEqual(result['6']['definition_file'], 'attacks/open_problems/top_problems/6.tex')
+            self.assertNotIn('UPSTREAM TEXT', json.dumps(result))
+            self.assertIsNone(result['20000601']['external_url'])
+            self.assertIsNone(result['6']['sources'][1]['url'])
+            self.assertIn('Printed source', result['6']['sources'][1]['citation'])
 
     def test_verbatim_notebook_definitions_sources_and_research_are_separate(self):
         source = (build_site.OPEN_PROBLEMS_PATH / 'gpt_6_astra_ultra' / '1.tex').read_text()
@@ -89,7 +125,7 @@ class OpenCatalogValidationTests(unittest.TestCase):
                             r'\\(?:sref|eref|hypertarget|needspace|raggedright)\b')
 
     def test_custom_math_macros_expand_before_subscripts_and_keep_longer_commands(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / '151.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
         source = source.replace(r'\subsection{Short English statement}',
                                 r'$\A_k,\E_{x},\Q,\Re,\Gamma$' + '\n'
                                 + r'\subsection{Short English statement}')
@@ -136,7 +172,7 @@ Additional provenance: \srcref{A1}. Statement: \src{S1}.
         self.assertTrue(all(r['researchTeX'] is None for r in snapshot['records']))
 
     def test_catalogue_quotation_with_nested_and_escaped_braces_is_omitted(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / '15.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
         source = source.replace(r'\subsection{Short English statement}',
                                 r'\cataloguescope{Hidden {nested} quotation with \{escaped\} sets.}'
                                 '\n' + r'\subsection{Short English statement}')
@@ -150,20 +186,19 @@ Additional provenance: \srcref{A1}. Statement: \src{S1}.
         snapshot['records'][0]['statusReviewedAt'] = ''
         self.assertEqual(self.load(snapshot), snapshot)
 
-    def test_duplicate_ids_and_ranks_fail_instead_of_overwriting_records(self):
-        for key, expected in [('problemId', 'Duplicate open problem ID'),
-                              ('releaseRank', 'Duplicate open problem rank')]:
-            snapshot = catalog()
-            snapshot['records'][1][key] = snapshot['records'][0][key]
-            with self.subTest(key=key), self.assertRaisesRegex(ValueError, expected):
-                self.load(snapshot)
+    def test_duplicate_ids_and_display_entries_fail_instead_of_overwriting(self):
+        snapshot = catalog()
+        snapshot['records'][1]['id'] = 1
+        with self.assertRaisesRegex(ValueError, 'Duplicate open problem ID'):
+            self.load(snapshot)
+        snapshot = catalog()
+        snapshot['displayOrder'] = [1, 1]
+        with self.assertRaisesRegex(ValueError, 'Duplicate open problem ID in display order'):
+            self.load(snapshot)
 
-    def test_invalid_ranks_ids_sources_and_record_counts_fail_explicitly(self):
-        cases = [
-            ('problemId', '../outside'), ('problemId', 'mo:1'), ('problemId', ''),
-            ('releaseRank', True), ('releaseRank', '1'), ('releaseRank', 0),
-            ('releaseRank', 3), ('sources', []), ('exactTarget', ''),
-        ]
+    def test_invalid_ids_sources_and_record_counts_fail_explicitly(self):
+        cases = [('id', '../outside'), ('id', 'mo:1'), ('id', ''), ('id', True),
+                 ('id', '1'), ('id', 0), ('id', 2**53), ('sources', []), ('exactTarget', '')]
         for key, value in cases:
             snapshot = catalog()
             snapshot['records'][0][key] = value
@@ -173,6 +208,11 @@ Additional provenance: \srcref{A1}. Statement: \src{S1}.
             snapshot = catalog()
             snapshot['recordCount'] = count
             with self.subTest(count=count), self.assertRaisesRegex(ValueError, 'recordCount'):
+                self.load(snapshot)
+        for order in [[1], [1, 9], [1, True], [1, '20000601']]:
+            snapshot = catalog()
+            snapshot['displayOrder'] = order
+            with self.subTest(order=order), self.assertRaises(ValueError):
                 self.load(snapshot)
 
 
@@ -206,23 +246,22 @@ class OpenProblemsBuildTests(unittest.TestCase):
         }) + '\nFULL SOLUTION\nCOMPLETION ESTIMATE: 100%'
 
     def test_stable_ids_load_versioned_attempts_without_overwriting_snapshot_status(self):
-        self.write('attacks/open_problems/Example_Model/problem.example_v2.tex',
+        self.write('attacks/open_problems/Example_Model/1_v2.tex',
                    'UNRESOLVED\nCOMPLETION ESTIMATE: 25%')
-        self.write('attacks/open_problems/Example_Model/problem.example.tex',
+        self.write('attacks/open_problems/Example_Model/1.tex',
                    'FULL SOLUTION\nCOMPLETION ESTIMATE: 70%')
-        self.write('reviews/open_problems/problem.example.json', '{"status": "incorrect"}')
+        self.write('reviews/open_problems/1.json', '{"status": "incorrect"}')
         snapshot = catalog()
-        result = build_site.build_open_problems_data({}, snapshot)['problem.example']
+        result = build_site.build_open_problems_data({}, snapshot)['1']
         self.assertEqual(result['status'], 'open_disputed_claim')
-        self.assertEqual(result['release_status'], 'open')
         self.assertEqual(result['llm_status'], 'unresolved')
         self.assertEqual(result['completion'], 70)
         self.assertEqual([a['version'] for a in result['attacks']], [1, 2])
         self.assertEqual(result['attacks'][1]['file_path'],
-                         'attacks/open_problems/Example_Model/problem.example_v2.tex')
+                         'attacks/open_problems/Example_Model/1_v2.tex')
         self.assertEqual(result['review']['status'], 'incorrect')
         self.assertNotIn('catalog_record', result)
-        self.assertEqual(result['link'], 'https://example.org/formal')
+        self.assertEqual(result['link'], 'https://www.unsolvedmath.com/problems/1')
         self.assertNotIn('edition_date', result)
         self.assertEqual(result['status_reviewed_at'], '2026-09-22')
 
@@ -232,11 +271,17 @@ class OpenProblemsBuildTests(unittest.TestCase):
                    'UNRESOLVED\nCOMPLETION ESTIMATE: 15%')
         self.write('attacks/open_problems/erdos/Example_Model/1.tex', 'UNRESOLVED')
         result = build_site.build_open_problems_data({}, catalog())
-        self.assertEqual(len(result['problem.example']['attacks']), 1)
-        self.assertEqual(result['problem.example']['attacks'][0]['version'], 2)
-        self.assertEqual(result['problem.example']['completion'], 15)
-        self.assertEqual(result['problem.example.second']['attacks'], [])
-        self.assertEqual(result['problem.example.second']['llm_status'], 'none')
+        self.assertEqual(len(result['1']['attacks']), 1)
+        self.assertEqual(result['1']['attacks'][0]['version'], 2)
+        self.assertEqual(result['1']['completion'], 15)
+        self.assertEqual(result['20000601']['attacks'], [])
+        self.assertEqual(result['20000601']['llm_status'], 'none')
+
+    def test_misfiled_attempt_metadata_cannot_attach_to_another_problem(self):
+        self.write('attacks/open_problems/top_problems/Model/1.tex',
+                   '% TOP_PROBLEM: {"id": 20000601}\nUNRESOLVED')
+        with self.assertRaisesRegex(ValueError, 'Attempt filename must match its canonical ID'):
+            build_site.build_open_problems_data({}, catalog())
 
     def test_unknown_numbered_attempt_fails_explicitly(self):
         self.write('attacks/open_problems/top_problems/Model/501.tex', 'UNRESOLVED')
@@ -248,7 +293,7 @@ class OpenProblemsBuildTests(unittest.TestCase):
             self.write(f'attacks/open_problems/top_problems/{model}/1.tex', 'UNRESOLVED')
         self.write('attacks/open_problems/top_problems/gpt_6_astra_pro/unlisted/501.tex',
                    'Outside the ranked catalogue')
-        result = build_site.build_open_problems_data({}, catalog())['problem.example']
+        result = build_site.build_open_problems_data({}, catalog())['1']
         self.assertEqual({a['model'] for a in result['attacks']},
                          {'gpt 6 astra ultra', 'gpt 6 astra pro'})
         self.assertEqual({a['file_path'] for a in result['attacks']},
@@ -272,7 +317,7 @@ A checked restricted case, with the general case missing.
 \end{document}
 '''
         self.write('attacks/open_problems/top_problems/Model/1.tex', content)
-        problem = build_site.build_open_problems_data({}, catalog())['problem.example']
+        problem = build_site.build_open_problems_data({}, catalog())['1']
         attack = problem['attacks'][0]
         self.assertNotIn('ATTEMPT_STATUS', attack['raw'])
         self.assertEqual(attack['status'], 'unresolved')
@@ -285,7 +330,7 @@ A checked restricted case, with the general case missing.
             'researchTeX': r'\subsection{Research attempt} Conditional reduction.',
             'definitionFile': 'attacks/open_problems/top_problems/1.tex',
         })
-        result = build_site.build_open_problems_data({}, snapshot)['problem.example']
+        result = build_site.build_open_problems_data({}, snapshot)['1']
         self.assertEqual(result['llm_status'], 'unresolved')
         self.assertEqual(len(result['attacks']), 1)
         self.assertEqual(result['attacks'][0]['model'], 'Research notebook')
@@ -293,28 +338,54 @@ A checked restricted case, with the general case missing.
         self.assertNotIn('completion', result)
 
     def test_statement_only_records_and_no_attempts_have_no_claim_or_completion(self):
-        self.write('attacks/open_problems/Statement_Model/problem.example.tex', self.statement_only())
+        self.write('attacks/open_problems/Statement_Model/1.tex', self.statement_only())
         snapshot = catalog()
         snapshot['records'][0]['statusReviewedAt'] = ''
         result = build_site.build_open_problems_data({}, snapshot)
         for problem in result.values():
             self.assertEqual(problem['llm_status'], 'none')
             self.assertNotIn('completion', problem)
-        self.assertIsNone(result['problem.example']['status_reviewed_at'])
-        self.assertEqual(result['problem.example']['attacks'][0]['entry_kind'], 'statement_only')
+        self.assertIsNone(result['1']['status_reviewed_at'])
+        self.assertEqual(result['1']['attacks'][0]['entry_kind'], 'statement_only')
 
-    def test_ids_with_internal_periods_work_and_ranks_do_not_identify_attempts(self):
-        self.write('attacks/open_problems/Model/problem.example.second.tex', 'UNRESOLVED')
+    def test_sparse_ids_work_and_display_order_does_not_identify_attempts(self):
+        self.write('attacks/open_problems/Model/20000601.tex', 'UNRESOLVED')
         snapshot = catalog()
-        snapshot['records'][0]['releaseRank'], snapshot['records'][1]['releaseRank'] = 2, 1
+        snapshot['displayOrder'].reverse()
         result = build_site.build_open_problems_data({}, snapshot)
-        self.assertEqual(list(result), ['problem.example.second', 'problem.example'])
-        self.assertEqual(len(result['problem.example.second']['attacks']), 1)
-        self.assertEqual(result['problem.example']['attacks'], [])
+        self.assertEqual(list(result), ['20000601', '1'])
+        self.assertEqual(len(result['20000601']['attacks']), 1)
+        self.assertEqual(result['1']['attacks'], [])
+
+    def test_reordering_changes_only_rank_not_attempts_urls_or_detail_filenames(self):
+        self.write('attacks/open_problems/top_problems/Model/20000601.tex',
+                   '% FIRST_POSTED: 2026-01-09\nUNRESOLVED')
+        snapshot = catalog()
+        original = build_site.build_open_problems_data({}, snapshot)
+        snapshot['displayOrder'].reverse()
+        reordered = build_site.build_open_problems_data({}, snapshot)
+        for key in original:
+            before, after = dict(original[key]), dict(reordered[key])
+            self.assertNotEqual(before.pop('rank'), after.pop('rank'))
+            self.assertEqual(before, after)
+        self.assertEqual(reordered['20000601']['attacks'][0]['date_posted'], '2026-01-09')
+        self.write('docs/data/top_problems/99.json', '{}')
+        with patch.object(build_site, 'load_erdos_status', return_value={'problems': {}}):
+            build_site.generate_js_data({}, {}, reordered, snapshot)
+        self.assertTrue((build_site.DATA_DIR / 'top_problems/20000601.json').is_file())
+        self.assertFalse((build_site.DATA_DIR / 'top_problems/99.json').exists())
+
+    def test_explicit_unknown_posting_date_and_statement_only_survive_migration(self):
+        self.write('attacks/open_problems/top_problems/Model/1.tex',
+                   '% FIRST_POSTED: null\n% ENTRY_KIND: statement_only\nFULL SOLUTION')
+        problem = build_site.build_open_problems_data({}, catalog())['1']
+        self.assertNotIn('date_posted', problem['attacks'][0])
+        self.assertEqual(problem['attacks'][0]['entry_kind'], 'statement_only')
+        self.assertEqual(problem['llm_status'], 'none')
 
     def test_unknown_and_invalid_ranked_tex_filenames_fail_instead_of_disappearing(self):
-        for filename in ['1.tex', 'problem.unknown.tex', 'problem.example_v0.tex',
-                         'problem.example_title.tex']:
+        for filename in ['2.tex', 'problem.unknown.tex', '1_v0.tex',
+                         '1_title.tex']:
             path = self.write(f'attacks/open_problems/Model/{filename}', 'UNRESOLVED')
             with self.subTest(filename=filename), self.assertRaisesRegex(ValueError, 'Unknown ranked'):
                 build_site.build_open_problems_data({}, catalog())
@@ -332,7 +403,7 @@ A checked restricted case, with the general case missing.
                          'attacks/open_problems/mo/Example_Model/1-question_v2.tex')
         self.assertEqual(mo['1']['review']['status'], 'incorrect')
         result = build_site.build_open_problems_data(mo, catalog())
-        self.assertEqual(set(result), {'problem.example', 'problem.example.second', 'mo:1'})
+        self.assertEqual(set(result), {'1', '20000601', 'mo:1'})
         self.assertEqual(result['mo:1']['mo_id'], '1')
         self.assertEqual(result['mo:1']['title'], 'Question "one"')
         self.assertIsNone(result['mo:1']['rank'])
@@ -350,8 +421,8 @@ A checked restricted case, with the general case missing.
         self.assertEqual(mo['1']['review']['status'], 'incomplete')
 
     def test_stats_and_js_exports_count_actual_attempts_across_both_collections(self):
-        self.write('attacks/open_problems/Statement_Model/problem.example.tex', self.statement_only())
-        self.write('attacks/open_problems/Actual_Model/problem.example.second.tex', 'UNRESOLVED')
+        self.write('attacks/open_problems/Statement_Model/1.tex', self.statement_only())
+        self.write('attacks/open_problems/Actual_Model/20000601.tex', 'UNRESOLVED')
         mo = {'1': {'id': '1', **mo_info(), 'attacks': [{
             'model': 'MO model', 'status': 'unresolved', 'completion': 30,
         }]}, '2': {'id': '2', **mo_info(), 'attacks': [{
@@ -389,10 +460,10 @@ A checked restricted case, with the general case missing.
             self.assertEqual(first, (self.root / 'docs/index.html').read_text())
             self.assertRegex(first, r'open_problems_data\.js\?v=[0-9a-f]{16}')
             record = json.loads((build_site.DATA_DIR / 'top_problems/1.json').read_text())
-            self.assertEqual(record, problems['problem.example'])
+            self.assertEqual(record, problems['1'])
             build_site.generate_js_data({}, {}, problems, snapshot)
             self.assertEqual(first, (self.root / 'docs/problem.html').read_text())
-            problems['problem.example']['definition_tex'] = 'Revised definition'
+            problems['1']['definition_tex'] = 'Revised definition'
             build_site.generate_js_data({}, {}, problems, snapshot)
             self.assertNotEqual(first, (self.root / 'docs/problem.html').read_text())
 
@@ -403,8 +474,9 @@ class RepositoryMigrationTests(unittest.TestCase):
             mo = build_site.build_mo_data()
             problems = build_site.build_open_problems_data(mo)
         self.assertEqual(len(mo), 100)
-        self.assertEqual(len(problems), 600)
-        self.assertEqual(sum(p['collection'] == 'ranked' for p in problems.values()), 500)
+        self.assertEqual(len(problems), len(mo) + len(build_site.load_open_problems_catalog()['records']))
+        self.assertEqual(sum(p['collection'] == 'ranked' for p in problems.values()),
+                         build_site.load_open_problems_catalog()['recordCount'])
         self.assertEqual(sum(bool(p['attacks']) for p in mo.values()), 93)
         for qid, problem in mo.items():
             self.assertEqual(problem['attacks'], problems[f'mo:{qid}']['attacks'])

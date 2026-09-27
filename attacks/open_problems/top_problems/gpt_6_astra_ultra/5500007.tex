@@ -1,0 +1,368 @@
+% TOP_PROBLEM: {"id": 5500007, "title": "$k$-sets", "category_id": 2, "category": {"id": 2, "name": "combinatorics", "display_name": "Combinatorics", "description": "Counting problems, graph theory, discrete structures.", "slug": "combinatorics", "order_index": 2, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% ATTEMPT_STATUS: unresolved
+\documentclass[11pt]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{\texorpdfstring{$k$-sets}{\$k\$-sets}}\label{5500007}
+\subsection{Definitions and mathematical statement}
+For an $n$-point set $P\subset{\mathbb{R}}^2$, a $k$-set is a subset $Q\subset P$ with $|Q|=k$ that can be strictly separated from $P\setminus Q$ by a line. Let
+\[
+ K(n,k)=\max_{|P|=n}\#\{Q\subset P:Q\text{ is a }k\text{-set}
+                                      \},\qquad1\le k<n.
+\]
+Determine its extremal growth as a function of $n$ and $k$, with the general-position convention of the cited problem. In a simple arrangement of nonvertical lines, the $k$-level consists of points on the lines with exactly $k$ lines strictly below, with closures at vertices. Point--line duality relates the two extremal problems, with a possible index shift depending on convention.
+
+The planar case corresponds to line arrangements. Arrangements of hyperplanes in higher dimensions introduce an additional dimension parameter; they are related generalizations, not literally the same planar function.
+\par\smallskip\textit{Formulation and concept references:} \href{https://topp.openproblem.net/p7}{[S1]}.
+
+\subsection{Short English statement}
+What is the largest possible number of k-point subsets cut off by a line from an n-point planar set, across all values of n and k?
+\subsection{Research attempt}
+\paragraph{Scope, literature check, and conventions.}
+This attempt by GPT-6 Astra Ultra was prepared on 27 September 2026.
+Write $K_P(k)$ for the number of $k$-sets of one particular planar
+configuration $P$. The problem asks for the maximum over configurations,
+not the average over random points or over $k$. Complementation gives
+$K_P(k)=K_P(n-k)$, so the interesting parameter can be restricted to
+$1\leq k\leq n/2$.
+
+The catalogue source [S1] retains this as an open problem. Dey's primary
+paper [E1] gives the upper bound $O(nk^{1/3})$ in that range, and the
+publisher abstract of T\'oth's construction [E2] gives a lower bound
+$n\exp(\Omega(\sqrt{\log k}))$. Neither bound is reproved here or
+advertised as a new result. A consulted 2024 paper [E3] still identifies
+the planar $O(n^{4/3})$ halving bound as the available general upper
+scale. Bounds for a random model or for a different dimension would not
+close the gap in this planar worst-case question.
+
+Assume no three points are collinear. For sweep bookkeeping it is convenient
+also to assume distinct first coordinates and distinct directions of
+segments joining pairs of points. These additional generic conditions
+can be obtained by an arbitrarily small perturbation. Every strictly
+separated subset in the original finite configuration has a separator with
+a positive margin, so a sufficiently small simultaneous perturbation
+preserves every existing $k$-set. Consequently using the stronger generic
+conditions does not reduce the extremal supremum. The exact identities
+below are first proved under those conditions, avoiding simultaneous events.
+
+The strategy is to encode the whole sequence $K_P(k)$ by directed edges,
+derive constraints from random convex hulls, and determine whether those
+constraints can control an individual level. This yields exact reductions
+and a complete elementary shallow-level estimate. An explicit nongeometric
+profile then shows why those upper constraints alone cannot recover even
+the known subquadratic halving bound.
+
+\paragraph{Lemma 479.1: count changes of the lowest $k$ projections.}
+For distinct $a,b\in P$, let $r(a,b)$ be the number of points strictly
+to the right of the directed line from $a$ to $b$, and put
+\[
+ E_j(P)=\#\{(a,b)\in P^2:a\ne b,\ r(a,b)=j\},
+                  \qquad 0\leq j\leq n-2.
+\]
+Then
+\begin{equation}\label{a479:edgeidentity}
+                               K_P(k)=E_{k-1}(P).
+\end{equation}
+
+\emph{Proof.} A subset $Q$ is strictly separable exactly when there is
+a nonzero vector $u$ such that
+\[
+                      u\cdot q<u\cdot p
+                \qquad(q\in Q,\ p\in P\setminus Q).
+\]
+For such a $u$, $Q$ is the set of the $k$ smallest projections onto $u$.
+The set of feasible $u$ is an intersection of open homogeneous halfplanes,
+so it is an open convex cone. It contains no antipodal pair, since reversing
+the direction reverses every strict comparison. Its intersection with the
+unit circle is therefore one connected open arc, if nonempty: positive
+linear combinations join any two feasible directions along the intervening
+short circular arc. Thus a given $Q$ appears only once as the direction
+rotates around the circle.
+
+Away from directions perpendicular to a segment joining two points, the
+projection order is constant. At such an event exactly two points tie,
+and the lowest-$k$ subset changes if and only if they occupy positions
+$k$ and $k+1$. For the normal obtained by rotating $b-a$ counterclockwise
+through $\pi/2$, the points with smaller projection than $a,b$ are
+exactly those to the right of the directed line $ab$. Hence the event
+changes the subset exactly when $r(a,b)=k-1$. Each ordered pair represents
+one of the two antipodal events for its underlying segment.
+
+The open arcs for the distinct $k$-sets form a cyclic succession, and
+the number of changes equals the number of arcs. There is more than one
+arc because a nonempty proper subset cannot be lowest in both opposite
+directions. Counting the changes proves \eqref{a479:edgeidentity}.
+\hfill$\square$
+
+This proof checks why counting appearances during a sweep does not
+overcount a subset appearing in several disconnected direction intervals.
+Convexity of its feasible cone is the missing justification in a bare
+``rotate a line'' argument.
+
+\paragraph{Corollaries: exact total mass, symmetry, and a benchmark family.}
+Reversing a directed edge interchanges its two sides, giving
+\begin{equation}\label{a479:symmetry}
+                    E_j(P)=E_{n-2-j}(P).
+\end{equation}
+Every ordered pair belongs to exactly one of the counts, so
+\begin{equation}\label{a479:total}
+       \sum_{k=1}^{n-1}K_P(k)=\sum_{j=0}^{n-2}E_j(P)=n(n-1).
+\end{equation}
+The average over $k$ is exactly $n$ for every generic configuration.
+This does not say that its largest level is $O(n)$, and it does not allow
+interchanging the maximum over $P$ with the sum over $k$.
+
+If $P$ consists of the vertices of a strictly convex polygon, then
+\begin{equation}\label{a479:convex}
+                              K_P(k)=n\qquad(1\leq k<n).
+\end{equation}
+Indeed a line avoiding the vertices cuts off a consecutive block of vertices
+in cyclic order: its intersection with the polygon boundary has at most
+two points. Conversely any nonempty proper consecutive block is separated
+by a chord joining interiors of the two boundary edges that delimit the
+block. Convexity puts the intervening chord inside the polygon and the two
+vertex arcs on opposite sides. There are precisely $n$ such blocks of
+size $k$. Thus $K(n,k)\geq n$, and the constant profile $E_j=n$
+realizes the average identity simultaneously at every level. Convexity is
+an easy family, not a candidate extremal construction for large $k$.
+
+When $n=2m$ and $k=m$, an undirected halving segment contributes both
+orientations to $E_{m-1}$. Consequently the number of halving \emph{subsets}
+is twice the number of halving \emph{segments}. This factor is retained
+in the comparison with dual arrangements.
+
+\paragraph{Exact dual indexing rather than a hidden shift.}
+For a point $p=(a_p,b_p)$ use the dual nonvertical line
+\[
+                              \ell_p(t)=a_pt-b_p.
+\]
+Distinct $a_p$ and no three collinear primal points give a simple line
+arrangement. Let $V_j$ denote the number of intersections of two dual
+lines with exactly $j$ \emph{other} lines strictly below their common
+height. Then
+\begin{equation}\label{a479:duality}
+                      K_P(k)=V_{k-1}+V_{n-k-1}.
+\end{equation}
+To prove this, directions of the form $(t,-1)$ cover one open semicircle
+of projection directions. The $k$ smallest projections change at exactly
+the crossings with $k-1$ lines below. The opposite semicircle corresponds
+to the $k$ largest values of $a_pt-b_p$, equivalently the complement of
+the $n-k$ smallest; its changes are counted by $V_{n-k-1}$. The two
+omitted horizontal normal directions have no tie because the $a_p$ are
+distinct, so there is no uncounted boundary event.
+
+There is a further convention issue for the level as defined in the root
+statement. Let $L_j$ be the closure of the open line portions with exactly
+$j$ lines below. At a crossing with $q$ other lines below, the lower
+two incident portions have $q$ lines below and the upper two have $q+1$.
+It follows that the number of vertices on $L_j$ is
+\begin{equation}\label{a479:levelvertices}
+                             V_{j-1}+V_j,
+             \qquad V_{-1}=V_{n-1}=0.
+\end{equation}
+Thus the exact identity for one fixed $k$-set count is
+\eqref{a479:duality}, while a level's vertex count has
+\eqref{a479:levelvertices}. They are closely related extremal quantities,
+but one should not silently replace one by the other on an individual
+configuration. In the halving case \eqref{a479:duality} becomes
+$K_P(m)=2V_{m-1}$, illustrating the distinction explicitly.
+
+\paragraph{Lemma 479.2: a hull-sampling generating identity.}
+Independently retain every point with probability $p\in(0,1]$, obtaining
+$R\subseteq P$. Let $h(R)$ be the number of directed hull edges, with
+$h(R)=0$ for $|R|\leq1$, $h(R)=2$ for $|R|=2$, and the usual number
+of convex-hull vertices for larger noncollinear samples. Then
+\begin{equation}\label{a479:sampling}
+                   \mathbb E h(R)
+                   =p^2\sum_{j=0}^{n-2}E_j(P)(1-p)^j
+                   \leq np.
+\end{equation}
+
+\emph{Proof.} An ordered pair $(a,b)$ becomes a hull edge with the
+interior of the sampled hull on its left exactly when $a,b$ are both
+retained and every original point to its right is omitted. Its probability
+is $p^2(1-p)^{r(a,b)}$. Points on its left are unrestricted; no other
+point is on the line. Linearity of expectation gives the equality,
+including the two-point sample where both orientations count. Finally
+$h(R)\leq|R|$ in every case, and $\mathbb E|R|=np$.
+\hfill$\square$
+
+For $k\geq1$, take $p=1/(k+1)$. For $0\leq j\leq k-1$,
+\[
+            (1-p)^j\geq(k/(k+1))^{k-1}\geq e^{-1},
+\]
+where the last inequality follows from
+$\log(1+1/k)\leq1/k$. Since all terms are nonnegative,
+\begin{equation}\label{a479:shallow}
+       \sum_{j=0}^{k-1}E_j(P)\leq e n(k+1),\qquad
+                            K_P(k)\leq e n(k+1).
+\end{equation}
+This is a complete elementary shallow-edge estimate. It is substantially
+weaker than the known $O(nk^{1/3})$ bound for one level and does not
+improve the current frontier.
+
+Optimizing the sampling inequality for a single term confirms the same
+limitation. For $k\geq2$, it gives
+\[
+                      E_{k-1}\leq\frac{n}{p(1-p)^{k-1}}.
+\]
+The denominator is largest at $p=1/k$, because the derivative of its
+logarithm is $1/p-(k-1)/(1-p)$. The result is asymptotic to $enk$.
+Changing only the sample probability does not manufacture the missing
+factor $k^{2/3}$.
+
+\paragraph{A profile that defeats the proposed upper-constraint argument.}
+Could using \emph{all} probabilities $p$, the total mass identity, and
+symmetry strengthen this method enough? These particular constraints
+alone cannot even force a subquadratic middle level. The following
+construction is a formal numerical profile, deliberately not claimed to
+come from a point set.
+
+For even $n\geq48$, put $r=(n-2)/2$ and define
+\begin{equation}\label{a479:fakeprofile}
+ \widetilde E_0=\widetilde E_{n-2}=3,\qquad
+ \widetilde E_r=n(n-1)-6,\qquad
+ \widetilde E_j=0\quad\text{at all other indices}.
+\end{equation}
+It is nonnegative, integral, symmetric, has total mass $n(n-1)$, and
+has the minimum three supporting edges at each extreme. Nevertheless
+its middle entry is quadratic. It satisfies every \emph{upper} inequality
+in \eqref{a479:sampling}:
+\begin{equation}\label{a479:fakeupper}
+                p\sum_j\widetilde E_j(1-p)^j\leq n
+                              \qquad(0\leq p\leq1).
+\end{equation}
+
+\emph{Verification.} Write $q=1-p$ and $M=n(n-1)-6$. The left side is
+$3p(1+q^{2r})+Mpq^r$. Its first term is at most six. The maximum of
+$pq^r$ is $(r/(r+1))^r/(r+1)$. For $r\geq2$,
+\[
+                  (r/(r+1))^r\leq4/9.
+\]
+For example, monotonicity follows by expanding
+$(1+1/r)^r=\sum_{j=0}^r(j!)^{-1}\prod_{h=0}^{j-1}(1-h/r)$:
+each existing factor increases with $r$ and extra terms are positive.
+The value at $r=2$ is $9/4$. Since $r+1=n/2$,
+\[
+ 3p(1+q^{2r})+Mpq^r
+ \leq6+\frac{8M}{9n}
+ \leq6+\frac89(n-1)\leq n
+\]
+for even $n\geq48$. This proves \eqref{a479:fakeupper}.
+
+There is no contradiction with Dey's theorem: the profile is not asserted
+to be geometrically realizable. Indeed random hulls also obey lower
+constraints not used in this upper-bound argument, and geometric
+realizability imposes much more. The example proves the narrower and
+useful statement that the total identity, reversal symmetry, the extreme
+count, and the entire family of the displayed upper sampling inequalities
+do not imply a subquadratic middle bound. An argument depending only on
+those data cannot solve the extremal problem.
+
+\paragraph{Where the geometric information was lost.}
+The random-hull calculation sees the distribution of numbers of points on
+one side of one directed edge. It does not track how different edges cross,
+how their endpoints interleave, or how rank transitions belonging to
+different levels fit into one arrangement. The formal profile exploits
+exactly that loss. One cannot insert it as a point-set construction, nor
+exclude it by appealing to sampling inequalities that it already satisfies.
+
+A natural next route is to draw the directed edges with $k-1$ points on
+their right and use their crossings. This is the kind of additional
+geometric input in the established approach of [E1]. An attempted shortcut
+was to assume that each point can be charged only a bounded number of
+rank-$k$ transitions, because it changes its membership in a lowest-$k$
+set only when it ties with another point. But a point has $n-1$ possible
+tie partners, and the rank of the tie varies with direction; no constant
+bound follows. Counting each pair once only recovers
+\eqref{a479:total}, which allows concentration on a single level.
+
+The first missing statement in the present proof track is a bound that
+couples transitions at an individual rank to their geometric crossings
+or to neighboring ranks strongly enough to exclude that concentration.
+Simply restating the known $O(nk^{1/3})$ theorem as such a statement
+would not improve it or determine the true scale. No stronger coupling
+inequality is established here.
+
+\paragraph{Exact finite verification of both interpretations.}
+The companion script checks 35 configurations: one convex configuration
+and four fixed-seed generic integer configurations at each size
+$3\leq n\leq9$. The convex examples use
+$(2^i,4^i)$, whose pair slopes $2^i+2^j$ are distinct. Random candidates
+are rejected if any three points are collinear, any first coordinates
+coincide, or any two segments have parallel directions.
+
+For every configuration the script computes all directed side counts by
+integer determinants. Independently, it samples projection directions on
+both sides of every critical event, enumerates the resulting lowest-$k$
+subsets, and deduplicates them as exact index sets. Directions are made
+with integer vectors of the form $M u\pm d$, where $u$ is perpendicular
+to a segment vector $d$ and $M$ exceeds every relevant dot-product
+perturbation. This keeps all nontied comparisons unchanged; no floating-point
+angle or tolerance is used. The resulting counts agree with
+\eqref{a479:edgeidentity}, symmetry, and the total mass identity.
+
+The dual arrangement intersections are computed with rational arithmetic,
+and \eqref{a479:duality} is checked separately. For configurations with
+at most eight points, every sampled subset is enumerated and its directed
+hull edges counted; the exact expectation at $p=1/2$ agrees with
+\eqref{a479:sampling}. The artificial profile at $n=48$ is also tested
+at 999 rational probabilities; its validity for all $p$ rests on the
+analytic proof above, not on that finite grid. Source, script, and result
+records are retained in
+\nolinkurl{_Local/top_problems/continuation_488_477_2026_09_27/algorithms/}.
+
+\paragraph{Outcome and explicit remaining gap.}
+\textbf{UNRESOLVED.} The work proves the directed-edge count, the exact
+dual indexing formulas, a convex-position family, and an elementary
+$O(nk)$ shallow-edge estimate. It also constructs a rigorous obstruction
+to extracting a sharp individual-level bound from the upper hull-sampling
+inequalities alone. These are verified reductions and failure diagnostics,
+not new matching extremal bounds.
+
+To continue, one could add a crossing statistic to the profile, seek an
+inequality relating it to the local rank sequence at each endpoint, and
+test that inequality on both the convex examples and known many-$k$-set
+constructions. Any candidate construction must supply actual planar
+coordinates or a realizability proof; a consistent list of side counts
+does not suffice. Neither the gap between the source bounds nor the full
+dependence on $n$ and $k$ has been resolved by this attempt.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1]Formal statement, Problem 7: Statement.
+\url{https://topp.openproblem.net/p7}.
+\textit{Formulation source. Consulted 24 September 2026: Planar k-set definition and the line-arrangement comparison.}
+\item[E1]Tamal K. Dey, Improved Bounds for Planar $k$-Sets and Related
+Problems, Discrete \& Computational Geometry 19 (1998), 373--382.
+\url{https://link.springer.com/article/10.1007/PL00009354}.
+\textit{Primary upper-bound paper; publisher record and author-uploaded
+text consulted 27 September 2026.}
+\item[E2]G\'eza T\'oth, Point Sets with Many $k$-Sets,
+Discrete \& Computational Geometry 26 (2001), 187--194.
+\url{https://link.springer.com/article/10.1007/s004540010022}.
+\textit{Publisher abstract verifies the stated lower bound for $n\geq2k$;
+the full construction is not claimed independently checked here.
+Consulted 27 September 2026.}
+\item[E3]Ranita Biswas, Sebastiano Cultrera di Montesano, Herbert
+Edelsbrunner, and Morteza Saghafian, Depth in arrangements:
+Dehn--Sommerville--Euler relations with applications,
+Journal of Applied and Computational Topology 8 (2024), 557--578.
+\url{https://link.springer.com/article/10.1007/s41468-024-00173-w}.
+\textit{Recent primary paper's frontier comparison; consulted
+27 September 2026.}
+\end{itemize}
+\end{document}

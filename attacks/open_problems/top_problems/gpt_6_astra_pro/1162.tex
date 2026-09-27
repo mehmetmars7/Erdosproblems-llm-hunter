@@ -1,0 +1,302 @@
+% TOP_PROBLEM: {"id": 1162, "title": "Hilbert's Sixteenth Problem", "category_id": 4, "category": {"id": 4, "name": "algebra", "display_name": "Algebra", "description": "Group theory, ring theory, field theory, and algebraic structures.", "slug": "algebra", "order_index": 4, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-09-27
+% !TeX program = lualatex
+% Compile twice: lualatex open_problems_500.tex
+% All references and prose are embedded; no BibTeX database or external inputs.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\setsansfont{Latin Modern Sans}
+\setmonofont{Latin Modern Mono}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{Latin Modern Math}
+\usepackage{microtype}
+\usepackage{enumitem,xurl,needspace}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{unicode=true,colorlinks=true,linkcolor=MidnightBlue,urlcolor=MidnightBlue,
+ pdftitle={Research notebook: Problems 40--49},pdfauthor={Source-annotated compilation},bookmarksnumbered=true}
+\usepackage{bookmark}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{3em}
+\cftsetpnumwidth{2.5em}
+\cftsetrmarg{4em}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\raggedright}{\thesection}{0.7em}{}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Mathematical problem statements}
+\fancyhead[R]{\small Source edition 22}
+\fancyfoot[C]{\thepage}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\emergencystretch}{3em}
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{1}
+\setlist[itemize]{leftmargin=3em,itemsep=5pt,topsep=4pt,parsep=0pt}
+\allowdisplaybreaks
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\sref}[2]{\hyperlink{source:#1:#2}{[S#2]}}
+\newcommand{\eref}[2]{\hyperlink{extra:#1:#2}{[E#2]}}
+% Turn the next switch off for a shorter reading copy. The quotations preserve
+% every exactTarget field, including qualifications omitted from a short summary.
+\newif\ifshowcatalogue
+\showcataloguetrue
+\newcommand{\cataloguescope}[1]{\ifshowcatalogue
+ \paragraph{Exact scope in the supplied catalogue.}
+ \begin{quote}\small #1\end{quote}\fi}
+
+% Research additions dated 27 September 2026; compile twice with LuaLaTeX.
+\numberwithin{equation}{section}
+\begin{document}
+\setcounter{section}{0}
+% ================================================================
+% problemId: 1162
+% Canonical problem ID: 1162
+% exactTarget SHA-256: 81dcde61465fa263d9218a450deb18aa55952f304b4113c688911a39b3528efe
+\clearpage
+\section*{\texorpdfstring{Hilbert's Sixteenth Problem}{Hilbert's Sixteenth Problem}}\label{1162}
+\subsection{Definitions and mathematical statement}
+A planar polynomial vector field of degree at most $n$ is
+\[
+ \dot x=P(x,y),\qquad\dot y=Q(x,y),\qquad P,Q\in\R[x,y],\quad\max(\deg P,\deg Q)\le n.
+\]
+A limit cycle is an isolated periodic orbit, not an arbitrary member of a continuous family of periodic trajectories. Let $H(n)$ be the supremum of the number of limit cycles over this class. The problem asks for finiteness of $H(n)$, its maximal value, and the possible relative configurations of these cycles for each degree. A bound depending on the individual coefficients is not a uniform degree bound.
+\par\smallskip\textit{Formulation and concept references:} \sref{1162}{1}.
+\cataloguescope{For every degree n >= 2, prove finiteness and determine the maximal number and possible configurations of limit cycles of planar polynomial vector fields of degree n.}
+\subsection{Short English statement}
+How many isolated periodic motions can a planar polynomial differential equation have, and how can those cycles be arranged?
+% BEGIN RESEARCH ADDITION 40
+\subsection{Research attempt}
+\paragraph{Current frontier.}
+\textit{Literature check: 27 September 2026.}
+The distinction between finiteness for one vector field and a bound uniform
+in all its degree-$n$ coefficients is essential. The latter is not supplied
+by the former. The formulation reference studies local cyclicity through
+Melnikov functions and Lyapunov constants, rather than the entire global
+configuration problem; its journal record gives a degree-six local lower
+bound of 44. \sref{1162}{1}, \eref{1162}{1}.
+The 2024 Buzzi--Novaes critique rules out the advertised quadratic formula
+for $H(n)$: the established lower-growth estimate is already of order
+$n^2\log n$. Thus a newspaper report about that formula is not evidence
+that the present target has been solved. \sref{1162}{2}.
+A 2026 manuscript investigates separable Chebyshev replication and its
+quadratic ceiling when no additional cycles are created. It is a useful
+construction-level comparison, not a general upper bound. \eref{1162}{2}.
+
+\paragraph{Attack route.}
+There are three distinct possibilities: construct increasingly many cycles
+at a fixed degree, obtain a uniform zero bound for suitable return maps,
+or cover the compactified coefficient space by neighborhoods with uniformly
+bounded cyclicity. The first must keep the degree fixed; the second must
+handle degenerate return maps; and the third needs local bounds at every
+limiting vector field, including those with centers, singular curves, and
+behavior at infinity. We pursue a concrete angular-return calculation,
+then test whether its uniformity survives degeneration. The computations
+below are deductions for this notebook; elementary ingredients and the
+restricted conclusions are not claimed to be historically new.
+
+\paragraph{Attempt: an exactly solvable diagnostic family.}
+Set $s=x^2+y^2$ and consider
+\[
+ P=xF(s)-yG(x,y),\qquad Q=yF(s)+xG(x,y),
+ \tag{40.1}
+\]
+where $F$ is a real polynomial and $G$ is polynomial and strictly positive
+on the closed annulus under consideration. In polar coordinates,
+\[
+ \dot r=rF(r^2),\qquad \dot\theta=G(r\cos\theta,r\sin\theta).
+ \tag{40.2}
+\]
+Consequently every positive root $a$ of $F$ whose circle lies in the
+annulus gives a periodic orbit $r=\sqrt a$. These are the only periodic
+orbits there: away from a root, $r$ is strictly monotone, and a trajectory
+cannot cross an equilibrium of the scalar equation for $r$ by uniqueness.
+If $F\not\equiv0$, each such circle is isolated, even for a multiple root.
+If $F\equiv0$, the annulus is filled by periodic orbits and none is a limit
+cycle. Thus this family has exactly as many limit cycles in the annulus
+as $F$ has distinct positive roots there.
+
+For a simple root $a$, let
+\[
+ T_a=\int_0^{2\pi}\frac{d\theta}
+ {G(\sqrt a\cos\theta,\sqrt a\sin\theta)}.
+\]
+The transverse Floquet multiplier is
+\[
+ \mu_a=\exp\bigl(2aF'(a)T_a\bigr).                 \tag{40.3}
+\]
+Indeed the linearization of $rF(r^2)$ at $\sqrt a$ is
+$2aF'(a)$, constant along the orbit. Equivalently, differentiating
+$dr/d\theta=rF(r^2)/G$ at the root gives
+$2aF'(a)/G$, because the term differentiating $1/G$ is multiplied by
+$F(a)=0$. This also checks that the nonconstant angular speed has not been
+silently ignored.
+
+Take $G=1$ and
+$F(s)=c\prod_{j=1}^{m}(s-a_j)$, with
+$0<a_1<\cdots<a_m$ and $c\ne0$. This is a degree-$2m+1$ field
+with precisely $m$ nested hyperbolic limit cycles, and their stability
+alternates. The example checks existence, isolation, degree, and relative
+position explicitly. It is only a lower bound for the unrestricted class;
+in particular it is nowhere near the known large lower bounds cited above.
+
+\paragraph{Attempt: first-order angular return maps.}
+Now perturb the linear center by arbitrary degree-at-most-$n$ polynomials:
+\[
+ \dot x=-y+\varepsilon p(x,y),\qquad
+ \dot y=x+\varepsilon q(x,y).
+\]
+On a fixed compact annulus $0<r_-\le r\le r_+<\infty$, write
+\[
+ R(r,\theta)=p(r\cos\theta,r\sin\theta)\cos\theta+
+ q(r\cos\theta,r\sin\theta)\sin\theta,
+\]
+\[
+ T(r,\theta)=\frac{q(r\cos\theta,r\sin\theta)\cos\theta-
+ p(r\cos\theta,r\sin\theta)\sin\theta}{r}.
+\]
+For sufficiently small $|\varepsilon|$, the angular velocity
+$1+\varepsilon T$ stays positive and
+\[
+ \frac{dr}{d\theta}=\frac{\varepsilon R}{1+\varepsilon T}.
+\]
+Smooth dependence of solutions of this scalar ODE, uniformly on a slightly
+larger compact annulus for $0\le\theta\le2\pi$, gives the $C^1$ expansion
+\[
+ \Pi_\varepsilon(r)-r=\varepsilon M(r)+O(\varepsilon^2),
+ \qquad M(r)=\int_0^{2\pi}R(r,\theta)\,d\theta.       \tag{40.4}
+\]
+For completeness, the zeroth-order trajectory is constant; replacing the
+perturbed trajectory in $R$ by this constant changes its value by
+$O(\varepsilon)$ by Gronwall's inequality. Multiplying by the exterior
+$\varepsilon$ gives the stated remainder. Differentiating the scalar ODE
+in the initial radius proves the same bound for the first derivative.
+The constants depend on the annulus and bounded coefficients of $p,q$.
+
+Parity now supplies an exact algebraic simplification. A monomial
+$x^iy^j$ in $p$ contributes
+$r^{i+j}\int\cos^{i+1}\theta\sin^j\theta\,d\theta$, which vanishes
+unless $i$ is odd and $j$ even. The analogous term from $q$ survives only
+when $i$ is even and $j$ odd. Hence
+\[
+ M(r)=rA(r^2),\qquad \deg A\le
+ \left\lfloor\frac{n-1}{2}\right\rfloor.             \tag{40.5}
+\]
+If all positive roots of $A$ in the annulus are simple and none is on its
+boundary, the implicit function theorem gives exactly one nearby limit
+cycle for every such root and no other cycles confined to the annulus,
+for sufficiently small nonzero $\varepsilon$. To justify ``no other'',
+remove small disjoint neighborhoods of the roots. On the remaining compact
+set $|M|$ has a positive minimum, and (40.4) excludes return-map zeros.
+Inside each root neighborhood, $M'$ is bounded away from zero, so the
+$C^1$ remainder gives uniqueness as well as existence.
+An orbit making several full turns would give a periodic point of the
+strictly increasing scalar return map. Such a point must be fixed: if
+$\Pi(r)>r$ or $\Pi(r)<r$, successive defined iterates remain strictly
+ordered and cannot return to $r$. Thus multiple-turn periodic points do
+not evade the zero count.
+
+
+As a check, choose $p=x(s-1)(s-4)$ and $q=y(s-1)(s-4)$.
+Then $M(r)=2\pi r(r^2-1)(r^2-4)$, and the two cycles at radii
+1 and 2 are in fact exact for every nonzero $\varepsilon$. Their transverse
+exponents have opposite signs. The accompanying symbolic script verifies
+the polar identities and these signs exactly.
+
+\paragraph{Stress test: why this does not produce a degree bound.}
+First, (40.5) bounds zeros of the \emph{first nonzero displacement term
+only when that term is actually the first-order one}. Taking
+$p=-yB(s)$ and $q=xB(s)$ gives $R=0$ and $M\equiv0$: the perturbation
+changes only angular speed, leaving a center. More generally $M\equiv0$
+does not imply that the full return map is the identity, and higher-order
+terms can control the bifurcation. Bounding their order of appearance and
+their zeros uniformly is not supplied by the calculation. This is precisely
+why the local-cyclicity literature uses Lyapunov constants and higher-order
+information. \sref{1162}{1}, \eref{1162}{1}.
+
+Second, the annulus estimates are not uniform as $r_-\downarrow0$,
+$r_+\uparrow\infty$, or the angular velocity approaches zero. Cycles may
+approach a singular point, a separatrix configuration, or infinity instead
+of one of the regular return-map charts. A fixed compact annulus is not a
+compactification of all these phenomena.
+
+Here is an exact compactness reduction which isolates the omitted step.
+Normalize a nonzero degree-at-most-$n$ coefficient vector to Euclidean norm
+one; multiplying a vector field by a positive constant preserves all its
+orbits. The normalized vectors form a compact sphere $K_n$. Suppose that
+for every $v\in K_n$ there were an open neighborhood $U_v$ and an integer
+$B_v$ such that \emph{every} vector field with coefficient vector in $U_v$
+had at most $B_v$ limit cycles in the entire plane. A finite subcover gives
+\[
+ H(n)\le\max_{1\le j\le N}B_{v_j}<\infty.           \tag{40.6}
+\]
+This implication is proved, but its hypothesis is unproved at degenerate
+fields. Pointwise finiteness does not imply this local boundedness: the
+function on $\{0\}\cup\{1/j:j\ge1\}$ given by $b(0)=0$ and $b(1/j)=j$
+is finite at every point of a compact space and has no finite bound.
+No upper semicontinuity of the cycle count has been established here.
+
+Third, even (40.6) would address only finiteness, not the target's request
+for the exact maximum and all realizable configurations. Nested circles
+in (40.1) do not classify nonnested or mixed configurations. A replication
+scheme whose degree increases at every step cannot disprove finiteness at
+one fixed degree; compare the explicitly degree-increasing 2026
+construction. \eref{1162}{2}.
+
+\needspace{14\baselineskip}
+\paragraph{Outcome.}
+\textbf{Outcome: Exploratory approach with unresolved gap.}
+We obtained an exact cycle count and Floquet formula in an angular-radial
+subclass, a uniform first-order return-map calculation on regular compact
+annuli, and a precise compactness implication for global finiteness.
+The stress tests identify loss of control when the first Melnikov function
+vanishes or return charts degenerate. There is no new global bound on
+$H(n)$, no fixed-degree unbounded construction, and no classification of
+all configurations. A resolution would need uniform control at every
+limiting field and, beyond finiteness, a separate sharpness and realization
+analysis. Historical novelty of the diagnostic lemmas is not asserted.
+% END RESEARCH ADDITION 40
+\subsection{Sources}
+\begin{itemize}\raggedright
+\item[\textnormal{[S1]}]\hypertarget{source:1162:1}{} Luiz Fernando da Silva Gouveia and Joan Torregrosa, The local cyclicity problem. Melnikov method using Lyapunov constants, Proceedings of the Edinburgh Mathematical Society 65 (2022), 356-375, Introduction, p. 356.
+\url{https://recercat.cat/bitstream/handle/2072/532013/MelnikovMethod.pdf?sequence=1}.
+{\small\textit{Catalogue formulation source.}}
+\item[\textnormal{[S2]}]\hypertarget{source:1162:2}{} A note on a recent attempt to solve the second part of Hilbert's 16th Problem.
+\url{https://arxiv.org/abs/2411.09594}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+\item[\textnormal{[S3]}]\hypertarget{source:1162:3}{} Pesquisadores da Unesp propõem solução para desafio matemático em aberto há mais de um século.
+\url{https://jornal.unesp.br/2024/09/24/pesquisadores-da-unesp-propoem-solucao-para-desafio-matematico-em-aberto-ha-mais-de-um-seculo/}.
+{\small\textit{Catalogue research/status reference; not a proof endorsement.}}
+% BEGIN RESEARCH SOURCES 40
+\item[\textnormal{[E1]}]\hypertarget{extra:1162:1}{} Luiz F. S. Gouveia and Joan Torregrosa,
+\emph{The local cyclicity problem: Melnikov method using Lyapunov constants},
+Proceedings of the Edinburgh Mathematical Society 65(2) (2022), 356--375,
+DOI 10.1017/S0013091522000128. Author-institution record and abstract,
+including the local degree-six bound and the first-order comparison.
+\url{https://portalrecerca.uab.cat/en/publications/the-local-cyclicity-problem-melnikov-method-using-lyapunov-consta}.
+{\small\textit{Accessible identification of [S1]; consulted 27 September 2026.
+The original repository link did not load in this research run.}}
+\item[\textnormal{[E2]}]\hypertarget{extra:1162:2}{} Olimjon Eshkobilov, Shirali Kadyrov,
+and Khudoyor Mamayusupov, \emph{Limit-Cycle Replication via Chebyshev Pullbacks
+and a Quadratic Ceiling for Separable Schemes}, arXiv:2604.12883v1,
+14 April 2026, Introduction, Theorems 1--2 and Section 5.
+\url{https://arxiv.org/html/2604.12883v1}.
+{\small\textit{Research manuscript, not treated as an independently verified
+resolution; consulted 27 September 2026.}}
+% END RESEARCH SOURCES 40
+\end{itemize}
+
+\end{document}

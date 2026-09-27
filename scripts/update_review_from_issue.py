@@ -50,7 +50,7 @@ def load_problem_ids(problem_type):
         for path in TOP_PROBLEMS_DIR.glob("*.tex"):
             header = re.search(r'^% TOP_PROBLEM: (.+)$', path.read_text(encoding="utf-8"), re.MULTILINE)
             if header:
-                ids.add(json.loads(header[1])["problemId"])
+                ids.add(str(json.loads(header[1])["id"]))
         return ids
     if problem_type == "erdos":
         path = LISTS_DIR / "erdos_problems.csv"
@@ -86,7 +86,7 @@ def validate_problem(problem_type_raw, problem_id):
     if problem_type == "open_problems" and problem_id.startswith("mo:"):
         problem_type, problem_id = "mo", problem_id[3:]
 
-    pattern = r"problem\.[a-z0-9]+(?:[.-][a-z0-9]+)*" if problem_type == "open_problems" else r"[0-9]+"
+    pattern = r"[1-9][0-9]*"
     if not re.fullmatch(pattern, problem_id):
         raise SystemExit(f"Invalid problem id: {problem_id}")
     if problem_id not in load_problem_ids(problem_type):
