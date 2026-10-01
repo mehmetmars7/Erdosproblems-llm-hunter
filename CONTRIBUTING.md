@@ -31,7 +31,7 @@ We focus on frontier models because they have shown the most promise in making m
 
 ### For Top Open Problems Attempts
 
-1. **Choose the Target**: Use the numbered definition in `attacks/open_problems/top_problems/<unsolvedmath_id>.tex`, preserving its mathematical scope and cited sources. The `TOP_PROBLEM` comment provides the numerical `id` used by URLs and reviews. Display rank is independent of this ID.
+1. **Choose the Target**: Use the numbered definition in `attacks/open_problems/top_problems/definitions/<unsolvedmath_id>.tex`, preserving its mathematical scope and cited sources. The `TOP_PROBLEM` comment provides the numerical `id` used by URLs and reviews. Display rank is independent of this ID.
 2. **File Location**: Place your TeX file in `attacks/open_problems/top_problems/<MODEL_NAME>/`.
 3. **File Naming**: Use `<unsolvedmath_id>.tex`, for example `1.tex` for P versus NP. Further versions use `1_v2.tex`, `1_v3.tex`, and so on. Keep the root definition file separate from model attempts.
 4. **Mathematical Content**: Include a precise statement, definitions and conventions, a literature check, the actual mathematical attempt, verification, and a final status. Cite relevant sources for the definition and concepts as well as theorems, reductions, or prior work used during the attempt. Use identifiable bibliographic references and source URLs; do not invent citations.

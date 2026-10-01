@@ -17,7 +17,7 @@ const ranked = (id, rank) => ({
 For every $n < 10$, prove the stated inequality.
 \subsection{Sources}
 \href{https://example.org/?x=1&y=2}{Definition <source>}`,
-    definition_file: `attacks/open_problems/top_problems/${id}.tex`,
+    definition_file: `attacks/open_problems/top_problems/definitions/${id}.tex`,
     status_qualification: 'Bounded review; still open.', status_reviewed_at: '2026-09-22',
     sources: [{ citation: 'Definition <source>', url: 'https://example.org/?x=1&y=2', role: 'formal_statement' }],
     attacks: []
@@ -189,7 +189,7 @@ assert.match(page.element('problem-links').innerHTML, /&quot;/);
 
 const tateEntry = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/problems.json'), 'utf8'))
     .find(record => /^Tate Conjecture for Algebraic Cycles$/i.test(record.title));
-const tatePath = `attacks/open_problems/top_problems/${tateEntry.id}.tex`;
+const tatePath = `attacks/open_problems/top_problems/definitions/${tateEntry.id}.tex`;
 const tateSource = fs.readFileSync(path.join(root, tatePath), 'utf8');
 const tate = JSON.parse(tateSource.match(/^% TOP_PROBLEM: (.+)$/m)[1]);
 const tateProblem = { ...ranked(tate.id, 15),
@@ -212,7 +212,7 @@ const missingDefinition = { ...records['20000601'], definition_tex: null, defini
     exact_target: 'Stale catalogue statement must not be displayed.' };
 page = await render('?type=open_problems&id=20000601', { '20000601': missingDefinition });
 assert.match(page.element('problem-links').innerHTML, /TeX definition could not be loaded/);
-assert.match(page.element('problem-statement-source').innerHTML, /top_problems\/20000601\.tex/);
+assert.match(page.element('problem-statement-source').innerHTML, /top_problems\/definitions\/20000601\.tex/);
 assert.doesNotMatch(page.element('problem-links').innerHTML, /Stale catalogue/);
 
 // A cached index can lack definitions or retain an older attempt list. The
@@ -294,7 +294,7 @@ for (const [legacy, record] of [['problem.p-versus-np', pnp], ['problem.hodge-co
     assert.equal(page.context.window.history.lastURL.hash, '#llm-attempts-section');
     assert.equal(page.element('.giscus').children[0].dataset.term, `OpenProblem-${record.id}`);
     assert.doesNotMatch(page.element('problem-statement-source').innerHTML, /unsolvedmath\.com|UnsolvedMath/);
-    assert.ok(page.element('problem-statement-source').innerHTML.includes(`/top_problems/${record.id}.tex`));
+    assert.ok(page.element('problem-statement-source').innerHTML.includes(`/top_problems/definitions/${record.id}.tex`));
     assert.equal((page.element('attempts-container').innerHTML.match(/class="attempt"/g) || []).length, record.attacks.length);
     assert.equal(new URL(page.context.getReviewIssueUrl('open_problems', String(record.id))).searchParams.get('problem_id'), String(record.id));
 }

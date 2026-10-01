@@ -498,7 +498,7 @@ def plan(args):
         records.append(selected)
         row['canonical_title'] = record['title']
         row['recovered_definition'] = recovered
-        jobs = [(definition_path, destination_root / f'{canonical}.tex', definition, True, recovered)]
+        jobs = [(definition_path, destination_root / 'definitions' / f'{canonical}.tex', definition, True, recovered)]
         for path in paths:
             if path.parent == source:
                 continue
@@ -591,10 +591,10 @@ def plan(args):
         'migrated_original_tex_files': len(all_tex) - len(withheld),
         'written_tex_files': len(operations),
         'recovered_definitions': sum(operation['derived_definition'] for operation in operations),
-        'root_statements': sum('/top_problems/' + str(op['canonical_id']) + '.tex' in op['destination'] for op in operations),
+        'root_statements': sum('/top_problems/definitions/' + str(op['canonical_id']) + '.tex' in op['destination'] for op in operations),
         'model_files': dict(collections.Counter(Path(op['destination']).parent.name for op in operations
-                                             if Path(op['destination']).parent.name != 'top_problems')),
-        'statement_only_model_files': sum(op['statement_only'] and Path(op['destination']).parent.name != 'top_problems' for op in operations),
+                                             if Path(op['destination']).parent.name != 'definitions')),
+        'statement_only_model_files': sum(op['statement_only'] and Path(op['destination']).parent.name != 'definitions' for op in operations),
         'upstream_linked_records': sum(record['external_url'] is not None for record in records),
         'local_extensions_without_upstream_page': sum(record['external_url'] is None for record in records),
         'source_files_untouched': True,

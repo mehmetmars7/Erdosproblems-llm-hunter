@@ -38,7 +38,8 @@ The Top Open Problems database comes mainly from UnsolvedMath. This repository:
 
 The portable metadata subset is in `lists/unsolvedmath/problems.json`, with
 display order in `lists/unsolvedmath/display_order.json`. Extended statements
-and model attempts are in `attacks/open_problems/top_problems/`. Generated
+are in `attacks/open_problems/top_problems/definitions/`, and model attempts
+are in sibling model folders under `top_problems/`. Generated
 representations appear in `docs/data/open_problems_data.js` and
 `docs/data/top_problems/`. The CC BY 4.0 attribution applies to the imported
 curation and metadata wherever reproduced; a file's location does not change

@@ -91,7 +91,7 @@ try {
             assert.equal(result.title, registry.find(record => record.id === id).title);
             assert.ok(result.statement > 100 && result.attempts > 0);
             assert.equal(result.external.length, 1);
-            assert.ok(result.external[0][0].endsWith(`/top_problems/${id}.tex`));
+            assert.ok(result.external[0][0].endsWith(`/top_problems/definitions/${id}.tex`));
             assert.ok(result.external.every(([url]) => !url.includes('unsolvedmath.com')));
         }
     }

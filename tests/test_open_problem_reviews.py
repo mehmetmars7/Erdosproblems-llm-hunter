@@ -19,7 +19,7 @@ class OpenProblemReviewTests(unittest.TestCase):
         self.lists = self.root / "lists"
         self.output = self.root / "reviews"
         self.lists.mkdir()
-        self.definitions = self.root / "attacks/open_problems/top_problems"
+        self.definitions = self.root / "attacks/open_problems/top_problems/definitions"
         self.definitions.mkdir(parents=True)
         for number, problem_id in enumerate([1, 20000601], 1):
             (self.definitions / f"{number}.tex").write_text(

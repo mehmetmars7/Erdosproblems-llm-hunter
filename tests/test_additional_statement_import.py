@@ -82,9 +82,9 @@ class AdditionalStatementImportTests(unittest.TestCase):
         self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.folder = Path(self.temp.name)
-        self.catalog = self.folder / 'top_problems'
+        self.catalog = self.folder / 'top_problems' / 'definitions'
         self.export = self.folder / 'portable'
-        self.catalog.mkdir()
+        self.catalog.mkdir(parents=True)
         self.export.mkdir()
         self.rows = {
             1: record(1, 'MPP-001', 'Existing one', 15, 'computer_science', 'Computer Science'),
