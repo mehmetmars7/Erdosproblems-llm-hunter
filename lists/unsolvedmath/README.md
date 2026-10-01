@@ -15,7 +15,8 @@ changes, and source-specific licensing information.
 English statement summaries. Additional local records are distinguished by
 the absence of an upstream problem URL. `display_order.json` controls the
 website's ordering independently of problem identity. Extended `.tex`
-statements and LLM attempts are stored in `attacks/open_problems/top_problems/`.
+statements are stored in `attacks/open_problems/top_problems/definitions/`;
+LLM attempts use the sibling model folders under `top_problems/`.
 
 `id` is the permanent numeric identity used in our URLs and filenames.
 `problem_number` is UnsolvedMath's public code (for example, `MPP-001`), shown

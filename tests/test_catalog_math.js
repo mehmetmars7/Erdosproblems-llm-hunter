@@ -24,7 +24,7 @@ for (const plain of [
 ]) assert.equal(prepare(plain), plain);
 
 // Already-delimited TeX from the numbered definitions must stay unchanged.
-const definitions = path.join(root, 'attacks/open_problems/top_problems');
+const definitions = path.join(root, 'attacks/open_problems/top_problems/definitions');
 let withMath = 0;
 const order = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/display_order.json'), 'utf8'));
 for (const number of order) {

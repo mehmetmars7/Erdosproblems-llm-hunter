@@ -9,7 +9,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 LISTS_DIR = BASE_DIR / "lists"
 REVIEWS_DIR = BASE_DIR / "reviews"
-TOP_PROBLEMS_DIR = BASE_DIR / "attacks" / "open_problems" / "top_problems"
+TOP_PROBLEMS_DIR = BASE_DIR / "attacks" / "open_problems" / "top_problems" / "definitions"
 
 
 FIELD_LABELS = {

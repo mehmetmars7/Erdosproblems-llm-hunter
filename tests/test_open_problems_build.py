@@ -74,20 +74,22 @@ class OpenCatalogValidationTests(unittest.TestCase):
         self.assertEqual(len({r['id'] for r in snapshot['records']}), snapshot['recordCount'])
 
     def test_missing_definitions_mismatched_numbers_and_incomplete_documents_fail(self):
-        original = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
+        original = (build_site.OPEN_PROBLEMS_PATH / 'definitions' / '1.tex').read_text()
         for content, filename in [(original.replace('TOP_PROBLEM:', 'OTHER:'), '1.tex'),
                                   (original, '2.tex'),
                                   (original.replace('\\subsection{Definitions', '\\subsection{Missing'), '1.tex'),
                                   (original.replace('\\end{document}', ''), '1.tex')]:
             with self.subTest(filename=filename), TemporaryDirectory() as directory:
                 folder = Path(directory)
-                (folder / filename).write_text(content)
+                (folder / 'definitions').mkdir()
+                (folder / 'definitions' / filename).write_text(content)
                 with patch.object(build_site, 'OPEN_PROBLEMS_PATH', folder), self.assertRaises(ValueError):
                     build_site.load_open_problems_catalog()
 
     def test_registry_titles_categories_and_sparse_order_are_authoritative(self):
         with TemporaryDirectory() as directory:
             folder = Path(directory)
+            (folder / 'definitions').mkdir()
             registry = [catalog_record(6), catalog_record(20000601)]
             registry[0].update(title='Hodge Conjecture', statement='UPSTREAM TEXT MUST NOT BE COPIED')
             registry[1]['external_url'] = None
@@ -108,7 +110,7 @@ Our own summary.
 \end{itemize}
 \end{document}
 ''')
-                (folder / f"{record['id']}.tex").write_text(text)
+                (folder / 'definitions' / f"{record['id']}.tex").write_text(text)
             with patch.object(build_site, 'OPEN_PROBLEMS_PATH', folder), \
                     patch.object(build_site, 'UNSOLVEDMATH_PATH', folder / 'problems.json'), \
                     patch.object(build_site, 'DISPLAY_ORDER_PATH', folder / 'display_order.json'), \
@@ -120,7 +122,7 @@ Our own summary.
             self.assertEqual(result['6']['rank'], 2)
             self.assertEqual(result['6']['title'], 'Hodge Conjecture')
             self.assertEqual(result['6']['domain'], 'number_theory')
-            self.assertEqual(result['6']['definition_file'], 'attacks/open_problems/top_problems/6.tex')
+            self.assertEqual(result['6']['definition_file'], 'attacks/open_problems/top_problems/definitions/6.tex')
             self.assertNotIn('UPSTREAM TEXT', json.dumps(result))
             self.assertIsNone(result['20000601']['external_url'])
             self.assertIsNone(result['6']['sources'][1]['url'])
@@ -145,7 +147,7 @@ Our own summary.
                             r'\\(?:sref|eref|hypertarget|needspace|raggedright)\b')
 
     def test_custom_math_macros_expand_before_subscripts_and_keep_longer_commands(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / 'definitions' / '1.tex').read_text()
         source = source.replace(r'\subsection{Short English statement}',
                                 r'$\A_k,\E_{x},\Q,\Re,\Gamma$' + '\n'
                                 + r'\subsection{Short English statement}')
@@ -241,7 +243,7 @@ Additional provenance: \srcref{A1}. Statement: \src{S1}.
         self.assertTrue(all(r['researchTeX'] is None for r in snapshot['records']))
 
     def test_catalogue_quotation_with_nested_and_escaped_braces_is_omitted(self):
-        source = (build_site.OPEN_PROBLEMS_PATH / '1.tex').read_text()
+        source = (build_site.OPEN_PROBLEMS_PATH / 'definitions' / '1.tex').read_text()
         source = source.replace(r'\subsection{Short English statement}',
                                 r'\cataloguescope{Hidden {nested} quotation with \{escaped\} sets.}'
                                 '\n' + r'\subsection{Short English statement}')
@@ -335,7 +337,7 @@ class OpenProblemsBuildTests(unittest.TestCase):
         self.assertEqual(result['status_reviewed_at'], '2026-09-22')
 
     def test_numbered_definitions_are_not_attempts_but_model_writeups_are(self):
-        self.write('attacks/open_problems/top_problems/1.tex', 'Definition only')
+        self.write('attacks/open_problems/top_problems/definitions/1.tex', 'Definition only')
         self.write('attacks/open_problems/top_problems/Example_Model/1_v2.tex',
                    'UNRESOLVED\nCOMPLETION ESTIMATE: 15%')
         self.write('attacks/open_problems/erdos/Example_Model/1.tex', 'UNRESOLVED')
@@ -397,7 +399,7 @@ A checked restricted case, with the general case missing.
         snapshot = catalog()
         snapshot['records'][0].update({
             'researchTeX': r'\subsection{Research attempt} Conditional reduction.',
-            'definitionFile': 'attacks/open_problems/top_problems/1.tex',
+            'definitionFile': 'attacks/open_problems/top_problems/definitions/1.tex',
         })
         result = build_site.build_open_problems_data({}, snapshot)['1']
         self.assertEqual(result['llm_status'], 'unresolved')

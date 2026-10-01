@@ -169,7 +169,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('--registry', type=Path, default=local / 'problems.json')
-    parser.add_argument('--catalog-dir', type=Path, default=root / 'attacks/open_problems/top_problems')
+    parser.add_argument('--catalog-dir', type=Path, default=root / 'attacks/open_problems/top_problems/definitions',
+                        help='Directory containing numbered definition files')
     parser.add_argument('--export-dir', type=Path, default=root / 'lists/unsolvedmath')
     parser.add_argument('--audit', type=Path)
     parser.add_argument('--apply', action='store_true', help='Create validated missing files; otherwise dry run')

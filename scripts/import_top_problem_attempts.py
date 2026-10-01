@@ -77,8 +77,8 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
 
     Returns (created_paths, unchanged_paths). Existing files are never replaced.
     """
-    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', model):
-        raise ValueError('Model must be a single folder name using letters, digits, _, ., or -')
+    if model == 'definitions' or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', model):
+        raise ValueError('Model must be a single folder name using letters, digits, _, ., or -; definitions is reserved')
     if type(version) is not int or version < 1:
         raise ValueError('Version must be a positive integer')
     catalog_dir = Path(catalog_dir)
@@ -89,7 +89,7 @@ def import_attempts(sources, catalog_dir=OPEN_PROBLEMS_PATH,
         except (OSError, UnicodeError, ValueError) as error:
             raise ValueError(f'{source}: {error}') from error
         for attempt in attempts:
-            root = catalog_dir / f'{attempt.problem_id}.tex'
+            root = catalog_dir / 'definitions' / f'{attempt.problem_id}.tex'
             header = re.search(r'^% TOP_PROBLEM: (.+)$', read_exact(root), re.MULTILINE)
             if not header:
                 raise ValueError(f'Missing TOP_PROBLEM metadata: {root}')
@@ -138,7 +138,7 @@ def main():
     parser.add_argument('--model', default='gpt_6_astra_ultra', help='Destination model folder')
     parser.add_argument('--version', type=int, default=1, help='Attempt version (default: 1; 2 produces N_v2.tex)')
     parser.add_argument('--catalog-dir', type=Path, default=OPEN_PROBLEMS_PATH,
-                        help='Directory containing the numbered TOP_PROBLEM definitions')
+                        help='Top-problems directory containing definitions/ and model folders')
     args = parser.parse_args()
     try:
         created, unchanged = import_attempts(args.sources, args.catalog_dir, args.model, args.version)

@@ -46,10 +46,10 @@ class TopProblemImportTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.folder = Path(self.temp.name)
         self.catalog = self.folder / 'top_problems'
-        self.catalog.mkdir()
+        (self.catalog / 'definitions').mkdir(parents=True)
         for rank in range(1, 4):
             metadata = {'id': rank}
-            (self.catalog / f'{rank}.tex').write_text(
+            (self.catalog / 'definitions' / f'{rank}.tex').write_text(
                 '% TOP_PROBLEM: ' + json.dumps(metadata) + '\n', encoding='utf-8')
 
     def source(self, content, name='batch.tex'):
@@ -114,7 +114,7 @@ class TopProblemImportTests(unittest.TestCase):
     def test_late_identity_mismatch_creates_no_output(self):
         good = self.source(batch(section(1)))
         wrong = self.source(batch(section(2)), 'wrong.tex')
-        (self.catalog / '2.tex').write_text('% TOP_PROBLEM: {"id": 3}\n')
+        (self.catalog / 'definitions' / '2.tex').write_text('% TOP_PROBLEM: {"id": 3}\n')
         with self.assertRaisesRegex(ValueError, 'Identity mismatch'):
             import_attempts([good, wrong], self.catalog)
         self.assertFalse((self.catalog / 'gpt_6_astra_ultra').exists())
@@ -151,7 +151,7 @@ class TopProblemImportTests(unittest.TestCase):
 
     def test_model_and_version_cannot_change_destination_layout(self):
         source = self.source(batch(section(1)))
-        for model in ['../elsewhere', '.', 'a/b']:
+        for model in ['../elsewhere', '.', 'a/b', 'definitions']:
             with self.subTest(model=model), self.assertRaises(ValueError):
                 import_attempts([source], self.catalog, model=model)
         for version in [0, -1, True]:

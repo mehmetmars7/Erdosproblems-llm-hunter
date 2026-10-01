@@ -604,7 +604,7 @@ def load_open_problems_catalog():
     for canonical in registry:
         if not isinstance(canonical, dict) or type(canonical.get('id')) is not int or canonical['id'] < 1:
             raise ValueError('Malformed canonical UnsolvedMath ID')
-        path = OPEN_PROBLEMS_PATH / f"{canonical['id']}.tex"
+        path = OPEN_PROBLEMS_PATH / 'definitions' / f"{canonical['id']}.tex"
         if not path.is_file():
             raise ValueError(f'Missing definition for UnsolvedMath {canonical["id"]}: {path}')
         content = path.read_text(encoding='utf-8')
@@ -622,10 +622,10 @@ def load_open_problems_catalog():
             record.update(parse_numbered_problem_tex(content, require_source_urls=False))
         except ValueError as error:
             raise ValueError(f'{path}: {error}') from error
-        record['definitionFile'] = f'attacks/open_problems/top_problems/{path.name}'
+        record['definitionFile'] = f'attacks/open_problems/top_problems/definitions/{path.name}'
         records.append(record)
     expected = {f'{record["id"]}.tex' for record in records}
-    extra = {path.name for path in OPEN_PROBLEMS_PATH.glob('*.tex')} - expected
+    extra = {path.name for path in (OPEN_PROBLEMS_PATH / 'definitions').glob('*.tex')} - expected
     if extra:
         raise ValueError(f'Definitions missing from the UnsolvedMath registry: {sorted(extra)}')
     snapshot = {'records': records, 'recordCount': len(records), 'displayOrder': order}
@@ -945,7 +945,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
         numbered_dir = attacks_dir / 'top_problems'
         if numbered_dir.exists():
             model_dirs.extend((directory, True) for directory in sorted(numbered_dir.iterdir())
-                              if directory.is_dir() and not directory.name.startswith('.'))
+                              if directory.is_dir() and directory.name != 'definitions'
+                              and not directory.name.startswith('.'))
         for model_dir, numbered in model_dirs:
             for tex_file in sorted(model_dir.glob('*.tex')):
                 pattern = r'(?P<id>[1-9]\d*)'
@@ -1072,7 +1073,7 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
         catalog_info = {
             'registry_path': 'lists/unsolvedmath/problems.json',
             'display_order_path': 'lists/unsolvedmath/display_order.json',
-            'source_path': 'attacks/open_problems/top_problems',
+            'source_path': 'attacks/open_problems/top_problems/definitions',
         }
         f.write(f'var openProblemsCatalog = {json.dumps(catalog_info, indent=2)};\n')
         f.write('window.OPEN_PROBLEMS_CATALOG = openProblemsCatalog;\n')

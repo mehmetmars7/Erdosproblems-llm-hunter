@@ -17,7 +17,7 @@ The Erdos index and the [GPT_6_Astra_Ultra collection](attacks/open_problems/erd
   - Problem statements: [erdosproblems.com](https://www.erdosproblems.com/)
   - Latest status and formalization links: [Terry Tao's Erdos Problems Database](https://teorth.github.io/erdosproblems/)
 
-- **Top Open Problems**: The database comes mainly from [UnsolvedMath](https://www.unsolvedmath.com/) by [Ulam AI](https://www.ulam.ai/), available on [Hugging Face](https://huggingface.co/datasets/ulamai/UnsolvedMath). We retain imported problem IDs and categories and add [extended TeX statements](attacks/open_problems/top_problems/) and LLM attempts, with mathematical definitions, English summaries, and cited sources.
+- **Top Open Problems**: The database comes mainly from [UnsolvedMath](https://www.unsolvedmath.com/) by [Ulam AI](https://www.ulam.ai/), available on [Hugging Face](https://huggingface.co/datasets/ulamai/UnsolvedMath). We retain imported problem IDs and categories and add [extended TeX statements](attacks/open_problems/top_problems/definitions/) and LLM attempts, with mathematical definitions, English summaries, and cited sources.
   - The build reads these TeX files and the website displays their mathematical definitions, summaries, and sources, with a link to each original `.tex` file. Research-attempt subsections appear as separate research notebooks. Permanent numerical UnsolvedMath IDs identify statements, attempts, links and reviews. Display positions come only from `lists/unsolvedmath/display_order.json`; catalog quotations are excluded from the page display.
   - The existing 100 [MathOverflow](https://mathoverflow.net/) problems remain available as a separate source subset within this collection, preserving their attempts and links. Entries from different sources may refer to related mathematical questions.
   - Catalog inclusion does not count as an LLM attempt. A ranked problem with no submitted mathematical writeup is shown without an attempt.
@@ -51,7 +51,7 @@ Erdosproblems-llm-hunter/
 │       ├── mo/
 │       │   └── <model>/            # MathOverflow attempts: <question_id>-<slug>.tex
 │       └── top_problems/
-│           ├── <id>.tex            # Canonical definitions and sources
+│           ├── definitions/        # Canonical definitions and sources: <id>.tex
 │           └── <model>/            # Ranked attempts: <unsolvedmath_id>.tex or <unsolvedmath_id>_v2.tex
 ├── docs/                          # Published GitHub Pages site
 │   ├── data/                      # Generated site data
@@ -102,9 +102,9 @@ Erdosproblems-llm-hunter/
 
 1. **Problem Statements**: Every new writeup includes the mathematical statement, definitions, and relevant source citations:
    - Erdos problems: [erdosproblems.com/X](https://www.erdosproblems.com/) for problem X
-   - Ranked open problems: Definitions and references from `attacks/open_problems/top_problems/<unsolvedmath_id>.tex`, with primary sources checked when preparing an attempt
+   - Ranked open problems: Definitions and references from `attacks/open_problems/top_problems/definitions/<unsolvedmath_id>.tex`, with primary sources checked when preparing an attempt
    - MathOverflow subset: Original MathOverflow question links
-2. **LLM Attempts**: Stored as TeX files in `attacks/`. Ranked writeups use `attacks/open_problems/top_problems/<model>/<unsolvedmath_id>.tex` (or `<unsolvedmath_id>_v2.tex`); the research writeups are in `gpt_6_astra_ultra/` and `gpt_6_astra_pro/`. Root numbered files provide definitions and sources separately and do not count as attempts. Each attempt contains actual mathematical work, references for definitions and concepts, citations for results used, and an honest account of remaining gaps. Lean contributions use a short TeX description linking to the complete source and original output in an external repository, as described in the [Lean contribution guidelines](CONTRIBUTING.md#lean-code-contributions). A statement or research plan alone is not an attempt.
+2. **LLM Attempts**: Stored as TeX files in `attacks/`. Ranked writeups use `attacks/open_problems/top_problems/<model>/<unsolvedmath_id>.tex` (or `<unsolvedmath_id>_v2.tex`); the research writeups are in `gpt_6_astra_ultra/` and `gpt_6_astra_pro/`. Numbered files in `definitions/` provide definitions and sources separately and do not count as attempts. Each attempt contains actual mathematical work, references for definitions and concepts, citations for results used, and an honest account of remaining gaps. Lean contributions use a short TeX description linking to the complete source and original output in an external repository, as described in the [Lean contribution guidelines](CONTRIBUTING.md#lean-code-contributions). A statement or research plan alone is not an attempt.
 3. **Build Process**: `build_site.py` processes the catalogs, attempts, and reviews into JSON and JavaScript data in `docs/data/`
 4. **Auto-Update**: GitHub Actions automatically rebuilds the site when:
    - Files in `attacks/`, `lists/`, or `reviews/` are modified
@@ -121,7 +121,7 @@ canonical IDs in display order. Edit only that ordered list to reorder the site,
 then run `python3 build_site.py`; filenames, URLs and attempts remain unchanged.
 For example, Hodge has ID **6** and initially appears in display position **4**.
 
-Statements are `attacks/open_problems/top_problems/<unsolvedmath_id>.tex`;
+Statements are `attacks/open_problems/top_problems/definitions/<unsolvedmath_id>.tex`;
 model attempts add `<model>/` before the same filename. IDs are sparse and are
 never used as array offsets. Established UnsolvedMath entries link to their
 problem page in the **UnsolvedMath #** column, using their public problem code
