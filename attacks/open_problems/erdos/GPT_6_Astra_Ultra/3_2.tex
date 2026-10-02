@@ -1,0 +1,558 @@
+% Repository-ready section fragment. Compile using standalone.tex.
+% Model: GPT-6 Astra Pro. Date: 27 September 2026.
+% This is Round 2 of the present conversation, not a renumbering of the hosted rounds.
+\section{Round 2: Critical scale contraction and mixed-radix constructions for Erd\H{o}s Problem \#3}
+
+\noindent\textbf{Author:} GPT-6 Astra Pro.\quad
+\textbf{Date:} 27 September 2026.\\
+\textbf{Status:} research attempt; no proof or counterexample to the original conjecture is claimed.
+
+\subsection{1) ROUND-2 OBJECTIVE}
+
+\textbf{Exact target.} Let $\mathbb N=\{1,2,\ldots\}$. Does every $A\subseteq\mathbb N$ with
+\[
+\sum_{a\in A}\frac1a=\infty
+\]
+contain a nontrivial arithmetic progression of every finite length? A nontrivial $k$-term progression has the form $a,a+d,\ldots,a+(k-1)d$ with $a,d\in\mathbb N$.
+The intended quantifiers are
+\[
+\forall A\subseteq\mathbb N,\quad
+\sum_{a\in A}a^{-1}=\infty
+\ \Longrightarrow\
+\forall k\ge3\ \exists a,d\ge1:\ \{a+id:0\le i<k\}\subseteq A.
+\]
+In particular, a disproof must avoid one \emph{fixed} length $k$ while retaining a divergent reciprocal sum. A sequence of examples whose avoided lengths grow does not disprove the statement.
+
+\textbf{Paths attempted.} This round pursues both a proof route and a counterexample route. On the proof side, the previous sufficient contraction is weakened to a critical, non-uniform contraction with explicitly controlled errors. On the counterexample side, fixed-base digit constructions are replaced by arbitrary mixed-radix constructions, and their reciprocal sums are analyzed exactly up to a factor of two. Finite searches test these constructions rather than treating a large finite sum as evidence of divergence.
+
+\textbf{Success condition.} A full solution would require either an unconditional summability estimate for every fixed $k$, or an explicit fixed-$k$ progression-free set with divergent reciprocal sum. Neither condition is established below. The results proved here identify testable sufficient conditions, establish restrictions on a natural construction scheme, and supply an exact numerical verification of a cited infinite example.
+
+\subsection{2) PREVIOUS FOUNDATION USED AND SOURCE AUDIT}
+
+For fixed $k\ge3$, define
+\[
+r_k(N)=\max\{|B|:B\subseteq\{1,\ldots,N\},\ B\text{ is }k\text{-AP-free}\},
+\qquad q_j=\frac{r_k(2^j)}{2^j}\quad(j\ge1).
+\]
+The previous conversation write-up \cite{previous} checked the equivalence
+\begin{equation}\label{r2:equiv}
+\text{every $k$-AP-free set has finite reciprocal sum}
+\quad\Longleftrightarrow\quad
+\sum_{j\ge1}q_j<\infty.
+\end{equation}
+It also checked the hosted finite comparison, using the separated-block construction in the repository \cite{hosted}. These inherited results are re-proved in Section~5.1 so that this document does not rely on an unavailable earlier round.
+
+The previous attempt established the sufficient condition $q_{2j}\le\theta q_j$ eventually, with a fixed $\theta<1/2$. It did not establish that inequality for the actual extremal function. It also refuted the proposed shortcut $r_k(mn)\le r_k(m)r_k(n)$: the set
+\[
+\{1,2,3,5,6,8,9,10,15,16\}
+\]
+is $4$-AP-free, so $r_4(16)\ge10>9=r_4(4)^2$. The bundled exact verifier checks this finite example again. The other failed shortcut was fixed-shift inheritance: $A=\{\lfloor n\log n\rfloor:n\ge3\}$ has a divergent reciprocal sum, but $A\cap(A-d)$ is finite for each fixed $d>0$, since its successive gaps tend to infinity. Neither failed shortcut is reused as an assumption.
+
+\paragraph{External quantitative inputs.}
+Bloom--Sisask give $r_3(N)\le N\exp(-c(\log N)^{1/9})$ \cite{bs}, which already makes the three-term dyadic series summable. A current-source check also located Raghavan's 2026 preprint, whose stated bound is
+\[
+r_3(N)\le N\exp\!\left(-c\frac{(\log N)^{1/6}}{\log\log N}\right)
+\]
+for sufficiently large $N$ \cite{rag}. The latter is recorded as a preprint claim checked at the abstract, not independently re-proved here; none of this round's arguments needs the improvement.
+
+For four terms, the verified Green--Tao input is $r_4(N)\ll N/(\log N)^c$ for an absolute $c>0$ \cite{gt}. For each fixed $k\ge5$, the verified Leng--Sah--Sawhney input is
+\[
+r_k(N)\ll_k N\exp\bigl(- (\log\log N)^{c_k}\bigr),
+\]
+where one may take $0<c_k<1$ \cite{lss}. These are identified as inputs checked in primary sources, not as a claim that every possible subsequent refinement has been exhausted. The first does not provide the exponent $>1$ needed by the elementary logarithmic summation argument; the second supplies a nonsummable dyadic majorant. A divergent majorant never proves that the actual extremal-density series diverges.
+
+\paragraph{Digit-construction provenance.}
+Walker studies modular progression-free digit sets and their shifted Kempner sets \cite{walker}. His base-$55$ example is used as a benchmark below, not presented as a new construction. The variable-base estimates and the elementary certification bounds are proved in full here. No priority or publication-level novelty is claimed for those elementary results.
+
+\paragraph{Format and access.}
+The nine numbered subsections follow the structure of the hosted \texttt{gpt\_pro\_5.4/3.tex}, fetched from the live repository. Direct web requests for the dynamic problem page and the individual Erd\H{o}s page failed during this round; repository files and the listed primary papers were accessible. The exact target agrees with the supplied previous write-up and the fetched repository text. The hosted percentage is not used as a mathematical premise.
+
+\subsection{3) NEW INSIGHT / TOOL (ROUND-2)}
+
+There are two useful quantities to track.
+
+First, condense the dyadic densities once more:
+\[
+p_m=2^m q_{2^m},\qquad V_m=(m+1)p_m.
+\]
+The series $\sum q_j$ converges exactly when $\sum p_m$ converges. A small improvement below the critical factor $1/2$ in $q_{2j}/q_j$ becomes a first-order drift inequality for $V_m$. This turns the desired convergence into an explicit telescoping estimate, including an error budget and a sharp endpoint counterexample.
+
+Second, in a mixed-radix construction, let $P_m$ be the product of the preceding digit densities and let $h_m$ be the reciprocal sum of the nonzero digits allowed at level $m$. The total reciprocal sum is comparable to
+\[
+1+\sum_{m\ge0}P_mh_m.
+\]
+Thus increasing the bases does not automatically generate a counterexample: it must generate enough local harmonic mass to overcome the accumulated density losses. This provides a rigorous test of the construction route.
+
+These are proved tools for this attempt. They are not asserted to contain the missing uniform estimate for $r_k$ or an unbounded family of local digit harmonic sums.
+
+\subsection{4) ATTACK PLAN (ROUND-2)}
+
+The proof route was to re-establish the exact dyadic reduction, derive a critical contraction criterion with errors, and then test whether subadditivity and the verified quantitative inputs imply its hypotheses. The construction route was to prove progression-freeness for mixed-radix digit sets, compute their harmonic convergence criterion, and search finite modular digit systems and finite modifications of a benchmark. Numerical candidates were separated from exact certificates. The final assessment records which implications were proved and where each route stopped.
+
+\subsection{5) WORK (ROUND-2)}
+
+\subsubsection{5.1 Self-contained recovery of the exact dyadic reduction}
+
+\noindent\textbf{Lemma 5.1 (subadditivity and monotonicity).}
+For $m,n\ge1$, $r_k(m+n)\le r_k(m)+r_k(n)$. Hence $q_{j+1}\le q_j$.
+
+\noindent\emph{Proof.}
+Intersect an admissible set with the first $m$ positions and the last $n$ positions; translate the latter intersection to $[1,n]$. Both pieces remain progression-free. Their cardinalities are bounded separately. Taking a maximum gives subadditivity, and setting $m=n=2^j$ gives the second assertion.\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 5.2 (separated blocks).}
+Suppose $N_{i+1}\ge3N_i$ and $E_i\subseteq(2N_i,3N_i]\cap\mathbb N$ is $k$-AP-free for each $i$. Then $\bigcup_iE_i$ is $k$-AP-free.
+
+\noindent\emph{Proof.}
+Consider $x<y<z$ with $x+z=2y$, and let $z$ lie in the block of scale $N$. Every earlier block lies in $(0,N]$. If $y$ is earlier, then $x+z>2N\ge2y$, impossible. If $y$ is in the block of $z$ but $x$ is earlier, then $x=2y-z>4N-3N=N$, also impossible. Therefore a three-term progression cannot cross a block boundary. A longer progression crossing a boundary has a consecutive triple crossing a boundary. It must therefore lie in a single block, where it is forbidden.\hfill$\square$
+
+\medskip
+\noindent\textbf{Theorem 5.3 (fixed-length equivalence).}
+For each fixed $k\ge3$, the following are equivalent: every $k$-AP-free subset of $\mathbb N$ has finite reciprocal sum; $\sum_{j\ge1}q_j<\infty$; and the reciprocal sums of all finite $k$-AP-free sets have a common finite upper bound depending only on $k$.
+
+\noindent\emph{Proof.}
+If $A$ is $k$-AP-free, each block $A\cap(2^j,2^{j+1}]$ contains at most $r_k(2^j)$ elements. Thus
+\begin{equation}\label{r2:dyadicupper}
+\sum_{a\in A}\frac1a\le\frac32+\sum_{j\ge1}q_j.
+\end{equation}
+This proves the two easy implications, using increasing finite truncations for infinite sets.
+
+Conversely, if $\sum q_j$ diverges, one parity of the index set has a divergent subseries. On that parity, choose $S_j\subseteq[1,2^j]$ of cardinality $r_k(2^j)$ and put $E_j=2^{j+1}+S_j$. Consecutive chosen scales have ratio $4$, so Lemma~5.2 makes their union $k$-AP-free. But its reciprocal sum is at least $\frac13\sum q_j$ over the chosen parity and therefore diverges. This proves the converse without an unjustified compactness argument.\hfill$\square$
+
+For completeness, if $F_k(N)$ denotes the maximum of $\sum_{b\in B,\ b\ge3}1/b$ over admissible $B\subseteq[1,N]$, the same proof gives
+\[
+\frac1{18}\sum_{j=1}^{\lfloor\log_2N\rfloor}q_j
+\le F_k(N)\le\sum_{j=1}^{\lfloor\log_2N\rfloor}q_j\qquad(N\ge8).
+\]
+For the lower bound use scales through $J_- =\lfloor\log_2(N/3)\rfloor$, choose the better parity, and obtain $\frac16\sum_{j\le J_-}q_j$. At most two final scales are lost, and monotonicity bounds the full sum by three times the retained sum. This is the inherited comparison, not an additional solution of the convergence problem.
+
+\subsubsection{5.2 A critical contraction theorem with an explicit error budget}
+
+\noindent\textbf{Lemma 5.4 (second condensation).}
+For $m\ge0$ and $p_m=2^mq_{2^m}$,
+\[
+\frac12p_{m+1}
+\le\sum_{j=2^m}^{2^{m+1}-1}q_j
+\le p_m.
+\]
+Consequently $\sum_{j\ge1}q_j<\infty$ if and only if $\sum_{m\ge0}p_m<\infty$.
+
+\noindent\emph{Proof.}
+There are $2^m$ summands in the block. By monotonicity each lies between $q_{2^{m+1}}$ and $q_{2^m}$. Summing the two inequalities proves both assertions.\hfill$\square$
+
+\medskip
+\noindent\textbf{Theorem 5.5 (critical drift criterion).}
+Fix $k\ge3$. Suppose there are $a>1$, an integer $m_0\ge0$, and nonnegative errors $e_m$ such that for every $m\ge m_0$,
+\begin{equation}\label{r2:drift}
+p_{m+1}\le\left(1-\frac{a}{m+2}\right)p_m+e_m,
+\qquad
+\sum_{m\ge m_0}(m+2)e_m<\infty.
+\end{equation}
+Then the fixed-$k$ conjecture holds. More precisely,
+\begin{equation}\label{r2:tailbound}
+\sum_{j\ge2^{m_0}}q_j
+\le\frac{(m_0+1)p_{m_0}+\sum_{m\ge m_0}(m+2)e_m}{a-1}.
+\end{equation}
+
+\noindent\emph{Proof.}
+Multiply the recurrence by $m+2$ and set $V_m=(m+1)p_m$. Then
+\[
+V_{m+1}\le V_m-(a-1)p_m+(m+2)e_m.
+\]
+Summing from $m_0$ through $M$ gives
+\[
+(a-1)\sum_{m=m_0}^{M}p_m
+\le V_{m_0}-V_{M+1}+\sum_{m=m_0}^{M}(m+2)e_m
+\le V_{m_0}+\sum_{m\ge m_0}(m+2)e_m,
+\]
+because $V_{M+1}\ge0$. Let $M\to\infty$, use Lemma~5.4, and then Theorem~5.3. This also proves the explicit bound.\hfill$\square$
+
+Combining \eqref{r2:tailbound} with \eqref{r2:dyadicupper} gives a uniform bound for the reciprocal sums of all $k$-AP-free sets. No rate is hidden in an appeal to asymptotic notation in this implication.
+
+\medskip
+\noindent\textbf{Corollary 5.6 (a concrete sufficient estimate).}
+Suppose $a>1$, $\delta>0$, and $C\ge0$ satisfy, for all sufficiently large $j$ of the form $j=2^m$,
+\begin{equation}\label{r2:target}
+q_{2j}\le\frac12\left(1-\frac{a}{\log_2j+2}\right)q_j
++\frac{C}{j^{1+\delta}}.
+\end{equation}
+Then the fixed-$k$ conjecture holds.
+
+\noindent\emph{Proof.}
+Multiply the displayed inequality by $2^{m+1}$ to obtain \eqref{r2:drift} with $e_m=2C\,2^{-\delta m}$. The weighted error sum is finite.\hfill$\square$
+
+This criterion is less restrictive than requiring a fixed ratio strictly below $1/2$: its allowable ratio approaches $1/2$, and it admits errors. It is still only a sufficient criterion. No necessity is claimed for arbitrary summable profiles, which can have irregular stretches of slow decay.
+
+\subsubsection{5.3 The endpoint really matters}
+
+\noindent\textbf{Proposition 5.7 (sharp endpoint in the sequence criterion).}
+The condition $a>1$ in Theorem~5.5 cannot be replaced by $a=1$, even with zero error and a positive nonincreasing density profile.
+
+\noindent\emph{Proof.}
+Take the abstract sequence
+\[
+q_j=\frac{1}{j(1+\log_2j)}\qquad(j\ge1).
+\]
+It is positive and nonincreasing, while $p_m=1/(m+1)$. Hence
+\[
+p_{m+1}=\left(1-\frac1{m+2}\right)p_m,
+\]
+but $\sum p_m$ and therefore $\sum q_j$ diverge. Moreover,
+\[
+\frac{q_{2j}}{q_j}=\frac12\frac{1+\log_2j}{2+\log_2j}<\frac12
+\]
+for every $j$. Thus a strict improvement below $1/2$ at every scale is not enough unless its cumulative size is controlled.\hfill$\square$
+
+This example is a numerical profile, not a progression-free set. Its role is to invalidate an analytic inference, not to disprove Erd\H{o}s's conjecture.
+
+\subsubsection{5.4 Why the attempted proof has not established the new hypothesis}
+
+I tried to deduce \eqref{r2:target} from the inherited subadditivity, monotonicity, and absolute density upper bounds. Those facts alone do not give such a conclusion. The following model isolates the issue.
+
+\noindent\textbf{Proposition 5.8 (a subadditive nonsummable model).}
+For integers $N\ge1$, let
+\[
+R(N)=\left\lceil\frac{N}{1+\log N}\right\rceil,
+\]
+where $\log$ is natural. Then $R$ is nondecreasing, integer-valued, satisfies $1\le R(N)\le N$, and is subadditive. Also $R(N)/N\to0$, but
+\[
+\sum_{j\ge1}\frac{R(2^j)}{2^j}=\infty.
+\]
+
+\noindent\emph{Proof.}
+The real function $f(x)=x/(1+\log x)$ is nondecreasing for $x\ge1$, since $f'(x)=\log x/(1+\log x)^2\ge0$. The ratio $f(x)/x$ is nonincreasing, so
+\[
+f(m+n)\le\frac{m}{1+\log m}+\frac{n}{1+\log n}=f(m)+f(n).
+\]
+Taking ceilings preserves this subadditive inequality because $\lceil u+v\rceil\le\lceil u\rceil+\lceil v\rceil$. The remaining elementary bounds follow from $0<f(N)\le N$. Finally,
+\[
+\frac{R(2^j)}{2^j}\ge\frac{1}{1+j\log2},
+\]
+which proves divergence.\hfill$\square$
+
+The model even obeys upper bounds of the shapes $R(N)\ll N/(\log N)^c$ for $0<c\le1$, and $R(N)\ll N\exp(-a(\log\log N)^\eta)$ for fixed $a>0$ and $0<\eta<1$. It is not asserted to satisfy all combinatorial constraints of $r_k$, or to arise from a family of sets. It shows that the particular general properties used so far do not force summability. The missing ingredient must exploit further progression-specific structure.
+
+\textbf{Precise stopping point for the proof route:} no estimate of the form \eqref{r2:drift} or \eqref{r2:target} is proved for the actual $r_k$ for the remaining lengths. The telescoping proof cannot be applied by simply assuming its hypothesis.
+
+\subsubsection{5.5 Modular digit sets: definitions and two elementary facts}
+
+Let $b\ge2$. A digit set $S\subseteq\{0,\ldots,b-1\}$ is \emph{modularly $k$-AP-free} if there are no $u\in\{0,\ldots,b-1\}$ and $d\in\{1,\ldots,b-1\}$ such that all residues $u,u+d,\ldots,u+(k-1)d$ modulo $b$ belong to $S$. Repeated residues are allowed in this test. In particular, when $b$ is composite we must not restrict to differences coprime to $b$ or to sequences with $k$ distinct residues.
+
+\noindent\textbf{Lemma 5.9 (uniform density loss).}
+If $S$ is modularly $k$-AP-free, then
+\[
+\frac{|S|}{b}\le\rho_k:=\frac{k-1}{k}<1.
+\]
+
+\noindent\emph{Proof.}
+For every residue $u$, the length-$k$ cyclic sequence $u,u+1,\ldots,u+k-1$ contains an occurrence outside $S$. Thus $\sum_{i=0}^{k-1}1_S(u+i)\le k-1$. Sum over $u$ modulo $b$. Each member of $S$ is counted $k$ times, including multiplicities if $k>b$, so $k|S|\le b(k-1)$.\hfill$\square$
+
+\medskip
+\noindent\textbf{Lemma 5.10 (embedding finite sets into the modular problem).}
+If $S\subseteq\{0,\ldots,M\}$ is $k$-AP-free as a set of integers and $b>2M$, then $S$ is modularly $k$-AP-free.
+
+\noindent\emph{Proof.}
+Suppose residues $s_0,\ldots,s_{k-1}\in S$ form a modular progression with nonzero difference. Each integer difference $s_{i+1}-s_i$ lies in $[-M,M]$ and has the same residue modulo $b$. Since this interval has diameter $2M<b$, all these differences are equal. The common integer difference is nonzero, giving an ordinary progression in $S$; reverse its order if the difference is negative. This is a contradiction.\hfill$\square$
+
+This embedding and the fixed-base descent principle are standard ingredients of the digit method in \cite{walker}; the proofs are included to make the later generalization explicit.
+
+\subsubsection{5.6 A variable-base construction that remains progression-free}
+
+For $m\ge0$, choose an integer base $b_m\ge2$ and a modularly $k$-AP-free set $S_m\subseteq\{0,\ldots,b_m-1\}$ containing $0$. Define
+\[
+B_0=1,\qquad B_m=\prod_{i=0}^{m-1}b_i,
+\]
+and let
+\[
+\mathcal C=\left\{\sum_{m\ge0}d_mB_m:
+ d_m\in S_m,\ d_m=0\text{ for all but finitely many }m\right\},
+\qquad A=\mathcal C+1.
+\]
+The shift by $1$ avoids a reciprocal of zero; it preserves arithmetic progressions.
+
+\noindent\textbf{Theorem 5.11 (mixed-radix progression-freeness).}
+The sets $\mathcal C$ and $A$ are $k$-AP-free.
+
+\noindent\emph{Proof.}
+Suppose $x,x+d,\ldots,x+(k-1)d\in\mathcal C$ with $d>0$. There is a largest $v\ge0$ such that $B_v$ divides $d$, because $B_v\to\infty$. The progression terms share their lower $v$ digits, hence their common residue $t$ modulo $B_v$. Dividing the progression by $B_v$ after subtracting $t$ gives integer terms with common difference $d/B_v$, which is nonzero modulo $b_v$. Their residues modulo $b_v$ are their $v$th digits, all in $S_v$. This contradicts the modular hypothesis for $S_v$. Translation proves the assertion for $A$.\hfill$\square$
+
+The bases and digit sets need not be constant or periodic, and the bases need not be prime. The argument does require every level's modular exclusion, not merely ordinary progression-freeness of its digit set.
+
+\subsubsection{5.7 Exact convergence criterion for the mixed-radix reciprocal sum}
+
+Write
+\[
+s_m=|S_m|,\qquad
+P_0=1,\qquad P_m=\prod_{i=0}^{m-1}\frac{s_i}{b_i},
+\qquad h_m=\sum_{d\in S_m\setminus\{0\}}\frac1d.
+\]
+Every $P_m$ is strictly positive, since $0\in S_i$ implies $s_i\ge1$.
+
+\noindent\textbf{Theorem 5.12 (harmonic layer formula up to absolute constants).}
+For the preceding construction, as an inequality in the extended nonnegative reals,
+\begin{equation}\label{r2:mixed}
+1+\frac12\sum_{m\ge0}P_mh_m
+\le\sum_{a\in A}\frac1a
+\le1+\sum_{m\ge0}P_mh_m.
+\end{equation}
+Thus the reciprocal sum diverges if and only if $\sum_mP_mh_m$ diverges.
+
+\noindent\emph{Proof.}
+The all-zero digit string contributes the element $1$. Partition the remaining elements by their highest nonzero digit, say at level $m$, with value $d\in S_m\setminus\{0\}$. They have the form $B_md+t+1$, where $t$ runs through the allowed lower-digit strings. There are $\prod_{i<m}s_i=P_mB_m$ such strings, all with $0\le t<B_m$. Therefore
+\[
+\frac1{B_m(d+1)}\le\frac1{B_md+t+1}\le\frac1{B_md}.
+\]
+Summing over $t$ and $d$ places the level's contribution between
+\[
+P_m\sum_{d\in S_m\setminus\{0\}}\frac1{d+1}
+\quad\text{and}\quad P_m h_m.
+\]
+For $d\ge1$, $1/(d+1)\ge1/(2d)$. Sum the nonnegative level contributions to obtain \eqref{r2:mixed}.\hfill$\square$
+
+\medskip
+\noindent\textbf{Corollary 5.13 (bounded local harmonic mass cannot give a counterexample).}
+If $h_m\le H$ for all $m$, then
+\[
+\sum_{a\in A}\frac1a\le1+kH.
+\]
+More generally, convergence follows whenever $\sum_m\rho_k^m h_m<\infty$.
+
+\noindent\emph{Proof.}
+Lemma~5.9 gives $P_m\le\rho_k^m$. Apply the upper bound in \eqref{r2:mixed} and sum the geometric series, whose sum is $k$.\hfill$\square$
+
+This rules out every construction in this class with a fixed finite library of digit systems, every bounded-base construction, and every eventually periodic choice. Even very rapidly increasing bases are not enough by themselves. Since $h_m\le1+\log b_m$, convergence follows from
+\[
+\sum_m\rho_k^m\log b_m<\infty.
+\]
+For example, $\log b_m\le C\eta^m$ with $1<\eta<1/\rho_k$ still gives convergence, although the bases may grow doubly exponentially in the level. This is a restriction on this specific modular construction scheme, not on all progression-free sets.
+
+\subsubsection{5.8 The precise remaining obstruction in the digit route}
+
+Define the finite-set extremal constant
+\[
+M_k=\sup\left\{\sum_{a\in F}\frac1a:
+ F\subseteq\mathbb N\text{ finite and }k\text{-AP-free}\right\}
+\]
+and the modular digit constant
+\[
+D_k=\sup\left\{\sum_{d\in S\setminus\{0\}}\frac1d:
+\begin{array}{l}
+b\ge2,\quad 0\in S\subseteq\{0,\ldots,b-1\},\\
+S\text{ is modularly }k\text{-AP-free}
+\end{array}\right\}.
+\]
+
+\noindent\textbf{Theorem 5.14 (uniform digit bounds retain the original difficulty).}
+In the extended nonnegative reals,
+\begin{equation}\label{r2:DM}
+D_k\le M_k\le D_k+1.
+\end{equation}
+Consequently $D_k<\infty$ is equivalent to the fixed-$k$ conjecture. If $D_k=\infty$, there is a mixed-radix construction of the form in Theorem~5.11 with divergent reciprocal sum.
+
+\noindent\emph{Proof.}
+The nonzero part of a modularly progression-free set is an ordinary finite progression-free set, so $D_k\le M_k$.
+
+For the other inequality, take a nonempty finite admissible $F$ and let $u=\min F$. Set $S=F-u$, which contains $0$, and choose $b>2\max S$, with $b\ge2$. Lemma~5.10 makes it modularly progression-free. Also
+\[
+\sum_{d\in S\setminus\{0\}}\frac1d
+=\sum_{a\in F\setminus\{u\}}\frac1{a-u}
+\ge\sum_{a\in F\setminus\{u\}}\frac1a
+\ge\sum_{a\in F}\frac1a-1.
+\]
+Taking suprema proves \eqref{r2:DM}. Theorem~5.3 gives the stated equivalence.
+
+Finally, if $D_k=\infty$, construct digit levels recursively. Once the previous levels have been chosen, $P_m>0$ is known. Choose a modularly $k$-AP-free digit system with $h_m\ge2/P_m$. Such a choice exists by the unboundedness hypothesis. Each term $P_mh_m$ is then at least $2$, so Theorem~5.12 proves harmonic divergence, and Theorem~5.11 proves progression-freeness.\hfill$\square$
+
+\textbf{Precise stopping point for the construction route:} no unbounded family in the definition of $D_k$ has been constructed for any relevant fixed $k$. The preceding recursive construction is conditional, not an exhibited counterexample. Conversely, proving $D_k<\infty$ uniformly in the base would already solve the fixed-length problem, rather than being a routine preliminary lemma.
+
+\subsubsection{5.9 A rigorous finite certificate for a fixed-base infinite sum}
+
+For a fixed base $b$ and digit set $S$ containing $0$, with $s=|S|<b$, write
+\[
+T_L=\left\{\sum_{i=0}^{L-1}d_ib^i:d_i\in S\right\},\quad
+B=b^L,\quad \rho=s/b,\quad
+H_L=\sum_{u\in T_L}\frac1{u+1}.
+\]
+Let $\mathcal K(S,b)$ be the nonnegative integers whose base-$b$ digits lie in $S$. Define
+\[
+C_L^- =\sum_{d\in S\setminus\{0\}}\sum_{u\in T_L}\frac1{dB+u+1},
+\qquad
+C_L^+ =\sum_{d\in S\setminus\{0\}}\sum_{u\in T_L}\frac1{dB+u}.
+\]
+
+\noindent\textbf{Theorem 5.15 (two finite rational bounds).}
+For every $L\ge1$,
+\begin{equation}\label{r2:cert}
+H_L+\frac{C_L^-}{1-\rho}
+\le\sum_{n\in\mathcal K(S,b)}\frac1{n+1}
+\le H_L+\frac{C_L^+}{1-\rho}.
+\end{equation}
+These are computable finite rational bounds on an infinite sum.
+
+\noindent\emph{Proof.}
+Decompose by the highest nonzero digit. At level $m$, if $t$ is a uniformly chosen lower digit string of length $m$, the normalized level contribution is
+\[
+\rho^m\sum_{d\in S\setminus\{0\}}
+\mathbb E\left[\frac1{d+(t+1)/b^m}\right].
+\]
+For $m\ge L$, the top $L$ digits of $t$ form a uniformly distributed $u\in T_L$, and
+\[
+\frac{u}{B}<\frac{t+1}{b^m}\le\frac{u+1}{B}.
+\]
+Consequently the expectation sum lies between $(B/s^L)C_L^-$ and $(B/s^L)C_L^+$. Summing over $m\ge L$ multiplies these by $\rho^L/(1-\rho)$. The factor $\rho^L B/s^L$ equals $1$. All lower levels together contribute exactly $H_L$, proving \eqref{r2:cert}.\hfill$\square$
+
+\paragraph{Exact arithmetic implementation.}
+The included \texttt{certify.py} uses only Python integers and rational arithmetic. For a chosen $Q=10^{30}$ it replaces every reciprocal $1/n$ by the outer bounds
+\[
+\frac{\lfloor Q/n\rfloor}{Q}\le\frac1n
+\le\frac{\lfloor Q/n\rfloor+1}{Q}.
+\]
+The finite sums are accumulated as integers; the geometric multiplier $b/(b-s)$ is an exact rational number. Thus no floating-point computation or optimization result is part of the certificate.
+
+\paragraph{Benchmark result.}
+For Walker's previously published digit set \cite{walker},
+\[
+\begin{split}
+b={}&55,\\
+S={}&\{0,1,2,4,5,9,10,11,14,16,17,18,21,24,\\
+&\hspace{14mm}30,37,39,41,42,45,47\},
+\end{split}
+\]
+the verifier checks all $55\cdot54=2970$ ordered residue/difference pairs and certifies modular $4$-AP-freeness. With $L=4$ it proves
+\begin{equation}\label{r2:numeric}
+4.43975336845522
+<\sum_{n\in\mathcal K(S,55)}\frac1{n+1}
+<4.43975337188055.
+\end{equation}
+The displayed decimal interval has width $3.42533\times10^{-9}$. The computation uses $21^4=194481$ prefix terms and $20\cdot21^4=3889620$ tail denominators in each tail sum. The exact rational endpoints are retained in \texttt{certificates.json}.
+
+This is an independently certified evaluation of a cited construction, not a new lower-bound record and not evidence of harmonic divergence. The upper endpoint certifies that this example's reciprocal sum is finite. A second certificate checks the base-$11$ digit set $\{0,1,2,4,5,7\}$ as a consistency test.
+
+\subsubsection{5.10 Computational attempts to improve the construction}
+
+\paragraph{Modular searches.}
+For each base, binary variables $x_d$ specify the selected digits. For every modular progression, let $E$ be its set of distinct residues. The constraint
+\[
+\sum_{d\in E}x_d\le |E|-1
+\]
+forbids that progression, including cases where residues repeat. Candidate searches used the linear surrogate objective
+\[
+\sum_{d=0}^{b-1}\left(\frac1{d+1}+\frac{\lambda}{b}\right)x_d,
+\]
+which rewards both small digits and density. This surrogate is not the actual infinite harmonic sum.
+
+The ordinary fixed-base searches used
+\[
+b\in\{11,13,17,19,23,29,31,37,41,43,47,53,55,59\},
+\qquad\lambda=0.55.
+\]
+A second set of ten searches used $b\in\{11,29,31,37,41,43,47,53,55,61\}$ with $\lambda=4$, interpreting the selected system as the first level followed by the base-$55$ benchmark at all higher levels. The returned candidates did not exceed the benchmark. Several optimizations terminated at their imposed time limits, so no exhaustive-search conclusion follows. Even a solver's optimality status would apply to the surrogate objective, not automatically to the infinite harmonic sum.
+
+Direct hybrids of the two known digit systems were also tested. Their exploratory intervals included approximately $4.43462$--$4.43472$ for one base-$55$ level followed by base $11$, and $4.437808$--$4.437845$ for two base-$55$ levels followed by base $11$. Neither improves \eqref{r2:numeric}. These exploratory intervals were evaluated in floating point and are not used as exact mathematical certificates.
+
+\paragraph{Finite modifications.}
+A further search tried adding individual missing integers, and then exchanging finite sets of small integers while retaining the benchmark's infinite tail. To test an addition $n$ in the first position of a progression, one can decide whether $n+d,n+2d,n+3d$ belong to the benchmark by a finite carry automaton. With $b=55$, the initial carry vector is $(n-1,n-1,n-1)$. Reading a base-$b$ digit $e$ of $d$ from right to left changes it by
+\[
+(c_1,c_2,c_3)\longmapsto
+\left(\left\lfloor\frac{c_1+e}{b}\right\rfloor,
+\left\lfloor\frac{c_2+2e}{b}\right\rfloor,
+\left\lfloor\frac{c_3+3e}{b}\right\rfloor\right),
+\]
+provided the three output residues belong to $S$. The state records whether a nonzero digit of $d$ has occurred. Acceptance means that the remaining carries have allowed digits and $d>0$. Carries remain bounded by $\max(n-1,3)$, so reachability is a finite exact test. If the added $n$ is in any other position, $d\le n-1$, giving a direct finite check.
+
+The individual-addition test found no safe single addition $n\le1000$. This finite observation is not a theorem that the infinite set is maximal. Exchange searches at cutoffs $55,110,220,550$ allowed existing small elements to be removed and allowed new elements passing the no-first-position-completion test. Any new progression then has either a non-first-position added element or at least two added elements, so its terms lie within $[1,4M]$ for cutoff $M$. This makes the restricted exchange constraints finite. The returned solutions made no changes; no exact optimality certificate was extracted, and no claim is made about all possible exchanges.
+
+The candidate lists, solver statuses, scripts, and exact certificates are preserved separately. Negative results from these bounded searches do not establish $D_4<\infty$, and a larger finite reciprocal sum would not establish $D_4=\infty$.
+
+\subsection{6) ADVERSARIAL VERIFICATION}
+
+\paragraph{Quantifiers and target preservation.}
+Every proposed counterexample uses one fixed $k$. The shift by $1$ in the digit construction is explicit, and the weight remains $1/n$. No conclusion about the original problem is inferred from a stronger divergence hypothesis or from increasing progression lengths.
+
+\paragraph{No circular use of the key estimate.}
+Theorem~5.5 proves a conditional implication. Its hypothesis has not been verified for the actual extremal densities. Theorem~5.14's divergent construction likewise assumes $D_k=\infty$; that assumption is not established. Neither conditional result is labeled a solution.
+
+\paragraph{Endpoint and normalization checks.}
+The second condensation uses $p_m=2^mq_{2^m}$, not merely $q_{2^m}$. The $a-1$ factor in the drift calculation is essential. The explicit profile in Proposition~5.7 shows failure at $a=1$ even with strict sub-$1/2$ ratios in the uncondensed sequence. Errors require the weighted sum $\sum(m+2)e_m$, not merely an unweighted convergence statement.
+
+\paragraph{Pasting and digit carries.}
+The separated-block proof uses positivity and open left endpoints. The mixed-radix proof uses divisibility of the common difference by the full product of previous bases. Modular tests include every nonzero residue difference, not just units, and include repeated-residue cycles. Omitting these cases would invalidate the construction for composite bases.
+
+\paragraph{Harmonic accounting.}
+The element $1$ is counted once. Every other integer in the construction has a unique highest nonzero digit. Its lower strings number exactly $P_mB_m$. The factor-of-two comparison follows from $d\ge1$, while the finite certificate has the exact cancellation $\rho^L b^L/s^L=1$. None of these estimates assumes uniform distribution of unrestricted integers.
+
+\paragraph{Computation versus proof.}
+The certificate uses integer comparisons for all modular progressions and outward rational rounding for every infinite-sum endpoint. The optimization routines use floating point and time limits, and their negative outcomes are treated as search observations. The carry automaton tests only the stated single-addition condition. No finite computation is used to certify a universal upper bound on $M_k$ or $D_k$.
+
+\paragraph{Novelty and source attribution.}
+The dyadic reduction is inherited. The benchmark digit set is Walker's. The external extremal estimates are attributed to their authors. The conditional drift theorem and mixed-radix estimates were developed in this attempt and proved here, but no claim of priority over the literature is made. Refining a numerical evaluation of an existing example is not described as a new record.
+
+\paragraph{Main remaining risk.}
+The elementary proofs and the integer certificates are independently checkable, but the document has not been formally verified in a proof assistant or reviewed by an external specialist. Most importantly, no argument has been found that establishes the missing progression-specific scale decay or an unbounded local-digit harmonic family.
+
+\subsection{7) FINAL (EXACTLY ONE)}
+
+\noindent\textbf{UNRESOLVED.}
+
+This second attempt does not prove or disprove Erd\H{o}s Problem~\#3. Its verified output is the critical contraction theorem with an explicit summable-error budget and a sharp endpoint example; progression-freeness and a harmonic convergence criterion for arbitrary modular mixed-radix digit constructions; the bounded-local-mass obstruction and the equivalence $D_k\le M_k\le D_k+1$; and an exact numerical certificate for the cited base-$55$ construction. The searches did not produce a better example.
+
+The proof route stops at establishing \eqref{r2:drift} for the actual $p_m$ for every remaining fixed length. The construction route stops at producing a fixed-$k$ family of modular digit sets with unbounded $h(S)$. By Theorems~5.3 and~5.14, these are substantial missing mathematical tasks, not finite verification details. The results above clarify and test the routes without asserting that the original conjecture is close to resolution.
+
+\subsection{8) COMPLETION ESTIMATE (MANDATORY)}
+
+\noindent\textbf{COMPLETION: 10\%}
+
+This is a conservative, subjective estimate of progress toward the \emph{original conjecture}, included to match the requested repository format. It is not a probability of correctness or success, not a calibrated distance to a proof, and not a measurement of how much of mathematics has been completed. The estimate remains low because the decisive unconditional summability bound, or a divergent counterexample construction, is still absent. Completing this write-up, proving conditional lemmas, or running additional finite searches does not justify a large increase in that percentage.
+
+\subsection{9) REFERENCES}
+
+\begin{thebibliography}{99}
+\bibitem{problem}
+T. F. Bloom, \emph{Erd\H{o}s Problem 3},
+\url{https://www.erdosproblems.com/3}.
+The individual page was not directly accessible during this round; the statement was checked against the supplied write-up and repository sources.
+
+\bibitem{hosted}
+\emph{Erdos Problems LLM Hunter},
+\texttt{attacks/open\_problems/erdos/gpt\_pro\_5.4/3.tex},
+``Round 5: Quantitative finite-scale extremal theorem for Erd\H{o}s Problem 3.''
+Fetched 27 September 2026; blob SHA
+\texttt{36490c6790d00b009584214157fe94aeaa990b51}.
+\url{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/attacks/open_problems/erdos/gpt_pro_5.4/3.tex}.
+Problem interface:
+\url{https://mehmetmars7.github.io/Erdosproblems-llm-hunter/problem.html?type=erdos&id=3}.
+
+\bibitem{previous}
+GPT-6 Astra Pro, \emph{Erd\H{o}s Problem 3: audit and research attempt},
+27 September 2026. The previous conversation's supplied \texttt{3.tex}; retained unchanged in the bundle under \texttt{previous/3.tex}.
+
+\bibitem{bs}
+T. F. Bloom and O. Sisask,
+\emph{An improvement to the Kelley--Meka bounds on three-term arithmetic progressions},
+arXiv:2309.02353 (2023).
+\url{https://arxiv.org/abs/2309.02353}.
+
+\bibitem{rag}
+R. Raghavan, \emph{Improved Bounds for 3-Progressions},
+arXiv:2603.27045 (27 March 2026), preprint.
+\url{https://arxiv.org/abs/2603.27045}.
+The stated abstract bound was checked; the proof was not independently audited in this attempt.
+
+\bibitem{gt}
+B. Green and T. Tao,
+\emph{New bounds for Szemer\'edi's theorem, III: A polylogarithmic bound for $r_4(N)$},
+Mathematika 63 (2017), 944--1040; arXiv:1705.01703v3.
+\url{https://arxiv.org/abs/1705.01703}.
+
+\bibitem{lss}
+J. Leng, A. Sah and M. Sawhney,
+\emph{Improved Bounds for Szemer\'edi's Theorem},
+arXiv:2402.17995v2, Theorem 1.1.
+\url{https://arxiv.org/html/2402.17995v2}.
+
+\bibitem{walker}
+A. Walker, \emph{Integer Sets of Large Harmonic Sum Which Avoid Long Arithmetic Progressions},
+arXiv:2203.06045v2, in particular the modular construction, harmonic approximation discussion, and base-$55$ example.
+\url{https://arxiv.org/html/2203.06045v2}.
+The arXiv version is dated 4 September 2025 in its version banner; the rendered HTML also carries a later title-block date. This note identifies the version by its arXiv version identifier rather than treating the title-block date as a separate revision.
+\end{thebibliography}

@@ -1,0 +1,166 @@
+% TOP_PROBLEM: {"id": 3400, "title": "Linear-size circuits for stable $0,1 < 2$ sorting?", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open", "problem_number": "OPG-474", "set_id": 12}
+% FIRST_POSTED: 2026-10-02
+% ATTEMPT_STATUS: unresolved
+% UnsolvedMath ID 3400; source catalogue code OPG-474
+% !TeX program = lualatex
+% Research attempt by GPT-6 Astra Ultra; no claim of a new complete solution.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[BoldFont=lmroman10-bold.otf,
+ ItalicFont=lmroman10-italic.otf,BoldItalicFont=lmroman10-bolditalic.otf]
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\AtBeginDocument{\let\setminus\smallsetminus}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{Linear-size circuits for stable $0,1 < 2$ sorting?}\label{3400}
+{\small UnsolvedMath ID 3400 · OPG-474 · Computer Science · OpenGarden}
+\subsection{Definitions and mathematical statement}
+For a word $x=x_1\cdots x_n\in\{0,1,2\}^n$, let $u(x)$ be the
+subword obtained by deleting every occurrence of $2$, preserving
+the order of all remaining symbols, and let $t(x)$ count the deleted
+symbols. Define $f_n(x)=u(x)2^{t(x)}$, where the superscript here
+denotes repetition of a symbol. Thus $f_n$ moves all twos to the
+right without changing the relative order of the zeros and ones.
+
+Encode the three symbols by $00,01,10$, respectively. The question
+is whether there is a constant $C$ and, for every $n\ge1$, a Boolean
+circuit on $2n$ input and $2n$ output bits computing $f_n$ on valid
+encodings with at most $Cn$ gates. Use fan-in-two AND and OR gates
+and fan-in-one NOT gates, with unrestricted reuse of outputs.
+The circuit's behavior on invalid symbol encodings is immaterial.
+
+This is a nonuniform circuit-size question; no bound on depth or
+procedure for constructing the circuits is required. The choice of
+a fixed finite complete bounded-fan-in basis affects size by only
+a constant factor. Stability is essential: sorting all zeros before
+all ones would discard the original relative order and compute a
+different function. Determine whether these stable-compaction maps
+have linear circuit size.
+\subsection{Short English statement}
+Can bounded-fan-in Boolean circuits of linear size move all twos to the end of a ternary word while preserving the order of its zeros and ones?
+\subsection{Research attempt}
+\paragraph{Scope and process.}
+This is a GPT-6 Astra Ultra research attempt dated 2 October 2026, using
+primary-source browsing and elementary mathematical checks. The canonical
+definition above is retained. Results below are restricted results or
+reductions, not a claim of a new solution to the entire catalogue question.
+No formal proof assistant or external mathematical referee checked this text.
+
+
+\paragraph{Literature and exact task.}
+The source poses a Boolean-circuit question about retaining the order
+of zeroes and ones while moving twos to the end. Ordinary sorting
+by the three numerical values changes that order and computes a
+different function. Asharov, Lin and Shi [R1] obtain strong circuit
+bounds for short-key sorting, but explicitly describe their compaction
+construction as non-stable. We do not transfer that construction to
+this target. Here we give an explicit quadratic-size stable circuit
+and an elementary linear lower bound in the required gate model.
+
+\paragraph{One adjacent operation with a constant gate cost.}
+For adjacent symbols $a,b$, exchange them exactly when $a=2$ and
+$b\ne2$. Otherwise retain them. This operation never exchanges a zero
+with a one. Using the prescribed encodings, let the two input pairs be
+$(a_1,a_0)$ and $(b_1,b_0)$. On valid encodings, the exchange flag is
+\[
+                         s=a_1\wedge\neg b_1.
+\]
+For each of the four output bits, let $u$ be its bit if no exchange
+occurs and $v$ its bit if exchange occurs. The output is the multiplexer
+\[
+                      (\neg s\wedge u)\vee(s\wedge v).
+\]
+Computing $\neg b_1$, $s$, and $\neg s$ uses three gates, and the four
+multiplexers use three gates each. Thus fifteen gates suffice per
+adjacent operation. Fan-out shares $s$ and $\neg s$ freely. Behaviour
+on the unused encoding $11$ is irrelevant, as permitted by the
+statement, while valid input pairs always produce valid outputs.
+
+\paragraph{A fixed network computing the required function.}
+First apply the adjacent operation successively at positions
+$(1,2),(2,3),\ldots,(n-1,n)$. Then repeat on the prefix of length
+$n-1$, and continue down to a prefix of length two. The locations are
+fixed before seeing the input, so this is a circuit, not an algorithm
+with input-dependent wiring. There are
+\[
+                       \sum_{j=1}^{n-1}j=\frac{n(n-1)}2
+\]
+operations. During each left-to-right pass, a two moves to the last
+position of the prefix if that prefix contains any two. If it contains
+none, it already has the desired form and the pass makes no change.
+Induction on prefix length consequently puts every two after every
+non-two. At every stage the multiset of symbols is preserved, and no
+operation exchanges two non-twos. Their relative order is therefore
+unchanged. The final word is exactly $u(x)2^{n-|u(x)|}$.
+The resulting circuit has size at most $15n(n-1)/2$ for $n\ge2$;
+for $n=1$ direct wires suffice. This proves an explicit $O(n^2)$ upper
+bound including stability, with no arithmetic or addressing primitive
+hidden in the gate count.
+
+\paragraph{An elementary lower bound.}
+Restrict inputs to symbols zero and two. Their high encoding bits
+$z_1,\ldots,z_n$ are independent Boolean variables and their low bits
+are zero. The first output symbol is two precisely when every input
+symbol is two. Hence its high bit computes
+\[
+                           z_1\wedge\cdots\wedge z_n.
+\]
+This function depends essentially on all $n$ variables. Consider the
+ancestor subgraph of that output in any circuit after the restriction.
+Let $b$ and $u$ count its binary and unary gates. It contains at least
+$n$ variable-source vertices and is connected when directions are
+forgotten. If it has additional constant sources, they only increase
+the required edge count. Thus it has at least $n+b+u-1$ edges, while
+its gate fan-in supplies at most $2b+u$ edges. It follows that
+$b\ge n-1$. Therefore any circuit for the full function needs at
+least $n-1$ gates. This argument allows arbitrary fan-out and makes
+no comparison-only assumption.
+
+\paragraph{Verification and the gap in a linear scan.}
+The standard-library certificate [R2] checks the fifteen-gate operation
+on all nine valid symbol pairs. It then exhausts all ternary words
+through length eight and compares the fixed network with directly
+deleting twos and appending them. These are functional checks, not a
+proof of an asymptotic lower bound; the induction and dependency count
+provide the general results.
+
+A sequential linear-time scan can append each non-two to a growing
+output list, but implementing that description requires a
+variable-address write or equivalent routing. Such a primitive is
+not one AND, OR or NOT gate. Counting each append as one operation
+therefore does not produce an $O(n)$ Boolean circuit. Conversely,
+lower bounds for comparison networks alone would not rule out the
+arbitrary Boolean circuits allowed here.
+
+\paragraph{Final status and first remaining gap.}
+\textbf{UNRESOLVED.} An explicit stable quadratic circuit and a linear
+lower bound are verified. The remaining question is whether the stable
+routing can be accomplished with only a constant number of Boolean
+gates per input symbol. Neither the adjacent network nor the
+non-stable short-key sorting result establishes that bound.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1] ULAM.AI and the UnsolvedMath Contributors, supplied problems.json, record 3400 (OPG-474), OpenGarden collection. Catalogue identity and source transcription; CC BY 4.0.
+\url{https://huggingface.co/datasets/ulamai/UnsolvedMath}.
+\item[S2] Open Problem Garden, Linear-size circuits for stable $0,1 < 2$ sorting?. Original problem and discussion; the mathematical formulation below is expanded from the supplied source record.
+\url{http://www.openproblemgarden.org/op/linear_size_circuits_for_stable_0_1_2_sorting}.
+
+\item[R1] Gilad Asharov, Wei-Kai Lin and Elaine Shi, \emph{Sorting
+Short Keys in Circuits of Size $o(n\log n)$}, 2020 preprint; SIAM
+Journal on Computing 51 (2022), 424--466. Primary PDF, including the
+stability discussion in its introduction, checked 2 October 2026.
+\url{https://arxiv.org/abs/2010.09884}.
+\item[R2] Reproducible exhaustive checks:
+\path{scripts/check_attempt_batch03_colouring_2026_10_02.py}, section 3400.
+
+\end{itemize}
+\end{document}

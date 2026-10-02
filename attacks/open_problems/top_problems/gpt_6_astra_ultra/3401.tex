@@ -1,0 +1,156 @@
+% TOP_PROBLEM: {"id": 3401, "title": "Discrete Logarithm Problem", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open", "problem_number": "OPG-2150", "set_id": 12}
+% FIRST_POSTED: 2026-10-02
+% ATTEMPT_STATUS: unresolved
+% MODEL: GPT 6 Astra Ultra
+% UnsolvedMath ID 3401; source catalogue code OPG-2150
+% !TeX program = lualatex
+% Research attempt dated 2026-10-02; canonical statement preserved.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[BoldFont=lmroman10-bold.otf,
+ ItalicFont=lmroman10-italic.otf,BoldItalicFont=lmroman10-bolditalic.otf]
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\AtBeginDocument{\let\setminus\smallsetminus}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{Discrete Logarithm Problem}\label{3401}
+{\small UnsolvedMath ID 3401 · OPG-2150 · Computer Science · OpenGarden}
+\subsection{Definitions and mathematical statement}
+Let $p$ be prime and let $g,h$ be nonzero residues modulo $p$, given
+by their least positive integer representatives. Assume $g\ne1$
+and promise $h\in\langle g\rangle$, the cyclic subgroup generated
+by $g$. A discrete logarithm of $h$ to base $g$ is an integer $a$
+such that $g^a\equiv h\pmod p$. If $r=\operatorname{ord}_p(g)$,
+all solutions are one residue class modulo $r$; an output
+$0\le a<p-1$ suffices.
+
+The conjecture, in the classical deterministic interpretation, is
+that no uniform algorithm solves every promised input in time
+polynomial in $\log p$. Input and output use binary encoding, and
+time is measured in bit operations. The subgroup promise fixes a
+missing condition in the short source: for an arbitrary pair $g,h$
+a logarithm need not exist. The question includes the case that $g$
+generates the whole multiplicative group.
+
+The target is worst-case complexity over unbounded primes, not
+hardness for a fixed modulus. It does not assert that an individual
+logarithm cannot be found by exhaustive search. Quantum algorithms,
+randomized algorithms, and distributional security claims use
+different computational requirements and must be distinguished from
+this precise classical deterministic assertion.
+\subsection{Short English statement}
+Is there no classical deterministic algorithm that finds every prime-field discrete logarithm in time polynomial in the bit length of the modulus?
+\subsection{Research attempt}
+\paragraph{Scope and method.}
+This research attempt by GPT-6 Astra Ultra is dated 2 October 2026.
+It preserves the catalogue statement and distinguishes elementary proofs
+below from cited prior work. No novelty claim or formal proof-assistant
+verification is made. The final paragraph states the precise remaining scope.
+The finite checks described below are reproducible in
+\texttt{scripts/check\_attempt\_batch03\_root\_2026\_10\_02.py}.
+\paragraph{Bit complexity and the direction of the question.}
+The input encodes $p$ in binary, so polynomial in $p$ is
+exponential in its bit length. The catalogue asks for a
+classical worst-case complexity conclusion over all valid
+inputs. We give an unconditional general algorithm with
+exponential bit complexity, and a polynomial algorithm for
+a restricted family. Neither proves a polynomial algorithm
+for every prime nor rules one out. The prime-power subgroup
+method is a special case of Pohlig--Hellman [R1], whose
+provenance matters: it is not a new discrete-logarithm
+algorithm claimed by this attempt.
+
+\paragraph{A general algorithm without knowing the order.}
+Put $N=p-1$ and $m=\lceil\sqrt N\rceil$. Store the residues
+$g^j$ for $0\le j<m$, together with an exponent for each
+distinct residue. Compute $b=g^{-m}$ modulo $p$ using
+the extended Euclidean algorithm for inversion. For
+$i=0,\ldots,m-1$, test whether $hb^i$ occurs in the table.
+A match with $g^j$ gives $g^{im+j}=h$. Reduce $im+j$
+modulo $N$ to get an allowed output and verify it by
+modular exponentiation.
+Fermat's theorem gives $g^N=1$, and the promise on $h$
+provides some exponent $0\le a<N$. Write $a=im+j$
+with $0\le j<m$. Because $N\le m^2$, its index satisfies
+$i<m$, and that iteration finds a matching residue.
+If the table has retained a different exponent for that
+same residue, it still yields a correct solution.
+Thus repeated powers when $g$ is not a generator do
+not invalidate the method. A sorted table gives a
+deterministic implementation with $O(m\log m)$ residue
+comparisons and $O(m)$ modular multiplications, apart
+from polynomial-size preliminary arithmetic. This is
+$p^{1/2}$ times polynomial factors in $\log p$, which
+is still exponential in the input length.
+
+\paragraph{An exact polynomial subfamily.}
+Suppose $p-1=2^s$. Repeatedly square $g$ until obtaining
+one; the first exponent is $r=2^t$, the exact order of
+$g$, with $1\le t\le s$. The promise excludes $g=1$.
+The element $g^{2^{t-1}}$ is the unique element of order
+two in $\mathbb F_p^*$, hence equals $-1$.
+Recover a logarithm modulo $2^t$ one bit at a time.
+If $a_j$ contains the already recovered bottom $j$
+bits, form
+\[
+ z_j=(h g^{-a_j})^{2^{t-j-1}}.
+\]
+Writing $a-a_j=2^j b$, correctness of the previous
+bits gives $z_j=(-1)^b$. Thus $z_j=1$ means that
+the next bit is zero, and $z_j=-1$ means it is one.
+Set $a_{j+1}=a_j$ or $a_j+2^j$ accordingly, starting
+with $a_0=0$. After $t$ steps the resulting $a_t$
+lies in $[0,r)$ and satisfies $g^{a_t}=h$.
+There are at most $s$ modular exponentiations of
+polynomial bit complexity, so the whole restricted
+algorithm is polynomial in $\log p$. No assumption
+that infinitely many such primes exist is needed.
+
+\paragraph{Where the general barrier remains.}
+The bit extraction works because successive quotients
+of the cyclic subgroup have order two. Replacing a
+large prime-order quotient by a two-way sign test is
+unjustified. More generally, a fast algorithm when
+the group order has small prime factors does not
+cover an arbitrary prime $p$. Conversely, a lower
+bound for algorithms that access only a generic
+group oracle would not automatically cover algorithms
+that exploit the binary representation and field
+arithmetic of these inputs. Verifying a proposed
+logarithm efficiently also provides neither a fast
+search algorithm nor a hardness proof.
+
+\paragraph{Verification and final status.}
+The root script checks the general algorithm on
+all nonidentity bases and generated targets for
+small primes, including nongenerators and $h=1$.
+It checks every base and subgroup target for
+$p=3,5,17,257$ in the bit-extraction algorithm.
+These are exact modular computations. The proofs
+establish their specified domains, but the unrestricted
+classical polynomial-time question remains unresolved
+by this attempt.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1] ULAM.AI and the UnsolvedMath Contributors, supplied problems.json, record 3401 (OPG-2150), OpenGarden collection. Catalogue identity and source transcription; CC BY 4.0.
+\url{https://huggingface.co/datasets/ulamai/UnsolvedMath}.
+\item[S2] Open Problem Garden, Discrete Logarithm Problem. Original problem and discussion; the mathematical formulation below is expanded from the supplied source record.
+\url{http://www.openproblemgarden.org/op/discrete_logarithm_problem}.
+
+\item[R1] S. C. Pohlig and M. E. Hellman, An improved algorithm for
+computing logarithms over GF(p) and its cryptographic significance,
+IEEE Trans. Information Theory 24 (1978), 106--110.
+\url{https://doi.org/10.1109/TIT.1978.1055817}.
+Author-hosted paper: \url{https://ee.stanford.edu/~hellman/publications/28.pdf}.
+
+\end{itemize}
+\end{document}

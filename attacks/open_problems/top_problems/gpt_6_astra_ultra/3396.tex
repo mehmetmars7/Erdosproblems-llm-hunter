@@ -1,0 +1,95 @@
+% TOP_PROBLEM: {"id": 3396, "title": "Exponential Algorithms for Knapsack", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open", "problem_number": "OPG-36311", "set_id": 12}
+% FIRST_POSTED: 2026-10-02
+% ATTEMPT_STATUS: unresolved
+% UnsolvedMath ID 3396; source catalogue code OPG-36311
+% !TeX program = lualatex
+% GPT-6 Astra Ultra research attempt, 2026-10-02; independently checked partial work.
+% Completion estimate: no numerical percentage assigned; see final status and literature audit.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[BoldFont=lmroman10-bold.otf,
+ ItalicFont=lmroman10-italic.otf,BoldItalicFont=lmroman10-bolditalic.otf]
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\AtBeginDocument{\let\setminus\smallsetminus}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{Exponential Algorithms for Knapsack}\label{3396}
+{\small UnsolvedMath ID 3396 · OPG-36311 · Computer Science · OpenGarden}
+\subsection{Definitions and mathematical statement}
+The input is a list of integers $a_1,\ldots,a_n,b$, encoded in binary.
+The decision problem specified by the source is subset sum:
+\[
+ \exists (x_1,\ldots,x_n)\in\{0,1\}^n\quad
+                        \sum_{i=1}^n a_ix_i=b.
+\]
+Each list position can be used at most once; equal integer values
+may appear in different positions. The empty selection is allowed.
+Although the source calls this knapsack, there is no additional
+profit objective or inequality capacity constraint.
+
+Let $L$ be the total bit length of the input, including signs. The
+algorithmic target is a uniform exact worst-case algorithm using
+\[
+                            O(2^{n/3}L^c)
+\]
+bit operations for some absolute constant $c$, on every input.
+This states the source's exponential rate while making the omitted
+cost of reading and handling large integers explicit. No space bound
+is imposed. Deterministic algorithms are the baseline interpretation;
+any randomized variant must state its error and time guarantees
+separately. A faster method that works only for random or specially
+structured integer lists does not meet the universal worst-case
+target. The problem is to achieve this running time or to establish
+a rigorously specified obstruction in an explicit computational model.
+\subsection{Short English statement}
+Can arbitrary binary-encoded subset-sum instances on n integers be solved exactly in time two to the n/3 times a polynomial in the input length?
+\subsection{Research attempt}
+\paragraph{Scope and process.}
+GPT-6 Astra Ultra, 2 October 2026. The canonical formulation above is retained. This attempt uses a primary-source literature audit, independent restricted proofs, and adversarial checks. Reproved results are not claimed as new. Numerical tests below are reproducible in \texttt{scripts/check\_attempt\_batch03\_extremal\_2026\_10\_02.py}.
+
+\paragraph{Literature and computational model.}
+Chen, Jin, Randolph and Servedio [S3] give polynomial-factor savings over $2^{n/2}$ in specified RAM models, with randomized one-sided-error algorithms. Their paper distinguishes these savings from improving the constant in the exponential exponent. Neither those model-specific savings nor average-case algorithms supply the catalogue's deterministic exact $2^{n/3}\operatorname{poly}(L)$ bit bound. We audit two deterministic reductions that attain the requested rate on explicit restricted families and identify the missing combination step in the naive three-way split.
+
+\paragraph{The exact baseline, including signed inputs.}
+Split the list positions into two blocks of sizes $\lfloor n/2\rfloor,\lceil n/2\rceil$. Enumerate their subset sums as lists $A,B$. Sort $B$ and, for every $a\in A$, test membership of $b-a$ in $B$ by binary search. Every full subset decomposes uniquely into subsets of the two blocks, so this decides the original question exactly. Equal sum values may be merged without changing existence. Signed entries cause no problem: no positivity-based pruning is used. Each sum has $O(L+\log n)$ bits, and additions, sorting comparisons and searches cost a polynomial in $L$. The resulting worst-case bound is $2^{n/2}\operatorname{poly}(L)$, not the requested exponent.
+
+\paragraph{A range-sensitive sufficient condition.}
+Let $g$ be the greatest common divisor of the nonzero entries. If there are no nonzero entries, the answer is precisely $b=0$. Otherwise $g\nmid b$ immediately gives a no-instance; if it divides, divide all entries and $b$ by $g$. Write $W=\sum_i|a_i|$ for the new entries. Start with $S_0=\{0\}$ and update
+\[
+ S_i=S_{i-1}\cup\{s+a_i:s\in S_{i-1}\}.
+\]
+Induction shows that $S_i$ is exactly the set of sums using the first $i$ positions once each. Store it as a Boolean row indexed by $[-W,W]$, using the old row when updating. This costs $O(nW\operatorname{poly}(L))$ bit operations. Thus the target rate holds whenever the normalized $W$ is at most $2^{n/3}$ times a fixed polynomial in $L$. Binary input does not ensure this: even one entry can have value exponential in its bit length.
+
+\paragraph{Compressing multiplicities without losing solutions.}
+Suppose a nonzero value $v$ occurs $m$ times. Choose chunks $1,2,4,\ldots$ greedily until the remainder is no larger than the next power of two, then use that remainder as the final chunk. These positive chunks sum to $m$, and each is at most one plus the sum of its predecessors. By induction, their subset sums comprise every integer from zero to $m$: adding a chunk $c\le s+1$ to an already covered interval $[0,s]$ gives overlapping or adjacent intervals $[0,s]$ and $[c,c+s]$. Replace the $m$ copies of $v$ by the chunk multiples of $v$.
+
+Exactly $\lceil\log_2(m+1)\rceil$ chunks suffice. Every old selection count has a chunk representation, and every new selection count is at most $m$, so attainable sums are unchanged in both directions. Negative values obey the same count argument; zero entries can be discarded. If nonzero multiplicities are $m_1,\ldots,m_s$, the compressed length is
+\[
+ N'=\sum_{j=1}^s\lceil\log_2(m_j+1)\rceil.
+\]
+The baseline now takes $2^{N'/2}\operatorname{poly}(L)$ time, meeting the desired rate when $N'\le2n/3$. The condition fails for lists with all distinct values, so it is a restricted theorem.
+
+\paragraph{Verification and the first general gap.}
+The script compares attainable sums before and after compression and against dynamic programming on every signed list of length at most five over $\{-2,-1,0,1,2\}$. It also checks every multiplicity through 25. Splitting arbitrary positions into three equal blocks does produce three lists of size $2^{n/3}$, but joining two lists explicitly takes up to $2^{2n/3}$ pairs. For each entry of the third list, a two-list scan similarly gives that larger cost. This diagnoses that construction, not a lower bound against all algorithms. An exact faster joining method, or a universally applicable structural reduction, remains missing.
+
+\paragraph{Final status.}
+The target rate holds under the stated range or multiplicity conditions. Arbitrary binary lists remain \textbf{UNRESOLVED} by this attempt.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1] ULAM.AI and the UnsolvedMath Contributors, supplied problems.json, record 3396 (OPG-36311), OpenGarden collection. Catalogue identity and source transcription; CC BY 4.0.
+\url{https://huggingface.co/datasets/ulamai/UnsolvedMath}.
+\item[S2] Open Problem Garden, Exponential Algorithms for Knapsack. Original problem and discussion; the mathematical formulation below is expanded from the supplied source record.
+\url{http://www.openproblemgarden.org/op/exponential_algorithms_for_knapsack}.
+\item[S3] X. Chen, Y. Jin, T. Randolph and R. A. Servedio, Subset Sum in Time $2^{n/2}/\mathrm{poly}(n)$, arXiv:2301.07134v2, 29 January 2023, Sections 1.1--1.2 for computational models and error guarantees.
+\url{https://arxiv.org/html/2301.07134v2}.
+\end{itemize}
+\end{document}
