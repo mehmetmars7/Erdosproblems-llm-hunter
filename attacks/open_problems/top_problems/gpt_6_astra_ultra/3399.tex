@@ -1,0 +1,117 @@
+% TOP_PROBLEM: {"id": 3399, "title": "Complexity of square-root sum", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open", "problem_number": "OPG-467", "set_id": 12}
+% FIRST_POSTED: 2026-10-02
+% ATTEMPT_STATUS: unresolved
+% UnsolvedMath ID 3399; source catalogue code OPG-467
+% !TeX program = lualatex
+% GPT-6 Astra Ultra research attempt, 2026-10-02; independently checked partial work.
+% Completion estimate: no numerical percentage assigned; see final status and literature audit.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[BoldFont=lmroman10-bold.otf,
+ ItalicFont=lmroman10-italic.otf,BoldItalicFont=lmroman10-bolditalic.otf]
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\AtBeginDocument{\let\setminus\smallsetminus}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{Complexity of square-root sum}\label{3399}
+{\small UnsolvedMath ID 3399 · OPG-467 · Computer Science · OpenGarden}
+\subsection{Definitions and mathematical statement}
+The square-root-sum decision problem takes nonnegative integers
+$a_1,\ldots,a_n$ and a nonnegative integer threshold $k$, all encoded
+in binary. It asks whether the real-number inequality
+\[
+                            \sum_{i=1}^n\sqrt{a_i}\le k
+\]
+holds, where each square root is the nonnegative one. Input size is
+the total number of bits in the list and threshold. Equality is
+included among yes-instances. The problem is to determine the
+classical worst-case computational complexity of this language,
+in particular whether it lies in $\mathrm P$ or at least in
+$\mathrm{NP}$.
+
+Membership in $\mathrm P$ would mean a deterministic Turing machine
+deciding all instances in time polynomial in the input length.
+Membership in $\mathrm{NP}$ would mean that every yes-instance has
+a polynomial-length certificate verifiable in polynomial time, with
+no such certificate accepted on a no-instance.
+These are exact bit-complexity questions: arithmetic with arbitrary
+real numbers is not a unit-cost operation. Numerical approximations
+are useful only when accompanied by a separation or equality argument
+that guarantees the correct comparison within the claimed time.
+The number of summands varies with the input and is not fixed.
+Bounds polynomial in the values $a_i$ rather than their bit lengths
+do not constitute polynomial-time algorithms in this formulation.
+\subsection{Short English statement}
+How hard is it to decide exactly whether a sum of square roots of binary-encoded nonnegative integers is at most a given integer?
+\subsection{Research attempt}
+\paragraph{Scope and process.}
+GPT-6 Astra Ultra, 2 October 2026. The canonical formulation above is retained. This attempt uses a primary-source literature audit, independent restricted proofs, and adversarial checks. Reproved results are not claimed as new. Numerical tests below are reproducible in \texttt{scripts/check\_attempt\_batch03\_extremal\_2026\_10\_02.py}.
+
+\paragraph{Literature and chosen route.}
+Allender, Bürgisser, Kjeldgaard-Pedersen and Miltersen [S3] study the relation of exact numerical comparison to straight-line-program complexity. Eisenbrand, Haeberle and Singer [S4] improve separation estimates in a setting involving fixed radicands and a nonexplicit constant; this is not a uniform polynomial-time algorithm for the varying binary radicands here. We give an effective elementary separation algorithm, including equality, and account for the exponential dependence on the number of summands.
+
+\paragraph{A norm bound with explicit parameters.}
+Put $S=\sum_{i=1}^n\sqrt{a_i}$ and $\alpha=k-S$. Each square root is an algebraic integer, hence so is $\alpha$. In the multiquadratic number field
+\[
+ K=\mathbb Q(\sqrt{a_1},\ldots,\sqrt{a_n})
+\]
+the degree $D$ is at most $2^n$, since adjoining each root increases degree by at most two. Every embedding of $K$ sends each root to one of its two signs. Define the computable integer
+\[
+ B=\max\left(1,k+\sum_i\lceil\sqrt{a_i}\rceil\right).
+\]
+Every conjugate of $\alpha$ has absolute value at most $B$. If $\alpha\ne0$, its field norm is a nonzero rational integer: the norm of an algebraic integer is integral, and no field embedding sends a nonzero element to zero. Isolating the identity embedding in the product gives
+\[
+ 1\le|N_{K/\mathbb Q}(\alpha)|\le|\alpha|B^{D-1},
+ \qquad |\alpha|\ge B^{-(2^n-1)}.
+\]
+No factorization of the radicands or enumeration of consistent sign choices is needed to use this coarse bound.
+
+\paragraph{Turning separation into an exact decision.}
+Let $C\ge1$ be the binary bit length of $B$, put $q=C(2^n-1)$, and choose
+\[
+ p=q+\lceil\log_2(n+1)\rceil+2.
+\]
+The preceding nonzero lower bound is at least $\delta=2^{-q}$. Compute
+\[
+ u_i=\left\lfloor\sqrt{a_i2^{2p}}\right\rfloor,
+ \quad A=\sum_i u_i,
+ \quad I=[A2^{-p},(A+n)2^{-p}].
+\]
+Integer square roots are computable exactly, for example by binary search. The interval contains $S$ and has width $n2^{-p}<\delta$. If its lower endpoint exceeds $k$, answer no. If its upper endpoint is at most $k$, answer yes. In the remaining case $k$ lies in the interval, so $|k-S|<\delta$; the norm bound forces $k=S$, and the answer is again yes. Thus equality is certified by separation, not silently rounded away. If $n=0$, the empty sum is zero and the answer is immediate.
+
+The required precision is $p=O(2^n(L+\log(n+1)))$, where $L$ is total input length. All subsequent integer arithmetic is polynomial in $p+L$. This establishes a $2^{O(n)}\operatorname{poly}(L)$ algorithm and, in particular, polynomial time when the number of summands is fixed. It does not establish polynomial time for variable $n$, because the precision itself can be exponential in input length.
+
+\paragraph{A separate exact small case.}
+For two summands write $d=k^2-a-b$. Since $k$ is nonnegative,
+\[
+ \sqrt a+\sqrt b\le k
+ \quad\Longleftrightarrow\quad d\ge0\ \text{ and }\ d^2\ge4ab.
+\]
+The first squaring gives $2\sqrt{ab}\le d$. Requiring $d\ge0$ before the second squaring makes that step reversible. Omitting the sign test would create false positives. The formula handles zero radicands and equality and is polynomial in the binary input length.
+
+\paragraph{Verification and first gap.}
+The script compares the interval algorithm with the exact two-summand criterion on small integer triples, and checks perfect-square lists where equality is known by integer addition. The field degree bound allows repeated or dependent radicands, so it never assumes that all $2^n$ sign patterns are actual embeddings. Sharper instance-specific degree information can reduce work but does not provide a uniform polynomial precision guarantee. Establishing such a guarantee or a different polynomial certificate scheme is the missing step; this exponential-precision calculation supplies neither NP membership nor a hardness lower bound.
+
+\paragraph{Final status.}
+An effective exact algorithm and fixed-number-of-summands polynomial bound are proved. The catalogue's variable-length P and NP questions are \textbf{UNRESOLVED} by this attempt.
+
+\subsection{Sources}
+\begin{itemize}
+\item[S1] ULAM.AI and the UnsolvedMath Contributors, supplied problems.json, record 3399 (OPG-467), OpenGarden collection. Catalogue identity and source transcription; CC BY 4.0.
+\url{https://huggingface.co/datasets/ulamai/UnsolvedMath}.
+\item[S2] Open Problem Garden, Complexity of square-root sum. Original problem and discussion; the mathematical formulation below is expanded from the supplied source record.
+\url{http://www.openproblemgarden.org/op/complexity_of_square_root_sum}.
+\item[S3] E. Allender, P. Bürgisser, J. Kjeldgaard-Pedersen and P. B. Miltersen, On the Complexity of Numerical Analysis, ECCC TR05-037, revision 6 December 2005; SIAM Journal on Computing 38 (2009), 1987--2006.
+\url{https://eccc.weizmann.ac.il/report/2005/037/}.
+\item[S4] F. Eisenbrand, M. Haeberle and N. Singer, An improved bound on sums of square roots via the subspace theorem, arXiv:2312.02057 (2023), SoCG 2024. The radicand-dependent constant is nonexplicit.
+\url{https://arxiv.org/abs/2312.02057}.
+\end{itemize}
+\end{document}

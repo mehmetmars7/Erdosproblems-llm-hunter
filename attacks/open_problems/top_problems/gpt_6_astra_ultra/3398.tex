@@ -1,0 +1,151 @@
+% TOP_PROBLEM: {"id": 3398, "title": "Subset-sums equality (pigeonhole version)", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open", "problem_number": "OPG-163", "set_id": 12}
+% FIRST_POSTED: 2026-10-02
+% ATTEMPT_STATUS: unresolved
+% UnsolvedMath ID 3398; source catalogue code OPG-163
+% !TeX program = lualatex
+% GPT-6 Astra Ultra research attempt; independently checked partial work, 2026-10-02.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{lmroman10-regular.otf}[BoldFont=lmroman10-bold.otf,
+ ItalicFont=lmroman10-italic.otf,BoldItalicFont=lmroman10-bolditalic.otf]
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{unicode-math}
+\setmathfont{latinmodern-math.otf}
+\AtBeginDocument{\let\setminus\smallsetminus}
+\usepackage{xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\section*{Subset-sums equality (pigeonhole version)}\label{3398}
+{\small UnsolvedMath ID 3398 · OPG-163 · Computer Science · OpenGarden}
+\subsection{Definitions and mathematical statement}
+The input consists of positive integers $a_1,\ldots,a_n$ written in
+binary, with the promise
+$S=\sum_i a_i<2^n-1$. For each index set $I\subseteq[n]$, its subset
+sum is $s(I)=\sum_{i\in I}a_i$, with $s(\varnothing)=0$.
+There are $2^n$ subsets but only $S+1<2^n$ possible integer sums,
+so two distinct subsets necessarily have the same sum.
+
+The search problem is to output distinct index sets $I,J$ such that
+\[
+                         \sum_{i\in I}a_i=\sum_{j\in J}a_j.
+\]
+Equivalently one may require both sets to be nonempty and disjoint:
+remove their common indices, and positivity ensures that neither
+remaining side is empty. Is there one deterministic algorithm that
+always finds such a pair on promised inputs in time polynomial in
+the total input bit length?
+
+The promise implies each $a_i<2^n$, so total bit length is at most
+quadratic in $n$; polynomial time in either size convention is
+equivalent on the promised domain. Equal values at different indices
+are permitted. Merely deciding existence gives no search solution,
+since the promise already makes that answer yes. Approximate
+equality or a running time polynomial in $S$ does not meet the
+exact polynomial-bit-time target.
+\subsection{Short English statement}
+Can equal sums from two different subsets be found in polynomial time whenever a simple counting bound guarantees their existence?
+\subsection{Research attempt: exact collision dynamic programming and bit complexity}
+\paragraph{Scope and literature check.}
+GPT-6 Astra Ultra, 2 October 2026. Values are positive binary integers,
+indices distinguish equal input values, and the goal is a deterministic
+algorithm polynomial in input bit length. Jin and Wu [S3] give faster
+exponential algorithms for this pigeonhole equal-sums search problem.
+The author publication list [S4] records a 2026 follow-up with
+subexponential and lower-bound results; that listing alone is not a
+proof of a polynomial algorithm for the full promise here. The work
+below gives an exact deterministic search procedure and carefully
+isolates the numeric-size dependence that prevents it from answering
+the general question.
+
+\paragraph{1. Detecting the first collision, with witnesses.}
+Maintain a table mapping each attainable sum to one subset of the
+indices processed so far, represented by a bit mask. Initially the
+only entry is $0\mapsto\varnothing$. Before processing $a_i$, take
+a snapshot of the current table. For each old entry $s\mapsto I$,
+the new subset $I\cup\{i\}$ has sum $t=s+a_i$. If $t$ is already
+an old attainable sum with witness $J$, output these two subsets.
+They are different because one contains $i$ and the other does not.
+If there is no such intersection, retain all old entries and add
+the shifted entries. Two shifted entries cannot collide with each
+other, since addition of the same integer preserves distinct sums.
+
+Inductively, before the first collision every subset of the processed
+prefix has a distinct table entry and the table size doubles at
+each step. If the procedure finished all $n$ steps without collision,
+it would contain $2^n$ different integers between zero and $S$,
+contrary to the promise $S+1<2^n$. Thus the procedure always returns
+an exact equal-sum pair on promised inputs. Removing their common
+indices gives disjoint witnesses of equal sum; positivity implies
+both remaining sides are nonempty.
+
+\paragraph{2. What running time is actually proved.}
+All table keys lie in $[0,S]$. A direct array implementation with
+snapshots takes $O(n(S+1))$ arithmetic and table operations. Keys
+have $O(\log(S+1))$ bits and witnesses have $n$ bits, giving the
+conservative bit bound
+\[
+ O\bigl(n(S+1)(n+\log(S+1))\bigr)
+\]
+and space $O((S+1)(n+\log(S+1)))$. Consequently this is a polynomial
+algorithm on any subclass with $S\le n^C$ for a fixed constant $C$.
+It is only pseudo-polynomial on the full input class.
+
+The promise does not make $S$ polynomially bounded. For $n\ge3$,
+take the $n-1$ powers $1,2,\ldots,2^{n-2}$ and append
+$2^{n-2}-1$. Their total is $3\cdot2^{n-2}-2<2^n-1$ but grows
+exponentially in $n$. They have an easy collision: the last entry
+equals the sum of the first $n-2$ entries. This family is not a
+hardness proof. It shows that the stated worst-case dynamic-programming
+bound cannot be called polynomial merely by invoking the promise.
+
+\paragraph{3. Why a first failure of superincreasing growth is insufficient.}
+If an ordered sequence satisfies
+$a_i>\sum_{j<i}a_j$ at every step, including $a_1>0$, its prefix
+totals obey $S_i\ge2S_{i-1}+1$. Thus $S_n\ge2^n-1$.
+The promised input cannot be superincreasing. But the first violation
+need not itself identify a collision. The increasing promised input
+\[
+                         (3,5,6,7,8)
+\]
+has total $29<31$. Its first violation occurs at six, since
+$6\le3+5$, yet the prefix $(3,5,6)$ has the eight distinct subset
+sums $0,3,5,6,8,9,11,14$. Overlap of the numeric ranges of two
+families of sums does not imply overlap of the discrete families.
+The dynamic program handles this gap by retaining all attainable
+values, precisely the expensive part that still needs replacement.
+
+\paragraph{4. Modular compression also needs a certificate.}
+A collision modulo a small modulus need not be an integer collision.
+For example, $(1,2,3,4)$ satisfies the promise, but the singleton
+sums one and four agree modulo three and are unequal as integers.
+Using a modulus greater than $S$ would make congruence of attainable
+sums imply equality, but restoring that many possible residues
+reintroduces the same numeric-size dependence. Several small moduli
+may filter candidates, yet no bound is proved here ensuring an exact
+collision after polynomially many candidate checks.
+
+\paragraph{Verification, first gap and final status.}
+The script [S9] runs the witness-producing algorithm on all
+promised positive vectors of length at most five with entries at
+most six, and on the displayed exponential-total family. It checks
+nonempty disjoint witnesses and exact integer equality. The first
+remaining gap is reducing the number of stored or examined sums
+to polynomial input size without losing a guaranteed collision.
+Full promised search problem: UNRESOLVED; the bounded-total subclass
+is solved by the explicitly analysed algorithm.
+\subsection{Sources}
+\begin{itemize}
+\item[S1] ULAM.AI and the UnsolvedMath Contributors, supplied problems.json, record 3398 (OPG-163), OpenGarden collection. Catalogue identity and source transcription; CC BY 4.0.
+\url{https://huggingface.co/datasets/ulamai/UnsolvedMath}.
+\item[S2] Open Problem Garden, Subset-sums equality (pigeonhole version). Original problem and discussion; the mathematical formulation below is expanded from the supplied source record.
+\url{http://www.openproblemgarden.org/op/theoretical_computer_science/subset_sums_equality}.
+\item[S3] Ce Jin and Hongxun Wu, \emph{A Faster Algorithm for Pigeonhole Equal Sums}, ICALP 2024. \url{https://arxiv.org/abs/2403.19117}.
+\item[S4] Deepak Bhati, Pranjal Dutta, Antoine Joux, Mahesh Sreekumar Rajasree and Karol W\k egrzycki, \emph{Pigeonhole Equal Subset Sum: Subexponential Algorithm, Tight Lower Bounds, and Average-Case Analysis}, listed for FOCS 2026 on an author's publication page, accessed 2 October 2026. \url{https://mahe94.github.io/publications/}.
+\item[S9] GPT-6 Astra Ultra, exact finite checks accompanying this attempt (2 October 2026). Repository script, Python standard library only. \texttt{scripts/check\_attempt\_batch03\_digraphs\_2026\_10\_02.py}.
+\end{itemize}
+\end{document}
