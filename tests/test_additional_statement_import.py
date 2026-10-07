@@ -114,6 +114,17 @@ class AdditionalStatementImportTests(unittest.TestCase):
         return {str(path.relative_to(self.folder)): path.read_bytes()
                 for path in self.folder.rglob('*') if path.is_file()}
 
+    def test_escaped_catalogue_code_preserves_identity_and_valid_tex(self):
+        row = dict(self.rows[19], problem_number='AIM_NUMBER_THEORY-0001')
+        self.rows[19] = row
+        self.registry.write_text(json.dumps(list(self.rows.values())), encoding='utf-8')
+        code = row['problem_number']
+        escaped = code.replace('_', r'\_')
+        prose = section(row).replace(f'record 19 ({code})', f'record 19 ({escaped})')
+        plan = self.prepare(self.source(prose))
+        self.assertIn(f'record 19 ({escaped})', plan['documents'][19])
+        self.assertEqual(plan['records'][-1]['problem_number'], code)
+
     def test_late_identity_mismatches_abort_without_writes(self):
         valid = section(self.rows[28])
         mismatches = [

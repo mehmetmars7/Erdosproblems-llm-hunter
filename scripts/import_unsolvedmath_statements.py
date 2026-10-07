@@ -81,7 +81,8 @@ def prepare_import(source, registry_path, catalog_dir, export_dir):
         visible = re.search(r'UnsolvedMath ID (\d+) · ([^}\n]+)\}', section)
         if not visible or int(visible[1]) != problem_id or visible[2] != record['category']['display_name']:
             raise ValueError(f'Visible ID/category mismatch for {problem_id}')
-        if f'record {problem_id} ({code})' not in section:
+        attribution_codes = (code, code.replace('_', r'\_'))
+        if not any(f'record {problem_id} ({value})' in section for value in attribution_codes):
             raise ValueError(f'Source attribution disagrees with ID {problem_id}')
         titles = []
         replace_tex_command(section, 'section', 1, lambda title: titles.append(title) or '')

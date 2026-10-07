@@ -74,6 +74,72 @@ wrapper differs. A changed section never overwrites an existing attempt: pass
 sections in the same import fail before any files are written. After building,
 check both the problem statement and the model attempt on the detail page.
 
+### OpenAI external-claim records
+
+Use `attacks/open_problems/top_problems/openai/<id>.tex` for summaries of
+claims in [openai/math](https://github.com/openai/math). Preserve the exact
+`TOP_PROBLEM` identity from the numbered definition. Records carry
+`FIRST_POSTED`, `ATTEMPT_STATUS`, and a strict `OPENAI_CLAIM` JSON header,
+with the pinned source commit, paper-level scope, result classification,
+and manuscript and formalization paths from `lists/openai_math/manifest.json`.
+The build rejects inconsistent statuses, unknown paths, and invalid metadata.
+
+Match the paper's main theorem to the complete problem statement, including
+quantifiers, hypotheses, parameters, and bundled questions. Only full or stronger
+matches use `ATTEMPT_STATUS: solved`; partial matches remain unresolved.
+A separate reviewer must check every proposed full or stronger match without
+seeing the first verdict, and the user must confirm the proposed solved labels
+before importing records. Scope review does not verify the proof itself:
+`independently_reviewed` remains false. Never change the catalogue source status,
+existing GPT attempts, reviews, numerical IDs, or existing display positions.
+
+The generator `scripts/import_openai_math.py` reads the pinned inventory and
+approved adjudication plus per-ID summary sections. Validate with its dry-run
+mode first. Repeating identical input is safe; changed records require
+`--version N`. Its `--diff` mode compares a later source revision without
+changing existing records. Keep downloaded OpenAI PDFs, TeX, Lean code, full
+inventories, and adjudication reports outside this repository.
+
+Rebuild the source inventory and candidate packets with the research tools below.
+The inventory needs PyYAML and candidate retrieval needs scikit-learn; install
+these optional dependencies in a separate research environment. They are not
+required for the site build. The OpenAI checkout must already be at the manifest's
+exact commit, and the full registry is separate from the site's smaller registry.
+
+```sh
+python3 scripts/inventory_openai_math.py \
+  --repo /path/to/openai-math-checkout \
+  --output /path/to/local-research \
+  --manifest lists/openai_math/manifest.json
+python3 scripts/match_openai_math_candidates.py \
+  --local /path/to/local-research \
+  --site . \
+  --registry /path/to/full-unsolvedmath/problems.json
+```
+
+Adjust the external paths for your workspace. Candidate scores identify pairs
+to inspect; they never authorize a solved label.
+
+Write the claim, argument outline, scope comparison, formal-verification scope,
+and status caveat in original prose. Link each paper's GitHub PDF page, direct
+PDF download, README citation page, and latest version. Include pinned Lean
+scope, Comparator files, and reasoning summaries where available. The no-copy
+8-gram check must pass. This site does not run linked Lean code, and a scope
+document must not be described as verification beyond its stated coverage.
+
+For a genuinely new target or a distinct subcase, first compare the precise
+statement with the full local UnsolvedMath registry and check its original
+sources. Preserve an existing identity whenever it already describes that target.
+New local identities must exceed both every existing ID and `id_registry.json`'s
+watermark. `scripts/allocate_openai_problem_ids.py` makes a deterministic
+allocation report from identity-reviewed proposals; `--reserve` advances the
+local watermark under a lock. It does not approve claims or write pages. New
+records use `LOCAL-<id>` and `published: false`, and a subcase records its parent
+identities without changing the parent's scope or claim. Newly formulated local
+targets use adjudication pool C and require the same independent scope review
+and solved-label confirmation as existing records. Keep allocation reports and
+full local registries outside the site repository.
+
 ### For the MathOverflow Subset
 
 1. **File Location**: Place your TeX file in `attacks/open_problems/mo/<MODEL_NAME>/`.

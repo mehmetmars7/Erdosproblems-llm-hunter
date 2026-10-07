@@ -60,3 +60,15 @@ provenance, and rights information, including any `NEEDS_REVIEW` or other rights
 notes. The portable catalogue is a metadata subset, not a complete copy of all
 upstream provenance fields. Preserve the relevant notices, source-specific
 terms, and indications of previous changes when reusing the underlying material.
+
+## OpenAI mathematical research
+
+External-claim records link to [openai/math](https://github.com/openai/math),
+published by OpenAI under [Apache License 2.0](https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/LICENSE).
+The `lean/` tree has its own Apache-2.0 notice. Manuscripts, proof text,
+PDFs, and Lean sources are linked at a pinned commit and are not vendored here.
+The committed manifest contains titles and paths for provenance and link checks.
+Our claim summaries and argument outlines are original prose. Catalogue
+attribution and source-specific licences continue to apply to problem statements.
+An OpenAI tag indicates the source of a claim, not endorsement or independent
+verification of its mathematics.

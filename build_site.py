@@ -26,6 +26,8 @@ ERDOS_STATUS_PATH = LISTS_DIR / "erdos_status.json"
 OPEN_PROBLEMS_PATH = ATTACKS_DIR / "open_problems" / "top_problems"
 UNSOLVEDMATH_PATH = LISTS_DIR / "unsolvedmath" / "problems.json"
 DISPLAY_ORDER_PATH = LISTS_DIR / "unsolvedmath" / "display_order.json"
+OPENAI_MANIFEST_PATH = LISTS_DIR / "openai_math" / "manifest.json"
+OPENAI_SOURCE_REPO = 'https://github.com/openai/math'
 # Tao's database includes independence results in its total solved count.
 RESOLVED_ERDOS_STATUSES = {'proved', 'disproved', 'solved', 'independent'}
 # Requested display rule for the Erdos LLM Claim column. This deliberately
@@ -281,6 +283,212 @@ def declared_attempt_status(content):
     return next(iter(statuses), None)
 
 
+def load_openai_manifest():
+    """Read the committed path inventory; validating claims requires no network."""
+    try:
+        manifest = json.loads(OPENAI_MANIFEST_PATH.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError('Cannot read OpenAI manifest') from exc
+    return manifest
+
+
+def parse_openai_claim(content, manifest=None):
+    """Validate a pinned external claim before giving it a solved label.
+
+    The catalogue remains the source of mathematical status. These headers
+    describe OpenAI's unreviewed claim and the scope of our statement match.
+    Paths must belong to the claimed family and manuscript, not just exist in
+    the same upstream repository.
+    """
+    markers = re.findall(r'^[ \t]*%[ \t]*OPENAI_CLAIM:[^\r\n]*', content,
+                         re.MULTILINE)
+    if not markers:
+        return None, content
+    if len(markers) != 1:
+        raise ValueError('Duplicate OPENAI_CLAIM declarations')
+
+    lines = content.splitlines(keepends=True)
+    header_keys = ('TOP_PROBLEM', 'FIRST_POSTED', 'ATTEMPT_STATUS', 'OPENAI_CLAIM')
+    headers = {}
+    for index, key in enumerate(header_keys):
+        marker = re.fullmatch(r'% ' + key + r': ([^\r\n]+)\r?\n?',
+                              lines[index] if len(lines) > index else '')
+        if not marker:
+            raise ValueError(f'OPENAI_CLAIM requires ordered {key} header')
+        headers[key] = marker[1]
+        if len(re.findall(r'^[ \t]*%[ \t]*' + key + r':', content,
+                          re.MULTILINE)) != 1:
+            raise ValueError(f'Duplicate {key} in OPENAI_CLAIM record')
+    if re.search(r'^[ \t]*%[ \t]*(?:ENTRY_KIND|COLLECTION_METADATA):', content,
+                 re.MULTILINE):
+        raise ValueError('OPENAI_CLAIM cannot also declare collection metadata or ENTRY_KIND')
+    try:
+        problem_header = json.loads(headers['TOP_PROBLEM'])
+        metadata = json.loads(headers['OPENAI_CLAIM'])
+    except json.JSONDecodeError as exc:
+        raise ValueError('Invalid OPENAI_CLAIM JSON or TOP_PROBLEM JSON') from exc
+    if not isinstance(problem_header, dict) or type(problem_header.get('id')) is not int \
+            or problem_header['id'] < 1:
+        raise ValueError('OPENAI_CLAIM requires a canonical TOP_PROBLEM ID')
+
+    def object_fields(value, keys, label):
+        if not isinstance(value, dict) or set(value) != set(keys):
+            raise ValueError(f'Invalid OPENAI_CLAIM {label} fields')
+
+    def text_field(value, label):
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f'Invalid OPENAI_CLAIM {label}')
+        return value
+
+    def date_field(value, label):
+        text_field(value, label)
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', value):
+            raise ValueError(f'Invalid OPENAI_CLAIM {label}')
+        try:
+            datetime.strptime(value, '%Y-%m-%d')
+        except ValueError as exc:
+            raise ValueError(f'Invalid OPENAI_CLAIM {label}') from exc
+
+    def string_list(value, label, nonempty=False):
+        if not isinstance(value, list) or (nonempty and not value):
+            raise ValueError(f'Invalid OPENAI_CLAIM {label}')
+        for item in value:
+            text_field(item, label)
+        if len(set(value)) != len(value):
+            raise ValueError(f'Duplicate OPENAI_CLAIM {label}')
+
+    object_fields(metadata, ('schema_version', 'source_repo', 'source_commit',
+                             'release_date', 'match', 'resolution',
+                             'independently_reviewed', 'second_pass', 'families'), 'metadata')
+    if type(metadata['schema_version']) is not int or metadata['schema_version'] != 1:
+        raise ValueError('Unsupported OPENAI_CLAIM schema_version')
+    if metadata['source_repo'] != OPENAI_SOURCE_REPO:
+        raise ValueError('Invalid OPENAI_CLAIM source_repo')
+    if metadata['independently_reviewed'] is not False:
+        raise ValueError('OPENAI_CLAIM must explicitly be independently_reviewed: false')
+    if metadata['match'] not in ('full', 'stronger', 'partial'):
+        raise ValueError('Invalid OPENAI_CLAIM match')
+    solved = metadata['match'] in {'full', 'stronger'}
+    if metadata['resolution'] not in (('proved', 'disproved') if solved else ('partial',)):
+        raise ValueError('Invalid OPENAI_CLAIM resolution for match')
+    if metadata['second_pass'] != ('agreed' if solved else 'n/a'):
+        raise ValueError('Invalid OPENAI_CLAIM second_pass for match')
+    if headers['ATTEMPT_STATUS'] != ('solved' if solved else 'unresolved'):
+        raise ValueError('OPENAI_CLAIM match conflicts with ATTEMPT_STATUS')
+    date_field(metadata['release_date'], 'release_date')
+    if headers['FIRST_POSTED'] != metadata['release_date']:
+        raise ValueError('OPENAI_CLAIM release_date conflicts with FIRST_POSTED')
+
+    if manifest is None:
+        manifest = load_openai_manifest()
+    if not isinstance(manifest, dict) or type(manifest.get('schema_version')) is not int \
+            or manifest.get('schema_version') != 1 \
+            or manifest.get('source_repo') != OPENAI_SOURCE_REPO \
+            or not isinstance(manifest.get('families'), list):
+        raise ValueError('Invalid OpenAI manifest')
+    source_commit = manifest.get('source_commit')
+    if not isinstance(source_commit, str) or not re.fullmatch(r'[0-9a-f]{40}', source_commit) \
+            or metadata['source_commit'] != source_commit:
+        raise ValueError('OPENAI_CLAIM source_commit does not match manifest')
+    eligible = manifest.get('eligible_paths')
+    string_list(eligible, 'manifest eligible_paths', nonempty=True)
+    eligible = set(eligible)
+
+    def checked_path(value, label):
+        text_field(value, label)
+        if value.startswith('/') or '\\' in value \
+                or any(part in {'', '.', '..'} for part in value.split('/')) \
+                or value not in eligible:
+            raise ValueError(f'OPENAI_CLAIM {label} path missing from manifest: {value!r}')
+
+    family_map = {}
+    for family in manifest['families']:
+        if not isinstance(family, dict) or not isinstance(family.get('family'), str) \
+                or family['family'] in family_map:
+            raise ValueError('Invalid OpenAI manifest family')
+        family_map[family['family']] = family
+    families = metadata['families']
+    if not isinstance(families, list) or not families:
+        raise ValueError('OPENAI_CLAIM requires families')
+    seen_families, seen_papers = set(), set()
+    for family in families:
+        object_fields(family, ('family', 'title', 'subject', 'manuscripts', 'lean',
+                              'reasoning_trace'), 'family')
+        number = family['family']
+        if not isinstance(number, str) or not re.fullmatch(r'\d{3}', number) \
+                or number not in family_map or number in seen_families:
+            raise ValueError('Invalid or duplicate OPENAI_CLAIM family')
+        seen_families.add(number)
+        inventoried = family_map[number]
+        for key in ('title', 'subject'):
+            text_field(family[key], key)
+            if family[key] != inventoried.get(key):
+                raise ValueError(f'OPENAI_CLAIM family {key} does not match manifest')
+        if family['reasoning_trace'] != inventoried.get('reasoning_trace'):
+            raise ValueError('OPENAI_CLAIM reasoning_trace does not match manifest family')
+        if family['reasoning_trace'] is not None:
+            checked_path(family['reasoning_trace'], 'reasoning_trace')
+        papers = family['manuscripts']
+        if not isinstance(papers, list) or not papers:
+            raise ValueError('OPENAI_CLAIM family requires manuscripts')
+        inventory_papers = inventoried.get('manuscripts')
+        if not isinstance(inventory_papers, list):
+            raise ValueError('Invalid OpenAI manifest manuscripts')
+        paper_map = {}
+        for paper in inventory_papers:
+            if not isinstance(paper, dict) or not isinstance(paper.get('pdf_path'), str) \
+                    or paper['pdf_path'] in paper_map:
+                raise ValueError('Invalid OpenAI manifest manuscript')
+            paper_map[paper['pdf_path']] = paper
+        for paper in papers:
+            object_fields(paper, ('title', 'pdf_path', 'readme_path', 'date',
+                                 'theorem_ref'), 'manuscript')
+            checked_path(paper['pdf_path'], 'pdf_path')
+            checked_path(paper['readme_path'], 'readme_path')
+            if paper['pdf_path'] not in paper_map or paper['pdf_path'] in seen_papers:
+                raise ValueError('OPENAI_CLAIM manuscript does not belong to its manifest family')
+            seen_papers.add(paper['pdf_path'])
+            for key in ('title', 'readme_path', 'date'):
+                if paper[key] != paper_map[paper['pdf_path']].get(key):
+                    raise ValueError(f'OPENAI_CLAIM manuscript {key} does not match manifest')
+            date_field(paper['date'], 'manuscript date')
+            text_field(paper['title'], 'manuscript title')
+            text_field(paper['theorem_ref'], 'theorem_ref')
+        lean = family['lean']
+        if inventoried.get('lean_doc') is None:
+            if lean is not None:
+                raise ValueError('OPENAI_CLAIM Lean scope absent from manifest family')
+        else:
+            object_fields(lean, ('doc_path', 'comparators', 'declarations',
+                                 'covers_main_theorem'), 'lean')
+            checked_path(lean['doc_path'], 'lean doc_path')
+            if lean['doc_path'] != inventoried['lean_doc']:
+                raise ValueError('OPENAI_CLAIM Lean scope does not match manifest family')
+            if lean['covers_main_theorem'] is not None \
+                    and type(lean['covers_main_theorem']) is not bool:
+                raise ValueError('Invalid OPENAI_CLAIM covers_main_theorem')
+            string_list(lean['comparators'], 'comparators')
+            string_list(lean['declarations'], 'declarations')
+            allowed_comparators = {
+                comparator[key]
+                for paper in papers
+                for comparator in paper_map[paper['pdf_path']].get('comparators', [])
+                for key in ('json', 'lean') if comparator.get(key)
+            }
+            for path in lean['comparators']:
+                checked_path(path, 'comparator')
+                if path not in allowed_comparators:
+                    raise ValueError('OPENAI_CLAIM comparator does not match selected manuscript in manifest family')
+            allowed_declarations = set()
+            for paper in papers:
+                for comparator in paper_map[paper['pdf_path']].get('comparators', []):
+                    declaration = comparator.get('declaration') or []
+                    allowed_declarations.update([declaration] if isinstance(declaration, str) else declaration)
+            if not set(lean['declarations']).issubset(allowed_declarations):
+                raise ValueError('OPENAI_CLAIM declaration does not match selected manuscript')
+    return metadata, ''.join(lines[4:])
+
+
 def infer_attempt_status(content):
     """Keep explicit partial submissions out of the legacy solved fallback.
 
@@ -310,8 +518,13 @@ def infer_attempt_status(content):
     return 'unresolved' if partial else 'solved'
 
 
-def parse_attack(content, model_name, date_posted=None):
+def parse_attack(content, model_name, date_posted=None, *, metadata_content=None,
+                 openai_manifest=None):
     """Parse an attack TeX file and extract structured data."""
+    original = content if metadata_content is None else metadata_content
+    openai, body = parse_openai_claim(original, openai_manifest)
+    if openai and original == content:
+        content = body
     provenance, content = parse_collection_metadata(content)
     # Look for section markers
     sections = {}
@@ -349,6 +562,11 @@ def parse_attack(content, model_name, date_posted=None):
             # Other included versions may quote incompatible estimates. Only
             # the attributed primary source supplies this record's estimate.
             completion = provenance.get('source_completion')
+    if openai:
+        model_name = 'OpenAI'
+        status = 'solved' if openai['match'] in {'full', 'stronger'} else 'unresolved'
+        completion = 100 if status == 'solved' else None
+        date_posted = openai['release_date']
 
     attack_data = {
         'model': model_name,
@@ -360,6 +578,8 @@ def parse_attack(content, model_name, date_posted=None):
     if provenance:
         attack_data['provenance'] = current_collection_provenance(provenance)
         attack_data['entry_kind'] = provenance['kind']
+    if openai:
+        attack_data.update(entry_kind='external_claim', claimant='OpenAI', openai=openai)
 
     if completion is not None:
         attack_data['completion'] = completion
@@ -881,6 +1101,12 @@ def summarize_open_problem_attempts(problem):
         attack.get('model', ''), attack.get('version', 1), attack.get('file_path', '')
     ))
     attempts = [a for a in problem['attacks'] if a.get('entry_kind') != 'statement_only']
+    openai_claims = [a for a in attempts if a.get('entry_kind') == 'external_claim'
+                    and a.get('claimant') == 'OpenAI']
+    solved_openai = any(a['openai']['match'] in {'full', 'stronger'} for a in openai_claims)
+    if openai_claims:
+        problem['tags'] = list(dict.fromkeys([*problem.get('tags', []), 'openai']))
+        problem['openai_claim'] = 'solved' if solved_openai else 'partial'
     problem['llm_status'] = (
         'none' if not attempts else
         'unresolved' if any(a.get('status') == 'unresolved' for a in attempts) else 'solved'
@@ -891,6 +1117,11 @@ def summarize_open_problem_attempts(problem):
     if completions:
         problem['completion'] = max(completions)
         problem['completion_source'] = 'llm'
+    if solved_openai:
+        problem['llm_status'] = 'solved'
+        problem['llm_status_source'] = 'openai_claim'
+        problem['completion'] = 100
+        problem['completion_source'] = 'openai_claim'
 
 
 def build_open_problems_data(mo_problems=None, snapshot=None):
@@ -936,6 +1167,7 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
             problems[problem_id]['attacks'].append(notebook)
 
     attacks_dir = ATTACKS_DIR / 'open_problems'
+    openai_manifest = None
     if attacks_dir.exists():
         model_dirs = []
         for model_dir in sorted(attacks_dir.iterdir()):
@@ -958,11 +1190,26 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                         'Use a canonical UnsolvedMath ID in top_problems/<model>/<id>.tex.'
                     )
                 content = read_tex_file(tex_file)
+                has_openai_header = re.search(r'^[ \t]*%[ \t]*OPENAI_CLAIM:', content,
+                                               re.MULTILINE) is not None
+                if model_dir.name == 'openai' or has_openai_header:
+                    if not numbered or model_dir.name != 'openai' or not has_openai_header:
+                        raise ValueError(f'OpenAI records require top_problems/openai and OPENAI_CLAIM: {tex_file}')
+                    if openai_manifest is None:
+                        openai_manifest = load_openai_manifest()
                 header = re.search(r'^% TOP_PROBLEM: (.+)$', content, re.MULTILINE)
                 if header:
                     metadata = json.loads(header[1])
                     if type(metadata.get('id')) is not int or str(metadata['id']) != problem_id:
                         raise ValueError(f'Attempt filename must match its canonical ID: {tex_file}')
+                    if has_openai_header:
+                        definition_path = numbered_dir / 'definitions' / f'{problem_id}.tex'
+                        if not definition_path.is_file():
+                            raise ValueError(f'Missing definition for OpenAI record: {tex_file}')
+                        definition_header = re.match(r'% TOP_PROBLEM: ([^\r\n]+)',
+                                                     read_tex_file(definition_path))
+                        if not definition_header or metadata != json.loads(definition_header[1]):
+                            raise ValueError(f'OpenAI TOP_PROBLEM must match its definition metadata: {tex_file}')
                 raw = content
                 if numbered and r'\subsection{Definitions and mathematical statement}' in content:
                     raw = parse_numbered_problem_tex(content, require_source_urls=False)['documentTeX']
@@ -975,7 +1222,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                         datetime.strptime(posted_date, '%Y-%m-%d')
                 else:
                     posted_date = get_file_date(tex_file)
-                parsed = parse_attack(raw, model_dir.name.replace('_', ' '), posted_date)
+                parsed = parse_attack(raw, model_dir.name.replace('_', ' '), posted_date,
+                                      metadata_content=content, openai_manifest=openai_manifest)
                 # Numbered documents lose comments during display conversion;
                 # read their declaration from the original source as well.
                 declared_status = declared_attempt_status(content)

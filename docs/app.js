@@ -115,7 +115,9 @@ function getAttemptClaim(attack) {
 }
 
 function getOverallClaim(attacks) {
-    const claims = getMathematicalAttempts(attacks).map(getAttemptClaim);
+    const attempts = getMathematicalAttempts(attacks);
+    if (attempts.some(isSolvedOpenAIClaim)) return 'solved';
+    const claims = attempts.map(getAttemptClaim);
     if (!claims.length) return 'none';
     if (claims.includes('unresolved')) return 'unresolved';
     return claims.every(claim => claim === 'solved') ? 'solved' : 'not stated';
@@ -133,6 +135,7 @@ function getUniqueModels(attacks) {
 
 function getModelLabels(attacks) {
     const shorten = name => {
+        if (/^openai$/i.test(name)) return 'openai';
         if (/gpt[ _]6[ _]astra[ _]ultra/i.test(name)) {
             return name.includes('(collection)') ? 'gpt 6 (collection)' : 'gpt 6';
         }
@@ -253,11 +256,15 @@ function filterOpenProblems(problems, filters = {}) {
     return Object.values(problems).filter(problem => {
         if (filters.source && getOpenProblemCollection(problem) !== filters.source) return false;
         if (filters.domain && !domainAliases.includes(problem.domain)) return false;
+        if (filters.tag && !(problem.tags || []).includes(filters.tag)) return false;
         if (filters.withAttempts && !getMathematicalAttempts(problem.attacks).length) return false;
         if (!search) return true;
         const sourceText = (problem.sources || []).map(source => `${source.citation || ''} ${source.url || ''}`).join(' ');
+        const familyTitles = (problem.attacks || []).flatMap(attack =>
+            (attack.openai?.families || []).map(family => family.title || ''));
         return [problem.id, problem.problem_number, problem.mo_id, problem.rank, problem.title, problem.exact_target,
-            problem.definition_tex, problem.domain_label, ...(problem.aliases || []), sourceText]
+            problem.definition_tex, problem.domain_label, ...(problem.aliases || []), ...(problem.tags || []),
+            (problem.tags || []).includes('openai') ? 'OpenAI' : '', ...familyTitles, sourceText]
             .filter(value => value !== null && value !== undefined).join(' ').toLowerCase().includes(search);
     });
 }
@@ -277,6 +284,56 @@ function getOpenProblemSources(problem) {
     return (problem.sources || []).filter(source => /^https?:\/\//i.test(source.url || ''));
 }
 
+function isSolvedOpenAIClaim(attack) {
+    return attack.entry_kind === 'external_claim' &&
+        ['full', 'stronger'].includes(attack.openai?.match) && attack.status === 'solved';
+}
+
+// Only construct links to the reviewed snapshot. Reject traversal and URL
+// syntax before encoding each path segment (including parentheses in titles).
+function getOpenAIFileUrl(metadata, path, download = false) {
+    const commit = 'adc7f1241b42e322a6451854ab7e4b4c146bf78a';
+    if (metadata?.source_repo !== 'https://github.com/openai/math' || metadata.source_commit !== commit ||
+        typeof path !== 'string' || /[\\%?#\u0000-\u001f\u007f]/.test(path) ||
+        path.split('/').some(part => !part || part === '.' || part === '..')) return '';
+    const knownPath = /^preprints\/[^/]+\/(?:[^/]+\.pdf|README\.md)$/.test(path) ||
+        /^lean\/docs\/\d{3}\.md$/.test(path) ||
+        /^lean\/ComparatorChallenges\/[^/]+\.(?:lean|json)$/.test(path) ||
+        /^reasoning_traces\/[^/]+\.pdf$/.test(path) || path === 'CONTENTS.md';
+    if (!knownPath || (download && !path.endsWith('.pdf'))) return '';
+    const encoded = path.split('/').map(part => encodeURIComponent(part)
+        .replace(/[!'()*]/g, character => `%${character.charCodeAt(0).toString(16).toUpperCase()}`)).join('/');
+    return `https://github.com/openai/math/${download ? 'raw' : 'blob'}/${commit}/${encoded}`;
+}
+
+function renderOpenAIProvenance(attack) {
+    const metadata = attack.openai;
+    if (!metadata) return '';
+    const link = (path, label, download = false) => {
+        const url = getOpenAIFileUrl(metadata, path, download);
+        return url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>` : '';
+    };
+    const families = (metadata.families || []).map(family => {
+        const papers = (family.manuscripts || []).map(manuscript => {
+            const links = [link(manuscript.pdf_path, 'PDF'), link(manuscript.pdf_path, 'PDF (download)', true),
+                link(manuscript.readme_path, 'Manuscript page')].filter(Boolean);
+            const date = /^\d{4}-\d{2}-\d{2}$/.test(manuscript.date || '') ? ` (${manuscript.date})` : '';
+            return `<li>${escapeHtml(manuscript.title || 'Manuscript')}${escapeHtml(date)}: ${links.join(' · ')}</li>`;
+        }).join('');
+        const lean = family.lean;
+        const leanLinks = lean ? [link(lean.doc_path, 'Lean scope'),
+            ...(lean.comparators || []).map(path => link(path, `Comparator: ${String(path).split('/').pop()}`))].filter(Boolean) : [];
+        const additionalLinks = [...leanLinks, link(family.reasoning_trace, 'Reasoning summary'),
+            link('CONTENTS.md', 'Catalogue entry')].filter(Boolean);
+        return `<li><strong>${escapeHtml(family.title || `Family ${family.family}`)}</strong>` +
+            `${papers ? `<ul>${papers}</ul>` : ''}${additionalLinks.length ? `<p>${additionalLinks.join(' · ')}</p>` : ''}</li>`;
+    }).join('');
+    return '<div class="status-note"><p>OpenAI produced these results with an internal model. ' +
+        'Unformalised results may contain errors. This claim has not been independently verified here, ' +
+        'and this site has not run the Lean code. Links refer to the pinned release snapshot.</p>' +
+        `${families ? `<ul>${families}</ul>` : ''}</div>`;
+}
+
 function renderOpenProblemRows(problems) {
     if (!problems.length) return '<tr><td colspan="9">No problems match these filters.</td></tr>';
     return problems.map(problem => {
@@ -286,7 +343,10 @@ function renderOpenProblemRows(problems) {
         const labels = getModelLabels(problem.attacks);
         const sourceLabel = isMO ? 'MathOverflow subset' : 'Ranked catalogue';
         const metadata = [problem.domain_label, sourceLabel,
+            (problem.tags || []).includes('openai') ? 'OpenAI' : '',
             isMO && Number.isFinite(problem.score) ? `MO score: ${problem.score}` : ''].filter(Boolean).join(' · ');
+        const claimLabel = getOpenProblemClaim(problem) +
+            (problem.llm_status_source === 'openai_claim' || attempts.some(isSolvedOpenAIClaim) ? ' · OpenAI' : '');
         const reviewed = problem.status_reviewed_at
             ? `<span class="catalogue-meta">Reviewed ${escapeHtml(String(problem.status_reviewed_at).slice(0, 10))}</span>` : '';
         const qualification = problem.status_qualification
@@ -302,7 +362,7 @@ function renderOpenProblemRows(problems) {
             <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
             <td${qualification}>${escapeHtml(getOpenProblemStatusLabel(problem))}${reviewed}</td>
             <td class="${escapeHtml(getReviewClass(problem.review))}"${reviewTitle}>${escapeHtml(getReviewLabel(problem.review))}</td>
-            <td class="claim-status"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(getOpenProblemClaim(problem))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td class="claim-status"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(claimLabel)}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td>${attempts.length ? escapeHtml(formatCompletion(problem.completion)) || '—' : '—'}</td>
             <td>${labels.length ? labels.map(escapeHtml).join(', ') : '—'}</td>
             <td>${sourceLink}</td>
@@ -348,6 +408,7 @@ function initOpenProblemsPage() {
     const subset = document.body.dataset.collection === 'mo';
     const search = document.getElementById('search');
     const domains = document.getElementById('filter-domain');
+    const tags = document.getElementById('filter-tag');
     const sources = document.getElementById('filter-source');
     const attempts = document.getElementById('filter-attacks');
     const sort = document.getElementById('sort-by');
@@ -358,6 +419,7 @@ function initOpenProblemsPage() {
         .map(({ value, label }) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
     search.value = params.get('q') || '';
     domains.value = domainOptions.find(group => group.aliases.includes(params.get('domain')))?.value || '';
+    if (tags) tags.value = params.get('tag') === 'openai' ? 'openai' : '';
     sources.value = subset ? 'mo' : ['ranked', 'mo'].includes(params.get('source')) ? params.get('source') : '';
     attempts.checked = params.get('attempts') === '1';
     const validSorts = ['rank', 'title', 'attempts', 'score', 'status', 'review', 'claim', 'completion', 'models', 'source', 'unsolvedmath'];
@@ -367,7 +429,8 @@ function initOpenProblemsPage() {
 
     function renderTable(syncUrl = true) {
         const filtered = filterOpenProblems(records, {
-            search: search.value, domain: domains.value, source: sources.value, withAttempts: attempts.checked
+            search: search.value, domain: domains.value, tag: tags?.value || '',
+            source: sources.value, withAttempts: attempts.checked
         });
         filtered.sort((a, b) => compareOpenProblems(a, b, sort.value, direction));
         sortButtons.forEach(button => {
@@ -378,13 +441,14 @@ function initOpenProblemsPage() {
         if (typeof MathJax !== 'undefined' && MathJax.typesetClear) MathJax.typesetClear([tbody]);
         tbody.innerHTML = renderOpenProblemRows(filtered);
         count.textContent = `${filtered.length} of ${records.length} entries · ${countWithAttacks(filtered)} with LLM attempts`;
-        if (syncUrl) updateUrl({ q: search.value.trim(), domain: domains.value, source: subset ? null : sources.value,
+        if (syncUrl) updateUrl({ q: search.value.trim(), domain: domains.value, tag: tags?.value || null,
+            source: subset ? null : sources.value,
             attempts: attempts.checked ? '1' : null, sort: sort.value === (subset ? 'score' : 'rank') ? null : sort.value,
             dir: direction === defaultOpenSortDirection(sort.value) ? null : direction });
         renderMath();
     }
     search.addEventListener('input', debounce(() => renderTable(), 200));
-    [domains, sources, attempts].forEach(input => input.addEventListener('change', () => renderTable()));
+    [domains, tags, sources, attempts].filter(Boolean).forEach(input => input.addEventListener('change', () => renderTable()));
     sort.addEventListener('change', () => {
         direction = defaultOpenSortDirection(sort.value);
         renderTable();
@@ -397,6 +461,7 @@ function initOpenProblemsPage() {
     document.getElementById('reset-filters').addEventListener('click', () => {
         search.value = '';
         domains.value = '';
+        if (tags) tags.value = '';
         sources.value = subset ? 'mo' : '';
         attempts.checked = false;
         sort.value = subset ? 'score' : 'rank';
@@ -736,6 +801,9 @@ window.ProblemHunting = {
     getOpenProblemClaim,
     getOpenProblemStatusLabel,
     getOpenProblemSources,
+    isSolvedOpenAIClaim,
+    getOpenAIFileUrl,
+    renderOpenAIProvenance,
     renderOpenProblemRows,
     getAttemptPreview,
     initOpenProblemsPage,
