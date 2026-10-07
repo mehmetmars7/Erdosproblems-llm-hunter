@@ -205,6 +205,27 @@ Existing `problem.html?type=mo&id=<question_id>` links remain supported. Reviews
 for ranked problems are stored in `reviews/open_problems/<unsolvedmath_id>.json`;
 existing MathOverflow reviews retain their `reviews/mo/<question_id>.json` paths.
 
+## OpenAI external claims
+
+Records of claims from [openai/math](https://github.com/openai/math) use
+`attacks/open_problems/top_problems/openai/<id>.tex` and the **OpenAI** tag.
+The Tag filter and Search can find these records. Each record links to the
+manuscript, PDF download, and any Lean scope and Comparator files at a pinned
+source commit; OpenAI manuscripts and Lean sources are not copied into this repository.
+
+The strict `OPENAI_CLAIM` JSON header identifies the claimed result and its scope.
+A full or stronger match can set the **LLM claim** to solved even when other
+attempts remain unresolved. This records an OpenAI claim matched to our statement,
+not an independent verification, and leaves the source catalogue status unchanged.
+A partial result does not receive a solved label. Disproofs can settle a conjecture.
+
+`scripts/import_openai_math.py` generates records from an inventory, approved
+paper-level adjudication, and original summary prose. It preserves existing
+records and requires a new version for changed content. The pinned path manifest
+in `lists/openai_math/manifest.json` supports offline metadata and link validation.
+Proposed solved labels require a separate scope review and user confirmation
+before records are generated. See the contribution guide for the record contract.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting new LLM attempts.

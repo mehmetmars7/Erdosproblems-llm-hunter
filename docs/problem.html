@@ -163,8 +163,8 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=1686a5f3b8705b53"></script>
-    <script src="app.js?v=1b4362d014719d60"></script>
+    <script src="data/open_problems_data.js?v=d72ec9f3704ac2ef"></script>
+    <script src="app.js?v=796b1356290e1977"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
@@ -328,6 +328,9 @@
             } else if (type === 'open_problems') {
                 const escapeHtml = window.ProblemHunting.escapeHtml;
                 const claim = problem.llm_status || determineOverallStatus(problem.attacks);
+                const solvedOpenAI = (problem.attacks || []).find(window.ProblemHunting.isSolvedOpenAIClaim);
+                const openAIRelease = solvedOpenAI && /^\d{4}-\d{2}-\d{2}$/.test(solvedOpenAI.openai.release_date || '')
+                    ? solvedOpenAI.openai.release_date : null;
                 const firstSolvedDate = claim === 'solved'
                     ? window.ProblemHunting.getMathematicalAttempts(problem.attacks)
                         .filter(attack => window.ProblemHunting.getAttemptClaim(attack) === 'solved')
@@ -337,10 +340,11 @@
                     : null;
                 metaDiv.innerHTML = `
                     <p><strong>Field:</strong> ${escapeHtml(problem.domain_label)}</p>
+                    ${(problem.tags || []).includes('openai') ? '<p><strong>Tags:</strong> <a href="open_problems.html?tag=openai">OpenAI</a></p>' : ''}
                     <p><strong>Problem Status:</strong> ${escapeHtml(window.ProblemHunting.getOpenProblemStatusLabel(problem))}</p>
                     ${problem.status_reviewed_at ? `<p><strong>Status reviewed in catalog:</strong> ${escapeHtml(problem.status_reviewed_at)}</p>` : ''}
                     ${problem.status_qualification ? `<p class="status-note">${escapeHtml(problem.status_qualification)}</p>` : ''}
-                    <p><strong>LLM Claim:</strong> ${claim === 'none' ? 'No attempts yet' : escapeHtml(claim)}${firstSolvedDate ? ` (${escapeHtml(firstSolvedDate)})` : ''}</p>
+                    <p><strong>LLM Claim:</strong> ${claim === 'none' ? 'No attempts yet' : escapeHtml(claim)}${claim === 'solved' && solvedOpenAI ? ` (OpenAI claim${openAIRelease ? `, ${escapeHtml(openAIRelease)}` : ''})` : firstSolvedDate ? ` (${escapeHtml(firstSolvedDate)})` : ''}</p>
                     ${completionLabel ? `<p><strong>LLM completion estimate:</strong> ${completionLabel}</p>` : ''}
                     <p><strong>Community Review:</strong> ${reviewDisplay}</p>
                 `;
@@ -419,10 +423,17 @@
                     const provenance = attack.provenance || {};
                     const isReused = attack.entry_kind === 'reused_writeup';
                     const isStatement = attack.entry_kind === 'statement_only';
+                    const isOpenAI = attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI';
+                    const openAIStatus = window.ProblemHunting.isSolvedOpenAIClaim(attack)
+                        ? `OpenAI claim: solved (${attack.openai.resolution}), not independently verified`
+                        : 'OpenAI claim: partial result';
                     const statusLabel = isStatement ? 'awaiting an attempt'
+                        : isOpenAI ? openAIStatus
                         : isReused ? `source claim: ${attackStatus} (unverified)` : attackStatus;
                     const sourceModel = escapeHtml((provenance.source_model || '').replace(/_/g, ' '));
+                    const openAITitles = (attack.openai?.families || []).map(family => family.title).filter(Boolean).join('; ');
                     const title = isStatement ? 'Problem statement: awaiting an attempt'
+                        : isOpenAI ? `OpenAI claim: ${escapeHtml(openAITitles || 'Claimed result')}`
                         : isReused ? `Reused writeup: ${sourceModel}`
                         : `Attempt ${idx + 1}: ${escapeHtml((attack.model || '').replace(/_/g, ' '))}`;
                     let provenanceNote = '';
@@ -437,21 +448,23 @@
                     } else if (isStatement) {
                         provenanceNote = `<p class="status-note">Included in the ${escapeHtml(attack.model)} collection as a statement-only record. ` +
                             'No mathematical attempt is provided. Completion: 0%. No independent review has been performed.</p>';
+                    } else if (isOpenAI) {
+                        provenanceNote = window.ProblemHunting.renderOpenAIProvenance(attack);
                     }
                     const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
-                    const sourceLink = sourceUrl ? ` <a href="${sourceUrl}" target="_blank">source</a>` : '';
+                    const sourceLink = sourceUrl ? ` <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener">source</a>` : '';
                     const commentsLink = ` <a href="#comments">comments</a>`;
                     const reviewLink = reviewIssueUrl ? ` <a href="${reviewIssueUrl}" target="_blank" rel="noopener">review</a>` : '';
                     
                     // Format date if available
                     const datePosted = attack.date_posted ? 
-                        `<div class="attack-date">Posted: ${attack.date_posted}</div>` : '';
+                        `<div class="attack-date">Posted: ${escapeHtml(attack.date_posted)}</div>` : '';
 
                     return `
                         <div class="attempt" data-statement-only="${isStatement}">
                             <div class="attempt-header">
                                 <h3>${title}</h3>
-                                <span class="status-text">${statusLabel}</span>${sourceLink}${commentsLink}${reviewLink}
+                                <span class="status-text">${escapeHtml(statusLabel)}</span>${sourceLink}${commentsLink}${reviewLink}
                             </div>
                             ${datePosted}
                             ${provenanceNote}

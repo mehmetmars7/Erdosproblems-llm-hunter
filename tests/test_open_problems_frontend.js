@@ -8,6 +8,7 @@ const root = path.resolve(__dirname, '..');
 function createBrowser(search = '', subset = false) {
     const ids = ['open-problems-tbody', 'results-count', 'search', 'filter-domain', 'filter-source',
         'filter-attacks', 'sort-by', 'catalogue-edition', 'reset-filters'];
+    if (!subset) ids.push('filter-tag');
     const elements = Object.fromEntries(ids.map(id => [id, {
         innerHTML: '', textContent: '', value: '', checked: false, handlers: {},
         addEventListener(type, handler) { this.handlers[type] = handler; }
@@ -57,6 +58,56 @@ const records = {
         status: 'unreviewed', llm_status: 'none', attacks: [] }
 };
 const ids = rows => Array.from(rows, row => String(row.id));
+const openAIMetadata = {
+    source_repo: 'https://github.com/openai/math',
+    source_commit: 'adc7f1241b42e322a6451854ab7e4b4c146bf78a',
+    release_date: '2026-10-06', match: 'full', resolution: 'disproved',
+    families: [{ family: '197', title: 'A distinct family title',
+        manuscripts: [{ title: 'Claimed result', pdf_path: 'preprints/Result-in-CAT(0)-spaces/main.pdf',
+            readme_path: 'preprints/Result-in-CAT(0)-spaces/README.md', date: '2026-09-23' }],
+        lean: { doc_path: 'lean/docs/197.md', comparators: ['lean/ComparatorChallenges/Result.lean',
+            'lean/ComparatorChallenges/Result.json'] } }]
+};
+const openAIAttempt = { model: 'OpenAI', claimant: 'OpenAI', entry_kind: 'external_claim',
+    status: 'solved', openai: openAIMetadata };
+const taggedRecords = { ...records, '6': { ...records['6'], tags: ['openai'],
+    llm_status_source: 'openai_claim', attacks: [attempt, openAIAttempt] } };
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { tag: 'openai' })), ['6']);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { tag: 'missing' })), []);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { tag: 'openai', domain: 'geometry' })), []);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'OpenAI' })), ['6']);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title' })), ['6']);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title', tag: 'openai' })), ['6']);
+assert.equal(api.getOverallClaim([attempt, openAIAttempt]), 'solved');
+assert.equal(api.getOverallClaim([{ ...openAIAttempt, status: 'unresolved', openai: { ...openAIMetadata, match: 'partial' } }]), 'unresolved');
+assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved · OpenAI/);
+assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /Algebra · Ranked catalogue · OpenAI/);
+assert.deepEqual(Array.from(api.getModelLabels([openAIAttempt])), ['openai']);
+assert.equal(api.getOpenAIFileUrl(openAIMetadata, openAIMetadata.families[0].manuscripts[0].pdf_path),
+    `https://github.com/openai/math/blob/${openAIMetadata.source_commit}/preprints/Result-in-CAT%280%29-spaces/main.pdf`);
+assert.equal(api.getOpenAIFileUrl(openAIMetadata, 'preprints/Title/custom name.pdf', true),
+    `https://github.com/openai/math/raw/${openAIMetadata.source_commit}/preprints/Title/custom%20name.pdf`);
+for (const path of ['https://example.org/paper.pdf', 'preprints/../paper.pdf', 'preprints/Title/%2e%2e.pdf',
+    'preprints/Title/paper.pdf?download=1', 'preprints/Title/paper.pdf#fragment', 'preprints/Title\\paper.pdf',
+    'preprints/Title/paper.pdf\n', 'lean/docs/not-a-family.md']) {
+    assert.equal(api.getOpenAIFileUrl(openAIMetadata, path), '', path);
+}
+assert.equal(api.getOpenAIFileUrl({ ...openAIMetadata, source_commit: 'main' }, 'lean/docs/197.md'), '');
+assert.equal(api.getOpenAIFileUrl({ ...openAIMetadata, source_repo: 'https://github.com/evil/math' }, 'lean/docs/197.md'), '');
+assert.equal(api.getOpenAIFileUrl(openAIMetadata, 'lean/docs/197.md', true), '');
+const provenance = api.renderOpenAIProvenance(openAIAttempt);
+assert.match(provenance, />PDF<\/a>/);
+assert.match(provenance, />PDF \(download\)<\/a>/);
+assert.match(provenance, />Lean scope<\/a>/);
+assert.match(provenance, />Manuscript page<\/a>/);
+assert.match(provenance, /Comparator: Result\.lean/);
+assert.match(provenance, /rel="noopener noreferrer"/);
+assert.match(provenance, /not been independently verified/);
+const maliciousProvenance = api.renderOpenAIProvenance({ ...openAIAttempt, openai: { ...openAIMetadata,
+    families: [{ title: '<img src=x onerror=alert(1)>', manuscripts: [{ title: '<script>alert(1)</script>',
+        pdf_path: 'javascript:alert(1)', readme_path: 'https://evil.example/README.md' }] }] } });
+assert.doesNotMatch(maliciousProvenance, /<img|<script|href="(?:javascript:|https:\/\/evil)/);
+assert.match(maliciousProvenance, /&lt;img/);
 assert.deepEqual(ids(Object.values(records).sort(api.sortOpenProblems)), ['20000601', '6', 'mo:40', 'mo:23']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { withAttempts: true })), ['6', 'mo:23']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { source: 'ranked', withAttempts: true })), ['6']);
@@ -153,8 +204,8 @@ assert.ok(preview.every(row => !row.label.includes('#null')));
 assert.equal(api.getAttemptPreview(erdos, records, 2).length, 2);
 
 // Exercise the page initializer and interactions without a browser dependency.
-function loadPage(page) {
-    page.window.OPEN_PROBLEMS_DATA = records;
+function loadPage(page, data = records) {
+    page.window.OPEN_PROBLEMS_DATA = data;
     page.window.OPEN_PROBLEMS_CATALOG = { edition_date: '2026-09-22', release_version: 22 };
     page.api.initOpenProblemsPage();
     return page;
@@ -205,6 +256,22 @@ assert.equal(sorted.window.history.lastURL.search, '');
 const restored = loadPage(createBrowser('?sort=title&dir=desc&source=ranked'));
 assert.deepEqual(rowIds(restored), ['6', '20000601']);
 assert.equal(restored.headers.title.header.attributes['aria-sort'], 'descending');
+const taggedPage = loadPage(createBrowser('?tag=openai&sort=title&source=ranked'), taggedRecords);
+assert.equal(taggedPage.elements['filter-tag'].value, 'openai');
+assert.match(taggedPage.elements['results-count'].textContent, /^1 of 4/);
+taggedPage.headers.title.handlers.click();
+assert.equal(taggedPage.window.history.lastURL.searchParams.get('tag'), 'openai');
+taggedPage.elements['filter-tag'].value = '';
+taggedPage.elements['filter-tag'].handlers.change();
+assert.equal(taggedPage.window.history.lastURL.searchParams.get('tag'), null);
+taggedPage.elements['filter-tag'].value = 'openai';
+taggedPage.elements['filter-tag'].handlers.change();
+assert.equal(taggedPage.window.history.lastURL.searchParams.get('tag'), 'openai');
+taggedPage.elements['reset-filters'].handlers.click();
+assert.equal(taggedPage.elements['filter-tag'].value, '');
+assert.equal(taggedPage.window.history.lastURL.search, '');
+assert.match(taggedPage.elements['results-count'].textContent, /^4 of 4/);
+assert.equal(loadPage(createBrowser('?tag=unknown'), taggedRecords).elements['filter-tag'].value, '');
 for (const [key, low, high] of [
     ['rank', { rank: 2 }, { rank: 10 }],
     ['status', { status: 'open' }, { status: 'solved' }],
@@ -227,10 +294,15 @@ assert.match(query.elements['results-count'].textContent, /^1 of 4/);
 assert.equal(query.elements.search.value, 'question');
 assert.equal(query.elements['sort-by'].value, 'title');
 const subset = loadPage(createBrowser('?source=ranked', true));
+assert.equal(subset.elements['filter-tag'], undefined);
 assert.equal(subset.elements['filter-source'].value, 'mo');
 assert.equal(subset.elements['sort-by'].value, 'score');
 assert.match(subset.elements['results-count'].textContent, /^2 of 2/);
 assert.doesNotMatch(subset.elements['open-problems-tbody'].innerHTML, /id=20000601|id=6/);
+const subsetTag = loadPage(createBrowser('?tag=openai', true), taggedRecords);
+assert.match(subsetTag.elements['results-count'].textContent, /^2 of 2/);
+subsetTag.elements['reset-filters'].handlers.click();
+assert.equal(subsetTag.window.history.lastURL.searchParams.get('tag'), null);
 const unavailable = createBrowser();
 unavailable.api.initOpenProblemsPage();
 assert.equal(unavailable.elements['results-count'].textContent, 'Catalogue unavailable');

@@ -104,6 +104,64 @@ assert.equal(page.element('erdos-main-link').hidden, true);
 assert.equal(page.element('prev-problem').href, 'problem.html?type=open_problems&id=20000601');
 assert.equal(page.element('next-problem').style.visibility, 'hidden');
 
+// OpenAI claims keep source status separate, use their own release date, and
+// expose safe links to all manuscripts and formalisation files in the snapshot.
+const openAIMetadata = {
+    source_repo: 'https://github.com/openai/math',
+    source_commit: 'adc7f1241b42e322a6451854ab7e4b4c146bf78a',
+    release_date: '2026-10-06', match: 'full', resolution: 'disproved',
+    families: [{ family: '197', title: 'Example family <title>',
+        manuscripts: [{ title: 'Example manuscript', pdf_path: 'preprints/Result-in-CAT(0)-spaces/custom.pdf',
+            readme_path: 'preprints/Result-in-CAT(0)-spaces/README.md', date: '2026-09-23' }],
+        lean: { doc_path: 'lean/docs/197.md', comparators: ['lean/ComparatorChallenges/Result.lean',
+            'lean/ComparatorChallenges/Result.json'], covers_main_theorem: true },
+        reasoning_trace: 'reasoning_traces/197.pdf' }]
+};
+const openAIAttempt = { model: 'OpenAI', claimant: 'OpenAI', entry_kind: 'external_claim',
+    status: 'solved', date_posted: '2026-10-06', openai: openAIMetadata,
+    file_path: 'attacks/open_problems/top_problems/openai/20000601.tex',
+    raw: String.raw`\subsection{OpenAI's claim}An original summary with $x^2$.` };
+const openAIProblem = { ...records['20000601'], tags: ['openai'], llm_status: 'solved',
+    llm_status_source: 'openai_claim', completion: 100,
+    attacks: [{ model: 'GPT 6 Astra Ultra', status: 'solved', date_posted: '2026-01-01', raw: 'Earlier claim.' },
+        { model: 'GPT 6 Astra Ultra', status: 'unresolved', raw: 'Unresolved attempt.' }, openAIAttempt] };
+page = await render('?type=open_problems&id=20000601', { '20000601': openAIProblem });
+assert.match(page.element('problem-meta').innerHTML, /Tags:<\/strong> <a href="open_problems\.html\?tag=openai">OpenAI/);
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> solved \(OpenAI claim, 2026-10-06\)/);
+assert.doesNotMatch(page.element('problem-meta').innerHTML, /solved \(2026-01-01\)/);
+assert.equal(page.element('llm-attempts-section h2').textContent, 'LLM claims and collection records');
+let openAIHtml = page.element('attempts-container').innerHTML;
+assert.match(openAIHtml, /OpenAI claim: Example family &lt;title&gt;/);
+assert.match(openAIHtml, /OpenAI claim: solved \(disproved\), not independently verified/);
+assert.match(openAIHtml, /\/blob\/adc7f1241b42e322a6451854ab7e4b4c146bf78a\/preprints\/Result-in-CAT%280%29-spaces\/custom\.pdf/);
+assert.match(openAIHtml, /\/raw\/adc7f1241b42e322a6451854ab7e4b4c146bf78a\/preprints\/Result-in-CAT%280%29-spaces\/custom\.pdf/);
+assert.match(openAIHtml, />PDF<\/a>/);
+assert.match(openAIHtml, />PDF \(download\)<\/a>/);
+assert.match(openAIHtml, />Lean scope<\/a>/);
+assert.match(openAIHtml, />Manuscript page<\/a>/);
+assert.match(openAIHtml, /Comparator: Result\.json/);
+assert.match(openAIHtml, />Reasoning summary<\/a>/);
+assert.match(openAIHtml, /not run the Lean code/);
+assert.match(openAIHtml, /2026-09-23/);
+assert.match(openAIHtml, /An original summary with \$x\^2\$/);
+assert.doesNotMatch(openAIHtml, /<title>|<iframe/);
+const partialAttempt = { ...openAIAttempt, status: 'unresolved',
+    openai: { ...openAIMetadata, match: 'partial', resolution: 'partial' } };
+page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
+    llm_status: 'unresolved', llm_status_source: undefined, attacks: [partialAttempt] } });
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> unresolved/);
+assert.match(page.element('attempts-container').innerHTML, /OpenAI claim: partial result/);
+assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved/);
+const hostileAttempt = { ...openAIAttempt, openai: { ...openAIMetadata,
+    families: [{ title: '<script>alert(1)</script>', manuscripts: [{ title: '<img src=x onerror=alert(1)>',
+        pdf_path: 'javascript:alert(1)', readme_path: 'https://evil.example/paper' }],
+        lean: { doc_path: 'lean/docs/../evil.md', comparators: ['https://evil.example/Comparator.lean'] } }] } };
+page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem, attacks: [hostileAttempt] } });
+openAIHtml = page.element('attempts-container').innerHTML;
+assert.doesNotMatch(openAIHtml, /<script|<img|href="(?:javascript:|https:\/\/evil)/);
+assert.match(openAIHtml, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+
 page = await render('?type=open_problems&id=mo%3A42');
 assert.match(page.element('problem-meta').innerHTML, /MathOverflow subset/);
 assert.equal(page.element('.giscus').children[0].dataset.term, 'MO-42');
