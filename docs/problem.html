@@ -163,8 +163,8 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=98c7d8e1afe48edb"></script>
-    <script src="app.js?v=8733cdbba183920c"></script>
+    <script src="data/open_problems_data.js?v=c94e5b8aa1a9d4a4"></script>
+    <script src="app.js?v=90dabcee6e70522c"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
@@ -437,9 +437,9 @@
                         : isOpenAI ? openAIStatus
                         : isReused ? `source claim: ${attackStatus} (unverified)` : attackStatus;
                     const sourceModel = escapeHtml((provenance.source_model || '').replace(/_/g, ' '));
-                    const openAITitles = (attack.openai?.families || []).map(family => family.title).filter(Boolean).join('; ');
+                    const openAIPaperTitles = window.ProblemHunting.getOpenAIPaperTitles(attack);
                     const title = isStatement ? 'Problem statement: awaiting an attempt'
-                        : isOpenAI ? `OpenAI claim: ${escapeHtml(openAITitles || 'Claimed result')}`
+                        : isOpenAI ? `OpenAI paper${openAIPaperTitles.length > 1 ? 's' : ''}: ${escapeHtml(openAIPaperTitles.join('; ') || 'Claimed result')}`
                         : isReused ? `Reused writeup: ${sourceModel}`
                         : `Attempt ${idx + 1}: ${escapeHtml((attack.model || '').replace(/_/g, ' '))}`;
                     let provenanceNote = '';
@@ -465,6 +465,8 @@
                     // Format date if available
                     const datePosted = attack.date_posted ? 
                         `<div class="attack-date">Posted: ${escapeHtml(attack.date_posted)}</div>` : '';
+                    const openAIContent = isOpenAI ? window.ProblemHunting.splitOpenAIClaimContent(attack) : null;
+                    const scopeNote = openAIContent?.scope ? `<div class="tex-content"><h4>Scope relative to this problem</h4>${formatTeX(openAIContent.scope, false, false)}</div>` : '';
 
                     return `
                         <div class="attempt" data-statement-only="${isStatement}">
@@ -473,9 +475,10 @@
                                 <span class="status-text">${escapeHtml(statusLabel)}</span>${sourceLink}${commentsLink}${reviewLink}
                             </div>
                             ${datePosted}
+                            ${scopeNote}
                             ${provenanceNote}
                             <div class="attempt-content tex-content">
-                                ${formatTeX(attack.raw, isReused)}
+                                ${formatTeX(openAIContent ? openAIContent.raw : attack.raw, isReused)}
                             </div>
                         </div>
                     `;
