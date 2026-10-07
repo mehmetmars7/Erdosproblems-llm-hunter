@@ -214,13 +214,19 @@ manuscript, PDF download, and any Lean scope and Comparator files at a pinned
 source commit; OpenAI manuscripts and Lean sources are not copied into this repository.
 
 The strict `OPENAI_CLAIM` JSON header identifies the claimed result and its scope.
-A full or stronger match can set the **LLM claim** to solved even when other
-attempts remain unresolved. This records an OpenAI claim matched to our statement,
-not an independent verification, and leaves the source catalogue status unchanged.
-A partial result does not receive a solved label. Disproofs can settle a conjecture.
+A full or stronger match sets **Problem Status** to **solved (OpenAI claim)**
+and the **LLM claim** to solved even when other attempts remain unresolved.
+A partial match is **partially solved (OpenAI claim)** with a partial LLM claim;
+it does not settle the complete question. An existing source-catalogue solution
+is not downgraded by a partial contribution. The original catalogue status is
+retained as `source_status` and displayed separately. Community Review records
+human checking independently; these status labels do not verify the proof.
+A related result is labelled related and keeps the problem's catalogue status.
+Disproofs can settle a conjecture.
 
 `scripts/import_openai_math.py` generates records from an inventory, approved
-paper-level adjudication, and original summary prose. It preserves existing
+paper-level adjudication, and original TeX explanations, including the
+mathematical hypotheses and conclusion of the claimed result. It preserves existing
 records and requires a new version for changed content. The pinned path manifest
 in `lists/openai_math/manifest.json` supports offline metadata and link validation.
 Proposed solved labels require a separate scope review and user confirmation

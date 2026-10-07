@@ -5,10 +5,12 @@ from __future__ import annotations
 import argparse
 from collections import Counter, defaultdict
 from datetime import datetime
+from html import unescape
 import json
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
+import unicodedata
 from urllib.parse import unquote
 
 PIN = "adc7f1241b42e322a6451854ab7e4b4c146bf78a"
@@ -161,6 +163,53 @@ def date_from_dir(directory: str) -> str:
     return datetime.strptime(" ".join(match.groups()), "%B %d %Y").date().isoformat()
 
 
+def manuscript_title(readme: str) -> str:
+    """Use the manuscript's citation title, rather than an index display alias."""
+    match = re.search(r"(?mi)^\s*title\s*=\s*\{", readme)
+    if match:
+        title, _ = braced(readme, match.end() - 1)
+        while title.startswith("{"):
+            inner, end = braced(title, 0)
+            if end != len(title):
+                break
+            title = inner
+    else:
+        heading = re.search(r"(?m)^#\s+(.+)$", readme)
+        links = markdown_links(heading[1]) if heading else []
+        if not links:
+            raise ValueError("Manuscript README requires a citation title or linked heading")
+        title = links[0][0]
+    title = unescape(title)
+    accent_marks = {"'": '\u0301', '"': '\u0308', '`': '\u0300',
+                    '^': '\u0302', '~': '\u0303', '=': '\u0304',
+                    '.': '\u0307', 'c': '\u0327', 'u': '\u0306',
+                    'v': '\u030c', 'H': '\u030b'}
+    title = re.sub(r'''\\(['"`^~=.cuvH])\s*(?:\{([^{}])\}|([A-Za-z]))''',
+                   lambda m: unicodedata.normalize('NFC', (m[2] or m[3]) + accent_marks[m[1]]), title)
+    # Keep titles as plain metadata; equivalent Unicode math avoids embedding
+    # HTML or TeX source in link labels and citation keys.
+    alphabets = {'C': 'ℂ', 'R': 'ℝ', 'Q': 'ℚ', 'N': 'ℕ', 'Z': 'ℤ'}
+    title = re.sub(r"\\mathbb\s*(?:\{([A-Za-z])\}|([A-Za-z]))",
+                   lambda m: alphabets.get(m[1] or m[2], m[1] or m[2]), title)
+    title = re.sub(r"\\(?:mathcal|mathsf|mathrm|mathit|text)\s*(?:\{([^{}]*)\}|([A-Za-z]))",
+                   lambda m: ' ' + (m[1] if m[1] is not None else m[2]) + ' ', title)
+    commands = {'ell': 'ℓ', 'pi': 'π', 'Gamma': 'Γ', 'alpha': 'α',
+                'times': '×', 'infty': '∞', 'le': '≤', 'leq': '≤',
+                'gt': '>', 'lt': '<', 'arcsin': 'arcsin', 'o': 'ø',
+                'mu': 'μ', 'log': 'log '}
+    title = re.sub(r'\\([A-Za-z]+)\s*', lambda m: commands.get(m[1], '\\' + m[1]), title)
+    subs = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    supers = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
+    title = re.sub(r"_(?:\{(\d+)\}|(\d+))", lambda m: (m[1] or m[2]).translate(subs), title)
+    title = re.sub(r"\^(?:\{(\d+)\}|(\d+))", lambda m: (m[1] or m[2]).translate(supers), title)
+    title = title.replace("$", "").replace("`", "")
+    title = title.replace("---", "—").replace("--", "–")
+    title = re.sub(r'\{([^{}])\}', r'\1', title)
+    if '\\' in title:
+        raise ValueError(f'Unsupported manuscript-title TeX: {title}')
+    return " ".join(title.split())
+
+
 def main() -> None:
     import yaml
 
@@ -268,7 +317,8 @@ def main() -> None:
                 raise ValueError(f"Manuscript has no TeX sources under build/: {directory}")
             for path in source_files:
                 present(path)
-            papers.append({"title": paper["title"], "dir": directory, "pdf_path": pdf_path, "date": date_from_dir(directory), "readme_path": readme_path, "inputs_md": inputs_md, "source_tex_dir": source_dir, "source_tex_files": source_files, "lean_scope_listed": pdf_path in scope_papers, "comparator_join_scope": "family_scope_document; no individual comparator-to-paper assertion" if pdf_path in scope_papers else None, "comparators": family_comparators if pdf_path in scope_papers else []})
+            title = manuscript_title((args.repo / readme_path).read_text())
+            papers.append({"title": title, "dir": directory, "pdf_path": pdf_path, "date": date_from_dir(directory), "readme_path": readme_path, "inputs_md": inputs_md, "source_tex_dir": source_dir, "source_tex_files": source_files, "lean_scope_listed": pdf_path in scope_papers, "comparator_join_scope": "family_scope_document; no individual comparator-to-paper assertion" if pdf_path in scope_papers else None, "comparators": family_comparators if pdf_path in scope_papers else []})
             extracts[directory] = {"family": family_id, "family_summary": entry["summary"], "overview_summary": overview[family_id]["summary"], "abstract": paper["abstract"]}
         families.append({"family": family_id, "title": entry["title"], "subject": overview[family_id]["subject"], "lean_doc": lean_doc, "reasoning_trace": reasoning_trace, "manuscripts": papers})
     inventory = {"schema_version": 1, "source_repo": SOURCE_REPO, "source_commit": PIN, "repo_path": str(args.repo.resolve()), "families": families, "counts": {"families": len(families), "manuscripts": len(all_pdfs), "lean_docs": sum(bool(family["lean_doc"]) for family in families), "subjects": len({family["subject"] for family in families}), "reasoning_traces": len(traces)}}

@@ -104,7 +104,7 @@ assert.equal(page.element('erdos-main-link').hidden, true);
 assert.equal(page.element('prev-problem').href, 'problem.html?type=open_problems&id=20000601');
 assert.equal(page.element('next-problem').style.visibility, 'hidden');
 
-// OpenAI claims keep source status separate, use their own release date, and
+// OpenAI claims show attributed problem status, keep source status separate, use their own release date, and
 // expose safe links to all manuscripts and formalisation files in the snapshot.
 const openAIMetadata = {
     source_repo: 'https://github.com/openai/math',
@@ -112,7 +112,9 @@ const openAIMetadata = {
     release_date: '2026-10-06', match: 'full', resolution: 'disproved',
     families: [{ family: '197', title: 'Example family <title>',
         manuscripts: [{ title: 'Example manuscript', pdf_path: 'preprints/Result-in-CAT(0)-spaces/custom.pdf',
-            readme_path: 'preprints/Result-in-CAT(0)-spaces/README.md', date: '2026-09-23' }],
+            readme_path: 'preprints/Result-in-CAT(0)-spaces/README.md', date: '2026-09-23',
+            statement_sources: [{ path: 'preprints/Result-in-CAT(0)-spaces/build/source/main.tex',
+                line: 57, label: 'Theorem 1.1' }] }],
         lean: { doc_path: 'lean/docs/197.md', comparators: ['lean/ComparatorChallenges/Result.lean',
             'lean/ComparatorChallenges/Result.json'], covers_main_theorem: true },
         reasoning_trace: 'reasoning_traces/197.pdf' }]
@@ -127,7 +129,9 @@ const openAIProblem = { ...records['20000601'], tags: ['openai'], llm_status: 's
         { model: 'GPT 6 Astra Ultra', status: 'unresolved', raw: 'Unresolved attempt.' }, openAIAttempt] };
 page = await render('?type=open_problems&id=20000601', { '20000601': openAIProblem });
 assert.match(page.element('problem-meta').innerHTML, /Tags:<\/strong> <a href="open_problems\.html\?tag=openai">OpenAI/);
-assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> solved \(OpenAI claim\)/);
+assert.match(page.element('problem-meta').innerHTML, /Source catalogue status:<\/strong> open/);
+assert.equal(page.element('contribute-cta').hidden, true);
 assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> solved \(OpenAI claim, 2026-10-06\)/);
 assert.doesNotMatch(page.element('problem-meta').innerHTML, /solved \(2026-01-01\)/);
 assert.equal(page.element('llm-attempts-section h2').textContent, 'LLM claims and collection records');
@@ -140,6 +144,8 @@ assert.match(openAIHtml, />PDF<\/a>/);
 assert.match(openAIHtml, />PDF \(download\)<\/a>/);
 assert.match(openAIHtml, />Lean scope<\/a>/);
 assert.match(openAIHtml, />Manuscript page<\/a>/);
+assert.match(openAIHtml, /\/build\/source\/main\.tex#L57/);
+assert.match(openAIHtml, />Statement: Theorem 1\.1<\/a>/);
 assert.match(openAIHtml, /Comparator: Result\.json/);
 assert.match(openAIHtml, />Reasoning summary<\/a>/);
 assert.match(openAIHtml, /not run the Lean code/);
@@ -149,10 +155,20 @@ assert.doesNotMatch(openAIHtml, /<title>|<iframe/);
 const partialAttempt = { ...openAIAttempt, status: 'unresolved',
     openai: { ...openAIMetadata, match: 'partial', resolution: 'partial' } };
 page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
-    llm_status: 'unresolved', llm_status_source: undefined, attacks: [partialAttempt] } });
-assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> unresolved/);
+    status: 'partial', source_status: 'open', llm_status: 'partial', llm_status_source: 'openai_claim',
+    attacks: [partialAttempt] } });
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> partially solved \(OpenAI claim\)/);
+assert.match(page.element('problem-meta').innerHTML, /Source catalogue status:<\/strong> open/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partial \(OpenAI claim, 2026-10-06\)/);
+assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
+assert.equal(page.element('contribute-cta').hidden, false);
 assert.match(page.element('attempts-container').innerHTML, /OpenAI claim: partial result/);
 assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved/);
+page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
+    status: 'solved', source_status: 'solved', llm_status: 'partial', attacks: [partialAttempt] } });
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> solved<\/p>/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partial \(OpenAI claim/);
+assert.equal(page.element('contribute-cta').hidden, true);
 const hostileAttempt = { ...openAIAttempt, openai: { ...openAIMetadata,
     families: [{ title: '<script>alert(1)</script>', manuscripts: [{ title: '<img src=x onerror=alert(1)>',
         pdf_path: 'javascript:alert(1)', readme_path: 'https://evil.example/paper' }],

@@ -163,8 +163,8 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=d72ec9f3704ac2ef"></script>
-    <script src="app.js?v=796b1356290e1977"></script>
+    <script src="data/open_problems_data.js?v=98c7d8e1afe48edb"></script>
+    <script src="app.js?v=8733cdbba183920c"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
@@ -265,12 +265,14 @@
                 erdosLink.hidden = false;
             }
 
-            // Use the mathematical status, not an LLM claim or a partial proof.
-            // Historical MO records do not supply a reviewed problem status.
-            const problemStatus = String(problem.status || '').trim().toLowerCase();
+            // Unfinished cases remain open to contributions. Community review
+            // checks claims separately from the status displayed here.
+            const problemStatus = String(type === 'open_problems'
+                ? window.ProblemHunting.getOpenProblemStatus(problem) : problem.status || '').trim().toLowerCase();
             const isOpenProblem = type === 'erdos'
                 ? /^open(?: \(lean\))?$/.test(problemStatus)
-                : type === 'open_problems' && (problemStatus === 'open' || problemStatus.startsWith('open_'));
+                : type === 'open_problems' && (problemStatus === 'open' || problemStatus.startsWith('open_') ||
+                    (problemStatus === 'partial' && (problem.attacks || []).some(window.ProblemHunting.isPartialOpenAIClaim)));
             document.getElementById('contribute-cta').hidden = !isOpenProblem;
 
             const reviewIssueUrl = getReviewIssueUrl(type, id);
@@ -327,10 +329,12 @@
                 `;
             } else if (type === 'open_problems') {
                 const escapeHtml = window.ProblemHunting.escapeHtml;
-                const claim = problem.llm_status || determineOverallStatus(problem.attacks);
+                const claim = window.ProblemHunting.getOpenProblemClaim(problem);
                 const solvedOpenAI = (problem.attacks || []).find(window.ProblemHunting.isSolvedOpenAIClaim);
-                const openAIRelease = solvedOpenAI && /^\d{4}-\d{2}-\d{2}$/.test(solvedOpenAI.openai.release_date || '')
-                    ? solvedOpenAI.openai.release_date : null;
+                const openAIClaim = solvedOpenAI || (problem.attacks || []).find(window.ProblemHunting.isPartialOpenAIClaim)
+                    || (problem.attacks || []).find(window.ProblemHunting.isRelatedOpenAIClaim);
+                const openAIRelease = openAIClaim && /^\d{4}-\d{2}-\d{2}$/.test(openAIClaim.openai.release_date || '')
+                    ? openAIClaim.openai.release_date : null;
                 const firstSolvedDate = claim === 'solved'
                     ? window.ProblemHunting.getMathematicalAttempts(problem.attacks)
                         .filter(attack => window.ProblemHunting.getAttemptClaim(attack) === 'solved')
@@ -342,9 +346,10 @@
                     <p><strong>Field:</strong> ${escapeHtml(problem.domain_label)}</p>
                     ${(problem.tags || []).includes('openai') ? '<p><strong>Tags:</strong> <a href="open_problems.html?tag=openai">OpenAI</a></p>' : ''}
                     <p><strong>Problem Status:</strong> ${escapeHtml(window.ProblemHunting.getOpenProblemStatusLabel(problem))}</p>
-                    ${problem.status_reviewed_at ? `<p><strong>Status reviewed in catalog:</strong> ${escapeHtml(problem.status_reviewed_at)}</p>` : ''}
+                    ${openAIClaim ? `<p><strong>Source catalogue status:</strong> ${escapeHtml(window.ProblemHunting.getOpenProblemSourceStatusLabel(problem))}</p>` : ''}
+                    ${problem.status_reviewed_at ? `<p><strong>Source status reviewed in catalog:</strong> ${escapeHtml(problem.status_reviewed_at)}</p>` : ''}
                     ${problem.status_qualification ? `<p class="status-note">${escapeHtml(problem.status_qualification)}</p>` : ''}
-                    <p><strong>LLM Claim:</strong> ${claim === 'none' ? 'No attempts yet' : escapeHtml(claim)}${claim === 'solved' && solvedOpenAI ? ` (OpenAI claim${openAIRelease ? `, ${escapeHtml(openAIRelease)}` : ''})` : firstSolvedDate ? ` (${escapeHtml(firstSolvedDate)})` : ''}</p>
+                    <p><strong>LLM Claim:</strong> ${claim === 'no attempt' ? 'No attempts yet' : escapeHtml(claim)}${openAIClaim ? ` (OpenAI claim${openAIRelease ? `, ${escapeHtml(openAIRelease)}` : ''})` : firstSolvedDate ? ` (${escapeHtml(firstSolvedDate)})` : ''}</p>
                     ${completionLabel ? `<p><strong>LLM completion estimate:</strong> ${completionLabel}</p>` : ''}
                     <p><strong>Community Review:</strong> ${reviewDisplay}</p>
                 `;
@@ -426,6 +431,7 @@
                     const isOpenAI = attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI';
                     const openAIStatus = window.ProblemHunting.isSolvedOpenAIClaim(attack)
                         ? `OpenAI claim: solved (${attack.openai.resolution}), not independently verified`
+                        : attack.openai?.match === 'related' ? 'OpenAI claim: related result'
                         : 'OpenAI claim: partial result';
                     const statusLabel = isStatement ? 'awaiting an attempt'
                         : isOpenAI ? openAIStatus
