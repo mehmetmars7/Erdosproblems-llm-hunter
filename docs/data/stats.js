@@ -21,8 +21,8 @@ var siteStats = {
     ]
   },
   "open_problems": {
-    "total_problems": 3484,
-    "ranked_total": 3384,
+    "total_problems": 3803,
+    "ranked_total": 3703,
     "mo_total": 100,
     "with_attacks": 1769,
     "ranked_with_attacks": 1676,
