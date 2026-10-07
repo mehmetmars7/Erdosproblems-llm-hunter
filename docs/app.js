@@ -264,11 +264,12 @@ function filterOpenProblems(problems, filters = {}) {
         if (filters.withAttempts && !getMathematicalAttempts(problem.attacks).length) return false;
         if (!search) return true;
         const sourceText = (problem.sources || []).map(source => `${source.citation || ''} ${source.url || ''}`).join(' ');
-        const familyTitles = (problem.attacks || []).flatMap(attack =>
-            (attack.openai?.families || []).map(family => family.title || ''));
+        const openAITitles = (problem.attacks || []).flatMap(attack =>
+            (attack.openai?.families || []).flatMap(family =>
+                [family.title || '', ...(family.manuscripts || []).map(manuscript => manuscript.title || '')]));
         return [problem.id, problem.problem_number, problem.mo_id, problem.rank, problem.title, problem.exact_target,
             problem.definition_tex, problem.domain_label, ...(problem.aliases || []), ...(problem.tags || []),
-            (problem.tags || []).includes('openai') ? 'OpenAI' : '', ...familyTitles, sourceText]
+            (problem.tags || []).includes('openai') ? 'OpenAI' : '', ...openAITitles, sourceText]
             .filter(value => value !== null && value !== undefined).join(' ').toLowerCase().includes(search);
     });
 }
@@ -356,6 +357,35 @@ function getOpenAIStatementUrl(metadata, manuscript, source) {
     return url ? `${url}#L${source.line}` : '';
 }
 
+function getOpenAIPaperTitles(attack) {
+    return [...new Set((attack.openai?.families || []).flatMap(family =>
+        (family.manuscripts || []).map(manuscript => manuscript.title)
+            .filter(title => typeof title === 'string' && title.trim())))];
+}
+
+function getOpenAIMatchLabel(attack) {
+    return {
+        full: 'Full solution claimed for this problem',
+        stronger: 'Stronger result claimed, covering this problem',
+        partial: 'Partial solution claimed for this problem',
+        related: 'Related result; no solution to this problem claimed'
+    }[attack.openai?.match] || 'Scope not specified';
+}
+
+// Display the imported scope before external papers so readers can distinguish
+// the catalogue question from the result they are about to open.
+function splitOpenAIClaimContent(attack) {
+    const raw = typeof attack.raw === 'string' ? attack.raw : '';
+    const heading = /^[ \t]*\\subsection\*?\{Scope relative to this problem\}[ \t]*\r?$/m.exec(raw);
+    if (!heading) return { scope: '', raw };
+    const bodyStart = heading.index + heading[0].length;
+    const remainder = raw.slice(bodyStart);
+    const next = /^[ \t]*\\(?:subsection|section)\*?\{|^[ \t]*\\end\{document\}/m.exec(remainder);
+    const bodyEnd = next ? bodyStart + next.index : raw.length;
+    return { scope: raw.slice(bodyStart, bodyEnd).trim(),
+        raw: raw.slice(0, heading.index) + raw.slice(bodyEnd) };
+}
+
 function renderOpenAIProvenance(attack) {
     const metadata = attack.openai;
     if (!metadata) return '';
@@ -373,17 +403,18 @@ function renderOpenAIProvenance(attack) {
                 ).filter(Boolean));
             }
             const date = /^\d{4}-\d{2}-\d{2}$/.test(manuscript.date || '') ? ` (${manuscript.date})` : '';
-            return `<li>${escapeHtml(manuscript.title || 'Manuscript')}${escapeHtml(date)}: ${links.join(' · ')}</li>`;
+            return `<li><strong>Paper: ${escapeHtml(manuscript.title || 'Manuscript')}</strong>${escapeHtml(date)}: ${links.join(' · ')}</li>`;
         }).join('');
         const lean = family.lean;
         const leanLinks = lean ? [link(lean.doc_path, 'Lean scope'),
             ...(lean.comparators || []).map(path => link(path, `Comparator: ${String(path).split('/').pop()}`))].filter(Boolean) : [];
         const additionalLinks = [...leanLinks, link(family.reasoning_trace, 'Reasoning summary'),
             link('CONTENTS.md', 'Catalogue entry')].filter(Boolean);
-        return `<li><strong>${escapeHtml(family.title || `Family ${family.family}`)}</strong>` +
+        return `<li>OpenAI catalogue family: ${escapeHtml(family.title || `Family ${family.family}`)}` +
             `${papers ? `<ul>${papers}</ul>` : ''}${additionalLinks.length ? `<p>${additionalLinks.join(' · ')}</p>` : ''}</li>`;
     }).join('');
-    return '<div class="status-note"><p>OpenAI produced these results with an internal model. ' +
+    return `<div class="status-note"><p><strong>Relationship to this problem:</strong> ${escapeHtml(getOpenAIMatchLabel(attack))}.</p>` +
+        '<p>OpenAI produced these results with an internal model. ' +
         'Unformalised results may contain errors. This claim has not been independently verified here, ' +
         'and this site has not run the Lean code. Links refer to the pinned release snapshot.</p>' +
         `${families ? `<ul>${families}</ul>` : ''}</div>`;
@@ -866,6 +897,9 @@ window.ProblemHunting = {
     isRelatedOpenAIClaim,
     getOpenAIFileUrl,
     getOpenAIStatementUrl,
+    getOpenAIPaperTitles,
+    getOpenAIMatchLabel,
+    splitOpenAIClaimContent,
     renderOpenAIProvenance,
     renderOpenProblemRows,
     getAttemptPreview,

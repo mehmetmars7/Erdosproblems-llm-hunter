@@ -81,6 +81,9 @@ assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { tag: 'openai', doma
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'OpenAI' })), ['6']);
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title' })), ['6']);
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title', tag: 'openai' })), ['6']);
+assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'claimed result' })), ['6']);
+assert.deepEqual(Array.from(api.getOpenAIPaperTitles(openAIAttempt)), ['Claimed result']);
+assert.equal(api.getOpenAIMatchLabel(openAIAttempt), 'Full solution claimed for this problem');
 assert.equal(api.getOverallClaim([attempt, openAIAttempt]), 'solved');
 const partialOpenAIAttempt = { ...openAIAttempt, status: 'unresolved', openai: { ...openAIMetadata, match: 'partial' } };
 assert.equal(api.getOverallClaim([partialOpenAIAttempt]), 'partial');
@@ -102,6 +105,10 @@ const relatedOpenAIAttempt = { ...partialOpenAIAttempt,
 const relatedOpenAIProblem = { ...partialOpenAIProblem, status: 'open',
     llm_status: 'related', attacks: [relatedOpenAIAttempt] };
 assert.equal(api.getAttemptClaim(relatedOpenAIAttempt), 'related');
+assert.equal(api.getOpenAIMatchLabel(partialOpenAIAttempt), 'Partial solution claimed for this problem');
+assert.equal(api.getOpenAIMatchLabel(relatedOpenAIAttempt), 'Related result; no solution to this problem claimed');
+assert.equal(api.getOpenAIMatchLabel({ ...openAIAttempt, openai: { ...openAIMetadata, match: 'stronger' } }),
+    'Stronger result claimed, covering this problem');
 assert.equal(api.getOpenProblemClaim(relatedOpenAIProblem), 'related');
 assert.equal(api.getOpenProblemStatusLabel(relatedOpenAIProblem), 'open');
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved · OpenAI/);
@@ -143,6 +150,9 @@ assert.match(provenance, />Manuscript page<\/a>/);
 assert.match(provenance, /Comparator: Result\.lean/);
 assert.match(provenance, /rel="noopener noreferrer"/);
 assert.match(provenance, /not been independently verified/);
+assert.match(provenance, /Relationship to this problem:<\/strong> Full solution claimed for this problem/);
+assert.match(provenance, /OpenAI catalogue family: A distinct family title/);
+assert.match(provenance, /<strong>Paper: Claimed result<\/strong>/);
 assert.ok(provenance.includes(`href="${statementURL}"`));
 assert.match(provenance, />Statement: thm:main_bound<\/a>/);
 const unsafeStatementProvenance = api.renderOpenAIProvenance({ ...openAIAttempt, openai: { ...openAIMetadata,
@@ -157,6 +167,27 @@ const maliciousProvenance = api.renderOpenAIProvenance({ ...openAIAttempt, opena
         pdf_path: 'javascript:alert(1)', readme_path: 'https://evil.example/README.md' }] }] } });
 assert.doesNotMatch(maliciousProvenance, /<img|<script|href="(?:javascript:|https:\/\/evil)/);
 assert.match(maliciousProvenance, /&lt;img/);
+const repeatedPaper = { ...openAIAttempt, openai: { ...openAIMetadata,
+    families: [...openAIMetadata.families, { manuscripts: [{ title: 'Claimed result' },
+        { title: 'Second paper & <title>' }, { title: '' }, {}] }] } };
+assert.deepEqual(Array.from(api.getOpenAIPaperTitles(repeatedPaper)), ['Claimed result', 'Second paper & <title>']);
+const scopedRaw = String.raw`\begin{document}
+\subsection{Mathematical statement of the claimed result}
+For all $n$, $f(n)>0$.
+\subsection{Scope relative to this problem}
+The result covers $n\le 10$ only.
+
+\subsection{Formal verification}
+No proof check here.
+\end{document}`;
+const scopedContent = api.splitOpenAIClaimContent({ raw: scopedRaw });
+assert.equal(scopedContent.scope, String.raw`The result covers $n\le 10$ only.`);
+assert.match(scopedContent.raw, /Mathematical statement of the claimed result/);
+assert.match(scopedContent.raw, /Formal verification/);
+assert.doesNotMatch(scopedContent.raw, /Scope relative to this problem|The result covers/);
+const unscopedContent = api.splitOpenAIClaimContent({ raw: 'An earlier claim without sections.' });
+assert.equal(unscopedContent.scope, '');
+assert.equal(unscopedContent.raw, 'An earlier claim without sections.');
 assert.deepEqual(ids(Object.values(records).sort(api.sortOpenProblems)), ['20000601', '6', 'mo:40', 'mo:23']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { withAttempts: true })), ['6', 'mo:23']);
 assert.deepEqual(ids(api.filterOpenProblems(records, { source: 'ranked', withAttempts: true })), ['6']);

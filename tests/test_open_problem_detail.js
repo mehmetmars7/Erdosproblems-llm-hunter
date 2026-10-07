@@ -122,7 +122,12 @@ const openAIMetadata = {
 const openAIAttempt = { model: 'OpenAI', claimant: 'OpenAI', entry_kind: 'external_claim',
     status: 'solved', date_posted: '2026-10-06', openai: openAIMetadata,
     file_path: 'attacks/open_problems/top_problems/openai/20000601.tex',
-    raw: String.raw`\subsection{OpenAI's claim}An original summary with $x^2$.` };
+    raw: String.raw`\subsection{OpenAI's claim}
+An original summary with $x^2$.
+\subsection{Scope relative to this problem}
+The claimed counterexample has $x^2=1$.
+\subsection{Status caveat}
+These are claims, not verified proofs.` };
 const openAIProblem = { ...records['20000601'], tags: ['openai'], llm_status: 'solved',
     llm_status_source: 'openai_claim', completion: 100,
     attacks: [{ model: 'GPT 6 Astra Ultra', status: 'solved', date_posted: '2026-01-01', raw: 'Earlier claim.' },
@@ -136,7 +141,9 @@ assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> solve
 assert.doesNotMatch(page.element('problem-meta').innerHTML, /solved \(2026-01-01\)/);
 assert.equal(page.element('llm-attempts-section h2').textContent, 'LLM claims and collection records');
 let openAIHtml = page.element('attempts-container').innerHTML;
-assert.match(openAIHtml, /OpenAI claim: Example family &lt;title&gt;/);
+assert.match(openAIHtml, /<h3>OpenAI paper: Example manuscript<\/h3>/);
+assert.match(openAIHtml, /OpenAI catalogue family: Example family &lt;title&gt;/);
+assert.match(openAIHtml, /Relationship to this problem:<\/strong> Full solution claimed for this problem/);
 assert.match(openAIHtml, /OpenAI claim: solved \(disproved\), not independently verified/);
 assert.match(openAIHtml, /\/blob\/adc7f1241b42e322a6451854ab7e4b4c146bf78a\/preprints\/Result-in-CAT%280%29-spaces\/custom\.pdf/);
 assert.match(openAIHtml, /\/raw\/adc7f1241b42e322a6451854ab7e4b4c146bf78a\/preprints\/Result-in-CAT%280%29-spaces\/custom\.pdf/);
@@ -151,6 +158,9 @@ assert.match(openAIHtml, />Reasoning summary<\/a>/);
 assert.match(openAIHtml, /not run the Lean code/);
 assert.match(openAIHtml, /2026-09-23/);
 assert.match(openAIHtml, /An original summary with \$x\^2\$/);
+assert.match(openAIHtml, /The claimed counterexample has \$x\^2=1\$/);
+assert.equal((openAIHtml.match(/Scope relative to this problem/g) || []).length, 1);
+assert.ok(openAIHtml.indexOf('The claimed counterexample') < openAIHtml.indexOf('>PDF</a>'));
 assert.doesNotMatch(openAIHtml, /<title>|<iframe/);
 const partialAttempt = { ...openAIAttempt, status: 'unresolved',
     openai: { ...openAIMetadata, match: 'partial', resolution: 'partial' } };
@@ -164,6 +174,8 @@ assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong
 assert.equal(page.element('contribute-cta').hidden, false);
 assert.match(page.element('attempts-container').innerHTML, /OpenAI claim: partial result/);
 assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved/);
+assert.match(page.element('attempts-container').innerHTML,
+    /Relationship to this problem:<\/strong> Partial solution claimed for this problem/);
 page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
     status: 'solved', source_status: 'solved', llm_status: 'partial', attacks: [partialAttempt] } });
 assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> solved<\/p>/);
@@ -177,6 +189,26 @@ page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAI
 openAIHtml = page.element('attempts-container').innerHTML;
 assert.doesNotMatch(openAIHtml, /<script|<img|href="(?:javascript:|https:\/\/evil)/);
 assert.match(openAIHtml, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/);
+assert.match(openAIHtml, /<h3>OpenAI paper: &lt;img src=x onerror=alert\(1\)&gt;<\/h3>/);
+
+// A catalogue question keeps its identity while the claim card names the papers
+// actually opened by its PDF links and presents their scope before those links.
+const maxCutProblem = JSON.parse(fs.readFileSync(path.join(root, 'docs/data/top_problems/2800802.json'), 'utf8'));
+page = await render('?type=open_problems&id=2800802', { '2800802': maxCutProblem });
+assert.equal(page.element('page-title').textContent,
+    '10 Lectures and 42 Open Problems — Sum of Squares approximation ratio for Max-Cut');
+openAIHtml = page.element('attempts-container').innerHTML;
+assert.match(openAIHtml, /<h3>OpenAI papers: A Direct Proof of Optimal Max-Cut Hardness; The Unique Games Theorem<\/h3>/);
+assert.ok(openAIHtml.indexOf('Scope relative to this problem') < openAIHtml.indexOf('>PDF</a>'));
+assert.ok(openAIHtml.indexOf('Paper: A Direct Proof of Optimal Max-Cut Hardness') < openAIHtml.indexOf('>PDF</a>'));
+const relatedAttempt = { ...openAIAttempt, status: 'unresolved',
+    openai: { ...openAIMetadata, match: 'related', resolution: 'partial' } };
+page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
+    status: 'open', source_status: 'open', llm_status: 'related', attacks: [relatedAttempt] } });
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open<\/p>/);
+assert.match(page.element('attempts-container').innerHTML,
+    /Relationship to this problem:<\/strong> Related result; no solution to this problem claimed/);
+assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved|OpenAI claim: partial result/);
 
 page = await render('?type=open_problems&id=mo%3A42');
 assert.match(page.element('problem-meta').innerHTML, /MathOverflow subset/);
