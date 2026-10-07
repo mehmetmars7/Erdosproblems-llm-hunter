@@ -83,6 +83,11 @@ claims in [openai/math](https://github.com/openai/math). Preserve the exact
 with the pinned source commit, paper-level scope, result classification,
 and manuscript and formalization paths from `lists/openai_math/manifest.json`.
 The build rejects inconsistent statuses, unknown paths, and invalid metadata.
+Each manuscript may also supply `statement_sources`, an array of
+`{"path": "preprints/<manuscript>/build/source.tex", "line": 1, "label": "Theorem 1.1"}`
+objects. Use an eligible TeX file from that manuscript's build directory and
+the actual source line and theorem label. These produce pinned links directly
+to the mathematical statement; they cannot point to another manuscript.
 
 Match the paper's main theorem to the complete problem statement, including
 quantifiers, hypotheses, parameters, and bundled questions. Only full or stronger
@@ -92,6 +97,13 @@ seeing the first verdict, and the user must confirm the proposed solved labels
 before importing records. Scope review does not verify the proof itself:
 `independently_reviewed` remains false. Never change the catalogue source status,
 existing GPT attempts, reviews, numerical IDs, or existing display positions.
+The build keeps the original catalogue status in `source_status`. A full or
+stronger match sets the displayed Problem Status to solved (OpenAI claim);
+a partial match is partially solved (OpenAI claim), unless the source catalogue
+already records a solution. Community review is independent of these claim labels.
+An existing record that covers a different mathematical target may be corrected
+to `match: related`; it keeps `ATTEMPT_STATUS: unresolved` and does not change
+the displayed Problem Status. New imports still exclude related-only matches.
 
 The generator `scripts/import_openai_math.py` reads the pinned inventory and
 approved adjudication plus per-ID summary sections. Validate with its dry-run
@@ -120,8 +132,13 @@ python3 scripts/match_openai_math_candidates.py \
 Adjust the external paths for your workspace. Candidate scores identify pairs
 to inspect; they never authorize a solved label.
 
-Write the claim, argument outline, scope comparison, formal-verification scope,
-and status caveat in original prose. Link each paper's GitHub PDF page, direct
+Write the claim, mathematical statement, argument outline, scope comparison,
+formal-verification scope, and status caveat in original TeX. The
+`mathematical_statement` section must give the manuscript's hypotheses,
+quantifiers, parameter range, and conclusion, including its theorem reference;
+distinguish the theorem proved for a subcase from the complete catalogue problem.
+Legacy inputs without this section remain readable by the generator.
+Link each paper's GitHub PDF page, direct
 PDF download, README citation page, and latest version. Include pinned Lean
 scope, Comparator files, and reasoning summaries where available. The no-copy
 8-gram check must pass. This site does not run linked Lean code, and a scope

@@ -5,7 +5,9 @@ No network operations are performed. The source checkout must already contain
 the inventory's pinned commit. Summary inputs are JSON, either a mapping of
 problem IDs to section objects or a directory of <id>.json section objects.
 The required keys are claim, outline, scope, formal_verification, status_caveat.
-They contain original TeX prose; the generator supplies the wrapper and Sources.
+New records also include mathematical_statement, containing the paper's
+mathematical hypotheses and conclusion. Legacy five-section inputs remain
+supported. The generator supplies the wrapper and Sources.
 
 Approval is a separate JSON artifact with source_commit and approved_solved_ids.
 Only IDs explicitly approved there can receive a solved claim. Every supporting
@@ -33,6 +35,7 @@ SOURCE_COMMIT = 'adc7f1241b42e322a6451854ab7e4b4c146bf78a'
 RELEASE_DATE = '2026-10-06'
 SECTION_KEYS = {
     'claim': "OpenAI's claim",
+    'mathematical_statement': 'Mathematical statement of the claimed result',
     'outline': 'Outline of the argument',
     'scope': 'Scope relative to this problem',
     'formal_verification': 'Formal verification',
@@ -159,6 +162,9 @@ def unicode_math_character(char):
     names = 'alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron pi rho sigma tau upsilon phi chi psi omega'.split()
     symbols.update({letter: '\\' + name for letter, name in zip(greek, names)
                     if name != 'omicron'})
+    symbols.update(dict(zip('ΓΔΘΛΞΠΣΥΦΨΩ',
+                            ('\\Gamma', '\\Delta', '\\Theta', '\\Lambda', '\\Xi',
+                             '\\Pi', '\\Sigma', '\\Upsilon', '\\Phi', '\\Psi', '\\Omega'))))
     symbols['ο'] = 'o'
     if char in symbols:
         return r'\(' + symbols[char] + r'\)'
@@ -187,6 +193,35 @@ def tex_link(path, label, commit=SOURCE_COMMIT, mode='blob'):
     # Percent-encoding is performed before TeX escaping, including parentheses.
     url = tex_escape(source_url(path, commit, mode))
     return r'\href{' + url + '}{' + tex_escape(label) + '}'
+
+
+def validate_statement_sources(sources, manuscript):
+    """Check source anchors before rendering; the build also checks the manifest."""
+    if not isinstance(sources, list):
+        raise ValueError('Statement sources require an array')
+    prefix = manuscript['pdf_path'].rsplit('/', 1)[0] + '/build/'
+    seen = set()
+    for source in sources:
+        if not isinstance(source, dict) or set(source) != {'path', 'line', 'label'}:
+            raise ValueError('Statement sources require exactly path, line, label')
+        path = source_path(source['path'])
+        if not path.startswith(prefix) or not path.endswith('.tex'):
+            raise ValueError('Statement source must belong to the selected manuscript build directory')
+        if type(source['line']) is not int or source['line'] < 1:
+            raise ValueError('Statement source line must be a positive integer')
+        if not isinstance(source['label'], str) or not source['label'].strip():
+            raise ValueError('Statement source label must be nonempty text')
+        identity = (path, source['line'], source['label'])
+        if identity in seen:
+            raise ValueError('Duplicate statement source')
+        seen.add(identity)
+    return sources
+
+
+def statement_source_link(source, manuscript):
+    validate_statement_sources([source], manuscript)
+    url = source_url(source['path']) + '#L' + str(source['line'])
+    return r'\href{' + tex_escape(url) + '}{' + tex_escape(source['label']) + '}'
 
 
 def adjudication_rows(document):
@@ -259,16 +294,49 @@ def group_rows(document, inventory, approval=None):
         elif row.get('resolution') != 'partial':
             raise ValueError('Partial adjudication requires partial resolution')
         grouped[problem_id].append(row)
+    for problem_id, rows in grouped.items():
+        if joint_coverage(rows) is not None and problem_id not in approved:
+            raise ValueError(f'Joint solved label {problem_id} requires explicit user approval in approved_solved_ids')
     return dict(sorted(grouped.items()))
+
+
+def joint_coverage(rows):
+    """Allow reviewed case coverage without relabelling individual papers full."""
+    decisions = [row.get('joint_coverage') for row in rows]
+    if not any(decision is not None for decision in decisions):
+        return None
+    decision = decisions[0]
+    fields = {'match', 'resolution', 'second_pass', 'justification'}
+    if not isinstance(decision, dict) or set(decision) != fields \
+            or any(value != decision for value in decisions):
+        raise ValueError('Joint coverage requires the same explicit decision on every selected row')
+    if decision['match'] not in {'full', 'stronger'} \
+            or decision['resolution'] not in {'proved', 'disproved'}:
+        raise ValueError('Joint coverage requires a solved match and resolution')
+    if decision['second_pass'] != 'agreed':
+        raise ValueError('Joint coverage requires an agreed independent second pass')
+    if not isinstance(decision['justification'], str) or not decision['justification'].strip():
+        raise ValueError('Joint coverage requires an explicit mathematical justification')
+    if len(rows) < 2 or len({row['candidate_id'] for row in rows}) != 1:
+        raise ValueError('Joint coverage requires multiple papers for one target')
+    return decision
 
 
 def build_metadata(rows, inventory):
     indexed = validate_inventory(inventory)
     solved = [row for row in rows if row['class'] in {'full', 'stronger'}]
     resolutions = {row['resolution'] for row in solved}
+    joint = joint_coverage(rows)
+    if joint is not None:
+        resolutions.add(joint['resolution'])
     if len(resolutions) > 1:
         raise ValueError('Conflicting proof and disproof adjudications require review')
     match = ('stronger' if any(row['class'] == 'stronger' for row in solved) else 'full') if solved else 'partial'
+    if all(row['class'] == 'related' for row in rows):
+        match = 'related'
+    if joint is not None:
+        match = 'stronger' if match == 'stronger' or joint['match'] == 'stronger' else 'full'
+    is_solved = bool(solved) or joint is not None
     families = []
     by_family = defaultdict(list)
     for row in rows:
@@ -278,11 +346,14 @@ def build_metadata(rows, inventory):
         papers, comparator_paths, declarations = [], set(), set()
         for row in sorted(family_rows, key=lambda item: item['manuscript_dir']):
             manuscript = indexed[(number, row['manuscript_dir'])][1]
-            papers.append({
+            paper = {
                 'title': manuscript['title'], 'pdf_path': manuscript['pdf_path'],
                 'readme_path': manuscript['readme_path'], 'date': manuscript['date'],
                 'theorem_ref': row['openai_theorem_ref'],
-            })
+            }
+            if 'statement_sources' in row:
+                paper['statement_sources'] = validate_statement_sources(row['statement_sources'], manuscript)
+            papers.append(paper)
             for comparator in manuscript.get('comparators', []):
                 comparator_paths.update([comparator['lean'], comparator['json']])
                 declaration = comparator.get('declaration')
@@ -304,8 +375,8 @@ def build_metadata(rows, inventory):
     return {
         'schema_version': 1, 'source_repo': SOURCE_REPO,
         'source_commit': SOURCE_COMMIT, 'release_date': RELEASE_DATE,
-        'match': match, 'resolution': next(iter(resolutions)) if solved else 'partial',
-        'independently_reviewed': False, 'second_pass': 'agreed' if solved else 'n/a',
+        'match': match, 'resolution': next(iter(resolutions)) if is_solved else 'partial',
+        'independently_reviewed': False, 'second_pass': 'agreed' if is_solved else 'n/a',
         'families': families,
     }
 
@@ -314,18 +385,20 @@ def load_sections(path, problem_id):
     path = Path(path)
     document = read_json(path / f'{problem_id}.json') if path.is_dir() else read_json(path)
     sections = document.get(str(problem_id), document) if isinstance(document, dict) else document
-    if not isinstance(sections, dict) or set(sections) != set(SECTION_KEYS):
-        raise ValueError(f'Summary {problem_id} requires exactly: {", ".join(SECTION_KEYS)}')
+    required = set(SECTION_KEYS) - {'mathematical_statement'}
+    if not isinstance(sections, dict) or set(sections) not in (required, set(SECTION_KEYS)):
+        raise ValueError(f'Summary {problem_id} requires: {", ".join(sorted(required))}; '
+                         'mathematical_statement is the only optional section')
     for key, text in sections.items():
         if not isinstance(text, str) or not text.strip():
             raise ValueError(f'Summary {problem_id} has empty {key}')
         if re.search(r'(?m)^\s*%\s*(?:TOP_PROBLEM|FIRST_POSTED|ATTEMPT_STATUS|OPENAI_CLAIM|COLLECTION_METADATA|ENTRY_KIND):', text):
             raise ValueError('Summary prose cannot supply metadata headers')
         if re.search(r'\\(?:begin|end)\s*\{(?:document|filecontents\*?)\}|\\(?:section|subsection|input|include|write|immediate|openout|read|catcode|usepackage|documentclass)\b', text):
-            raise ValueError('Summary inputs contain prose only; document, section, or external-file commands are forbidden')
+            raise ValueError('Summary inputs contain TeX prose and mathematics only; document, section, or external-file commands are forbidden')
         if re.search(r'https?://|\\(?:href|url)\b', text):
             raise ValueError('Summary links belong in deterministic Sources')
-    return {key: sections[key].strip() for key in SECTION_KEYS}
+    return {key: sections[key].strip() for key in SECTION_KEYS if key in sections}
 
 
 def render_sources(metadata):
@@ -335,14 +408,19 @@ def render_sources(metadata):
             folder = PurePosixPath(manuscript['pdf_path']).parts[1]
             title = tex_escape(manuscript['title'])
             citation = tex_escape('OAI:' + folder)
+            links = [
+                tex_link(manuscript['pdf_path'], 'PDF (GitHub)'),
+                tex_link(manuscript['pdf_path'], 'PDF (direct)', mode='raw'),
+                tex_link(manuscript['readme_path'], 'Manuscript page and citation'),
+                tex_link(manuscript['pdf_path'], 'Latest version', commit='main'),
+            ]
+            if 'statement_sources' in manuscript:
+                sources = validate_statement_sources(manuscript['statement_sources'], manuscript)
+                links.extend('Statement source: ' + statement_source_link(source, manuscript)
+                             for source in sources)
             items.append(r'\item OpenAI, \emph{' + title + '}, ' + manuscript['date']
                          + r'; citation key \texttt{' + citation + '}. '
-                         + '; '.join([
-                             tex_link(manuscript['pdf_path'], 'PDF (GitHub)'),
-                             tex_link(manuscript['pdf_path'], 'PDF (direct)', mode='raw'),
-                             tex_link(manuscript['readme_path'], 'Manuscript page and citation'),
-                             tex_link(manuscript['pdf_path'], 'Latest version', commit='main'),
-                         ]) + '.')
+                         + '; '.join(links) + '.')
         if family['lean']:
             items.append(r'\item Family ' + family['family'] + ': '
                          + tex_link(family['lean']['doc_path'], 'Lean scope') + '.')
@@ -368,6 +446,9 @@ def render_record(definition, metadata, sections):
                         '% OPENAI_CLAIM: ' + json_line(metadata)]) + '\n'
     body = r'\section*{' + tex_escape(canonical['title']) + '}\n'
     for key, heading in SECTION_KEYS.items():
+        # Preserve rendering of legacy five-section records.
+        if key == 'mathematical_statement' and key not in sections:
+            continue
         body += '\n\\subsection{' + heading + '}\n' + sections[key].strip() + '\n'
     return header + PREAMBLE + body + '\n' + render_sources(metadata) + '\\end{document}\n'
 

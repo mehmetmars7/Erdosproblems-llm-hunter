@@ -295,8 +295,8 @@ def load_openai_manifest():
 def parse_openai_claim(content, manifest=None):
     """Validate a pinned external claim before giving it a solved label.
 
-    The catalogue remains the source of mathematical status. These headers
-    describe OpenAI's unreviewed claim and the scope of our statement match.
+    These headers describe OpenAI's unreviewed claim and the scope of our
+    statement match. The original catalogue status is retained separately.
     Paths must belong to the claimed family and manuscript, not just exist in
     the same upstream repository.
     """
@@ -331,8 +331,9 @@ def parse_openai_claim(content, manifest=None):
             or problem_header['id'] < 1:
         raise ValueError('OPENAI_CLAIM requires a canonical TOP_PROBLEM ID')
 
-    def object_fields(value, keys, label):
-        if not isinstance(value, dict) or set(value) != set(keys):
+    def object_fields(value, keys, label, optional=()):
+        if not isinstance(value, dict) or not set(keys).issubset(value) \
+                or not set(value).issubset(set(keys) | set(optional)):
             raise ValueError(f'Invalid OPENAI_CLAIM {label} fields')
 
     def text_field(value, label):
@@ -366,7 +367,7 @@ def parse_openai_claim(content, manifest=None):
         raise ValueError('Invalid OPENAI_CLAIM source_repo')
     if metadata['independently_reviewed'] is not False:
         raise ValueError('OPENAI_CLAIM must explicitly be independently_reviewed: false')
-    if metadata['match'] not in ('full', 'stronger', 'partial'):
+    if metadata['match'] not in ('full', 'stronger', 'partial', 'related'):
         raise ValueError('Invalid OPENAI_CLAIM match')
     solved = metadata['match'] in {'full', 'stronger'}
     if metadata['resolution'] not in (('proved', 'disproved') if solved else ('partial',)):
@@ -442,7 +443,7 @@ def parse_openai_claim(content, manifest=None):
             paper_map[paper['pdf_path']] = paper
         for paper in papers:
             object_fields(paper, ('title', 'pdf_path', 'readme_path', 'date',
-                                 'theorem_ref'), 'manuscript')
+                                 'theorem_ref'), 'manuscript', optional=('statement_sources',))
             checked_path(paper['pdf_path'], 'pdf_path')
             checked_path(paper['readme_path'], 'readme_path')
             if paper['pdf_path'] not in paper_map or paper['pdf_path'] in seen_papers:
@@ -454,6 +455,24 @@ def parse_openai_claim(content, manifest=None):
             date_field(paper['date'], 'manuscript date')
             text_field(paper['title'], 'manuscript title')
             text_field(paper['theorem_ref'], 'theorem_ref')
+            if 'statement_sources' in paper:
+                sources = paper['statement_sources']
+                if not isinstance(sources, list):
+                    raise ValueError('Invalid OPENAI_CLAIM statement_sources')
+                source_prefix = paper['pdf_path'].rsplit('/', 1)[0] + '/build/'
+                seen_sources = set()
+                for source in sources:
+                    object_fields(source, ('path', 'line', 'label'), 'statement source')
+                    checked_path(source['path'], 'statement source')
+                    if not source['path'].startswith(source_prefix) or not source['path'].endswith('.tex'):
+                        raise ValueError('OPENAI_CLAIM statement source does not match selected manuscript build directory')
+                    if type(source['line']) is not int or source['line'] < 1:
+                        raise ValueError('Invalid OPENAI_CLAIM statement source line')
+                    text_field(source['label'], 'statement source label')
+                    identity = (source['path'], source['line'], source['label'])
+                    if identity in seen_sources:
+                        raise ValueError('Duplicate OPENAI_CLAIM statement source')
+                    seen_sources.add(identity)
         lean = family['lean']
         if inventoried.get('lean_doc') is None:
             if lean is not None:
@@ -469,6 +488,8 @@ def parse_openai_claim(content, manifest=None):
                 raise ValueError('Invalid OPENAI_CLAIM covers_main_theorem')
             string_list(lean['comparators'], 'comparators')
             string_list(lean['declarations'], 'declarations')
+            if lean['covers_main_theorem'] is True and not lean['comparators']:
+                raise ValueError('OPENAI_CLAIM main-theorem coverage requires a selected manuscript Comparator')
             allowed_comparators = {
                 comparator[key]
                 for paper in papers
@@ -1096,17 +1117,28 @@ def build_mo_data():
 
 
 def summarize_open_problem_attempts(problem):
-    """Keep writeup claims and estimates separate from catalog status."""
+    """Show scoped OpenAI claims while retaining the original catalogue status."""
     problem['attacks'].sort(key=lambda attack: (
         attack.get('model', ''), attack.get('version', 1), attack.get('file_path', '')
     ))
     attempts = [a for a in problem['attacks'] if a.get('entry_kind') != 'statement_only']
     openai_claims = [a for a in attempts if a.get('entry_kind') == 'external_claim'
                     and a.get('claimant') == 'OpenAI']
-    solved_openai = any(a['openai']['match'] in {'full', 'stronger'} for a in openai_claims)
+    solved_openai = any(a['openai']['match'] in {'full', 'stronger'}
+                        and a.get('status') == 'solved' for a in openai_claims)
+    partial_openai = any(a['openai']['match'] == 'partial' for a in openai_claims)
     if openai_claims:
         problem['tags'] = list(dict.fromkeys([*problem.get('tags', []), 'openai']))
-        problem['openai_claim'] = 'solved' if solved_openai else 'partial'
+        problem['openai_claim'] = 'solved' if solved_openai else 'partial' if partial_openai else 'related'
+        problem.setdefault('source_status', problem['status'])
+        # A partial contribution cannot undo a solution already recorded by
+        # the source catalogue. All other OpenAI statuses describe claims,
+        # independently of the human community-review record.
+        if solved_openai or partial_openai and problem['source_status'] != 'solved':
+            problem['status'] = 'solved' if solved_openai else 'partial'
+            problem['status_source'] = 'openai_claim'
+        else:
+            problem['status_source'] = 'source_catalogue'
     problem['llm_status'] = (
         'none' if not attempts else
         'unresolved' if any(a.get('status') == 'unresolved' for a in attempts) else 'solved'
@@ -1122,6 +1154,9 @@ def summarize_open_problem_attempts(problem):
         problem['llm_status_source'] = 'openai_claim'
         problem['completion'] = 100
         problem['completion_source'] = 'openai_claim'
+    elif openai_claims:
+        problem['llm_status'] = 'partial' if partial_openai else 'related'
+        problem['llm_status_source'] = 'openai_claim'
 
 
 def build_open_problems_data(mo_problems=None, snapshot=None):

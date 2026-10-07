@@ -70,6 +70,9 @@ const openAIMetadata = {
 };
 const openAIAttempt = { model: 'OpenAI', claimant: 'OpenAI', entry_kind: 'external_claim',
     status: 'solved', openai: openAIMetadata };
+const statementSource = { path: 'preprints/Result-in-CAT(0)-spaces/build/source/main.tex',
+    line: 57, label: 'thm:main_bound' };
+openAIMetadata.families[0].manuscripts[0].statement_sources = [statementSource];
 const taggedRecords = { ...records, '6': { ...records['6'], tags: ['openai'],
     llm_status_source: 'openai_claim', attacks: [attempt, openAIAttempt] } };
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { tag: 'openai' })), ['6']);
@@ -79,14 +82,51 @@ assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'OpenAI' })
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title' })), ['6']);
 assert.deepEqual(ids(api.filterOpenProblems(taggedRecords, { search: 'distinct family title', tag: 'openai' })), ['6']);
 assert.equal(api.getOverallClaim([attempt, openAIAttempt]), 'solved');
-assert.equal(api.getOverallClaim([{ ...openAIAttempt, status: 'unresolved', openai: { ...openAIMetadata, match: 'partial' } }]), 'unresolved');
+const partialOpenAIAttempt = { ...openAIAttempt, status: 'unresolved', openai: { ...openAIMetadata, match: 'partial' } };
+assert.equal(api.getOverallClaim([partialOpenAIAttempt]), 'partial');
+assert.equal(api.getOverallClaim([attempt, partialOpenAIAttempt]), 'partial');
+assert.equal(api.getAttemptClaim(partialOpenAIAttempt), 'partial');
+assert.equal(api.getAttemptClaim({ ...attempt, status: 'partial' }), 'unresolved');
+assert.equal(api.getOpenProblemStatusLabel(taggedRecords['6']), 'solved (OpenAI claim)');
+assert.equal(api.getOpenProblemSourceStatusLabel(taggedRecords['6']), 'open with solved subcases');
+const partialOpenAIProblem = { ...taggedRecords['6'], status: 'partial', source_status: 'open',
+    llm_status: 'partial', attacks: [attempt, partialOpenAIAttempt] };
+assert.equal(api.getOpenProblemStatusLabel(partialOpenAIProblem), 'partially solved (OpenAI claim)');
+assert.equal(api.getOpenProblemClaim(partialOpenAIProblem), 'partial');
+assert.equal(api.getOpenProblemSourceStatusLabel(partialOpenAIProblem), 'open');
+const catalogueSolved = { ...partialOpenAIProblem, status: 'solved', source_status: 'solved' };
+assert.equal(api.getOpenProblemStatusLabel(catalogueSolved), 'solved');
+assert.equal(api.getOpenProblemClaim(catalogueSolved), 'partial');
+const relatedOpenAIAttempt = { ...partialOpenAIAttempt,
+    openai: { ...openAIMetadata, match: 'related' } };
+const relatedOpenAIProblem = { ...partialOpenAIProblem, status: 'open',
+    llm_status: 'related', attacks: [relatedOpenAIAttempt] };
+assert.equal(api.getAttemptClaim(relatedOpenAIAttempt), 'related');
+assert.equal(api.getOpenProblemClaim(relatedOpenAIProblem), 'related');
+assert.equal(api.getOpenProblemStatusLabel(relatedOpenAIProblem), 'open');
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved · OpenAI/);
+assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved \(OpenAI claim\)/);
+assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /partially solved \(OpenAI claim\)/);
+assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /Source catalogue: open/);
+assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /partial · OpenAI/);
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /Algebra · Ranked catalogue · OpenAI/);
 assert.deepEqual(Array.from(api.getModelLabels([openAIAttempt])), ['openai']);
 assert.equal(api.getOpenAIFileUrl(openAIMetadata, openAIMetadata.families[0].manuscripts[0].pdf_path),
     `https://github.com/openai/math/blob/${openAIMetadata.source_commit}/preprints/Result-in-CAT%280%29-spaces/main.pdf`);
 assert.equal(api.getOpenAIFileUrl(openAIMetadata, 'preprints/Title/custom name.pdf', true),
     `https://github.com/openai/math/raw/${openAIMetadata.source_commit}/preprints/Title/custom%20name.pdf`);
+const statementURL = `https://github.com/openai/math/blob/${openAIMetadata.source_commit}/preprints/Result-in-CAT%280%29-spaces/build/source/main.tex#L57`;
+assert.equal(api.getOpenAIStatementUrl(openAIMetadata, openAIMetadata.families[0].manuscripts[0], statementSource), statementURL);
+assert.equal(api.getOpenAIFileUrl(openAIMetadata, statementSource.path, true), '');
+for (const source of [{ ...statementSource, line: true }, { ...statementSource, line: 0 },
+    { ...statementSource, line: '57' }, { ...statementSource, line: 1.5 },
+    { ...statementSource, label: '' }, { ...statementSource, extra: 'unknown' },
+    { ...statementSource, path: 'preprints/Other/build/source/main.tex' },
+    { ...statementSource, path: 'preprints/Result-in-CAT(0)-spaces/build/source/../main.tex' },
+    { ...statementSource, path: 'preprints/Result-in-CAT(0)-spaces/main.tex' },
+    { ...statementSource, path: statementSource.path + '#L99' }]) {
+    assert.equal(api.getOpenAIStatementUrl(openAIMetadata, openAIMetadata.families[0].manuscripts[0], source), '');
+}
 for (const path of ['https://example.org/paper.pdf', 'preprints/../paper.pdf', 'preprints/Title/%2e%2e.pdf',
     'preprints/Title/paper.pdf?download=1', 'preprints/Title/paper.pdf#fragment', 'preprints/Title\\paper.pdf',
     'preprints/Title/paper.pdf\n', 'lean/docs/not-a-family.md']) {
@@ -103,6 +143,15 @@ assert.match(provenance, />Manuscript page<\/a>/);
 assert.match(provenance, /Comparator: Result\.lean/);
 assert.match(provenance, /rel="noopener noreferrer"/);
 assert.match(provenance, /not been independently verified/);
+assert.ok(provenance.includes(`href="${statementURL}"`));
+assert.match(provenance, />Statement: thm:main_bound<\/a>/);
+const unsafeStatementProvenance = api.renderOpenAIProvenance({ ...openAIAttempt, openai: { ...openAIMetadata,
+    families: [{ ...openAIMetadata.families[0], manuscripts: [{ ...openAIMetadata.families[0].manuscripts[0],
+        statement_sources: [{ ...statementSource, label: '<img src=x onerror=alert(1)>' },
+            { ...statementSource, path: 'preprints/Other/build/source/main.tex' },
+            { ...statementSource, line: '57" onclick="alert(1)' }] }] }] } });
+assert.doesNotMatch(unsafeStatementProvenance, /<img|onclick=|preprints\/Other/);
+assert.match(unsafeStatementProvenance, /Statement: &lt;img/);
 const maliciousProvenance = api.renderOpenAIProvenance({ ...openAIAttempt, openai: { ...openAIMetadata,
     families: [{ title: '<img src=x onerror=alert(1)>', manuscripts: [{ title: '<script>alert(1)</script>',
         pdf_path: 'javascript:alert(1)', readme_path: 'https://evil.example/README.md' }] }] } });

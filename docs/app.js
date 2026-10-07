@@ -105,9 +105,11 @@ function getMathematicalAttempts(attacks) {
     return (attacks || []).filter(a => a.entry_kind !== 'statement_only');
 }
 
-// Partial work is not a solution. Keep legacy browser fallbacks aligned with
-// the builder's solved/unresolved claim labels without changing problem status.
+// OpenAI partial results keep their scope visible. Other legacy partial
+// attempts retain the existing unresolved label.
 function getAttemptClaim(attack) {
+    if (isPartialOpenAIClaim(attack)) return 'partial';
+    if (isRelatedOpenAIClaim(attack)) return 'related';
     const status = String(attack.status || '').trim().toLowerCase();
     if (status === 'solved') return 'solved';
     if (status === 'partial' || status === 'unresolved') return 'unresolved';
@@ -117,6 +119,8 @@ function getAttemptClaim(attack) {
 function getOverallClaim(attacks) {
     const attempts = getMathematicalAttempts(attacks);
     if (attempts.some(isSolvedOpenAIClaim)) return 'solved';
+    if (attempts.some(isPartialOpenAIClaim)) return 'partial';
+    if (attempts.some(isRelatedOpenAIClaim)) return 'related';
     const claims = attempts.map(getAttemptClaim);
     if (!claims.length) return 'none';
     if (claims.includes('unresolved')) return 'unresolved';
@@ -272,12 +276,35 @@ function filterOpenProblems(problems, filters = {}) {
 function getOpenProblemClaim(problem) {
     const attempts = getMathematicalAttempts(problem.attacks);
     if (!attempts.length) return 'no attempt';
+    if (attempts.some(isSolvedOpenAIClaim)) return 'solved';
+    if (attempts.some(isPartialOpenAIClaim)) return 'partial';
+    if (attempts.some(isRelatedOpenAIClaim)) return 'related';
     if (problem.llm_status && problem.llm_status !== 'none') return problem.llm_status;
     return getOverallClaim(attempts);
 }
 
+function getOpenProblemStatus(problem) {
+    const attempts = getMathematicalAttempts(problem.attacks);
+    if (attempts.some(isSolvedOpenAIClaim)) return 'solved';
+    const sourceStatus = problem.source_status ?? problem.status;
+    if (attempts.some(isPartialOpenAIClaim) && sourceStatus !== 'solved') return 'partial';
+    return problem.status || 'unreviewed';
+}
+
+function isOpenAIProblemStatus(problem) {
+    const attempts = getMathematicalAttempts(problem.attacks);
+    return attempts.some(isSolvedOpenAIClaim) ||
+        (attempts.some(isPartialOpenAIClaim) && (problem.source_status ?? problem.status) !== 'solved');
+}
+
 function getOpenProblemStatusLabel(problem) {
-    return String(problem.status || 'unreviewed').replace(/_/g, ' ');
+    const status = getOpenProblemStatus(problem);
+    const label = status === 'partial' ? 'partially solved' : String(status).replace(/_/g, ' ');
+    return label + (isOpenAIProblemStatus(problem) ? ' (OpenAI claim)' : '');
+}
+
+function getOpenProblemSourceStatusLabel(problem) {
+    return String(problem.source_status ?? problem.status ?? 'unreviewed').replace(/_/g, ' ');
 }
 
 function getOpenProblemSources(problem) {
@@ -289,6 +316,16 @@ function isSolvedOpenAIClaim(attack) {
         ['full', 'stronger'].includes(attack.openai?.match) && attack.status === 'solved';
 }
 
+function isPartialOpenAIClaim(attack) {
+    return attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI' &&
+        attack.openai?.match === 'partial';
+}
+
+function isRelatedOpenAIClaim(attack) {
+    return attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI' &&
+        attack.openai?.match === 'related';
+}
+
 // Only construct links to the reviewed snapshot. Reject traversal and URL
 // syntax before encoding each path segment (including parentheses in titles).
 function getOpenAIFileUrl(metadata, path, download = false) {
@@ -297,6 +334,7 @@ function getOpenAIFileUrl(metadata, path, download = false) {
         typeof path !== 'string' || /[\\%?#\u0000-\u001f\u007f]/.test(path) ||
         path.split('/').some(part => !part || part === '.' || part === '..')) return '';
     const knownPath = /^preprints\/[^/]+\/(?:[^/]+\.pdf|README\.md)$/.test(path) ||
+        /^preprints\/[^/]+\/build\/(?:[^/]+\/)*[^/]+\.tex$/.test(path) ||
         /^lean\/docs\/\d{3}\.md$/.test(path) ||
         /^lean\/ComparatorChallenges\/[^/]+\.(?:lean|json)$/.test(path) ||
         /^reasoning_traces\/[^/]+\.pdf$/.test(path) || path === 'CONTENTS.md';
@@ -306,17 +344,34 @@ function getOpenAIFileUrl(metadata, path, download = false) {
     return `https://github.com/openai/math/${download ? 'raw' : 'blob'}/${commit}/${encoded}`;
 }
 
+function getOpenAIStatementUrl(metadata, manuscript, source) {
+    if (!source || typeof source !== 'object' || Array.isArray(source) ||
+        Object.keys(source).sort().join(',') !== 'label,line,path' ||
+        !Number.isSafeInteger(source.line) || source.line < 1 ||
+        typeof source.label !== 'string' || !source.label.trim() ||
+        typeof source.path !== 'string' || typeof manuscript?.pdf_path !== 'string') return '';
+    const folder = /^preprints\/([^/]+)\/[^/]+\.pdf$/.exec(manuscript.pdf_path)?.[1];
+    if (!folder || !source.path.startsWith(`preprints/${folder}/build/`) || !source.path.endsWith('.tex')) return '';
+    const url = getOpenAIFileUrl(metadata, source.path);
+    return url ? `${url}#L${source.line}` : '';
+}
+
 function renderOpenAIProvenance(attack) {
     const metadata = attack.openai;
     if (!metadata) return '';
-    const link = (path, label, download = false) => {
-        const url = getOpenAIFileUrl(metadata, path, download);
+    const externalLink = (url, label) => {
         return url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>` : '';
     };
+    const link = (path, label, download = false) => externalLink(getOpenAIFileUrl(metadata, path, download), label);
     const families = (metadata.families || []).map(family => {
         const papers = (family.manuscripts || []).map(manuscript => {
             const links = [link(manuscript.pdf_path, 'PDF'), link(manuscript.pdf_path, 'PDF (download)', true),
                 link(manuscript.readme_path, 'Manuscript page')].filter(Boolean);
+            if (Array.isArray(manuscript.statement_sources)) {
+                links.push(...manuscript.statement_sources.map(source =>
+                    externalLink(getOpenAIStatementUrl(metadata, manuscript, source), `Statement: ${source?.label || ''}`)
+                ).filter(Boolean));
+            }
             const date = /^\d{4}-\d{2}-\d{2}$/.test(manuscript.date || '') ? ` (${manuscript.date})` : '';
             return `<li>${escapeHtml(manuscript.title || 'Manuscript')}${escapeHtml(date)}: ${links.join(' · ')}</li>`;
         }).join('');
@@ -346,9 +401,12 @@ function renderOpenProblemRows(problems) {
             (problem.tags || []).includes('openai') ? 'OpenAI' : '',
             isMO && Number.isFinite(problem.score) ? `MO score: ${problem.score}` : ''].filter(Boolean).join(' · ');
         const claimLabel = getOpenProblemClaim(problem) +
-            (problem.llm_status_source === 'openai_claim' || attempts.some(isSolvedOpenAIClaim) ? ' · OpenAI' : '');
+            (problem.llm_status_source === 'openai_claim' ||
+                attempts.some(attack => isSolvedOpenAIClaim(attack) || isPartialOpenAIClaim(attack)) ? ' · OpenAI' : '');
         const reviewed = problem.status_reviewed_at
-            ? `<span class="catalogue-meta">Reviewed ${escapeHtml(String(problem.status_reviewed_at).slice(0, 10))}</span>` : '';
+            ? `<span class="catalogue-meta">${isOpenAIProblemStatus(problem) ? 'Source reviewed' : 'Reviewed'} ${escapeHtml(String(problem.status_reviewed_at).slice(0, 10))}</span>` : '';
+        const sourceStatus = attempts.some(attack => isSolvedOpenAIClaim(attack) || isPartialOpenAIClaim(attack))
+            ? `<span class="catalogue-meta">Source catalogue: ${escapeHtml(getOpenProblemSourceStatusLabel(problem))}</span>` : '';
         const qualification = problem.status_qualification
             ? ` title="${escapeHtml(problem.status_qualification)}"` : '';
         const reviewHandles = getReviewHandles(problem.review);
@@ -360,7 +418,7 @@ function renderOpenProblemRows(problems) {
         return `<tr>
             <td>${rank}</td>
             <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
-            <td${qualification}>${escapeHtml(getOpenProblemStatusLabel(problem))}${reviewed}</td>
+            <td${qualification}>${escapeHtml(getOpenProblemStatusLabel(problem))}${sourceStatus}${reviewed}</td>
             <td class="${escapeHtml(getReviewClass(problem.review))}"${reviewTitle}>${escapeHtml(getReviewLabel(problem.review))}</td>
             <td class="claim-status"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(claimLabel)}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td>${attempts.length ? escapeHtml(formatCompletion(problem.completion)) || '—' : '—'}</td>
@@ -799,10 +857,15 @@ window.ProblemHunting = {
     getOpenProblemDomains,
     filterOpenProblems,
     getOpenProblemClaim,
+    getOpenProblemStatus,
     getOpenProblemStatusLabel,
+    getOpenProblemSourceStatusLabel,
     getOpenProblemSources,
     isSolvedOpenAIClaim,
+    isPartialOpenAIClaim,
+    isRelatedOpenAIClaim,
     getOpenAIFileUrl,
+    getOpenAIStatementUrl,
     renderOpenAIProvenance,
     renderOpenProblemRows,
     getAttemptPreview,

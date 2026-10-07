@@ -53,6 +53,9 @@ class OpenAIImportTests(unittest.TestCase):
         self.approval = {'source_commit': importer.SOURCE_COMMIT, 'approved_solved_ids': [5]}
         self.sections = {
             'claim': 'OpenAI claims the requested estimate for integral fillings.',
+            'mathematical_statement': (r'Theorem 1.1: For every integral \(k\)-cycle \(z\), '
+                                      r'there is a filling \(b\) with \(\partial b=z\) and '
+                                      r'\[\mathbf M(b)\le C_k\mathbf M(z)^{(k+1)/k}.\]'),
             'outline': 'A construction controls the boundary while comparing local pieces.',
             'scope': 'The conclusion includes each cycle specified by this catalogue statement.',
             'formal_verification': 'The documented comparator addresses the main bound. This site has not run Lean.',
@@ -124,6 +127,30 @@ class OpenAIImportTests(unittest.TestCase):
         deferred = dict(row, out_of_scope=True, **{'class': None, 'resolution': None})
         self.assertFalse(importer.group_rows([deferred], self.inventory))
 
+    def test_joint_case_coverage_preserves_partial_paper_matches(self):
+        inventory = deepcopy(self.inventory)
+        second = deepcopy(inventory['families'][0]['manuscripts'][0])
+        second['dir'] = 'Complementary-case-September-23-2026'
+        for key in ('pdf_path', 'readme_path', 'source_tex_dir'):
+            second[key] = second[key].replace(self.folder, second['dir'])
+        inventory['families'][0]['manuscripts'].append(second)
+        decision = {'match': 'full', 'resolution': 'proved', 'second_pass': 'agreed',
+                    'justification': 'One paper handles k=5; the other handles every k>=6.'}
+        first = dict(self.row, **{'class': 'partial', 'resolution': 'partial',
+                                 'second_pass': 'n/a', 'joint_coverage': decision})
+        other = dict(first, manuscript_dir=second['dir'])
+        with self.assertRaisesRegex(ValueError, 'explicit user approval'):
+            importer.group_rows([first, other], inventory)
+        grouped = importer.group_rows([first, other], inventory, self.approval)
+        self.assertTrue(all(row['class'] == 'partial' for row in grouped[5]))
+        metadata = importer.build_metadata(grouped[5], inventory)
+        self.assertEqual((metadata['match'], metadata['resolution'], metadata['second_pass']),
+                         ('full', 'proved', 'agreed'))
+        unreviewed = dict(decision, second_pass='pending')
+        with self.assertRaisesRegex(ValueError, 'independent second pass'):
+            importer.group_rows([dict(first, joint_coverage=unreviewed),
+                                 dict(other, joint_coverage=unreviewed)], inventory, self.approval)
+
     def test_headers_sources_and_parentheses_are_deterministic(self):
         metadata = importer.build_metadata([self.row], self.inventory)
         record = importer.render_record(self.definition_header, metadata, self.sections)
@@ -138,6 +165,55 @@ class OpenAIImportTests(unittest.TestCase):
         self.assertIn('Manuscript page and citation', record)
         self.assertIn('Comparator Fillings.lean', record)
         self.assertEqual(record, importer.render_record(self.definition_header, metadata, self.sections))
+
+    def test_statement_source_metadata_and_tex_links_preserve_paper_and_line(self):
+        source = {'path': f'preprints/{self.folder}/build/source/main.tex',
+                  'line': 57, 'label': 'thm:main_bound'}
+        self.row['statement_sources'] = [source]
+        self.manifest['eligible_paths'].append(source['path'])
+        metadata = importer.build_metadata([self.row], self.inventory)
+        self.assertEqual(metadata['families'][0]['manuscripts'][0]['statement_sources'], [source])
+        pending, _ = self.prepare()
+        record = next(iter(pending.values()))
+        self.assertIn('/build/source/main.tex\\#L57}{thm:main\\_bound}', record)
+        self.assertIn(r'CAT\%280\%29-spaces', record)
+        self.assertIn('Statement source:', record)
+        self.assertIn('/blob/' + importer.SOURCE_COMMIT + '/', record)
+
+    def test_statement_source_import_rejects_cross_paper_and_noninteger_lines(self):
+        source = {'path': f'preprints/{self.folder}/build/source/main.tex',
+                  'line': 57, 'label': 'Theorem 1.1'}
+        for invalid in (dict(source, line=True), dict(source, line=0),
+                        dict(source, path='preprints/Other/build/main.tex'),
+                        dict(source, extra='unknown')):
+            row = dict(self.row, statement_sources=[invalid])
+            with self.subTest(source=invalid), self.assertRaises(ValueError):
+                importer.build_metadata([row], self.inventory)
+        # Structural validity is insufficient when the pinned manifest lacks the file.
+        self.row['statement_sources'] = [source]
+        with self.assertRaisesRegex(ValueError, 'statement source.*manifest'):
+            self.prepare()
+
+    def test_mathematical_statement_preserves_tex_and_precedes_argument_outline(self):
+        sections = importer.load_sections(self.summaries, 5)
+        self.assertEqual(sections['mathematical_statement'], self.sections['mathematical_statement'])
+        metadata = importer.build_metadata([self.row], self.inventory)
+        record = importer.render_record(self.definition_header, metadata, sections)
+        self.assertIn(self.sections['mathematical_statement'], record)
+        self.assertLess(record.index(r'\subsection{Mathematical statement of the claimed result}'),
+                        record.index(r'\subsection{Outline of the argument}'))
+        self.assertIn('Theorem 1.1:', record)
+
+    def test_legacy_summary_inputs_remain_readable(self):
+        legacy = {key: value for key, value in self.sections.items()
+                  if key != 'mathematical_statement'}
+        self.summaries.write_text(json.dumps({'5': legacy}), encoding='utf-8')
+        sections = importer.load_sections(self.summaries, 5)
+        self.assertEqual(sections, legacy)
+        metadata = importer.build_metadata([self.row], self.inventory)
+        record = importer.render_record(self.definition_header, metadata, sections)
+        self.assertNotIn(r'\subsection{Mathematical statement of the claimed result}', record)
+        self.assertIn(r'\subsection{Outline of the argument}', record)
 
     def test_one_record_groups_papers_but_keeps_paper_theorem_references(self):
         inventory = deepcopy(self.inventory)
@@ -195,12 +271,13 @@ class OpenAIImportTests(unittest.TestCase):
                 importer.validate_checkout(self.root, self.inventory)
 
     def test_summary_cannot_inject_metadata_or_arbitrary_links(self):
-        for text in ('% ATTEMPT_STATUS: solved', r'\input{elsewhere.tex}',
-                     'See https://example.org/text', r'\subsection{Sources}'):
-            sections = dict(self.sections, claim=text)
-            self.summaries.write_text(json.dumps({'5': sections}), encoding='utf-8')
-            with self.subTest(text=text), self.assertRaises(ValueError):
-                importer.load_sections(self.summaries, 5)
+        for field in ('claim', 'mathematical_statement'):
+            for text in ('% ATTEMPT_STATUS: solved', r'\input{elsewhere.tex}',
+                         'See https://example.org/text', r'\subsection{Sources}'):
+                sections = dict(self.sections, **{field: text})
+                self.summaries.write_text(json.dumps({'5': sections}), encoding='utf-8')
+                with self.subTest(field=field, text=text), self.assertRaises(ValueError):
+                    importer.load_sections(self.summaries, 5)
 
     def test_no_copy_detects_paragraphs_while_omitting_metadata_sources_and_math(self):
         borrowed = 'every compact object admits a uniform quantitative filling estimate'

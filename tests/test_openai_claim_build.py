@@ -1,4 +1,4 @@
-"""Keep external OpenAI claims scoped, pinned, and separate from source status."""
+"""Keep scoped OpenAI statuses attributed and preserve the source catalogue."""
 
 from copy import deepcopy
 import json
@@ -13,6 +13,7 @@ import build_site
 COMMIT = 'adc7f1241b42e322a6451854ab7e4b4c146bf78a'
 PDF = 'preprints/Example-in-CAT(0)-spaces-September-23-2026/custom-result.pdf'
 README = PDF.rsplit('/', 1)[0] + '/README.md'
+STATEMENT = PDF.rsplit('/', 1)[0] + '/build/source/main.tex'
 COMPARATORS = ['lean/ComparatorChallenges/Example.lean',
                'lean/ComparatorChallenges/Example.json']
 TOP_PROBLEM = {'id': 1, 'title': 'Example conjecture'}
@@ -33,7 +34,7 @@ def manifest():
                                  'declaration': 'Example.main'}],
             }],
         }],
-        'eligible_paths': [PDF, README, *COMPARATORS, 'lean/docs/197.md',
+        'eligible_paths': [PDF, README, STATEMENT, *COMPARATORS, 'lean/docs/197.md',
                            'reasoning_traces/example.pdf', 'CONTENTS.md'],
     }
 
@@ -89,6 +90,13 @@ class OpenAIClaimMetadataTests(unittest.TestCase):
         self.assertEqual(result['raw'], 'Original summary.')
         self.assertNotIn('OPENAI_CLAIM', str(result['sections']))
 
+    def test_main_theorem_coverage_cannot_refer_to_unassigned_comparators(self):
+        metadata = claim()
+        metadata['families'][0]['lean']['comparators'] = []
+        metadata['families'][0]['lean']['declarations'] = []
+        with self.assertRaisesRegex(ValueError, 'selected manuscript Comparator'):
+            self.parse(metadata)
+
     def test_stronger_disproof_is_a_solved_claim(self):
         result = self.parse(claim('stronger', 'disproved'))
         self.assertEqual(result['status'], 'solved')
@@ -98,6 +106,42 @@ class OpenAIClaimMetadataTests(unittest.TestCase):
         result = self.parse(claim('partial'), body='COMPLETION ESTIMATE: 100%')
         self.assertEqual(result['status'], 'unresolved')
         self.assertNotIn('completion', result)
+
+    def test_optional_statement_sources_accept_exact_pinned_paper_locations(self):
+        metadata = claim()
+        sources = [{'path': STATEMENT, 'line': 57, 'label': 'thm:main_bound'},
+                   {'path': STATEMENT, 'line': 83, 'label': 'Theorem 1.1'}]
+        metadata['families'][0]['manuscripts'][0]['statement_sources'] = sources
+        self.assertEqual(self.parse(metadata)['openai'], metadata)
+        # The extension does not require changing existing schema-1 records.
+        self.assertEqual(self.parse()['openai'], claim())
+
+    def test_statement_sources_reject_wrong_shapes_lines_labels_and_duplicates(self):
+        source = {'path': STATEMENT, 'line': 57, 'label': 'Theorem 1.1'}
+        bad_sources = [None, source, 'not an array', [None], [dict(source, extra='unknown')],
+                       [{key: value for key, value in source.items() if key != 'label'}],
+                       [source, source]]
+        bad_sources.extend([dict(source, line=line)] for line in (True, False, 0, -1, 1.5, '57', None))
+        bad_sources.extend([dict(source, label=label)] for label in ('', '   ', 1, None))
+        for sources in bad_sources:
+            metadata = claim()
+            metadata['families'][0]['manuscripts'][0]['statement_sources'] = sources
+            with self.subTest(sources=sources), self.assertRaises(ValueError):
+                self.parse(metadata)
+
+    def test_statement_sources_cannot_cross_papers_or_escape_build_directory(self):
+        for path in ('preprints/Other/build/source/main.tex',
+                     PDF.rsplit('/', 1)[0] + '/main.tex',
+                     PDF.rsplit('/', 1)[0] + '/build/source/../main.tex',
+                     PDF.rsplit('/', 1)[0] + '/build/source/missing.tex', README, PDF):
+            inventory = manifest()
+            if not path.endswith('missing.tex') and path not in inventory['eligible_paths']:
+                inventory['eligible_paths'].append(path)
+            metadata = claim()
+            metadata['families'][0]['manuscripts'][0]['statement_sources'] = [
+                {'path': path, 'line': 57, 'label': 'Theorem 1.1'}]
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                build_site.parse_openai_claim(record(metadata), inventory)
 
     def test_family_without_lean_or_reasoning_trace_is_valid(self):
         metadata, inventory = claim(), manifest()
@@ -245,7 +289,9 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
             attack = build_site.parse_attack(record(claim(match)), 'openai',
                                               openai_manifest=manifest())
             result = self.summarize([{'model': 'GPT', 'status': 'unresolved', 'completion': 35}, attack])
-            self.assertEqual(result['status'], 'open')
+            self.assertEqual(result['status'], 'solved')
+            self.assertEqual(result['source_status'], 'open')
+            self.assertEqual(result['status_source'], 'openai_claim')
             self.assertEqual(result['llm_status'], 'solved')
             self.assertEqual(result['llm_status_source'], 'openai_claim')
             self.assertEqual(result['completion'], 100)
@@ -253,18 +299,61 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
             self.assertEqual(result['tags'], ['openai'])
             self.assertEqual(result['openai_claim'], 'solved')
 
-    def test_partial_is_unresolved_without_a_completion(self):
+    def test_partial_is_visible_without_a_solved_label_or_invented_completion(self):
         attack = build_site.parse_attack(record(claim('partial')), 'openai',
                                           openai_manifest=manifest())
         result = self.summarize([attack])
-        self.assertEqual(result['llm_status'], 'unresolved')
-        self.assertEqual(result['llm_status_source'], 'attempts')
+        self.assertEqual(result['status'], 'partial')
+        self.assertEqual(result['source_status'], 'open')
+        self.assertEqual(result['status_source'], 'openai_claim')
+        self.assertEqual(result['llm_status'], 'partial')
+        self.assertEqual(result['llm_status_source'], 'openai_claim')
         self.assertEqual(result['openai_claim'], 'partial')
         self.assertEqual(result['tags'], ['openai'])
         self.assertNotIn('completion', result)
         result = self.summarize([{'model': 'GPT', 'status': 'unresolved', 'completion': 35}, attack])
         self.assertEqual(result['completion'], 35)
         self.assertEqual(result['completion_source'], 'llm')
+
+    def test_partial_contribution_keeps_a_catalogue_solution_and_human_review(self):
+        attack = build_site.parse_attack(record(claim('partial')), 'openai',
+                                          openai_manifest=manifest())
+        review = {'status': 'unreviewed'}
+        problem = {'status': 'solved', 'attacks': [attack], 'review': review}
+        build_site.summarize_open_problem_attempts(problem)
+        self.assertEqual(problem['status'], 'solved')
+        self.assertEqual(problem['source_status'], 'solved')
+        self.assertEqual(problem['status_source'], 'source_catalogue')
+        self.assertEqual(problem['llm_status'], 'partial')
+        self.assertIs(problem['review'], review)
+
+    def test_related_result_does_not_claim_partial_solution_of_a_different_target(self):
+        attack = build_site.parse_attack(record(claim('related')), 'openai',
+                                         openai_manifest=manifest())
+        result = self.summarize([attack])
+        self.assertEqual(result['status'], 'open')
+        self.assertEqual(result['source_status'], 'open')
+        self.assertEqual(result['openai_claim'], 'related')
+        self.assertEqual(result['llm_status'], 'related')
+        self.assertNotIn('completion', result)
+
+    def test_repeated_aggregation_retains_the_original_source_status(self):
+        attack = build_site.parse_attack(record(), 'openai', openai_manifest=manifest())
+        result = self.summarize([attack])
+        build_site.summarize_open_problem_attempts(result)
+        self.assertEqual(result['status'], 'solved')
+        self.assertEqual(result['source_status'], 'open')
+
+    def test_published_rh_and_bsd_matches_remain_partial(self):
+        for problem_id in ('2', '5'):
+            path = build_site.OPEN_PROBLEMS_PATH / 'openai' / f'{problem_id}.tex'
+            attack = build_site.parse_attack(path.read_text(encoding='utf-8'), 'openai')
+            with self.subTest(problem_id=problem_id):
+                self.assertEqual(attack['openai']['match'], 'partial')
+                result = self.summarize([{'model': 'GPT', 'status': 'unresolved'}, attack])
+                self.assertEqual(result['status'], 'partial')
+                self.assertEqual(result['llm_status'], 'partial')
+                self.assertNotEqual(result['status'], 'solved')
 
     def test_absent_openai_keeps_existing_status_precedence_and_estimates(self):
         result = self.summarize([{'model': 'GPT', 'status': 'solved', 'completion': 80},
@@ -274,6 +363,9 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
         self.assertEqual(result['completion_source'], 'llm')
         self.assertNotIn('tags', result)
         self.assertNotIn('openai_claim', result)
+        self.assertNotIn('source_status', result)
+        self.assertNotIn('status_source', result)
+        self.assertEqual(result['status'], 'open')
         self.assertEqual(self.summarize([])['llm_status'], 'none')
 
 
@@ -331,7 +423,8 @@ Determine whether all examples qualify.
         result = self.build()['1']
         self.assertEqual(result['tags'], ['openai'])
         self.assertEqual(result['llm_status'], 'solved')
-        self.assertEqual(result['status'], 'open')
+        self.assertEqual(result['status'], 'solved')
+        self.assertEqual(result['source_status'], 'open')
         self.assertEqual(result['attacks'][0]['model'], 'OpenAI')
         self.assertEqual(result['attacks'][0]['openai'], claim())
 

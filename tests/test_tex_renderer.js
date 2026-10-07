@@ -58,6 +58,11 @@ assert.doesNotMatch(render(tex`\href{javascript:alert(1)}{source}`), /href=/);
 assert.match(render(tex`\url{https://example.org/?a=1\&b=2}`), /href="https:\/\/example.org\/\?a=1&amp;b=2"/);
 assert.match(render(tex`\url{https://users.renyi.hu/\~{}p_erdos/1982-01.pdf}`), /href="https:\/\/users\.renyi\.hu\/~p_erdos\/1982-01\.pdf"/);
 assert.match(render(tex`\href{https://example.org/}{\emph{Source} $x^2$}`), /<em>Source<\/em> \$x\^2\$/);
+// Generated OpenAI theorem anchors must retain the line fragment after TeX
+// escaping while encoded parentheses stay part of the manuscript path.
+const statementLink = render(tex`\href{https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/Result-in-CAT\%280\%29-spaces/build/source/main.tex\#L57}{thm:main\_bound}`);
+assert.match(statementLink, /\/Result-in-CAT%280%29-spaces\/build\/source\/main\.tex#L57"/);
+assert.match(statementLink, />thm:main_bound<\/a>/);
 
 // Submitted HTML and TeX sizing arguments cannot acquire event handlers, CSS
 // payloads, or unvalidated anchors when generated markup is restored.

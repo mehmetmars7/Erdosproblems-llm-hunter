@@ -50,6 +50,14 @@ class InventoryParserTests(unittest.TestCase):
         self.assertEqual(inventory.date_from_dir("A-paper-September-3-2026"), "2026-09-03")
         self.assertEqual(inventory.date_from_dir("Tangent-flow-uniqueness-2026-09-24"), "2026-09-24")
 
+    def test_citation_title_does_not_use_index_disambiguation(self):
+        readme = '# [Index alias](paper2.pdf)\n\ntitle = {{The Quasi-Riemann Hypothesis}},\n'
+        self.assertEqual(inventory.manuscript_title(readme), 'The Quasi-Riemann Hypothesis')
+
+    def test_citation_math_is_plain_metadata_and_subtitles_are_retained(self):
+        readme = r'title = {{An $L^3$ bound: a construction over $\mathbb{C}^4$}},'
+        self.assertEqual(inventory.manuscript_title(readme), 'An L³ bound: a construction over ℂ⁴')
+
     def test_relative_scope_links_resolve_at_checkout_root(self):
         self.assertEqual(
             inventory.repo_path("../../preprints/Paper/paper.pdf", "lean/docs"),
