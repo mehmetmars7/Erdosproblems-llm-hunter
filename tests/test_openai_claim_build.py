@@ -107,6 +107,28 @@ class OpenAIClaimMetadataTests(unittest.TestCase):
         self.assertEqual(result['status'], 'unresolved')
         self.assertNotIn('completion', result)
 
+    def test_withdrawal_notice_is_unresolved_and_keeps_archival_metadata(self):
+        result = self.parse(claim('related', 'withdrawn'))
+        self.assertEqual(result['status'], 'unresolved')
+        self.assertEqual(result['openai']['resolution'], 'withdrawn')
+        self.assertNotIn('completion', result)
+        for match in ('full', 'stronger', 'partial'):
+            with self.subTest(match=match), self.assertRaises(ValueError):
+                self.parse(claim(match, 'withdrawn'))
+
+    def test_withdrawal_does_not_change_existing_partial_progress(self):
+        partial = self.parse(claim('partial'))
+        withdrawal = self.parse(claim('related', 'withdrawn'))
+        problem = {'status': 'open', 'attacks': [partial, withdrawal]}
+        build_site.summarize_open_problem_attempts(problem)
+        self.assertEqual(problem['llm_status'], 'partial')
+        self.assertEqual(problem['status'], 'partial')
+        self.assertEqual(len(problem['attacks']), 2)
+        only_notice = {'status': 'open', 'attacks': [withdrawal]}
+        build_site.summarize_open_problem_attempts(only_notice)
+        self.assertEqual(only_notice['llm_status'], 'none')
+        self.assertEqual(only_notice['status'], 'open')
+
     def test_optional_statement_sources_accept_exact_pinned_paper_locations(self):
         metadata = claim()
         sources = [{'path': STATEMENT, 'line': 57, 'label': 'thm:main_bound'},

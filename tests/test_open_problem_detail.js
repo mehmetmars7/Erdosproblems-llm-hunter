@@ -231,6 +231,21 @@ assert.match(page.element('attempts-container').innerHTML,
     /Relationship to this problem:<\/strong> Related result; no solution to this problem claimed/);
 assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved|OpenAI claim: partial result/);
 
+// The Hodge withdrawal is a separate short v2 notice, with a current source
+// link, while the original pinned release record remains available.
+const hodgeWithNotice = JSON.parse(fs.readFileSync(path.join(root, 'docs/data/top_problems/6.json'), 'utf8'));
+const hodgeNotice = hodgeWithNotice.attacks.find(a => a.model === 'OpenAI' && a.version === 2);
+assert.equal(hodgeNotice.openai.resolution, 'withdrawn');
+assert.ok(hodgeWithNotice.attacks.some(a => a.model === 'OpenAI' && a.version === 1));
+page = await render('?type=open_problems&id=6', { '6': hodgeWithNotice });
+const hodgeCards = page.element('attempts-container').innerHTML;
+assert.match(hodgeCards, /OpenAI withdrawal notice \(v2\): The rational Hodge conjecture for products of K3 surfaces/);
+assert.match(hodgeCards, /OpenAI notice: withdrawn/);
+assert.match(hodgeCards, /Withdrawn on October 6, 2026/);
+assert.match(hodgeCards, /href="https:\/\/github.com\/openai\/math\/blob\/main\/preprints\/The-rational-Hodge-conjecture-for-products-of-K3-surfaces-October-4-2026\/hodge-conjecture-products-k3.pdf"/);
+assert.match(hodgeCards, /OpenAI papers:/);
+assert.match(hodgeCards, /Archived manuscript/);
+
 page = await render('?type=open_problems&id=mo%3A42');
 assert.match(page.element('problem-meta').innerHTML, /MathOverflow subset/);
 assert.equal(page.element('.giscus').children[0].dataset.term, 'MO-42');

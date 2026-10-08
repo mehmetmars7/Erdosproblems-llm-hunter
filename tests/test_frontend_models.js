@@ -15,6 +15,12 @@ assert.deepEqual(Array.from(api.getReviewHandles(authorSubmission)), ['ckkogler'
 assert.match(api.formatReviewHandleLinks(authorSubmission), /href="https:\/\/github.com\/ckkogler"/);
 assert.match(api.formatReviewHandleLinks(authorSubmission), /href="https:\/\/github.com\/samuel-kittle"/);
 assert.equal(api.getReviewLabel({ status: 'accepted', reviewed_by: ['plby', 'teorth'] }), 'accepted');
+const withdrawal = { model: 'OpenAI', claimant: 'OpenAI', entry_kind: 'external_claim',
+    status: 'unresolved', openai: { match: 'related', resolution: 'withdrawn' } };
+assert.equal(api.getAttemptClaim(withdrawal), 'withdrawn');
+assert.equal(api.isRelatedOpenAIClaim(withdrawal), false);
+assert.equal(api.getOverallClaim([withdrawal]), 'none');
+assert.deepEqual(Array.from(api.getMathematicalAttempts([withdrawal])), []);
 const astra = { model: 'GPT 6 Astra Ultra', status: 'unresolved' };
 const imported = { ...astra, entry_kind: 'reused_writeup', provenance: { source_model: 'gpt_pro_5.2' } };
 const labels = attacks => Array.from(api.getModelLabels(attacks));

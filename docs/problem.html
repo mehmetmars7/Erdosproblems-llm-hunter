@@ -163,8 +163,8 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=8ac2e4a5b4b7ac43"></script>
-    <script src="app.js?v=cd471cbf9d08794f"></script>
+    <script src="data/open_problems_data.js?v=b19ce00131df6083"></script>
+    <script src="app.js?v=cd39890b8f7abc94"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=2"></script>
     <script src="tex-bare-math.js"></script>
@@ -430,7 +430,9 @@
                     const isStatement = attack.entry_kind === 'statement_only';
                     const isHuman = attack.entry_kind === 'human_contribution';
                     const isOpenAI = attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI';
-                    const openAIStatus = window.ProblemHunting.isSolvedOpenAIClaim(attack)
+                    const isWithdrawal = window.ProblemHunting.isWithdrawnOpenAIClaim(attack);
+                    const openAIStatus = isWithdrawal ? 'OpenAI notice: withdrawn'
+                        : window.ProblemHunting.isSolvedOpenAIClaim(attack)
                         ? `OpenAI claim: solved (${attack.openai.resolution}), not independently verified`
                         : attack.openai?.match === 'related' ? 'OpenAI claim: related result'
                         : 'OpenAI claim: partial result';
@@ -442,6 +444,7 @@
                     const openAIPaperTitles = window.ProblemHunting.getOpenAIPaperTitles(attack);
                     const title = isHuman ? 'Human Contribution'
                         : isStatement ? 'Problem statement: awaiting an attempt'
+                        : isWithdrawal ? `OpenAI withdrawal notice (v${attack.version || 2}): ${escapeHtml(openAIPaperTitles.join('; '))}`
                         : isOpenAI ? `OpenAI paper${openAIPaperTitles.length > 1 ? 's' : ''}: ${escapeHtml(openAIPaperTitles.join('; ') || 'Claimed result')}`
                         : isReused ? `Reused writeup: ${sourceModel}`
                         : `Attempt ${idx + 1}: ${escapeHtml((attack.model || '').replace(/_/g, ' '))}`;
@@ -457,7 +460,7 @@
                     } else if (isStatement) {
                         provenanceNote = `<p class="status-note">Included in the ${escapeHtml(attack.model)} collection as a statement-only record. ` +
                             'No mathematical attempt is provided. Completion: 0%. No independent review has been performed.</p>';
-                    } else if (isOpenAI) {
+                    } else if (isOpenAI && !isWithdrawal) {
                         provenanceNote = window.ProblemHunting.renderOpenAIProvenance(attack);
                     }
                     const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
