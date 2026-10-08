@@ -9,7 +9,7 @@ vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context
 const api = context.window.ProblemHunting;
 const authorSubmission = { status: 'submitted', submission_role: 'authors',
     submitted_by: ['ckkogler', 'samuel-kittle'], independently_reviewed: false };
-assert.equal(api.getReviewLabel(authorSubmission), 'submitted by authors');
+assert.equal(api.getReviewLabel(authorSubmission), 'submitted');
 assert.equal(api.getReviewLabel({ status: 'submitted' }), 'submitted');
 assert.deepEqual(Array.from(api.getReviewHandles(authorSubmission)), ['ckkogler', 'samuel-kittle']);
 assert.match(api.formatReviewHandleLinks(authorSubmission), /href="https:\/\/github.com\/ckkogler"/);
