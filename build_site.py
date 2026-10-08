@@ -1193,6 +1193,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
             'status_reviewed_at': record.get('statusReviewedAt') or None,
             'attacks': [],
         }
+        if record.get('economics'):
+            problems[problem_id]['economics'] = record['economics']
         if record.get('researchTeX'):
             notebook = parse_attack(record['researchTeX'], 'Research notebook')
             # Notebook reductions and exploratory work are not declarations

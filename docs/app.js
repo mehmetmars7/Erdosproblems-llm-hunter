@@ -312,6 +312,35 @@ function getOpenProblemSources(problem) {
     return (problem.sources || []).filter(source => /^https?:\/\//i.test(source.url || ''));
 }
 
+function getEconomicsProvenanceHtml(problem) {
+    const economics = problem.economics;
+    if (!economics || problem.domain !== 'economics') return '';
+    const bases = {
+        source_statement: 'Published mathematical statement',
+        adapted_research_question: 'Catalogue formalization of a published research question',
+        proposed_specification: 'Proposed catalogue specification'
+    };
+    const evidence = {
+        explicit_open: 'Explicit open question verified in the cited source',
+        research_agenda: 'Published research agenda verified in the cited source',
+        not_verified: 'A published open-question statement was not verified',
+        resolved_or_misstated: 'The original wording needs correction or was resolved'
+    };
+    const first = economics.earliest_verified_reference;
+    const authors = first && (Array.isArray(first.authors) ? first.authors.join(', ') : first.authors);
+    const citation = first ? [authors, first.year, first.title, first.locator].filter(Boolean).join('. ') : '';
+    const link = first && /^https?:\/\//i.test(first.url || '')
+        ? `<a href="${escapeHtml(first.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(citation)}</a>`
+        : escapeHtml(citation || 'Not established; supporting literature is listed below.');
+    return `<div class="status-note economics-provenance">` +
+        `<p><strong>Economics subfield:</strong> ${escapeHtml(economics.field || '')}</p>` +
+        `<p><strong>Formulation:</strong> ${escapeHtml(bases[economics.formalization_basis] || 'Unreviewed')}</p>` +
+        `<p><strong>Question provenance:</strong> ${escapeHtml(evidence[economics.source_status] || 'Unreviewed')}</p>` +
+        `<p><strong>Earliest verified question reference:</strong> ${link}</p>` +
+        `<p><strong>Historical priority:</strong> ${escapeHtml(economics.priority_note || 'First formulation not established.')}</p>` +
+        `</div>`;
+}
+
 function isSolvedOpenAIClaim(attack) {
     return attack.entry_kind === 'external_claim' &&
         ['full', 'stronger'].includes(attack.openai?.match) && attack.status === 'solved';
@@ -895,6 +924,7 @@ window.ProblemHunting = {
     getOpenProblemStatusLabel,
     getOpenProblemSourceStatusLabel,
     getOpenProblemSources,
+    getEconomicsProvenanceHtml,
     isSolvedOpenAIClaim,
     isPartialOpenAIClaim,
     isRelatedOpenAIClaim,

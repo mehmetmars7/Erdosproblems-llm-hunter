@@ -38,6 +38,27 @@ function createBrowser(search = '', subset = false) {
 
 const browser = createBrowser();
 const { api } = browser;
+const economicsCandidate = { domain: 'economics', economics: {
+    field: 'Taxation <script>', formalization_basis: 'proposed_specification',
+    source_status: 'not_verified', priority_note: 'First formulation not established.',
+    earliest_verified_reference: null
+} };
+assert.equal(api.getEconomicsProvenanceHtml({ domain: 'algebra' }), '');
+assert.match(api.getEconomicsProvenanceHtml(economicsCandidate), /open-question statement was not verified/);
+assert.match(api.getEconomicsProvenanceHtml(economicsCandidate), /Not established; supporting literature/);
+assert.doesNotMatch(api.getEconomicsProvenanceHtml(economicsCandidate), /<script>|href=/);
+const economicsSourced = { domain: 'economics', economics: {
+    ...economicsCandidate.economics, formalization_basis: 'adapted_research_question',
+    source_status: 'research_agenda', earliest_verified_reference: {
+        authors: ['Author'], year: 2024, title: 'Question <img>', locator: 'Section 6',
+        url: 'https://example.org/?a=1&b=2'
+    }
+} };
+assert.match(api.getEconomicsProvenanceHtml(economicsSourced), /research agenda verified/);
+assert.match(api.getEconomicsProvenanceHtml(economicsSourced), /href="https:\/\/example.org\/\?a=1&amp;b=2"/);
+assert.match(api.getEconomicsProvenanceHtml(economicsSourced), /Question &lt;img&gt;/);
+economicsSourced.economics.earliest_verified_reference.url = 'javascript:alert(1)';
+assert.doesNotMatch(api.getEconomicsProvenanceHtml(economicsSourced), /href=/);
 const attempt = { model: 'GPT 6 Astra Ultra', status: 'unresolved' };
 const statement = { ...attempt, entry_kind: 'statement_only' };
 const records = {
