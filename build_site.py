@@ -1135,13 +1135,13 @@ def summarize_open_problem_attempts(problem):
         problem['tags'] = list(dict.fromkeys([*problem.get('tags', []), 'openai']))
         problem['openai_claim'] = 'solved' if solved_openai else 'partial' if partial_openai else 'related'
         problem.setdefault('source_status', problem['status'])
-        # A partial contribution cannot undo a solution already recorded by
-        # the source catalogue. All other OpenAI statuses describe claims,
-        # independently of the human community-review record.
-        if solved_openai or partial_openai and problem['source_status'] != 'solved':
-            problem['status'] = 'solved' if solved_openai else 'partial'
+        # Partial results describe progress in the claim, while the complete
+        # problem retains its source-catalogue status.
+        if solved_openai:
+            problem['status'] = 'solved'
             problem['status_source'] = 'openai_claim'
         else:
+            problem['status'] = problem['source_status']
             problem['status_source'] = 'source_catalogue'
     problem['llm_status'] = (
         'none' if not attempts else

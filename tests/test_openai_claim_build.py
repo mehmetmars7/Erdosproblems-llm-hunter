@@ -122,7 +122,7 @@ class OpenAIClaimMetadataTests(unittest.TestCase):
         problem = {'status': 'open', 'attacks': [partial, withdrawal]}
         build_site.summarize_open_problem_attempts(problem)
         self.assertEqual(problem['llm_status'], 'partial')
-        self.assertEqual(problem['status'], 'partial')
+        self.assertEqual(problem['status'], 'open')
         self.assertEqual(len(problem['attacks']), 2)
         only_notice = {'status': 'open', 'attacks': [withdrawal]}
         build_site.summarize_open_problem_attempts(only_notice)
@@ -325,9 +325,9 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
         attack = build_site.parse_attack(record(claim('partial')), 'openai',
                                           openai_manifest=manifest())
         result = self.summarize([attack])
-        self.assertEqual(result['status'], 'partial')
+        self.assertEqual(result['status'], 'open')
         self.assertEqual(result['source_status'], 'open')
-        self.assertEqual(result['status_source'], 'openai_claim')
+        self.assertEqual(result['status_source'], 'source_catalogue')
         self.assertEqual(result['llm_status'], 'partial')
         self.assertEqual(result['llm_status_source'], 'openai_claim')
         self.assertEqual(result['openai_claim'], 'partial')
@@ -348,6 +348,16 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
         self.assertEqual(problem['status_source'], 'source_catalogue')
         self.assertEqual(problem['llm_status'], 'partial')
         self.assertIs(problem['review'], review)
+
+    def test_partial_claim_restores_source_status_from_a_legacy_partial_label(self):
+        attack = build_site.parse_attack(record(claim('partial')), 'openai',
+                                         openai_manifest=manifest())
+        problem = {'status': 'partial', 'source_status': 'open', 'attacks': [attack]}
+        build_site.summarize_open_problem_attempts(problem)
+        self.assertEqual(problem['status'], 'open')
+        self.assertEqual(problem['source_status'], 'open')
+        self.assertEqual(problem['status_source'], 'source_catalogue')
+        self.assertEqual(problem['llm_status'], 'partial')
 
     def test_related_result_does_not_claim_partial_solution_of_a_different_target(self):
         attack = build_site.parse_attack(record(claim('related')), 'openai',
@@ -373,7 +383,7 @@ class OpenAIClaimAggregationTests(unittest.TestCase):
             with self.subTest(problem_id=problem_id):
                 self.assertEqual(attack['openai']['match'], 'partial')
                 result = self.summarize([{'model': 'GPT', 'status': 'unresolved'}, attack])
-                self.assertEqual(result['status'], 'partial')
+                self.assertEqual(result['status'], 'open')
                 self.assertEqual(result['llm_status'], 'partial')
                 self.assertNotEqual(result['status'], 'solved')
 

@@ -7,6 +7,19 @@ const root = path.resolve(__dirname, '..');
 const context = vm.createContext({ window: {}, document: { addEventListener() {} } });
 vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
 const api = context.window.ProblemHunting;
+const datedAttempts = [
+    { model: 'OpenAI', version: 1, date_posted: '2026-10-06' },
+    { model: 'Z model', version: 1, date_posted: '2026-10-08' },
+    { model: 'OpenAI', version: 2, date_posted: '2026-10-08' },
+    { model: 'A model', version: 1, date_posted: '2026-09-27' },
+    { model: 'Undated', version: 1 },
+    { model: 'Invalid date', version: 1, date_posted: 'unknown' }
+];
+const originalOrder = [...datedAttempts];
+assert.deepEqual(Array.from(api.sortAttemptsNewestFirst(datedAttempts), a => `${a.model} v${a.version}`),
+    ['OpenAI v2', 'Z model v1', 'OpenAI v1', 'A model v1', 'Undated v1', 'Invalid date v1']);
+assert.deepEqual(datedAttempts, originalOrder);
+assert.deepEqual(Array.from(api.sortAttemptsNewestFirst()), []);
 const authorSubmission = { status: 'submitted', submission_role: 'authors',
     submitted_by: ['ckkogler', 'samuel-kittle'], independently_reviewed: false };
 assert.equal(api.getReviewLabel(authorSubmission), 'submitted');

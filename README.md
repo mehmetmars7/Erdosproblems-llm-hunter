@@ -216,9 +216,9 @@ source commit; OpenAI manuscripts and Lean sources are not copied into this repo
 The strict `OPENAI_CLAIM` JSON header identifies the claimed result and its scope.
 A full or stronger match sets **Problem Status** to **solved (OpenAI claim)**
 and the **LLM claim** to solved even when other attempts remain unresolved.
-A partial match is **partially solved (OpenAI claim)** with a partial LLM claim;
-it does not settle the complete question. An existing source-catalogue solution
-is not downgraded by a partial contribution. The original catalogue status is
+A partial match displays **partially solved** in the **LLM claim**, while
+**Problem Status** retains the source-catalogue status: the complete question
+remains open if the catalogue records it as open. The original catalogue status is
 retained as `source_status` and displayed separately. Community Review records
 human checking independently; these status labels do not verify the proof.
 A related result is labelled related and keeps the problem's catalogue status.

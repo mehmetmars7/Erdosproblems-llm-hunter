@@ -162,6 +162,8 @@ assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> solve
 assert.doesNotMatch(page.element('problem-meta').innerHTML, /solved \(2026-01-01\)/);
 assert.equal(page.element('llm-attempts-section h2').textContent, 'LLM claims and collection records');
 let openAIHtml = page.element('attempts-container').innerHTML;
+assert.ok(openAIHtml.indexOf('<h3>OpenAI paper:') < openAIHtml.indexOf('Earlier claim.'));
+assert.ok(openAIHtml.indexOf('Earlier claim.') < openAIHtml.indexOf('Unresolved attempt.'));
 assert.match(openAIHtml, /<h3>OpenAI paper: Example manuscript<\/h3>/);
 assert.match(openAIHtml, /OpenAI catalogue family: Example family &lt;title&gt;/);
 assert.match(openAIHtml, /Relationship to this problem:<\/strong> Full solution claimed for this problem/);
@@ -188,19 +190,19 @@ const partialAttempt = { ...openAIAttempt, status: 'unresolved',
 page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
     status: 'partial', source_status: 'open', llm_status: 'partial', llm_status_source: 'openai_claim',
     attacks: [partialAttempt] } });
-assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> partially solved \(OpenAI claim\)/);
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open<\/p>/);
 assert.match(page.element('problem-meta').innerHTML, /Source catalogue status:<\/strong> open/);
-assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partial \(OpenAI claim, 2026-10-06\)/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partially solved \(OpenAI claim, 2026-10-06\)/);
+assert.match(page.element('attempts-container').innerHTML, /OpenAI claim: partially solved/);
 assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
 assert.equal(page.element('contribute-cta').hidden, false);
-assert.match(page.element('attempts-container').innerHTML, /OpenAI claim: partial result/);
 assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved/);
 assert.match(page.element('attempts-container').innerHTML,
     /Relationship to this problem:<\/strong> Partial solution claimed for this problem/);
 page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAIProblem,
     status: 'solved', source_status: 'solved', llm_status: 'partial', attacks: [partialAttempt] } });
 assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> solved<\/p>/);
-assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partial \(OpenAI claim/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partially solved \(OpenAI claim/);
 assert.equal(page.element('contribute-cta').hidden, true);
 const hostileAttempt = { ...openAIAttempt, openai: { ...openAIMetadata,
     families: [{ title: '<script>alert(1)</script>', manuscripts: [{ title: '<img src=x onerror=alert(1)>',
@@ -229,7 +231,7 @@ page = await render('?type=open_problems&id=20000601', { '20000601': { ...openAI
 assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open<\/p>/);
 assert.match(page.element('attempts-container').innerHTML,
     /Relationship to this problem:<\/strong> Related result; no solution to this problem claimed/);
-assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved|OpenAI claim: partial result/);
+assert.doesNotMatch(page.element('attempts-container').innerHTML, /OpenAI claim: solved|OpenAI claim: partially solved/);
 
 // The Hodge withdrawal is a separate short v2 notice, with a current source
 // link, while the original pinned release record remains available.
@@ -239,6 +241,11 @@ assert.equal(hodgeNotice.openai.resolution, 'withdrawn');
 assert.ok(hodgeWithNotice.attacks.some(a => a.model === 'OpenAI' && a.version === 1));
 page = await render('?type=open_problems&id=6', { '6': hodgeWithNotice });
 const hodgeCards = page.element('attempts-container').innerHTML;
+assert.equal(hodgeWithNotice.status, 'open');
+assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open<\/p>/);
+assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> partially solved \(OpenAI claim, 2026-10-06\)/);
+assert.ok(hodgeCards.indexOf('<h3>OpenAI withdrawal notice (v2):') < hodgeCards.indexOf('<h3>OpenAI papers:'));
+assert.ok(hodgeCards.indexOf('<h3>OpenAI papers:') < hodgeCards.indexOf('<h3>Attempt 3:'));
 assert.match(hodgeCards, /OpenAI withdrawal notice \(v2\): The rational Hodge conjecture for products of K3 surfaces/);
 assert.match(hodgeCards, /OpenAI notice: withdrawn/);
 assert.match(hodgeCards, /Withdrawn on October 6, 2026/);
