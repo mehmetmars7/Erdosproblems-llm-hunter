@@ -589,6 +589,10 @@
                 (match, environment, content) => protectHTML(`<pre>${escapeHTML(content)}</pre>`));
             text = text.replace(/\\verb\*?([^\w\s])([^\n]*?)\1/g,
                 (match, delimiter, content) => protectHTML(`<code>${escapeHTML(content)}</code>`));
+            // Comment lines are source metadata, not visible content. Literal
+            // code is already protected; retain collection boundaries until
+            // labels and references have been assigned their source scopes.
+            text = text.replace(/^[ \t]*%(?! BEGIN REUSED SOURCE:)[^\r\n]*(?:\r?\n|$)/gm, '');
             // A browser table has no page breaks or repeated page headers.
             // Use the same HTML table renderer as ordinary tabular material.
             text = text.replace(/\\begin\{longtable\}(?:\[[^\]]*\])?([\s\S]*?)\\end\{longtable\}/g,
@@ -822,6 +826,9 @@
             if (inferInlineMath) text = convertInlineMath(text);
             text = window.wrapBareTeXMath ? window.wrapBareTeXMath(text) : text;
             text = protectMath(text);
+            // Reference scopes are captured; hide source boundaries before
+            // escaped prose percentages become literal percent characters.
+            text = text.replace(/^[ \t]*%[^\r\n]*(?:\r?\n|$)/gm, '');
 
             // These escapes belong to prose; retain their mathematical meanings
             // in the protected expressions above.
@@ -905,19 +912,6 @@
             // title. Keep the title and omit only the table-of-contents entry.
             text = replaceTwoArgCommand(text, 'texorpdfstring', title => title);
             text = replaceCommandArguments(text, 'addcontentsline', 3, () => '');
-            
-            // Handle LaTeX comments (lines starting with %) only in the first ~10 lines
-            const lines = text.split('\n');
-            const headerLineCount = Math.min(10, lines.length);
-            for (let i = 0; i < headerLineCount; i++) {
-                if (lines[i].match(/^\s*%/)) {
-                    lines[i] = lines[i].replace(/^(\s*)%(.*)$/, '$1<span class="latex-comment">%$2</span>');
-                } else if (!lines[i].trim().startsWith('<span class="latex-comment">') && lines[i].trim().length > 0) {
-                    // Stop processing comments once we hit a non-comment, non-empty line
-                    break;
-                }
-            }
-            text = lines.join('\n');
             
             // Convert LaTeX environments to HTML before escaping
             // This must happen before HTML escaping
