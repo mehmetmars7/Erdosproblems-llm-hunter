@@ -99,8 +99,8 @@ before importing records. Scope review does not verify the proof itself:
 existing GPT attempts, reviews, numerical IDs, or existing display positions.
 The build keeps the original catalogue status in `source_status`. A full or
 stronger match sets the displayed Problem Status to solved (OpenAI claim);
-a partial match is partially solved (OpenAI claim), unless the source catalogue
-already records a solution. Community review is independent of these claim labels.
+a partial match displays partially solved in the LLM claim and retains the
+source-catalogue Problem Status. Community review is independent of these claim labels.
 An existing record that covers a different mathematical target may be corrected
 to `match: related`; it keeps `ATTEMPT_STATUS: unresolved` and does not change
 the displayed Problem Status. New imports still exclude related-only matches.

@@ -106,6 +106,17 @@ function getMathematicalAttempts(attacks) {
         && !isWithdrawnOpenAIClaim(a));
 }
 
+function sortAttemptsNewestFirst(attacks) {
+    const postedTime = attack => {
+        const date = attack.date_posted;
+        const time = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(date)
+            ? Date.parse(date) : NaN;
+        return Number.isFinite(time) ? time : -Infinity;
+    };
+    return [...(attacks || [])].sort((a, b) =>
+        postedTime(b) - postedTime(a) || (b.version || 1) - (a.version || 1));
+}
+
 // OpenAI partial results keep their scope visible. Other legacy partial
 // attempts retain the existing unresolved label.
 function getAttemptClaim(attack) {
@@ -286,18 +297,22 @@ function getOpenProblemClaim(problem) {
     return getOverallClaim(attempts);
 }
 
+function getOpenProblemClaimLabel(problem) {
+    const claim = getOpenProblemClaim(problem);
+    return claim === 'partial' ? 'partially solved' : claim;
+}
+
 function getOpenProblemStatus(problem) {
     const attempts = getMathematicalAttempts(problem.attacks);
     if (attempts.some(isSolvedOpenAIClaim)) return 'solved';
     const sourceStatus = problem.source_status ?? problem.status;
-    if (attempts.some(isPartialOpenAIClaim) && sourceStatus !== 'solved') return 'partial';
+    if (attempts.some(isPartialOpenAIClaim)) return sourceStatus || 'unreviewed';
     return problem.status || 'unreviewed';
 }
 
 function isOpenAIProblemStatus(problem) {
     const attempts = getMathematicalAttempts(problem.attacks);
-    return attempts.some(isSolvedOpenAIClaim) ||
-        (attempts.some(isPartialOpenAIClaim) && (problem.source_status ?? problem.status) !== 'solved');
+    return attempts.some(isSolvedOpenAIClaim);
 }
 
 function getOpenProblemStatusLabel(problem) {
@@ -438,7 +453,7 @@ function renderOpenProblemRows(problems) {
         const metadata = [problem.domain_label, sourceLabel,
             (problem.tags || []).includes('openai') ? 'OpenAI' : '',
             isMO && Number.isFinite(problem.score) ? `MO score: ${problem.score}` : ''].filter(Boolean).join(' · ');
-        const claimLabel = getOpenProblemClaim(problem) +
+        const claimLabel = getOpenProblemClaimLabel(problem) +
             (problem.llm_status_source === 'openai_claim' ||
                 attempts.some(attack => isSolvedOpenAIClaim(attack) || isPartialOpenAIClaim(attack)) ? ' · OpenAI' : '');
         const reviewed = problem.status_reviewed_at
@@ -886,6 +901,7 @@ window.ProblemHunting = {
     getUniqueModels,
     getModelLabels,
     getMathematicalAttempts,
+    sortAttemptsNewestFirst,
     getAttemptClaim,
     getOverallClaim,
     countWithAttacks,
@@ -898,6 +914,7 @@ window.ProblemHunting = {
     getOpenProblemDomains,
     filterOpenProblems,
     getOpenProblemClaim,
+    getOpenProblemClaimLabel,
     getOpenProblemStatus,
     getOpenProblemStatusLabel,
     getOpenProblemSourceStatusLabel,

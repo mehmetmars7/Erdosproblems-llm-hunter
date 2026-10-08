@@ -94,8 +94,9 @@ assert.equal(api.getOpenProblemStatusLabel(taggedRecords['6']), 'solved (OpenAI 
 assert.equal(api.getOpenProblemSourceStatusLabel(taggedRecords['6']), 'open with solved subcases');
 const partialOpenAIProblem = { ...taggedRecords['6'], status: 'partial', source_status: 'open',
     llm_status: 'partial', attacks: [attempt, partialOpenAIAttempt] };
-assert.equal(api.getOpenProblemStatusLabel(partialOpenAIProblem), 'partially solved (OpenAI claim)');
+assert.equal(api.getOpenProblemStatusLabel(partialOpenAIProblem), 'open');
 assert.equal(api.getOpenProblemClaim(partialOpenAIProblem), 'partial');
+assert.equal(api.getOpenProblemClaimLabel(partialOpenAIProblem), 'partially solved');
 assert.equal(api.getOpenProblemSourceStatusLabel(partialOpenAIProblem), 'open');
 const catalogueSolved = { ...partialOpenAIProblem, status: 'solved', source_status: 'solved' };
 assert.equal(api.getOpenProblemStatusLabel(catalogueSolved), 'solved');
@@ -113,9 +114,9 @@ assert.equal(api.getOpenProblemClaim(relatedOpenAIProblem), 'related');
 assert.equal(api.getOpenProblemStatusLabel(relatedOpenAIProblem), 'open');
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved · OpenAI/);
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /solved \(OpenAI claim\)/);
-assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /partially solved \(OpenAI claim\)/);
+assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /<td[^>]*>open<span class="catalogue-meta">Source catalogue: open/);
 assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /Source catalogue: open/);
-assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /partial · OpenAI/);
+assert.match(api.renderOpenProblemRows([partialOpenAIProblem]), /partially solved · OpenAI/);
 assert.match(api.renderOpenProblemRows([taggedRecords['6']]), /Algebra · Ranked catalogue · OpenAI/);
 assert.deepEqual(Array.from(api.getModelLabels([openAIAttempt])), ['openai']);
 assert.equal(api.getOpenAIFileUrl(openAIMetadata, openAIMetadata.families[0].manuscripts[0].pdf_path),
