@@ -675,7 +675,7 @@ function getReviewLabel(review) {
     const status = (review && review.status ? review.status : '').toLowerCase();
     switch (status) {
         case 'submitted':
-            return review.submission_role === 'authors' ? 'submitted by authors' : 'submitted';
+            return 'submitted';
         case 'flagged':
         case 'incorrect':
         case 'known':
