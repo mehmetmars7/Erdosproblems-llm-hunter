@@ -26,7 +26,8 @@
                 const block = label.closest('.theorem, .lemma, .proposition, .corollary, .claim, .definition, .remark');
                 const heading = block?.querySelector('strong')?.textContent || '';
                 const name = label.dataset.texLabelKind === 'math' ? renderedEquationName(label)
-                    : heading.match(/\[([\s\S]+)\]:?\s*$/)?.[1];
+                    : block?.querySelector('.tex-theorem-title')?.textContent
+                        || heading.match(/\[([\s\S]+)\]:?\s*$/)?.[1];
                 targets.set(keyFor(label), { label, name });
             });
             maps.set(attempt, targets);

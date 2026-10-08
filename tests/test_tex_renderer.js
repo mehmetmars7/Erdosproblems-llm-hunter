@@ -161,7 +161,7 @@ assert.equal(render(tex`\[\begin{psmallmatrix}1&0\\0&1\end{psmallmatrix}\]`),
     tex`<p>\[\begin{pmatrix}1&amp;0\\0&amp;1\end{pmatrix}\]</p>`);
 assert.match(render(tex`$\Bigl(x\Bigr)$`), /\$\\left\(x\\right\)\$/);
 assert.equal(render(tex`\paragraph{A bound for $N^{\varepsilon}$.}`), '<h5>A bound for $N^{\\varepsilon}$.</h5>');
-assert.match(render(tex`\begin{theorem}[Known result]$x>0$.\end{theorem}`), /<div class="theorem"><strong>Theorem\[Known result\]:<\/strong> \$x&gt;0\$\.<\/div>/);
+assert.match(render(tex`\begin{theorem}[Known result]$x>0$.\end{theorem}`), /<div class="theorem"><strong>Theorem \(<span class="tex-theorem-title">Known result<\/span>\):<\/strong> \$x&gt;0\$\.<\/div>/);
 assert.equal(render(tex`(\emph{cographs}) and (\*)`), '<p>(<em>cographs</em>) and (*)</p>');
 assert.equal(render(tex`\[x
 >y\]`), '<p>\\[x\n&gt;y\\]</p>');
@@ -174,6 +174,18 @@ By Lemma~\ref{lem:packing}, use \eqref{eq:missing}.`);
 assert.match(references, /data-tex-label="lem:packing"/);
 assert.match(references, /data-tex-reference="lem:packing"/);
 assert.match(references, />\(eq:missing\)<\/a>/);
+const cleverReferences = render(tex`\begin{theorem}[Finite network spectral-radius criterion\label{thm:finite}]
+Claim.\end{theorem}
+Use \cref{thm:finite} and \Cref{thm:finite, thm:other}.
+\begingroup\sloppy Visible bibliography.\endgroup
+\begin{verbatim}\cref{literal} \begingroup\sloppy\endgroup\end{verbatim}`);
+assert.match(cleverReferences, /Theorem \(<span class="tex-theorem-title">Finite network spectral-radius criterion/);
+assert.match(cleverReferences, /data-tex-label="thm:finite"/);
+assert.match(cleverReferences, /data-tex-reference="thm:finite" data-tex-reference-kind="cref"/);
+assert.match(cleverReferences, /data-tex-reference="thm:other" data-tex-reference-kind="Cref"/);
+const proseOnly = cleverReferences.replace(/<pre>[\s\S]*?<\/pre>/g, '');
+assert.doesNotMatch(proseOnly, /\\(?:cref|Cref|begingroup|endgroup|sloppy)\b|Theorem\[/);
+assert.match(cleverReferences, /<pre>\\cref\{literal\} \\begingroup\\sloppy\\endgroup<\/pre>/);
 const importedReferences = render(tex`% BEGIN REUSED SOURCE: one.tex
 \label{shared}First \ref{shared}.
 % END REUSED SOURCE: one.tex

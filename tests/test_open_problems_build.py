@@ -348,6 +348,28 @@ class OpenProblemsBuildTests(unittest.TestCase):
         self.assertEqual(result['20000601']['attacks'], [])
         self.assertEqual(result['20000601']['llm_status'], 'none')
 
+    def test_ordinary_article_expands_local_operators_without_changing_download(self):
+        source = r'''% ATTEMPT_STATUS: unresolved
+\documentclass{article}
+\newcommand{\Fix}{\operatorname{Fix}}
+\newcommand{\fix}{\Fix}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\begin{document}
+\section{Conditional equilibrium consequences}
+$\Fix(T)=\fix(T)$ and $x\in\argmax_{a\in C}u(a)$.
+\verb|\Fix| and \begin{verbatim}\argmax\end{verbatim} stay literal.
+\end{document}'''
+        path = self.write('attacks/open_problems/top_problems/Model/1.tex', source)
+        result = build_site.build_open_problems_data({}, catalog())['1']
+        raw = result['attacks'][0]['raw'].split(r'\begin{document}', 1)[1]
+        self.assertIn(r'\operatorname{Fix}', raw)
+        self.assertIn(r'\operatorname*{arg\,max}', raw)
+        self.assertNotIn(r'\fix(T)', raw)
+        self.assertIn(r'\verb|\Fix|', raw)
+        self.assertIn(r'\begin{verbatim}\argmax\end{verbatim}', raw)
+        self.assertEqual(result['attacks'][0]['status'], 'unresolved')
+        self.assertEqual(path.read_text(), source)
+
     def test_misfiled_attempt_metadata_cannot_attach_to_another_problem(self):
         self.write('attacks/open_problems/top_problems/Model/1.tex',
                    '% TOP_PROBLEM: {"id": 20000601}\nUNRESOLVED')

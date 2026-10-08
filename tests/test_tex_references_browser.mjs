@@ -178,6 +178,33 @@ See \\ref{shared}.
     }]);
     assert.equal(unsafeMarkup.executed, false);
 
+    const clever = await evaluate(`(() => {
+        document.body.innerHTML = '<main><article class="attempt"></article></main>';
+        const host = document.querySelector('main');
+        const attempt = host.querySelector('.attempt');
+        attempt.innerHTML = formatTeX(String.raw\`\\begin{theorem}[Finite network spectral-radius criterion\\label{thm:finite}]
+Claim.\\end{theorem}
+See \\cref{thm:finite}, \\Cref{thm:finite, thm:missing}.
+\\begingroup\\sloppy Bibliography.\\endgroup\`);
+        ProblemHunting.initTeXReferences(host);
+        return {
+            title: attempt.querySelector('strong').textContent,
+            prose: attempt.textContent,
+            links: [...attempt.querySelectorAll('.tex-reference')].map(link => ({
+                key: link.dataset.texReference, caption: link.textContent,
+                href: link.getAttribute('href'), target: document.querySelector(link.getAttribute('href') || '#absent')?.dataset.texLabel
+            }))
+        };
+    })()`);
+    assert.equal(clever.title, 'Theorem (Finite network spectral-radius criterion):');
+    assert.doesNotMatch(clever.prose, /\\(?:cref|Cref|begingroup|endgroup|sloppy)\b/);
+    for (const link of clever.links.filter(link => link.key === 'thm:finite')) {
+        assert.equal(link.caption, 'Finite network spectral-radius criterion');
+        assert.equal(link.target, 'thm:finite');
+        assert.ok(link.href);
+    }
+    assert.equal(clever.links.find(link => link.key === 'thm:missing').href, null);
+
     const rendered = await evaluate(`(() => {
         document.body.innerHTML = '<main><article class="attempt"></article></main>';
         const host = document.querySelector('main');

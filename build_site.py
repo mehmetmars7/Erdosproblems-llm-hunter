@@ -757,6 +757,15 @@ def expand_tex_notation(text, macros):
     return tokens.sub(lambda m: macros.get(m[3], m[0]) if m[3] else m[0], text)
 
 
+def normalize_article_notation(content):
+    """Expand declared notation in ordinary articles, preserving the source wrapper."""
+    document = re.search(r'^[ \t]*\\begin\{document\}[ \t]*\r?$', content, re.MULTILINE)
+    if not document:
+        return content
+    macros = tex_notation_macros(content[:document.start()], {})
+    return content[:document.end()] + expand_tex_notation(content[document.end():], macros)
+
+
 def parse_numbered_problem_tex(content, *, require_source_urls=True):
     """Extract display content while leaving the downloadable source untouched."""
     # Standalone submissions can retain archival comments after the document.
@@ -1252,6 +1261,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                 raw = content
                 if numbered and r'\subsection{Definitions and mathematical statement}' in content:
                     raw = parse_numbered_problem_tex(content, require_source_urls=False)['documentTeX']
+                elif numbered and not has_openai_header:
+                    raw = normalize_article_notation(content)
                 posted_marker = re.search(r'^% FIRST_POSTED: (.+)$', content, re.MULTILINE)
                 if posted_marker:
                     posted_date = posted_marker[1].strip()

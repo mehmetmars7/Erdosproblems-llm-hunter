@@ -163,10 +163,10 @@
 
     <script src="data/erdos_data.js"></script>
     <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=11e5116d0e9f62b0"></script>
+    <script src="data/open_problems_data.js?v=e0cb443be45cc1b6"></script>
     <script src="app.js?v=22bc0d7d3ef6454f"></script>
     <script src="attempt-previews.js"></script>
-    <script src="tex-references.js?v=2"></script>
+    <script src="tex-references.js?v=3"></script>
     <script src="tex-bare-math.js"></script>
     <script src="catalog-math.js"></script>
     <script>
@@ -765,7 +765,7 @@
                 const spansRows = /\\[Bb]igg?l[\s\S]*?\\\\[\s\S]*?\\[Bb]igg?r/.test(math);
                 let normalized = math
                     .replace(/\\label\{[^}]+\}/g, '')
-                    .replace(/\\(eqref|ref)\{([^}]+)\}/g, (match, kind, key) => {
+                    .replace(/\\(eqref|ref|cref|Cref)\{([^}]+)\}/g, (match, kind, key) => {
                         const visible = key.replace(/[\\{}%#_$&]/g, '\\$&');
                         return kind === 'eqref' ? `\\text{(${visible})}` : `\\text{${visible}}`;
                     })
@@ -820,15 +820,21 @@
 
             // Keep explicit source references visible, even when a target is
             // absent. Their links are scoped to this writeup after DOM rendering.
-            text = text.replace(/\\(label|ref|eqref)\{([^}]+)\}/g, (match, kind, key, offset, input) => {
+            text = text.replace(/\\(label|ref|eqref|cref|Cref)\{([^}]+)\}/g, (match, kind, key, offset, input) => {
                 const scope = referenceScope(input, offset);
                 if (kind === 'label') return protectHTML(referenceLabel(key, scope));
-                const caption = kind === 'eqref' ? `(${key})` : key;
-                return protectHTML(`<a class="tex-reference" data-tex-reference="${escapeHTML(key)}" data-tex-reference-kind="${kind}" data-tex-scope="${scope}">${escapeHTML(caption)}</a>`);
+                const keys = /^(?:cref|Cref)$/.test(kind) ? key.split(',').map(key => key.trim()).filter(Boolean) : [key];
+                return keys.map(key => {
+                    const caption = kind === 'eqref' ? `(${key})` : key;
+                    return protectHTML(`<a class="tex-reference" data-tex-reference="${escapeHTML(key)}" data-tex-reference-kind="${kind}" data-tex-scope="${scope}">${escapeHTML(caption)}</a>`);
+                }).join(', ');
             });
             if (inferInlineMath) text = convertInlineMath(text);
             text = window.wrapBareTeXMath ? window.wrapBareTeXMath(text) : text;
             text = protectMath(text);
+            // These affect PDF line breaking/grouping, not the mathematical text.
+            // Literal code and mathematics have already been protected.
+            text = text.replace(/\\(?:begingroup|endgroup|sloppy|fussy)\b/g, '');
             // Reference scopes are captured; hide source boundaries before
             // escaped prose percentages become literal percent characters.
             text = text.replace(/^[ \t]*%[^\r\n]*(?:\r?\n|$)/gm, '');
@@ -1006,15 +1012,19 @@
             text = text.replace(/\\begin\{verbatim\}([\s\S]*?)\\end\{verbatim\}/g, '<pre>$1</pre>');
             
             // Convert theorem-like environments (theorem, lemma, definition, proof, etc.)
-            text = text.replace(/\\begin\{theorem\}(\[.*?\])?([\s\S]*?)\\end\{theorem\}/g, '<div class="theorem"><strong>Theorem$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{lemma\}(\[.*?\])?([\s\S]*?)\\end\{lemma\}/g, '<div class="lemma"><strong>Lemma$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{claim\}(\[.*?\])?([\s\S]*?)\\end\{claim\}/g, '<div class="lemma"><strong>Claim$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{proposition\}(\[.*?\])?([\s\S]*?)\\end\{proposition\}/g, '<div class="proposition"><strong>Proposition$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{corollary\}(\[.*?\])?([\s\S]*?)\\end\{corollary\}/g, '<div class="corollary"><strong>Corollary$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{remark\}(\[.*?\])?([\s\S]*?)\\end\{remark\}/g, '<div class="remark"><strong>Remark$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{definition\}(\[.*?\])?([\s\S]*?)\\end\{definition\}/g, '<div class="definition"><strong>Definition$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{construction\}(\[.*?\])?([\s\S]*?)\\end\{construction\}/g, '<div class="definition"><strong>Construction$1:</strong> $2</div>');
-            text = text.replace(/\\begin\{inputthm\}(\[.*?\])?([\s\S]*?)\\end\{inputthm\}/g, '<div class="theorem"><strong>Input$1:</strong> $2</div>');
+            for (const [environment, css, kind] of [
+                ['theorem', 'theorem', 'Theorem'], ['lemma', 'lemma', 'Lemma'],
+                ['claim', 'lemma', 'Claim'], ['proposition', 'proposition', 'Proposition'],
+                ['corollary', 'corollary', 'Corollary'], ['remark', 'remark', 'Remark'],
+                ['definition', 'definition', 'Definition'], ['construction', 'definition', 'Construction'],
+                ['inputthm', 'theorem', 'Input']
+            ]) {
+                const pattern = new RegExp('\\\\begin\\{' + environment + '\\}(?:\\[([\\s\\S]*?)\\])?([\\s\\S]*?)\\\\end\\{' + environment + '\\}', 'g');
+                text = text.replace(pattern, (match, title, body) => {
+                    const caption = title ? ' (' + protectHTML('<span class="tex-theorem-title">') + title + protectHTML('</span>') + ')' : '';
+                    return `<div class="${css}"><strong>${kind}${caption}:</strong> ${body}</div>`;
+                });
+            }
             // Separate markers also support a lemma proof nested inside a longer proof.
             text = text.replace(/\\begin\{proof\}(\[.*?\])?/g, '<div class="proof"><em>Proof$1:</em> ');
             text = text.replace(/\\end\{proof\}/g, ' ∎</div>');
