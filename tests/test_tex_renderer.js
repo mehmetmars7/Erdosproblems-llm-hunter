@@ -13,6 +13,30 @@ vm.runInContext(scripts.find(script => script.includes('function formatTeX')), c
 const render = context.formatTeX;
 const tex = String.raw;
 
+// Source comments must stay hidden anywhere in an article or fragment, while
+// escaped percentages and literal code remain visible.
+const commented = tex`% Hidden header.
+\section{Visible heading}
+   % Hidden body with \label{hidden} and $x$.
+Visible 50\%.
+% Hidden footer.`;
+for (const preserve of [false, true]) {
+    const result = render(commented, preserve);
+    assert.match(result, /Visible heading/);
+    assert.match(result, /Visible 50%/);
+    assert.doesNotMatch(result, /Hidden|data-tex-label="hidden"|latex-comment/);
+}
+assert.match(render(tex`\begin{verbatim}
+% Literal code comment.
+\end{verbatim}`), /% Literal code comment\./);
+assert.equal(render(tex`\verb|% literal|`), '<p><code>% literal</code></p>');
+assert.equal(render(tex`\% Visible percent.`), '<p>% Visible percent.</p>');
+const humanContribution = render(fs.readFileSync(path.join(root,
+    'attacks/open_problems/top_problems/Human_Contribution/30007169.tex'), 'utf8'));
+assert.match(humanContribution, /Human Contribution: Samuel Kittle and Constantin Kogler/);
+assert.match(humanContribution, /\\dim_H K/);
+assert.doesNotMatch(humanContribution, /Insert immediately|input-ready|host document|Problem #2713 \/ local ID/);
+
 assert.equal(render(tex`C\textasciicircum{}r and O\textasciitilde{}(n)`, false, false),
              '<p>C^r and O~(n)</p>');
 
@@ -157,6 +181,7 @@ const importedReferences = render(tex`% BEGIN REUSED SOURCE: one.tex
 \label{shared}Second \ref{shared}.`, true);
 assert.match(importedReferences, /data-tex-label="shared" data-tex-scope="1"/);
 assert.match(importedReferences, /data-tex-label="shared" data-tex-scope="2"/);
+assert.doesNotMatch(importedReferences, /BEGIN REUSED SOURCE|END REUSED SOURCE/);
 assert.match(render(tex`$x=\ref{eq:value}$`), /\\text\{eq:value\}/);
 const multilineDelimiter = tex`\[\begin{aligned}X&=\Biggl(a+b\\&+c\Biggr).\end{aligned}\]`;
 assert.match(render(multilineDelimiter), /\\Biggl\(/);
