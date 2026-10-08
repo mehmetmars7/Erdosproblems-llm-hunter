@@ -674,6 +674,8 @@ function initThemeToggle() {
 function getReviewLabel(review) {
     const status = (review && review.status ? review.status : '').toLowerCase();
     switch (status) {
+        case 'submitted':
+            return review.submission_role === 'authors' ? 'submitted by authors' : 'submitted';
         case 'flagged':
         case 'incorrect':
         case 'known':
@@ -706,8 +708,9 @@ function normalizeReviewHandle(handle) {
 }
 
 function getReviewHandles(review) {
-    if (!review || !review.reviewed_by) return [];
-    const raw = review.reviewed_by;
+    if (!review) return [];
+    const raw = review.status === 'submitted' ? review.submitted_by : review.reviewed_by;
+    if (!raw) return [];
     let items = [];
     if (Array.isArray(raw)) {
         items = raw;

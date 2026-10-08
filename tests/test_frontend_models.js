@@ -7,6 +7,14 @@ const root = path.resolve(__dirname, '..');
 const context = vm.createContext({ window: {}, document: { addEventListener() {} } });
 vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
 const api = context.window.ProblemHunting;
+const authorSubmission = { status: 'submitted', submission_role: 'authors',
+    submitted_by: ['ckkogler', 'samuel-kittle'], independently_reviewed: false };
+assert.equal(api.getReviewLabel(authorSubmission), 'submitted by authors');
+assert.equal(api.getReviewLabel({ status: 'submitted' }), 'submitted');
+assert.deepEqual(Array.from(api.getReviewHandles(authorSubmission)), ['ckkogler', 'samuel-kittle']);
+assert.match(api.formatReviewHandleLinks(authorSubmission), /href="https:\/\/github.com\/ckkogler"/);
+assert.match(api.formatReviewHandleLinks(authorSubmission), /href="https:\/\/github.com\/samuel-kittle"/);
+assert.equal(api.getReviewLabel({ status: 'accepted', reviewed_by: ['plby', 'teorth'] }), 'accepted');
 const astra = { model: 'GPT 6 Astra Ultra', status: 'unresolved' };
 const imported = { ...astra, entry_kind: 'reused_writeup', provenance: { source_model: 'gpt_pro_5.2' } };
 const labels = attacks => Array.from(api.getModelLabels(attacks));

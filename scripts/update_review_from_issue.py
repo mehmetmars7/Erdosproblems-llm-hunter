@@ -22,6 +22,7 @@ FIELD_LABELS = {
 }
 
 VERDICT_MAP = {
+    "submitted": ("submitted", "submitted"),
     "flagged": ("flagged", "flagged"),
     "incorrect": ("incorrect", "incorrect"),
     "known": ("known", "known"),
@@ -151,6 +152,14 @@ def main():
         "issue_number": issue_number,
         "issue_url": issue_url,
     }
+    if status == "submitted":
+        review_data.pop("reviewed_by")
+        review_data.pop("reviewed_at")
+        review_data.update(
+            submitted_by=issue_author.strip() or review_labeler.strip(),
+            submitted_at=issue_created_at[:10] if issue_created_at else "",
+            independently_reviewed=False,
+        )
 
     review_dir = REVIEWS_DIR / problem_type
     review_dir.mkdir(parents=True, exist_ok=True)

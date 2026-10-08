@@ -58,6 +58,16 @@ class OpenProblemReviewTests(unittest.TestCase):
         self.assertEqual(saved["reviewed_at"], "2026-09-24")
         self.assertEqual(saved["issue_number"], "42")
 
+    def test_submission_attributes_submitter_without_inventing_a_review(self):
+        self.submit(verdict="submitted")
+        saved = json.loads((self.output / "open_problems/1.json").read_text())
+        self.assertEqual(saved["status"], "submitted")
+        self.assertEqual(saved["submitted_by"], "author")
+        self.assertEqual(saved["submitted_at"], "2026-09-24")
+        self.assertFalse(saved["independently_reviewed"])
+        self.assertNotIn("reviewed_by", saved)
+        self.assertNotIn("reviewed_at", saved)
+
     def test_sparse_canonical_ids_and_normalized_type_are_supported(self):
         self.submit(problem_type="open_problems", problem_id="20000601")
         self.assertTrue((self.output / "open_problems/20000601.json").is_file())

@@ -99,6 +99,27 @@ const reviewURL = new URL(page.context.getReviewIssueUrl('open_problems', '20000
 assert.equal(reviewURL.searchParams.get('problem_type'), 'Open Problems');
 assert.equal(reviewURL.searchParams.get('problem_id'), '20000601');
 
+const authorSubmission = JSON.parse(fs.readFileSync(path.join(root,
+    'reviews/open_problems/30007169.json'), 'utf8'));
+page = await render('?type=open_problems&id=20000601', {
+    '20000601': { ...records['20000601'], review: authorSubmission }
+});
+const submissionMeta = page.element('problem-meta').innerHTML;
+assert.match(submissionMeta, /Community Review:<\/strong> submitted by authors/);
+assert.match(submissionMeta, /href="https:\/\/github.com\/ckkogler"/);
+assert.match(submissionMeta, /href="https:\/\/github.com\/samuel-kittle"/);
+assert.match(submissionMeta, /independent review pending/);
+assert.doesNotMatch(submissionMeta, /accepted/);
+
+const acceptedReview = JSON.parse(fs.readFileSync(path.join(root, 'reviews/erdos/652.json'), 'utf8'));
+page = await render('?type=erdos&id=1', records, undefined, {
+    '1': { ...erdosRecords['1'], review: acceptedReview }
+});
+assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> accepted/);
+assert.match(page.element('problem-meta').innerHTML, /href="https:\/\/github.com\/plby"/);
+assert.match(page.element('problem-meta').innerHTML, /href="https:\/\/github.com\/teorth"/);
+assert.doesNotMatch(page.element('problem-meta').innerHTML, /independent review pending/);
+
 page = await render('?type=open_problems&id=6');
 assert.equal(page.element('erdos-main-link').hidden, true);
 assert.equal(page.element('prev-problem').href, 'problem.html?type=open_problems&id=20000601');

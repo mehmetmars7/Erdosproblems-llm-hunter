@@ -273,6 +273,11 @@ for a ranked record and copy its canonical UnsolvedMath ID (such as `6`) from th
 detail page. Select **MO** and its numeric question ID for the MathOverflow subset,
 or **Erdos** and its numeric problem number. An accepted review requires a citation
 and an explanation. Review changes pass through a pull request before publication.
+Use `submitted` to record a contribution awaiting independent review. Submission
+records attribute `submitted_by`, rather than crediting the submitter as a reviewer.
+For a contribution by its authors, `submission_role: authors` displays
+**submitted by authors** with their GitHub handles. This does not accept the proof
+or independently review another contribution on the same problem page.
 Maintainers use the `ready-for-pr` label to create that pull request. Its required
 `build` check must pass before merging; if GitHub displays an **Approve workflows
 to run** banner, a maintainer must review and approve the workflow run first.
