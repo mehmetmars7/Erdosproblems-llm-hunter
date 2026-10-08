@@ -102,7 +102,7 @@ function sortByScore(a, b) {
  * Get unique models from attacks
  */
 function getMathematicalAttempts(attacks) {
-    return (attacks || []).filter(a => a.entry_kind !== 'statement_only');
+    return (attacks || []).filter(a => a.entry_kind !== 'statement_only' && a.entry_kind !== 'human_contribution');
 }
 
 // OpenAI partial results keep their scope visible. Other legacy partial

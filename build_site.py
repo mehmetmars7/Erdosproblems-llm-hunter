@@ -1121,7 +1121,8 @@ def summarize_open_problem_attempts(problem):
     problem['attacks'].sort(key=lambda attack: (
         attack.get('model', ''), attack.get('version', 1), attack.get('file_path', '')
     ))
-    attempts = [a for a in problem['attacks'] if a.get('entry_kind') != 'statement_only']
+    attempts = [a for a in problem['attacks']
+                if a.get('entry_kind') not in {'statement_only', 'human_contribution'}]
     openai_claims = [a for a in attempts if a.get('entry_kind') == 'external_claim'
                     and a.get('claimant') == 'OpenAI']
     solved_openai = any(a['openai']['match'] in {'full', 'stronger'}
@@ -1268,6 +1269,8 @@ def build_open_problems_data(mo_problems=None, snapshot=None):
                     parsed['entry_kind'] = 'statement_only'
                     parsed['status'] = 'unresolved'
                     parsed.pop('completion', None)
+                if re.search(r'^% ENTRY_KIND: human_contribution\s*$', content, re.MULTILINE):
+                    parsed['entry_kind'] = 'human_contribution'
                 parsed['file_path'] = tex_file.relative_to(BASE_DIR).as_posix()
                 parsed['version'] = int(match.group('ver') or 1)
                 problems[problem_id]['attacks'].append(parsed)
@@ -1422,15 +1425,15 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
             'mo_total': sum(p['collection'] == 'mo' for p in open_problems.values()),
             'with_attacks': sum(
                 1 for p in open_problems.values()
-                if any(a.get('entry_kind') != 'statement_only' for a in p.get('attacks', []))
+                if any(a.get('entry_kind') not in {'statement_only', 'human_contribution'} for a in p.get('attacks', []))
             ),
             'ranked_with_attacks': sum(
                 1 for p in open_problems.values() if p['collection'] == 'ranked'
-                and any(a.get('entry_kind') != 'statement_only' for a in p.get('attacks', []))
+                and any(a.get('entry_kind') not in {'statement_only', 'human_contribution'} for a in p.get('attacks', []))
             ),
             'models': sorted(set(
                 a['model'] for p in open_problems.values() for a in p.get('attacks', [])
-                if a.get('entry_kind') != 'statement_only'
+                if a.get('entry_kind') not in {'statement_only', 'human_contribution'}
             )),
         }
     }
