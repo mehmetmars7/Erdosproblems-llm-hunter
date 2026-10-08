@@ -370,7 +370,9 @@ def parse_openai_claim(content, manifest=None):
     if metadata['match'] not in ('full', 'stronger', 'partial', 'related'):
         raise ValueError('Invalid OPENAI_CLAIM match')
     solved = metadata['match'] in {'full', 'stronger'}
-    if metadata['resolution'] not in (('proved', 'disproved') if solved else ('partial',)):
+    resolutions = ('proved', 'disproved') if solved else (
+        ('partial', 'withdrawn') if metadata['match'] == 'related' else ('partial',))
+    if metadata['resolution'] not in resolutions:
         raise ValueError('Invalid OPENAI_CLAIM resolution for match')
     if metadata['second_pass'] != ('agreed' if solved else 'n/a'):
         raise ValueError('Invalid OPENAI_CLAIM second_pass for match')
@@ -1122,7 +1124,8 @@ def summarize_open_problem_attempts(problem):
         attack.get('model', ''), attack.get('version', 1), attack.get('file_path', '')
     ))
     attempts = [a for a in problem['attacks']
-                if a.get('entry_kind') not in {'statement_only', 'human_contribution'}]
+                if a.get('entry_kind') not in {'statement_only', 'human_contribution'}
+                and a.get('openai', {}).get('resolution') != 'withdrawn']
     openai_claims = [a for a in attempts if a.get('entry_kind') == 'external_claim'
                     and a.get('claimant') == 'OpenAI']
     solved_openai = any(a['openai']['match'] in {'full', 'stronger'}

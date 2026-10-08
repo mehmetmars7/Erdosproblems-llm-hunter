@@ -102,12 +102,14 @@ function sortByScore(a, b) {
  * Get unique models from attacks
  */
 function getMathematicalAttempts(attacks) {
-    return (attacks || []).filter(a => a.entry_kind !== 'statement_only' && a.entry_kind !== 'human_contribution');
+    return (attacks || []).filter(a => a.entry_kind !== 'statement_only' && a.entry_kind !== 'human_contribution'
+        && !isWithdrawnOpenAIClaim(a));
 }
 
 // OpenAI partial results keep their scope visible. Other legacy partial
 // attempts retain the existing unresolved label.
 function getAttemptClaim(attack) {
+    if (isWithdrawnOpenAIClaim(attack)) return 'withdrawn';
     if (isPartialOpenAIClaim(attack)) return 'partial';
     if (isRelatedOpenAIClaim(attack)) return 'related';
     const status = String(attack.status || '').trim().toLowerCase();
@@ -324,7 +326,12 @@ function isPartialOpenAIClaim(attack) {
 
 function isRelatedOpenAIClaim(attack) {
     return attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI' &&
-        attack.openai?.match === 'related';
+        attack.openai?.match === 'related' && !isWithdrawnOpenAIClaim(attack);
+}
+
+function isWithdrawnOpenAIClaim(attack) {
+    return attack.entry_kind === 'external_claim' && attack.claimant === 'OpenAI' &&
+        attack.openai?.resolution === 'withdrawn';
 }
 
 // Only construct links to the reviewed snapshot. Reject traversal and URL
@@ -898,6 +905,7 @@ window.ProblemHunting = {
     isSolvedOpenAIClaim,
     isPartialOpenAIClaim,
     isRelatedOpenAIClaim,
+    isWithdrawnOpenAIClaim,
     getOpenAIFileUrl,
     getOpenAIStatementUrl,
     getOpenAIPaperTitles,

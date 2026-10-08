@@ -104,6 +104,10 @@ already records a solution. Community review is independent of these claim label
 An existing record that covers a different mathematical target may be corrected
 to `match: related`; it keeps `ATTEMPT_STATUS: unresolved` and does not change
 the displayed Problem Status. New imports still exclude related-only matches.
+An attributed withdrawal notice may use a new version with `match: related`,
+`resolution: withdrawn`, and `ATTEMPT_STATUS: unresolved`. Retain the archived
+manuscript's pinned metadata and link the current notice in its short TeX text.
+Withdrawal records are displayed separately and do not count as mathematical progress.
 
 The generator `scripts/import_openai_math.py` reads the pinned inventory and
 approved adjudication plus per-ID summary sections. Validate with its dry-run
