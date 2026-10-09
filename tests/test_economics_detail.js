@@ -85,6 +85,7 @@ async function main() {
     assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
     assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> no attempt/);
     assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
+    assert.match(page.element('problem-meta').innerHTML, /Completion:<\/strong> —<\/p>/);
     assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:|Source catalogue ID:|Original catalogue:|Difficulty ranks can change/);
     assert.match(page.element('problem-meta').innerHTML, /Rank:<\/strong> 3<\/p>/);
     assert.match(page.element('problem-meta').innerHTML, /economics\.html\?jel=C73/);
@@ -174,6 +175,23 @@ async function main() {
     assert.equal(page.element('comments').hidden, false);
     assert.match(attackHtml, /href="#comments">comments<\/a>/);
     assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-1');
+
+    for (const [completion, label] of [[45.5, '45.5%'], [0, '0%'], [100, '100%']]) {
+        const estimated = { ...withAttacks, 'C73-1': { ...withAttacks['C73-1'],
+            completion, completion_source: 'llm' } };
+        page = await render('?type=economics&id=C73-1', estimated);
+        assert.ok(page.element('problem-meta').innerHTML.includes(
+            '<strong>Completion:</strong> ' + label + ' (LLM estimate)</p>'));
+        assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
+    }
+    page = await render('?type=economics&id=C73-1', withAttacks);
+    assert.match(page.element('problem-meta').innerHTML, /Completion:<\/strong> —<\/p>/,
+        'An attempt with no estimate must not acquire an invented percentage');
+    page = await render('?type=economics&id=C73-1', {
+        ...sample, 'C73-1': { ...sample['C73-1'], completion: 100 }
+    });
+    assert.match(page.element('problem-meta').innerHTML, /Completion:<\/strong> —<\/p>/,
+        'Statement-only entries cannot display a completion estimate');
 
     // A new ordering changes navigation and displayed rank while retaining every fixed route.
     const reordered = Object.fromEntries(Object.entries(sample).map(([id, record]) =>
