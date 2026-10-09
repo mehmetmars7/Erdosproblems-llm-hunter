@@ -1,0 +1,111 @@
+% ECONOMICS_PROBLEM: {"id": "C78-417", "title": "Stability probability under compact indifference", "jel_code": "C78", "source_id": "OP-0544"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\title{A graph integral and exact forest algorithm for random tie refinements}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C78-417}. \textbf{Status:} Partial. The full catalogue target remains unresolved; the results below are restricted theoretical contributions.
+
+\section{The compact input and the unresolved classification}
+Fix a perfect matching $M$ and weak preference orders. Every agent independently chooses a uniform strict refinement of every reported tie. If tie blocks have sizes $t_{a,j}$, the denominator of the stability probability is
+\[
+ D=\prod_a\prod_j t_{a,j}!,\qquad p_I(M)=N_I(M)/D.
+\]
+Its binary encoding has polynomial length, even though explicitly listing all refinements may take exponential space. The cited survey and primary paper distinguish this compact-indifference model from explicitly listed lottery profiles \cite{survey,primary}. We do not substitute those encodings. The contribution below is an exact integral representation, a polynomial algorithm when a derived graph is a forest, and upper complexity bounds for the general problem. It does not prove general hardness or a general polynomial algorithm.
+
+For every unmatched pair $(a,b)$, compare $b$ with $M(a)$ in $a$'s weak order. There are three possibilities: strictly better, tied, or strictly worse. If either endpoint ranks the other strictly worse than its own partner, the pair can never block. If both rank one another strictly better, it always blocks and $p_I(M)=0$. Henceforth assume no such deterministic blocker.
+
+\section{Latent priorities and an exact integral}
+For each agent $a$, assign independent uniform priorities on $[0,1]$ to the agents in the tie containing $M(a)$, with smaller priority ranked first. This produces a uniform permutation of that tie. Denote the priority of $M(a)$ by $X_a$. Conditional on $X_a=x$, each other tied agent precedes the partner with probability $x$, independently across the other tied agents. Orders in other ties cannot affect whether $M$ is stable and integrate out.
+
+Construct an undirected bipartite graph $G$ on the original $2n$ agents. Include edge $ab$ precisely when the unmatched pair is tied with its matching partner at \emph{both} endpoints. Let $d_a$ count unmatched pairs in which $a$ ties the other endpoint with $M(a)$ while the other endpoint strictly prefers $a$ to its own partner. Such a pair requires that $a$ rank its partner first among the two, a conditional probability $1-X_a$.
+
+\begin{theorem}[Graph integral]
+When no deterministic blocker exists,
+\[
+ p_I(M)=\int_{[0,1]^{2n}}
+       \prod_a(1-x_a)^{d_a}
+       \prod_{ab\in E(G)}(1-x_ax_b)\,dx.                  \tag{1}
+\]
+\end{theorem}
+\begin{proof}
+Condition on the complete vector of partner priorities. For a tied-tied edge, the two directed comparisons use independent competitor priorities, so their joint blocking probability is $x_ax_b$. A strictly-better/tied pair is safe with probability $1-x_a$ at its tied endpoint. Different unordered pairs use distinct competitor-priority variables; those variables are independent once the partner priorities have been conditioned upon. Thus all pairwise safety events are conditionally independent. Multiplying their conditional probabilities gives the integrand, and integrating the independent uniform partner priorities proves (1).
+\end{proof}
+
+Unconditionally the safety events generally are not independent, because several comparisons use the same partner priority. Multiplying their marginal probabilities is therefore invalid. For a two-edge star with no forced exponents, the integral is
+\[
+ \int_0^1(1-x/2)^2\,dx=7/12,
+\]
+whereas the product of the two single-edge safety probabilities is $(3/4)^2=9/16$. The discrepancy is already visible in this smallest dependent shape. Such a star is realizable with one agent tying two competing agents and its own partner, while each competing endpoint ties the center with its partner; remaining agents rank their partners first.
+
+As an exact arithmetic check, formula (1) was expanded over edge subsets and compared with direct enumeration of all strict tie refinements for all 81 two-by-two weak-order profiles, fixing the identity matching. It was also checked on 150 three-by-three profiles generated by assigning each entry an independent integer rank in $\{0,1,2\}$ (seed 4172026). All comparisons agreed as rational numbers. The expansion integrates each monomial using
+$\int_0^1x^k(1-x)^d dx=k!d!/(k+d+1)!$.
+These small-instance checks test the integral representation and deterministic-blocker handling; the polynomial forest complexity claim rests on the proof below.
+
+For a single tied-tied edge and exponents $d_a,d_b$, (1) is
+\[
+ \frac1{(d_a+1)(d_b+1)}-
+ \frac1{(d_a+1)(d_a+2)(d_b+1)(d_b+2)}.                    \tag{2}
+\]
+Indeed $\int_0^1(1-x)^d dx=1/(d+1)$ and
+$\int_0^1x(1-x)^d dx=1/[(d+1)(d+2)]$. At $d_a=d_b=0$ this is $3/4$, agreeing with three safe outcomes among four independent binary tie orders.
+
+\section{Exact dynamic programming on a forest}
+Assume $G$ is a forest and root each component. A leaf-to-parent message is the integral of all factors in the leaf's subtree, retaining the parent's coordinate $y$. If the child messages into vertex $v$ are $m_{u\to v}(x)$, set
+\[
+ F_v(x)=(1-x)^{d_v}\prod_{u\text{ child of }v}m_{u\to v}(x),
+ \quad A_v=\int_0^1F_v(x)\,dx,
+ \quad B_v=\int_0^1xF_v(x)\,dx.
+\]
+Then
+\[
+ m_{v\to\mathrm{parent}(v)}(y)=A_v-B_vy.                  \tag{3}
+\]
+At the root the component contribution is $A_v$; multiply the contributions of different components.
+
+\begin{theorem}[Polynomial exact computation for forests]
+If the tied-tied graph is a forest, the algorithm (3) computes $p_I(M)$ and $N_I(M)$ in polynomial bit complexity from the compact weak-order input.
+\end{theorem}
+\begin{proof}
+Subtrees share only their parent variable. Applying Fubini to the bounded nonnegative integrand in (1), integrate children first. The only remaining parent-edge factor is $1-xy$, yielding (3). Induction over the rooted tree proves correctness, including isolated vertices, whose contribution is $1/(d_v+1)$.
+
+Every child message is affine. Thus $F_v$ is a univariate polynomial of degree at most $d_v+$ the number of children, which is $O(n)$. Form its coefficients by polynomial multiplication and integrate each monomial by division by its exponent plus one. There are $O(n)$ vertices and polynomially many rational arithmetic operations. To check bit complexity, begin with integer coefficients for $(1-x)^{d_v}$. Each vertex introduces only denominators at most $O(n)$ in its two integrals; take their product as a common denominator if necessary. Across all vertices this introduces $O(n^2)$ such factors, with $O(n^2\log n)$ total bits. Products and sums of the polynomially many coefficient expressions increase numerator bit lengths by at most a polynomial amount; coefficient magnitudes can also be bounded by expanding the original product, which has only $O(n^2)$ factors of bounded coefficients. Therefore exact rational operations have polynomial operand length. Finally multiply by the integer $D$, whose bit length is polynomial, to recover the exact count.
+\end{proof}
+
+The proof does not assert that messages remain affine on graphs with cycles. Eliminating a vertex with several remaining neighbors creates a multivariate factor, and its number of coefficients can grow exponentially. Bounded treewidth suggests a more general method, but any claim of polynomial complexity must control those polynomial degrees and coefficient encodings as part of the algorithm.
+
+\section{General counting and threshold upper bounds}
+The exact count belongs to $\#\mathrm P$. A nondeterministic machine guesses each tie permutation in a fixed-length binary list encoding, rejects invalid or repeated entries, and checks all unmatched pairs for blocking in polynomial time. Every refinement has exactly one valid encoding, so accepting paths count stable refinements without multiplying them by the number of alternate certificates.
+
+For a rational threshold $\tau=a/b$ with $b>0$, the required answer is $bN_I(M)-aD\ge0$. Multiplication of a counting function by a nonnegative binary integer remains a counting function: append a binary guess and accept it only if its encoded integer is below the multiplier. The easily computed nonnegative integer $aD$ is itself such a counting function. Consequently $2(bN_I(M)-aD)+1$ is a gap of counting functions, and its strict positivity is a $\mathrm{PP}$ predicate. The added one handles equality correctly. This uses the standard equivalent definition of $\mathrm{PP}$ by positive counting gaps; it is an upper bound, not a completeness proof.
+
+An exact-count algorithm decides thresholds by multiplication and comparison. Conversely a threshold oracle recovers the count by binary search over integers $0,\ldots,D$, querying thresholds $k/D$; only $O(\log D)$ queries are needed. Thus the two tasks are polynomial-time Turing interreducible, while belonging to different function and decision complexity categories. Their reductions do not justify calling the decision problem $\#\mathrm P$-complete.
+
+The remaining problem is the general compact-indifference classification. Formula (1) supplies a concrete object for a hardness reduction or a wider decomposition algorithm, but the signed expansion over all edge subsets is exponential. No reduction establishing $\#\mathrm P$-hardness or $\mathrm{PP}$-hardness has been proved here, and no claim about the current literature beyond the inspected sources is made.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), \emph{Selected open problems in Matching Under Preferences}, Section 3.1.2 and Table 1. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{primary} H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei and B. Rastegari (2020), \emph{Stable Matching with Uncertain Linear Preferences}, Algorithmica 82, 1410--1433. \url{https://doi.org/10.1007/s00453-019-00650-0}. These references identify the compact-indifference question; the restricted algorithm is proved above without a novelty claim.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,89 @@
+% ECONOMICS_PROBLEM: {"id": "D91-431", "title": "Causal mental models", "jel_code": "D91", "source_id": "OP-0304"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\title{Identifying response types without equating narratives with reasoning}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{D91-431}. \textbf{Status:} Unresolved. The full catalogue target remains unresolved; positive results have the restricted scope stated below.
+
+\section{Separate predictive validation from latent-process claims}
+The target combines a latent perceived causal model, coded text, experimental choices, and elicitation reactivity. A graph alone does not predict actions: subjective conditional distributions and a decision rule are also needed. This attempt treats these as a prespecified finite family of response laws, derives identification and testing conditions, and then constructs a mediation counterexample. It establishes restricted observable implications without claiming that accurate narratives reveal the actual pre-choice process.
+
+Let latent type $M\in\{1,\ldots,K\}$ have population probabilities $\pi$. Randomize an intervention $Z$ from a finite set with known positive probabilities $q_z$. Observe a finite-valued action $A$ and a frozen text code $T$, including an unclassifiable category. Assume known measurement and behavior kernels
+\[
+ K_m(z,a,t)=\Prb(A=a,T=t\mid Z=z,M=m).
+\]
+These kernels incorporate elicitation timing and possible dependence between action and report; conditional independence of text and action is not automatically assumed. Form a matrix $Q$ with entries $Q_{(z,a,t),m}=q_zK_m(z,a,t)$. Its columns sum to one and the observed probability vector is $p=Q\pi$.
+
+\begin{proposition}[Finite-mixture identification criterion]
+The sharp type-share set is $\{\pi\ge0:\mathbf1^T\pi=1,Q\pi=p\}$. Shares are identified for every possible observed law if $Q$ has full column rank. If its rank is deficient, some interior share vectors are observationally indistinguishable.
+\end{proposition}
+\begin{proof}
+Every model satisfies the linear mixture equation, and every feasible share vector generates the observed law by drawing a type and then its stipulated kernel. Full column rank makes the solution unique. Under rank deficiency choose $v\ne0$ with $Qv=0$. Since column sums equal one, $\mathbf1^Tv=\mathbf1^TQv=0$. For any strictly positive share vector $\pi$, sufficiently small $\epsilon>0$ keeps $\pi\pm\epsilon v$ in the simplex. They are distinct and have the same observable law.
+\end{proof}
+
+For two Bernoulli action types, suppose their success probabilities under $z=0,1$ are $(0.2,0.8)$ and $(0.2,0.2)$. Under $z=1$, the population success probability is $0.2+0.6\pi_1$, identifying the share. If only $z=0$ is used and text has identical distributions across types, all shares are observationally equivalent. Thus intervention diversity, not coder agreement, supplies this identification. If the kernels themselves are unknown without restrictions, the matrix calculation no longer identifies them or the shares. Even known overlapping kernels generally do not reveal an individual's type from one observation.
+
+\section{Repeated interventions can classify distinguishable response laws}
+For a restricted individual experiment, a fixed type $m_*$ answers $T$ independent randomized tasks. Draw $Z_t$ independently from $q$, and let $A_t\in\{0,1\}$ have mean $p_{m_*}(Z_t)$, independently across tasks conditional on type and interventions. Each candidate supplies its full probability function $p_m$. Choose the candidate minimizing empirical squared prediction loss.
+
+\begin{proposition}[A finite-class classification guarantee]
+Let $\delta_m=\E_q[(p_m(Z)-p_{m_*}(Z))^2]$. For any $m\ne m_*$ with $\delta_m>0$,
+\[
+ \Prb(\text{candidate }m\text{ beats }m_*)
+ \le \exp(-T\delta_m^2/2).
+\]
+If $\delta_m>0$ for every competing candidate, the probability of any misclassification is at most the sum of these bounds. A zero-distance competitor instead contributes the trivial bound one, so the resulting total bound need not be informative.
+\end{proposition}
+\begin{proof}
+For each task subtract the squared loss of $m_*$ from that of $m$. This difference is in $[-1,1]$. Conditional on $Z$, the Bernoulli conditional-mean property makes its expectation $(p_m(Z)-p_{m_*}(Z))^2$. The independent average therefore has mean $\delta_m$. Hoeffding's inequality bounds the probability that it is nonpositive by $\exp(-T\delta_m^2/2)$. A union bound proves the final statement, irrespective of a fixed tie rule.
+\end{proof}
+
+The bound is conservative, but makes the dependence on experimental separation explicit. If two perceived DAGs with their choice rules predict the same action law on every admissible intervention, then $\delta_m=0$ and repeated tasks cannot distinguish them. Moreover, repetition may itself change reasoning through learning or fatigue. The independence and fixed-type assumptions are restrictions to check, not consequences of collecting more responses. A held-out predictive loss can validate response forecasts under those conditions while remaining silent about the ontological truth of the latent graph.
+
+\section{Elicitation effects have their own randomized estimand}
+Let $E\in\{0,1\}$ randomize no explanation versus explanation before choice, independently of all potential actions, with probability $1/2$. For bounded actions $A(e)\in[0,1]$, the estimator
+\[
+ \widehat\rho=n^{-1}\sum_i\{2E_iA_i-2(1-E_i)A_i\}
+\]
+is unbiased for $\rho=\E[A(1)-A(0)]$. Each summand lies in $[-2,2]$; for independent people, Hoeffding yields $\Prb(|\widehat\rho-\rho|>t)\le2\exp(-nt^2/8)$. This is a causal effect of the elicitation protocol, holding the remaining task fixed. It does not identify whether prompts change beliefs, attention, effort, or presentation motives.
+
+A post-choice explanation arm is useful only with a timing convention: its request must not be anticipated in a way that changes the earlier action if it is intended as a nonreactive benchmark. No difference in average action also fails to prove zero individual reactivity, because positive and negative effects can cancel. Repeated coding of the same text estimates reproducibility of $h(T)$, not accuracy relative to unobserved $M$.
+
+\section{Randomized information does not identify belief mediation}
+The integrated target is $\theta_B=\E[Y(0,B(1))-Y(0,B(0))]$. Here is an exact counterexample even with perfectly measured beliefs. Let randomized information be $Z\in\{0,1\}$, let $B(z)=z$, and compare two potential-outcome models:
+\[
+ \mathcal M_1:\ Y(z,b)=b,\qquad
+ \mathcal M_2:\ Y(z,b)=z.
+\]
+Both produce observed $(B,Y)=(Z,Z)$ under every randomized assignment probability. Add text $T=B$ in both, and all observed narratives also agree. In $\mathcal M_1$, $\theta_B=1$, because changing the belief under fixed $z=0$ changes the action. In $\mathcal M_2$, $\theta_B=0$, because information affects the action directly. Thus perfect belief measurement, predictive text and randomized information jointly fail to identify the mediated contrast.
+
+The missing experiment assigns beliefs or a defensible intervention changing beliefs while fixing other relevant pathways. Alternatively, exclusion of the direct information pathway plus adequate mediator support and a cross-world restriction could identify a natural indirect effect. Those are stronger claims than total-effect randomization. The counterexample intentionally violates overlap of beliefs within information arms, pinpointing one obstacle; with overlap, unmeasured mediator--outcome confounding can supply another.
+
+The finite-kernel criterion and classification guarantee solve declared subproblems, while reactivity estimation and the mediation counterexample separate targets often conflated. The unresolved research task is validating the kernels and temporal process assumptions against genuine pre-choice reasoning, including strategic narratives and learning across tasks. No recovered mental model or empirical mediated share is claimed.
+
+\begin{thebibliography}{9}
+\bibitem{survey} I. Haaland, C. Roth, S. Stantcheva and J. Wohlfart (2025), \emph{Understanding Economic Behavior Using Open-Ended Survey Data}, ECONtribute Discussion Paper 362, April version. \url{https://www.econtribute.de/RePEc/ajk/ajkdps/ECONtribute_362_2025.pdf}. The checked introduction discusses authentic mechanisms versus retrospective explanations. The mixture and mediation examples above are self-contained formalizations.
+\end{thebibliography}
+
+\end{document}

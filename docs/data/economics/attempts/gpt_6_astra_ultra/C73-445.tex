@@ -1,0 +1,145 @@
+% ECONOMICS_PROBLEM: {"id":"C73-445","title":"Convergence of model-free learning in dynamic population games","jel_code":"C73","source_id":"OP-0152"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\dist}{dist}
+\title{Best-response cycles and a convergent sampled benchmark}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Partial; the full catalogue problem remains unresolved.}
+
+\begin{abstract}
+A one-state population game with a unique equilibrium cycles under exact constant-step best response. Thus accurate frozen-environment optimization does not imply population convergence. A completely specified diminishing-step batched implementation converges in the same game. For finite continuous primitives, a residual based on optimal frozen values characterizes convergence to the equilibrium set. The source FP-DQN convergence problem remains open in this attempt.
+\end{abstract}
+\section{The game and its unique equilibrium}
+There is one state, which transitions to itself under either action, and a discount $\alpha\in[0,1)$. If fraction $p$ of the population takes action 1, frozen-environment rewards are
+\[
+ r_p(1)=1-p,\qquad r_p(0)=p.
+ \tag{1}
+\]
+The optimal frozen value is $\max\{p,1-p\}/(1-\alpha)$, and the action-value difference is $1-2p$. State stationarity is automatic. The unique stationary Nash policy has $p^*=1/2$: below it action 1 is strictly better; above it action 0 is strictly better. Neither pure endpoint is optimal in its own environment.
+
+Let $B(p)=1$ below $1/2$ and $B(p)=0$ above $1/2$, with a fixed tie rule at equality. Because this is an exact best response, a population-learning failure in this example is not an inner Bellman approximation error.
+\section{A persistent constant-step cycle}
+For constant $\eta\in(0,1]$, use
+\[
+ p_{k+1}=(1-\eta)p_k+\eta B(p_k).
+ \tag{2}
+\]
+\begin{theorem}
+The points
+\[
+ p_-=\frac{1-\eta}{2-\eta},\qquad p_+=\frac1{2-\eta}
+\]
+form a two-cycle of (2). Their distances to the unique equilibrium equal
+$\eta/(2(2-\eta))>0$.
+\end{theorem}
+\begin{proof}
+We have $p_-<1/2<p_+$. Substitution gives
+$(1-\eta)p_-+\eta=p_+$ and
+$(1-\eta)p_+=p_-$. Subtracting $1/2$ from each displayed point gives the stated distances.
+\end{proof}
+For $\eta=1$ the cycle alternates between zero and one. For $\eta=0.2$ it alternates between $4/9$ and $5/9$. Smaller constant steps reduce but do not eliminate the limiting error.
+
+The conclusion concerns the precise update (2), not every method called fictitious play. In particular, diminishing steps and averaging change the process. This construction is therefore not a claimed counterexample to the source's specific FP-DQN routine.
+\section{A fully specified model-free process}
+At iteration $k\ge1$, hold the environment fixed at $p_k$. Draw $n_k=k^2$ independent Bernoulli reward samples for each action with the means in (1). Let $\widehat B_k\in\{0,1\}$ maximize the two sample means, using a fixed tie rule. Set
+\[
+ p_{k+1}=(1-\eta_k)p_k+\eta_k\widehat B_k,\qquad
+ \eta_k=\frac1{k+2}.
+ \tag{3}
+\]
+The decision rule only uses sampled rewards, not their formulas. The implementation requires a batched simulator or a protocol freezing the population while samples are collected. It is distinct from decentralized learning in a simultaneously moving environment.
+
+\begin{lemma}
+Almost surely, the maximum error of the two sample means is at most $k^{-1/4}$ for every sufficiently large $k$.
+\end{lemma}
+\begin{proof}
+Conditional on the past, the two bounded sample averages satisfy
+\[
+ \Prob\{\max_a|\widehat r_k(a)-r_{p_k}(a)|>k^{-1/4}
+             \mid\text{past}\}
+ \le4\exp(-2k^{3/2}).
+\]
+For a bounded variable $X\in[0,1]$, the exponential bound
+$\E e^{\lambda(X-\E X)}\le e^{\lambda^2/8}$, multiplied over independent draws and optimized after Markov's inequality, gives each tail used here. The displayed failure probabilities have finite sum. The probability of any failure after index $K$ is bounded by their tail sum, which tends to zero. Thus only finitely many failures occur almost surely.
+\end{proof}
+\begin{theorem}
+The process (3) converges to $1/2$ almost surely.
+\end{theorem}
+\begin{proof}
+Work on a path with eventual sample accuracy and fix $\varepsilon>0$. Eventually both sample errors are below $\varepsilon/4$ and $\eta_k<\varepsilon/4$. If $|p_k-1/2|\ge\varepsilon/2$, the true payoff gap is at least $\varepsilon$, so its sign is correctly estimated. The selected response points toward $1/2$.
+
+For sufficiently large $k$, a point within distance $\varepsilon/2$ moves by at most $\eta_k$ and remains within $3\varepsilon/4$. A point at distance between $\varepsilon/2$ and $\varepsilon$ moves toward the center; any overshoot has distance at most $\eta_k$, so it remains within $\varepsilon$. The radius-$\varepsilon$ interval is therefore eventually invariant.
+
+Suppose the process never enters radius $\varepsilon/2$ after that time. Every response is then correct. Without crossing the center, each step reduces distance by
+$\eta_k(1/2+|p_k-1/2|)\ge\eta_k/2$. A crossing would put distance below $\eta_k<\varepsilon/2$ and contradict the supposition. Because $\sum_k\eta_k=\infty$, staying outside radius $\varepsilon/2$ is impossible. Eventually the process enters the invariant radius-$\varepsilon$ interval. Use a countable sequence $\varepsilon\downarrow0$ to conclude convergence.
+\end{proof}
+This supplies a complete convergence theorem for one benchmark and a deliberately generous sample schedule. It is not a sample-complexity optimum or a theorem for neural function approximation. Persistent estimation bias would invalidate the shrinking-error step and could leave a nonzero neighborhood.
+\section{A residual for general finite models}
+For the catalogue's finite state-action setting assume bounded rewards, continuous rewards and transition probabilities in $z=(\mu,\pi)$, and discount $\alpha<1$. Let $V_z^*$ be the optimal frozen value and
+\[
+ Q_z^*(x,a)=r_z(x,a)+\alpha\sum_y p_z(y\mid x,a)V_z^*(y).
+\]
+Define
+\[
+ R(z)=\|\mu-\mu P_z^\pi\|_1+
+ \sum_x\sum_a\pi(a\mid x)\{V_z^*(x)-Q_z^*(x,a)\}.
+ \tag{4}
+\]
+The optimality sum covers every state, including states of zero population mass. Multiplying it by $\mu(x)$ would lose the catalogue's optimality condition for actions at unoccupied states.
+
+\begin{proposition}
+If the stationary Nash set $\mathcal E$ is nonempty, then
+$R(z_k)\to0$ if and only if $\dist(z_k,\mathcal E)\to0$.
+\end{proposition}
+\begin{proof}
+If rewards are bounded in absolute value by $M$, Bellman contraction gives
+$\|V_z^*\|_\infty\le M/(1-\alpha)$. Write $\Delta r=\max_{x,a}|r_z(x,a)-r_{z'}(x,a)|$ and $\Delta P=\max_{x,a}\sum_y|p_z(y\mid x,a)-p_{z'}(y\mid x,a)|$. Comparing the two Bellman fixed-point equations gives
+\[
+ \|V_z^*-V_{z'}^*\|_\infty
+ \le \frac{\Delta r}{1-\alpha}
+       +\frac{\alpha M\Delta P}{(1-\alpha)^2}.
+\]
+Thus the values, action values, and residual are continuous.
+
+Every optimal action gap is nonnegative. Its policy-weighted sum vanishes exactly when every positive-probability action at every state is optimal. Together with stationarity this proves $R^{-1}(0)=\mathcal E$. The configuration space is compact and the zero set is closed.
+
+If distance to $\mathcal E$ tends to zero, nearest equilibrium points exist and uniform continuity of $R$ implies residual convergence. Conversely, if residuals vanish but a subsequence stays a positive distance away, compactness supplies a convergent further subsequence. Its limit has residual zero by continuity, contradicting that distance.
+\end{proof}
+If an approximate value has uniform error $\epsilon$, each action gap has error at most $(1+\alpha)\epsilon$. Replacing approximate gaps by their positive parts changes (4) by at most $|X|(1+\alpha)\epsilon$, since the action probabilities sum to one at each state. This controls evaluation error in a diagnostic. It does not provide a universal linear bound of equilibrium distance by residual: continuity supplies a modulus only after the particular game is known.
+
+Likewise, small policy changes between iterations are not equivalent to a small residual. A learner can stop updating at a nonoptimal policy because exploration ceases. Equation (4) tests stationarity and optimality directly, provided frozen optimal values are estimated accurately enough.
+\section{Remaining problem and source boundary}
+The exact cycle establishes that solving each frozen control problem is insufficient for convergence. The sampled theorem supplies a transparent special case with separate control of sample error and population movement. The residual result gives a correct target for numerical evaluation.
+
+General noncontractive population games may cycle, possess multiple equilibria, or retain approximation and replay-buffer bias. The source's FP-DQN implementation needs its own stability argument and its actual approximation, exploration, averaging, and sample schedules. Those are not supplied by the one-state proof. The full catalogue problem therefore remains unresolved.
+\begin{thebibliography}{9}
+\bibitem{cbs} M. Cederle, S. Bolognani, and G. A. Susto (2026).
+\emph{Towards Model-Free Learning in Dynamic Population Games: An Application to Karma Economies}, arXiv:2605.11042v1, sections 5 and 7.
+The primary text separates numerical population convergence from its single-agent guarantees.
+\url{https://arxiv.org/html/2605.11042v1}.
+\end{thebibliography}
+
+\end{document}
