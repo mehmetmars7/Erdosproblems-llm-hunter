@@ -1,0 +1,94 @@
+% ECONOMICS_PROBLEM: {"id": "D91-558", "title": "Scaling behavioral interventions", "jel_code": "D91", "source_id": "OP-0308"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Scaling behavioral interventions: honest forecast evaluation with noisy trial effects}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+For a target law over interventions and implementations, let $L_j=\tau_j(s_L)$ and $H_j=\tau_j(s_H)$. The prediction target is
+\[
+ R(f)=E[(f(T_j,F_j)-H_j)^2],\qquad T_j=L_j+\varepsilon_j,
+\]
+where $F_j$ records prespecified intervention and implementation features. The low-scale estimate $T_j$, rather than the latent $L_j$, is available when the forecast is made. DellaVigna and Linos \cite{scale} explicitly discuss magnitude and rank forecasting and the need for more interventions to assess it. The results below distinguish trial noise, intervention-level generalization and causal scale effects.
+
+\begin{theorem}[Held-intervention risk correction]
+Suppose test interventions are iid from the declared target law and independent of training. For intervention $j$, a high-scale validation trial returns $V_j=H_j+\eta_j$. Conditional on the latent effects, observed forecast inputs and training, assume $E\eta_j=0$ and $E\eta_j^2=v_j$, where $v_j$ is known or replaced by a conditionally unbiased estimate with finite expectation. Then
+\[
+ \widehat R(f)=\frac1J\sum_{j=1}^J\{(f(T_j,F_j)-V_j)^2-v_j\}
+\]
+is unbiased for the latent forecast risk, conditional on training. For any two trained rules $f,g$, their uncorrected loss difference is already unbiased for $R(f)-R(g)$; no variance subtraction is needed.
+\end{theorem}
+\begin{proof}
+Expand $(f-H-\eta)^2=(f-H)^2-2(f-H)\eta+\eta^2$ and take the specified conditional expectation. The cross term vanishes and the last term equals $v$. Averaging over target interventions proves the first claim. Subtracting the corresponding expansions for $f$ and $g$ cancels $\eta^2$ identically, leaving the latent loss difference minus $2(f-g)\eta$, whose conditional mean is zero. Training independence is essential: fitting the forecaster to the validation outcomes can correlate the forecast error with $\eta$.
+\end{proof}
+For a fixed pair of rules and homoskedastic validation variance $v$, conditional centering also yields
+\[
+ \operatorname{Var}\{(f-V)^2-(g-V)^2\}
+ =\operatorname{Var}\{(f-H)^2-(g-H)^2\}+4vE[(f-g)^2].
+\]
+This follows because the two terms in the preceding proof have zero covariance. The effective sample size for assessing new interventions is $J$, not the number of individuals pooled across their trials. If effects, predictions and trial estimates are bounded in $[-B,B]$, the loss difference lies in $[-4B^2,4B^2]$; Hoeffding gives an honest radius $8B^2\sqrt{\log(2/\alpha)/(2J)}$. A preregistered finite pool of comparisons can be handled by a union bound. Selecting the most favorable comparison afterward without that adjustment changes the guarantee.
+
+\begin{proposition}[Magnitude prediction under a Gaussian intervention law]
+Suppose $(L,H)$ is jointly Gaussian with means $(\mu_L,\mu_H)$, variances $(v_L,v_H)$, covariance $c$, and independent low-trial noise $\varepsilon\sim N(0,v_\varepsilon)$. Assume $v_L+v_\varepsilon>0$. The unique mean-square optimal forecast, up to almost-sure equality, is
+\[
+ f^*(T)=\mu_H+\frac{c}{v_L+v_\varepsilon}(T-\mu_L),
+\]
+and its risk is $v_H-c^2/(v_L+v_\varepsilon)$.
+\end{proposition}
+\begin{proof}
+The pair $(T,H)$ is jointly Gaussian, with covariance $c$ and variance of $T$ equal to $v_L+v_\varepsilon$. Subtract the displayed linear function from $H$. The residual is Gaussian and uncorrelated, hence independent, of $T$, with variance $v_H-c^2/(v_L+v_\varepsilon)$. It has mean zero. For any other measurable forecast $f$ of finite risk, orthogonality gives
+$E(f-H)^2=E(f-f^*)^2+E(f^*-H)^2$.
+This proves both optimality and the risk formula.
+\end{proof}
+Even perfect knowledge of the cross-intervention regression leaves variation in large-scale effects not predicted by small-scale effects. Increasing the high-scale validation sample improves evaluation of $R$ but does not remove that irreducible prediction component.
+
+\begin{proposition}[An exact rank-prediction ceiling]
+Under the preceding Gaussian law, assume $v_H>0$ and $c\ne0$. For two independent interventions, the probability that the optimal forecast correctly orders their large-scale effects is
+\[
+ \frac12+\frac1\pi\arcsin\rho,\qquad
+ \rho=\frac{|c|}{\sqrt{v_H(v_L+v_\varepsilon)}}.
+\]
+\end{proposition}
+\begin{proof}
+The differences in forecasts and true effects are centered jointly Gaussian. Scaling them to unit variance gives correlation $\rho\ge0$. Represent this pair as $(G_1,\rho G_1+\sqrt{1-\rho^2}G_2)$ for independent standard Gaussians. The direction of $(G_1,G_2)$ is uniform on the circle, because its density depends only on radius. The two linear forms have opposite signs on wedges of total angle $2\arccos\rho$. Hence their signs agree with probability $1-\arccos\rho/\pi$, equal to the stated expression. Perfect correlation follows by continuity. With $c=0$, forecasts tie and independent fair tie-breaking gives probability $1/2$.
+\end{proof}
+The Gaussian assumption is a declared prediction model, not evidence that actual intervention effects are Gaussian. It makes the distinction between ranking and magnitude accuracy quantitative: neither is established simply by a significant average treatment effect.
+
+\section*{Causal scaling requires a different experiment}
+Suppose each intervention is observed at only one saturation $s_j$. Even exact knowledge of its effect there does not identify its scale response: the families
+$\tau_j(s)=a_j+b_j(s-s_j)$ all agree at the observed saturation for arbitrary slopes compatible with outcome bounds. Complete publication registries do not alter this observational equivalence.
+
+\begin{proposition}[Two-stage saturation identification]
+Consider independent interference clusters using the same intervention version and target composition. Randomize each cluster to saturation regime $S\in\{s_L,s_H\}$ with positive probabilities $q_s$, then randomize individual receipt $D$ with known positive conditional probabilities $p_d(s)$. Assume the exposure mapping makes outcomes $Y_i(d,s)$ well defined, with no interference across clusters. The cluster average of
+\[
+ \frac{1\{S=s\}}{q_s}
+ \left\{\frac{D_iY_i}{p_1(s)}-\frac{(1-D_i)Y_i}{p_0(s)}\right\}
+\]
+is unbiased for the direct effect at regime $s$, averaged over the fixed baseline units. Subtracting the two regime scores identifies the causal change in the direct effect.
+\end{proposition}
+\begin{proof}
+Condition on the cluster's complete potential outcomes. Two-stage randomization and consistency give expectation $Y_i(1,s)-Y_i(0,s)$ for each score. Average over units and then the declared population of clusters. Dependence within a cluster affects uncertainty but not this expectation. If literal fixed treated fractions make own receipt change peer exposure, the exposure label must include that distinction; the stipulated mapping cannot silently equate the two peer configurations.
+\end{proof}
+
+\section*{Remaining gap}
+The note provides honest forecast evaluation and a quantitative restricted prediction model, not an empirically validated universal scaling function. Changing implementers, treatment versions or target intervention laws requires new transport information. Causal saturation experiments answer a different question from forecasts across institutions, and neither intervention registries nor noise correction remove that distinction.
+
+\begin{thebibliography}{9}
+\bibitem{scale} S. DellaVigna and E. Linos (2020). \emph{RCTs to Scale: Comprehensive Evidence from Two Nudge Units}. March 2020 author manuscript, Section 4 and discussion. \url{https://eml.berkeley.edu/~sdellavi/wp/NudgeToScale2020-03-20.pdf}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,163 @@
+% ECONOMICS_PROBLEM: {"id": "D83-571", "title": "Human-aware model training", "jel_code": "D83", "source_id": "OP-0418"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Human-aware model training: Safe robust training under finite response margins}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{User behavior is part of the objective}
+For finite states, user types, signals, verification outcomes, and actions,
+let $K_\theta$ be a trained signal experiment and let users know their
+type and the true joint state/type law $q$. They may verify at a stated
+cost before acting. The target is
+\[
+ \max_{\theta\in\Theta}\min_{q\in\mathcal Q}
+ \{V_q(\theta)-C(\theta)\},
+ \qquad H_q(\theta)\le\overline h\quad(q\in\mathcal Q),       \tag{1}
+\]
+where $H$ is harm under the selected utility-maximizing user response.
+Bryan and Gans already analyze heterogeneous users and several extensions
+\cite[Sections 4--5]{bg}. Here the additional task is robust training when
+the state/type law is uncertain and safety must hold for the induced
+response. We establish a finite-menu guarantee that deals explicitly with
+response changes. All kernels, payoffs, costs, and tie-breaking rules are
+known; uncertainty below concerns only $q$.
+
+\section*{Reducing verification to policies}
+A deterministic contingent policy specifies, for every type and signal,
+either a decision to decline verification with one action, or a decision
+to verify with an action for every verification outcome. Unused branches
+are omitted, so they cannot create duplicate policies and artificial
+zero response margins. There are
+finitely many such policies, denoted $\Pi_\theta$. Type-specific policies
+can be combined into one mapping; this does not let a user observe other
+users' types. For a state/type pair $s$ let $f_{\theta\pi}(s)$ be its
+expected payoff net of verification cost, integrating signal and
+verification randomness, and let $g_{\theta\pi}(s)$ be its expected harm.
+Assume
+\[
+ |f_{\theta\pi}(s)|\le B,
+ \qquad 0\le g_{\theta\pi}(s)\le H.                        \tag{2}
+\]
+Maximizing ex ante over these policies implements posterior optimality at
+every positive-probability information set, because the decisions at
+different information sets have independent feasibility constraints.
+Randomization cannot improve the maximum of their expected utilities.
+Fix a total priority order on policies to resolve any maximizing ties.
+Thus
+\[
+ V_q(\theta)=\max_{\pi\in\Pi_\theta}q^{\mathsf T}f_{\theta\pi},
+ \qquad H_q(\theta)=q^{\mathsf T}g_{\theta,\pi(q,\theta)}.   \tag{3}
+\]
+For a finite training menu and finite nonempty uncertainty set, enumeration
+of (3) solves (1) whenever its feasible set is nonempty. No continuity or
+equilibrium-existence assertion is needed for this finite calculation.
+
+\section*{A margin certificate for estimated environments}
+Let $q_1,\ldots,q_m$ be the true candidate laws and
+$\widehat q_1,\ldots,\widehat q_m$ approximations satisfying
+$\|q_j-\widehat q_j\|_1\le\eta$. For each $\theta,j$ let
+$\widehat\pi_{\theta j}$ maximize estimated utility. Define its margin
+as its utility advantage over the best other deterministic policy;
+the margin is $+\infty$ when only one policy exists. Let
+$\mathcal M$ be the subset of training choices for which every estimated
+margin is strictly greater than $2B\eta$. Define the certified set
+\[
+ \mathcal F_c=\{\theta\in\mathcal M:
+ \widehat q_j^{\mathsf T}g_{\theta,\widehat\pi_{\theta j}}
+ \le\overline h-H\eta\ \text{for every }j\}.              \tag{4}
+\]
+
+\begin{theorem}
+Suppose $\Theta$ is finite and $\mathcal F_c$ is nonempty. Choose
+$\widehat\theta$ maximizing
+$\widehat W(\theta)=\min_j V_{\widehat q_j}(\theta)-C(\theta)$
+over $\mathcal F_c$. Then $\widehat\theta$ is feasible for every true
+law. For every $\theta^*\in\mathcal M$ whose true harms satisfy
+$H_{q_j}(\theta^*)\le\overline h-2H\eta$ for all $j$,
+\[
+ \min_j V_{q_j}(\widehat\theta)-C(\widehat\theta)
+ \ge \min_j V_{q_j}(\theta^*)-C(\theta^*)-2B\eta.          \tag{5}
+\]
+\end{theorem}
+\begin{proof}
+For every policy, (2) implies
+$|q_j^{\mathsf T}f-\widehat q_j^{\mathsf T}f|\le B\eta$ and
+$|q_j^{\mathsf T}g-\widehat q_j^{\mathsf T}g|\le H\eta$.
+A difference between two policy utilities therefore changes by at most
+$2B\eta$. The strict estimated margin guarantees that the estimated
+maximizer is also the unique true maximizer. This holds for every
+$\theta\in\mathcal M$ and every $j$, so (4) implies true feasibility.
+It also shows that the stipulated comparator belongs to $\mathcal F_c$:
+its estimated harm is at most $\overline h-H\eta$.
+Taking maxima over policies preserves the uniform utility bound
+$|V_{q_j}-V_{\widehat q_j}|\le B\eta$; taking the minimum over $j$
+preserves it again. Therefore
+$W(\widehat\theta)\ge\widehat W(\widehat\theta)-B\eta
+\ge\widehat W(\theta^*)-B\eta\ge W(\theta^*)-2B\eta$,
+which proves (5).
+\end{proof}
+The theorem compares with choices that have both a behavioral margin and
+a safety margin. It does not silently compare with every feasible optimum.
+Policies that differ only at zero-probability events can create zero
+margins even when realized behavior is unique. One may either retain
+the conservative certificate above or first quotient policies that agree
+under every candidate law, using the same equivalence for harm.
+
+\section*{Why value accuracy alone does not certify safety}
+\begin{example}
+There are two states $\omega=0,1$, no signals, no useful verification,
+and actions safe and risky. Safe utility and harm are zero. Risky utility
+is $2\omega-1$ and risky harm is one in both states. Write
+$q(\omega=1)=p$ and select risky at a utility tie. Then
+\[
+ V_p=\max(0,2p-1),\qquad H_p=\mathbf1\{p\ge1/2\}.
+\]
+For arbitrarily small $\varepsilon>0$, the laws $p=1/2-\varepsilon$
+and $p=1/2+\varepsilon$ have arbitrarily close values and distributions
+but harms differing by one. This proves that a small distribution or
+value-estimation error cannot give a uniformly small harm error without
+a condition controlling the selected response.
+\end{example}
+The same issue explains why compact training parameters and continuous
+utility primitives alone are insufficient for a constrained maximum:
+selected harm can jump at a response tie. The finite-menu theorem avoids
+an attainment claim outside its assumptions.
+
+\section*{Sharper uncertainty calculations and the remaining gap}
+For a fixed experiment and a nonempty compact polytope of possible laws,
+the worst utility value can also be computed by a linear program:
+minimize $t$ subject to $q$ belonging to that polytope and
+$t\ge q^{\mathsf T}f_{\theta\pi}$ for every policy. This is exact
+because at the optimum $t$ equals the maximum in (3); compactness and
+finite continuous policy values ensure attainment. Selected harm requires
+additional policy-region constraints and the declared tie rule, so the
+utility LP alone is not a safety calculation.
+
+The unresolved part is a data-grounded identified set for verification
+costs, heterogeneous utilities, and response kernels, together with useful
+safety guarantees near genuine behavioral ties. Randomized signals can
+help estimate those objects, but cannot replace the measurement and
+incentive assumptions. The certificate gives an implementable restricted
+answer and specifies exactly which comparators its regret guarantee covers.
+\begin{thebibliography}{9}
+\bibitem{bg} K. A. Bryan and J. S. Gans (2026), \emph{Training AI For
+When Humans Will Use It}, arXiv:2608.12538v1.
+\url{https://arxiv.org/html/2608.12538v1}.
+\end{thebibliography}
+
+\end{document}

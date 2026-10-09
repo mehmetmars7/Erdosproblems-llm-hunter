@@ -1,0 +1,87 @@
+% ECONOMICS_PROBLEM: {"id": "E37-594", "title": "Recession and tail-risk forecasting", "jel_code": "E37", "source_id": "OP-0239"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Recession and tail-risk forecasting: delayed switching forecasts and a calibration consequence}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+At date $t$ a forecaster predicts the tail indicator
+\[
+ D_t=1\{Y_{t+H}/Y_t-1<-q\},\qquad Y_t>0,\quad0<q<1.
+\]
+The label is first available at date $t+H$. Fix $N$ supplied probability forecasts, each measurable using the actual information available at its forecast date. The comparator may switch among these forecasts at most $K$ times. The ECB agenda \cite{ecb} motivates real-time indicators and forecast combinations; the delayed online bound below is a methodological benchmark, not a claim of empirical recession prediction or a newly discovered online-learning theorem.
+
+\section*{A fully specified delayed rule}
+Let $T\ge2$, $N\ge2$, $H\ge1$, and $0\le K\le(T-1)/2$. When a label arrives at date $t+H$, assume it can be used before that date's forecast. If the operational release occurs afterward, replace $H$ below by $H+1$. Set $d=\min(H,T)$ and split forecast dates into $d$ residue subsequences. Consecutive dates in a subsequence have all previous labels from that subsequence available.
+
+An expert path $j_{1:T}\in\{1,\ldots,N\}^T$ supplies expert $j_t$'s forecast at date $t$. For $K>0$, assign paths a Markov prior: initial index uniform, switch probability $\gamma=K/(T-1)$, and a uniform new index among the other $N-1$. For $K=0$, use the uniform prior on the $N$ constant paths. Each residue subsequence runs its own exponential-weights mixture over this path prior, updating only from labels belonging to that subsequence, at learning rate $\eta=1/2$.
+
+\begin{theorem}[A pathwise delayed Brier bound]
+For every sequence of outcomes and real-time expert forecasts, the resulting predictions satisfy
+\[
+ \sum_{t=1}^T(p_t-D_t)^2-
+ \min_{j:\,\#\text{switches}\le K}\sum_{t=1}^T(f_{j_t,t}-D_t)^2
+ \le2d\left[\log N+K\log(N-1)+(T-1)h\left(\frac K{T-1}\right)\right],
+\]
+where $h(u)=-u\log u-(1-u)\log(1-u)$, with endpoint values zero. No independence of overlapping outcomes is required.
+\end{theorem}
+\begin{proof}
+For $y\in\{0,1\}$, the function $p\mapsto\exp\{-\eta(p-y)^2\}$ has second derivative
+$e^{-\eta(p-y)^2}\{4\eta^2(p-y)^2-2\eta\}$, which is nonpositive on $[0,1]$ when $\eta\le1/2$. Concavity and Jensen therefore give a mixture loss at most
+$-\eta^{-1}\log\sum_jw_j e^{-\eta\ell_j}$.
+Telescoping the exponential-weight normalizers on one subsequence bounds its mixture loss by any path's subsequence loss plus $\eta^{-1}\log(1/\operatorname{prior}(j))$. All updates used in this argument are available by the next date in that subsequence, so the rule is nonanticipative.
+
+A path with $k$ switches has negative log prior
+$\log N+k\log((N-1)/\gamma)+(T-1-k)\log(1/(1-\gamma))$.
+For $\gamma\le1/2$ this is nondecreasing in $k$, and at $k=K$ equals the bracket in the theorem. Sum the $d$ subsequence inequalities against the same global comparator path. The $K=0$ prior gives the result directly with complexity $\log N$.
+\end{proof}
+The finite path construction can be exponentially represented; no efficient implementation claim is needed for the guarantee. For fixed $H,N$ and $K=o(T)$ its regret is $o(T)$, because $h(K/(T-1))\to0$. If delay grows, the explicit displayed complexity condition, rather than $K=o(T)$ alone, determines whether this bound is useful. The factor multiplying the switch complexity is not claimed minimax sharp.
+
+\begin{proposition}[Delay has an unavoidable cost]
+For $N=2$, even a constant comparator can force expected regret at least
+$\min(H,T)(1-2\epsilon)^2/4$, for any fixed $0<\epsilon<1/2$, on a class whose conditional event probabilities are bounded below by $\epsilon$ and above by $1-\epsilon$.
+\end{proposition}
+\begin{proof}
+Choose one of two worlds with constant event probability $\theta=\epsilon$ or $1-\epsilon$, and provide these two constants as expert forecasts. Before the first delayed label, the observable information is identical in the two worlds. For any prediction $p$, the expected excess Brier loss relative to the true-probability expert is $(p-\theta)^2$. Averaging worlds gives at least $(1-2\epsilon)^2/4$, minimized at $p=1/2$. Sum over the first $\min(H,T)$ dates. Later expected excess losses are nonnegative, so the lower bound persists over the full horizon.
+
+This can be realized with the stipulated positive-output tail events: set the first $H$ output values to one, draw independent Bernoulli labels with probability $\theta$, and recursively choose $Y_{t+H}/Y_t$ to be a fixed positive number below $1-q$ when $D_t=1$ and a fixed number above $1-q$ otherwise. Before the first label, the output history is identical; afterward it reveals labels only at their allowed dates. The conditional event probabilities stay $\theta$.
+\end{proof}
+
+\section*{A limited calibration implication}
+Let $\mathcal I_t$ denote date-$t$ information and suppose the true conditional probability $q_t=E[D_t\mid\mathcal I_t]$ is supplied by an admissible comparator path almost surely. Let $R_T$ be the deterministic regret bound above. For a prespecified probability bin $B\subset[0,1]$, write $w_t=1\{p_t\in B\}$.
+
+\begin{proposition}[Unnormalized bin calibration]
+Under the preceding truth-in-class condition,
+\[
+ E\left|\frac1T\sum_tw_t(p_t-D_t)\right|
+ \le\sqrt{R_T/T}+\sqrt{d/T}.
+\]
+\end{proposition}
+\begin{proof}
+Conditional expectation of the squared-loss difference against $q_t$ is $(p_t-q_t)^2$. Taking expectations of the pathwise regret bound therefore gives $\sum_tE(p_t-q_t)^2\le R_T$. Cauchy--Schwarz bounds the expected absolute average of $\sum w_t(p_t-q_t)$ by $\sqrt{R_T/T}$.
+Within each residue subsequence, the variables $w_t(D_t-q_t)$ are martingale differences: $w_t,q_t$ are known at prediction, the conditional mean is zero, and each label is known before the next prediction in that subsequence. The variance of each subsequence sum is at most its length. The square of the sum across subsequences is at most $d$ times the sum of their squares, hence its second moment is at most $dT$. Cauchy--Schwarz gives the second term. No independence across residue subsequences is asserted.
+\end{proof}
+This divides by $T$, not by the potentially tiny number of forecasts in a rare bin. It is weaker than uniform conditional calibration. Useful discrimination also needs variation in $q_t$: if $q_t$ is constant, a calibrated constant forecast is optimal and no method can identify which individual future dates will experience independent shocks.
+
+\section*{Remaining gap}
+The finite switching benchmark is handled with an explicit, conservative delay cost and a matching necessity of some delay penalty. Sharp switching-delay dependence, smooth conditional-density classes, revisions to labels and robust calibration of rare bins remain open here. No historical crisis data were used, and the note makes no claim of out-of-sample economic improvement over a substantive forecasting benchmark.
+
+\begin{thebibliography}{9}
+\bibitem{ecb} European Central Bank. \emph{Forecasting and business cycle analysis}, Forecasting and related tools. Primary institutional research agenda, accessed October 9, 2026. \url{https://www.ecb.europa.eu/pub/economic-research/research_agenda/forecasting/html/index.en.html}.
+\end{thebibliography}
+\end{document}
