@@ -1,0 +1,88 @@
+% ECONOMICS_PROBLEM: {"id": "C23-425", "title": "Continuous-treatment DiD", "jel_code": "C23", "source_id": "OP-0423"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\title{Sharp response bounds and the extra content of parallel trends}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C23-425}. \textbf{Status:} Partial. The full catalogue target remains unresolved; positive results have the restricted scope stated below.
+
+\section{A two-dose target for the same population}
+The target is $\tau_B(d,d')=\E[Y_1(d)-Y_1(d')\mid D\in B]$, where $B$ has positive probability. This compares assigned doses for the same people. Differences between observed dose-group means compare different people. We assume consistency, no anticipation, and bounded outcomes, then examine an explicit response restriction before adding conventional parallel trends. The bound $L$ below is a maintained substantive assumption, not something validated by observing one outcome per person.
+
+Let $t$ and $y$ be a person's observed dose and post-period outcome. Suppose their response $f:[0,\bar d]\to[0,1]$ satisfies $f(t)=y$ and $|f(x)-f(x')|\le L|x-x'|$. Define
+\[
+ l_x=\max(0,y-L|x-t|),\quad u_x=\min(1,y+L|x-t|),\quad c=L|d-d'|.
+\]
+\begin{theorem}[Sharp bounds with one observed anchor]
+Under these response restrictions alone the sharp interval for $\tau_B(d,d')$ is $[\E(\ell\mid D\in B),\E(u\mid D\in B)]$, where
+\[
+ \ell=\max(l_d-u_{d'},-c),\qquad u=\min(u_d-l_{d'},c).
+ \tag{1}
+\]
+\end{theorem}
+\begin{proof}
+Feasible pairs $(v,w)=(f(d),f(d'))$ form $[l_d,u_d]\times[l_{d'},u_{d'}]$ intersected with $|v-w|\le c$. The constant function $f\equiv y$ shows nonemptiness. Differences across the rectangle fill $[l_d-u_{d'},u_d-l_{d'}]$, so intersection gives (1). For any feasible difference $a$, select $w=\max(l_{d'},l_d-a)$ and $v=w+a$. Feasibility of $a$ ensures the upper bounds as well.
+
+Put values $y,v,w$ at the distinct points among $t,d,d'$, interpolate linearly in sorted order, and extend constantly beyond the extremes. Pairwise Lipschitz inequalities bound every segment slope by $L$, and interpolation preserves $[0,1]$. Repeated points have equal assigned values. These formulas are measurable in the observed data and extend each endpoint choice to a valid complete response law. They preserve the law of $(Y_0,D,Y_1)$, since the pre-period outcome is unrestricted in this first class. Randomizing between the two endpoint constructions independently conditional on observations attains every intermediate average contrast. Thus the entire interval is sharp.
+\end{proof}
+
+For $t=1,y=0.5,L=0.4,d=0.5,d'=1.5$, both marginal response intervals are $[0.3,0.7]$ and the contrast interval is $[-0.4,0.4]$. Replacing $d'$ by $0.6$ gives $[-0.04,0.04]$, despite much wider marginal intervals. Nearby doses must produce nearby outcomes for the same person. Subtracting marginal bounds without their cross-dose restriction loses this information. The result also handles $L=0$ and $d=d'$ correctly, giving zero.
+
+\section{An exact finite-law program with parallel trends}
+Let $\Prb(D=0)>0$ and $g=\E[Y_1-Y_0\mid D=0]$. Conventional parallel trends adds
+\[
+ \E[f(0)\mid D=t]=\E[Y_0\mid D=t]+g. \tag{2}
+\]
+This is a group-mean restriction, not the individual equality $f(0)=Y_0+g$.
+Suppose the observed law has finitely many atoms $o=(y_{0o},t_o,y_o)$ with probabilities $p_o>0$. For each atom introduce $q_{o,x}$ for $x\in\{0,d,d'\}$, requiring
+\[
+ 0\le q_{o,x}\le1,\quad |q_{o,x}-y_o|\le L|x-t_o|,\quad
+ |q_{o,x}-q_{o,x'}|\le L|x-x'|,
+\]
+plus, for every observed dose $t$,
+\[
+ \sum_{o:t_o=t}p_o q_{o,0}=\sum_{o:t_o=t}p_o(y_{0o}+g). \tag{3}
+\]
+Optimize $\sum_{o:t_o\in B}p_o(q_{o,d}-q_{o,d'})/\Prb(D\in B)$ over this linear program.
+
+\begin{proposition}[Sharpness with the additional trend restriction]
+An infeasible program rejects the declared restrictions. Otherwise its minimum and maximum are attained and are the sharp bounds for the finite observed law with (2).
+\end{proposition}
+\begin{proof}
+Conditional means of any compatible response law satisfy all the linear inequalities by convexity, and satisfy (3) by parallel trends. They preserve the objective. Conversely, feasible values define deterministic responses at $0,d,d',t_o$ conditional on atom $o$; sorted linear interpolation supplies full Lipschitz responses. The observed law and group means are reproduced exactly. The feasible set is a closed bounded polytope, so extrema are attained. Mixing the two compatible laws yields all intermediate values.
+\end{proof}
+
+For a worked check, let $D$ be equally likely to be zero or one, and let $Y_0=Y_1=0$ throughout. Set $L=1$, $B=\{1\}$, $d=0$, $d'=1$. Without (2), the treated group's contrast ranges from zero to one. With (2), its mean $f(0)$ must be zero; nonnegativity then makes the contrast zero. A group-mean restriction and an outcome bound together can determine an individual potential outcome almost surely.
+
+This does not identify arbitrary dose comparisons. Change the treated outcome to $1/2$, retaining baseline zero and $L=1$. Parallel trends fixes $f(0)=0$ in that group, and consistency fixes $f(1)=1/2$. Both $f(1/2)=0$ and $f(1/2)=1/2$ extend to admissible responses. Thus the intermediate-dose contrast still differs between observationally equivalent models.
+
+\section{What is and is not completed}
+Equation (1) solves a response-only restriction class, and the finite program solves its intersection with conventional parallel trends for finite observed support. These are elementary constructive results, not claims of novelty over established partial-identification methods. With continuous doses, (2) holds only almost everywhere; a conditional-kernel optimization is needed, and a grid approximation requires control of its discretization error. The finite program should not be relabeled a sharp continuous-law solution without that argument.
+
+Individual Lipschitz continuity does not guarantee differentiability at a requested dose: piecewise-linear endpoint constructions often have kinks. A causal derivative therefore needs additional smoothness and overlap neighborhoods. Dose randomization within $B$, with appropriate continuity, would supply a different point-identification route, but is an additional design restriction. Confidence sets when $L$, the observed law, or $g$ is estimated require a sampling experiment and a treatment of first-stage uncertainty. No such empirical validation is claimed here. The remaining broad problem is to choose defensible selection restrictions, establish their continuous-law identified sets, and obtain informative uniform inference.
+
+\begin{thebibliography}{9}
+\bibitem{did} B. Callaway, A. Goodman-Bacon and P. H. C. Sant'Anna, \emph{Difference-in-Differences with a Continuous Treatment}, American Economic Review, publisher record, DOI 10.1257/aer.20240137. \url{https://www.aeaweb.org/articles?id=10.1257/aer.20240137}. The checked abstract distinguishes treatment-on-the-treated contrasts from cross-dose selection. The constructions above impose their own explicit restrictions.
+\end{thebibliography}
+
+\end{document}
