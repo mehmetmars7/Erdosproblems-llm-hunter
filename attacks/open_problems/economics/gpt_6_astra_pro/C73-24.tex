@@ -1,0 +1,167 @@
+% ECONOMICS_PROBLEM: {"id": "C73-24", "title": "Subgame-perfect equilibrium in concurrent reachability games", "jel_code": "C73", "source_id": "OP-0159"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-24: Subgame-perfect equilibrium in concurrent reachability games}
+\label{sec:C73-24}
+\noindent\textbf{Input:} \texttt{C73-24.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+Let $S$ be nonempty finite, $s_0\in S$, $A_i(s)$ nonempty finite, and $P(s'\mid s,a_1,a_2)$ a stochastic kernel. Two players simultaneously choose independent mixed actions prescribed by the public state history, with no private-action memory added to the strategy domain. Targets are $F_i\subseteq S$. A finite history $h=(s_0,\ldots,s_m)$ is feasible when each consecutive transition has positive probability for at least one feasible joint action.
+
+For such $h$, start a fresh continuation law at $s_m$ and prefix the earlier states. Its payoff $u_i^h$ is the probability that the entire prefixed sequence ever visits $F_i$; it is identically one when $F_i$ has already been visited. The literal question is
+\[
+ \forall G,s_0\quad\exists\sigma\quad\forall h\text{ feasible}\quad
+ \forall i\in\{1,2\}\quad\forall\tau_i,
+ \quad u_i^h(\tau_i,\sigma_{-i}|_h)\leq u_i^h(\sigma|_h).
+\]
+All continuation deviations are behavioral state-history strategies. No conditioning on a probability-zero event is used. Histories with previously attained targets, off-path histories, nonabsorbing targets, and indefinitely postponed hitting times are stress points. The statement needs no correction.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Rajasekaran and Vardi \cite{reach-source}, Section 1, distinguish the finite-horizon existence theorem from unresolved infinite-horizon Nash and subgame-perfect existence; Section 2 uses state-history strategies and prefixed objectives. The work below proves finite-horizon existence directly and extends it under a specified universal stopping hypothesis. It does not identify an unrestricted existence proof or a nonexistence example. Context checked on 9 October 2026.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Type and tools.} This is infinite-horizon equilibrium existence. Relevant tools are: finite mixed Nash existence (solve local simultaneous moves); backward induction (finite trees); target-flag augmentation (remember past success); countable product compactness (extract strategies); graph elimination (test universal stopping); uniform tail estimates (make payoffs continuous); delayed-hit constructions (break invalid limit arguments).
+
+\textbf{Proof tracks.} Approximate by finite-horizon subgame-perfect equilibria and identify exactly when equilibrium inequalities pass to a limit. Alternatively search for recursive equilibrium selectors on the augmented state space. \textbf{Disproof tracks.} Make attainment drift to infinite time; force conflicting target incentives; test all one-step two-action binary-payoff games. The achieved proof uses universal stopping, and the adversarial construction shows why that hypothesis cannot simply be omitted from the proof.
+
+\subsection*{4) WORK}
+\paragraph{Flag augmentation.}
+Let $z=(s,B)$, where $B\subseteq\{1,2\}$ records the players whose targets have been visited. Update $B$ after a transition to $s'$ by adjoining $\{i:s'\in F_i\}$. Start with $B_0=\{i:s_0\in F_i\}$. Keep only augmented states reachable under some finite sequence of positive-probability transitions. This finite set is denoted $Z$. A public state history uniquely determines its augmented history, so using these flags adds no observation or private randomization. A continuation payoff is eventual membership of $i$ in the flag set.
+
+\begin{lemma}[Finite-horizon subgame-perfect equilibrium]
+For every integer horizon $H\geq0$, the game paying according to targets reached by stage $H$ has a behavioral subgame-perfect equilibrium at every feasible history up to that horizon.
+\end{lemma}
+\begin{proof}
+At depth $H$, the payoff is the vector of attained flags. Assume continuation equilibria have been chosen after all feasible successor histories of a history $h$ at depth $t<H$. Define a finite two-player normal-form game whose payoff at joint action $a$ is the expectation, under $P$, of the already chosen continuation payoff. The finite Nash theorem states that every game with finitely many players and actions has an equilibrium in independent mixed actions \cite{nash}; all its hypotheses hold for this local game. Choose one such equilibrium.
+
+To verify against an arbitrary multistage deviation, condition on the next state. By the induction hypothesis, replacing the prescribed continuation after that state cannot improve the deviator's payoff, even if the deviator planned a sequence of changes rather than one change. Once continuations are bounded this way, the current mixed Nash inequality bounds the current action change as well. This proves the continuation inequality at $h$ for every behavioral deviation. There are finitely many histories through depth $H$, so backwards induction completes the construction, including every feasible off-path history.
+\end{proof}
+
+\paragraph{A precisely stated solved subclass.}
+Let $D\subseteq Z$ be a set of resolved states such that for every $z=(s,B)\in D$ and every joint action, every positive-probability successor is in $D$ and has the same flag set $B$. Thus once $D$ is reached no payoff can change. Assume there is no nonempty subset $C\subseteq Z\setminus D$ with the following property:
+\[
+ \forall z\in C\quad\exists\text{ a pure joint action }a
+ \quad \operatorname{supp}P(\cdot\mid z,a)\subseteq C. \tag{US}
+\]
+This is a hypothesis on all joint choices, not just on an equilibrium's on-path behavior.
+
+\begin{lemma}[Finite graph test and uniform tail]
+If $Z\setminus D$ is nonempty, then under (US) there are an integer $1\leq L\leq |Z\setminus D|$ and $\delta>0$ such that, after every history ending outside $D$ and under every strategy profile,
+\[
+ \Pr(\tau_D>kL\mid\text{that fixed prefix})\leq(1-\delta)^k.
+\]
+The same bound holds after unilateral deviations. The condition (US) is equivalent to almost-sure hitting of $D$ from every augmented state under every joint history policy.
+\end{lemma}
+\begin{proof}
+Put $C_0=Z\setminus D$ and repeatedly set
+\[
+ C_{r+1}=\{z\in C_r:\exists a,\ \operatorname{supp}P(\cdot\mid z,a)\subseteq C_r\}.
+\]
+If this decreasing sequence stabilizes at a nonempty set, it violates (US). Otherwise it empties in at most $|C_0|$ rounds; let $L$ be such an index. Let $p_*>0$ be the minimum of the finitely many positive transition probabilities in the game. Give a removed state its first removal round as rank, and give states of $D$ rank zero. At any state of positive rank $r$, every pure joint action has a positive-probability successor of rank below $r$, with probability at least $p_*$. Averaging over any mixed joint action preserves this lower bound. Repeated conditioning therefore gives probability at least $p_*^L$ of strictly descending ranks until reaching $D$ within $L$ steps; if the initial rank is less than $L$, the bound remains valid because $p_*\leq1$. Set $\delta=p_*^L$. Applying this conditional bound in blocks of length $L$ proves the geometric tail, without restricting history dependence. If $C_0$ is empty, hitting is immediate and no bound is needed.
+
+Conversely, if the elimination sequence stabilizes at nonempty $C$, choose one witnessing pure joint action at each of its states. These pure joint choices factor into the two players' pure actions and keep the process in $C$ with probability one. Thus universal almost-sure hitting fails from those states. This proves the equivalence. Correlated joint control was allowed in the upper-bound argument only to make it stronger; the witnessing nonstopping policy already factors into independent pure choices.
+\end{proof}
+
+\begin{theorem}[Exact SPE under universal stopping of unresolved payoffs]
+Every game satisfying the resolved-set and (US) hypotheses has an exact subgame-perfect equilibrium in precisely the input's state-history strategy class.
+\end{theorem}
+\begin{proof}
+If $Z=D$, every continuation payoff is already fixed and every profile is an SPE. Assume henceforth that $Z\setminus D$ is nonempty. Enumerate the feasible histories; there are countably many. Each player/history strategy coordinate belongs to a finite-dimensional compact simplex. By successively taking subsequences converging at the first coordinate, then the second, and so on, and using the diagonal subsequence, every sequence of profiles has a coordinatewise convergent subsequence.
+
+Choose finite-horizon SPE profiles for horizons $H=1,2,\ldots$, and extend them arbitrarily after their horizons. Extract a coordinatewise convergent subsequence $\sigma^{H_j}\to\sigma$. Fix a feasible history $h$ of depth $m$. A continuation payoff truncated $K$ steps after $h$ depends polynomially on finitely many strategy coordinates, so it is continuous for coordinatewise convergence. Its difference from the full payoff is at most the probability that $D$ has not been reached by those $K$ steps, bounded by $(1-\delta)^{\lfloor K/L\rfloor}$ uniformly over \emph{all} profiles and deviations. Hence the full continuation payoff is a uniform limit of continuous functions and is continuous.
+
+Now fix any player and any behavioral continuation deviation $\tau_i$. For all $H_j\geq m$, the finite-horizon SPE inequality at $h$ holds for the restriction of $\tau_i$. Replacing both payoffs there by their full-horizon counterparts changes the inequality by at most
+$2(1-\delta)^{\lfloor(H_j-m)/L\rfloor}$.
+The latter tends to zero. By the just-proved continuity, both full payoffs converge along $\sigma^{H_j}\to\sigma$, including when one component is replaced by the fixed $\tau_i$. Passing to the limit gives the required SPE inequality.
+
+The extracted subsequence did not depend on $h,i,\tau_i$. The argument can therefore be applied to every such choice; no diagonalization over the uncountable set of deviations is being asserted or needed. Past target flags were included throughout, proving the exact continuation convention in the input.
+\end{proof}
+
+\begin{proposition}[An exact equilibrium limit can fail without uniform stopping]
+Even a finite common-interest game with one effective controller can have a sequence of exact infinite-horizon SPE converging coordinatewise to a profile that is not a Nash equilibrium.
+\end{proposition}
+\begin{proof}
+There are two states, $s$ and absorbing $w$, and common target $\{w\}$. Player one has actions wait and stop at $s$; wait stays at $s$, stop moves to $w$. Player two has one action. For each $n\geq1$, prescribe wait while the absolute stage is less than $n$, and stop thereafter. From every feasible history at $s$, this strategy reaches $w$ after finitely many additional steps, so each payoff is one, the largest possible. Histories already at $w$ also have payoff one. Thus each profile is an exact SPE.
+
+At each fixed finite history at $s$, the prescribed action is eventually wait as $n\to\infty$. The coordinatewise limit is therefore always wait, with payoff zero from $s$. Deviating to immediate stop gives payoff one. This limit is not even a Nash equilibrium. Immediate stop itself is an SPE, so the example does not show nonexistence in this game; it disproves closedness of the equilibrium set under the proposed compactness argument.
+\end{proof}
+
+\paragraph{Tiny exhaustive test.}
+The script checks all $4^4=256$ two-action, one-step deterministic terminal games with terminal payoff pairs in $\{0,1\}^2$. Exact support calculations find a pure equilibrium for 254 tables and a mixed equilibrium for the remaining two. Backward induction makes these SPE in the associated one-step reachability games. Pseudocode:
+\begin{lstlisting}
+for table in product([(0,0),(0,1),(1,0),(1,1)], repeat=4):
+    candidate = pure_nash(table) or exact_two_by_two_mixed_nash(table)
+    assert all_unilateral_pure_deviation_inequalities(candidate, table)
+\end{lstlisting}
+By linearity, the checked pure deviation inequalities imply all mixed one-stage inequalities. These small cases cannot test arbitrarily delayed infinite-horizon phenomena.
+
+\subsection*{5) VERIFICATION}
+The finite-horizon proof uses only public state histories, not remembered private actions or an unannounced correlation device. The target-flag augmentation is computed from those histories. The (US) tail bound includes every feasible prefix, every profile, and every deviation, exactly the uniformity needed for the compactness proof. The delayed-stop example specifically breaks continuity while preserving finiteness and exact SPE of every approximant. If both targets are already attained, or every target is unreachable, the corresponding continuation inequalities are trivial; the argument does not require targets themselves to be absorbing.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for unrestricted finite concurrent stochastic reachability games.
+
+\textbf{Strongest checked partial result.} Exact SPE existence under a graph-testable universal stopping condition on unresolved payoffs, with a complete all-history compactness proof. The delayed-stop construction fully refutes the claim that coordinatewise limits of exact SPE must be equilibria.
+
+\textbf{Exact first gap.} Without a uniform tail bound, no selection of finite-horizon equilibria has been proved to preserve every infinite-horizon continuation deviation inequality in the limit.
+
+\textbf{Top three next moves.} (1) Add continuation payoff vectors to the compactness state and characterize which limit vectors are actually attainable. (2) Decompose joint-controlled nonstopping components and prove an equilibrium selection rule that prevents postponement of profitable exits. (3) Search two- and three-component conflicting-target games while testing every feasible prefix, rather than only the initial-state inequalities.
+
+\textbf{Minimal counterexample perspective.} A genuine nonexistence example must defeat all history-dependent profiles, not just stationary ones or limits of a chosen approximating sequence. The one-controller delayed-stop example is the smallest obstruction to the proof route, not a candidate game without SPE.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{reach-source}
+Senthil Rajasekaran and Moshe Y. Vardi.
+\emph{Verifying Equilibria in Finite-Horizon Probabilistic Concurrent Game Systems}.
+arXiv:2503.14690, version 7 (2026), Sections 1--2.
+\url{https://arxiv.org/html/2503.14690v7}.
+
+\bibitem{nash}
+John F. Nash, Jr. Equilibrium points in $n$-person games.
+\emph{Proceedings of the National Academy of Sciences} 36(1) (1950), 48--49.
+DOI: 10.1073/pnas.36.1.48.
+\url{https://www.pnas.org/doi/10.1073/pnas.36.1.48}.
+
+\end{thebibliography}
+
+\end{document}

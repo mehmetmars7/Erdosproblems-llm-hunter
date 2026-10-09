@@ -1,0 +1,171 @@
+% ECONOMICS_PROBLEM: {"id": "C73-19", "title": "Polynomial algorithms for games with ergodic payoff", "jel_code": "C73", "source_id": "OP-0164"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-19: Polynomial algorithms under state-independent mean payoff}
+\label{sec:C73-19}
+\noindent\textbf{Input:} \texttt{C73-19.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+An input lists a nonempty finite state set $S$, a controlling player (Max or Min) at every state, nonempty finite action sets $A(s)$, rational rewards $r(s,a)$, rational stochastic kernels $P(\cdot\mid s,a)$, and a rational threshold $q$, all explicitly in binary. Single-action states allow uncontrolled randomness. For arbitrary behavioral strategies, time starts at zero and
+\[
+ g_s(\sigma,\tau)=\mathbb E_{s,\sigma,\tau}
+ \left[\liminf_{T\to\infty}\frac1T\sum_{t=0}^{T-1}r(s_t,a_t)\right].
+\]
+The promise is $\exists\rho\in\mathbb R\ \forall s\in S$, $\sup_\sigma\inf_\tau g_s=\inf_\tau\sup_\sigma g_s=\rho$. The question is whether there exist a deterministic algorithm and a polynomial $p$ such that every promised input of bit length $L$ is correctly classified according to $\rho\geq q$ within $p(L)$ steps. Behavior on unpromised inputs need not be correct.
+
+No correction is needed. In particular, the promise does not assert irreducibility, a mixing-time bound, or equality of different orders of expectation and $\liminf$. A counterexample to a proposed algorithm is not a disproof of polynomial-time solvability.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The TROPICAL activity report \cite{tropical} lists polynomial algorithms for games with ergodic payment as a research direction; its brief statement does not fix the exact promise in this file. Hansen and Nie \cite{hansen-nie} discuss the unresolved zero-sum discounted/simple-stochastic-game complexity question. The reduction below is proved directly for the displayed state-independent-value promise and is not based on interpreting all possible meanings of ``ergodic'' as equivalent. The check is dated 9 October 2026.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Type and tools.} This is exact bit complexity for stochastic games. Relevant tools are: Bellman contraction (discounted values); additive bias certificates (mean payoff); bounded-difference martingales (pathwise averages); rational reductions (preserve input size); regenerative resets (force a common value); elementary hitting-time bounds (stress-test iteration); stationary policies (finite certificates).
+
+\textbf{Proof tracks.} Seek a polynomial bias computation or reduce the promised class to a known tractable subclass. \textbf{Disproof tracks.} Embed a discounted game using resets; force very slow convergence with a tiny binary probability; check whether a scalar Bellman eigenvalue actually controls the stipulated pathwise payoff. The reset reduction and a complete pathwise verification lemma are the strongest achieved route.
+
+\subsection*{4) WORK}
+\begin{lemma}[Pathwise additive-bias certificate]
+Suppose $h:S\to\mathbb R$ and $\rho\in\mathbb R$ satisfy
+\[
+ \rho+h(s)=
+ \begin{cases}
+ \max_{a\in A(s)}[r(s,a)+\sum_{s'}P(s'\mid s,a)h(s')],&s\text{ Max},\\
+ \min_{a\in A(s)}[r(s,a)+\sum_{s'}P(s'\mid s,a)h(s')],&s\text{ Min}.
+ \end{cases}
+\]
+Choosing an attaining action at each controlled state gives stationary strategies that guarantee the common value $\rho$, from every initial state, for the expectation of the pathwise $\liminf$ criterion in the input.
+\end{lemma}
+\begin{proof}
+Fix Max's maximizing selector and any behavioral Min strategy. Conditional on the past and the chosen action, every step satisfies
+\[
+ r(s_t,a_t)+\mathbb E[h(s_{t+1})\mid\mathcal F_t,a_t]-h(s_t)\geq\rho.
+\]
+Here $\mathcal F_t$ contains all information before the transition; using a filtration including the current action removes any issue with randomized actions. Let
+$D_{t+1}=h(s_{t+1})-\mathbb E[h(s_{t+1})\mid\mathcal F_t,a_t]$ and $M_T=\sum_{t<T}D_{t+1}$. These are bounded martingale differences, with $|D_{t+1}|\leq2\|h\|_\infty$. Summing gives
+\[
+ \sum_{t<T}(r(s_t,a_t)-\rho)
+ \geq h(s_0)-h(s_T)+M_T.
+\]
+For every $\eta>0$, the bounded-difference martingale inequality gives a bound $2\exp[-\eta^2T/(8\|h\|_\infty^2)]$ on $\Pr(|M_T|>\eta T)$ when $\|h\|_\infty>0$. The probabilities are summable; the elementary Borel--Cantelli lemma implies $M_T/T\to0$ almost surely. If $h=0$ this conclusion is immediate. The bounded telescoping term divided by $T$ also tends to zero. Thus the pathwise $\liminf$ is at least $\rho$ almost surely, and its expectation is at least $\rho$ because rewards are bounded.
+
+Fixing Min's minimizing selector reverses every inequality for arbitrary Max play and gives a pathwise $\limsup$ at most $\rho$. Therefore its pathwise $\liminf$ and its expectation are at most $\rho$. The general inequality maxmin $\leq$ minimax and these two guarantees prove equality. No exchange of expectation and $\liminf$ was used.
+\end{proof}
+
+\begin{proposition}[Discounted games embed in the promised class]
+Given a finite rational turn-based zero-sum discounted game with $0<\beta<1$, rewards $r$, transitions $P$, and initial state $s_*$, form
+\[
+ P'(s'\mid s,a)=\beta P(s'\mid s,a)+(1-\beta)\mathbf1_{\{s'=s_*\}}.
+\]
+Keep the rewards and controlling players unchanged. The new undiscounted game satisfies the input's promise and its common mean value is the normalized discounted value from $s_*$ in the original game. This construction has polynomial bit complexity.
+\end{proposition}
+\begin{proof}
+The discounted Bellman map $T_\beta$ takes a vector $z$ to the maximum or minimum, according to the state's owner, of $r(s,a)+\beta Pz(s,a)$. A maximum or minimum of finitely many real numbers changes by at most their largest coordinatewise change. Hence $\|T_\beta z-T_\beta w\|_\infty\leq\beta\|z-w\|_\infty$. Iteration is Cauchy by the geometric bound on successive increments, and completeness of $\mathbb R^S$ supplies a unique fixed point $h$.
+
+The fixed point is the unnormalized discounted value. To verify this rather than assume it, choose a maximizing action in its equation at each Max state. Against arbitrary Min actions,
+$r(s_t,a_t)+\beta\mathbb E h(s_{t+1})\geq h(s_t)$ conditionally. Multiply by $\beta^t$, sum expectations to time $T-1$, and use the bound $\beta^T\|h\|_\infty\to0$. This guarantees expected discounted sum at least $h(s_0)$. Min's selector gives the reverse inequality. The normalized criterion is consequently $(1-\beta)h(s_0)$.
+
+For the reset game,
+\[
+ r+P'h=r+\beta Ph+(1-\beta)h(s_*).
+\]
+The last term is the same for every state and action. Taking the appropriate maximum or minimum yields
+\[
+ \max/\min\,(r+P'h)=h(s)+\rho,
+ \qquad \rho=(1-\beta)h(s_*).
+\]
+The preceding lemma proves the mean-payoff promise and value from every initial state. Each output probability is a sum of at most two products of rational input numbers. Its numerator and denominator have bit length at most a constant multiple of the corresponding input lengths, and the number of states and actions is unchanged. Normalized discounted threshold $q$ maps to the same threshold $q$. For an unnormalized threshold, multiply it by $1-\beta$. Thus the reduction is polynomial.
+\end{proof}
+
+\paragraph{What this reduction proves.}
+A polynomial exact algorithm for the promised class would give one for arbitrary rational discounted turn-based zero-sum games. It does not prove that either problem lacks such an algorithm. Resetting to $s_*$ does not imply every state is reachable from $s_*$; the proposition claims state-independent value, exactly the specified promise, not a stronger irreducibility property.
+
+\begin{proposition}[The promise does not give polynomial horizon convergence]
+For each integer $b\geq1$, there is a two-state uncontrolled promised game with $O(b)$-bit data, common value one, and expected average reward at horizon $T$ at most $2^{-b}(T-1)/2$ when started in its first state.
+\end{proposition}
+\begin{proof}
+At state $a$ the reward is zero; transition to absorbing $b_1$ has probability $\delta=2^{-b}$ and otherwise the state remains $a$. At $b_1$ the reward is one. The hitting time is finite almost surely because the probability of remaining in $a$ for $t$ transitions is $(1-\delta)^t\to0$. Every sample path that hits $b_1$ has average reward tending to one; boundedness gives the required common expected pathwise value. Starting at $a$, $\Pr(s_t=b_1)=1-(1-\delta)^t\leq t\delta$, by a union bound on the first $t$ transitions. Summing over $0\leq t<T$ and dividing by $T$ gives the assertion. For $T\leq2^{b-1}$ the expected average is less than $1/4$. Thus even constant-accuracy finite-horizon substitution can require exponentially many stages in the bit length on this family.
+\end{proof}
+
+\paragraph{Tiny cases and exact calculation.}
+One state reduces to the owner's maximum or minimum immediate reward. For a nontrivial reset test use $\beta=2/3$, states $0$ (Max) and $1$ (Min), and actions listed as (reward, next state):
+\[
+ A(0)=\{(0,0),(1,1)\},\qquad A(1)=\{(0,0),(2,1)\}.
+\]
+The discounted fixed point is $h=(9/5,6/5)$, since the two action values are $(6/5,9/5)$ at state zero and $(6/5,14/5)$ at state one. Reset to zero gives $\rho=3/5$. The reset action expressions $r+P'h$ are $(9/5,12/5)$ and $(9/5,17/5)$; their maximum and minimum equal $h+\rho$. The script checks these fractions exactly.
+\begin{lstlisting}
+for state in states:
+    rhs = [reward[state,a] + sum(Preset[state,a,z]*h[z]
+                               for z in states)
+           for a in actions[state]]
+    assert owner_extremum(rhs) == h[state] + rho
+\end{lstlisting}
+
+\subsection*{5) VERIFICATION}
+The bias proof covers arbitrary behavioral deviations, not just stationary competitors. Bounded martingale increments hold because the state set and $h$ are finite, even when the input bit lengths are large. The reset construction has no vanishing-probability limit: it is an exact finite transformation at the input discount factor. The slow-convergence example meets the promise despite a transient state. Neither a poor finite-horizon algorithm nor a complexity-preserving embedding is an unconditional complexity lower bound. The threshold's binary length remains part of every running-time assertion.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for polynomial-time exact threshold decision on every promised input.
+
+\textbf{Strongest checked partial result.} An exact polynomial reduction from rational discounted turn-based zero-sum games to the stated promise, supported by a pathwise bias-certificate proof. The two-state family also rigorously rules out a proposed proof based solely on uniformly polynomial finite-horizon convergence.
+
+\textbf{Exact first gap.} There is no proved algorithm here that computes or separates the additive eigenvalue in time polynomial in input bit length on the reset subclass, let alone on every promised game.
+
+\textbf{Top three next moves.} (1) Seek a strongly bounded number of policy changes for reset Bellman operators, independent of $(1-\beta)^{-1}$. (2) Construct exact rational primal/dual certificates that can be found without enumerating policy pairs. (3) Determine whether the scalar-value promise permits a polynomial decomposition when a bounded additive bias does not exist.
+
+\textbf{Minimal counterexample perspective.} Complexity cannot be refuted by one finite game. A negative result would need a family and a justified computational lower-bound framework. The two-state rare-transition family is only a counterexample to a horizon-based algorithmic shortcut.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{tropical}
+Inria, TROPICAL research team. \emph{TROPICAL Activity Report 2024}.
+Section 3.1, printed p.~4 (PDF page 6).
+\url{https://radar.inria.fr/rapportsactivite/RA2024/tropical/TROPICAL-RA-2024.pdf}.
+
+\bibitem{hansen-nie}
+Kristoffer Arnsfelt Hansen and Xinhao Nie.
+\emph{On the Complexity of Stationary Nash Equilibria in Discounted Perfect Information Stochastic Games}.
+arXiv:2510.11550, version 1 (2025).
+\url{https://arxiv.org/html/2510.11550v1}.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,98 @@
+% ECONOMICS_PROBLEM: {"id": "C78-293", "title": "Growing numbers of changed agents: correcting an overbroad complexity promise", "jel_code": "C78", "source_id": "OP-0199"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Robust stable matching with growing changes: padding and tractable structure}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\section{Question and scope}
+For two strict complete stable-marriage profiles on $n$ workers and $n$ firms, suppose at most $p(n)$ workers and $q(n)$ firms change their preference lists. The original broad promise allowing almost every list to change is already corrected in the catalogue. The remaining question concerns particular unbounded growth restrictions. We extend the elementary padding observation to sublinear polynomial growth and distinguish it from the known XP algorithm and a structural tractable family. We do not classify all unbounded functions.
+
+A matching is robust if it has no blocking pair in either profile. The functions $p(n),q(n)$ are polynomial-time computable integer bounds between zero and $n$. Changed-agent bounds here mean \emph{at most}, not exactly. The source supplies NP-hardness for unrestricted changes and an $n^{p+q+O(1)}$ algorithm; the latter is restated with a proof to expose what its exponent implies.
+
+\begin{lemma}[Mutual-first-choice padding]
+Given two profiles on $r$ workers and firms, append $n-r$ worker--firm pairs. Each appended pair ranks its partner first in both profiles. Original agents place all appended agents below all original ones. Complete all remaining list positions identically in the two profiles. Restriction to original agents is a bijection between robust matchings of the padded and original instances. No appended agent changes preferences.
+\end{lemma}
+\begin{proof}
+Every stable matching must match each appended pair together: otherwise the two first choices block. Original agents consequently match among themselves. A blocking original pair has exactly its old preferences, while an appended agent cannot block with anybody when assigned its first choice. Extension by the forced pairs and restriction are therefore inverse maps preserving stability in both profiles.
+\end{proof}
+
+\begin{theorem}[Hardness under polynomially small changed fractions]
+Suppose a polynomial-time computable integer function $n(r)\geq r$ is polynomially bounded in $r$ and satisfies
+\[
+ \min\{p(n(r)),q(n(r))\}\geq r
+\]
+for all sufficiently large $r$. Then robust-existence under the two changed-agent bounds is NP-complete. In particular, this holds whenever both bounds are eventually at least $c n^\epsilon$, for fixed $c>0$ and $0<\epsilon\leq1$, subject to their natural upper bound $n$.
+\end{theorem}
+\begin{proof}
+Pad an unrestricted size-$r$ instance to size $n(r)$ using the lemma. At most $r$ workers and $r$ firms change, so the promised bounds hold. Explicit list length is $O(n(r)^2\log n(r))$, polynomial in the original size. The lemma preserves the answer. The finitely many small excluded sizes can be solved directly in a reduction or absorbed by padding to a fixed larger threshold. Membership in NP follows by checking a proposed perfect matching for all blocking pairs in both profiles in polynomial time.
+
+For the power-law corollary choose an integer $d>1/\epsilon$ and set $n(r)=\lceil C r^d\rceil$ with a sufficiently large fixed integer $C$, increasing it if necessary for the eventual threshold and $n(r)\geq r$. This is an integer-polynomial padding rule and satisfies $cn(r)^\epsilon\geq r$. In particular, when $\epsilon<1$, NP-hardness survives bounds that are a vanishing fraction of all agents.
+\end{proof}
+
+For $p(n)=q(n)=O(\log n)$, this reduction would require exponentially large padding and establishes no NP-hardness result. A large enough numerical padding instance is not a polynomial reduction.
+
+\section{The known parameter-dependent algorithm}
+Let $C$ be the set of changed agents, with $k=|C|$.
+
+\begin{proposition}[Partner enumeration; source algorithm with proof]
+Robust existence can be decided, and a matching produced when it exists, in $O(n^{k+2})$ time after preferences have been indexed by rank.
+\end{proposition}
+\begin{proof}
+Enumerate a proposed partner for every member of $C$, at most $n^k$ choices. Discard choices that are inconsistent with a partial matching. Close the resulting fixed pairs under partners; let $F$ be all their endpoints. Check every pair within $F$ for blocking in both profiles and reject a failed choice.
+
+For a free agent $v\notin F$, its preference list is unchanged. For every opposite-side fixed agent $u$, if $u$ prefers $v$ to its fixed partner in either profile, require $v$'s eventual partner to be strictly above $u$ in $v$'s common list. These are rank cutoffs. Remove all fixed agents and retain a free--free edge only if both endpoints satisfy their respective cutoffs. Run deferred acceptance on these possibly incomplete strict lists and retain the choice only if it returns a perfect matching on the free agents.
+
+If it does, fixed--fixed blocking was checked, free--free blocking is excluded by deferred acceptance, and fixed--free blocking is excluded by the cutoffs. An omitted free--free edge cannot block: an endpoint that rejected it by its cutoff receives an acceptable partner above that edge. Thus the combined matching is robust.
+
+Conversely, a robust matching appears in the enumeration through its partners for $C$. Its remaining partners meet every cutoff and form a perfect stable matching of the truncated instance. Deferred acceptance on strict incomplete bipartite lists matches the same set of agents as every stable matching: the usual rejection argument shows that a rejected pair cannot occur in any stable matching, and hence a proposer left unmatched cannot be matched in a stable perfect matching. Thus this enumeration choice succeeds. Rank checks, cutoffs and deferred acceptance each take $O(n^2)$ time, proving the bound.
+\end{proof}
+
+This is the algorithm of the cited source, not a new fixed-parameter algorithm. It is polynomial for bounded $k$; $k=O(\log n)$ gives only a quasipolynomial upper bound by this argument.
+
+\section{A genuinely growing but structured tractable family}
+Suppose a common partition into balanced blocks is supplied: each block has equally many workers and firms, and every agent ranks all agents of the opposite side in its own block above every outsider in both profiles. Let block $j$ have size $n_j$ on each side and $k_j$ changed agents.
+
+\begin{theorem}[Independent blocks]
+Every stable matching stays within blocks. Robust existence is therefore decidable in time $\sum_j O(n_j^{k_j+2})$. In particular, a uniform constant bound on $k_j$ gives a polynomial algorithm even if the total number of changed agents tends to infinity.
+\end{theorem}
+\begin{proof}
+If a matching sends a worker from a block to an outside firm, balance implies that some firm in that block is also matched outside. That worker and firm prefer each other to their outside partners, a blocking pair. Thus stable matchings stay inside. Conversely, combining stable matchings of all blocks introduces no cross-block blocking because every assigned partner is internal. These statements hold simultaneously in the two profiles. Apply the preceding algorithm independently to each block and add its running times. For fixed $k_j\leq K$, the sum is at most a constant times $n^{K+2}$.
+\end{proof}
+
+\section{Remaining gap and reference}
+Growth rates alone leave a substantial interval between constant-change algorithms and the polynomial-growth hardness theorem. Polylogarithmic bounds, asymmetric restrictions and graph structure require separate arguments. The block theorem adds a substantive preference restriction, so it is not a classification by $p,q$ alone.
+
+Rohith Reddy Gangam, Tung Mai, Nitya Raju and Vijay V. Vazirani, \emph{Stable Matching: Dealing with Changes in Preferences}, arXiv:2304.02590v3, Section 4.4, Algorithm 3, Theorem 15 and Remark 17. \url{https://arxiv.org/html/2304.02590v3}. The source discusses unrestricted NP-hardness and gives the XP algorithm. The padding and block arguments above state the precise additional consequences used in this attempt.
+
+\end{document}

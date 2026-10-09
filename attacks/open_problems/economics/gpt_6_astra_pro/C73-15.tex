@@ -1,0 +1,272 @@
+% ECONOMICS_PROBLEM: {"id": "C73-15", "title": "Payoff characterization of convergence for a fixed mirror-descent rule", "jel_code": "C73", "source_id": "OP-0148"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-15: Payoff characterization for a fixed mirror-descent rule}
+\label{sec:C73-15}
+\noindent\textbf{Input:} \texttt{C73-15.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+
+\subsection*{1) FORMAL RESTATEMENT}
+Fix finite nonempty action sets, proper lower-semicontinuous strictly convex
+regularizers $h_i$ on their simplexes, differentiable and finite on the relative
+interiors, and a sequence $\eta_t>0$. Let $X=\prod_i\Delta(S_i)$ and
+$v_i(x)_a=u_i(a,x_{-i})$. For an interior starting point define
+\[
+ D_{h_i}(p,x)=h_i(p)-h_i(x)-\langle\nabla h_i(x),p-x\rangle,
+\quad
+ x_i^{t+1}=\argmax_{p\in\Delta(S_i)}
+ \{\eta_t\langle v_i(x^t),p\rangle-D_{h_i}(p,x_i^t)\}.
+\]
+As in the input, assume uniqueness of every update and that all iterates remain
+where the required gradients are defined. The target is a condition on $u$ for
+\[
+ \forall x^1\in\operatorname{relint}X,\qquad
+ \operatorname{dist}(x^t,\NE(G))\longrightarrow0.
+\]
+The rule, including every step size, is fixed before testing a game. The input
+does not select one particular regularizer or schedule, so a theorem for a
+special choice is a partial classification, not a solution for the whole family.
+
+The main specialization below is negative entropy
+$h_i(p)=\sum_a p_a\log p_a$, with $0\log0=0$ and natural logarithms. It gives
+\[
+ x_{i,a}^{t+1}=
+ \frac{x_{i,a}^{t}\exp(\eta_t v_{i,a}(x^t))}
+      {\sum_bx_{i,b}^{t}\exp(\eta_t v_{i,b}(x^t))}.
+ \tag{MD}
+\]
+The formula is the unique optimizer: the first-order conditions of the strictly
+concave entropy-regularized objective give the displayed positive probabilities,
+and normalization determines the multiplier. Hence the interior-domain condition
+is satisfied for every finite step.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Bichler et al. \cite{potentialness} distinguish potential structure from general
+learning convergence and explicitly discuss the absence of a comprehensive
+classification. Their empirical potentialness measure is not a necessary-and-sufficient
+theorem for the particular discrete rule above. The following schedule-sensitive
+statements and counterexamples are proved directly.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof track.} Obtain exact log-ratio recursions for entropy; classify the
+finite-total-step case using initializations near every vertex; identify positive
+subclasses when total learning time is infinite.
+
+\textbf{Construction track.} Try a one-player game with summable steps, a zero-sum
+mixed-equilibrium game, and an identical-payoff game with a large constant step.
+These test three different failed generalizations.
+
+\textbf{Tools and purpose.} Entropy first-order conditions make updates explicit;
+log odds remove normalization; uniform payoff bounds control finite total movement;
+closedness of the Nash set permits vertex tests; strict convexity supplies an
+energy inequality; invariant diagonal profiles reduce a two-player update to one
+variable; exact logarithmic identities certify a two-cycle.
+
+\subsection*{4) WORK}
+\begin{theorem}[Complete classification for summable entropic steps]
+For the entropy rule (MD), suppose $S=\sum_{t\geq1}\eta_t<\infty$. Then the universal
+convergence property holds if and only if the game is strategically constant:
+\[
+ u_i(a_i,s_{-i})=u_i(b_i,s_{-i})
+ \quad\text{for all }i,a_i,b_i,s_{-i}.
+ \tag{SC}
+\]
+Equivalently, $\NE(G)=X$.
+\end{theorem}
+\begin{proof}
+If (SC) holds, all pure actions of a player have the same payoff against every
+mixed opponents' profile. Every mixed profile is therefore Nash, proving sufficiency.
+
+For necessity choose $M$ with $|u_i(s)|\leq M$ for every player and pure profile.
+Multilinearity gives $|v_{i,a}(x)|\leq M$ on $X$. Iterating the ratio form of (MD),
+\[
+ \frac{x_{i,a}^{t}}{x_{i,b}^{t}}
+ =\frac{x_{i,a}^{1}}{x_{i,b}^{1}}
+   \exp\left(\sum_{s<t}\eta_s[v_{i,a}(x^s)-v_{i,b}(x^s)]\right).
+\]
+Fix an arbitrary pure profile $a^*$. Take interior starting points with
+$x_{i,a_i^*}^{1}\geq1-\delta$. Summing the ratios to $a_i^*$ gives, for every $t$,
+\[
+ \frac{1-x_{i,a_i^*}^{t}}{x_{i,a_i^*}^{t}}
+ \leq e^{2MS}\frac{\delta}{1-\delta}.
+\]
+Thus every iterate is within a quantity tending to zero with $\delta$ of the
+vertex $a^*$. If the assumed universal Nash-set convergence holds, compactness
+provides a subsequential Nash limit with the same closeness bound. Letting
+$\delta\downarrow0$ and using that the Nash set is closed shows $a^*\in\NE(G)$.
+Every pure profile is therefore Nash. For fixed $i,s_{-i}$, the profiles
+$(a_i,s_{-i})$ and $(b_i,s_{-i})$ give both opposite best-response inequalities,
+forcing equality of the two payoffs. This proves (SC).
+\end{proof}
+The necessity argument uses the universal interior-initialization quantifier.
+It does not assert that one preselected interior starting point must fail in every
+nonconstant game.
+
+\begin{proposition}[Two positive tests when total learning time is infinite]
+Under (MD), if $\sum_t\eta_t=\infty$, every one-player finite game converges to its
+optimal-action simplex. Also, every finite game in which each player has a strictly
+dominant pure action converges to the corresponding pure Nash equilibrium.
+\end{proposition}
+\begin{proof}
+For one player, let $c_a$ denote its fixed payoff and
+$S_t=\sum_{s<t}\eta_s$. The exact formula is
+\[
+ x_a^t=\frac{x_a^1e^{c_aS_t}}{\sum_bx_b^1e^{c_bS_t}}.
+\]
+If $c_a<\max_b c_b$, its ratio to a maximizing action tends to zero. Ratios between
+maximizing actions remain their initial ratios, proving the asserted convergence.
+
+If $a_i^*$ strictly dominates every other action, finiteness gives
+$v_{i,a_i^*}(x)-v_{i,b}(x)\geq\delta_i>0$ for every $x$ and $b\ne a_i^*$.
+The same ratio recursion bounds
+$x_{i,b}^t/x_{i,a_i^*}^t$ by its initial value times $e^{-\delta_iS_t}$.
+All the undesired masses tend to zero. The dominant profile is Nash by definition.
+\end{proof}
+
+\begin{theorem}[Zero-sum does not guarantee last-iterate convergence]
+For matching pennies
+\[
+ A=\begin{pmatrix}1&-1\\-1&1\end{pmatrix},\qquad B=-A,
+\]
+the simultaneous entropy rule fails to approach the Nash set from every interior
+initialization other than the equilibrium, for every positive step sequence.
+\end{theorem}
+\begin{proof}
+Write $p,q$ for the first-action probabilities and
+$z=\log(p/(1-p))$, $w=\log(q/(1-q))$. The unique Nash equilibrium is
+$p=q=1/2$: a nonindifferent opponent would force a pure best reply, and no pure
+pair is mutually optimal; indifference requires exactly these probabilities.
+The ratio recursion gives
+\[
+ z^{t+1}=z^t+2\eta_t\tanh(w^t/2),\qquad
+ w^{t+1}=w^t-2\eta_t\tanh(z^t/2).
+\]
+Set $E(z,w)=\log\cosh(z/2)+\log\cosh(w/2)$. Its Hessian is diagonal with strictly
+positive entries $\tfrac14\operatorname{sech}^2(z/2)$ and
+$\tfrac14\operatorname{sech}^2(w/2)$. The displacement above is orthogonal to
+$\nabla E$. Strict convexity therefore gives
+$E(z^{t+1},w^{t+1})>E(z^t,w^t)$ unless $(z^t,w^t)=(0,0)$.
+Starting elsewhere, energy stays at least $E(z^1,w^1)>0$. Convergence to the unique
+Nash profile would make $(z^t,w^t)\to(0,0)$ and the energy tend to zero, which is
+impossible. This argument uses no lower bound on $\eta_t$ and no assumption on
+its total sum.
+\end{proof}
+
+\begin{theorem}[An exact two-cycle in an exact potential game]
+Let both payoff matrices be
+$A=B=\left(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\right)$, take
+$\eta_t=4\log3$, and initialize $p^1=q^1=3/4$. Then the entropy iterates alternate
+between $(3/4,3/4)$ and $(1/4,1/4)$. Neither profile is Nash.
+\end{theorem}
+\begin{proof}
+The common payoff itself is an exact potential. Symmetry preserves $p=q$.
+For the common log odds $z$, the payoff difference between the first and second
+actions is $1-2p=-\tanh(z/2)$, so
+\[
+ z^{t+1}=z^t-4\log3\,\tanh(z^t/2).
+\]
+At $z=\log3$, $\tanh(z/2)=1/2$, and the next value is $-\log3$.
+Oddness gives the reverse step. At $(3/4,3/4)$ the expected payoff is $3/8$ and
+switching to the second pure action gives $3/4$; at $(1/4,1/4)$ switching to the
+first gives the same improvement. The periodic orbit is disjoint from the closed
+Nash set, so its distance from that set is positive.
+\end{proof}
+This is a counterexample to arbitrary-step potential convergence, not to the
+summable-step classification, whose assumptions it does not satisfy.
+
+\subsection*{5) VERIFICATION}
+For a one-player two-action game with rewards $(1,0)$, initialization $(1/2,1/2)$,
+and $\eta_t=2^{-t}$, the exact limit is
+$(e/(1+e),1/(1+e))$, not an optimum. This tiny case checks the finite-total-step
+obstruction without interactions. A one-action player contributes no condition
+to (SC), and a wholly constant game trivially passes every rule.
+
+The script verifies the potential two-cycle with a floating-point round-trip
+error below $10^{-12}$; its proof is the exact identity involving $\log3$ above.
+It also checks 100 strict matching-pennies energy increases from log odds
+$(0.7,-0.4)$ with step $0.1$. Minimal pseudocode is
+\begin{lstlisting}
+for t:
+    for each player and action:
+        new_log_weight = log(old_weight) + eta[t] * payoff_vector[action]
+    normalize each player's new weights simultaneously
+\end{lstlisting}
+Simultaneity matters: using one player's new probabilities in the other player's
+update would be a different algorithm. The proof never treats negative entropy
+as differentiable on the boundary. None of the failures concerns convergence of
+time-averaged play to a correlated equilibrium.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest checked partial result.} A complete payoff-array classification for
+entropy with summable positive steps; positive infinite-total-step subclasses; an
+all-positive-schedules matching-pennies obstruction; and an exact potential-game
+two-cycle for a specified constant step.
+
+\textbf{Exact first gap.} For arbitrary fixed regularizers and nonsummable schedules,
+no necessary-and-sufficient payoff-array criterion is proved.
+
+\textbf{Next three moves.}
+\begin{enumerate}[nosep]
+\item For nonsummable entropy steps, identify a payoff condition that controls
+last-iterate rather than averaged regret and survives all interior initializations.
+\item For a specified potential array, determine a sharp step-size stability bound;
+the exact cycle supplies a concrete large-step test.
+\item Extend the finite-total-step vertex argument to regularizers for which a
+uniform, initialization-sensitive movement bound can actually be proved.
+\end{enumerate}
+\textbf{Counterexample perspective.} Two actions and two players already suffice to
+break both zero-sum and potential-based universal claims. They do not establish
+that an arbitrary specified rule has no useful convergent class.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{potentialness}
+Martin Bichler, Davide Legacci, Panayotis Mertikopoulos, Matthias Oberlechner, and Bary Pradelski.
+\emph{Characterizing the Convergence of Game Dynamics via Potentialness}.
+arXiv:2503.16285, version 1 (2025).
+\url{https://arxiv.org/html/2503.16285v1}.
+
+\end{thebibliography}
+
+\end{document}
