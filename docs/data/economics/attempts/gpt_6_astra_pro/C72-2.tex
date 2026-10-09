@@ -1,0 +1,185 @@
+% ECONOMICS_PROBLEM: {"id": "C72-2", "title": "A polynomial-time approximation scheme for bimatrix Nash equilibrium", "jel_code": "C72", "source_id": "OP-0131"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem}
+\usepackage{microtype}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Reg}{Reg}
+\DeclareMathOperator{\supp}{supp}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\allowdisplaybreaks[2]
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\small Open Problems Econ}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\hypersetup{pdfauthor={GPT 6 Astra Pro},pdfsubject={Checked partial results and explicit remaining gaps}}
+
+\fancyhead[L]{\small\texttt{C72-2} -- Research attempt}
+\title{Research attempt: \texttt{C72-2}\\[5pt]\large Deterministic approximation schemes for bimatrix Nash equilibria}
+\author{GPT 6 Astra Pro}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Scope of this report.} The main target remains UNRESOLVED. Fully proved subclaims and counterexamples are identified locally. Computational checks reported here are supplementary to the proofs. Their scripts and output files are not included in this manuscript and have not been independently verified for this publication. No novelty or priority claim is made.\par
+\section{FORMAL RESTATEMENT}
+Let $m,n\geq1$, $A,B\in\mathbb Q^{m\times n}\cap[0,1]^{m\times n}$, and let $L$ be the binary length of the explicitly listed matrices and their dimensions. Write $\Delta_d=\{x\in\mathbb R_+^d:\sum_jx_j=1\}$ and
+\[
+ \Reg_{A,B}(x,y)=\max\left\{\max_i(Ay)_i-x^TAy,\;\max_j(x^TB)_j-x^TBy\right\}.
+\]
+All logarithms in estimates are natural unless a base is displayed. A deterministic polynomial-time approximation scheme (PTAS) here means
+\[
+ \exists\mathcal A\ \forall\varepsilon\in\mathbb Q\cap(0,1)\ \exists\text{ polynomial }p_\varepsilon\ %
+ \forall(m,n,A,B):
+\]
+$\mathcal A(A,B,\varepsilon)$ returns rational $(x,y)\in\Delta_m\times\Delta_n$ with $\Reg_{A,B}(x,y)\leq\varepsilon$, using at most $p_\varepsilon(L)$ bit operations. The same algorithm must work for every accuracy; the degree may depend on the fixed accuracy. This is additive Nash regret, not well-supported Nash regret, multiplicative approximation, or a fully polynomial scheme.
+
+\paragraph{Literal statement and hygiene.}
+The statement is well posed under canonical rational encodings. A one-action player, zero payoffs, and degenerate best-response sets are allowed. No assumption such as $\mathrm{P}\ne\mathrm{PPAD}$ is part of the question. Exhibiting a game with no small-support \emph{exact} equilibrium would not disprove this algorithmic assertion. Every finite game has a mixed equilibrium; the issue is uniform computation.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Lipton, Markakis and Mehta give the small-support sampling approach underlying a quasipolynomial approximation algorithm \cite{c72-lmm}. Rubinstein's Theorem 1.2 states that, under ETH for PPAD, some fixed positive accuracy requires $N^{\log^{1-o(1)}N}$ time for $N\times N$ games \cite{c72-rub}. This is a conditional obstruction to a PTAS, not an unconditional separation. A September 2026 preprint refines accuracy-dependent lower bounds under both PCP for PPAD and ETH for PPAD \cite{c72-gol}; its additional hypothesis is not silently added to Rubinstein's theorem. The constructive arguments below are supplied in full rather than treated as a new literature claim. Search cutoff: 9 October 2026.
+
+\section{ATTACK PLAN}
+\paragraph{Proof strategies.}
+First, discretize an exact equilibrium by empirical distributions, then check whether enumeration is polynomial for fixed accuracy. Second, compress supports using linear-algebraic structure. Third, ask whether one can find the successful sampled supports without enumerating them. The first two paths yield rigorous partial results; the third is the missing algorithmic step.
+
+\paragraph{Disproof strategies.}
+Try hard small games against the proposed enumeration shortcut; test whether support lower bounds really imply time lower bounds; and apply a precise conditional hardness theorem without pretending its hypothesis has been proved. A finite payoff table cannot by itself refute a claim quantified over all deterministic algorithms.
+
+\paragraph{Landscape and tools.}
+This is a total-search and approximation-complexity problem. Kakutani's fixed-point theorem supplies a sampling anchor; Hoeffding's inequality controls all pure deviations; a union bound exposes the logarithmic support size; exact rational arithmetic verifies a candidate; Carath\'eodory compression uses separate payoff-matrix ranks; rational linear programming finds equilibria on proposed supports; and PPAD reductions delimit what an algorithm would imply.
+
+\section{WORK}
+\subsection{Existence, concentration, and a deterministic quasipolynomial algorithm}
+\begin{lemma}[Finite-game anchor]
+Every such bimatrix game has an exact mixed Nash equilibrium.
+\end{lemma}
+\begin{proof}
+For each $(x,y)$ let $F(x,y)$ be the product of the two mixed best-response sets. A linear function attains its maximum on a finite-dimensional simplex, so each set is nonempty, convex, and compact. If $(x_k,y_k)$ and corresponding best responses converge, each best-response inequality passes to the limit by continuity of matrix multiplication. Thus the graph is closed; on this compact domain, with compact range, this implies upper hemicontinuity. Kakutani's theorem states that an upper-hemicontinuous correspondence from a nonempty compact convex subset of a Euclidean space into itself, with nonempty compact convex values, has a fixed point. All hypotheses hold for $F$ on $\Delta_m\times\Delta_n$. A fixed point is an exact equilibrium.
+\end{proof}
+
+\begin{lemma}[Bounded sampling inequality]
+If $X_1,\ldots,X_k$ are independent, identically distributed random variables in $[0,1]$ with mean $\mu$, then
+\[
+ \Pr\left(\left|k^{-1}\sum_{\ell=1}^kX_\ell-\mu\right|>\delta\right)
+ \leq 2e^{-2k\delta^2}.
+\]
+\end{lemma}
+\begin{proof}
+For $X\in[0,1]$, put $H(t)=\log\E e^{tX}$. Differentiation is justified by boundedness. The second derivative is the variance of $X$ under exponentially tilted probabilities. Any $[0,1]$-valued variable $U$ satisfies $\operatorname{Var}(U)\leq\E(U-1/2)^2\leq1/4$. Since $H(0)=0$ and $H'(0)=\mu$, integration twice gives $\log\E e^{t(X-\mu)}\leq t^2/8$ for every real $t$. Independence and Markov's inequality yield
+$\Pr(\sum(X_\ell-\mu)>k\delta)\leq\exp(-tk\delta+kt^2/8)$. Set $t=4\delta$ and apply the same argument to the negative sum. Adding the two bounds proves the claim.
+\end{proof}
+
+\begin{theorem}[Checked constructive upper bound]
+For
+\[
+ k\geq\left\lceil 2\varepsilon^{-2}\log\bigl(4(m+n)\bigr)\right\rceil
+\]
+there is an $\varepsilon$-equilibrium in which each probability is an integer multiple of $1/k$. It can be found deterministically in
+\[
+ (mn)^k\operatorname{poly}(L,k)
+\]
+bit operations. For fixed $\varepsilon$ this is quasipolynomial in the input length, not a proved PTAS.
+\end{theorem}
+\begin{proof}
+Fix an exact equilibrium $(x^*,y^*)$ and sample $k$ actions independently from each marginal, producing empirical distributions $\widehat x,\widehat y$. The preceding lemma and a union bound show that, with failure probability at most
+\[
+ 2(m+n)\exp(-k\varepsilon^2/2)\leq\tfrac12,
+\]
+all coordinates of $A\widehat y-Ay^*$ and $\widehat x^TB-(x^*)^TB$ have absolute value at most $\varepsilon/2$. There is therefore at least one outcome satisfying both bounds.
+
+Let $v_A=(x^*)^TAy^*$. Every row in the support of $x^*$ has payoff $v_A$ against $y^*$, since an equilibrium places positive weight only on maximizing rows. Every sampled row is in that support with probability one. Hence
+\[
+ \widehat x^TA\widehat y\geq v_A-\varepsilon/2,
+ \qquad \max_i(A\widehat y)_i\leq v_A+\varepsilon/2.
+\]
+The row regret is at most $\varepsilon$. The same reasoning, with the players interchanged, proves the column bound.
+
+Enumerate all ordered lists of $k$ row actions and $k$ column actions, form their rational empirical distributions, and compute the two regrets exactly. At least one pair passes. There are at most $m^kn^k$ pairs. Products and sums of the input rationals and denominator-$k$ probabilities have polynomial bit length in $(L,k)$, so each check has polynomial bit complexity. To choose $k$ without numerical logarithm rounding, compute $b=\lceil\log_2(4(m+n))\rceil$ by integer arithmetic and use $k=\lceil2b/\varepsilon^2\rceil$; $b\geq\log(4(m+n))$.
+
+Since $\log(mn)=O(\log L)$ for explicitly represented matrices, the exponent in the total enumeration is $O(\varepsilon^{-2}(\log L)^2)$. This bound does not become a fixed power of $L$ when $\varepsilon$ is fixed.
+\end{proof}
+
+\subsection{A polynomial exact algorithm for separately bounded ranks}
+\begin{lemma}[Support compression]
+If $\operatorname{rank}(A)=r$ and $\operatorname{rank}(B)=s$, some exact equilibrium has row support at most $s+1$ and column support at most $r+1$.
+\end{lemma}
+\begin{proof}
+Start from $(x^*,y^*)$. The point $Ay^*$ lies in the convex hull of columns of $A$ indexed by $\operatorname{supp}(y^*)$, inside a space of dimension at most $r$. It therefore has a convex representation with at most $r+1$ such columns. For completeness, if a representation has more than $r+1$ positive weights, the selected points are affinely dependent: coefficients $c_j$, not all zero, satisfy $\sum c_j=0$ and $\sum c_jA_{\cdot j}=0$. Subtract $t c_j$ from the weights, choosing the sign and largest admissible $t>0$ so weights remain nonnegative and at least one becomes zero. The represented point is unchanged. Repetition terminates with at most $r+1$ weights. This constructs $y'$ supported inside $\operatorname{supp}(y^*)$ with $Ay'=Ay^*$.
+
+Apply the same elimination to rows of $B$ to construct $x'$ supported inside $\operatorname{supp}(x^*)$, of size at most $s+1$, with $(x')^TB=(x^*)^TB$. Every row used by $x'$ is still a best response to $y'$, and every column used by $y'$ is still a best response to $x'$. Thus $(x',y')$ is an equilibrium.
+\end{proof}
+
+\begin{theorem}[Fixed separate ranks]
+For fixed $r,s$, an exact rational equilibrium can be found in polynomial time on games satisfying $\operatorname{rank}(A)\leq r$ and $\operatorname{rank}(B)\leq s$.
+\end{theorem}
+\begin{proof}
+Enumerate nonempty $I\subseteq[m]$, $J\subseteq[n]$ with $|I|\leq s+1$ and $|J|\leq r+1$. For each, solve the following rational linear feasibility problem in $x,y,u,v$:
+\begin{align*}
+ &x,y\geq0,\quad \sum_i x_i=\sum_jy_j=1,
+   \quad x_{I^c}=0,\quad y_{J^c}=0,\quad 0\leq u,v\leq1,\\
+ &(Ay)_i=u\quad(i\in I),\qquad (Ay)_i\leq u\quad(i\in[m]),\\
+ &(x^TB)_j=v\quad(j\in J),\qquad (x^TB)_j\leq v\quad(j\in[n]).
+\end{align*}
+The rational linear-programming theorem supplies a feasible rational point of polynomial bit length, or certifies infeasibility, in time polynomial in the encoding of these linear constraints. The coefficients and number of variables and inequalities have polynomial size in $L$. A feasible point is an equilibrium because all positive probabilities are on best responses. The compression lemma guarantees a feasible pair of support sets. The number of pairs is at most a constant, depending on $(r,s)$, times $m^{s+1}n^{r+1}$. There are no bilinear constraints in this feasibility test. Zero ranks and zero entries cause no failure. This is a condition on the two separate ranks, not on $\operatorname{rank}(A+B)$.
+\end{proof}
+
+\subsection{The disproof track: exactly what conditional hardness proves}
+Assume the ETH-for-PPAD hypothesis in \cite{c72-rub}. If the requested PTAS existed, choose a fixed rational accuracy no larger than the hard constant in its Theorem 1.2. The polynomial-input-length instances produced by that reduction would then be solvable in a fixed polynomial in $N$. This contradicts its $N^{\log^{1-o(1)}N}$ lower bound. Thus that hypothesis implies that the requested PTAS does not exist. The present report does not prove the hypothesis and consequently does not turn this implication into an unconditional disproof.
+
+\section{VERIFICATION}
+\paragraph{Small cases and reproducible search.}
+One-action games are solved by choosing the other player's best pure action. The reported computation exhaustively checks all $2^8=256$ binary-payoff $2\times2$ bimatrix games. It enumerates both players' denominator-two distributions, evaluates regrets by integer arithmetic, and finds an exact equilibrium in every case; 254 of these games have a pure equilibrium. Pseudocode is: enumerate matrices, enumerate denominator-two marginals, compute both pure-deviation gains, and retain the minimum. These small successes neither imply a support bound independent of dimension nor a PTAS.
+
+\paragraph{Adversarial checks.}
+Sampling from an unknown equilibrium is only an existence argument; exhaustive enumeration is what makes the algorithm constructive. Simultaneous coordinate concentration is needed: checking only the sampled actions would miss an unsampled profitable deviation. Support compression preserves the entire vectors $Ay$ and $x^TB$, not just equilibrium payoffs. The rank algorithm's exponent depends on the structural ranks. Finally, no limiting process or numerical tolerance is used in candidate verification, and no unproved complexity separation is used in the unconditional upper bounds.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+The unrestricted deterministic PTAS assertion is neither proved nor unconditionally disproved here.
+
+\paragraph{Strongest checked partial result.}
+There is a deterministic $\exp(O(\varepsilon^{-2}(\log L)^2))$-time approximation algorithm, and a polynomial-time exact algorithm when both separate payoff-matrix ranks are fixed. Under the explicitly stated ETH-for-PPAD assumption, no PTAS exists.
+
+\paragraph{Exact first gap.}
+No deterministic procedure is supplied that finds successful $O(\varepsilon^{-2}\log(m+n))$-sized empirical supports in $L^{O_\varepsilon(1)}$ time without quasipolynomial enumeration; nor is an unconditional lower bound against all such procedures proved.
+
+\paragraph{Three next moves.}
+(1) Seek a polynomial-time separation or search oracle for the simultaneous empirical best-response inequalities. (2) Identify a parameter weaker than the two separate ranks for which the support-feasibility systems admit efficient search. (3) Either reduce the current conditional hardness assumption to an established separation or construct a PTAS that demonstrates the hypothesis fails. A support lower bound alone does not accomplish the third task.
+
+\paragraph{What a counterexample would mean.}
+There is no single finite game witnessing nonexistence of an approximation scheme: every instance has a rational approximate equilibrium. A negative solution must be an algorithmic lower-bound argument for an unbounded family, including its encoding and its quantification over algorithms.
+
+\begin{thebibliography}{9}
+\bibitem{c72-lmm} R. J. Lipton, E. Markakis, and A. Mehta. \emph{Playing large games using simple strategies}. EC 2003. \url{https://doi.org/10.1145/779928.779933}.
+\bibitem{c72-rub} A. Rubinstein. \emph{Settling the complexity of computing approximate two-player Nash equilibria}. arXiv:1606.04550, Theorem 1.2. \url{https://arxiv.org/abs/1606.04550}.
+\bibitem{c72-gol} N. Golowich. \emph{The Fine-Grained Complexity of Approximate Nash Equilibrium and Free Games}. arXiv:2609.07136v2, September 2026. \url{https://arxiv.org/html/2609.07136v2}.
+\end{thebibliography}
+
+\end{document}

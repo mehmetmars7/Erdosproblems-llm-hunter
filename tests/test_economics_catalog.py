@@ -231,6 +231,22 @@ class EconomicsCatalogueTests(unittest.TestCase):
         update_economics_ranks(self.write_ranks('Problem ID,New rank\nC73-1,3\nC72-2,2\nC72-3,1\n'), self.root)
         self.assertEqual(len(build_economics_data(self.root)[target['id']]['attacks']), 2)
 
+    def test_pdf_title_layout_does_not_leak_into_public_attempt_heading(self):
+        target = self.imported()['problems'][0]
+        path = self.write_attempt(target)
+        source = path.read_text().replace(
+            r'\begin{document}',
+            r'\title{\textbf{Research note}\\[5pt]' + '\n'
+            + r'\large Complete proof and remaining gap}' + '\n'
+            + r'\begin{document}\maketitle')
+        path.write_text(source)
+        attempt = generate_economics_data(self.root)[target['id']]['attacks'][0]
+        self.assertIn(r'\section*{\textbf{Research note} Complete proof and remaining gap}',
+                      attempt['raw'])
+        self.assertNotIn(r'\\[5pt]', attempt['raw'])
+        self.assertNotIn(r'\large', attempt['raw'])
+        self.assertEqual((self.root / 'docs' / attempt['download_url']).read_text(), source)
+
     def test_attempt_identity_and_explicit_status_are_required(self):
         target = self.imported()['problems'][0]
         path = self.write_attempt(target)

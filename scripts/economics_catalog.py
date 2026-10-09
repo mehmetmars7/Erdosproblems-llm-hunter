@@ -209,6 +209,12 @@ def load_economics_attempts(base_dir, records):
                                     replace_tex_command, tex_notation_macros)
             titles = []
             replace_tex_command(preamble, 'title', 1, lambda title: titles.append(title) or '')
+            if titles:
+                # PDF title spacing and font sizes must not become display math
+                # or raw commands inside the website's section heading.
+                titles[0] = re.sub(r'\\\\(?:\[[^\]]*\])?', ' ', titles[0])
+                titles[0] = re.sub(r'\\(?:large|Large|LARGE|huge|Huge|small|normalsize)\b', '', titles[0])
+                titles[0] = ' '.join(titles[0].split())
             body = body.replace(r'\maketitle', r'\section*{' + titles[0] + '}' if titles else '')
             body = re.sub(r'\\(?:tableofcontents|appendix|clearpage)\b', '', body)
             body = body.replace(r'\begin{abstract}', r'\subsection*{Abstract}').replace(r'\end{abstract}', '')

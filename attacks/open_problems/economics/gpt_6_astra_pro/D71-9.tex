@@ -1,0 +1,206 @@
+% ECONOMICS_PROBLEM: {"id": "D71-9", "title": "The optimal randomized ordinal metric-distortion constant", "jel_code": "D71", "source_id": "OP-0227"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem}
+\usepackage{microtype}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Reg}{Reg}
+\DeclareMathOperator{\supp}{supp}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\allowdisplaybreaks[2]
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\small Open Problems Econ}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\hypersetup{pdfauthor={GPT 6 Astra Pro},pdfsubject={Checked partial results and explicit remaining gaps}}
+
+\fancyhead[L]{\small\texttt{D71-9} -- Research attempt}
+\title{Research attempt: \texttt{D71-9}\\[5pt]\large Optimal randomized ordinal metric distortion}
+\author{GPT 6 Astra Pro}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Scope of this report.} The main target remains UNRESOLVED. Fully proved subclaims and counterexamples are identified locally. Computational checks reported here are supplementary to the proofs. Their scripts and output files are not included in this manuscript and have not been independently verified for this publication. No novelty or priority claim is made.\par
+\section{FORMAL RESTATEMENT}
+For each $n\geq1$ and $m\geq2$, let $V$ be $n$ labeled voters and $C$ be $m$ labeled candidates. A profile $P$ assigns each voter a strict total ranking of the candidates. A randomized ordinal rule assigns $q(P)\in\Delta(C)$ using only these rankings. There is no strategyproofness, computational-efficiency, anonymity, or neutrality requirement.
+
+A compatible pseudometric $d$ on the disjoint union $V\sqcup C$ is nonnegative, symmetric, zero on the diagonal, and satisfies every triangle inequality. Distinct points may have zero distance. If voter $v$ ranks $a$ above $b$, compatibility requires $d(v,a)\leq d(v,b)$; reported strict rankings are allowed to break metric ties. Put $\mathrm{SC}_d(c)=\sum_{v\in V}d(v,c)$. A distortion bound $D$ means
+\[
+ \forall n,m,P\ \forall d\text{ compatible with }P:\qquad
+ \sum_{c\in C}q_c(P)\mathrm{SC}_d(c)
+ \leq D\min_{a\in C}\mathrm{SC}_d(a).
+\]
+This multiplicative inequality, rather than an undefined ratio, handles zero optimum. Define $D(R)$ as the least such bound for a rule $R$, allowing $+\infty$, and
+\[
+ D^*=\inf_R D(R).
+\]
+The main target is the exact numerical value of $D^*$, with a matching rule and a lower-bound construction. We separately prove that some rule attains the infimum, but this does not determine the number.
+
+\paragraph{Hygiene.}
+Weak metric consistency despite strict ordinal reports is deliberate and matches the problem statement. Restricting to Euclidean embeddings, requiring strict distance inequalities, or excluding zero optima would change the formal domain. Candidate and voter labels can be placed in canonical finite sets, so the collection of finite profiles is countable. One voter always admits distortion 1 by choosing its first-ranked candidate.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Charikar and Ramakrishnan disprove the general randomized-distortion-2 conjecture and establish a lower bound approaching $2.1126$ \cite{d71-cr}. Cai and coauthors' 8 September 2026 preprint reports an upper bound $2.13713$ and states the lower bound as $2.11264$ \cite{d71-cai}. Thus the recent reported interval is $[2.11264,2.13713]$, not a solved exact constant. The numerical certificate underlying the recent upper bound is not reproduced here. Our exact results below concern the two-candidate case, fixed-profile linear programming, and attainment of the unrestricted infimum. Sources checked through 9 October 2026.
+
+\section{ATTACK PLAN}
+\paragraph{Proof strategies.}
+Prove a uniform coarse bound to obtain compact feasible sets; solve the two-candidate tradeoff exactly; then express each finite profile's best lottery through the rational cone of compatible pseudometrics. This gives exact finite problems and a precise remaining supremum.
+
+\paragraph{Disproof strategies.}
+Use two indistinguishable line metrics to force opposite optimal choices; search small ranking profiles by robust linear programming; and test zero-optimum and unbounded metric directions that would invalidate a normalized ratio formulation. The two-candidate lower bound succeeds exactly but does not close the known multi-candidate gap.
+
+\paragraph{Landscape and tools.}
+This is ordinal social choice and robust optimization. Triangle inequalities bound top-choice costs; random dictatorship supplies feasibility; two-point line metrics make lower bounds sharp; balancing affine losses finds an optimal lottery; compactness proves attainment; finite polyhedral-cone generation reduces infinitely many metrics to finitely many rays; and rational linear programming yields exact profilewise certificates.
+
+\section{WORK}
+\subsection{A uniform feasible bound, including zero optima}
+\begin{lemma}[Random dictatorship]
+Choose a voter uniformly and return its top candidate. This rule has distortion at most $3-2/n\leq3$.
+\end{lemma}
+\begin{proof}
+Let $c_v$ be voter $v$'s top candidate and fix any candidate $a$. For $u\ne v$, two triangle inequalities give
+$d(u,c_v)\leq d(u,a)+d(a,v)+d(v,c_v)$. Consequently
+\begin{align*}
+ \mathrm{SC}(c_v)
+ &\leq\mathrm{SC}(a)+(n-2)d(v,a)+n d(v,c_v)\\
+ &\leq\mathrm{SC}(a)+(2n-2)d(v,a),
+\end{align*}
+since compatibility implies $d(v,c_v)\leq d(v,a)$. Average this inequality over $v$ to obtain
+$\E\mathrm{SC}(c_v)\leq(3-2/n)\mathrm{SC}(a)$.
+It holds for every $a$, so choose a minimum-cost candidate. The proof never divides by its cost; if that cost is zero the returned expected cost is zero. When $n=1$ the same formula gives 1.
+\end{proof}
+
+\subsection{Exact solution for two candidates}
+Suppose the candidates are $a,b$, with $s$ voters ranking $a$ above $b$ and $t=n-s$ ranking $b$ above $a$.
+
+\begin{theorem}[Profilewise optimum with two candidates]
+If $s,t>0$, the optimal probability of $a$ is
+\[
+ q^*=\frac{s^2}{s^2+t^2},
+\]
+and the exact least distortion attainable at this ordinal profile is
+\[
+ d_P=1+\frac{2st}{s^2+t^2}\leq2.
+\]
+If one side is empty, choosing the unanimously preferred candidate gives $d_P=1$. In particular the best worst-case distortion among all two-candidate profiles is exactly 2.
+\end{theorem}
+\begin{proof}
+Let $\Delta=d(a,b)$. Each voter who prefers $b$ satisfies
+$\Delta\leq d(v,a)+d(v,b)\leq2d(v,a)$, so $\mathrm{SC}(a)\geq t\Delta/2$. Each voter preferring $a$ satisfies $d(v,b)-d(v,a)\leq\Delta$, while the difference for a voter preferring $b$ is nonpositive. Thus
+\[
+ \mathrm{SC}(b)-\mathrm{SC}(a)\leq s\Delta
+ \leq\frac{2s}{t}\mathrm{SC}(a).
+\]
+The exchanged inequalities give
+$\mathrm{SC}(a)-\mathrm{SC}(b)\leq(2t/s)\mathrm{SC}(b)$.
+For a lottery choosing $a$ with probability $q$, its factor relative to whichever candidate is optimal is therefore at most
+\[
+ 1+\max\left\{\frac{2(1-q)s}{t},\frac{2qt}{s}\right\}.
+\]
+If an optimal social cost is zero, the same inequalities imply the other is also zero when $s,t>0$, so the multiplicative statement remains valid.
+
+Both terms are attained by compatible line pseudometrics. To make $a$ optimal, place $a$ at 0 and $b$ at 1, place its $s$ supporters at 0, and place the $t$ supporters of $b$ at $1/2$. The latter voters break their distance tie in favor of $b$, as permitted. Costs are $t/2$ and $s+t/2$, giving precisely the first excess factor. Interchange the two sides to attain the second. Thus the displayed maximum is the exact worst-case excess for each $q$.
+
+Its first term decreases linearly in $q$ and its second increases linearly. A minimum is obtained at their intersection, because to either side the larger term can be decreased by moving toward the intersection. Solving $(1-q)s/t=qt/s$ gives $q^*=s^2/(s^2+t^2)$ and the stated value. Since $(s-t)^2\geq0$, $2st\leq s^2+t^2$, with equality at a balanced profile. For unanimity, the unanimously top candidate has weakly lower cost than its opponent in every compatible metric, and a metric with positive equal candidate costs shows that a bound below 1 is impossible. The balanced $n=2$ example proves the global two-candidate lower bound 2.
+\end{proof}
+
+\subsection{Attainment of the unrestricted optimum}
+For a fixed finite profile $P$, define its feasible set
+\[
+ \mathcal F_P=\left\{(q,D)\in\Delta(C)\times[0,3]:
+ \sum_cq_c\mathrm{SC}_d(c)\leq D\mathrm{SC}_d(a)
+ \quad\forall d\sim P,\ \forall a\in C\right\}.
+\]
+Testing every $a$ is equivalent to testing the minimum social cost.
+
+\begin{theorem}[An optimal unrestricted rule exists]
+For each finite profile $P$, $d_P=\min_{(q,D)\in\mathcal F_P}D$ exists. Moreover
+\[
+ \boxed{\quad D^*=\sup_{\text{finite profiles }P}d_P,\quad}
+\]
+and a single ordinal rule attains $D^*$.
+\end{theorem}
+\begin{proof}
+For each fixed $d,a$, the defining inequality is closed and linear in $(q,D)$. Hence $\mathcal F_P$ is a closed subset of the compact set $\Delta(C)\times[0,3]$. It is nonempty by random dictatorship. Continuity of the $D$ coordinate implies its minimum is attained. Among all optimal lotteries at $P$, choose the lexicographically least one in a fixed candidate order: minimize the first coordinate on that compact set, then the second on the resulting compact subset, and so on. This defines a unique $q_P$ without any randomization over rules.
+
+Set $R^*(P)=q_P$ for every canonical finite profile. Each such lottery satisfies its cost inequality with $d_P$, so the rule has distortion at most $\sup_Pd_P$. Conversely, any rule restricted to a fixed profile must have distortion at least $d_P$; taking the supremum over profiles proves $D(R)\geq\sup_Pd_P$ for every $R$. Thus equality holds for $R^*$ and for the infimum over rules. Arbitrary finite labels can be put into canonical order. This proof imposes no computational bound, consistent with the input.
+\end{proof}
+
+\subsection{A finite rational linear programme at each profile}
+\begin{theorem}[Exact finite-profile formulation]
+For each fixed finite ordinal profile, $d_P$ and some optimal lottery are rational and can be computed by a finite rational linear programme after enumerating a finitely generated compatible-metric cone.
+\end{theorem}
+\begin{proof}
+Introduce one variable $d_{uv}$ for each unordered pair of distinct points in $V\sqcup C$. Symmetry and diagonal zeros are thereby automatic. Nonnegativity, all triangle inequalities, and all ordinal-consistency inequalities are a finite collection of homogeneous linear inequalities with integer coefficients. Their solution set $\mathcal C(P)$ is a rational polyhedral cone. It is pointed: both $d$ and $-d$ can be nonnegative only when $d=0$.
+
+The finite-generation theorem for polyhedral cones states that a pointed cone defined by finitely many rational homogeneous linear inequalities is generated by finitely many rational extreme rays. One constructive justification is to intersect its nonzero vectors with $\sum_{u<v}d_{uv}=1$. Nonnegativity makes this section bounded; it is a rational polytope, whose finitely many vertices are rational solutions of active linear constraints. Every point in a bounded polytope is a convex combination of its vertices: if a point is not a vertex, move in a nonzero direction preserving its active constraints until additional constraints become tight, express it as a convex combination of the two endpoints, and induct on the dimension of its minimal face. Rescaling those vertices generates the original cone. The zero cone needs no nonzero generators.
+
+Let these generators be $d^1,\ldots,d^L$, and define $s_c^\ell=\mathrm{SC}_{d^\ell}(c)$. The finite linear programme is
+\begin{align*}
+ \text{minimize }&D\\
+ \text{subject to }&q\geq0,\quad\sum_cq_c=1,\quad0\leq D\leq3,\\
+ &\sum_cq_cs_c^\ell\leq D s_a^\ell
+       \quad(1\leq\ell\leq L,\ a\in C).
+\end{align*}
+Necessity follows by evaluating each compatible ray. For sufficiency, every compatible pseudometric is a nonnegative linear combination of the rays. For each \emph{fixed} candidate $a$, add its ray inequalities with those coefficients. This gives the required inequality at the combined metric; holding it for every $a$ gives the minimum-cost formulation. Thus this LP is exactly $\mathcal F_P$, not a relaxation. Rays with $s_a^\ell=0$ are retained and force any chosen lottery's corresponding cost to be zero, handling zero-optimum directions explicitly.
+
+The feasible region in $(q,D)$ is a nonempty bounded rational polytope. A linear objective attains its minimum on a face containing a rational vertex, so an optimal $q$ and $d_P$ are rational. Enumeration of active constraint systems followed by rational feasibility and optimization gives a finite exact algorithm. Its complexity need not be polynomial in $n,m$ and no such claim is made.
+\end{proof}
+
+\paragraph{What this reduction does not accomplish.}
+The global problem is now the exact value of a supremum over unbounded numbers of voters and candidates of these rational profilewise optima. A supremum of rational numbers need not be rational or attained by one finite profile. The existence of an optimal rule and exact finite LPs therefore does not itself close the numerical interval in the literature.
+
+\section{VERIFICATION}
+The reported exact computation checks the two-candidate formula on 230 profiles, including unanimous ones, with integer support counts and total voters at most 20. The computation also solves four small robust metric LPs with floating-point linear programming as exploratory checks. The returned examples include the balanced two-candidate profile with value 2, a $2$-to-$1$ split with value $1.8$, a three-candidate cyclic three-voter profile with numerical value 2, and one four-voter three-candidate profile with numerical value about $1.90909$. The last two are \emph{not} supplied as exact certified bounds. They do not improve either published global bound.
+
+Pseudocode for exact verification is: construct all metric and ranking inequalities; intersect the nonnegative cone with total distance 1; enumerate rational vertices; form the displayed lottery LP; solve it with rational arithmetic and check every inequality. For the two-candidate test the analytic formula and rational line witnesses avoid cone enumeration. The included exploratory implementation instead dualizes normalized adversarial metric LPs and uses SciPy; its floating-point outputs are not substituted for the exact theorem.
+
+All proofs allow coincident voter/candidate points and tied distances. The lower-bound line metrics satisfy the problem statement's weak consistency, not an unstated strict condition. Zero-cost instances are covered without division. Compactness is applied to the finite-dimensional lottery simplex at each fixed profile, not to an unjustified compact space of all metrics. No anonymity or neutrality is smuggled into the rule class.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED} for the exact unrestricted numerical value $D^*$.
+
+\paragraph{Strongest checked partial results.}
+The exact two-candidate optimum is 2, with profilewise lottery $q=s^2/(s^2+t^2)$. A globally optimal rule exists, and every fixed finite profile has an exact rational LP and an optimal rational lottery. The coarse self-contained bound is $2\leq D^*\leq3$; the substantially tighter reported literature interval is contextual and is not re-proved by this package.
+
+\paragraph{Exact first gap.}
+Determine the exact supremum $\sup_P d_P$ over arbitrary finite $n,m$, by a single matching universal upper-bound argument and a lower-bound family. No such equality is established here.
+
+\paragraph{Three next moves.}
+(1) Extract exact dual certificates from structured multi-candidate profiles near the known lower-bound families. (2) Identify extremal ray patterns that can be bounded uniformly in the number of voters and candidates. (3) Seek a matching analytic bound for the stable-lottery construction or a strictly stronger lower-bound family, retaining zero-optimum metric directions in both analyses.
+
+\paragraph{Minimal obstruction structure.}
+Any profile forcing distortion strictly above 2 must have at least three candidates, by the exact two-candidate theorem. A sequence approaching the global optimum may require growing profile size; no finite worst profile is presumed. The existence of a rule attaining the global infimum is already settled here independently of whether the worst profile is attained.
+
+\begin{thebibliography}{9}
+\bibitem{d71-cr} M. Charikar and P. Ramakrishnan. \emph{Metric Distortion Bounds for Randomized Social Choice}. arXiv:2111.03694, SODA 2022. \url{https://arxiv.org/abs/2111.03694}.
+\bibitem{d71-cai} Z. Cai, M. Charikar, J. Hastings, P. Ramakrishnan, K. Wang, and Q. Ye. \emph{Stable Voting Rules on the Edge of Optimal Metric Distortion}. arXiv:2609.08259, September 2026. \url{https://arxiv.org/html/2609.08259v1}.
+\end{thebibliography}
+
+\end{document}
