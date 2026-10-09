@@ -1,0 +1,85 @@
+% ECONOMICS_PROBLEM: {"id": "C78-369", "title": "Parameterized computation of a reachable Pareto-optimal allocation", "jel_code": "C78", "source_id": "OP-0552"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Parameterized computation of a reachable Pareto-optimal allocation: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The target is a globally Pareto-optimal member of the set of allocations reachable from the initial endowment by mutually beneficial network swaps, together with a legal sequence. This attempt proves fixed-parameter algorithms for a supplied set of permitted traders and for maximum connected-component size, and a polynomial solution when every acceptable list has length at most two. These are exact results for stated restrictions, not a full complexity classification. In particular, no treewidth-only algorithm or hardness result for every proposed parameter is claimed.
+
+The matching survey \cite{survey} formulates the reachable-set question, and the original network-swap paper \cite{swaps} studies this model. Both primary sources were opened. A locally terminal allocation need not dominate allocations reached on other branches, so the algorithm below searches the entire relevant reachable set before choosing an outcome.
+
+\section*{A finite acyclic state graph}
+For applicant $a$, let $r_a(h)$ be its strict rank of acceptable house $h$, with smaller ranks better. Every legal swap strictly decreases both participants' ranks. Define
+\[
+ \Phi(M)=\sum_a r_a(M(a)).
+\]
+A swap reduces this integer by at least two. If there are $n$ applicants and all lists have length at most $n$, every legal sequence has length at most $n(n-1)/2$. With individual list lengths $\ell_a$, the sharper upper bound is $\frac12\sum_a(\ell_a-1)$. These are bounds on path length, not on the number of branches: an exponentially large reachable set remains possible.
+
+A state graph has an allocation at each vertex and an arc for every legal swap. Breadth-first search from $M_0$ enumerates precisely the reachable vertices. Store the predecessor and swapped pair upon first discovery of each vertex. Once the reachable graph is enumerated, choose a vertex minimizing $\Phi$. If a reachable allocation Pareto improved it, at least one rank would strictly decrease and none would increase, contradicting minimality. Predecessors reconstruct a legal sequence. Strict preferences are essential to this simple integer argument; ties require a suitably modified objective and Pareto definition.
+
+\section*{A supplied set of permitted traders}
+Suppose the instance specifies a set $K$ of $k$ applicants who alone may participate in swaps. The remaining applicants keep their endowed houses. The only houses that ever move are the $k$ endowed to $K$, so there are at most $k!$ possible states. Precompute rank comparisons, enumerate at most $\binom k2$ possible exchanges per state, and reject pairs not adjacent in $G$ or not mutually improving.
+
+\begin{proposition}[Fixed-parameter search with a trader set]
+A globally Pareto-optimal allocation relative to the permitted-swap reachable set and a witnessing legal sequence can be found in
+\[
+ O(k!\,k^2\operatorname{poly}(k)+|I|^c)
+\]
+time and $O(k!\operatorname{poly}(k)+|I|)$ space for a fixed constant $c$.
+\end{proposition}
+\begin{proof}
+The state-space bound follows from permutation of the endowed houses of $K$. Breadth-first search visits all and only states connected by permitted legal swaps. The rank-sum minimum cannot have a reachable strict Pareto improvement by the preceding argument. Outsiders' assignments are constant, so optimizing over the active coordinates is equivalent to the whole-population Pareto test. Parent pointers give the required certificate.
+\end{proof}
+
+The quantifiers matter. If the input merely asks whether some unknown set of at most $k$ applicants can implement a desired outcome, enumerating all $\binom nk$ subsets gives an $n^{O(k)}$ procedure, which is XP rather than FPT. Nor does selecting the best allocation among sequences involving at most $k$ traders prove Pareto optimality against sequences with more traders. The result above concerns a restriction of which applicants are permitted to exchange, as explicitly contemplated by the catalogue.
+
+\section*{A less direct structural parameter}
+Let $c$ be the largest number of vertices in a connected component of the social network. Houses cannot cross components. A global allocation is reachable if and only if its restriction to each component is reachable in that component: project a global sequence for necessity, and concatenate component sequences for sufficiency.
+
+Independently enumerate each component's reachable allocations and minimize the component rank sum. The product allocation is globally Pareto optimal. Indeed, a global reachable Pareto improvement would restrict to a weak improvement in every component and a strict improvement in at least one, contradicting that component's optimality. The concatenation of the stored component paths supplies a legal global sequence. The total time is bounded by
+\[
+ O(n\,c!\,c^2\operatorname{poly}(c)+|I|^{c_0})
+\]
+for a constant $c_0$; the unrelated exponent symbol is fixed, not the component parameter. Thus maximum component size is an FPT parameter even though the whole network may contain arbitrarily many applicants. Treewidth bounds do not imply bounded component size, so this result does not conflict with hard instances on trees.
+
+\section*{Lists of length at most two}
+Assume every initial endowment is acceptable and every acceptable list has at most two houses. An applicant initially holding its first choice can never participate in a legal swap. An applicant initially holding its second choice can only improve by receiving its unique first choice, after which it can never swap again.
+
+\begin{proposition}[Disjoint improvements]
+Under these assumptions all possible legal swaps are already recognizable at $M_0$, they are pairwise disjoint, and performing all of them produces a reachable allocation that Pareto dominates every reachable allocation.
+\end{proposition}
+\begin{proof}
+Every participant in any swap must not previously have swapped, since a previous swap gives its first choice. Therefore at the time of a legal exchange both houses are still the participants' original endowments. The pair must already have been adjacent and mutually prefer one another's endowed house at $M_0$. Each applicant has at most one house better than its endowment; that house has a unique initial owner. Hence it belongs to at most one mutually beneficial pair. These pairs are disjoint and their swaps do not interfere. Every reachable allocation performs a subset of these swaps, and performing the whole set weakly improves everyone and strictly improves any omitted pair.
+\end{proof}
+
+This yields a linear scan of network edges after rank preprocessing. Length three changes the argument: an applicant may improve twice, and the house desired for its second improvement can depend on earlier exchanges. The proof does not establish tractability at that next list length or FPT in arbitrary maximum list length.
+
+\section*{Verification and unresolved directions}
+All three algorithms explicitly return paths; simply returning a permutation with attractive ranks would omit the reachability requirement. Their correctness follows from exhaustive relevant-state coverage or, for two-house lists, an exact disjointness argument. The useful remaining targets include sharper parameters permitting large connected components, the boundary at longer lists, and parameterized hardness for precisely specified decision versions. The catalogue's broad classification remains unresolved by these restricted positive results.
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), Selected Open Problems in Matching Under Preferences, Section 3.1.3. Primary PDF inspected:
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{swaps} L. Gourv\`es, J. Lesca and A. Wilczynski (2017), Object Allocation via Swaps along a Social Network, IJCAI. Primary proceedings record inspected:
+\url{https://www.ijcai.org/proceedings/2017/31}.
+\end{thebibliography}
+\end{document}

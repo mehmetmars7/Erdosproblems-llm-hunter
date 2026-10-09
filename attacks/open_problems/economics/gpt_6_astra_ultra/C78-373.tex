@@ -1,0 +1,99 @@
+% ECONOMICS_PROBLEM: {"id": "C78-373", "title": "A most-probably rank-maximal house allocation", "jel_code": "C78", "source_id": "OP-0549"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{A most-probably rank-maximal house allocation: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} A matching must be chosen before uncertain strict preferences are realized, and success means rank maximality in that realized profile. This attempt gives an exact integer program for an explicit joint scenario distribution, proves NP membership for its threshold decision problem, and derives exact algorithms under a bounded number of applicants or bounded disconnected components with independent preferences. It also constructs a three-applicant example showing that maximizing expected rank score solves a different problem. A full complexity classification for the catalogue's three representations is not established.
+
+The 2019 matching survey \cite{survey} proposes rank-maximality under uncertainty as a direction, rather than supplying the exact optimization theorem below. Its primary PDF was inspected. The present results do not assert novelty or certify that each restricted case is an open problem.
+
+\section*{Encoding lexicographic rank comparisons exactly}
+Let $n=|A|$, $R$ the maximum acceptable-list length, and choose base $B=n+1$. For scenario $s$, assign edge weight
+\[
+ w_s(a,h)=B^{R-r_s(a,h)}.
+\]
+For any feasible matching $M$, its score is
+$S_s(M)=\sum_{(a,h)\in M}w_s(a,h)$.
+If two rank vectors first differ at coordinate $r$, a one-unit advantage there contributes $B^{R-r}$, while all possible lower-coordinate losses are bounded by
+\[
+ n\sum_{j=r+1}^R B^{R-j}=B^{R-r}-1.
+\]
+Thus numerical comparison of these integer scores is exactly lexicographic rank comparison. The integers have bit length $O(R\log(n+1))$, polynomial in an explicit preference input. No cardinality objective is inserted ahead of rank one.
+
+For each strict scenario $s$, compute the deterministic maximum weight matching value $W_s$. A matching is rank maximal for that scenario exactly when $S_s(M)=W_s$. The deterministic subproblem is polynomial by standard weighted bipartite matching, including the option of unmatched applicants and houses.
+
+\section*{An exact formulation for explicit joint support}
+Suppose the input lists scenarios $s=1,\ldots,q$ with rational probabilities $p_s>0$ summing to one. Introduce a binary variable $x_{ah}$ for every acceptable edge and a binary success indicator $z_s$. Solve
+\[
+ \max\sum_{s=1}^q p_sz_s
+\]
+subject to
+\[
+ \sum_hx_{ah}\leq1\quad\forall a,\qquad
+ \sum_ax_{ah}\leq1\quad\forall h,\qquad
+ \sum_{(a,h)\in E}w_s(a,h)x_{ah}\geq W_sz_s\quad\forall s.
+                                                               \tag{1}
+\]
+All edge scores are nonnegative. If $z_s=0$, its score constraint is vacuous; if $z_s=1$, the matching must attain $W_s$, since no feasible matching can exceed it. Conversely any chosen matching allows $z_s=1$ in exactly its successful scenarios. Positive probabilities imply an optimum sets all available success indicators to one. Therefore (1) is exact and has polynomial encoding size in the explicitly listed joint distribution.
+
+It is an integer program, not a polynomial-time algorithm. Nevertheless it proves that the rational-threshold decision problem for explicit joint support lies in NP: a matching is a certificate, each $W_s$ is polynomially computable, and summing the listed probabilities for successful scenarios uses polynomial-bit rational arithmetic. This membership proof cannot be transferred unchanged to a succinct independent-lottery input whose joint support is exponentially large.
+
+\section*{Guaranteed positivity and enumeration bounds}
+Choose a deterministic rank-maximal matching for a scenario having largest probability. Its success probability is at least $\max_sp_s\geq1/q$. This bound requires only the explicit-support model and does not imply that the chosen matching is optimal; several scenarios may share a rank-maximal matching.
+
+If there are $n$ applicants, each with at most $\ell$ acceptable houses, enumerating assignments from its acceptable houses plus unmatched status uses at most $(\ell+1)^n$ candidates. Reject collisions and evaluate the remaining candidates. This is FPT in $(n,\ell)$; when the house count is bounded by $n$ after removing isolated houses, it is also FPT in $n$ alone. A bound on uncertain applicants by itself does not bound the number of deterministic applicants or their feasible matchings, so this enumeration does not prove the requested FPT result for that parameter alone.
+
+For independent explicit lotteries, multiplying each applicant's listed scenario probabilities evaluates any enumerated joint profile exactly; for independent uniform refinements, enumerate each tie block's permutations. These are correct exponential algorithms, but the product of support sizes or tie factorials can be exponential in the input. Their existence is not an efficient complexity classification.
+
+\section*{Disconnected components and independence}
+Form the bipartite acceptable-pair graph and decompose it into connected components. At a fixed strict profile, a global matching is rank maximal if and only if each component's matching is rank maximal within that component. If a component were improvable, replacing only it would lexicographically improve the global rank vector. Conversely, if each component is lexicographically optimal, their score maxima add, so the global score is maximal.
+
+If preferences are independent across these components, the success probability of a product matching factors as the product of component success probabilities. All factors are nonnegative, and each component has some positive-probability success matching. Maximizing separately in each component is therefore globally optimal. If each component contains at most $c$ applicants and $c$ houses, and its local profile support can be enumerated in $f(c)\operatorname{poly}(|I|)$ time, exhaustive local optimization gives an FPT algorithm in $c$. For uniform refinements the number of local strict profiles is at most $(c!)^c$, which is such a function. For explicit individual lotteries, duplicate strict orders can first be combined, leaving at most $c!$ distinct orders per applicant.
+
+An arbitrary joint distribution can correlate component successes, so optimizing each marginal probability need not maximize the probability of their intersection. Component size alone does not justify the product algorithm in that representation.
+
+\section*{Expected score gives the wrong objective}
+There are three applicants and three houses $x,y,z$, all acceptable. Applicants 1 and 2 have the same preferences $x\succ y\succ z$ in both scenarios. Applicant 3 has $x\succ z\succ y$ in scenario 1, of probability $.6$, and $y\succ x\succ z$ in scenario 2, of probability $.4$. Encode ranks using $B=4$. For the six perfect allocations, recorded as the houses of applicants 1, 2, 3, the score and success calculations are
+\[
+\begin{array}{c|rr|r|r}
+M&S_1&S_2&\Pr(\text{rank maximal})&\E S\\\hline
+(x,y,z)&24&21&.6&22.8\\
+(x,z,y)&18&33&.4&24\\
+(y,x,z)&24&21&.6&22.8\\
+(y,z,x)&21&9&0&16.2\\
+(z,x,y)&18&33&.4&24\\
+(z,y,x)&21&9&0&16.2
+\end{array}
+\]
+The maximum scores are 24 in the first scenario and 33 in the second. Maximizing expected score selects the second or fifth row, both succeeding with probability $.4$. Maximizing success probability selects the first or third row, succeeding with probability $.6$. Since every partial matching can be extended in a complete balanced market and all added edge scores are positive, no partial matching overturns the calculation. Exhaustive enumeration of all six assignments verified these numbers.
+
+The difference is substantive: expected score rewards how well a matching performs even when it misses the scenario optimum, and weights numerical score gaps. The original objective records only whether that optimum is reached. Lexicographic encoding is appropriate for testing each realized success event, but averaging its score before optimization changes the loss function.
+
+\section*{Remaining work}
+The exact formulation and structural algorithms are usable partial results. The verified example rules out a tempting reduction to expected rank score. Hardness for succinct lotteries, bounded uncertainty and small ties, as well as precise counting complexity for evaluating a fixed matching, remains unresolved in this attempt. The positive-probability bound and exponential enumerations establish existence and computability without implying a polynomial algorithm for the general input classes.
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), Selected Open Problems in Matching Under Preferences, Sections 2.1 and 3.1.2. Primary PDF inspected:
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\end{thebibliography}
+\end{document}
