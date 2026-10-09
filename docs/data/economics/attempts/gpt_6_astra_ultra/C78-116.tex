@@ -1,0 +1,145 @@
+% ECONOMICS_PROBLEM: {"id": "C78-116", "title": "Complexity-class membership of general supermatch existence", "jel_code": "C78", "source_id": "OP-0559"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Repair optimization and an exact family of supermatches}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C78-116}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\begin{abstract}
+The stable-marriage repair problem for a specified failed set is a linear optimization problem over a face of the stable-matching polytope. This gives a second-level polynomial-hierarchy upper bound for general supermatch existence, without claiming NP membership. A fully explicit family of disconnected alternating cycles has an exact robustness formula. For roommates we give a separate third-level upper bound that handles the non-fixed-pair qualification without an unproved fixed-pair oracle.
+\end{abstract}
+\section{Question and counting convention}
+In a strict acceptable-list matching instance, all listed partners are preferred to remaining unmatched. A matching is stable if no acceptable pair strictly prefers each other to their assigned partners. Write $\mathcal S(I)$ for the stable matchings. A pair is fixed if it is in every member of $\mathcal S(I)$. For stable $M$, let $B(M)$ be its non-fixed pairs. The requested condition is
+\[
+ \forall F\subseteq B(M),\ |F|=a,\quad
+ \exists N\in\mathcal S(I):\quad N\cap F=\varnothing,
+ \quad |M\setminus N|\le a+b. \tag{1}
+\]
+Both $a\ge1$ and $b\ge0$ are input integers. Only removed original pairs are counted. If $|B(M)|<a$, condition (1) is vacuous. The published survey explicitly distinguishes the general NP-membership question from one-failure results \cite{Survey,Genc}.
+
+\section{A repair oracle for strict bipartite matching}
+Let $E\subseteq U\times W$ be the acceptable graph. For $e=uw$, write $E_u^{>w}$ for edges incident to $u$ whose woman is preferred to $w$, and analogously $E_w^{>u}$. Consider
+\begin{align*}
+ x_e&\ge0 &&(e\in E),\\
+ \sum_{e\ni v}x_e&\le1 &&(v\in U\cup W),\\
+ x_{uw}+\sum_{e\in E_u^{>w}}x_e+
+              \sum_{e\in E_w^{>u}}x_e&\ge1 &&(uw\in E).
+\end{align*}
+We use the classical stable-marriage polytope theorem: for strict bipartite preferences with unacceptable pairs omitted, this polytope is the convex hull of the incidence vectors of stable matchings. This is an established input from the linear-programming theory of stable marriage \cite{RRV}, not a theorem first proved here. In particular its extreme points are integral, and linear optimization with rational objectives is polynomial-time.
+
+\begin{proposition}[Optimal repair as a face optimization]
+For any stable matching $M$ and any subset $F\subseteq M$, the minimum repair cost is
+\[
+ d(M,F)=|M|-\max\left\{\sum_{e\in M}x_e:
+                    x\text{ satisfies the displayed system},\ x_e=0\ (e\in F)\right\}.
+\]
+An infeasible maximization means $d(M,F)=+\infty$. The value and an optimal integral repair can be computed in polynomial time. Moreover, whether a given pair $e\in M$ is fixed can be decided by one feasibility test of the same system with $x_e=0$.
+\end{proposition}
+\begin{proof}
+Because all coordinates are nonnegative, intersecting with $x_e=0$ for $e\in F$ selects a face. Equivalently, if a convex combination of stable-matching vectors has zero in a coordinate, every positive-weight member has zero there. Thus this face is exactly the convex hull of stable matchings avoiding $F$. Maximizing the retained original pairs is the same as minimizing $|M\setminus N|$. The objective is integral on vertices; polynomial-time rational linear programming followed, if necessary, by successive coordinate optimization selects an integral vertex with this optimum. The one-edge feasibility statement is exactly the definition of non-fixedness.
+\end{proof}
+
+Removing the failed edges from the acceptable graph and running deferred acceptance would not implement this oracle. A failed edge remains an acceptable potential blocking pair in the original instance. The face construction keeps its original stability inequality.
+
+\begin{theorem}[Consequences for complexity]
+For strict bipartite marriage, verification of a proposed general $(a,b)$-supermatch is in coNP, and existence is in $\Sigma_2^P$. If $a$ is a fixed constant, verification is polynomial-time and existence is in NP.
+\end{theorem}
+\begin{proof}
+First verify stability of $M$ and compute $B(M)$ by the preceding proposition. Failure of (1) has a polynomial certificate: a set $F\subseteq B(M)$ of size $a$ with $d(M,F)>a+b$, where the last inequality is checked by the polynomial repair algorithm. This proves the coNP statement. Existence has the form $\exists M\,\forall F\,Q(I,M,F)$, where $Q$ is a polynomial-time predicate that accepts invalid failed sets and otherwise applies the repair test. This is membership in $\Sigma_2^P$ by its quantified-predicate definition. When $a$ is constant, enumerate at most $|M|^a$ sets and run the repair algorithm, giving a polynomial verifier for a guessed $M$.
+\end{proof}
+
+There is no NP conclusion for variable $a$ in this proof. Polynomial repair of one failed set does not compress the exponentially many possible failed sets.
+
+\section{A self-contained exact calculation on cycle components}
+For an integer $m\ge2$, make a component with men $u_1,\ldots,u_m$ and women $w_1,\ldots,w_m$, cyclic indices, and only the following acceptable lists:
+\[
+ u_i:\ w_i>w_{i+1},\qquad
+ w_i:\ u_{i-1}>u_i.
+\]
+Take a disjoint union of $q$ such components with sizes $m_1,\ldots,m_q$, and no cross-component acceptable pairs.
+
+\begin{lemma}[The two states of a component]
+The component of size $m$ has exactly two stable matchings,
+$M^0=\{u_iw_i:i=1,\ldots,m\}$ and
+$M^1=\{u_iw_{i+1}:i=1,\ldots,m\}$.
+They have no common pair.
+\end{lemma}
+\begin{proof}
+If a man $u_i$ were unmatched in a stable matching, the woman $w_{i+1}$, who ranks him first, and $u_i$ would block. Hence every man is matched and the matching is perfect. In a cycle, choosing one diagonal edge forces all diagonal edges; choosing one shifted edge forces all shifted edges. These are the only perfect matchings. The diagonal matching is stable because each man receives his first choice. The shifted matching is stable because each woman receives her first choice. The two edge sets are disjoint, including when $m=2$.
+\end{proof}
+
+Order the component sizes as $m_{(1)}\ge\cdots\ge m_{(q)}$ and let $L=\sum_jm_j$.
+\begin{theorem}[Exact robustness formula]
+Every stable matching of this union has $L$ non-fixed pairs. If $a>L$, all stable matchings satisfy (1) vacuously. If $1\le a\le L$, every stable matching has the same worst repair cost,
+\[
+ \max_{F\subseteq M,\ |F|=a}d(M,F)
+   =\sum_{j=1}^{\min(a,q)}m_{(j)}.
+\]
+Consequently the instance admits an $(a,b)$-supermatch exactly when the displayed sum is at most $a+b$, apart from the stated vacuous case.
+\end{theorem}
+\begin{proof}
+A global stable matching independently selects one of the two states in each component. To avoid even one of its current pairs in a component, a repair must switch to the other state and therefore loses all $m_j$ original pairs there. Switching each touched component and no other one is stable and avoids every failed pair. Hence $d(M,F)$ is precisely the sum of the sizes of touched components.
+
+An $a$-set touches at most $\min(a,q)$ components, so its cost is at most the stated sum. If $a\le q$, select one failed pair from each of the largest $a$ components. If $a>q$, select one from every component and distribute the remaining $a-q$ failures among their still available pairs; this is possible since $a\le L$. These choices attain the upper bound.
+\end{proof}
+
+For example, a single component of size three is $(2,1)$-robust under (1), since any two failures can be repaired by changing its three pairs. It is not robust under the alternative ``at most two failures, at most one additional pair'' convention: one failure would allow only two removals. Thus replacing ``exactly $a$'' by ``at most $a$'' while retaining a budget of $|F|+b$ changes the problem even in this elementary family.
+
+\section{Roommates and the remaining classification}
+For strict roommates the preceding bipartite polytope theorem does not apply. A safe upper bound can instead be obtained without assuming that fixed pairs are easy to recognize.
+\begin{proposition}[A direct roommates upper bound]
+General supermatch existence for strict roommates, with condition (1), belongs to $\Sigma_3^P$.
+\end{proposition}
+\begin{proof}
+Guess a stable $M$. Universally quantify a proposed size-$a$ subset $F\subseteq M$ and, for each $e\in F$, a proposed stable matching $Q_e$ avoiding $e$. These data have polynomial length because $a\le|M|$ whenever the failed set can be valid. If any subset condition or witness is invalid, accept this universal branch. Otherwise existentially supply a stable $N$ avoiding $F$ with $|M\setminus N|\le a+b$; stability and the two constraints are polynomial checks.
+
+If $F$ contains a fixed pair, there is no valid tuple of its $Q_e$, so all those branches are harmless. If every pair in $F$ is non-fixed, some valid tuple exists and that branch demands exactly the required repair. Thus the quantified formula is equivalent to (1), and has the form $\exists\forall\exists$ with a polynomial predicate. If $a>|M|$, there is no valid $F$ and the condition is correctly vacuous.
+\end{proof}
+
+These are upper bounds and an exact special family. No matching hardness result for variable $a$, no NP certificate for all general marriage instances, and no precise roommates classification has been established here. The use of the classical polytope theorem is explicit; the new work in this note is the reduction and the cycle-family calculation, without any claim of publication priority.
+\begin{thebibliography}{9}
+\bibitem{Survey} K. Cechl\'arov\'a, \ A. Cseh, and D. F. Manlove (2019).
+\emph{Selected open problems in Matching Under Preferences}, Section 3.3.2.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{Genc} B. Genc, M. Siala, G. Simonin, and B. O'Sullivan (2019).
+Complexity Study for the Robust Stable Marriage Problem.
+\emph{Theoretical Computer Science} 775, 76--92.
+\href{https://doi.org/10.1016/j.tcs.2018.12.017}{doi:10.1016/j.tcs.2018.12.017}.
+Author manuscript: \url{https://homepages.laas.fr/msiala/preprints/19-TCS.pdf}.
+\bibitem{RRV} A. E. Roth, U. G. Rothblum, and J. H. Vande Vate (1993).
+Stable matchings, optimal assignments, and linear programming.
+\emph{Mathematics of Operations Research} 18(4), 803--828. Section 6, stable-matching polytope.
+\url{https://web.stanford.edu/~alroth/papers/1993_MOR_StableMatchingsOptimal.pdf}.
+\end{thebibliography}
+
+\end{document}

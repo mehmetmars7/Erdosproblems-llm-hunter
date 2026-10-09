@@ -1,0 +1,139 @@
+% ECONOMICS_PROBLEM: {"id": "C21-101", "title": "Minimax rates for dose--response curves", "jel_code": "C21", "source_id": "OP-0528"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Oracle dose-response rates and an exact nuisance remainder}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C21-101}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{The restricted question}
+The target is $\theta(a)=\int\mu(a,x)p(x)dx$ on an interior dose interval $I=[\eta,1-\eta]$. Observations are independent $(X,A,Y)$, $|Y|\le M$, with a conditional dose density $c\le g\le C$. The catalogue's structural independence and continuity assumptions identify this version of the curve at every interior dose. The full question concerns arbitrary positive smoothness indices and unknown $g,p$.
+
+We establish both oracle minimax rates for $0<s=s_\mu\le1$ and derive a conditional risk inequality for an estimator using independently trained nuisance estimates. These results distinguish the one-dimensional smoothing cost from a remaining nuisance product. They do not settle the general unknown-nuisance minimax frontier. For lower bounds the class constants are assumed to contain a fixed neighborhood of the uniform design and a constant Bernoulli regression; otherwise a ball could be degenerate.
+
+\section{Oracle estimator and upper bounds}
+Partition $I$ into $J$ intervals of equal width $h=|I|/J$. For $a\in B_j$, when $g$ is supplied, define
+\[
+ \widehat\theta(a)=\frac1{nh}\sum_{i=1}^n
+ \frac{Y_i\ind\{A_i\in B_j\}}{g(A_i\mid X_i)}.
+\]
+Only the dose density is supplied; the covariate density is still unknown.
+
+\begin{theorem}[Oracle minimax rates for order at most one]
+For fixed $0<s\le1$, the oracle integrated squared minimax risk is of order $n^{-2s/(2s+1)}$. Its squared supremum minimax risk on $I$ is of order $(\log n/n)^{2s/(2s+1)}$. Constants may depend on the fixed model bounds and $I$, but not $n$.
+\end{theorem}
+\begin{proof}[Upper bounds]
+The expectation in bin $j$ is $\bar\theta_j=h^{-1}\int_{B_j}\theta(t)dt$, since the inverse conditional dose density cancels $g$. Marginalization preserves the $s$-H\"older bound in dose, so $|\bar\theta_j-\theta(a)|\le Lh^s$. The unscaled summand has absolute value at most $M/c$ and second moment at most $M^2h/c$. Hence each bin estimate has variance at most $M^2/(cnh)$. Integration gives
+\[
+ \E\|\widehat\theta-\theta\|_{2,I}^2
+ \le C_1\{h^{2s}+(nh)^{-1}\}.
+\]
+For the supremum, a bounded-summand exponential-moment argument yields
+\[
+ \Prob\left\{\max_j|\widehat\theta_j-\bar\theta_j|
+ >C_2\left(\sqrt{u/(nh)}+u/(nh)\right)\right\}
+ \le2Je^{-u}. \tag{1}
+\]
+One direct derivation bounds each centered summand's $k$th absolute moment by its variance times its absolute bound to power $k-2$, sums the exponential series, and applies exponential Markov; union bounding over bins gives (1). Taking $u=\log(2J)+v$ and integrating $e^{-v}$ proves
+\[
+ \E\|\widehat\theta-\theta\|_{\infty,I}^2
+ \le C_3\left\{h^{2s}+\frac{\log(2J)}{nh}
+ +\frac{\log^2(2J)}{n^2h^2}\right\}.
+\]
+Choose $h$ of order $n^{-1/(2s+1)}$ or $(\log n/n)^{1/(2s+1)}$, respectively, rounding $J$ to an integer. These prove the upper bounds.
+\end{proof}
+
+\section{Self-contained lower-bound constructions}
+After a fixed rescaling of outcome units if $M<1$, take $X,A$ independent uniform and $Y\mid A=a$ Bernoulli with probability $\theta(a)\in[1/4,3/4]$. Set $Y(a)=\ind\{U\le\theta(a)\}$ for one independent uniform $U$. Multiplying these outcomes and their target means by any fixed positive constant only changes the risk constants. This gives the required structural independence and continuous mean; the conditional mean is independent of $x$, and supplied densities $g=p=1$ carry no information about $\theta$.
+
+Fix a nonzero smooth bump $\phi$ supported in $(0,1)$, with maximum one. Put disjoint translated bumps $\phi_j(a)=\phi((a-a_j)/h)$ in an interior subinterval, with $J\asymp1/h$. At amplitude $\delta=\epsilon h^s$, all curves below satisfy the H\"older restrictions for small fixed $\epsilon$. For two Bernoulli probabilities in $[1/4,3/4]$, using $\log z\le z-1$ gives
+\[
+ \KL(\operatorname{Ber}(u),\operatorname{Ber}(v))
+ \le\frac{(u-v)^2}{v(1-v)}\le\tfrac{16}{3}(u-v)^2. \tag{2}
+\]
+Thus sample KL divergence is at most a constant times $n$ times squared $L^2$ distance of the regression curves.
+
+\begin{lemma}[Integrated lower bound]
+The above submodel has integrated minimax risk at least a constant times $n^{-2s/(2s+1)}$.
+\end{lemma}
+\begin{proof}
+Use $\theta_\omega=1/2+\delta\sum_{j=1}^J\omega_j\phi_j$, with independent signs $\omega_j\in\{-1,1\}$. Decode sign $j$ from the sign of $\int_{B_j}(\widehat\theta-1/2)\phi_j$. If the sign is wrong, Cauchy--Schwarz implies squared estimation error on this bin is at least $\delta^2h\int\phi^2$. Adjacent sign experiments have sample KL at most $C n\delta^2h$ by (2). Choose $h\asymp n^{-1/(2s+1)}$ and $\epsilon$ small, so their total variation is at most $1/2$. Here the inequality $\TV\le\sqrt{\KL/2}$ follows, for example, by mapping a density pair to the set where the first is larger, applying the log-sum inequality, and using binary KL $\ge2(u-v)^2$; the latter follows by differentiating twice in $u$.
+
+For each fixed configuration of other signs, the sum of the two testing errors is at least $1-\TV\ge1/2$. Averaging all signs gives error probability at least $1/4$ per bit. Sum the bin losses to get $cJ\delta^2h\asymp\delta^2$, as required.
+\end{proof}
+
+\begin{lemma}[Supremum lower bound]
+The same submodel has squared supremum minimax risk at least a constant times $(\log n/n)^{2s/(2s+1)}$.
+\end{lemma}
+\begin{proof}
+Use $J$ alternatives $\theta_j=1/2+\delta\phi_j$ and reference $\theta_0=1/2$. Distinct alternatives are separated by $\delta$ in supremum norm. Choose $h\asymp(\log n/n)^{1/(2s+1)}$ and small $\epsilon$, so (2) gives $\KL(P_j^{\otimes n},P_0^{\otimes n})\le(\log J)/8$ for all large $n$.
+
+For clarity the testing bound used here is as follows. Let $V$ be uniform on $\{1,\ldots,J\}$, with data law $P_V$. Its mutual information with the data is at most $J^{-1}\sum_j\KL(P_j,Q)$ for any reference law $Q$: subtracting the actual mixture-law KL leaves the nonnegative KL from the mixture to $Q$. For any decoder with error probability $p_e$, the conditional entropy of $V$ is at most $\log2+p_e\log J$. Indeed, condition additionally on whether the decoder is correct; the binary indicator has entropy at most $\log2$, and on error at most $J-1$ indices remain. Since $H(V)=\log J$, these facts imply
+\[
+ p_e\ge1-\frac{I(V;\text{data})+\log2}{\log J}\ge\tfrac12
+\]
+for all large $J$. Select the nearest alternative to any function estimator; a decoding error forces supremum estimation error at least $\delta/2$. Its average squared risk is consequently at least $\delta^2/8$. This proves the claim and finishes the lower bounds for Theorem 2.1.
+\end{proof}
+
+\section{The exact remainder when the density is estimated}
+Use a training sample independent of a validation sample of size $n$. Condition on trained functions $\widetilde\mu,\widetilde g$ satisfying $|\widetilde\mu|\le M$, $\widetilde g\ge c/2$. For bin $j$, set
+\[
+ Z_j(O)=\frac1h\int_{B_j}\widetilde\mu(t,X)dt+
+ \frac{\ind\{A\in B_j\}}{h\widetilde g(A\mid X)}
+ [Y-\widetilde\mu(A,X)],\qquad
+ \widetilde\theta_j=\frac1n\sum_i Z_j(O_i).
+\]
+Let $a_0=\|\widetilde\mu-\mu\|_\infty$ and $b_0=\|\widetilde g-g\|_\infty$ on $[0,1]^{d+1}$.
+
+\begin{proposition}[Conditional product remainder]
+Conditionally on training,
+\[
+ \E Z_j-\bar\theta_j
+ =\frac1h\int_{B_j}\int
+ \frac{(\widetilde\mu-\mu)(\widetilde g-g)}{\widetilde g}(t,x)
+ p(x)\,dx\,dt. \tag{3}
+\]
+The integrated conditional risk is at most
+\[
+ C\{h^{2s}+(nh)^{-1}+a_0^2b_0^2\},
+\]
+and the supremum conditional risk is at most
+\[
+ C\{h^{2s}+\log(2J)/(nh)+\log^2(2J)/(n^2h^2)+a_0^2b_0^2\}.
+\]
+\end{proposition}
+\begin{proof}
+Condition on $(X,A)$ in the residual term and integrate using its true conditional density $g$. The sum of its mean and the first term is $\widetilde\mu+(g/\widetilde g)(\mu-\widetilde\mu)$ inside the bin integral. Subtract $\mu$ and factor to obtain (3), bounded by $2a_0b_0/c$. The first term of $Z_j$ is bounded by $M$, while its residual term is bounded by $4M/(ch)$ and has second moment at most a constant times $1/h$ because $g\le C$. The same variance and maximum inequalities as before apply, with changed constants. Add bin bias and (3) using $(u+v+w)^2\le3(u^2+v^2+w^2)$.
+\end{proof}
+
+No estimator of $p$ appears: fresh covariates perform marginalization. This does not make $s_p$ irrelevant to the full minimax problem, because nuisance learning and possible higher-order corrections still depend on the experiment. The proposition supplies a sufficient condition: if the expected squared nuisance product is no larger than the desired oracle risk, the corresponding oracle rate follows after accounting for sample splitting. It is not a necessary condition and is not a lower bound for unknown nuisances. Smoothness above one, weaker nuisance norms, the low-smoothness frontier, and sharp joint effects of $s_\mu,s_g,s_p,d$ remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{source} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.5.3. \url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}. The survey supplies the agenda; histogram, testing, and remainder arguments are written out here, with no claim that these classical techniques are new.
+\end{thebibliography}
+
+\end{document}

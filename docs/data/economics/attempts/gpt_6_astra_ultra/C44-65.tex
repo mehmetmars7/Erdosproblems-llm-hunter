@@ -1,0 +1,171 @@
+% ECONOMICS_PROBLEM: {"id": "C44-65", "title": "Sharp regret guarantees for dynamic treatment regimes", "jel_code": "C44", "source_id": "OP-0506"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Sharp regret guarantees for dynamic treatment regimes: Known-assignment learning and a sharp two-policy horizon lower bound}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+For dynamic deterministic policies $\pi=(\pi_1,\ldots,\pi_T)$ with
+history-dependent decisions, the canonical target is minimax regret
+\[
+ \inf_{\widehat\pi\in\Pi}\sup_{P\in\mathcal P}
+ \mathbb E_P\{\sup_{\pi\in\Pi}V_P(\pi)-V_P(\widehat\pi)\}.
+\]
+Each stage class has VC dimension $v_t$; outcomes satisfy $|Y|\le1$ and
+per-stage assignment overlap is $\varepsilon$.
+The dynamic-policy agenda appears in \cite[Section 3.3.3]{agenda}.
+We prove a known-assignment upper bound, a VC corollary, and a matching
+horizon dependence already for two policies in smooth submodels. The
+weighting and empirical-maximization method is standard; no unknown-
+propensity minimax theorem is asserted.
+
+\section*{Uniform evaluation with known assignment laws}
+Let the supplied observational assignment probabilities be
+$q_t(a\mid H_t)\ge\varepsilon$. Set
+\[
+ R_\pi(O)=\prod_{t=1}^T\frac{\mathbf1\{A_t=\pi_t(H_t)\}}
+                                  {q_t(A_t\mid H_t)},\qquad
+ f_\pi=R_\pi Y.
+\]
+Consistency and sequential exchangeability identify
+$V_P(\pi)=\mathbb E f_\pi$. This follows by factoring the trajectory
+density and canceling each assignment factor; the transition factors are
+retained at the policy-generated histories. Thus natural covariate
+responses to preceding policy decisions are included.
+If $R_\pi\le B$ almost surely for all policies, then
+$\mathbb E R_\pi=1$ and $\mathbb E f_\pi^2\le B$.
+The universal choice from per-stage overlap is $B=\varepsilon^{-T}$.
+
+\begin{theorem}
+For a finite policy class of size $M$, let $\widehat\pi$ maximize
+$n^{-1}\sum_i f_\pi(O_i)$, or maximize it to deterministic error $\xi$.
+Then
+\[
+ \mathbb E\{\sup_\pi V_P(\pi)-V_P(\widehat\pi)\}
+ \le C\left\{\sqrt{\frac{B\log(2M)}n}
+                    +\frac{B\log(2M)}n\right\}+\xi,       \tag{1}
+\]
+with a universal constant $C$. Regret is also bounded by two.
+\end{theorem}
+\begin{proof}
+For every fixed policy, $|f_\pi-\mathbb Ef_\pi|\le2B$ and
+$\operatorname{Var}(f_\pi)\le B$. The exponential-moment proof of
+Bernstein's inequality gives, for $z>0$,
+\[
+ P\left\{|(P_n-P)f_\pi|>
+       \sqrt{2Bz/n}+4Bz/(3n)\right\}\le2e^{-z}.
+\]
+For completeness its moment bound uses
+$\mathbb E|Z|^k\le(2B)^{k-2}\mathbb E Z^2$ for centered
+$Z=f_\pi-\mathbb E f_\pi$, expands $\mathbb E e^{tZ}$, and sums the
+geometric upper bound on terms $k\ge2$; optimizing Markov's bound gives
+the displayed inequality. Union bound at $z=\log(2M)+s$ gives failure
+probability at most $e^{-s}$ for all policies simultaneously. Integrating
+this tail bounds the expected supremum by a constant times the two terms
+in (1). Empirical maximality implies regret at most
+$2\sup_\pi|(P_n-P)f_\pi|+\xi$, proving (1).
+\end{proof}
+
+\begin{proposition}
+For the pointwise-separable product class in the canonical statement,
+let $G_t(n)=\sum_{k=0}^{\min(v_t,n)}\binom nk$ and
+$G(n)=\prod_t G_t(n)$. An approximate empirical maximizer satisfies
+\[
+ \mathbb E\{\sup_\pi V_P(\pi)-V_P(\widehat\pi)\}
+ \le4B\sqrt{\frac{2\log(2G(n))}{n}}+\xi.               \tag{2}
+\]
+For $1\le v_t\le n$, one may use $G_t(n)\le(en/v_t)^{v_t}$;
+$G_t(n)=1$ for $v_t=0$. This bound is generally weaker in $B$ than (1).
+\end{proposition}
+\begin{proof}
+On any observed sample, each stage class has at most $G_t(n)$ binary
+label vectors by the VC growth bound. One elementary proof of that bound
+uses the recursion $G_v(n)\le G_v(n-1)+G_{v-1}(n-1)$, obtained by
+splitting labelings according to whether the last coordinate can be both
+labels; induction yields the binomial sum. The vectors of complete-path
+indicators therefore number at most $G(n)$.
+Weights $Y_i\prod_tq_t(A_{it}\mid H_{it})^{-1}$ are fixed on this
+sample and do not depend on the policy. Each corresponding score vector
+has Euclidean norm at most $B\sqrt n$. For independent Rademacher signs,
+the exponential inequality
+$\mathbb E_\sigma\exp(t\sum_i\sigma_i a_i)
+\le\exp(t^2\sum_i a_i^2/2)$ and a union bound give an expected absolute
+maximum at most $B\sqrt{2n\log(2G(n))}$.
+An independent ghost sample and Jensen's inequality symmetrize
+$\mathbb E\sup|(P_n-P)f|$ to at most twice that maximum divided by $n$.
+Pointwise separability makes the suprema measurable. The same empirical-
+maximization inequality as before proves (2). The standard binomial sum
+bound follows by expanding $(1+x)^n$ at $x=v_t/n$.
+\end{proof}
+
+\section*{Exponential information loss with one decision to learn}
+\begin{theorem}
+For every $T\ge1$ and $0<\varepsilon<1/2$, there is a known-assignment
+model with $v_1=1$, $v_t=0$ for $t>1$, and smooth continuous-coordinate
+nuisances of every order, for which minimax regret is
+\[
+ \asymp\min\{1,(n\varepsilon^T)^{-1/2}\}.               \tag{3}
+\]
+The constants can be chosen universal. The policy class has exactly two
+policies and includes all combinations of its specified stage classes.
+\end{theorem}
+\begin{proof}
+Let assignments be independent Bernoulli$(\varepsilon)$ and histories,
+if continuous coordinates are required, include independent uniforms
+irrelevant to outcomes. One policy always assigns one; the other assigns
+zero at the first stage and one thereafter. Their stage classes are
+$\Pi_1=\{0,1\}$ and $\Pi_t=\{1\}$ for $t>1$.
+Let $Y\in\{-1,1\}$ have mean zero off the all-one assignment path and
+mean $\theta$ on that path. Choose two laws $\theta=\pm\Delta$.
+Sequential exchangeability holds by independent randomization, and
+conditional outcome means are constant within each discrete history
+stratum, satisfying any fixed H\"older index with an adequate radius.
+The policy values are respectively $\theta$ and zero. Choosing the wrong
+policy incurs regret $\Delta$.
+The laws differ only on a path with probability $q=\varepsilon^T$.
+For $\Delta\le1/2$, one-observation KL is at most $Cq\Delta^2$.
+Choose $\Delta=b\min\{1,(nq)^{-1/2}\}$ with $b$ sufficiently small.
+Pinsker's inequality bounds sample total variation by $1/2$; the sum of
+wrong-policy probabilities is at least $1/2$. Maximal regret is therefore
+at least $\Delta/4$.
+For the upper bound, (1) with $M=2$, $B=q^{-1}$ gives
+$C\{(nq)^{-1/2}+(nq)^{-1}\}$. When $nq\ge1$ the second term is smaller
+than the first; when $nq<1$ the universal regret bound two applies.
+This proves (3).
+\end{proof}
+
+\section*{Interpretation and remaining task}
+Fixed VC complexity and smoothness do not prevent exponential horizon
+loss: the uncertain value is observed only on a complete treatment path.
+In the known-assignment finite-class experiment, a polynomial bound on
+the cumulative ratios $B_T$, together with polynomial $\log M_T$,
+is a sufficient condition for polynomial sample requirements by (1).
+For increasing horizons the exact subexperiment in (3) is consistent
+precisely when $n\varepsilon^{T_n}\to\infty$.
+These are statistical guarantees conditional on an optimization oracle;
+finite enumeration costs $M$ and can itself be exponential in $T$.
+Unknown assignments, transition smoothness, history dimensions, stronger
+variance-sensitive VC bounds, and polynomial-time optimization over
+infinite policy classes are the unresolved parts of the original target.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,109 @@
+% ECONOMICS_PROBLEM: {"id": "C73-113", "title": "Constant regret in general-sum Markov games", "jel_code": "C73", "source_id": "OP-0151"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Finite improvement and history-sensitive regret in Markov games}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C73-113}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\begin{abstract}
+An exact full-feedback oracle permits constant ordinary policy regret in common-interest finite-horizon Markov games by a finite improvement procedure. Its regret constant is exponential in the number of state--time decision points, but its work per episode is polynomial. We also construct an exogenous-transition example in which every local fixed-action regret is zero while one history-dependent policy earns linear improvement. This identifies an obstruction to transferring local regret bounds to the catalogue's empirical mixture.
+\end{abstract}
+\section{Question and feedback}
+For a finite episodic game with $n$ players, horizon $H$, state set $S$, rewards in $[0,1]$, and common initial state, write $V_i(\pi)$ for player $i$'s expected episode reward. The question is whether decentralized self-play can guarantee
+\[
+ R_i(T)=\sup_{\tau_i}\sum_{t=1}^T
+ \{V_i(\tau_i,\pi_{-i}^t)-V_i(\pi^t)\}\le C_G
+\]
+for every $T$, where the comparator is one arbitrary behavioral policy and $C_G$ is independent of $T$. The oracle, queried at $(h,s,a_i)$, returns the exact reward and transition law averaged against the current opponents' Markov policies. Arithmetic and oracle use per episode must be polynomial. The source asks a constant-regret question after obtaining a near-$1/T$ guarantee for its own recursively generated output \cite{YB}; its output construction is distinct from the ordinary uniform episode mixture used here.
+
+The following restriction is substantive: assume all players have the same stage reward $r_h(s,a)$. Opponent policies remain fixed during each oracle sweep. Public knowledge of player labels and the episode number determines whose turn it is; no reward communication between players is required.
+\section{A constructive constant bound in common-interest games}
+Let $m=|S|$ and
+\[
+ K=\prod_{i=1}^n |A_i|^{Hm}.
+\]
+This counts deterministic Markov policy profiles, including decisions at unreachable states. Initialize any such profile. During episode $t$, the active player is $1+((t-1)\bmod n)$. Everyone plays the current profile. The active player queries all of its state--time--action oracle entries, evaluates its current policy, and computes a deterministic best response by backward induction. For the next episode, it changes its policy only if the best response has strictly larger initial-state value. Break action ties by a fixed public order. All other policies remain fixed. Oracle computation can be performed after play, using the opponents' unchanged policies for that episode.
+
+\begin{theorem}[Constant regret with polynomial episode work]
+In every common-interest game just specified, the procedure makes at most $K-1$ policy changes. There exists $t_0\le nK+1$ such that its profile is constant for all $t\ge t_0$ and is a Nash equilibrium against all behavioral deviations from the prescribed initial state. For every player and every integer $T\ge1$,
+\[
+ R_i(T)\le HnK.
+\]
+Each episode needs at most $Hm|A_i|$ oracle queries by its active player and $O(Hm^2|A_i|)$ arithmetic operations, if each transition query returns a length-$m$ vector. This is an exact-arithmetic oracle result.
+\end{theorem}
+\begin{proof}
+Against fixed Markov opponents, player $i$ faces a finite-horizon Markov decision problem with the queried reward $\bar r_{i,h}$ and kernel $\bar P_{i,h}$. Define $B_{H+1}=0$ and recursively
+\[
+ B_h(s)=\max_{a_i}\{\bar r_{i,h}(s,a_i)
+              +\bar P_{i,h}B_{h+1}(s,a_i)\}.
+\]
+Backward conditioning proves that the expected remaining reward of any history-dependent randomized policy at a history ending in $(h,s)$ is at most $B_h(s)$. Choosing a maximizing action attains the bound at every state. Thus a deterministic Markov best response is also a best response among all behavioral policies. Evaluation of the current policy uses the same recursion with its prescribed action instead of the maximum.
+
+Let $V(\pi)$ denote the common value. Every change strictly increases $V$, and every visited profile is one of $K$ deterministic profiles. Consequently no profile can be revisited after a change and at most $K-1$ changes occur. If a complete cycle of $n$ active-player turns contains no change, each player has checked its best response against the same profile; all subsequent cycles also have no change. Before this happens, every full cycle contains a strict improvement. There are therefore at most $K-1$ such cycles and one final checking cycle, or at most $nK$ episodes before the permanent profile is used.
+
+At the permanent profile $\pi^*$, $V_i(\tau_i,\pi_{-i}^*)\le V_i(\pi^*)$ for every behavioral $\tau_i$. Before it, the gain from any deviation is at most $H$ because total rewards lie in $[0,H]$. For every fixed $\tau_i$ the sum of its gains is at most $HnK$; taking its supremum proves the bound. The stated computational counts follow directly from the two backward recursions and one oracle sweep.
+\end{proof}
+
+The algorithm need not know $K$ or detect global termination. Strict improvement comparisons use exact oracle values. Bit-complexity, approximate comparisons, and sampling noise require separate analysis: a numerical tolerance can stop at an approximate equilibrium whose error, if held fixed forever, produces linear regret. The theorem's constant can be enormous, so it is not a claim of a practical fast convergence rate.
+
+\begin{corollary}[Ordinary mixture guarantee]
+In the theorem's setting, draw an episode index uniformly from $\{1,\ldots,T\}$ and then execute its entire policy profile. A player that ignores its own recommendation and uses any one behavioral policy gains at most $HnK/T$ in expectation.
+\end{corollary}
+\begin{proof}
+For every such policy its gain is the average of the $T$ episode gains. The theorem bounds their supremum. This argument does not resample an index at each stage.
+\end{proof}
+
+\section{Why statewise regret can miss the comparator}
+The next example uses only two stages and action-independent transitions. At stage one player 2 publicly chooses $b\in\{0,1\}$. At stage two player 1 chooses a prediction $a\in\{0,1\}$ and player 2 again chooses a bit $c$. Player 1's stage-two reward is $\ind\{a=c\}$, all other rewards are zero. The stage-two state is the same regardless of the stage-one bit. Both players observe the action history.
+
+\begin{proposition}[A local-to-global separation]
+For every even $T$, there is a sequence of Markov policy profiles such that all statewise external regrets against fixed actions are zero for both players, but player 1's ordinary regret against a single behavioral policy is $T/2$.
+\end{proposition}
+\begin{proof}
+In odd episodes let player 2 choose $b=c=0$; in even episodes let it choose $b=c=1$. Each episode's policy is Markov: the common bit is fixed in the policy before the episode. Let player 1 predict using a fair coin independently of the history. Its total expected reward is $T/2$. Each fixed stage-two action is correct in exactly $T/2$ episodes, so its local regret is zero. All other local payoff vectors are identically zero.
+
+Consider the single behavioral rule that at stage two predicts the observed stage-one bit. It is the same rule in every episode, and is always correct. Its total value is $T$, giving regret $T/2$, which is also the maximum possible gain in this example.
+\end{proof}
+
+The comparator learns information about the selected episode profile from observed play. Even an action-independent physical transition does not remove this information. Consequently a reduction based only on the occupancy of physical states and local fixed-action regrets needs extra hypotheses or an explicit treatment of public histories.
+
+\section{What is still missing}
+The common-interest proof depends on a strict common potential over a finite policy set. In a general-sum game a profitable unilateral change can reduce other players' values and can revisit earlier profiles. The proof supplies no bound on these cycles. The local-regret example, meanwhile, is a comparison of a policy sequence with its mixture; it is not a lower bound against every self-play algorithm. A resolution needs a general-sum procedure controlling the specified ordinary behavioral comparator under the stated oracle and resource restrictions. Neither the common-interest construction nor the example does this.
+
+\begin{thebibliography}{9}
+\bibitem{YB} A. E. Yorulmaz and T. Ba\c{s}ar (2025).
+\emph{Near Optimal Convergence to Coarse Correlated Equilibrium in General-Sum Markov Games}. arXiv:2511.02157v1. Sections 2.3--2.5 specify feedback and deviations; Section 5 states the constant-regret direction.
+\url{https://arxiv.org/html/2511.02157v1}.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,92 @@
+% ECONOMICS_PROBLEM: {"id": "C78-136", "title": "Complexity of reachability in the divorce digraph", "jel_code": "C78", "source_id": "OP-0554"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C78-136}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Complexity of reachability in the divorce digraph}
+
+\textbf{Status.} Unresolved for general complete strict preference lists. We prove short successful divorce paths on a structural domain and an exact parameterized algorithm for mutually preferred independent blocks.
+
+\subsection*{Short problem and exact dynamics}
+There are $n$ men and $n$ women with complete strict preferences. A perfect matching $M$ admits a blocking pair $(u,w)$ when both prefer each other to their current partners. A divorce operation replaces $(u,M(u))$ and $(M^{-1}(w),w)$ by $(u,w)$ and $(M^{-1}(w),M(u))$. Displaced partners must remarry; all states therefore remain perfect matchings. The question is whether a given initial matching reaches any stable matching under such operations, and how difficult it is to decide this for complete lists.
+
+A \emph{mutual-top elimination order} is a list of pairs $(u_1,w_1),\ldots,(u_n,w_n)$ using every agent once such that, after the preceding pairs are deleted from the preference lists, $u_j$ and $w_j$ rank each other first among remaining agents. This is an explicit recognizable restriction on preferences, not an assumption about the starting matching.
+
+\begin{theorem}[Universal short reachability under mutual-top elimination]
+If an instance admits a mutual-top elimination order, it has a unique stable matching, namely the listed pairs. From every initial perfect matching there is a divorce path to it of length at most $n-1$. Given an elimination order, the path can be found with polynomially many preference comparisons.
+\end{theorem}
+\begin{proof}
+A mutual first-choice pair must belong to every stable matching: otherwise it blocks. Delete that forced pair and repeat along the order. This proves uniqueness and identifies the only possible stable matching; the listed matching is stable because, for any unmatched pair, its earlier eliminated member ranks its assigned partner ahead of the later member.
+
+Now process the order from the initial matching, maintaining that all earlier listed pairs are matched together and never changed again. If $(u_j,w_j)$ is already present, continue. Otherwise both its agents and their current partners are among the remaining agents. They prefer each other to those partners by the mutual-top condition, so their pair is blocking. Perform its divorce operation. The displaced partners remain in the remaining population, and all earlier pairs remain fixed. This makes the next required pair correct. At most one divorce is used per stage, and the last pair is automatic once the preceding $n-1$ are fixed.
+\end{proof}
+
+\begin{proposition}[Recognition and a common-priority special case]
+Repeatedly deleting any currently mutual-top pair recognizes the existence of a mutual-top elimination order in polynomial time. In particular, if all women share one strict ranking of men, every initial matching reaches the unique stable matching in at most $n-1$ divorces.
+\end{proposition}
+\begin{proof}
+Suppose an elimination order exists and $(u,w)$ is any currently mutual-top pair. It must appear as a pair in that order: its earlier appearing member cannot be paired with someone else while its first-choice partner remains. Move this pair to the start of the order. Every other pair that was mutual-top when deleted remains mutual-top after additional agents have been removed. Thus deleting an arbitrary available pair preserves existence of an order for the residual instance. If the greedy algorithm gets stuck before deleting everyone, no such order could have existed. Scanning preference lists after each deletion is polynomial.
+For the common-ranking case, take the highest-ranked remaining man and his favorite remaining woman. He is her first choice among remaining men, so they are mutual-top. Repeat. The preceding theorem then applies.
+\end{proof}
+
+\subsection*{An exact reachability reduction for separated markets}
+A balanced partition consists of blocks $(P_j,R_j)$ with $|P_j|=|R_j|=n_j$. Assume every member of $P_j$ ranks every member of $R_j$ above every outsider and vice versa. The initial matching is \emph{internal} if it matches each block to itself. Let $I_j$ be the restriction to block $j$, and $M_{0,j}$ the initial restricted matching.
+
+\begin{lemma}[Product dynamics from internal states]
+Starting from an internal matching, all blocking pairs and all subsequent divorce operations are internal to one block. A resulting matching is stable globally if and only if all its block restrictions are stable.
+\end{lemma}
+\begin{proof}
+At an internal matching, each agent has an inside partner and ranks every outsider below that partner. Thus a cross-block pair cannot block. An inside blocking pair displaces only inside partners, so the divorce keeps every block internal. Induction gives invariance of the internal state set. Within it, cross-block blocking is impossible and inside blocking is exactly blocking in the restricted instance. This proves the equivalence of stability.
+\end{proof}
+
+\begin{theorem}[Bounded-block exact algorithm and certificate bound]
+Given a balanced mutually preferred partition and an internal initial matching, a stable matching is reachable globally if and only if it is reachable from $M_{0,j}$ in every block $I_j$. If every $n_j\leq k$, reachability is decidable in time
+\[
+ O\left(\sum_j n_j!\,\operatorname{poly}(n_j)+\operatorname{poly}(n)\right)
+ \subseteq O\left(n k!\,\operatorname{poly}(k)+\operatorname{poly}(n)\right).
+\]
+Every affirmative instance has a path of length at most $\sum_j(n_j!-1)$, with a directly checkable sequence of blocking pairs.
+\end{theorem}
+\begin{proof}
+Every global path projects onto a legal path in each block after deleting steps in other blocks, by the lemma. Reaching a global stable matching therefore requires success in every block. Conversely, concatenate one successful local path for each block, leaving the others fixed. Each local blocking pair is still blocking globally, so this is a valid global path ending at a stable matching.
+For each block enumerate its $n_j!$ permutations. At a state inspect all at most $n_j^2$ man--woman pairs using precomputed ranks; each blocking pair gives one successor permutation. Breadth-first search from $M_{0,j}$ finds a stable state if and only if one is reachable. Generating and indexing a successor takes polynomial time in $n_j$, giving the running time. A shortest successful local path never repeats a vertex and therefore has at most $n_j!-1$ arcs. Concatenation yields the length bound. Verification checks preference inequalities and the prescribed partner swap at every step.
+\end{proof}
+The parameter guarantee is for the maximum block size of a supplied, verifiable partition; its factorial dependence is explicit. It remains useful when the total market is large but has small independent components. Requiring an internal initial matching is essential to the proof: when agents start across blocks, outsiders can be preferred to their current partners and cross-block operations may occur.
+
+\subsection*{Why this does not classify the general problem}
+A mutual-top pair can always be fixed constructively, but in a general instance the elimination can stop on a residual market without such a pair. The short-path theorem gives no conclusion about that residual market. Likewise, a complete-list instance need not have small independent blocks. The general digraph still has $n!$ vertices. A simple-path bound of $n!-1$ permits a nondeterministic polynomial-space search by storing the current permutation and a binary step counter. Guess each blocking-pair move and accept if a stable state is reached within the bound. Deterministic polynomial space can also be seen directly. To decide whether one permutation reaches another in at most $L$ moves, enumerate all midpoint permutations and recursively test the two halves with bounds $\lfloor L/2\rfloor$ and $\lceil L/2\rceil$. At $L\le1$, test equality or a single legal move. Equality permits padding a shorter path. The recursion has depth $O(\log(n!))=O(n\log n)$; each frame stores a constant number of permutations, a midpoint enumeration counter, and a length bound, using $O(n\log n)$ bits. Enumerate stable target permutations in an outer loop. This is polynomial space, although its time need not be polynomial. Neither search supplies a polynomial-length certificate or NP membership. Our stronger path bounds rely on the stated structural restrictions.
+
+No reduction from incomplete lists is asserted: completing lists can introduce new blocking pairs and paths. Proving that a completion gadget preserves both affirmative and negative reachability is an additional task, not a consequence of hardness for the incomplete-list model.
+
+\subsection*{References and source scope}
+Katar\'ina Cechl\'arov\'a, \'Agnes Cseh and David F. Manlove (2019), \emph{Selected open problems in Matching Under Preferences}, Section 3.2.2. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}. The primary survey was inspected for the complete-list reachability question and the restriction that displaced partners remarry.
+
+Jiehua Chen (2019 preprint), \emph{Reaching Stable Marriage via Divorces is Hard}, arXiv:1906.12274. \url{https://arxiv.org/abs/1906.12274}. The primary record's incomplete-preference hardness statement was checked; it is not cited as a classification of complete strict lists. The structural path and product arguments above are given in full without a priority claim.
+
+\end{document}

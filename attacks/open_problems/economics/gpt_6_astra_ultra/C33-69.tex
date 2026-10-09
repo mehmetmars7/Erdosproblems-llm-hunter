@@ -1,0 +1,178 @@
+% ECONOMICS_PROBLEM: {"id": "C33-69", "title": "Causal effects with endogenous evolving interference networks", "jel_code": "C33", "source_id": "OP-0492"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Causal effects with endogenous evolving interference networks: Identification and the limits of contraction as an effective-sample-size claim}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target}
+With $m$ independent network trajectories, the effect averages terminal
+outcomes over vertices while allowing the graph to evolve under policy:
+\[
+ \theta_{N,T}(g,g')=\frac1N\sum_{i=1}^N
+                \mathbb E[Y_{T,i}^g-Y_{T,i}^{g'}].
+\]
+The evolving-network agenda is in \cite[Section 3.2.3]{agenda}.
+For the quantitative results in this note impose $|Y_{T,i}|\le1$;
+this is an explicit additional condition because the canonical statement
+does not itself give a terminal-outcome moment bound.
+We prove an identified known-assignment estimator, a counterexample to
+unqualified $mN$ information scaling, and a sufficient local-independence
+condition under which network size does help.
+
+\section*{Keep the graph transition in the intervention law}
+Let $Z_{t+1}$ include the next graph, covariates and outcomes.
+Factor the observed trajectory law as
+\[
+ p_0(dH_1)\prod_{t=1}^T q_t(dA_t\mid H_t)
+                                  K_t(dZ_{t+1}\mid H_t,A_t).
+\]
+Every $H_t$ is measured before its assignment. Sequential exchangeability
+and consistency identify the intervention law by replacing $q_t$ by
+$g_t$ and retaining $K_t$. Put
+\[
+ R_g=\prod_{t=1}^T\frac{dg_t(\cdot\mid H_t)}{dq_t(\cdot\mid H_t)}(A_t),
+ \qquad \bar Y=N^{-1}\sum_iY_{T,i}.
+\]
+\begin{proposition}
+Suppose the assignment kernels and both policy ratios are supplied and
+$R_g,R_{g'}\le B$ almost surely. Then
+\[
+ \widehat\theta=\frac1m\sum_{j=1}^m(R_{g,j}-R_{g',j})\bar Y_j
+\]
+is unbiased and has mean-squared error at most $4B/m$.
+The interval $[\widehat\theta\pm2\sqrt{B/(m\alpha)}]$ intersected with
+$[-2,2]$ has coverage at least $1-\alpha$.
+\end{proposition}
+\begin{proof}
+Cancel assignment factors in the joint density to obtain
+$\mathbb E[R_g\bar Y]=\mathbb E_g\bar Y$ and $\mathbb E R_g=1$.
+All graph-transition factors remain in the resulting integral, so it is
+the total policy effect. Since $R_g^2\le BR_g$,
+\[
+ \mathbb E[(R_g-R_{g'})\bar Y]^2
+ \le2\mathbb E(R_g^2+R_{g'}^2)\le4B.
+\]
+Independence of trajectories gives the risk bound. Chebyshev's inequality
+proves coverage, and intersection with the known target range preserves it.
+\end{proof}
+This formula also states what a sufficient history must contain: all
+measured variables needed for the asserted exchangeability of each
+assignment and its invariant subsequent transition law. Conditioning on
+the final graph instead would replace the intervention law by a different
+conditional population.
+
+\section*{Row contraction alone does not deliver $mN$ information}
+\begin{theorem}
+Fix $0<a<1/4$. For all $N$ there is a one-step model with an empty
+candidate graph, independent node transition noises conditional on the
+observed past and assignments, and influence row sums at most $a<1$,
+in which minimax risk for the total effect is at least $c_a/m$ uniformly
+in $N$. Both policy density ratios are bounded by two.
+\end{theorem}
+\begin{proof}
+In each trajectory draw an observed baseline $Z\sim\operatorname{Ber}(p)$,
+where $p\in[1/4,3/4]$, and put that same observed value in every node's
+baseline covariate. Draw a common randomized assignment $A\sim
+\operatorname{Ber}(1/2)$ and assign $A_i=A$ to all vertices.
+Given these variables, generate independent
+\[
+ Y_i\sim\operatorname{Ber}(1/2+a A_i Z_i),\qquad Z_i=Z.
+\]
+The two policies assign all ones or all zeros. Their likelihood ratios
+against the common assignment are $2\mathbf1\{A=1\}$ and
+$2\mathbf1\{A=0\}$. The effect is $\theta=ap$.
+Each transition uses only its own baseline and assignment, and changing
+its baseline changes its Bernoulli law in total variation by at most $a$;
+there is no influence from other nodes. Thus its influence matrix has
+row sum at most $a$, and the conditional node noises are independent.
+Nevertheless the conditional distribution of every assignment and outcome
+given $Z$ is independent of $p$. The likelihood for $p$ consists of exactly
+$m$ Bernoulli baseline draws, regardless of $N$.
+For $p_\pm=1/2\pm b/\sqrt m$ the sample KL is bounded by $Cb^2$.
+Choosing small $b$ and testing the two targets gives risk at least
+$c a^2/m$. All assumptions in the theorem, including sequential
+exchangeability, hold by construction.
+\end{proof}
+The missing restriction in any $mN$ claim here is on the initial spatial
+law or shared observed random inputs. The contraction condition addresses
+transition sensitivity, not how many independent draws of that initial
+law have been observed. In this counterexample $N$ repeated baseline
+copies contain only one draw of $Z$.
+
+\section*{A positive result from independent causal cones}
+The following stronger submodel makes the information gained from $N$
+explicit. Let a fixed candidate graph have maximum undirected degree $D$.
+Initial node variables and all node-time innovations, including assignment
+randomization, are mutually independent. Graph changes may be generated
+locally as part of the state. Suppose the terminal outcome at vertex $i$
+and every assignment ancestor needed for its policy intervention depend
+only on innovations in a deterministic space-time cone $\mathcal C_i$.
+All vertices in that cone are within graph distance $R$ of $i$.
+Assume the observational assignment law factorizes into known local
+kernels and that the policy kernels have the same local ancestry.
+Define $R_{i,g}$ as the product of policy-to-observed ratios for assignment
+nodes ancestral to $Y_{T,i}$. Suppose $R_{i,g},R_{i,g'}\le B_{\rm loc}$.
+Let $H$ be the maximum number of cones, including itself, intersecting
+any given cone. In particular
+\[
+ H\le \min\left\{N,\ 1+\sum_{k=1}^{2R}D^k\right\}.    \tag{1}
+\]
+\begin{theorem}
+Under precisely these cone and independence conditions,
+\[
+ \widehat\theta_{\rm loc}=
+ \frac1{mN}\sum_{j=1}^m\sum_{i=1}^N
+ (R_{i,g,j}-R_{i,g',j})Y_{T,i,j}
+\]
+is unbiased, has risk at most $4B_{\rm loc}^2H/(mN)$, and gives an
+honest interval of radius $2B_{\rm loc}\sqrt{H/(mN\alpha)}$ by
+Chebyshev's inequality.
+\end{theorem}
+\begin{proof}
+Marginalize all nodes outside the ancestral cone in reverse topological
+order; each removed conditional density integrates to one. Inside the
+cone, weighting cancels precisely the ancestral assignment factors.
+This proves each summand's expectation is the required vertex effect,
+including the local graph transitions.
+Write the summand as $Z_i$. It is a function of the innovations in
+$\mathcal C_i$ and has $|Z_i|\le2B_{\rm loc}$. Disjoint cones have
+independent innovations and hence zero covariance. For an intersecting
+pair, Cauchy--Schwarz bounds covariance in absolute value by
+$4B_{\rm loc}^2$. At most $NH$ ordered pairs intersect, so
+$\operatorname{Var}(N^{-1}\sum_iZ_i)\le4B_{\rm loc}^2H/N$.
+Divide by $m$ for independent trajectories and apply Chebyshev.
+If cones intersect, their center vertices are at distance at most $2R$;
+counting graph walks gives (1).
+\end{proof}
+
+\section*{Unresolved dependence on $T,D,\lambda$}
+For nearest-neighbor updates a radius proportional to $T$ gives a
+conservative bound through (1), often exponential in $T$. It does not
+exploit contraction $\lambda$ to sharpen that dependence. Doing so needs
+control of initial correlations, assignment dependence, and how likelihood
+ratios interact with influence decay. The counterexample shows why those
+conditions cannot be omitted. Unknown kernels, unbounded outcomes without
+moment assumptions, and a sharp joint minimax rate in the full evolving-
+network class remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

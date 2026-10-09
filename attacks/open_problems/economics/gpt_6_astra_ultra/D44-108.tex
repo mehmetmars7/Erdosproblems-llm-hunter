@@ -1,0 +1,108 @@
+% ECONOMICS_PROBLEM: {"id": "D44-108", "title": "Simple combinatorial bidding", "jel_code": "D44", "source_id": "OP-0294"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Communication, complements, and covering menus}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{D44-108}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{A precise restricted frontier}
+The original question asks how communication and cognitive limits constrain welfare in combinatorial bidding, under declared incentives and behavioral responses. We solve a restricted deterministic communication problem with one privately informed complement bidder and one public additive bidder. It already exhibits an exponential menu requirement in some regimes. We do not identify a human decision-time frontier or cover general valuations.
+
+Let $G$ have $m$ goods, $1\le r\le t\le m$, and $0<c<1/m$. Bidder 1 privately knows $S\subseteq G$ with $|S|=r$ and values a bundle $A$ by
+\[
+ v_S(A)=\ind\{S\subseteq A\}.
+\]
+Bidder 2 has the publicly known additive value $v_2(A)=c|A|$. All values lie in $[0,1]$. Both have quasilinear utility and outside allocation/payment zero. Feasible allocations are disjoint. Define
+\[
+ W_*=1+c(m-r),\qquad W_t=1+c(m-t),\qquad N=\binom mr.
+\]
+The efficient allocation gives $S$ to bidder 1 and $G\setminus S$ to bidder 2, so its welfare is $W_*$ for every type. Communication is one-way and deterministic: bidder 1 selects one of at most $L$ messages and the mechanism implements a fixed allocation and transfers for each message. A deterministic prescribed response must satisfy dominant-strategy optimality. For the lower bound we even allow an arbitrary deterministic response, making the impossibility stronger.
+
+\section{Counting and implementation}
+\begin{theorem}[Matching communication bounds up to a logarithmic covering factor]
+Any deterministic $L$-message mechanism whose prescribed outcome has welfare at least $W_t$ for every $r$-set $S$ must satisfy
+\[
+ L\ge\frac{\binom mr}{\binom tr}.
+\]
+Conversely, there exists an individually rational posted-menu mechanism with truthful utility-maximizing selection, worst-case welfare at least $W_t$, and
+\[
+ L\le\left\lceil\frac{\binom mr}{\binom tr}(1+\log N)\right\rceil.
+\]
+It communicates a menu index using $\lceil\log_2(L+1)\rceil$ bits, including the outside option. The additive bidder needs no message. Thus the necessary and sufficient numbers of messages differ by at most a factor of order $1+\log N$.
+\end{theorem}
+\begin{proof}
+Consider any message used by at least one type and let $A$ be its allocation to bidder 1. If some type mapped to this message has $S\not\subseteq A$, its welfare is at most $cm<1\le W_t$, a contradiction. Thus $A$ contains every $S$ using the message. Even if all remaining goods go to bidder 2, welfare is at most $1+c(m-|A|)$. The promised bound implies $|A|\le t$. A message can therefore serve at most $\binom tr$ of the $N$ possible types. Covering all types proves the lower bound; transfers cannot change welfare in this calculation.
+
+For the upper bound, draw independently $L$ uniformly random $t$-subsets of $G$. A fixed $r$-set is contained in a draw with probability
+\[
+ p=\frac{\binom{m-r}{t-r}}{\binom mt}=\frac{\binom tr}{\binom mr}.
+\]
+Its probability of remaining uncovered is $(1-p)^L\le e^{-pL}$. The union bound makes the probability that any type remains uncovered at most $Ne^{-pL}<1$ for the stated $L$. A covering family $\mathcal T$ of that size consequently exists. Repeated members may be removed. This is a finite existence proof; exhaustive enumeration can construct one, without a polynomial-time claim.
+
+For each $T\in\mathcal T$, offer bidder 1 the bundle $T$ at price $ct$ and give the complement to bidder 2. Pass the payment $ct$ to bidder 2. A bidder whose true demand is $S$ obtains $1-ct>0$ from any covering menu entry, obtains $-ct<0$ from any noncovering entry, and obtains zero from nonparticipation. Every utility-maximizing response therefore selects a cover, giving welfare exactly $W_t$. Bidder 1 is individually rational. Bidder 2 receives value $c(m-t)$ and cash $ct$, totaling its full-endowment value $cm$, so it accepts voluntarily. Transfers balance. Selecting a maximizer is dominant because the second valuation is public and no other strategic report affects the menu.
+\end{proof}
+
+The theorem can be stated as a direct mechanism by fixing a deterministic rule selecting a covering $T(S)$. Truthful reporting gives maximal attainable utility; a false report cannot give greater utility, even if it selects a different covering set. The mechanism is truthful, though truth-telling need not be a unique best response. Every best response still attains the welfare guarantee.
+
+\begin{corollary}[Bit cost and the exact-efficiency endpoint]
+If at most $B=kb$ bits may be sent in the stated one-way model, attaining welfare ratio $W_t/W_*$ requires
+\[
+ B\ge\log_2\binom mr-\log_2\binom tr.
+\]
+For $t=r$, exact efficiency requires $L\ge\binom mr$ and is attainable with exactly that many active menu entries. If $r\le t$ then
+\[
+ \frac{\binom mr}{\binom tr}
+ =\prod_{j=0}^{r-1}\frac{m-j}{t-j}\ge(m/t)^r.
+\]
+In particular, for $r$ proportional to $m$ and $t\le\zeta m$ with fixed $\zeta<1$, the number of required messages grows exponentially with $m$.
+\end{corollary}
+\begin{proof}
+There are at most $2^B$ messages. Apply the theorem. At $t=r$ the family of all $r$-sets is an exact covering menu, and no set of size at most $r$ covers two distinct types. The product identity is factorial cancellation. Each factor is at least $m/t$ since $t\le m$.
+\end{proof}
+
+The lower bound concerns menu cardinality. Its logarithm is a bit bound, so exponential menu size does not by itself imply exponentially many bits. Conflating these quantities would reverse the intended interpretation of simplicity.
+
+\section{A concrete welfare tradeoff}
+Take $c=\gamma/m$ for fixed $0<\gamma<1$, $r=\alpha m$, and $t=\zeta m$ when these are integers. The posted menu guarantees
+\[
+ \frac{1+\gamma(1-\zeta)}{1+\gamma(1-\alpha)}
+\]
+and requires at least $(1/\zeta)^{\alpha m}$ messages in the deterministic model. Giving the grand bundle to bidder 1 always attains $1/[1+\gamma(1-\alpha)]$ with a single active message. The cost of preserving surplus for the additive bidder can therefore be quantified without assuming that complementary values can be communicated through independent item bids.
+
+The interface has a simple operational implementation once a cover family is fixed: display its members and their common price; a bidder can inspect all $L$ sets, test containment using at most $mL$ elementary membership comparisons, and submit an index. This is an upper bound on an explicit computational procedure, not a prediction of human time. Construction of a smallest covering family is also a separate combinatorial problem; the probabilistic upper bound is not an efficient optimization algorithm for it.
+
+\section{Boundaries of the result}
+Randomized allocation, randomized communication, interactive queries, multiple informed complement bidders, and uncertainty about the additive valuation are absent. The deterministic counting proof does not automatically apply when a type can receive its desired set only with high probability; then a distributional or randomized communication lower bound is needed.
+
+For a behavioral application, the rational response kernel in the theorem would need replacement by a measured menu-selection kernel. Selection failures, experience, display order, and search costs can then reduce the computed welfare guarantee. No experimental estimates have been supplied here. The exact covering-menu calculation supplies a benchmark against which such evidence could be compared, while the original population-specific frontier remains unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{survey} I. Palacios-Huerta, D. C. Parkes and R. Steinberg (2024), \emph{Combinatorial Auctions in Practice}, Journal of Economic Literature 62(2), 517--553. DOI: \href{https://doi.org/10.1257/jel.20221679}{10.1257/jel.20221679}. Section 4.3 of the primary author manuscript discusses simplicity and trust: \url{https://parkes.seas.harvard.edu/sites/g/files/omnuum8711/files/parkes/files/palacios-huerta.pdf}. It motivates the agenda; the restricted covering calculations are proved here and are not attributed to the survey.
+\end{thebibliography}
+
+\end{document}

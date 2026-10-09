@@ -1,0 +1,148 @@
+% ECONOMICS_PROBLEM: {"id": "C55-114", "title": "Minimax causal estimation with high-dimensional sparse nuisances", "jel_code": "C55", "source_id": "OP-0532"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{A finite-dictionary risk bound for sparse nonlinear causal nuisances}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C55-114}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\begin{abstract}
+For the catalogue's bounded sparse logistic model, a fully specified split-sample estimator has squared risk bounded by a parametric term plus a product of sparse prediction complexities. A direct proof avoids assuming nuisance support recovery. We obtain a sufficient parametric region and a parametric lower bound, but not the matching risk outside that region. An approximation formula also shows precisely what a simple truncation argument yields for weak sparsity.
+\end{abstract}
+\section{Model and target}
+Observe independent $O=(X,W,Y)$ with $X\in[-1,1]^d$, $W,Y\in\{0,1\}$. Consistency, treatment exchangeability, and overlap identify $\psi=\E m(X)$, where $m(x)=\E[Y\mid X=x,W=1]$ and $e(x)=\Prb(W=1\mid X=x)\in[\epsilon,1-\epsilon]$. The catalogue assumes
+\[
+ e(x)=\epsilon+(1-2\epsilon)\operatorname{expit}(b_0+x^Tb),
+ \qquad m(x)=\operatorname{expit}(c_0+x^Tc),
+\]
+with bounded intercepts, bounded slope $\ell_1$ norms, and support sizes at most $s_e,s_m$. Its sparse covariance condition is retained but not needed for the upper bound below. This is a prediction argument; no assertion about recovering coefficients is made. The source motivates nonlinear high-dimensional causal models \cite{CF}, rather than stating the rate proved here.
+
+Set $\bar s_j=\min(s_j,d)$ and
+\[
+ A_j=1+(\bar s_j+1)\log\{C_0 n(d+1)\},\qquad
+ u_j=\min\{1,A_j/n\},\quad j\in\{e,m\},
+\]
+where $C_0>1$ depends only on coefficient bounds. Constants below may depend on those bounds and $\epsilon$, but not on $n,d,s_e,s_m$.
+\section{Estimator and a prediction lemma}
+Divide the data into three independent blocks of size $k=\lfloor n/3\rfloor$ and discard at most two observations. On the first block fit $e$ by squared-loss empirical risk minimization over a finite grid of its allowed logistic functions. On the second block fit $m$ by minimizing
+$\sum W(Y-g(X))^2$ over its own grid. Include the zero-slope models. For each support of size at most $\bar s$, round every coefficient to mesh $1/[n(\bar s+1)]$ in a fixed bounded box. Grid vectors need not satisfy the original $\ell_1$ constraint exactly. The resulting regressions are bounded probabilities, with $\hat e\in[\epsilon,1-\epsilon]$. Their grid cardinalities obey
+\[
+ \log N_j\le C A_j,
+\]
+and each true regression has a grid approximation with uniform error at most $C/n$, since expit is $1/4$-Lipschitz.
+
+\begin{lemma}[Finite squared-loss dictionary]
+Let independent training observations have $0\le Y\le1$, and let $D\in\{0,1\}$ be a selection indicator. Suppose $m(X)=\E[Y\mid X,D=1]$ and $\Prb(D=1\mid X)\ge\epsilon$. For a finite set $\mathcal G$ of functions in $[0,1]$, let $\hat g$ minimize the empirical mean of $D(Y-g(X))^2$. Then
+\[
+ \E\|\hat g-m\|_{L^2(P_X)}^2
+ \le C_\epsilon\left\{\inf_{g\in\mathcal G}\|g-m\|_{L^2(P_X)}^2
+              +\frac{1+\log|\mathcal G|}{k}\right\}.
+\]
+The same assertion with $D=1$ needs no selection assumption.
+\end{lemma}
+\begin{proof}
+For $g\in\mathcal G$ define
+$Z_g=D\{(Y-g(X))^2-(Y-m(X))^2\}$ and
+$r_g=\E[D(g-m)^2]$. Conditional centering gives $\E Z_g=r_g$. Factoring the squared-loss difference shows $|Z_g|\le2|g-m|D$, hence $\Var(Z_g)\le4r_g$ and $|Z_g-\E Z_g|\le4$. Bernstein's inequality and $2\sqrt{ab}\le a/2+2b$ imply, simultaneously for all $g$ with probability at least $1-\delta$,
+\[
+ |\mathbb P_k Z_g-r_g|\le \tfrac12 r_g+
+ C\log(2|\mathcal G|/\delta)/k.
+\]
+Here $\mathbb P_k$ is the training average. If $g_0$ minimizes population approximation error over the dictionary, empirical optimality gives
+$\mathbb P_kZ_{\hat g}\le\mathbb P_kZ_{g_0}$, so
+$r_{\hat g}\le3r_{g_0}+C\log(2|\mathcal G|/\delta)/k$.
+Integrating this exponential tail and using
+$r_g\ge\epsilon\|g-m\|_2^2$ proves the claim. The Bernstein inequality used here follows by applying the exponential Markov bound to a bounded centered sum and using the power-series estimate
+$e^z\le1+z+z^2/[2(1-|z|/3)]$ for $|z|<3$.
+\end{proof}
+
+The lemma applies to the propensity with response $W$, and to the treated outcome with $D=W$. Boundedness also gives prediction risk at most one. Thus
+\begin{equation}\label{eq:prediction}
+ \E\|\hat e-e\|_2^2\le C u_e,
+ \qquad \E\|\hat m-m\|_2^2\le C u_m.
+\end{equation}
+No density estimator for $X$ is used.
+
+\section{A product risk theorem}
+On the third block form
+\[
+ \widetilde\psi=\frac1k\sum_{i=1}^k
+ \left[\hat m(X_i)+\frac{W_i}{\hat e(X_i)}
+                          \{Y_i-\hat m(X_i)\}\right],
+ \qquad \hat\psi=\min(1,\max(0,\widetilde\psi)).
+\]
+\begin{theorem}[A sufficient parametric region]
+For $n\ge6$, uniformly over the exact sparse logistic model,
+\[
+ \E(\hat\psi-\psi)^2\le C\{n^{-1}+u_eu_m\}.
+\]
+In particular $A_eA_m\le C_1n$ implies order-$n^{-1}$ risk, with the constant depending also on $C_1$.
+\end{theorem}
+\begin{proof}
+Condition on both training blocks. The conditional bias before clipping is exactly
+\begin{align*}
+ B&=\E\left[\hat m+\frac e{\hat e}(m-\hat m)-m\right]
+   =\E\left[\frac{\hat e-e}{\hat e}(\hat m-m)\right].
+\end{align*}
+Hence $B^2\le\epsilon^{-2}\|\hat e-e\|_2^2\|\hat m-m\|_2^2$.
+The two random fitted functions are independent, because they use different training blocks. Taking expectations factors this product and allows \eqref{eq:prediction} to be applied separately. The evaluation summands have absolute value at most $1+1/\epsilon$, so their conditional variance divided by $k$ is at most $C_\epsilon/k$. Bias--variance decomposition proves the result for $\widetilde\psi$. Projection onto $[0,1]$ cannot increase distance to $\psi\in[0,1]$.
+\end{proof}
+
+Independence of the two training blocks is doing real work: bounds on only their separate mean squared prediction errors would not justify factoring a product when both fits use the same observations. Other cross-fitting schemes are possible but require an appropriate joint error bound.
+
+\begin{proposition}[Parametric lower bound]
+Suppose the permitted covariate class is nonempty and the allowed outcome intercept interval has nonempty interior. Then there is $c>0$ such that the minimax squared risk is at least $c/n$ for all sufficiently large $n$.
+\end{proposition}
+\begin{proof}
+Fix any admissible covariate law and propensity with zero slopes and constant probability $e_0\in[\epsilon,1-\epsilon]$. Let $Y\mid W=0$ have a fixed Bernoulli law, and let $Y\mid W=1$ be Bernoulli with mean $\theta$, independent of $X$. Choose an interior permitted mean $\theta_0$ and alternatives $\theta_\pm=\theta_0\pm h/\sqrt n$, with small fixed $h>0$. These have zero outcome slopes and target $\theta_\pm$.
+
+For means in a fixed interior interval, $\operatorname{KL}(\mathrm{Ber}(p),\mathrm{Ber}(q))\le(p-q)^2/[q(1-q)]$, by $\log z\le z-1$. Consequently the $n$-sample KL divergence between the two laws is at most $C h^2$. Choose $h$ so that their total variation is at most $1/2$, using $\TV^2\le\operatorname{KL}/2$. Any estimator induces a test by selecting the nearer target. An incorrect selection entails squared error at least $h^2/n$, and the sum of the two testing error probabilities is at least $1-\TV\ge1/2$. One of its two risks is therefore at least $h^2/(4n)$.
+\end{proof}
+
+This proves a sharp order in the stated sufficient region; it does not prove that region necessary.
+\section{Approximate sparsity and the unresolved boundary}
+For a coefficient vector $v$, write $v^{(s)}$ for its $s$ largest slopes and $T_s(v)=\|v-v^{(s)}\|_1$. Since $|X_j|\le1$, truncation creates uniform probability error at most $C T_s(v)$. The same argument, using the union of all grids up to a selected $s$, yields prediction risk bounded by
+\[
+ C\min\left\{1,\frac{(s+1)\log\{C n(d+1)\}}n+T_s(v)^2\right\}.
+\]
+If $\sum_j|v_j|^q\le B$ with $0<q<1$, sorted coefficients satisfy
+$|v|_{(j)}\le B^{1/q}j^{-1/q}$. Integrating this bound gives
+$T_s(v)\le [q/(1-q)]B^{1/q}s^{1-1/q}$ for $s\ge1$. Substitution, followed by the same independent-training product argument, is a valid approximate-sparsity upper bound. At $q=1$ this $\ell_1$ truncation bound supplies no uniformly vanishing tail; replacing it by a decaying expression without further design control would be unjustified.
+
+The main omissions are matching lower bounds for the nonlinear sparse model when $A_eA_m\gg n$, sharper use of the sparse covariance restriction, and the full $q=1$ approximation frontier. The displayed product upper bound should not be labeled the minimax risk outside its proven matching region. It also carries avoidable grid logarithms and is not a claim of computationally efficient sparse regression.
+\begin{thebibliography}{9}
+\bibitem{CF} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta (2025).
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}. arXiv:2508.17099v1, Section 3.5.3, ``New models.''
+\url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}.
+\end{thebibliography}
+
+\end{document}

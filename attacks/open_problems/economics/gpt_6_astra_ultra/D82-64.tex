@@ -1,0 +1,86 @@
+% ECONOMICS_PROBLEM: {"id": "D82-64", "title": "Manipulation-resistant learning", "jel_code": "D82", "source_id": "OP-0287"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\setlength{\parskip}{4pt}
+\title{Manipulation-resistant learning: finite-horizon extraction certificates}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem:} \texttt{D82-64}. \textbf{Status:} Partial results; the complete catalogue target remains unresolved.
+\section{Problem and scope}
+The catalogue asks two buyers to learn well in stationary environments while retaining the type-dependent rents of a specified static Bayesian mechanism against nearly revenue-optimal adaptive sellers. Okumura's single-agent results motivate this question, and his conclusion explicitly raises multiple learning agents \cite{O}. We give an exact finite-horizon audit for a fixed pair of learning rules, including a two-policy witness for the worst extraction loss. This is a verification method, not an asymptotic construction of a manipulation-resistant learner.
+
+\section{The finite experiment}
+Fix $T$, finite persistent type sets, a full-support rational prior $F$, a finite seller mechanism menu, and fixed buyer algorithms. A menu element maps the current finite buyer-action profile to a lottery over a finite rational grid of feasible one-good allocations and bounded nonnegative payments; an opt-out action yields zero allocation and payment. Private observations and public observations are specified as part of the input. Assume the algorithms have finite memory, finite random choices with rational probabilities, and specified initial states. All seller observations are histories from a finite alphabet. The seller may randomize and remembers its own observations and actions. The static benchmark utilities $U_i^*(\theta_i)$ are supplied together with their mechanism and equilibrium convention.
+
+A deterministic seller policy assigns a menu element to every possible seller information history. There are finitely many such policies, including assignments at histories of probability zero. Enumerate them as $\sigma^1,\ldots,\sigma^J$. Exact summation over the finite probability tree gives
+\[
+ r_j=\mathbb E_F^{\sigma^j}\!\left[T^{-1}\sum_{t=1}^T(p_{1t}+p_{2t})\right],\qquad
+ u_{i\theta,j}=\mathbb E_F^{\sigma^j}\!\left[T^{-1}\sum_{t=1}^T(\theta x_{it}-p_{it})\mid\theta_i=\theta\right].
+\]
+The conditional calculation integrates the other buyer's type using $F(\theta_{-i}\mid\theta_i)$; independence is not assumed.
+
+\begin{theorem}[Exact extraction loss as finitely many linear programs]
+Under these assumptions let $r^*=\max_j r_j$ and $\eta\ge0$. For each supported buyer type define
+\begin{align}
+ \underline u_{i\theta}(\eta)=\min_{q\ge0}\quad&\sum_jq_j u_{i\theta,j},\label{eq:extractionlp}\\
+ \sum_jq_j=1,\qquad&\sum_jq_jr_j\ge r^*-\eta.\nonumber
+\end{align}
+Then the worst extraction loss over all $\eta$-optimal adaptive seller responses is
+\[
+ S_T(F)=\max_{i,\theta}\{U_i^*(\theta)-\underline u_{i\theta}(\eta)\}.
+\]
+If a nonnegative loss is desired, take the positive part of the right-hand side. For a declared finite class of priors, maximize this formula over that class.
+\end{theorem}
+\begin{proof}
+Fix all of the seller's random seeds before play. A realized seed specifies a deterministic action at every seller history, hence a deterministic policy in the enumerated list. Integrating over seeds gives probabilities $q_j$. This also covers fresh randomization at each information history: the finite collection of random choices can be drawn before play. The seed is independent of the initially hidden types. Expected revenue and each conditional type utility are consequently the corresponding linear combinations of $r_j$ and $u_{i\theta,j}$.
+
+Conversely, the seller can draw $j$ with probabilities $q_j$ before interaction and execute $\sigma^j$. Thus every feasible mixture is implementable. Revenue maximization over the simplex gives $r^*$, and the constraint in \eqref{eq:extractionlp} is exactly the approximate-best-response constraint. For each type the worst utility is the displayed minimum. Finally, a supremum over policies commutes with a maximum over the finitely many buyer types, which gives the stated formula. The simplex slice is nonempty and compact, so all minima are attained.
+\end{proof}
+
+\begin{proposition}[A worst response uses at most two pure policies]
+For every $(i,\theta)$, a minimizer in \eqref{eq:extractionlp} can be selected with at most two nonzero weights. When $\eta=0$, one revenue-maximizing deterministic policy suffices.
+\end{proposition}
+\begin{proof}
+A linear objective has an optimum at an extreme point of the feasible polytope. If an extreme point had at least three positive coordinates, there would be a nonzero perturbation $h$ on those coordinates with $\sum_jh_j=0$ and $\sum_jr_jh_j=0$. Both $q+\delta h$ and $q-\delta h$ would remain feasible for sufficiently small positive $\delta$, contradicting extremality. If $\eta=0$, a feasible mixture can put weight only on policies with $r_j=r^*$; selecting the one of these with smallest conditional utility is optimal.
+\end{proof}
+
+This is useful for reporting a failed learner: a counterexample can list two seller programs, their mixing probability, their expected revenues, and the affected conditional utility. A proof based on only one deterministic near-optimal seller can miss the worst mixture when $\eta>0$.
+
+\section{Opt-out does not by itself protect static rents}
+\begin{example}[A revenue-best response with positive extraction loss]
+There are two buyers. Buyer 2 has the single possible value zero. Buyer 1 has value $1/4$ with probability $9/10$ and value $1$ with probability $1/10$. The type prior has full support on these declared type sets. Payments are in $[0,1]$. The static benchmark sells to buyer 1 at price $1/4$, with acceptance at indifference. If both dynamic learners always opt out, every seller policy is revenue optimal, while buyer 1's high-type extraction loss is $3/4$ at every horizon.
+\end{example}
+\begin{proof}
+To verify the benchmark, write the single nonzero buyer's low/high interim allocation probabilities as $x_L,x_H$. BIC implies $x_H\ge x_L$. Low-type IR and the high-type deviation inequality give $p_L\le x_L/4$ and $p_H\le p_L+x_H-x_L\le x_H-3x_L/4$. Expected revenue is therefore at most
+\[
+ (9/10)(x_L/4)+(1/10)(x_H-3x_L/4)
+ = (3/20)x_L+(1/10)x_H\le1/4.
+\]
+The posted price attains the bound and leaves the high type utility $3/4$. Buyer 2 cannot pay a positive amount under IR. Under permanent opt-out all dynamic allocations and payments are zero, so maximal dynamic revenue and every buyer's realized utility are zero. The asserted loss follows. The always-opt-out learner also has linear stationary regret in a free-allocation environment, so this example does not establish an impossibility for efficient learners.
+\end{proof}
+
+\section{Remaining gap}
+The finite audit keeps correlation, private feedback, and seller adaptation explicit. Its enumeration is exponentially large in the horizon and assumes a finite seller menu; there is no claim of an efficient or horizon-uniform algorithm. Establishing an attainable two-buyer $(R_T,S_T)$ frontier still requires constructing learners and controlling their behavior uniformly in $T$ and over an infinite prior class. One cannot infer that frontier from a few finite-horizon certificates or copy a single-agent guarantee while ignoring the information revealed by the other learner.
+
+\begin{thebibliography}{9}
+\bibitem{O} K. Okumura, \emph{Robust Learning with Private Information}, arXiv:2505.05341v3 (2026). \url{https://arxiv.org/abs/2505.05341v3}. Sections 3--6 define and analyze the single-agent problem; Section 8 identifies multiple learning agents as a further direction. The finite-horizon propositions above are independent derivations, not the paper's asymptotic results.
+\end{thebibliography}
+\end{document}

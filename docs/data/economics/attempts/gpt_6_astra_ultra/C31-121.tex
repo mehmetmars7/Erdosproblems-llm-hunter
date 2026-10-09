@@ -1,0 +1,173 @@
+% ECONOMICS_PROBLEM: {"id": "C31-121", "title": "Decomposing effects of overlapping mediator mechanisms", "jel_code": "C31", "source_id": "OP-0518"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Local mechanism allocations and their statistical error}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C31-121}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\begin{abstract}
+With conditionally independent mediators and a sparse low-order outcome expansion, the catalogue's symmetric mechanism allocation is exactly a sum of small local allocations. We prove a polynomial evaluation formula, a simultaneous error bound separating statistical and numerical errors, and an estimable binary subclass. A positive-noise chain shows that bounded parent degree alone does not imply low-order interactions among mechanism switches.
+\end{abstract}
+\section{The allocation and a restricted graphical model}
+Treatment $W\in\{0,1\}$ acts on $p$ mediator mechanisms. For a switched set $S\subseteq[p]$, mechanism $j\in S$ uses its treatment-zero kernel and the others their treatment-one kernels; the outcome mechanism remains that under treatment one. Let $v(S)$ be the resulting mean. The target for mechanism $j$ is
+\[
+ a_j=\sum_{S\subseteq[p]\setminus\{j\}}
+ \frac{|S|!(p-|S|-1)!}{p!}\{v(S\cup\{j\})-v(S)\}.
+ \tag{1}
+\]
+The source motivates representing diffuse and overlapping mediators \cite{CF}; this particular allocation is an editorial choice and is not an intrinsic uniquely determined pathway decomposition.
+
+Assume all causal and positivity restrictions needed to identify the hybrid interventions. In this note's first subclass the mediators are independent conditional on $(X,W)$, each with at most $K$ states, with probabilities $k_j^w(m\mid x)$. Suppose the identified treatment-one outcome mean has a known sparse interaction representation
+\[
+ \mu_1(x,m)=\sum_{C\in\mathcal C}h_C(x,m_C),
+ \qquad |C|\le r,\quad |\mathcal C|=m_0,
+ \quad |h_C|\le B_C.
+ \tag{2}
+\]
+An empty interaction is allowed and makes no contribution to (1). Define for $D\subseteq C$
+\[
+ v_C(D;x)=\sum_{m_C}h_C(x,m_C)
+       \prod_{i\in C}k_i^{\ind\{i\notin D\}}(m_i\mid x).
+\]
+Then $v(S)=\E_X\sum_Cv_C(S\cap C;X)$.
+\section{A local identity and exact evaluation}
+\begin{theorem}[Local allocation formula]
+For $j\in C$, put
+\[
+ g_{C,j}(x)=\sum_{D\subseteq C\setminus\{j\}}
+ \frac{|D|!(|C|-|D|-1)!}{|C|!}
+       \{v_C(D\cup\{j\};x)-v_C(D;x)\}.
+\]
+Then
+\[
+ a_j=\E_X g_j(X),\qquad
+ g_j(x)=\sum_{C\ni j}g_{C,j}(x), \tag{3}
+\]
+and $\sum_ja_j=v([p])-v(\varnothing)$. Given all nuisance values at one $x$, all $g_j(x)$ can be computed with $O(m_0r2^rK^r)$ arithmetic operations, apart from storage and evaluation of those supplied nuisance functions.
+\end{theorem}
+\begin{proof}
+For a uniformly random permutation of $[p]$, the probability that exactly $S$ precedes $j$ is $|S|!(p-|S|-1)!/p!$. Thus (1) is the expected marginal change on inserting $j$ in that permutation. Expand $v$ using (2). Terms with $j\notin C$ cancel. In a term with $j\in C$, only the relative ordering of the elements of $C$ matters; restriction of a uniform permutation to $C$ is uniform over its $|C|!$ orders. Its predecessor distribution gives precisely $g_{C,j}$. Taking expectation in $X$ proves (3).
+
+For every full permutation, the sum of its $p$ successive marginal changes telescopes to $v([p])-v(\varnothing)$. Averaging proves efficiency. Finally, each of at most $2^{|C|}$ local values requires at most $K^{|C|}$ summands and $O(r)$ operations per product. Summing its marginal changes for all $j\in C$ has no larger order. Add over the $m_0$ interactions.
+\end{proof}
+
+\section{A simultaneous error certificate}
+Suppose nuisance estimates are trained independently of $n$ evaluation covariates $X_1,\ldots,X_n$. They remain probability kernels, and $|\hat h_C|\le B_C$. On a training event $\mathcal E$ suppose, uniformly in $x$,
+\[
+ |\hat h_C-h_C|\le\gamma_C,
+ \qquad
+ \max_{w=0,1}\sum_m|\hat k_i^w(m\mid x)-k_i^w(m\mid x)|\le\delta_i.
+ \tag{4}
+\]
+Let $D_j=\sum_{C\ni j}B_C$ and
+$E_C=\gamma_C+B_C\sum_{i\in C}\delta_i$.
+Compute local allocations using these fits and average them over the evaluation covariates. Permit an additional deterministic numerical error of absolute size at most $\nu_j$ in the final coordinate; call the output $\hat a_j$.
+
+\begin{theorem}[Uniform coordinate error]
+Conditional on any training sample in $\mathcal E$, with probability at least $1-\alpha$ over the evaluation sample, all coordinates satisfy
+\[
+ |\hat a_j-a_j|\le
+ 2\sum_{C\ni j}E_C+
+ 2D_j\sqrt{\frac{2\log(2p/\alpha)}n}+\nu_j.
+ \tag{5}
+\]
+If $\Prb(\mathcal E)\ge1-\eta$, intervals centered at $\hat a_j$ with these radii cover the entire allocation vector with probability at least $1-\alpha-\eta$.
+\end{theorem}
+\begin{proof}
+A product of probability kernels changes in $\ell_1$ distance by at most the sum of the component $\ell_1$ changes. Indeed telescope the two products one factor at a time, sum absolute values, and use unit mass of every unchanged factor. Therefore every local hybrid value has error at most $E_C$. The weights in the local formula for $g_{C,j}$ sum to one, so its two value differences give error at most $2E_C$. Summing proves a uniform approximation error $2\sum_{C\ni j}E_C$ for $g_j$.
+
+Also $|\hat g_{C,j}(x)|\le2B_C$, hence $|\hat g_j(x)|\le2D_j$. Conditional on training, the evaluation variables are independent. The bounded-variable exponential inequality gives
+\[
+ \Prb\left(\left|n^{-1}\sum_i\hat g_j(X_i)-\E\hat g_j(X)\right|
+ >2D_j\sqrt{2\log(2p/\alpha)/n}\right)\le\alpha/p.
+\]
+A union bound, the deterministic approximation error, and the numerical error give (5). Adding the training failure probability proves the unconditional coverage assertion.
+\end{proof}
+
+The formula displays two distinct growth costs: interaction size controls computation, while the number and magnitudes of interactions containing a coordinate control its error. If $B_C\le B$, every coordinate belongs to at most $\Delta$ terms, and all nuisance bounds are $\gamma,\delta$, the first term is at most $2\Delta(\gamma+Br\delta)$.
+
+\section{A directly estimable binary subclass}
+There is a useful case in which the local formula simplifies further. Let $M_j\in\{-1,1\}$. Suppose $W$ is randomized with probability $1/2$, and given $X,W=1$ all mediators are independent fair signs. Given $X,W=0$, they are independent with means $\nu_j(x)\in[-1+\zeta,1-\zeta]$, for fixed $\zeta>0$. Assume $0\le Y\le1$ and
+\[
+ \mu_1(x,m)=h_\varnothing(x)+
+          \sum_{\varnothing\ne C\in\mathcal C}h_C(x)\prod_{j\in C}m_j.
+ \tag{6}
+\]
+The joint function is assumed to remain in $[0,1]$. The known collection has $O(p)$ terms, $|C|\le r$, and maximum coordinate incidence $\Delta$. All $h_C,\nu_j$ are $s$-H\"older in $x\in[0,1]^d$, $0<s\le1$, with known radius; $X$ has a density bounded above and below.
+
+\begin{proposition}[Explicit identified formula and constructive rate]
+In this subclass,
+\[
+ h_C(x)=\E\left[Y\prod_{j\in C}M_j\mid X=x,W=1\right],
+ \qquad
+ a_j=\E_X\sum_{C\ni j}\frac{h_C(X)}{|C|}\prod_{i\in C}\nu_i(X).
+ \tag{7}
+\]
+For fixed $d,r,\Delta$, independent training and evaluation samples of sizes proportional to $n$, histogram estimates of these conditional means with mesh
+$h\asymp\{\log(np)/n\}^{1/(2s+d)}$ give simultaneous error
+\[
+ \max_j|\hat a_j-a_j|
+ =O_{\Prb}\left(\Delta\{\log(np)/n\}^{s/(2s+d)}
+       +\Delta\sqrt{\log(2p)/n}\right),
+ \tag{8}
+\]
+provided $\log(np)=o(n)$. Known radii and bounded-outcome concentration yield honest simultaneous intervals at the same order. Evaluation is polynomial in $n,p$ for fixed $r,d$.
+\end{proposition}
+\begin{proof}
+The fair independent signs form an orthogonal product basis: the expectation of the product for distinct sets is zero and for the same set is one. Multiplying (6) by the sign product and conditioning proves the first identity. A local interaction has zero mean whenever any member of $C$ remains under its fair treatment-one kernel; if all are switched, its mean is $h_C\prod_{i\in C}\nu_i$. Each member of $C$ is equally likely to be last in a random permutation of $C$, so it receives exactly $1/|C|$ of this value. This proves (7).
+
+For the rate, estimate each $h_C$ by averaging the bounded response $Y\prod_{i\in C}M_i$ among treated observations in a covariate cube, and each $\nu_j$ by averaging $M_j$ among controls there. Clip the fits to $[-1,1]$. Cube approximation bias is at most $L(\sqrt d h)^s$. There are $O(ph^{-d})$ conditional means. Every group--cube probability is at least $c h^d/2$. A binomial lower-tail bound and union bound show that, with probability tending to one, all counts are at least a constant times $nh^d$. Conditional on counts, the bounded-variable inequality and another union bound give a uniform stochastic error at most $C\sqrt{\log(np)/(nh^d)}$. These same inequalities with explicit failure budgets give finite-sample honest bounds, using the full response interval for empty cubes.
+
+Let the resulting uniform bound be $\varepsilon_n$. Since all fitted means have absolute value at most one, telescoping products in (7) bounds the error of its $C$ term by $(1+|C|)\varepsilon_n/|C|\le2\varepsilon_n$. Summing at most $\Delta$ terms gives $2\Delta\varepsilon_n$. The independent evaluation step adds $O_{\Prb}(\Delta\sqrt{\log(2p)/n})$ by bounded-variable concentration. The stated mesh balances bias and stochastic error, proving (8) and its coverage version.
+\end{proof}
+
+\section{Why bounded parent sets are insufficient}
+For a contrasting identified positive-kernel model, arrange binary mediators in a chain. At the root, $\Prb(M_1=1)$ is $u_0$ or $u_1$ according to its selected mechanism, where $0<u_0,u_1<1$ and $u_0\ne u_1$ (for example, $u_0=1/4$ and $u_1=3/4$). At every subsequent node use
+\[
+ \Prb(M_j=1\mid M_{j-1}=m)=a+b_wm,
+ \qquad w\in\{0,1\},
+\]
+with $a>0$, distinct $b_0,b_1>0$, and $a+\max b_w<1$. All conditional probabilities are strictly between zero and one. Let the outcome be $Y=M_p$. Every parent set has size one and the outcome is a one-coordinate function. Nevertheless the $p$-fold discrete difference of $v(S)$ with respect to all mechanism switches equals
+\[
+ (u_0-u_1)(b_0-b_1)^{p-1}\ne0.
+\]
+To verify this, write recursively $m_j=a+b_{w_j}m_{j-1}$. Terms arising from the additive $a$ do not depend on the root switch and disappear upon differencing that switch. The remaining term is $u_{w_1}\prod_{j=2}^pb_{w_j}$; differencing all coordinates gives the formula. Thus low parent degree and a sparse observed outcome alone do not bound the interaction order of the hybrid value function.
+
+The local algorithm is therefore restricted to independent mediators, not a solution for the full sparse DAG class. Sharp minimax simultaneous rates, general dependence and graph-width conditions, and efficient estimation of arbitrary outcome interactions remain unresolved. Numerical error has been explicitly budgeted rather than folded into an unspecified statistical rate.
+\begin{thebibliography}{9}
+\bibitem{CF} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta (2025).
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}. arXiv:2508.17099v1, Section 3.4.3, ``Representing complex mediators.''
+\url{https://arxiv.org/html/2508.17099v1#S3.SS4.SSS3}.
+\end{thebibliography}
+
+\end{document}

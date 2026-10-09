@@ -1,0 +1,174 @@
+% ECONOMICS_PROBLEM: {"id": "C14-54", "title": "Adaptation across different structural classes of causal nuisances", "jel_code": "C14", "source_id": "OP-0531"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Adaptation across different structural classes of causal nuisances: Aggregation without a structural-class label}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+The three specified families impose, respectively, H\"older, bounded-variation,
+and sparse-logistic restrictions on the propensity $e$ and treated regression $m$.
+Here $X$ is uniform, $Y,W$ are binary, and $\varepsilon\le e\le1-\varepsilon$.
+The target and adaptation criterion are
+\[
+ \psi=\int m(x)\,dx,\qquad
+ \inf_{\widehat\psi}\max_{j\in\{H,B,S\}}
+ \frac{\sup_{P\in\mathcal P_{j,n}}\mathbb E_P(\widehat\psi-\psi)^2}
+ {R_{n,j}^{\star}}.
+\]
+The cross-class agenda is stated in \cite[Section 3.5.3]{agenda}.
+This note proves a sufficient condition for constant-factor adaptation and a
+necessary constrained-risk inequality. Neither evaluates all three constituent
+minimax risks. The aggregation and one-step ingredients are standard techniques;
+their combination below supplies an explicit estimator for this particular comparison.
+
+\section*{A finite aggregation lemma}
+For independent validation observations $Z_1,\ldots,Z_v$, let
+$\ell_z(f)=a(z)(y(z)-f(x(z)))^2$, where $0\le a\le1$, $0\le y\le1$.
+Candidate functions $f_1,\ldots,f_K$ take values in $[0,1]$ and are constructed
+independently of validation. Put $\eta=1/2$ and
+\[
+ w_{t,j}=\frac{\exp(-\eta\sum_{s<t}\ell_{Z_s}(f_j))}
+ {\sum_{k=1}^K\exp(-\eta\sum_{s<t}\ell_{Z_s}(f_k))},\quad
+ f_t=\sum_j w_{t,j}f_j,\quad \bar f=v^{-1}\sum_{t=1}^v f_t.
+\]
+\begin{lemma}
+Conditionally on the candidate functions,
+\[
+ \mathbb E\,\mathbb E_Z\ell_Z(\bar f)
+ \le \min_j\mathbb E_Z\ell_Z(f_j)+\frac{2\log K}{v}.
+\]
+\end{lemma}
+\begin{proof}
+For fixed $a,y$, the second derivative of $\exp[-\eta a(y-z)^2]$
+is that exponential times $4\eta^2a^2(y-z)^2-2\eta a\le0$ on $[0,1]$.
+Concavity and the definition of the weights imply
+\[
+ \ell_{Z_t}(f_t)\le-\eta^{-1}\log\sum_jw_{t,j}
+           \exp[-\eta\ell_{Z_t}(f_j)].
+\]
+Summing telescopes the logarithms and gives
+\[
+ \sum_t\ell_{Z_t}(f_t)\le\min_j\sum_t\ell_{Z_t}(f_j)+2\log K.
+\]
+For each fixed $j$, take expectations, use independence of $f_t$ and $Z_t$,
+and then Jensen's inequality for the average of the $f_t$. Finally minimize
+over the fixed $j$. This does not take an expectation of a minimum in the
+wrong direction.
+\end{proof}
+
+\section*{A single estimator and an oracle guarantee}
+Split the data into five blocks whose sizes are between $n/6$ and $n/4$
+for sufficiently large $n$. Use the first two blocks to train and validate
+three propensity candidates. Use the next two, independently, to train and
+validate three outcome candidates. Propensities are clipped to
+$[\varepsilon,1-\varepsilon]$; outcomes to $[0,1]$.
+For propensity validation use $(W-f(X))^2$; for outcome validation use
+$W(Y-f(X))^2$. Denote the resulting aggregates by $\bar e,\bar m$.
+On the fifth block, of size $N$, form and clip to $[0,1]$ the estimator
+\[
+ \widetilde\psi=\frac1N\sum_{i=1}^N
+ \left[\bar m(X_i)+\frac{W_i}{\bar e(X_i)}
+                  \{Y_i-\bar m(X_i)\}\right].                 \tag{1}
+\]
+All expectations in the next statement include training randomness.
+The norm $\|\cdot\|_2$ is Lebesgue $L^2$ on the unit cube.
+\begin{theorem}
+Suppose that for every family $j$ there is a candidate among the three
+propensity learners and a candidate among the three outcome learners with
+\[
+ \sup_{P\in\mathcal P_{j,n}}\mathbb E\|\widehat e_j-e\|_2^2
+ \le a_{j,n}^2,\qquad
+ \sup_{P\in\mathcal P_{j,n}}\mathbb E\|\widehat m_j-m\|_2^2
+ \le b_{j,n}^2.
+\]
+Then (1), using no class label, satisfies
+\[
+ \sup_{P\in\mathcal P_{j,n}}\mathbb E(\widehat\psi-\psi)^2
+ \le C_\varepsilon\left\{n^{-1}+
+       (a_{j,n}^2+n^{-1})(b_{j,n}^2+n^{-1})\right\}.       \tag{2}
+\]
+Consequently, if $R_{n,j}^\star\ge c/n$ and
+$a_{j,n}^2b_{j,n}^2\le C R_{n,j}^\star$ for all three families,
+the displayed adaptation criterion is bounded uniformly in $n$.
+\end{theorem}
+\begin{proof}
+Subtracting the Bayes risk in the aggregation lemma gives
+$\mathbb E\|\bar e-e\|_2^2\le a_{j,n}^2+C/n$.
+For outcomes it gives
+$\mathbb E\int e(x)(\bar m-m)^2dx\le b_{j,n}^2+C/n$,
+and hence the corresponding unweighted bound divided by $\varepsilon$.
+Conditionally on both aggregates, the summands in (1) are independent and
+bounded in absolute value by $1+1/\varepsilon$. Their conditional bias is exactly
+\[
+ B=\int\left(1-\frac{e}{\bar e}\right)(\bar m-m)dx.
+\]
+Cauchy--Schwarz gives
+$B^2\le\varepsilon^{-2}\|\bar e-e\|_2^2\|\bar m-m\|_2^2$.
+The two aggregates are independent because their training and validation
+blocks are disjoint. Thus the expectation of this product factors. Conditional
+variance is at most $(1+1/\varepsilon)^2/N$. Projection onto $[0,1]$
+cannot increase squared error, proving (2). Since clipped candidate squared
+errors are bounded by one, the cross terms in (2) are $O(n^{-1})$.
+The two hypotheses of the last assertion therefore bound every ratio.
+\end{proof}
+
+\begin{remark}
+A candidate may work well in several classes. No test for a unique class
+membership is needed. The theorem also permits selecting the best propensity
+and outcome structures separately. Conversely, the product condition can
+fail where higher-order estimators outperform first-order estimation;
+(2) does not certify optimal adaptation in that region.
+\end{remark}
+
+\section*{An obstruction involving the target, rather than class labels}
+\begin{proposition}
+Let $P_0$ and $P_1$ belong to two of the declared families, with sample laws
+$P_0^n,P_1^n$, $P_1^n\ll P_0^n$, and
+$\chi^2(P_1^n,P_0^n)<\infty$. Write $\Delta=|\psi(P_1)-\psi(P_0)|$.
+If an estimator has risk at most $A r_0$ at $P_0$, then
+\[
+ \mathbb E_{P_1^n}(\widehat\psi-\psi(P_1))^2
+ \ge\left[\Delta-\sqrt{A r_0\{1+\chi^2(P_1^n,P_0^n)\}}\right]_+^2. \tag{3}
+\]
+In particular an adaptation factor $A$ on classes with risks $r_0,r_1$
+requires the right side of (3) to be at most $A r_1$ for every such pair.
+\end{proposition}
+\begin{proof}
+Let $L=dP_1^n/dP_0^n$. Cauchy--Schwarz yields
+$|\mathbb E_1(\widehat\psi-\psi(P_0))|
+\le\sqrt{A r_0\mathbb E_0L^2}$. Subtract the target difference,
+apply the reverse triangle inequality, and use
+$\mathbb E_1 Z^2\ge(\mathbb E_1Z)^2$. Finally
+$\mathbb E_0L^2=1+\chi^2(P_1^n,P_0^n)$.
+\end{proof}
+
+\section*{Unresolved part}
+The missing work is to evaluate the constituent risks for the precise BV and
+sparse dictionaries, construct hard cross-class pairs or mixtures for (3),
+and decide whether higher-order aggregation beats (2) in the remaining
+regions. Dictionary size and sparsity alone do not specify approximation
+geometry or distinguishability. The sufficient condition proved here is
+not asserted to be necessary, and (3) is not a claim that structural classes
+must be disjoint or testably separated.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

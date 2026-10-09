@@ -1,0 +1,113 @@
+% ECONOMICS_PROBLEM: {"id": "C12-126", "title": "Pre-analysis commitments compatible with adaptive experimentation", "jel_code": "C12", "source_id": "OP-0486"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C12-126}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Pre-analysis commitments compatible with adaptive experimentation}
+
+\textbf{Status.} Unresolved for optimal discovery across general adaptive targets. The results below give a checkable commitment rule and a treatment-budget separation bound in one restricted experiment.
+
+\subsection*{Short problem and statistical model}
+A pre-analysis commitment fixes a measurable program before observations arrive. The program may adapt allocations and create hypotheses; the aim is familywise error at most $\alpha$ at every time and useful discovery power under an expected treatment budget.
+Let $\mathcal F_t$ contain observations and authorized randomness through time $t$. A launched test $j$ has stopping-time launch $\sigma_j$, an $\mathcal F_{\sigma_j}$-measurable level $a_j\geq0$, and subsequently observed scores $X_{jt}\in[-1,1]$. Its null is the \emph{conditional} assertion
+\[
+ H_j:\quad \E[X_{jt}\mid\mathcal F_{t-1}]\leq0\quad(t>\sigma_j).
+\]
+A newly chosen target must meet this assertion under its claimed null after conditioning on the history that chose it. Unconditional zero means are insufficient. Assume countably many launches and $\sum_j a_j\leq\alpha$ almost surely. A test with $a_j=0$ never rejects. For each fixed sampling law, whether a launched hypothesis is true is required to be measurable at its launch; its conditional score restriction must hold on all such true-null launch histories.
+
+\begin{theorem}[Commitments that survive predictable updates]
+For $t>\sigma_j$ choose $\mathcal F_{t-1}$-measurable bets $\lambda_{jt}\in[0,1]$, and define
+\[
+ E_{jt}=\prod_{s=\sigma_j+1}^{t}(1+\lambda_{js}X_{js}).
+\]
+Reject $H_j$ only if $E_{jt}\geq1/a_j$. Under every law for which the declared true nulls obey their conditional score restrictions, the probability of ever rejecting any true null is at most $\alpha$. The assertion permits adaptive assignment, adaptive bets, and history-selected hypotheses launched on future observations.
+\end{theorem}
+\begin{proof}
+Under a true null the factors are nonnegative and their conditional means are at most one, so $E_{jt}$ is a nonnegative supermartingale starting at one at its launch. For any finite horizon, stop at its first crossing of $1/a_j$ or the horizon. Conditional expectation at the launch is at most one; on crossing the stopped value is at least $1/a_j$. Thus the conditional crossing probability is at most $a_j$. Increasing the horizon gives the same bound for ever crossing. Multiply by the history-measurable indicator that the selected null is true, take expectations and sum over launches. The union bound gives at most $\E\sum_j a_j\leq\alpha$. If truth is represented by a law-dependent conditional hypothesis, the same proof applies on launch histories where the conditional restriction holds.
+\end{proof}
+
+For example, at time $t$ let potential outcomes lie in $[0,1]$, randomize $W_t$ with predictable known $p_t\in[\epsilon,1-\epsilon]$, independently of that unit's potential outcomes conditional on past information. Set
+\[
+ X_t=\epsilon\left\{\frac{W_tY_t}{p_t}
+               -\frac{(1-W_t)Y_t}{1-p_t}-\theta_0\right\}/2,
+ \qquad \theta_0\in[-1,1].
+\]
+Then $|X_t|\leq1$, and its conditional mean is nonpositive if the next unit's conditional treatment effect is at most $\theta_0$. Changing eligibility or outcomes is valid only if the updated score still has this property. A null about a population average alone need not imply it for outcome-adaptively selected subpopulations.
+
+\subsection*{An information limit imposed by the budget}
+Consider a fixed horizon $T$. Control responses are Bernoulli$(1/2)$ under both laws. Treatment responses are independent Bernoulli$(1/2)$ under $P_0$ and Bernoulli$(1/2+\Delta)$ under $P_\Delta$, where $0<\Delta\leq1/4$. Conditional assignment kernels may adapt to all previous observations, but the same committed kernel is used under both laws. Write $N_T=\sum_{t\leq T}W_t$. We impose $\E_0N_T\leq bT$, where $0<b<1$.
+
+\begin{proposition}[Budget lower bound for any adaptive test]
+For any rejection event $R\in\mathcal F_T$ with $P_0(R)\leq\alpha$,
+\[
+ P_\Delta(R)\leq\alpha+\sqrt{\frac43 bT\Delta^2}.
+\]
+Thus power bounded away from size requires $bT\Delta^2$ bounded away from zero, even when assignments and stopping decisions adapt.
+\end{proposition}
+\begin{proof}
+Factor the joint likelihood sequentially. The assignment factors cancel, as do control-response factors. Taking expectation under $P_0$ gives
+\[
+ \KL(P_0,P_\Delta)=\E_0N_T\,
+ \KL(\mathrm{Ber}(1/2),\mathrm{Ber}(1/2+\Delta))
+ =\E_0N_T[-\tfrac12\log(1-4\Delta^2)].
+\]
+For $4\Delta^2\leq1/4$, the last bracket is at most
+$2\Delta^2/(1-4\Delta^2)\leq(8/3)\Delta^2$.
+Pinsker's inequality and $P_\Delta(R)\leq P_0(R)+\TV(P_0,P_\Delta)$ prove the claim. The calculation includes internal randomization by adjoining its common law to the experiment.
+\end{proof}
+
+\begin{proposition}[A budget-feasible anytime test with power]
+Use independent assignments $W_t\sim\mathrm{Ber}(b)$ and the prespecified alternative $\Delta\in(0,1/4]$. For the null that treatment success probability is at most $1/2$, define
+\[
+ L_t=\prod_{s\leq t}\{1+2\Delta(2Y_s-1)\}^{W_s}.
+\]
+Reject when $L_t\geq1/\alpha$. The test is valid at every time, satisfies $\E N_T=bT$, and, if $bT\Delta^2\geq3\log(1/\alpha)$, has power by $T$ at least
+\[
+ 1-\exp(-bT/8)-\exp(-bT\Delta^2/16)
+\]
+under $P_\Delta$.
+\end{proposition}
+\begin{proof}
+Each factor has conditional expectation at most one under the null, giving the preceding supermartingale argument. Under the alternative, $N_T$ is binomial and $\Prb(N_T<bT/2)\leq e^{-bT/8}$. Conditional on assignments, the $N_T$ treated responses are independent with mean $1/2+\Delta$. Their empirical mean is at least $1/2+3\Delta/4$, except with probability $e^{-N_T\Delta^2/8}$ by Hoeffding.
+The mean log likelihood for a treated response is
+$\KL(\mathrm{Ber}(1/2+\Delta),\mathrm{Ber}(1/2))\geq2\Delta^2$ by Pinsker. Also
+\[
+ \log\frac{1+2\Delta}{1-2\Delta}
+ =\int_0^{2\Delta}\frac{2\,du}{1-u^2}\leq\frac{16}{3}\Delta.
+\]
+Reducing the empirical success frequency from its mean by $\Delta/4$ therefore leaves average log likelihood at least $(2/3)\Delta^2$. On the two good events, $\log L_T\geq bT\Delta^2/3\geq\log(1/\alpha)$. Their failure probabilities give the bound, and crossing by $T$ follows from $L_T$ crossing at $T$ if it has not crossed earlier.
+\end{proof}
+
+\subsection*{Remaining gap}
+The lower and upper results isolate the effective information budget $bT$, with logarithmic confidence costs in the constructive test. They do not optimize allocation across multiple unknown alternatives, outcome definitions or eligible populations. The test uses a prespecified effect size; mixtures of such likelihood processes remain valid, but their optimal discovery utility and selection costs are not characterized here. Registration alone does not verify a conditional score inequality, and the theorem supplies no causal justification for an outcome or population selected after observing its responses.
+
+\subsection*{Reference and provenance}
+Carlos Cinelli, Avi Feller, Guido Imbens, Edward Kennedy, Sara Magliacane and Jose Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.1.3, ``Automation and reducing frictions.'' \url{https://arxiv.org/html/2508.17099v1}. This is the inspected source of the agenda. The supermartingale construction is a standard method, proved here; the restricted budget calculation does not claim an optimal general adaptive discovery program.
+
+\end{document}

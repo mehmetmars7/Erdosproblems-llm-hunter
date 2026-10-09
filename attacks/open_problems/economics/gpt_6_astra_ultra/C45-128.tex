@@ -1,0 +1,122 @@
+% ECONOMICS_PROBLEM: {"id": "C45-128", "title": "Neural-network structure in conditional treatment effects", "jel_code": "C45", "source_id": "OP-0499"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C45-128}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Neural-network structure in conditional treatment effects}
+
+\textbf{Status.} Unresolved for arbitrary unknown neural architectures and honest adaptation. We derive oracle and nuisance-dependent risk bounds for a fixed ReLU feature space, prove a matching lower bound on an explicit network subfamily, and construct finite-sample honest balls when an approximation bound is given.
+
+\subsection*{Short question and fixed-feature restriction}
+The target is the conditional treatment effect $\tau(x)=\E[Y(1)-Y(0)\mid X=x]$, not neural weights. Assume independent observations, $X$ uniform on $[0,1]^d$, consistency, no interference, conditional exchangeability, and $Y\in[-B,B]$. These causal assumptions precede any neural representation. Let $V_s$ be a known $s$-dimensional space spanned by fixed ReLU-network functions, and let $\phi_1,\ldots,\phi_s$ be a known orthonormal basis for $V_s$ in $L^2([0,1]^d)$. The basis itself need not have a particular normalization as a neural network. Assume
+\[
+ \inf_{f\in V_s}\|\tau-f\|_2\leq a.
+\]
+The known approximation bound $a$ is part of the inference problem. Computation of the basis and its integrals is assumed available; no optimization claim for learned hidden layers follows.
+
+\begin{theorem}[Exact oracle risk and an honest function ball]
+In a randomized experiment with $e(x)=1/2$, put
+\[
+ Z_i=2(2W_i-1)Y_i,\qquad
+ \widehat\theta_j=\frac1n\sum_{i=1}^n\phi_j(X_i)Z_i,\qquad
+ \widehat\tau=\sum_{j=1}^s\widehat\theta_j\phi_j.
+\]
+Then
+\[
+ \E\|\widehat\tau-\tau\|_2^2
+ =\|\tau-\Pi_{V_s}\tau\|_2^2+
+       \frac1n\sum_{j=1}^s\Var(\phi_j(X)Z)
+ \leq a^2+\frac{4B^2s}{n}.
+\]
+Moreover, the ball in $L^2([0,1]^d)$ centered at $\widehat\tau$ with squared radius
+\[
+ r^2=a^2+\frac{4B^2s}{n\alpha}
+\]
+covers $\tau$ with probability at least $1-\alpha$, uniformly over the declared class.
+\end{theorem}
+\begin{proof}
+Randomization and the causal assumptions give $\E[Z\mid X]=\tau(X)$, and $|Z|\leq2B$. Each coefficient is unbiased for $\langle\phi_j,\tau\rangle$. Orthogonality separates squared error into the fixed approximation residual and the squared coefficient errors; independence of observations yields the variance identity. Since $\E\phi_j(X)^2=1$, each variance is at most $4B^2$. Finally, Markov's inequality applied only to the nonnegative squared coefficient error, whose mean is at most $4B^2s/n$, gives the asserted radius after adding the fixed residual bound $a^2$.
+\end{proof}
+The ball is conservative in its dependence on $\alpha$, but has the oracle $s/n$ squared-radius order at fixed confidence. It is a confidence region for a function in a known feature space plus approximation residual, not a weight confidence set.
+
+\begin{theorem}[Conditional nuisance bound]
+Suppose instead $\epsilon\leq e\leq1-\epsilon$. Train $\widehat e,\widehat m_0,\widehat m_1$ on data independent of the $n$ estimation observations, with $\widehat e\in[\epsilon,1-\epsilon]$ and $\widehat m_w\in[-B,B]$. In the coefficient estimator replace $Z_i$ by
+\[
+ Z=\widehat m_1(X)-\widehat m_0(X)
+       +\frac{W(Y-\widehat m_1(X))}{\widehat e(X)}
+       -\frac{(1-W)(Y-\widehat m_0(X))}{1-\widehat e(X)}.
+\]
+Conditional on training, let
+\[
+ b=(\widehat e-e)
+       \left\{\frac{\widehat m_1-m_1}{\widehat e}
+                  +\frac{\widehat m_0-m_0}{1-\widehat e}\right\},
+ \quad K=2B+2B/\epsilon.
+\]
+Then
+\[
+ \E[\|\widehat\tau-\tau\|_2^2\mid\text{training}]
+ \leq a^2+\|b\|_2^2+K^2s/n,
+ \quad
+ \|b\|_2\leq\epsilon^{-1}\|\widehat e-e\|_4
+       (\|\widehat m_1-m_1\|_4+\|\widehat m_0-m_0\|_4).
+\]
+\end{theorem}
+\begin{proof}
+Conditioning first on $X$ and substituting $\E[WY\mid X]=em_1$ and $\E[(1-W)Y\mid X]=(1-e)m_0$ gives $\E[Z\mid X,\text{training}]=\tau+b$ by direct algebra. Also $|Z|\leq K$, since only one residual term is nonzero. Coefficient variances sum to at most $K^2s/n$. The mean estimator is $\Pi_{V_s}(\tau+b)$, so its squared bias relative to $\tau$ is the sum of the orthogonal approximation residual and $\|\Pi_{V_s}b\|_2^2\leq\|b\|_2^2$. The final inequality is H\"older's inequality and the clipping bound on denominators.
+\end{proof}
+If training yields a certified deterministic $\|b\|_2\leq r_b$, Markov gives a conditional honest ball with squared radius $a^2+(r_b^2+K^2s/n)/\alpha$. A high-probability training certificate can be combined by allocating error to its failure. Estimated nuisance accuracy without a uniform certificate does not itself justify that confidence radius.
+
+\subsection*{A concrete ReLU family attaining the dimensional rate}
+Set $d=1$. Partition $[0,1]$ into $s$ intervals $J_j=[(j-1)/s,j/s]$, and let $t_j$ be the triangular tent, zero outside $J_j$, zero at its endpoints and one at its midpoint. Explicitly, with $a_j=(j-1)/s$, $b_j=(j-1/2)/s$, $c_j=j/s$,
+\[
+ t_j(x)=2s\{(x-a_j)_+-2(x-b_j)_++(x-c_j)_+\}.
+\]
+Thus $\|t_j\|_2^2=1/(3s)$ and $\phi_j=\sqrt{3s}\,t_j$ are orthonormal. A function $\tau_\omega=h\sum_{j=1}^s\omega_jt_j$, $\omega_j\in\{-1,1\}$, is a one-hidden-layer ReLU network of width $3s$, with $O(s)$ nonzero parameters and magnitudes bounded by $\max(1,4sh)$. Clipping to $[-2B,2B]$ is inactive when $h\leq B/2$.
+
+\begin{theorem}[Restricted minimax lower bound]
+Let $e=1/2$, $m_0=0$ and $m_1=\tau_\omega$. Conditional on $X=x,W=w$, let $Y\in\{-B,B\}$ have mean $m_w(x)$. For every $n,s\geq1$, every estimator $\widetilde\tau$ satisfies
+\[
+ \sup_\omega\E_\omega\|\widetilde\tau-\tau_\omega\|_2^2
+ \geq\frac{B^2}{192}\min\{1,s/n\}
+\]
+when $h=\min\{B/2,B\sqrt{s/(16n)}\}$. In this subfamily $a=0$, $m_0$ is smooth of every order, and conditional variances are at least $3B^2/4$.
+\end{theorem}
+\begin{proof}
+Two sign vectors differing only at coordinate $j$ change outcomes only when $W=1$ and $X\in J_j$. At such a point, write $u=ht_j(x)/B\leq1/2$. The divergence between Bernoulli probabilities $(1+u)/2$ and $(1-u)/2$ is $u\log((1+u)/(1-u))\leq4u^2$. Averaging over treatment and $X$ gives one-observation divergence at most $2h^2/(3sB^2)$, and $n$ observations give at most $1/24$ with our choice of $h$. Hence adjacent experiments have TV at most $1/2$.
+Assign an estimated sign by the sign of $\langle\widetilde\tau,\phi_j\rangle$, breaking zero ties arbitrarily. A wrong sign entails squared coefficient error at least $h^2/(3s)$. For each fixed configuration of the other signs, the sum of the two testing errors for sign $j$ is at least $1-\TV\geq1/2$. Averaging over the $2^s$ sign vectors therefore gives error probability at least $1/4$ for each coordinate. Bessel's inequality and summation give average squared risk at least $h^2/12$.
+Finally $h^2\geq (B^2/16)\min(1,s/n)$, yielding the displayed constant. Since $|m_w|\leq B/2$, the variance statement follows from $\Var(Y\mid X,W)=B^2-m_w^2$.
+\end{proof}
+
+\subsection*{Remaining gap and source}
+For $s\leq n$, the preceding upper and lower bounds match in squared-risk order on this fixed-feature network subfamily. For $s>n$, a zero estimator has risk at most $B^2/4$ on the displayed subfamily. These are not minimax bounds for every architecture specified only by depth, width and sparsity. Learned hidden layers, nuisance smoothness at sharp thresholds, and adaptation of honest balls to unknown architecture or unknown $a$ remain unresolved here.
+
+Carlos Cinelli, Avi Feller, Guido Imbens, Edward Kennedy, Sara Magliacane and Jose Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.3.3, ``Beyond smoothness'' and ``Inference.'' \url{https://arxiv.org/html/2508.17099v1}. This inspected agenda motivates the question; the explicit projection calculation and tent-family proof above are restricted deductions, without a novelty claim.
+
+\end{document}

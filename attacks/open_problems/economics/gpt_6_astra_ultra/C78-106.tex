@@ -1,0 +1,121 @@
+% ECONOMICS_PROBLEM: {"id": "C78-106", "title": "The approximation threshold for unrestricted MAX-SMTI", "jel_code": "C78", "source_id": "OP-0555"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Tie localization in maximum stable marriage}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C78-106}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and restricted progress}
+MAX-SMTI seeks a largest weakly stable matching when acceptable-partner lists are incomplete and may have arbitrary ties on both sides. A pair blocks only when both agents strictly prefer one another to their current partners; every acceptable partner is better than being unmatched. The unrestricted polynomial approximation threshold is not determined here.
+
+We prove an additive approximation bound controlled by agents with ties, an exact algorithm parameterized by total tie excess, and a local alternating-path certificate. These statements concern the original weak stability notion. They neither improve the unrestricted $3/2$ guarantee cited in the source survey nor turn its conditional hardness statements into unconditional ones. The survey's numerical frontier is a dated literature report \cite{survey}; our claims below are proved directly.
+
+Let $I=(U,W,E,\succeq)$ be finite. Put $t=$ the number of agents whose lists contain a tie of size at least two. Put
+\[
+ K=\sum_{\text{all nontrivial ties }B}(|B|-1).
+\]
+This counts ties in both sides' lists, including repeated acceptable pairs appearing in different agents' lists. It is a parameter of the input, not an approximation ratio. A strict refinement orders each tie without changing comparisons between different ranks.
+
+\section{Where a cardinality gap can occur}
+\begin{lemma}[Every augmenting comparison path meets a tied agent]
+Let $M,M'$ be weakly stable matchings of $I$. Every component of $M\mathbin\triangle M'$ that is an augmenting path for $M$ contains an agent whose original preference list has a nontrivial tie.
+\end{lemma}
+\begin{proof}
+Suppose instead all agents on such a path have strict lists. Write the path
+\[
+ u_0,w_1,u_1,w_2,\ldots,u_{r-1},w_r,
+\]
+where $u_0,w_r$ are unmatched in $M$, the pairs $(u_{j-1},w_j)$ belong to $M'$, and $(u_j,w_j)$ belong to $M$ for $1\le j<r$. If $r=1$, the edge directly blocks $M$.
+
+For $r>1$, $u_0$ prefers $w_1$ to being unmatched. Stability of $M$ forces $w_1$ to prefer $u_1$ to $u_0$, because its comparisons are strict. Stability of $M'$ now forces $u_1$ to prefer $w_2$ to $w_1$. Inductively, at each interior $w_j$, stability of $M$ forces preference for $u_j$ over $u_{j-1}$; stability of $M'$ then forces $u_j$ to prefer $w_{j+1}$ to $w_j$. At the last edge $u_{r-1}$ prefers $w_r$ to its $M$ partner and $w_r$ is unmatched in $M$, so this edge blocks $M$, a contradiction.
+\end{proof}
+
+\begin{theorem}[Additive approximation and exact strict-list cardinality]
+Every weakly stable matching $M$ satisfies
+\[
+ \OPT(I)-|M|\le t,\qquad \OPT(I)\le2|M|. \tag{1}
+\]
+Consequently $|M|\ge\max\{\OPT(I)-t,\OPT(I)/2\}$. If $t=0$, all stable matchings have the same cardinality. In particular an arbitrary tie refinement followed by a strict-list stable-marriage algorithm produces the additive guarantee in (1) in polynomial time.
+\end{theorem}
+\begin{proof}
+Choose maximum weakly stable $M'$. The difference $|M'|-|M|$ is the number of components augmenting $M$ minus the number augmenting $M'$. The former components are vertex disjoint; by the lemma each contains a tied agent. There are at most $t$ such components, proving the first inequality. The same argument with $t=0$ in either ordering proves equal cardinality for strict lists.
+
+For the second inequality, a weakly stable matching is maximal as an ordinary matching: an acceptable edge joining two unmatched endpoints would block it. Every edge of $M'$ must therefore touch a vertex covered by $M$. The $2|M|$ covered vertices can each be incident to at most one edge of $M'$, so $|M'|\le2|M|$.
+
+A matching stable in a strict refinement is weakly stable originally, since any original strict improvement is retained by the refinement. The proposing algorithm described below runs in polynomial time and provides such a matching.
+\end{proof}
+
+The additive bound is useful when few agents are indifferent relative to the size of an optimal market. It does not produce a fixed factor below $3/2$ when $t$ grows proportionally to market size. In particular a claim that arbitrary tie-breaking solves unrestricted MAX-SMTI would be false.
+
+\section{An exact parameterized algorithm}
+\begin{lemma}[Refinement realization]
+Every weakly stable matching $M$ is stable in some strict refinement.
+\end{lemma}
+\begin{proof}
+For each matched agent put its $M$ partner first within that partner's tie, breaking all remaining ties arbitrarily. Suppose an unmatched pair blocks the resulting strict instance. If an endpoint was originally indifferent between that pair and its matched partner, the refinement just chosen ranks its partner first, a contradiction. An unmatched endpoint strictly prefers every acceptable partner in the original instance as well. Thus both endpoints must originally strictly prefer the putative blocking pair, contradicting weak stability of $M$.
+\end{proof}
+
+\begin{theorem}[Exact algorithm for bounded total tie excess]
+There is an algorithm returning a maximum weakly stable matching in at most
+\[
+ (K+1)^K\,\operatorname{poly}(|U|+|W|+|E|)
+\]
+time, with the convention $(K+1)^K=1$ at $K=0$.
+\end{theorem}
+\begin{proof}
+Enumerate every strict refinement; their number is $\prod_B|B|!$. Each tie has $|B|\le K+1$, and
+\[
+ |B|!=\prod_{j=2}^{|B|}j\le(K+1)^{|B|-1}.
+\]
+Multiplying proves the enumeration bound. For each refinement run the following proposing procedure. An unmatched $u$ proposes to its highest-ranked acceptable partner not yet approached. Each $w$ retains its preferred proposal among its current tentative partner and the new proposal, rejecting the other. Stop when no unmatched proposer has an untried partner. At most $|E|$ proposals occur. If a pair blocked the final matching, the proposer must have approached that partner before its eventual worse assignment or before exhausting its list. The receiver rejected it only for a better proposer and subsequently could only improve, contradicting blockage. Thus the output is stable.
+
+Keep a largest output over all refinements. Every retained output is weakly stable in $I$. By refinement realization, some enumerated refinement makes a maximum weakly stable $M^*$ stable. The strict-list cardinality conclusion of Theorem 2.2 implies the proposing output for that refinement has size $|M^*|$. Hence the largest retained output is optimal.
+\end{proof}
+
+This is fixed-parameter tractable in $K$, but factorial-type growth remains when ties are unrestricted. The bound is not polynomial in the general input. No claim is made that this elementary enumeration is the best parameterized algorithm in the literature.
+
+\section{A certificate involving short augmenting paths}
+\begin{proposition}[A sufficient $3/2$ certificate]
+Let $M$ be weakly stable. If the underlying acceptable-pair graph has no augmenting path for $M$ of length three, then every matching $M'$ in that graph, stable or otherwise, satisfies $|M'|\le3|M|/2$.
+\end{proposition}
+\begin{proof}
+A length-one augmenting path is impossible because $M$ is maximal. By hypothesis length three is also impossible. In an augmenting component of $M\mathbin\triangle M'$, therefore, $M$ has at least two edges and $M'$ exactly one more, giving at most ratio $3/2$ on that component. Equal-cardinality paths and cycles have ratio one, and components reducing cardinality have ratio at most one. Sum these component inequalities, including common edges separately.
+\end{proof}
+
+The hypothesis concerns all graph augmentations, not only augmentations that happen to preserve stability. Searching for a larger stable matching by isolated stable moves is not justified by this proposition: a length-three graph augmentation can introduce blocking pairs outside the path. A valid unrestricted improvement must control these blocking pairs or reorganize several paths at once.
+
+A minimal example shows the danger of arbitrary refinement. Let $u_1$ tie $w_1,w_2$, let $u_2$ accept only $w_1$, let $w_1$ rank $u_1$ above $u_2$, and let $w_2$ accept only $u_1$. The size-one matching $\{u_1w_1\}$ is weakly stable: $u_1$ is indifferent to $w_2$, and $w_1$ rejects $u_2$ strictly. The size-two matching $\{u_1w_2,u_2w_1\}$ is also weakly stable, because $u_1$ does not strictly prefer $w_1$. These exhaust the potentially blocking absent edges in each case. Thus even one tied agent can account for a factor-two outcome on a small market, while the additive bound is attained exactly.
+
+\section{Remaining gap}
+The lemmas locate cardinality losses in disjoint paths containing indifference and show how exhaustive refinement removes them when total tie excess is controlled. They do not give a polynomial procedure eliminating enough obstructing paths at arbitrary $K$, nor a new hardness reduction. Closing the unrestricted approximation gap remains the original unresolved task.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), \emph{Selected open problems in Matching Under Preferences}, Section 3.2.3 and Figure 2. Primary manuscript: \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}. This source reports a $3/2$ guarantee, a $33/29$ hardness bound, and a $(4/3-\varepsilon)$ bound conditional on UGC as of that survey. No assertion that these are newly verified 2026 frontier values is needed for the results here.
+\end{thebibliography}
+
+\end{document}

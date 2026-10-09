@@ -1,0 +1,116 @@
+% ECONOMICS_PROBLEM: {"id": "D86-132", "title": "Approximation frontier for randomized inspection contracts", "jel_code": "D86", "source_id": "OP-0597"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{D86-132}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Approximation frontier for randomized inspection contracts}
+
+\textbf{Status.} Unresolved for the XOS PTAS and subadditive constant approximation. We solve the additive-cost restriction explicitly, including optimized payment, and identify the cost-minimization oracle that a generalization would require.
+
+\subsection*{Short problem and maintained contract model}
+There are finitely many actions $A$, $|A|=n$, with success probabilities $f_b\in[0,1]$ and costs $c_b\geq0$, including an action of zero cost. A recommendation $a$, payment $\alpha\in[0,1]$ on success, and hidden independent inspection set $S$ give utilities
+\[
+ U_a=\alpha f_a-c_a,\qquad
+ U_b=\alpha f_b\Prb(S\cap\{a,b\}=\varnothing)-c_b\quad(b\ne a).
+\]
+Recommendation-favoring ties are allowed. Principal payoff is $(1-\alpha)f_a-\E h(S)$. Our restriction is additive inspection cost $h(S)=\sum_{b\in S}w_b$, with known $w_b\geq0$. The $w_b$ denote inspection costs, distinct from action costs $c_b$.
+
+A necessary condition for implementation is $U_a\geq0$, since deviation to a zero-cost action has nonnegative utility. It is also sufficient with unrestricted inspection: inspecting $a$ always gives all deviations utility at most zero. For $\alpha>0$ and $U_a\geq0$, define
+\[
+ r_b=\begin{cases}
+ \max\{0,1-(U_a+c_b)/(\alpha f_b)\},&f_b>0,\\
+ 0,&f_b=0,
+ \end{cases}\qquad b\ne a.
+\]
+Each $r_b\in[0,1]$. Incentive compatibility is equivalent to
+$\Prb(a\in S\text{ or }b\in S)\geq r_b$ for all $b\ne a$.
+
+\begin{theorem}[Exact cost for a fixed recommendation and payment]
+For $\alpha>0$ and $U_a\geq0$, the minimum additive inspection cost is
+\[
+ C(a,\alpha)=\min_{0\leq z\leq1}
+       \left\{w_az+\sum_{b\ne a}w_b(r_b-z)_+\right\}.       \tag{1}
+\]
+A minimum is attained at $z=0$ or at one of the $r_b$. An optimal inspection distribution can be represented with at most $n+1$ sets and found by sorting these requirements.
+\end{theorem}
+\begin{proof}
+Let $z=\Prb(a\in S)$. By the union bound,
+$r_b\leq z+\Prb(b\in S,a\notin S)$, so
+$\Prb(b\in S)\geq(r_b-z)_+$. Additive expected cost is therefore at least the objective in (1).
+Conversely, fix $z\in[0,1]$ and draw $U$ uniformly from $[0,1]$. If $U<z$, inspect only $a$. Otherwise inspect precisely those $b\ne a$ with $U<r_b$. Then
+$\Prb(b\in S)=(r_b-z)_+$ and
+$\Prb(a\in S\text{ or }b\in S)=\max(z,r_b)\geq r_b$.
+The construction attains the lower bound. Thresholds at $z$ and the distinct $r_b$ give at most $n+1$ constant-set intervals, an explicit finite distribution. The objective is continuous piecewise linear in $z$ with breakpoints at the $r_b$; above $\max_b r_b$ it is $w_az$, which is nondecreasing. Hence a minimum occurs at zero or a listed breakpoint.
+\end{proof}
+
+\begin{corollary}[A transparent decision rule]
+If all $r_b$ are positive and $w_a\geq\sum_{b\ne a}w_b$, choosing $z=0$ is optimal. More generally the one-sided slopes of the objective in (1) are obtained from
+$w_a-\sum_{b:r_b>z}w_b$, with the appropriate equality terms at breakpoints. Thus inspecting the recommended action is worthwhile exactly when it replaces sufficiently costly marginal inspections.
+\end{corollary}
+\begin{proof}
+On every open interval between consecutive requirements, differentiating (1) gives the stated slope. The slope is nondecreasing as $z$ rises. Under the first condition every slope is nonnegative, so zero minimizes the function. The one-sided slope test characterizes minima of this convex piecewise-linear function.
+\end{proof}
+
+\begin{theorem}[Global additive-cost optimization]
+For rational $f_b,c_b,w_b$, an optimal additive-cost contract can be obtained by a polynomial number of rational arithmetic operations, comparisons, and square-root operations. It has an explicit polynomial-size inspection support and algebraic probabilities of degree at most two. This is an exact algebraic-output result; it does not assert that every optimal payment is rational.
+\end{theorem}
+\begin{proof}
+For a recommendation with $c_a=0$, payment zero and no inspections implement $a$ and give payoff $f_a$, which is an upper bound for any contract recommending $a$. For $c_a>0$, recommendations with $f_a<c_a$ are impossible; otherwise restrict $\alpha$ to $[c_a/f_a,1]$, a compact interval bounded away from zero.
+For each $b$ with $f_b>0$, the unclipped requirement has form
+\[
+ \widetilde r_b(\alpha)=1-f_a/f_b+(c_a-c_b)/(\alpha f_b).
+\]
+Collect all points in the payment interval where an unclipped requirement is zero or two unclipped requirements are equal, as well as the endpoints. Every equality is affine in $1/\alpha$, hence has at most one solution unless it holds identically. There are $O(n^2)$ nontrivial partition points, all rational. Inside each resulting interval, signs and ordering of all clipped requirements are constant.
+By (1), the optimal $z$ is selected from $0$ and the $r_j$. For any such candidate, on a fixed payment interval the inspection cost is $A+B/\alpha$ for explicitly computed rational constants $A,B$. Its principal payoff is
+\[
+ F(\alpha)=f_a(1-\alpha)-A-B/\alpha.
+\]
+Its derivative is $-f_a+B/\alpha^2$. Thus its maximum on the closed interval is attained at an endpoint, or at $\sqrt{B/f_a}$ if $B>0$ and this point lies inside. Endpoint values use the original continuous clipped formulas, so ties and coincident breakpoints cause no difficulty.
+The principal maximizes over $z$ candidates as well as $\alpha$, so it suffices to maximize each candidate function separately and compare all resulting values. Repeating for at most $n$ recommendations is polynomial. Formula (1)'s threshold construction then gives a distribution whose endpoints are rational expressions in a rational or quadratic optimal payment; its support is polynomial and its probabilities lie in the same quadratic field. Standard comparison of rational quadratic numbers, for example by sign checks before squaring, is exact and uses polynomial bit complexity for these expressions. An action of zero cost ensures at least one feasible contract and a nonnegative optimum.
+\end{proof}
+
+\subsection*{Where the XOS and subadditive difficulty enters}
+For any monotone cost, when a realized set contains $a$, deleting its other elements cannot hurt detection and cannot raise cost. Thus such sets can always be replaced by $\{a\}$. The remaining optimization for fixed $a,\alpha$ is the finite linear program
+\[
+ \min_{(p_S)}\sum_Sh(S)p_S,\quad
+ \sum_Sp_S=1,\quad
+ \sum_{S:S\cap\{a,b\}\ne\varnothing}p_S\geq r_b,\quad p_S\geq0.
+\]
+A basic optimal solution has at most $n$ positive probabilities: there are the normalization equality and at most $n-1$ independent active detection constraints. This small-support existence fact does not identify those sets efficiently.
+
+For dual weights $\lambda_b\geq0$, testing dual feasibility requires minimizing
+\[
+ h(S)-\sum_{b\ne a}\lambda_b\ind\{S\cap\{a,b\}\ne\varnothing\}.
+\]
+Among sets avoiding $a$, this becomes minimization of $h(S)-\sum_{b\in S}\lambda_b$. The source's demand query instead \emph{maximizes} $h(S)-\sum_{b\in S}q_b$. These are different optimization tasks; an arbitrary demand oracle does not automatically supply this minimum. Additivity collapses the coupling and yields (1). XOS and subadditive functions need not admit the same collapse, and a cost approximation alone need not give a multiplicative approximation to principal profit when revenue and inspection cost nearly cancel.
+
+\subsection*{Reference}
+Tomer Ezra, Stefano Leonardi and Matteo Russo, \emph{Contract Design Beyond Hidden-Actions}, SODA 2026, 2113--2133; author version arXiv:2402.16553v2 (26 November 2025), Sections 2 and 8. \url{https://arxiv.org/html/2402.16553v2}; \url{https://doi.org/10.1137/1.9781611978971.77}. The model and oracle scope were checked in the primary text. The additive case belongs to the tractable side of the broader inspection literature; the explicit derivation here does not claim to solve its XOS or subadditive approximation questions.
+
+\end{document}

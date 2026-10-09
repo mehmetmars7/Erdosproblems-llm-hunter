@@ -1,0 +1,129 @@
+% ECONOMICS_PROBLEM: {"id": "C31-146", "title": "Heterogeneous direct effects with network dependence", "jel_code": "C31", "source_id": "OP-0505"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Independent sets, clique replication, and sharp network CATE subcases}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\begin{abstract}
+For a known exposure design with constant positive probabilities, an independent set in the dependency graph yields a nonparametric risk bound and a simultaneous confidence band. When the graph is a disjoint union of cliques, a matching cloned-data lower bound gives the exact effective sample size: the number of cliques, regardless of their sizes. Complete and star graphs then demonstrate why maximum degree alone cannot characterize the minimax rate.
+\end{abstract}
+\section{Short target and restricted experiment}
+The catalogue asks for heterogeneous direct-effect risk and simultaneous inference as functions of the actual dependency graph. Fix one exposure $e$ and let $|Y_i(w,e)|\le M$. Assignment is independent of all potential outcomes conditional on all covariates, and exposure consistency holds. Assume the probabilities
+$p_i(w,e\mid X_1,\ldots,X_n)=p_i(w,e)\ge\epsilon>0$
+are known constants. Assume the records $(X_i,W_i,E_i,Y_i)$ have dependency graph $D$: subcollections with no edge between them are independent. Each $X_i$ is uniform on $[0,1]^d$ and the conditional potential-outcome means have a common version $m(w,e,x)$. Let
+$\tau(x)=m(1,e,x)-m(0,e,x)$,
+and assume $|\tau(x)-\tau(x')|\le L_\tau\|x-x'\|^\beta$ for $0<\beta\le1$.
+
+The constant-probability restriction ensures the following score is a function of each observed record alone:
+\[
+ Z_i={\ind\{W_i=1,E_i=e\}Y_i\over p_i(1,e)}
+       -{\ind\{W_i=0,E_i=e\}Y_i\over p_i(0,e)}.
+\]
+Full-covariate-dependent weights would require a dependency assumption for the \emph{weighted} records, which is not automatic from $D$.
+\begin{lemma}[Independent regression experiment]
+$\E[Z_i\mid X_i=x]=\tau(x)$ and $|Z_i|\le K=M/\epsilon$. For any independent vertex set $I$ of $D$, the pairs $(X_i,Z_i)$, $i\in I$, are mutually independent.
+\end{lemma}
+\begin{proof}
+Conditional on the full covariate vector and potential outcomes, randomization and consistency give
+$\E[\ind\{W_i=w,E_i=e\}Y_i/p_i(w,e)]=Y_i(w,e)$.
+Taking conditional expectation given $X_i$ and subtracting proves the regression identity. The two indicator events are disjoint, proving the bound. The definition of a dependency graph gives joint independence for every independent set, and measurable recordwise transformations preserve it.
+\end{proof}
+\section{Risk and a band from an independent set}
+Let $N=|I|\ge1$. Partition $[0,1]^d$ into $J=q^d$ equal cubes of side $h=1/q$ and volume $v=h^d$. On cube $B$ define
+\[
+ \widehat\tau_B={1\over Nv}\sum_{i\in I}Z_i\ind\{X_i\in B\},
+ \qquad \widehat\tau(x)=\widehat\tau_B\quad(x\in B).
+\]
+Using the known covariate density avoids random bin denominators. Clipping the estimator to $[-2M,2M]$ can only improve squared risk.
+\begin{theorem}[Upper bound and honest simultaneous band]
+The squared integrated risk is at most
+\[
+ \E\|\widehat\tau-\tau\|_2^2
+ \le L_\tau^2 d^\beta h^{2\beta}+{K^2\over Nh^d}.
+\]
+Choosing $q$ of order $N^{1/(2\beta+d)}$ gives risk at most $C N^{-2\beta/(2\beta+d)}$ for fixed primitives. For $0<\delta<1$, put $t=\log(2J/\delta)$. With probability at least $1-\delta$, simultaneously for every $x$,
+\[
+ |\widehat\tau(x)-\tau(x)|\le
+ L_\tau d^{\beta/2}h^\beta+
+ K\sqrt{2t/(Nv)}+{4Kt\over3Nv}.
+\]
+The same assertion holds after clipping.
+\end{theorem}
+\begin{proof}
+The expectation in bin $B$ is $\tau_B=v^{-1}\int_B\tau$. Its pointwise bias is at most $L_\tau(\sqrt d h)^\beta$. Each summand before division by $Nv$ has second moment at most $K^2v$. Independence therefore gives bin variance at most $K^2/(Nv)$. Integration over all bins gives the risk bound, with zero cross term because the stochastic part is centered.
+
+For the band, centered summands have absolute value at most $2K$ and total variance at most $NK^2v$. The elementary Bernstein exponential bound for independent centered $U_i$, with $|U_i|\le b$, follows by expanding their moment-generating functions and using $|\E U_i^k|\le b^{k-2}\E U_i^2$ for $k\ge2$. It gives
+$\Prob(|\sum U_i|>\sqrt{2Vt}+2bt/3)\le2e^{-t}$ when $V\ge\sum\E U_i^2$.
+Use $b=2K$, $V=NK^2v$, divide by $Nv$, and take a union bound over $J$ bins. Adding the bias yields the claim. Projection onto an interval containing the true value reduces each absolute error.
+\end{proof}
+Selecting a maximum independent set can be computationally hard. The theorem is valid for any supplied independent set; no polynomial-time optimum graph search is claimed.
+\section{Matching lower bound for disjoint cliques}
+Suppose $D$ is a disjoint union of $k$ nonempty cliques. Fix positive constants $M,L_\tau,\epsilon$ allowing a neighborhood of the Bernoulli model below, for example $M=1$, $\epsilon<1/2$, and a sufficiently large fixed H\"older radius for $m$.
+\begin{theorem}[Exact information order for clique components]
+Over this restricted experiment the minimax squared integrated risk is bounded above and below by constant multiples of
+$k^{-2\beta/(2\beta+d)}$ as $k\to\infty$. The constants do not depend on the clique sizes.
+\end{theorem}
+\begin{proof}
+One vertex from each clique is independent, giving the upper bound. For the lower bound, generate one independent observation per clique and copy it exactly to every vertex in that clique. Use a constant exposure map $E_i=e$, uniform $X$, an independent fair treatment coin $W$, and potential outcomes with conditional Bernoulli means
+$m_0(x)=1/2$ and $m_1(x)=1/2+f(x)$.
+Potential outcomes can be generated using independent uniform seeds conditional on $X$ and then shared within each clique. Assignment is independent of those seeds given all covariates. This is a valid randomized no-interference submodel of the larger exposure class. The full data contain exactly $k$ independent observations of information about $f$.
+
+Here is the lower-bound construction in detail. Fix a nonzero Lipschitz bump $\psi$ supported in the central half of $[0,1]^d$, with $0\le\psi\le1$. On the $q^d$ grid cells indexed by $j$ put
+\[
+ f_\theta(x)=a q^{-\beta}\sum_j\theta_j\psi(qx-j),
+ \qquad \theta_j\in\{-1,1\}.
+\]
+The sum has at most one nonzero term at each point. For a sufficiently small fixed $a>0$, these functions lie in the required H\"older ball and $|f_\theta|\le1/4$. Within a cell this follows from Lipschitz continuity and $\beta\le1$; between supported bumps their separation is of order $1/q$, which gives the same H\"older bound. The resulting Bernoulli probabilities lie in $[1/4,3/4]$.
+
+Neighbors differing only in bit $j$ have single-observation Kullback--Leibler divergence at most
+$C a^2 q^{-(2\beta+d)}$: integrate their squared mean difference and use
+$\operatorname{KL}(\operatorname{Bern}(p),\operatorname{Bern}(q))\le(p-q)^2/[q(1-q)]$.
+Treatment probability $1/2$ only reduces the bound. For $k$ independent observations divergences add. Choose integer $q$ of order $k^{1/(2\beta+d)}$ with a sufficiently large constant so that every neighboring divergence is at most $1/2$. Pinsker's inequality makes their total-variation distance at most $1/2$.
+
+For any estimator, estimate each bit by the sign of its inner product with the corresponding rescaled bump. A wrong sign forces squared error on that cell at least
+$a^2q^{-(2\beta+d)}\int\psi^2$, by Cauchy--Schwarz projection onto that bump. Average over the uniform prior on bits. Pairing neighboring parameters, every bit has average error probability at least $(1-1/2)/2=1/4$, since the sum of the two testing errors is at least one minus total variation. Summing over $q^d$ cells gives average risk at least $c a^2q^{-2\beta}$. The worst-case risk is at least this average, proving the lower bound for every estimator.
+\end{proof}
+\section{The same degree can mean different information}
+\begin{corollary}
+For the complete dependency graph, the minimax risk need not tend to zero with $n$. For the star graph on $n$ vertices, the same experiment has minimax risk of order $(n-1)^{-2\beta/(2\beta+d)}$. Both graphs have maximum degree $n-1$.
+\end{corollary}
+\begin{proof}
+For the complete graph, clone one informative record $n$ times. Two separated constant regression means with overlapping one-observation laws yield a fixed positive two-point risk bound. For the star, its $n-1$ leaves are independent, giving the upper bound. For a lower bound, clone the center with one leaf and make the other leaves independent. This smaller dependency graph, consisting of one two-vertex clique and singleton cliques, is a subgraph of the star. Every independence requirement of the star is therefore satisfied. It contains $n-1$ independent records, to which the preceding lower bound applies.
+\end{proof}
+The exact minimax parameter for arbitrary dependency graphs, optimal bands, nonconstant assignment weights, and more general smoothness remain open in this attempt. The lower bounds deliberately use constant exposure; they establish difficulty inside the class, not a claim that interference never matters.
+\begin{thebibliography}{9}
+\bibitem{CF} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Sections 3.2.3 and 3.3.3. \url{https://arxiv.org/html/2508.17099v1}. Source of the network/replication agenda; the graph-specific restricted bounds are derived above.
+\end{thebibliography}
+
+\end{document}

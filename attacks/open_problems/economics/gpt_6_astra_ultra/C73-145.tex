@@ -1,0 +1,102 @@
+% ECONOMICS_PROBLEM: {"id": "C73-145", "title": "Learning with persistent states", "jel_code": "C73", "source_id": "OP-0285"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Persistent states: a welfare guarantee and two failures of observed-state regret}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\begin{abstract}
+When states evolve independently of actions, a statewise smoothness inequality and regret against stationary deviations imply a finite-horizon welfare bound against a central controller. When actions change transitions, zero regret measured on the observed state trajectory can coexist with arbitrarily poor welfare, even under a common Doeblin reset. The constructions pinpoint why counterfactual state trajectories matter.
+\end{abstract}
+\section{Short target and behavioral requirement}
+The catalogue asks for welfare guarantees for learning in finite games with persistent, action-dependent states. Fix finite states $S$, finite action sets $A_i$, rewards $u_i(s,a)\in[0,1]$, and social welfare $w(s,a)=\sum_i u_i(s,a)$. A central controller has the same physical transition law and sees the current state. It may choose the whole action vector. Its optimal expected horizon-$T$ welfare is $W_T^*$.
+
+For the positive theorem assume the transition kernel $P(s'\mid s)$ is independent of all actions. The learners see the state. Let $\pi^*(s)$ maximize $w(s,a)$ for each state, with a fixed tie rule. Assume their realized play satisfies, in expectation,
+\[
+ \E\sum_{t=1}^T u_i(S_t,A_t)
+ \ge\E\sum_{t=1}^T u_i(S_t,\pi_i^*(S_t),A_{-i,t})-R_i(T).
+\]
+This is a regret requirement against a state-dependent stationary deviation, stronger than regret only against one constant action. It can be imposed against all stationary maps; only this particular comparator is needed in the theorem. No assertion is made that arbitrary learners satisfy it.
+\section{A statewise guarantee when transitions are exogenous}
+Suppose constants $\lambda>0$, $\mu\ge0$ obey, for every state $s$ and action profile $a$,
+\[
+ \sum_i u_i(s,\pi_i^*(s),a_{-i})
+      \ge\lambda w(s,\pi^*(s))-\mu w(s,a).
+\]
+\begin{theorem}[Finite-horizon welfare bound]
+Under these assumptions the learners' expected welfare $W_T$ satisfies
+\[
+ W_T\ge {\lambda\over1+\mu}W_T^*
+                 -{\sum_iR_i(T)\over1+\mu}.
+\]
+If the number of players is uniformly bounded and the regret bounds are uniformly sublinear over a declared model class, this supplies a uniform sublinear remainder for that class. No mixing assumption is needed in this exogenous-state case.
+\end{theorem}
+\begin{proof}
+Because actions do not affect states, every policy of the central controller induces the same state law. Maximizing current welfare at every state cannot reduce any future payoff, so
+$W_T^*=\E\sum_t w(S_t,\pi^*(S_t))$.
+Sum the regret inequalities over players and apply the smoothness inequality at each observed $(S_t,A_t)$. This gives
+$W_T\ge\lambda W_T^*-\mu W_T-\sum_iR_i(T)$.
+Rearrangement proves the bound. The uniform assertion follows directly from the stated uniform bounds. The argument makes no comparison between different state trajectories because those trajectories have identical laws under all actions.
+\end{proof}
+This is a conditional theorem: it supplies no new learning algorithm or computational regret rate. It also does not permit regret comparators to hold opponents' reactions fixed in one place and re-equilibrate them in another.
+\section{An irreversible trap}
+\begin{proposition}[Zero observed-state regret, linear policy regret]
+There is a one-player two-state, two-action model and a deterministic learner with zero external regret on its observed states for every horizon, but welfare 1 against central optimum $T$ for every $T\ge1$.
+\end{proposition}
+\begin{proof}
+States are $s,d$, initially $s$, and actions are safe and bad. Both actions earn reward 1 in $s$ and 0 in $d$. From $s$, safe stays in $s$ and bad enters $d$; $d$ is absorbing under either action. Choose bad initially. Its total reward is 1. Every fixed action or stationary state-dependent action earns exactly the same reward when evaluated on the learner's \emph{observed} states, since current reward does not depend on action. That external regret is zero. The policy always choosing safe, with its own induced trajectory, remains in $s$ and earns $T$. Thus regret against counterfactual policies is $T-1$.
+\end{proof}
+A stage payoff comparison has ignored the opportunity cost of consuming the favorable state. The example does not contradict guarantees that assume sublinear policy regret: this learner fails that assumption.
+\section{Uniform mixing does not repair the wrong comparator}
+For a reset probability $\eta\in(0,1]$, keep the same reward function but change transitions. From \emph{either} state, safe has base next state $s$ and bad has base next state $d$. With probability $\eta$ replace the base next state by a fresh fair draw from $\{s,d\}$, independently over time.
+\begin{theorem}[An ergodic failure with explicit ratio]
+Every stationary randomized policy induces an irreducible, aperiodic chain with one-step total-variation contraction factor at most $1-\eta$. Nevertheless the always-bad learner has zero observed-state regret against every stationary deviation. Starting at $s$, its welfare and the central optimum are
+\[
+ W_T=1+(T-1)\eta/2,\qquad
+ W_T^*=1+(T-1)(1-\eta/2).
+\]
+Their limiting ratio is $\eta/(2-\eta)$. Consequently no strictly positive asymptotic welfare fraction uniform over all $\eta>0$ follows from observed-state regret and mere ergodicity.
+\end{theorem}
+\begin{proof}
+Every transition row assigns at least $\eta/2$ to each state, proving irreducibility and aperiodicity. Each row is a mixture of mass $\eta$ on the same fair-reset law and mass $1-\eta$ on another law. Coupling the common reset proves the contraction bound, also for mixtures of actions at a state.
+
+Current rewards remain action-independent, so all deviations evaluated on observed states earn the learner's reward exactly. Under always bad, every next state is $s$ with probability $\eta/2$, independent of the previous state. Under always safe it is $s$ with probability $1-\eta/2$. The central controller cannot obtain a larger next-period probability of $s$ under any action mixture, and its current reward is already fixed by the state. Backward induction therefore makes always safe optimal. Summing the initial reward and subsequent expected rewards gives the formulas. Dividing and taking $T\to\infty$ gives the ratio, which tends to zero as $\eta\downarrow0$.
+\end{proof}
+At a fixed positive lower bound on $\eta$, the last argument does not rule out constants depending on that bound. Nor does it disprove a positive theorem with a proper policy-regret condition in an action-dependent smooth game. It shows that replacing that condition by observed-state regret is invalid even in a very small, rapidly describable Markov model.
+\section{Remaining target and reference}
+The next needed result must compare each deviation on its induced state law, control opponents' adaptations, and keep mixing and regret constants uniform over the stated class. The positive theorem covers only action-independent transitions; the negative examples diagnose an inadequate hypothesis. They do not settle the catalogue's general persistent-state learning frontier.
+\begin{thebibliography}{9}
+\bibitem{Tardos} \'E. Tardos (2026), Learning and the price of anarchy in games, \emph{Proceedings of the International Congress of Mathematicians 2026}, vol. 2, 302--312. \url{https://doi.org/10.1137/25M1808064}. Background on welfare from learning and dynamic-game challenges. The restricted theorem and counterexamples here are proved explicitly and do not assert a general learning result for the dynamic models discussed in that article.
+\end{thebibliography}
+
+\end{document}

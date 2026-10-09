@@ -1,0 +1,100 @@
+% ECONOMICS_PROBLEM: {"id": "H26-143", "title": "Efficient tax enforcement", "jel_code": "H26", "source_id": "OP-0477"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Enforcement frontiers with a known finite model and randomized measurement}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\begin{abstract}
+For a finite-horizon enforcement model with known behavioral transitions, an occupancy linear program gives the exact expected cost--gap frontier. A mixture of at most two deterministic Markov policies suffices for one expected budget constraint. A separate randomized-audit estimator remains valid under adaptive audit targeting, provided audit positivity and accurate verification hold. These results separate optimization from the difficult task of identifying behavioral and welfare primitives.
+\end{abstract}
+\section{Short target and maintained model}
+The catalogue asks which combinations of audits, reporting rules, and other enforcement tools efficiently reduce unpaid liability, including their behavioral and welfare effects. Here fix a finite horizon $H$, finite state set $S$, finite nonempty action sets $A_t(s)$, initial distribution $\mu$, and known transition kernels $P_t(s'\mid s,a)$. State includes all taxpayer behavior and information needed for this Markov description. Known expected per-period unpaid liability is $g_t(s,a)\ge0$ and known administrative cost is $c_t(s,a)\ge0$. A discount $0<\beta\le1$ is allowed.
+
+We minimize $\E\sum_{t=0}^{H-1}\beta^t g_t(S_t,A_t)$ subject to $\E\sum_t\beta^t c_t(S_t,A_t)\le B$. The budget is in expectation; it is not a pathwise spending cap. Tax rates and legal admissibility are already encoded in the action sets. No reduced-form transition is assumed invariant beyond this declared model.
+\section{An exact restricted frontier}
+For variables $x_t(s,a)\ge0$ impose
+\[
+ \sum_a x_0(s,a)=\mu(s),\qquad
+ \sum_a x_{t+1}(s,a)=\sum_{z,a}P_t(s\mid z,a)x_t(z,a).
+\]
+Minimize $\sum_{t,s,a}\beta^t g_t(s,a)x_t(s,a)$ subject to these flow equations and $\sum_{t,s,a}\beta^t c_t(s,a)x_t(s,a)\le B$.
+\begin{theorem}[Occupancy characterization]
+The linear program is feasible if and only if the original expected-budget problem is feasible, and their optimum values agree. Every feasible history-dependent policy has a feasible occupancy vector. Every feasible vector is implemented by a randomized Markov policy, with arbitrary actions assigned to zero-probability states. The optimum is attained whenever the feasible set is nonempty.
+\end{theorem}
+\begin{proof}
+For a policy set $x_t(s,a)=\Prob(S_t=s,A_t=a)$. The law of total probability gives the flow equations, and linearity gives its cost and gap. Conversely, put $d_t(s)=\sum_a x_t(s,a)$ and choose action $a$ with probability $x_t(s,a)/d_t(s)$ when $d_t(s)>0$. Induction in $t$ using the flow equations proves that the resulting joint state-action probabilities equal $x_t$. At a zero-mass state the chosen action cannot alter this induction. All feasible vectors satisfy $\sum_{s,a}x_t(s,a)=1$, so the feasible set is closed and bounded. Its continuous linear objective attains its minimum.
+\end{proof}
+\begin{theorem}[Two policies suffice]
+If there is one expected budget constraint and the problem is feasible, an optimal policy can be implemented by one initial lottery over at most two deterministic Markov policies. Thus its achievable cost--gap frontier is the lower boundary of the convex hull of their finitely many cost--gap pairs.
+\end{theorem}
+\begin{proof}
+Any randomized Markov policy can be implemented by drawing in advance an independent action for every time-state pair from its policy probabilities. Conditional on this finite collection the policy is deterministic Markov. A pair $(t,s)$ is visited at most once, so pre-drawing reproduces the same law as drawing on arrival. Consequently every achievable occupancy, and hence every cost--gap pair, belongs to the convex hull of deterministic Markov pairs. Initial lotteries attain every point in that hull. The preceding theorem shows that general histories add no further pairs.
+
+Optimize over weights on those finitely many pairs. Add a nonnegative slack variable for the cost inequality. The resulting feasible weights satisfy two equalities: total weight one and cost plus slack equal to $B$. If an extreme point has more than two positive variables, their columns in these two equalities are linearly dependent. A sufficiently small positive and negative perturbation in the dependence direction preserves feasibility and writes the point as the midpoint of distinct feasible points, a contradiction. A linear objective has an extreme optimal solution, so at most two policy weights are positive (and possibly fewer if slack is positive).
+\end{proof}
+This is an exact optimization result for known primitives, not a theorem that an estimated frontier is uniformly reliable. A hard budget requires augmenting the state by remaining resources and deleting overspending actions; a lottery satisfying an expected budget need not satisfy that stronger constraint.
+\section{Measuring gaps under adaptive audits}
+For a distinct measurement experiment consider $n$ records. Let the true unpaid liability of record $t$ be $G_t\in[0,G]$. Before auditing it, its liability is determined, possibly as a function of the past. The audit indicator $I_t$ is generated by a fresh independent coin with known probability $p_t\ge p_0>0$, where $p_t$ may depend on the available past. An audit reveals $G_t$ exactly. The randomization remains valid conditional on the full past and current $G_t$.
+\begin{theorem}[Adaptive inverse-probability measurement]
+The estimator $\widehat G=n^{-1}\sum_t I_tG_t/p_t$ satisfies
+\[
+ \E\left[\widehat G-{1\over n}\sum_tG_t\right]=0,
+ \qquad
+ \Prob\left(\left|\widehat G-{1\over n}\sum_tG_t\right|>z\right)
+ \le2\exp\{-2nz^2p_0^2/G^2\}.
+\]
+The mean squared error for this possibly random realized-population target is at most $G^2/(np_0)$.
+\end{theorem}
+\begin{proof}
+Set $D_t=G_t(I_t/p_t-1)$. Conditional on the past and $G_t$, it has mean zero and variance $G_t^2(1-p_t)/p_t\le G^2/p_0$. These are martingale differences in the enlarged filtration revealing each liability before its audit coin. Orthogonality of distinct differences proves the mean and variance assertions after division by $n$.
+
+The conditional range length of $D_t$ is $G_t/p_t\le G/p_0$. The bounded-variable exponential inequality gives
+$\E[e^{\lambda D_t}\mid\text{past},G_t]\le\exp(\lambda^2G^2/(8p_0^2))$.
+Iterating conditional expectations, applying Markov's inequality to the sum, and minimizing over $\lambda>0$ yields $\exp(-2nz^2p_0^2/G^2)$ for either tail. Their sum proves the bound.
+\end{proof}
+If some type is never audited, two populations can agree on every observed record and differ in that type's liability, destroying identification. If audits themselves measure liability with systematic error, the theorem estimates the verification outcome instead unless that error is corrected. Randomization does not eliminate measurement error.
+\section{Why the gap is not welfare}
+\begin{proposition}
+A strict reduction in unpaid liability need not improve welfare even when administrative cost is unchanged.
+\end{proposition}
+\begin{proof}
+Consider a declared one-person model in which an activity produces real surplus 10 and a statutory liability 2, of which 1 is unpaid. Under a second regime the activity is prohibited, producing zero surplus and zero liability. Both regimes have zero administrative resource cost. The unpaid gap falls from 1 to 0, but real surplus falls from 10 to 0. Tax payments are transfers and no separate public-service benefit is included. These specified numbers give the claimed counterexample; they are not empirical estimates.
+\end{proof}
+Thus a welfare frontier requires endogenous activity, public-service value, compliance resource costs, and declared social weights. Identifying these transitions from targeted historical audits, and designing efficient joint taxes and enforcement, remain outside the proved finite-model and measurement results.
+\begin{thebibliography}{9}
+\bibitem{Slemrod} J. Slemrod (2019), Tax compliance and enforcement, \emph{Journal of Economic Literature} 57(4), 904--954. \url{https://doi.org/10.1257/jel.20181437}. Background on behavioral responses, measurement, and normative enforcement comparisons.
+\bibitem{JBG} A. Jensen, A. Brockmeyer, and L. Gadenne (2024), Taxation and development, \emph{VoxDevLit} 12(1). \url{https://voxdev.org/voxdevlit/taxation}. Source of the broader tax-design and enforcement agenda; not a source for an empirically identified transition model here.
+\end{thebibliography}
+
+\end{document}
