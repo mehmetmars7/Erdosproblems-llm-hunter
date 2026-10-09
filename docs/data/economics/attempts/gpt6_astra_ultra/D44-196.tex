@@ -1,0 +1,264 @@
+% ECONOMICS_PROBLEM: {"id": "D44-196", "title": "Computing median prices for XOS valuations", "jel_code": "D44", "source_id": "OP-0176"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Computing median prices for XOS valuations\\\large Additive learning, finite-precision control, and a demand obstruction}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{D44-196}. \textbf{Status:} Unresolved; restricted results and reductions.
+
+\section{The exact computational target}
+For independent buyer valuations arriving in a fixed order, let
+$\pi_g(p)$ be the probability that good $g$ is sold at nonnegative
+prices $p$. An $\alpha$-median vector satisfies
+$\pi_g(p)\leq1-\alpha$ for all goods and
+$\pi_g(p)\geq\alpha$ for goods with $p_g>0$.
+The target asks for polynomial computation and samples for
+$\alpha=1/2-\epsilon$, for generic XOS distributions with value and
+demand oracles. It requires a single output price vector.
+
+D\"utting et al.\ \cite[Sections 4.1 and 4.5, Definitions 4.1--4.2 and
+Theorem 4.9]{sample} explicitly pose extension of their unit-demand
+construction to XOS valuations. Their proof constructs prices from an
+empirical distribution; its statement's use of ``distribution over
+prices'' does not authorize replacing the present target by average
+sale bounds for a price mixture. We solve an additive restriction,
+give an explicit finite-precision qualification, and prove a robust
+XOS example that invalidates a tempting cross-price monotonicity
+extension. The full XOS computational problem remains unresolved.
+
+\section{An elementary concentration fact}
+\begin{lemma}[Bernoulli sample tails]\label{tail}
+If $X_1,\ldots,X_N$ are independent Bernoulli variables of common mean
+$q$, then, for every $a>0$,
+\[
+ \Pr\left\{N^{-1}\sum_jX_j-q\geq a\right\}
+ \leq e^{-2Na^2},
+\]
+and the same bound holds for the lower tail.
+\end{lemma}
+\begin{proof}
+For a Bernoulli variable, let
+$H(t)=\log\E e^{t(X-q)}$. Then $H(0)=H'(0)=0$, while $H''(t)$ is
+the variance of a Bernoulli variable under exponential tilting and is
+at most $1/4$. Integrating twice gives $H(t)\leq t^2/8$ for all real
+$t$. Independence and Markov's inequality yield, for $t>0$,
+\[
+ \Pr\{\textstyle\sum_j(X_j-q)\geq Na\}
+ \leq\exp(-tNa+Nt^2/8).
+\]
+Choosing $t=4a$ proves the upper-tail bound. Applying the same argument
+to $1-X_j$ proves the lower-tail bound.
+\end{proof}
+
+\section{A single median vector for additive buyers}
+Assume $n,m\geq1$ and
+$v_i(S)=\sum_{g\in S}a_{ig}$ with nonnegative finite coefficients.
+Let $Y_g=\max_i a_{ig}$, and suppose its distribution function $F_g$
+is continuous. The original genericity assumption implies this
+continuity in the additive case: for the singleton available set
+$\{g\}$, an atom of $a_{ig}$ at any fixed nonnegative price would
+create a positive-probability demand tie. A finite maximum of atomless
+variables is atomless. Correlations between different goods within a
+buyer are unrestricted.
+
+Draw $N$ iid complete valuation profiles, with $N$ odd, and set $p_g$
+to the middle order statistic of their $Y_g$ values.
+
+\begin{theorem}[Additive sample-median algorithm]\label{additive}
+For every $0<\epsilon<1/2$ and $0<\delta<1$, any odd
+\[
+ N\geq\frac{\log(2m/\delta)}{2\epsilon^2}
+\]
+makes the output a single $(1/2-\epsilon)$-median vector with
+probability at least $1-\delta$. The algorithm uses $Nnm$ singleton
+value queries and $O(Nnm+mN\log N)$ comparison and arithmetic
+operations. This is an oracle comparison bound; exact numerical work
+is polynomial in the supplied scalar encodings when those encodings
+are available.
+\end{theorem}
+\begin{proof}
+With additive values a buyer takes exactly the available goods whose
+coefficient exceeds their prices, outside a null tie event. Therefore
+good $g$ sells precisely when some $a_{ig}>p_g$, independently of what
+happens to other goods. Its sale probability is $1-F_g(p_g)$, and
+arrival order does not affect this identity.
+
+For a continuous CDF, $F_g(Y_g)$ is uniform on $[0,1]$. To see this
+without strict increase, for each $u\in(0,1)$ use continuity to select
+a threshold where the CDF is $u$; intervals on which the CDF is flat
+have zero probability, so $\Pr\{F_g(Y_g)\leq u\}=u$.
+Consequently, if $F_g(p_g)<1/2-\epsilon$, at least $(N+1)/2$ of $N$
+independent uniform variables are at most $1/2-\epsilon$. Their
+indicator average exceeds its expectation by more than $\epsilon$,
+so Lemma~\ref{tail} bounds this event by $e^{-2N\epsilon^2}$.
+The symmetric argument bounds $F_g(p_g)>1/2+\epsilon$ by the same
+quantity. A union bound over goods gives failure probability at most
+$2m e^{-2N\epsilon^2}\leq\delta$.
+
+On the complementary event, every sale probability lies in
+$[1/2-\epsilon,1/2+\epsilon]$. These bounds imply both required median
+conditions, including the weaker lower-bound requirement when a price
+is zero. Computing coefficients by singleton queries, maxima over
+buyers, and sorting each good's sample gives the operation counts.
+\end{proof}
+
+Genericity alone does not specify a finite-bit representation for an
+arbitrary real median. The next statement makes one sufficient
+rounding assumption explicit rather than hiding precision in an oracle.
+
+\begin{proposition}[A finite-precision version]\label{precision}
+Assume additionally $0\leq a_{ig}\leq V$, with known $V>0$, and each
+$F_g$ is $K$-Lipschitz for a known $K>0$. Suppose singleton values can
+be returned to absolute error at most $h$, where $h$ is rational and
+$0<h\leq\epsilon/(4K)$. Form the sample maxima and medians from these
+approximate values, round each resulting price to a nearest nonnegative
+multiple of $h$, and use Theorem~\ref{additive} with accuracy
+$\epsilon/2$. The resulting rational vector is a
+$(1/2-\epsilon)$-median vector with probability at least $1-\delta$.
+Its coordinates have polynomial encoding length in the encodings of
+$h,V$ and the chosen grid indices.
+\end{proposition}
+\begin{proof}
+Changing each scalar by at most $h$ changes its maximum by at most $h$.
+It also changes any fixed order statistic by at most $h$: if all
+coordinates lie within $h$ of their originals, their ordered values
+satisfy the same coordinatewise bounds. Clipping approximate prices
+below zero to zero cannot increase their error to a nonnegative true
+median. Rounding to a grid adds at most $h$, so each final price is
+within $2h$ of the exact sample median. Lipschitz continuity changes
+its true sale probability by at most $2Kh\leq\epsilon/2$.
+The probability bound at accuracy $\epsilon/2$ and this deterministic
+rounding bound prove the claim. Final prices lie in $[0,V+2h]$ and
+have form an integer times the rational grid size, giving the stated
+encoding control. Precision-oracle costs must be counted separately
+if that oracle has a specified nonconstant cost.
+\end{proof}
+
+\section{Own-price monotonicity survives; cross-price substitution fails}
+The first fact is useful but insufficient for a multidimensional price
+search.
+
+\begin{lemma}[Own-price sale monotonicity]\label{own}
+Fix two price vectors differing only in good $g$, with
+$p'_g\geq p_g$. Under valuations for which all demands at all available
+sets for these two vectors are unique, if $g$ is unsold at $p$, it is
+unsold at $p'$. Hence generic distributions satisfy
+$\pi_g(p'_g,p_{-g})\leq\pi_g(p_g,p_{-g})$.
+\end{lemma}
+\begin{proof}
+In the lower-price run no buyer purchases $g$. Inductively suppose the
+two runs have the same remaining set before a buyer and the same earlier
+purchases. Her unique optimum in the lower-price run excludes $g$.
+Increasing only $p_g$ leaves every excluding bundle's utility unchanged
+and weakly reduces every including bundle's utility. The same excluding
+bundle therefore remains the unique optimum. Thus her purchases agree
+in the two runs. Induction through all buyers proves the pointwise
+claim. There are finitely many available sets and buyers for the two
+fixed price vectors, so genericity makes the required uniqueness event
+have probability one. Taking probabilities proves the inequality.
+\end{proof}
+
+\begin{proposition}[A generic XOS complementarity example]\label{counter}
+There is a generic distribution over one buyer's XOS valuations on
+three goods $a,b,c$ such that increasing the price of $b$, holding all
+other prices fixed, reduces the sale probability of $c$ from one to
+zero.
+\end{proposition}
+\begin{proof}
+Let $Z_a,Z_b,Z_c$ be independent uniform variables on $(0,1/10)$ and set
+\[
+ v(S)=\max\{10\Ind\{a\in S\},\
+                 6\Ind\{b\in S\}+6\Ind\{c\in S\}\}
+       +\sum_{g\in S}Z_g.
+\]
+This is the maximum of two nonnegative additive clauses, after adding
+$Z_g$ to each clause's coefficient, so is XOS.
+For any fixed price and available set, equality of two distinct
+bundles' utilities is a nonconstant affine equation in the independent
+continuous $Z_g$: their deterministic base values are constants and
+the coefficient of some $Z_g$ in their difference is $1$ or $-1$.
+It has probability zero. There are finitely many bundles, giving
+unique demand almost surely. This proves genericity for every fixed
+price and available set.
+
+At prices $(5,2,2)$, maximizing the first additive clause's net value
+selects only $a$ and gives $5+Z_a<5.1$. Maximizing the second selects
+$b,c$ and gives $8+Z_b+Z_c>8$. Since maximization over bundles commutes
+with the maximum over two clauses, the unique demand is $\{b,c\}$.
+At prices $(5,6,2)$, the best first-clause bundle is again $\{a\}$
+with utility $5+Z_a>5$. The best second-clause bundle is $\{b,c\}$
+with utility $4+Z_b+Z_c<4.2$; the small positive $Z_b$ makes including
+$b$ optimal in that clause. Thus the unique actual demand is $\{a\}$.
+The sale probability of $c$ has fallen from one to zero in every
+realization in the support.
+\end{proof}
+
+The construction is robust to atomless perturbations and uses only two
+clauses. It rules out an argument that treats every XOS demand system
+as substitutes in other goods' prices. It is not an oracle lower bound
+or a proof that every possible price-adjustment algorithm fails.
+
+\section{Validation of a proposed vector is easier than finding one}
+\begin{proposition}[Independent-sample validation]
+Given any proposed vector $p$, possibly chosen from earlier data, use
+$N$ fresh iid profiles to simulate the sequential sales with $n$ demand
+queries per profile. Let $\widehat\pi_g$ be sample sale frequencies.
+For $N\geq\log(2m/\delta)/(2\eta^2)$,
+\[
+ \max_g|\widehat\pi_g-\pi_g(p)|\leq\eta
+\]
+with probability at least $1-\delta$. Thus empirical bounds
+$\widehat\pi_g\leq1/2+\epsilon-\eta$ for all $g$ and
+$\widehat\pi_g\geq1/2-\epsilon+\eta$ for $p_g>0$ certify the desired
+median inequalities on that event.
+\end{proposition}
+\begin{proof}
+Condition on the proposed prices and all earlier data. For each good,
+the fresh sale indicators are independent Bernoulli variables of mean
+$\pi_g(p)$. Apply both tails of Lemma~\ref{tail} and union bound over
+$m$ goods; the conditional bound is uniform in $p$, hence remains valid
+unconditionally. Add or subtract $\eta$ from the empirical inequalities
+to obtain the true inequalities. Sequential simulation uses one demand
+query for each buyer on the remaining set, with unavailable goods
+removed as part of the declared oracle interface.
+\end{proof}
+
+This validator does not guarantee that a proposed vector passes, does
+not justify reusing its data for arbitrary adaptive proposals, and
+does not construct a price vector. The gap is a polynomial search
+procedure for general XOS demand that returns one vector with controlled
+precision. Additive separation and a fresh-data certificate settle
+restricted parts of that task but do not close it.
+\begin{thebibliography}{9}
+\bibitem{sample} P. D\"utting, T. Kesselheim, B. Lucier,
+R. Reiffenh\"auser, and S. Singla (2024).
+\emph{Online Combinatorial Allocations and Auctions with Few Samples}.
+arXiv:2409.11091v1, Sections 4.1 and 4.5,
+Definitions 4.1--4.2, Lemma 4.5, and Theorem 4.9.
+\url{https://arxiv.org/html/2409.11091v1}.
+\end{thebibliography}
+
+\end{document}

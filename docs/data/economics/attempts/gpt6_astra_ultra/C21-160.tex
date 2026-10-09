@@ -1,0 +1,151 @@
+% ECONOMICS_PROBLEM: {"id": "C21-160", "title": "The joint estimation and inference frontier for causal response functions", "jel_code": "C21", "source_id": "OP-0508"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{One center for estimation and simultaneous inference\\\large A projection construction and a sharp smoothness-diagonal benchmark}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C21-160}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Question and main distinction}
+The target asks whether the same center can have minimax integrated risk and an honest band of optimal uniform width. A pointwise Gaussian interval with unaccounted smoothing bias can fail, but that does not prove a universal incompatibility. We give a general projection construction and instantiate it on $s=\beta=t\in(0,1]$. It attains the optimal integrated estimation rate and the optimal simultaneous-band width order at one center, with explicit bias allowance. The general causal nuisance frontier is still unresolved.
+
+The source's bias discussion appears in \cite[Section 3.3.3]{challenge}. Our construction combines two smoothing scales and does not assert that an unmodified MSE-optimal histogram itself has the best maximum-error behavior.
+
+\section{A general center-transfer theorem}
+Let the target $f$ take values in $[-M,M]$ on a measurable domain with probability measure $\mu$. Suppose an estimator $T$ also takes values there. Let $[L(x),U(x)]$ be a nonempty random interval contained in $[-M,M]$ for every $x$, and suppose the simultaneous coverage event
+$\mathcal E=\{L(x)\leq f(x)\leq U(x)\text{ for every }x\}$
+is measurable. All procedures used below are finite histograms, so this measurability is automatic. Define pointwise
+\[
+ C(x)=\min\{U(x),\max\{L(x),T(x)\}\},\quad
+ A(x)=\max\{C(x)-L(x),U(x)-C(x)\}.
+\]
+
+\begin{theorem}[Projection preserves risk at a quantifiable cost]\label{transfer}
+If uniformly over a class
+$\E\|T-f\|_{L^2(\mu)}^2\leq r_n$ and $\Pr(\mathcal E^c)\leq\delta_n$, then the band $C\pm A$ has simultaneous coverage at least $1-\delta_n$ and
+\[
+ \sup_P\E\|C-f\|_{L^2(\mu)}^2\leq r_n+4M^2\delta_n,
+ \qquad
+ \sup_P\E\|A\|_\infty\leq\sup_P\E\|U-L\|_\infty.
+\]
+No independence between $T$ and $[L,U]$ is needed.
+\end{theorem}
+\begin{proof}
+The center $C$ belongs to $[L,U]$, so $[C-A,C+A]$ contains that interval and $A\leq U-L$. On $\mathcal E$, projection onto an interval containing $f(x)$ cannot increase distance to $f(x)$. Explicitly, if $T<L$ then $T\leq L\leq f$; if $T>U$ then $f\leq U\leq T$; inside the interval $C=T$. These cases prove $|C-f|\leq|T-f|$ pointwise on $\mathcal E$. Off that event both functions are in $[-M,M]$, so their integrated squared distance is at most $4M^2$. Taking expectations gives the first bound, and the pointwise radius inequality gives the second. Coverage follows by containment.
+\end{proof}
+
+A preliminary band with merely fixed failure probability would contribute a constant to this risk argument. The useful choice is a high-coverage band, with $\delta_n$ smaller than the desired integrated risk. Whether that choice has a width penalty is a property of the statistical experiment, rather than an algebraic fact about projection.
+
+\section{An explicit causal construction}
+Use the binary causal baseline, $|Y|\leq1$, covariate density bounded between fixed positive constants, and fixed overlap $\varepsilon$. Suppose $s=\beta=t\in(0,1]$, both $m_w$ are $t$-H\"older with constant $L$, and $\tau$ satisfies the catalogue's compatible $t$-H\"older bound. The propensity may be unknown and arbitrarily rough within its prescribed overlap and smoothness restrictions.
+
+For a grid with $J=q^d$ cells of side $h=1/q$, estimate each $m_w$ by its cell-arm outcome average, or zero for an empty cell-arm. Let $T_h$ be the difference of these estimates, so $T_h\in[-2,2]$.
+
+\begin{lemma}[Integrated risk of the armwise histogram]\label{hist}
+Uniformly over this class,
+\[
+ \E\|T_h-\tau\|_{L^2(P_X)}^2
+                  \leq C\{h^{2t}+J/n\}.
+\]
+\end{lemma}
+\begin{proof}
+For a cell-arm with probability $p$, let $N\sim\operatorname{Bin}(n,p)$. Its conditional mean $\bar m$ differs from $m_w(x)$ throughout the cell by at most $Ld^{t/2}h^t$. Conditional on $N>0$, its sample mean has variance at most $1/N$. The identities and inequalities
+\[
+ \E\frac1{N+1}=\frac{1-(1-p)^{n+1}}{(n+1)p},\qquad
+ \frac{\Ind\{N>0\}}N\leq\frac2{N+1},\qquad
+ (1-p)^n\leq\frac1{(n+1)p}
+\]
+follow respectively by integrating $(1-p+pt)^n$ on $[0,1]$, direct comparison for positive integers, and maximizing $(n+1)p(1-p)^n$ over $p$. They bound both sample variance and empty-cell loss by $C/(np)$. Since each arm probability in a cell is at least $\varepsilon P_X(A_j)$, integrating this bound over that cell contributes at most $C/n$. The squared-bias contribution is $Ch^{2t}$ over the entire domain. Sum over cells and arms and use $(u-v)^2\leq2u^2+2v^2$ to obtain the claim.
+\end{proof}
+
+Choose $h_E$ of order $n^{-1/(2t+d)}$ and let $T=T_{h_E}$. For the band use a second grid $h_B$ of order $(\log n/n)^{1/(2t+d)}$. On that grid, for positive cell-arm counts use center $T_{h_B}$ and radius
+\[
+ a_j=2Ld^{t/2}h_B^t+
+ \sum_{w=0}^1\sqrt{\frac{2\log(4J_B/\delta_n)}{N_{jw}}},
+ \qquad \delta_n=n^{-2}.
+\]
+Intersect the interval with $[-2,2]$, and use $[-2,2]$ when a count is zero. Call the resulting endpoints $L,U$.
+
+\begin{theorem}[Joint attainment on the diagonal]\label{joint}
+Apply Theorem~\ref{transfer} with $M=2$ to these $T,L,U$. The resulting common center $C$ and radius $A$ obey
+\[
+ \sup_P\E\|C-\tau\|_{L^2(P_X)}^2\leq C_1 n^{-2t/(2t+d)},
+ \qquad
+ \sup_P\E\|A\|_\infty\leq C_2(\log n/n)^{t/(2t+d)},
+\]
+and cover $\tau$ simultaneously with probability at least $1-n^{-2}$.
+The constants depend only on fixed class parameters and $d$.
+\end{theorem}
+\begin{proof}
+Lemma~\ref{hist} gives the stated integrated rate for $T$. Conditional on the cell-arm labels, Hoeffding's inequality for outcomes in $[-1,1]$ bounds each arm-mean error by its displayed square-root term with failure at most $\delta_n/(2J_B)$. A union bound and the two armwise H\"older bias bounds give coverage at least $1-\delta_n$ for $[L,U]$.
+
+Each cell-arm probability is at least $\varepsilon f_*h_B^d$. Except with probability $2J_B\exp(-cnh_B^d)$, every count is at least $c'nh_B^d$, by the binomial lower-tail bound. On this event, maximum full width is at most
+\[
+ C\left\{h_B^t+
+      \sqrt{\frac{\log(4J_Bn^2)}{nh_B^d}}\right\}
+ \leq C'(\log n/n)^{t/(2t+d)}.
+\]
+Width is always at most four, and the exceptional probability is smaller than this rate for all large $n$. Thus its expected width has the claimed order. Apply Theorem~\ref{transfer}; the extra risk term is $16n^{-2}$, smaller than $n^{-2t/(2t+d)}$. The same data may construct both histograms because the transfer theorem does not require independence.
+\end{proof}
+
+\section{Why the two orders are benchmark-optimal}
+\begin{proposition}[Risk lower bound]\label{risklower}
+If the class constants admit the randomized Bernoulli submodels below, every estimator has worst-case integrated squared risk at least
+\[c n^{-2t/(2t+d)}.\]
+\end{proposition}
+\begin{proof}
+Let $X$ be uniform and $W$ a fair randomized treatment. Choose a fixed bump $\varphi$ supported in the central half of the unit cube, Lipschitz, nonnegative, and with maximum exactly one. In $J=q^d$ disjoint cells set
+\[
+ \tau_\omega(x)=a\sum_{j=1}^J\omega_j\varphi((x-x_j)/h),
+ \qquad \omega_j\in\{-1,1\},\quad a=\kappa h^t,
+\]
+with sufficiently small fixed $\kappa$. The separation between supports and the vanishing at support boundaries give a uniform $t$-H\"older constant independent of $J$. Let $m_0=0,m_1=\tau_\omega$, and let $Y\in\{-1,1\}$ have these armwise conditional means. Means have magnitude at most $1/2$ after reducing $\kappa$, so variances are uniformly positive. Potential outcomes can be generated independently conditional on $X$, independently of treatment, verifying the causal assumptions.
+
+For neighboring sign vectors differing only at $j$, squared $L^2$ distance on that cell is $4a^2h^d\int\varphi^2$. The Bernoulli inequality
+$\KL(\operatorname{Ber}(p),\operatorname{Ber}(q))\leq(p-q)^2/[q(1-q)]$ follows from $\log u\leq u-1$. It gives an $n$-observation neighbor divergence at most $Cna^2h^d$. Take $q$ of order $n^{1/(2t+d)}$ and $\kappa$ small enough that every neighbor total variation is at most $1/2$, by Pinsker.
+
+Decode each sign by the nearer of the two local bump functions to an arbitrary estimator in $L^2$ on its cell. An incorrect sign forces local squared error at least $a^2h^d\int\varphi^2$, by the triangle inequality between the two candidates. For every fixed choice of the other signs, the two testing error probabilities sum to at least $1-\TV\geq1/2$. Averaging over the uniform sign prior and summing cells gives average risk at least $cJa^2h^d=ca^2$. Maximum risk dominates the average, proving the order.
+\end{proof}
+
+For completeness, the logarithmic width lower bound follows from a distinct testing construction. Keep the same randomized model but use only $J$ alternatives with one positive bump each and the zero null. At amplitude $a=\kappa h^t$, disjoint supports make the cross likelihood-ratio moments equal to one, whereas a self moment for $n$ observations is $(1+c a^2h^d)^n$. The mixture chi-square distance is therefore
+\[
+ \chi^2=J^{-1}\{(1+c a^2h^d)^n-1\}.
+\]
+Choose $h$ of order $(\log n/n)^{1/(2t+d)}$ with a small enough constant so that $cna^2h^d\leq\frac12\log J$. Then the distance tends to zero. For a band honest at any fixed $1-\eta$ with $\eta<1/2$, reject the null if it contains any alternative function. Under the mixture this occurs with probability at least $1-\eta-o(1)$, hence also under the null up to $o(1)$. When it contains the null and its full width is less than $a$, it cannot contain an alternative. Null coverage thus implies probability at least $1-2\eta-o(1)$ of width at least $a$, yielding the matching expected-width lower bound. A symmetric band's full width is twice its maximum radius, so the same order applies to the criterion in the target.
+
+\section{Undersmoothing is a property of a construction}
+There is a concrete variance penalty if a histogram is forced to undersmooth. In the simpler randomized experiment with uniform $X$, $e=1/2$, and centered independent Rademacher outcomes in both arms, the cell-mean difference has zero bias. For a grid with $nh^d\to\infty$, its integrated variance is bounded above and below by constants times $(nh^d)^{-1}$. The upper bound follows from Lemma~\ref{hist}. For the lower bound, if $N\sim\operatorname{Bin}(n,h^d/2)$, Chebyshev implies $\Pr(1\leq N\leq nh^d)\to1$, and on that event $1/N\geq1/(nh^d)$. Conditional outcome independence makes the two arm variances add. Integrating over cells proves the lower bound.
+
+Taking $h=b_n n^{-1/(2t+d)}$, $b_n\to0$, with $nh^d\to\infty$, therefore inflates risk in this submodel by $b_n^{-d}$. The usual upper-bound ratio of smoothing bias to a pointwise standard error is proportional to
+$\sqrt{nh^d}h^t=b_n^{t+d/2}$ and does vanish. This calculation explains the cost for that undersmoothed center. Theorem~\ref{joint} shows that it is not a lower bound on every honest procedure: a high-coverage, explicitly bias-bounded band and projection avoid that risk penalty.
+
+The unresolved part is the optimal joint pair when effect smoothness exceeds arm-mean smoothness and nuisance estimation constrains the best band. The transfer theorem still applies there if one can build a sufficiently high-coverage band with the right width; establishing that statistical input, including uniform remainder control, is the substantive gap.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.3.3, ``Inference,'' inspected 9 October 2026. \url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}.
+\end{thebibliography}
+
+\end{document}

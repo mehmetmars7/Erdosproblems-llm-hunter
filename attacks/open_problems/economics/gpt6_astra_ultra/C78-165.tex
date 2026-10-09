@@ -1,0 +1,201 @@
+% ECONOMICS_PROBLEM: {"id": "C78-165", "title": "Approximating the least unpopularity margin", "jel_code": "C78", "source_id": "OP-0543"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Least unpopularity margin\\\large Additive amplification and deletion certificates}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C78-165}. \textbf{Status:} Unresolved; restricted results and reductions.
+
+\section{Target and scope}
+The target minimizes the maximum net number of votes against a house
+allocation. Write $n=|A|$, $N=|A|+|H|$, and
+$\Delta(Q,M)=\phi(Q,M)-\phi(M,Q)$. Thus
+$\mu(M)=\max_Q\Delta(Q,M)$ and $\mu^*=\min_M\mu(M)$.
+Preferences are strict, unacceptable assignments are prohibited, and
+unmatched is worse than every acceptable house.
+
+The source survey \cite[Section 3.1.1, Theorems 1--3]{survey} distinguishes
+polynomial evaluation, polynomial recognition of a popular matching, and
+NP-hard minimization of the margin. Its final paragraph asks for stronger
+approximation results. We derive a precise additive hardness consequence
+of that stated NP-hardness, whose primary proof is
+\cite[Theorem 5.2]{mcc}, and an additive algorithm parameterized by a
+small deletion certificate. These are self-contained reductions except
+for the two explicitly cited established algorithmic facts. No optimal
+multiplicative threshold is claimed.
+
+\section{A computable objective and its exact product structure}
+For a fixed matching $M$ append one private dummy house $d_a$ for each
+applicant, representing being unmatched. Every applicant must now be
+assigned a house, and only $a$ may use $d_a$. Give acceptable edge $(a,h)$
+weight $1,0,-1$ according as $h$ is better than, equal to, or worse than
+$M(a)$. Give $(a,d_a)$ the corresponding weight for unmatched.
+
+\begin{lemma}[Evaluation and certificates]\label{evaluation}
+The maximum weight of an applicant-saturating matching in this augmented
+bipartite graph equals $\mu(M)$. In particular $\mu(M)$ is an integer in
+$[0,n]$ and is computable in polynomial time, together with a maximizing
+challenger.
+\end{lemma}
+\begin{proof}
+Remove dummy edges from any augmented matching to obtain a feasible
+original matching $Q$. Each applicant contributes exactly her vote to
+$\Delta(Q,M)$, including the unmatched case. Conversely every $Q$ has a
+unique augmentation by the private dummies, with that same weight.
+Maximizing proves the identity. Choosing $Q=M$ gives nonnegativity and
+there are only $n$ summands, each at most one. A maximum-weight bipartite
+assignment is computable in polynomial time; the dummy extension always
+makes an applicant-saturating assignment feasible.
+\end{proof}
+
+\begin{proposition}[Disjoint instances add]\label{sum}
+Suppose the acceptable graph is the disjoint union of instances
+$I_1,\ldots,I_t$, with no applicant accepting a house in another
+component. For every matching $M=\bigcup_jM_j$,
+\[
+ \mu_I(M)=\sum_{j=1}^t\mu_{I_j}(M_j),\qquad
+ \mu_I^*=\sum_{j=1}^t\mu_{I_j}^*.
+\]
+\end{proposition}
+\begin{proof}
+Every challenger is uniquely a tuple $(Q_1,\ldots,Q_t)$ and its vote
+margin is the sum of the component margins. Independent maximization
+over the finite sets of component challengers gives the first equality.
+Independent minimization over the finite sets of component matchings
+gives the second. In particular isolated applicants and houses contribute
+zero and cause no exceptional case.
+\end{proof}
+
+\section{What replication actually proves about additive error}
+An additive guarantee is measured in $N$, the total number of vertices,
+not the bit length of the displayed preference lists.
+
+\begin{theorem}[Polynomial-power additive hardness]\label{hardness}
+Fix constants $C>0$ and $0<\epsilon\leq1$. A deterministic polynomial-time
+algorithm that always returns $M$ satisfying
+\[
+ \mu_I(M)\leq\mu_I^*+C N^{1-\epsilon}
+\]
+would yield a deterministic polynomial-time exact optimizer. Consequently
+such an algorithm is impossible unless $\mathrm P=\mathrm{NP}$, using
+the NP-hardness recorded in \cite[Theorem 3]{survey}.
+More generally the same implication holds for an error function $g$ if
+there is a polynomially bounded, polynomially computable integer $t(N)$
+such that $g(t(N)N)<t(N)$.
+\end{theorem}
+\begin{proof}
+Given a nonempty instance $I$, make $t$ disjoint labeled copies. Run the
+hypothetical algorithm on their union and write its restriction to copy
+$j$ as $M_j$. Proposition~\ref{sum} gives
+\[
+ \sum_{j=1}^t\mu_I(M_j)\leq t\mu_I^*+g(tN).
+\]
+If $g(tN)<t$, the average of the integer component margins is strictly
+less than $\mu_I^*+1$. Therefore at least one component has margin at most
+$\mu_I^*$. No component can have margin less than the optimum. Evaluate
+all $t$ margins by Lemma~\ref{evaluation} and return a minimum one.
+This is an exact optimum, even when that optimum is zero.
+
+For the displayed power bound, choose an integer $t$ strictly larger
+than $(C N^{1-\epsilon})^{1/\epsilon}$. Then
+$C(tN)^{1-\epsilon}/t=C N^{1-\epsilon}t^{-\epsilon}<1$.
+Since $C,\epsilon$ are fixed, a sufficiently large fixed constant times
+an integer power of $N$ supplies such $t$ with polynomial bit length
+and polynomially many copies. The transformed explicit input therefore
+has polynomial length and the reduction is polynomial. The empty
+instance is solved directly.
+\end{proof}
+
+This proof does \emph{not} establish hardness for every $g(N)=o(N)$.
+For example, take $g(N)=N/\log(N+2)$. Then $g(tN)/t$ is of order
+$N/\log(tN)$ and need not be below one for polynomial $t$.
+The replication rate is an essential hypothesis. Randomized guarantees
+would require corresponding randomized complexity assumptions and a
+specified success probability; they are not included in the theorem.
+
+\section{An additive certificate from a popular core}
+Delete a set $B$ of applicants, keeping all houses and the preferences
+of the remaining applicants. Denote the resulting instance by $I-B$.
+
+\begin{theorem}[Deletion sensitivity and a parameterized algorithm]
+For every $B\subseteq A$ with $|B|=k$,
+\[
+ |\mu_I^*-\mu_{I-B}^*|\leq k.
+\]
+If $I-B$ admits a popular matching $M_0$, any extension of $M_0$ obtained
+by assigning applicants of $B$ to unused acceptable houses, or leaving
+them unmatched, has margin at most $k$. Hence it has additive error at
+most $k$. For every fixed $k$, one can find such a certificate and
+matching, or correctly report that no deletion set of size at most $k$
+leaves a popular instance, in $n^{O(k)}\operatorname{poly}(N)$ time.
+\end{theorem}
+\begin{proof}
+Take an optimum $M_0$ in $I-B$ and extend it while preserving its
+assignments. In any challenger $Q$, the applicants outside $B$
+contribute at most $\mu_{I-B}(M_0)$: restricting $Q$ to these applicants
+is a feasible challenger in $I-B$, even if it uses houses assigned to
+$B$ by the extended matching. The $k$ deleted applicants contribute at
+most $k$. This proves $\mu_I^*\leq\mu_{I-B}^*+k$ and the popular-core
+assertion.
+
+Conversely restrict any $M$ in $I$ to the core. Choose a maximizing
+challenger $Q_0$ there and leave every applicant of $B$ unmatched in the
+full challenger. Its core margin is $\mu_{I-B}(M|_{A\setminus B})$ and
+the remaining contribution is at least $-k$. Consequently
+$\mu_I(M)\geq\mu_{I-B}^*-k$; minimize over $M$.
+
+Enumerate all subsets of size at most $k$ and apply the polynomial
+popular-matching recognition and construction algorithm of
+\cite[Theorem 1]{survey}. If one succeeds, use its popular matching and
+the extension just proved. If all fail, there is no such deletion set.
+There are at most $\sum_{j=0}^k\binom nj\leq(k+1)\max\{1,n\}^k$ subsets.
+\end{proof}
+
+The existence of a deletion certificate is not implied by a small
+optimum margin. No approximation ratio for the minimum deletion number
+has been proved here. The method is useful when a small exceptional
+set is independently known or can be enumerated.
+
+\section{Remaining problem}
+The power-error obstruction rules out a substantial family of additive
+improvements under the cited complexity assumption, but leaves errors
+such as $N/\log N$ and all sharp multiplicative guarantees open.
+The deletion theorem identifies a tractable structural promise, rather
+than removing this gap. In particular no division by a possibly zero
+optimum occurs anywhere in the argument. All results above are analytic;
+no experimental enumeration is used to infer complexity.
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh, and D. F. Manlove (2019).
+\emph{Selected open problems in Matching Under Preferences}.
+Bulletin of EATCS 128, Sections 3.1.1 and 3.2.4.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{mcc} R. M. McCutchen (2008).
+\emph{The least-unpopularity-factor and least-unpopularity-margin
+criteria for matching problems with one-sided preferences}.
+LATIN 2008, LNCS 4957, 593--604. Theorem 5.2 and final paragraph.
+\url{https://mattmccutchen.net/research/publications/least-unpopularity.pdf}.
+\end{thebibliography}
+\end{document}

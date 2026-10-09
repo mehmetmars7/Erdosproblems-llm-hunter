@@ -1,0 +1,131 @@
+% ECONOMICS_PROBLEM: {"id": "C31-168", "title": "Translating network potential outcomes into graphical causal models", "jel_code": "C31", "source_id": "OP-0488"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Finite response tables and graphical representability\\\large Exact restrictions for independent mechanisms}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C31-168}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Scope of the attempt}
+The target asks which joint network counterfactual tables arise from a specified graphical model, and how hard this is to decide. We give exact characterizations for two important latent structures: one unrestricted common error, and mutually independent node errors. These are different model classes. We also give a finite polynomial feasibility formulation for incomplete intervention families and an explicit counterexample to checking intervention marginals alone. Arbitrary overlapping latent-parent structures and sharp computational lower bounds remain outside the result.
+
+The motivation is the framework-translation discussion in \cite[Section 3.2.3]{challenge}. Finite response functions are a classical device, including in \cite{balke}. The assertions below are proved directly; no priority claim is made for the encoding.
+
+\section{Finite response functions}
+Let $G$ be a directed acyclic graph on $V=\{1,\ldots,v\}$. Variable $X_i$ takes values in a nonempty finite set $\mathcal X_i$ of size $d_i$. Put
+\[
+ \mathcal A_i=\prod_{j\in\operatorname{pa}(i)}\mathcal X_j,
+ \qquad \mathcal R_i=\{r_i:\mathcal A_i\longrightarrow\mathcal X_i\},
+ \qquad R_i=|\mathcal R_i|=d_i^{|\mathcal A_i|}.
+\]
+The empty product is a singleton. An intervention $I$ fixes a subset of the variables to supplied values. For each response tuple $r\in\mathcal R:=\prod_i\mathcal R_i$, evaluate the remaining equations in a topological order. For a finite supplied intervention family $\mathcal I$, write $T(r)$ for the complete resulting table of observed variables under those interventions. Its finite ambient state space is $\mathcal T$. Repeated or deterministically fixed entries may be retained.
+
+All probabilities below are on full joint tables, rather than a list of their separate marginal laws. A structural model with independent errors means $X_i=f_i(X_{\operatorname{pa}(i)},U_i)$ with mutually independent $U_i$. Their spaces and distributions need not have been finite in advance.
+
+\begin{theorem}[Exact finite reduction]\label{finite}
+A table law $p=(p_t:t\in\mathcal T)$ has an independent-error representation on $G$ if and only if there exist numbers $\theta_{i,r_i}\geq0$ satisfying
+\begin{align}
+ \sum_{r_i\in\mathcal R_i}\theta_{i,r_i}&=1\quad(i\in V),\label{simplex}\\
+ p_t&=\sum_{r:T(r)=t}\prod_{i=1}^v\theta_{i,r_i}
+                       \quad(t\in\mathcal T).\label{polynomial}
+\end{align}
+If all nodes may instead share one arbitrary common error, representability holds if and only if
+\[
+ p_t>0\quad\Longrightarrow\quad t\in T(\mathcal R).
+\]
+\end{theorem}
+\begin{proof}
+In an independent-error model define the random response function
+$R_i(a)=f_i(a,U_i)$ simultaneously for every $a\in\mathcal A_i$.
+There are finitely many such functions, and independence of the $U_i$ makes the $R_i$ independent. Their marginal masses give \eqref{simplex}. Evaluating each intervention recursively gives exactly $T(R)$, whose mass function is \eqref{polynomial}.
+
+Conversely, given the displayed numbers, draw independent $U_i$ with values in $\mathcal R_i$ and probabilities $\theta_{i,r_i}$. Set $f_i(a,U_i)=U_i(a)$. Topological evaluation shows that this model produces the required law under every intervention jointly, including the stipulated coupling between interventions.
+
+For a common error, each error realization still determines one tuple $r$, so the support restriction is necessary. If it holds, for each table with positive mass choose one $r(t)$ such that $T(r(t))=t$. Let a common error select $t$ with probability $p_t$, and give node $i$ the response function $r_i(t)$. This realizes the law. Only finitely many representatives are needed, so there is no measurable-selection issue.
+\end{proof}
+
+Exposure restrictions can be added by deleting response tuples whose tables violate the stated equalities. In the independent-error case this can equivalently be done by retaining equations $p_t=0$ for forbidden tables. Simply deleting their individual response functions is generally incorrect: an exposure restriction can involve several mechanisms jointly.
+
+\section{Complete interventions make the restrictions observable in the table}
+Call $\mathcal I$ \emph{response-revealing} if, for every node $i$ and every $a\in\mathcal A_i$, it includes an intervention fixing all variables except $i$, with the parents of $i$ fixed to $a$. The values assigned to the other variables may be chosen arbitrarily and consistently once. Such a family permits interventions on outcomes. A treatment-only table need not have this property.
+
+For a deterministic table $t$, let $\rho_i(t)(a)$ be its observed value of node $i$ under the chosen intervention just described. Thus $\rho_i(t)\in\mathcal R_i$. Say that $t$ is compatible when
+\[
+                     T(\rho(t))=t.\tag{3}
+\]
+This checks recursive composition for every supplied intervention, not just exposure invariance.
+
+\begin{theorem}[A checkable complete-table criterion]\label{complete}
+If $\mathcal I$ is response-revealing, a table law $p$ admits independent node errors if and only if:
+\begin{enumerate}
+\item every table in its support satisfies (3);
+\item the random arrays $\rho_1(T),\ldots,\rho_v(T)$ are mutually independent under $p$.
+\end{enumerate}
+The realizing marginal response laws are then unique. Given an explicit rational table law, the two conditions can be checked exactly by rational arithmetic without solving polynomial equations over the reals.
+\end{theorem}
+\begin{proof}
+Under any graphical model, fixing all other variables forces the output at $i$ to equal its response to the fixed parent values. Hence $\rho_i(T(r))=r_i$. The map $T$ is consequently injective and (3) is necessary. Independent node errors give independence of the recovered arrays.
+
+Conversely, under the two conditions draw independent response functions with the marginal laws of $\rho_i(T)$ under $p$. Their joint distribution is exactly the pushforward of $p$ by $\rho$. Compatibility then shows that applying $T$ returns $p$. Injectivity gives uniqueness of the marginals. The algorithm enumerates the support, recovers its arrays, checks (3), computes the marginal masses, and compares each joint array mass to the product of its marginals. Products for tuples outside the supplied support must also be checked; equivalently, enumerate the Cartesian product of the marginal supports and verify the factorization there. All sets are finite and all tested quantities are rational.
+\end{proof}
+
+\begin{proposition}[Decision procedure and its encoding limits]
+For arbitrary finite $\mathcal I$ and rational $p$, independent-error representability is decidable. In the expanded encoding that explicitly lists all response tuples and their tables, it is an instance of existential real polynomial feasibility with $\sum_iR_i$ variables and polynomial degree at most $v$. Common-error representability reduces to finitely many support-membership checks. These statements do not assert polynomial running time in the compact graph encoding.
+\end{proposition}
+\begin{proof}
+Construct $\mathcal R_i$, enumerate $\mathcal R$, and evaluate $T$ in topological order for each tuple and intervention. Equations \eqref{simplex}--\eqref{polynomial}, together with nonnegativity, are a finite system of rational polynomial equalities and inequalities. Quantifier elimination over real closed fields decides its feasibility \cite[Chapters 13--14]{bpr}. This standard decidability theorem is the only general algebraic decision result used here. Its existential encoding has the stated variables and degrees. In the common-error case, enumerate $T(\mathcal R)$ and apply Theorem~\ref{finite}. The response count $d_i^{\prod_{j\in\operatorname{pa}(i)}d_j}$ can itself be enormous relative to a list of vertices and edges, so the expanded formulation gives no polynomial bound in that shorter input. Moreover, real feasible probabilities need not have a supplied small rational witness; rational-only search would not be a complete replacement for real feasibility.
+\end{proof}
+
+\section{Why intervention marginals do not determine representability}
+\begin{proposition}[An explicit network counterexample]
+Let $A,Y_1,Y_2$ be binary with graph $A\to Y_1$, $A\to Y_2$, and mutually independent node errors required. There exist two joint treatment-response table laws that give the same observational law and the same joint observable law under each of $\operatorname{do}(A=0)$ and $\operatorname{do}(A=1)$, but only one has independent node errors.
+\end{proposition}
+\begin{proof}
+Let $U,V,A$ be independent fair bits. Define the first law by
+\[
+ (Y_1(0),Y_1(1))=(U,V),\qquad
+ (Y_2(0),Y_2(1))=(V,U).
+\]
+Under each fixed treatment, $(Y_1,Y_2)$ is a pair of independent fair bits. The same holds conditionally on the natural value of $A$, so its observational law is three independent fair bits. However, the two outcome response arrays are not independent. For example,
+\[
+ \Pr\{(Y_1(0),Y_1(1))=(0,0),\ (Y_2(0),Y_2(1))=(0,0)\}
+   =\tfrac14\ne\tfrac1{16}.
+\]
+The response arrays would have to be independent functions of the separate node errors in any proposed representation. Thus no such representation exists.
+
+For the second law take four mutually independent fair bits for the four potential outcomes, also independent of $A$. This law is realized by independent response-array errors at the outcome nodes and an independent error at $A$. Both of its fixed-treatment outcome pairs are again independent fair bits, and its observational law is identical to that of the first law. The counterexample therefore persists even when each intervention's full outcome vector, rather than just individual outcome marginals, is observed.
+\end{proof}
+
+\section{What remains open in this attempt}
+The finite reduction is a usable necessary-and-sufficient answer for independent mechanisms, and the common-error comparison isolates the force of independence. It is not a complete answer for the catalogue's full collection of prescribed latent structures. A common latent parent of only some nodes, or several overlapping independent latent parents, imposes a different factorization; assigning arbitrary joint probabilities to node response arrays would silently discard it. Finite cardinality reductions for such specified latent structures, tight complexity in succinct network encodings, and efficient certificates for useful restricted graph families still need separate arguments. No empirical or numerical claim is used here.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1. Section 3.2.3, ``Balancing generality and practicality,'' inspected 9 October 2026. \url{https://arxiv.org/html/2508.17099v1#S3.SS2.SSS3}.
+\bibitem{balke} A. Balke and J. Pearl (1994), \emph{Counterfactual Probabilities: Computational Methods, Bounds and Applications}, Proceedings of UAI 1994, 46--54; author-posted version arXiv:1302.6784. The title and abstract were checked; the present proofs do not rely on an uninspected theorem. \url{https://arxiv.org/abs/1302.6784}.
+\bibitem{bpr} S. Basu, R. Pollack and M.-F. Roy (2006), \emph{Algorithms in Real Algebraic Geometry}, second edition, Springer. Chapters 13--14 (existential decision and quantifier elimination); publisher contents and bibliographic record checked. \url{https://link.springer.com/book/10.1007/3-540-33099-2}.
+\end{thebibliography}
+
+\end{document}

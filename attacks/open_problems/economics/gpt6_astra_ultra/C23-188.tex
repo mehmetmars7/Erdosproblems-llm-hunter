@@ -1,0 +1,297 @@
+% ECONOMICS_PROBLEM: {"id": "C23-188", "title": "Hybrid panel models combining selection and latent factors", "jel_code": "C23", "source_id": "OP-0601"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Hybrid panel models combining selection and latent factors\\\large Cross-model incompatibility and a compatible temporal-bridge union}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C23-188}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and contribution}
+The target is a uniformly consistent estimator and honest inference on a
+union of observed-selection and latent-factor models. Identification inside
+each class does not establish identification across their union. We give
+an explicit two-period incompatibility example, even with overlap given
+the observed lagged outcome. We then specify a smaller compatible union,
+prove its common identifying formula, give finite-sample confidence sets,
+and quantify departures from its assumptions. The general noisy-factor
+and unknown-design problem remains open.
+
+Arkhangelsky and Imbens \cite{survey}, Section 10.4 of the June 2024 author
+version, motivate methods combining unconfoundedness and fixed effects.
+That section and the survey's Section 7.3.2 on augmentation were checked.
+The broader arbitrary-rank union is the catalogue's editorial extension.
+The augmented weighting algebra used here is standard; the point is to
+state structural classes on which its target is actually common.
+
+\section{An explicit failure of union identification}
+Observe independent copies of $(D,Y_0,Y_1)$, with treatment only in the
+second period, consistency $Y_1=DY_1(1)+(1-D)Y_1(0)$, no interference,
+and target $\tau=\E[Y_1(1)-Y_1(0)\mid D=1]$.
+The following two structural classes are each identified for this target.
+Class $\mathcal X$ assumes conditional mean exchangeability of $Y_1(0)$
+given $Y_0$ and overlap given $Y_0$. Class $\mathcal F$ assumes
+\[
+ Y_t(0)=\ell+g_t+\eta_t,\quad g_0=0,\quad
+ \E[\eta_1-\eta_0\mid D=1]
+ =\E[\eta_1-\eta_0\mid D=0]. \tag{1}
+\]
+This is a rank-one fixed-effect component with a stated group-mean
+restriction on the disturbances; it does not require conditional
+mean independence given $\ell$. All expectations are finite.
+The untreated trend in (1) has the same group mean, so the DID formula
+identifies $\tau$ within $\mathcal F$.
+
+\begin{proposition}[Separate identification does not survive union]
+There are models $m_X\in\mathcal X$ and $m_F\in\mathcal F$ with the same
+observable law, with $\Pr(D=1\mid Y_0)$ taking only values $1/4,3/4$,
+but with $\tau(m_X)=1$ and $\tau(m_F)=1/2$. No estimator is consistent
+at both models. Any confidence set honest at level $1-\alpha$ at both
+has diameter at least $1/2$ with probability at least $1-2\alpha$
+under their common observable law.
+\end{proposition}
+\begin{proof}
+Generate a fair binary latent variable $A$, then a binary assignment type
+$T$ with $\Pr(T=1\mid A)=1/4+A/2$. Set $D=T$, $Y_0=A$, and let
+$Y_1=D$ in the observable law. Here $\Pr(D=1)=1/2$,
+$\E[A\mid D=1]=3/4$, and $\E[A\mid D=0]=1/4$.
+
+For $m_X$, define $Y_1(0)=0$, $Y_1(1)=1$. Conditional mean exchangeability
+given $A=Y_0$ holds, both potential outcomes being constants, and the
+stated overlap holds. Consistency gives the stipulated observed law and
+$\tau(m_X)=1$.
+
+For $m_F$, define $Y_1(0)=T(A-1/4)$ and $Y_1(1)=1$.
+The assignment type is a common cause of treatment and potential outcomes;
+it is held fixed under treatment intervention, so this definition is a
+valid structural joint law and not a replacement of treatment by its
+intervention value inside a potential outcome. Consistency again gives
+$Y_1=D$. Set $\ell=A$, $g_1=-1/4$, $\eta_0=0$, and
+$\eta_1=T(A-1/4)-A+1/4$. For $D=1$ this error is zero; for $D=0$ it is
+$1/4-A$ with conditional mean zero. Thus (1) holds. The treated untreated
+mean is $3/4-1/4=1/2$, giving $\tau(m_F)=1/2$.
+
+For any estimator, the events that it lies within distance less than $1/4$
+of the two targets are disjoint. Their probabilities under the same
+observable sample law cannot both tend to one. For confidence sets,
+the two coverage events each have probability at least $1-\alpha$
+under that law; their intersection has probability at least $1-2\alpha$.
+On the intersection the set contains both $1/2$ and $1$, proving the
+claimed diameter restriction.
+\end{proof}
+
+To check separate identification explicitly, $\mathcal X$ uses
+\[
+ \E[Y_1\mid D=1]-
+ \E\{\E[Y_1\mid D=0,Y_0]\mid D=1\},
+\]
+whereas $\mathcal F$ uses
+$\E[Y_1-Y_0\mid D=1]-\E[Y_1-Y_0\mid D=0]$.
+In the displayed observed law these give $1$ and $1/2$, respectively.
+This counterexample is not offered against more restrictive factor models
+that require conditional restrictions absent from (1). It establishes
+why a proposed union must be audited across classes, even after checking
+rank and observed overlap.
+
+\section{A compatible union through a supplied temporal bridge}
+Now specify a different experiment. Observe $n$ independent copies of
+$O=(U,D,Y)$, where $U=(X,P)$ contains baseline covariates and a vector
+$P\in\R^T$ of pretreatment outcomes. Let $Y(d)$ be the post-treatment
+potential outcomes, with $|Y(d)|\leq M$ and consistency. The target is
+again the ATT, $\tau=\E[Y(1)-Y(0)\mid D=1]$.
+Assume $p=\Pr(D=1)\geq p_0>0$ and actual propensity
+$e(U)\in[\epsilon,1-\epsilon]$. Fix before seeing these observations
+measurable working functions $e_*(U)\in[\epsilon,1-\epsilon]$ and
+$h_*(U)\in[-M,M]$. They are supplied inputs, not estimates implicitly
+assumed known to be correct.
+
+Define the following structural classes. In $\mathcal M_X$, require
+$e=e_*$ and
+\[
+ \E[Y(0)\mid U,D=1]=\E[Y(0)\mid U,D=0]. \tag{2}
+\]
+In $\mathcal M_F$, require the stronger outcome bridge
+\[
+ \E[Y(0)\mid U,D=d]=h_*(U),\qquad d=0,1, \tag{3}
+\]
+while the actual propensity need not equal $e_*$. Thus one class supplies
+a correct treatment design with selection adjustment, and the other a
+correct untreated-outcome bridge. Neither class restricts selection on
+$Y(1)$, which is unnecessary for the ATT.
+
+Here is an explicit fixed-rank factor model giving (3). Let
+\[
+ P=g(X)+F\ell,\qquad
+ Y(0)=g_0(X)+f^\mathsf T\ell+\eta,
+ \qquad\E[\eta\mid U,D]=0,
+\]
+where $F$ is a supplied $T\times r$ matrix and
+$f=F^\mathsf Tb$ for a supplied $b\in\R^T$. Then
+\[
+ h_*(U)=g_0(X)+b^\mathsf T[P-g(X)] \tag{4}
+\]
+is the bridge. Assume its absolute value is at most $M$.
+This construction permits latent loadings and their selection, but requires
+noiseless pretreatment factors and a supplied temporal span restriction.
+Rotation of factors changes neither (4) nor identification. It does not
+claim that short noisy histories automatically reveal the loadings.
+
+\begin{theorem}[A common identified functional]
+On $\mathcal M_X\cup\mathcal M_F$, define the observed score
+\[
+ A(O)=D[Y-h_*(U)]-
+       (1-D)\frac{e_*(U)}{1-e_*(U)}[Y-h_*(U)].
+ \tag{5}
+\]
+Then $\E A=p\tau$. Consequently the union is point identified by the
+single observable functional $\E A/\E D$, including observationally
+equivalent models belonging to different classes.
+\end{theorem}
+\begin{proof}
+Write $\mu_d(U)=\E[Y(0)\mid U,D=d]$ and
+$\mu_{11}(U)=\E[Y(1)\mid U,D=1]$. Conditioning on $U$ gives
+\[
+ \E A=\E\left[e(\mu_{11}-h_*)
+       -(1-e)\frac{e_*}{1-e_*}(\mu_0-h_*)\right],\qquad
+ p\tau=\E[e(\mu_{11}-\mu_1)].
+\]
+Subtracting yields the exact identity
+\[
+ \E A-p\tau=
+ \E[e(\mu_1-\mu_0)]+
+ \E\left[\frac{e-e_*}{1-e_*}(\mu_0-h_*)\right]. \tag{6}
+\]
+In $\mathcal M_X$, the first term is zero by (2) and the second by
+$e=e_*$. In $\mathcal M_F$, (3) makes both terms zero. This proves the
+functional identity on the entire union. If two such models have the
+same observed law, they have the same two expectations in the ratio,
+whose denominator is at least $p_0$, so their targets coincide.
+For the factor example, substituting $P-g(X)=F\ell$ into (4) gives
+$h_*=g_0+f^\mathsf T\ell$, and the stated error condition proves (3).
+\end{proof}
+
+\section{Finite-sample inference on the compatible union}
+Let $\overline A,\overline D$ be the sample means. If
+$\overline D\geq p_0/2$, set $\widehat\tau$ equal to
+$\overline A/\overline D$ clipped to $[-2M,2M]$; otherwise use zero.
+Put $H=2M/\epsilon$ and, for $\alpha\in(0,1)$, define
+\[
+ r_A=H\sqrt{\frac{2\log(4/\alpha)}n},\qquad
+ r_D=\sqrt{\frac{\log(4/\alpha)}{2n}},\qquad
+ r=\frac{2(r_A+2Mr_D)}{p_0}.
+\]
+If $\overline D\geq p_0/2$, use
+$C=[\widehat\tau-r,\widehat\tau+r]\cap[-2M,2M]$;
+otherwise let $C=[-2M,2M]$.
+
+\begin{theorem}[Uniform confidence and consistency]
+For every $n$ and every model in the declared union,
+$\Pr(\tau\in C)\geq1-\alpha$.
+For fixed $M,\epsilon,p_0$, $\widehat\tau$ is uniformly consistent,
+and $\E\diam C=O(n^{-1/2})$ for fixed $\alpha$.
+\end{theorem}
+\begin{proof}
+The score in (5) satisfies $|A|\leq H$ because
+$|Y-h_*|\leq2M$ and $e_* /(1-e_*)\leq1/\epsilon$.
+Hoeffding's inequality, proved by the bounded tilted-variance argument,
+and a union bound give probability at least $1-\alpha$ to
+\[
+ |\overline A-\E A|\leq r_A,\qquad
+ |\overline D-p|\leq r_D.
+\]
+On this event and when $\overline D\geq p_0/2$, the common functional
+identity yields
+\[
+ \left|\frac{\overline A}{\overline D}-\tau\right|
+ \leq\frac{|\overline A-p\tau|+|\tau|\,|p-\overline D|}
+                 {\overline D}
+ \leq\frac{2(r_A+2Mr_D)}{p_0}.
+\]
+Clipping cannot increase distance to $\tau\in[-2M,2M]$. On the other
+branch the whole target range is reported, proving coverage.
+Moreover
+$\Pr(\overline D<p_0/2)\leq\exp(-np_0^2/2)$, since $p\geq p_0$.
+The diameter is at most $2r$ on the first branch and $4M$ on the second,
+so its expectation is at most $2r+4M e^{-np_0^2/2}$.
+Uniform consistency follows from the same concentration calculation with
+any fixed error tolerance: sample-mean deviations of order a fixed
+positive tolerance have exponentially small probabilities uniformly
+in the stated bounded class.
+\end{proof}
+
+This is deliberately an independent-unit sampling theorem, with $T,r$
+fixed or supplied and the bridge and working design treated as inputs.
+It is not a central limit theorem for a dependent array with estimated
+factor rotations or an unknown factor rank.
+
+\begin{proposition}[Explicit sensitivity enlargement]
+Allow departures from both models while preserving the boundedness and
+overlap assumptions. If
+\[
+ \|\mu_1-\mu_0\|_\infty\leq d_0,\quad
+ \|e-e_*\|_{L^2(P_U)}\leq d_e,\quad
+ \|\mu_0-h_*\|_{L^2(P_U)}\leq d_h,
+\]
+then the same procedure, with radius
+$r+2[d_0+d_ed_h/\epsilon]/p_0$ on its first branch, has coverage at
+least $1-\alpha$ for $\tau$.
+\end{proposition}
+\begin{proof}
+Equation (6), the first sup-norm bound, and Cauchy--Schwarz imply
+$|\E A-p\tau|\leq p d_0+d_ed_h/\epsilon$.
+On the concentration event used above, the numerator in the ratio-error
+bound is now at most $r_A+2Mr_D+pd_0+d_ed_h/\epsilon$.
+Since $p\leq1$ and the first branch has $\overline D\geq p_0/2$,
+the extra ratio error is at most $2[d_0+d_ed_h/\epsilon]/p_0$.
+On the second branch the full target range is reported, so the same
+concentration event proves coverage in all cases.
+\end{proof}
+
+\section{The first unresolved step}
+The negative example and positive theorem address different declared
+classes; the latter does not repair the incompatible union by notation.
+It imposes a common temporal bridge or a correct observed selection design,
+which supplies the shared observable functional. To extend the result to
+estimated bridges, independent training and explicit uniform bounds on
+bridge and propensity errors would be needed; (6) identifies the relevant
+bias terms. General noisy factor histories may fail (3), and approximation
+of the conditional confounding term is then a substantive identification
+restriction rather than a routine nuisance-estimation rate. Neither
+intersection efficiency nor optimal inference with estimated rank is
+established here.
+
+\begin{thebibliography}{9}
+\bibitem{survey} D. Arkhangelsky and G. Imbens (2024),
+\emph{Causal Models for Longitudinal and Panel Data: A Survey},
+arXiv:2311.15458v3, 25 June 2024. Section 10.4, Bridging
+Unconfoundedness and the TWFE Approach, printed p. 71; Section 7.3.2,
+Augmented Synthetic Control.
+\url{https://arxiv.org/pdf/2311.15458v3}.
+Published in The Econometrics Journal 27(3), C1--C61,
+\url{https://doi.org/10.1093/ectj/utae014}.
+\end{thebibliography}
+
+\end{document}

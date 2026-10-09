@@ -1,0 +1,278 @@
+% ECONOMICS_PROBLEM: {"id": "C12-156", "title": "Multiplicity and power in adaptive platform trials", "jel_code": "C12", "source_id": "OP-0484"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Multiplicity and power in adaptive platform trials\\\large Conditional entry, eligible information, and dependence-sensitive benchmarks}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C12-156}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and precise scope}
+The problem asks for strong familywise error control at every time, together
+with nonvacuous power after a quantified amount of information, even when
+arms enter adaptively and share controls. We establish conditional validity
+and an explicit bounded-score power bound, a multiplicity lower bound in a
+separate independent-stream submodel, and a bounded shared-control family
+where one simultaneous boundary replaces a multiplicity penalty. These
+benchmarks do not characterize the general efficiency frontier.
+
+Cinelli et al. \cite{challenge}, Section 3.1.3, identify multiple comparisons
+as one of several platform-trial challenges. Our proofs below concern the
+catalogue's constant conditional-effect formulation. Exponential
+supermartingale testing and error spending are standard tools; we supply
+all arguments needed to handle adaptive entry rather than claim these
+tools themselves as new.
+
+\section{The filtration and an eligible observation clock}
+Let $(\mathcal F_t)_{t\geq0}$ contain every platform observation and
+randomization revealed by time $t$. At a stopping time $\tau_j$, the
+platform fixes arm $j$, a contemporaneous comparator, a target effect,
+and a testing protocol. Index the countably many entrants by $j\geq1$,
+with deterministic tie-breaking if several enter together. Eligibility
+at a later time is decided before that time's allocation and outcome.
+Within an eligible observation, treatment label $A$ has known predictable
+probabilities $p_j,p_0>0$ for the arm and comparator. Other allocations
+are allowed. Outcomes satisfy $0\leq Y\leq1$ and
+\[
+ \E[Y\mid\mathcal F_{t-1},A=j]
+ -\E[Y\mid\mathcal F_{t-1},A=0]=\theta_j. \tag{1}
+\]
+The comparator mean may depend arbitrarily on the past. Conditional on
+the entry history, $\theta_j$ is fixed; the truth event
+$\{\theta_j\leq0\}$ is entry-measurable in this formulation.
+For each eligible observation define
+\[
+ X_{j,s}=\frac{\Ind\{A=j\}Y}{p_j}
+             -\frac{\Ind\{A=0\}Y}{p_0}.
+\]
+Here $s$ is arm $j$'s eligible-observation index and the filtration at
+that observation includes the entire intervening platform history.
+Assume an entry-known constant $c_j<\infty$ bounds
+$p_j^{-1}+p_0^{-1}\leq c_j$ on every eligible history. This is an
+additional quantitative overlap bound. Positivity alone supplies no
+uniform finite information guarantee. Equation (1) gives conditional
+mean $\theta_j$ and a conditional support interval of length at most
+$c_j$ for $X_{j,s}$.
+
+\begin{lemma}[Conditional exponential bound]
+If a random variable $X$ has conditional mean $\mu$ and conditional
+support in an interval of length $c$, then for real $\lambda$,
+\[
+ \E[\exp\{\lambda(X-\mu)\}\mid\mathcal G]
+ \leq\exp(\lambda^2c^2/8).
+\]
+Consequently, for an entry-chosen $\lambda_j>0$,
+\[
+ E_{j,s}=\exp\left\{\lambda_j\sum_{v=1}^s X_{j,v}
+                    -s\lambda_j^2c_j^2/8\right\},\quad E_{j,0}=1,
+ \tag{2}
+\]
+is a nonnegative supermartingale under $\theta_j\leq0$, conditional
+on that arm's entry history. Hold it constant between eligible observations.
+\end{lemma}
+\begin{proof}
+For a fixed conditional law let $g(\lambda)=\log\E e^{\lambda(X-\mu)}$.
+Boundedness permits differentiation and gives $g(0)=g'(0)=0$.
+The second derivative is the variance under exponential tilting, still
+supported on an interval of length $c$. For any variable $V$ in
+$[a,a+c]$, its variance is at most
+$\E(V-a-c/2)^2\leq c^2/4$. Thus $g''\leq c^2/4$, and integration
+twice proves the inequality for either sign of $\lambda$.
+Apply it to each eligible increment, whose conditional mean is
+$\theta_j\leq0$; the conditional expected multiplier in (2) is at
+most $e^{\lambda_j\theta_j}\leq1$. This uses the global pre-observation
+history, not merely the history of that arm. Holding a process constant
+at other times preserves the supermartingale property.
+\end{proof}
+
+\section{Strong error control and a power guarantee}
+Choose an entry-measurable error allocation $a_j\in(0,1)$ such that
+$\sum_j a_j\leq\alpha$ almost surely. Such a rule may spend the remaining
+budget adaptively but never exceed it. Reject arm $j$ on its first crossing
+$E_{j,s}\geq1/a_j$, and count the hypothesis only once.
+
+\begin{theorem}[Conditional entry spending]
+This procedure satisfies strong, time-uniform familywise error control:
+\[
+ \Pr\{\text{some true null is ever rejected}\}\leq\alpha.
+\]
+Suppose arm $j$ has entry-specified alternative $\theta_j\geq\delta_j>0$
+and its first $m_j$ eligible observations occur almost surely. Put
+$A_j=\log(1/a_j)$, $B_j=\log(1/\beta_j)$ and choose at entry
+\[
+ \lambda_j=\sqrt{\frac{8A_j}{m_jc_j^2}},\qquad
+ m_j\geq\frac{c_j^2}{2\delta_j^2}
+                 (\sqrt{A_j}+\sqrt{B_j})^2. \tag{3}
+\]
+Then its conditional probability of rejection by that eligible count is
+at least $1-\beta_j$. The rule remains valid at all earlier and later times.
+\end{theorem}
+\begin{proof}
+Condition on an entry history under its null. For a finite horizon $T$,
+stop (2) at its first crossing or at $T$. Iterated conditional expectations
+for this bounded stopping time give expectation at most one. Its value
+on a crossing is at least $1/a_j$, hence crossing probability is at most
+$a_j$. Increasing $T$ proves the same for any crossing. This argument
+also works on a null-truth event measurable at entry; multiplication by
+its indicator and conditional expectation give
+\[
+ \Pr\{H_j\text{ true and rejected}\}
+ \leq\E[\Ind\{H_j\text{ true}\}a_j].
+\]
+Countable union and monotone convergence bound the probability of any
+false rejection by $\E\sum_j a_j\leq\alpha$. Arbitrary shared-control
+dependence is allowed throughout this calculation.
+
+For power, apply the lemma to $-(X_{j,s}-\theta_j)$ and iterate to obtain
+\[
+ \Pr\left\{\sum_{s=1}^mX_{j,s}<m\theta_j-u
+          \mid\mathcal F_{\tau_j}\right\}
+ \leq e^{-2u^2/(mc_j^2)}.
+\]
+The first $m_j$ eligible observations are well-defined almost surely by
+assumption. With probability at least $1-\beta_j$, their sum is at least
+$m_j\delta_j-c_j\sqrt{m_jB_j/2}$. The crossing threshold at that count is
+\[
+ A_j/\lambda_j+m_j\lambda_jc_j^2/8
+     =c_j\sqrt{m_jA_j/2}.
+\]
+Inequality (3) makes the lower bound on the sum at least this threshold.
+Crossing at that count entails rejection by that count. All the calculations
+are conditional on the entry choices, proving the stated power assertion.
+\end{proof}
+
+This theorem gives a prespecified-horizon design with monitoring at every
+time, not an effect-size-adaptive optimal boundary. The information proxy
+$m_j/c_j^2$ can be conservative when allocation probabilities are small.
+Also, a count of eligible observations is not calendar time: an arm that
+stops receiving eligible observations need never attain the power horizon.
+Testing outcomes must occur strictly after selection of the hypothesis;
+the proof supplies no license to reuse the observations that selected it.
+
+\section{A multiplicity cost that a universal rule cannot avoid}
+For a lower bound take $K$ independent experimental streams. In each stream
+there are $m$ independent Bernoulli observations, with an exactly known
+comparator mean $1/2$. Under $P_0$ all means equal $1/2$; under $P_j$ only
+stream $j$ has mean $1/2+\delta$, with $0<\delta\leq1/4$. This can also
+be embedded in a trial with extra independent comparator observations
+whose distribution is identical under every law. These extra observations
+supply no likelihood information in the comparison below.
+
+\begin{theorem}[Uniform-power multiplicity lower bound]
+Let an arbitrary, possibly randomized procedure based on these observations
+have familywise error at most $\alpha$ under $P_0,P_1,\ldots,P_K$ and
+reject the active stream with probability at least $1-\beta$ under each
+$P_j$. If $q=1-\beta-\alpha>0$, then
+\[
+ 4m\delta^2\geq q\log(K/\alpha)-\log2. \tag{4}
+\]
+The conclusion also applies to any time-uniform procedure evaluated at this
+fixed information horizon.
+\end{theorem}
+\begin{proof}
+Let $A_j$ be the event that the rejection set is exactly $\{j\}$.
+Under $P_j$, failure to reject $j$ has probability at most $\beta$ and
+rejection of any other stream has probability at most $\alpha$.
+Thus $P_j(A_j)\geq q$. Under $P_0$ these events are disjoint and all
+imply some false rejection, so $\sum_jP_0(A_j)\leq\alpha$.
+At least one $j$ has $P_0(A_j)\leq\alpha/K$.
+
+For any event with probabilities $v$ and $u$ under $P,Q$, conditional
+Jensen on the event and its complement gives
+$\KL(P,Q)\geq\operatorname{kl}(v,u)$, with the usual endpoint limits.
+Moreover
+\[
+ \operatorname{kl}(v,u)
+ =v\log(1/u)+(1-v)\log(1/(1-u))
+   +v\log v+(1-v)\log(1-v)
+ \geq v\log(1/u)-\log2.
+\]
+For the chosen event this is at least $q\log(K/\alpha)-\log2$.
+Only $m$ observations change law between $P_j$ and $P_0$. Their one-draw
+KL divergence is bounded by their chi-square divergence $4\delta^2$:
+$\log x\leq x-1$ proves $\KL(P,Q)\leq\chi^2(P,Q)$ directly.
+Independence adds KL divergences, giving $\KL(P_j,P_0)\leq4m\delta^2$.
+Independent algorithmic randomization changes neither bound. This proves (4).
+\end{proof}
+
+Thus simultaneous power over unrestricted alternatives has a logarithmic
+multiplicity obstruction even if the comparator mean is known perfectly.
+Equation (4) matches the logarithmic dependence of (3) under equal spending,
+up to constants and the score information proxy. It does not prove optimality
+of inverse-probability scores, and it is not a lower bound asserting that
+all strongly dependent scientific models must pay $\log K$.
+
+\section{A shared-comparator family with no multiplicity factor}
+To exhibit why additional structure matters, suppose treatment-arm means
+$m_j\in[0,1]$ are known constants, possibly distinct, while every arm is
+compared with the same sequence of independent outcomes
+$C_s\in[0,1]$ with common unknown mean $\mu$. Arm effects are
+$\theta_j=m_j-\mu$. Known means are a strong restriction, for example a
+model with deterministic calibrated treatment responses. All arms in this
+finite family are declared before the comparator sequence is used.
+
+\begin{proposition}[One boundary for an ordered null family]
+Fix $\lambda>0$ and reject $j$ once
+\[
+ \exp\{\lambda\textstyle\sum_{s=1}^t(m_j-C_s)-t\lambda^2/8\}
+       \geq1/\alpha. \tag{5}
+\]
+For any number of arms this controls the probability of ever rejecting a
+true null by $\alpha$. If $m_j-\mu\geq\delta$, its rejection probability
+by $m$ is at least $1-\beta$ whenever
+\[
+ m\geq\frac{(\sqrt{\log(1/\alpha)}+
+                    \sqrt{\log(1/\beta)})^2}{2\delta^2},
+ \qquad\lambda=\sqrt{8\log(1/\alpha)/m}.
+\]
+\end{proposition}
+\begin{proof}
+For every true null $m_j\leq\mu$, the left side of (5) at each time is
+at most $\exp\{\lambda\sum_{s=1}^t(\mu-C_s)-t\lambda^2/8\}$.
+The latter is one nonnegative supermartingale starting at one, so the
+stopped-process argument above bounds its ever-crossing probability by
+$\alpha$. This pathwise domination controls all true nulls at once.
+The power proof is (3) with score $m_j-C_s$, support length one,
+and error allocation $\alpha$; its conditional mean is $m_j-\mu$.
+\end{proof}
+
+The gain is a consequence of the one-dimensional ordered family of null
+means plus the common comparator. Shared controls alone, with unknown
+unrestricted treatment means, do not create that structure. The general
+problem is to quantify intermediate gains with estimated arm means,
+adaptive allocations, and delayed entry while retaining conditional
+validity. That frontier, and the separate false-discovery-rate variant,
+remain unresolved here.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy,
+S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics:
+A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1,
+Section 3.1.3, Platform trials.
+\url{https://arxiv.org/html/2508.17099v1#S3.SS1.SSS3}.
+\end{thebibliography}
+
+\end{document}

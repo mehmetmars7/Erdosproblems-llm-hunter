@@ -1,0 +1,160 @@
+% ECONOMICS_PROBLEM: {"id": "C21-184", "title": "Honest simultaneous confidence bands for the CATE", "jel_code": "C21", "source_id": "OP-0507"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Honest CATE bands on a smoothness diagonal\\\large A sharp benchmark and a uniform nuisance-remainder certificate}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C21-184}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Restricted sharp result}
+The target is optimal simultaneous inference for a whole conditional treatment effect, with separate regularity restrictions on the effect and its nuisances. We determine the exact width order on the diagonal $s=\beta=t\in(0,1]$, without knowing the propensity. We then derive a sufficient product-error condition for exploiting a smoother effect. The full nuisance phase diagram, especially when $s>\beta$, is not determined.
+
+Observe $n$ independent $(X,W,Y)$ under the binary causal assumptions of the catalogue, with $X\in[0,1]^d$, $|Y|\leq1$, density $f_X\in[f_*,f^*]$, and $\varepsilon\leq e\leq1-\varepsilon$. Both arm means satisfy
+\[
+ |m_w(x)-m_w(x')|\leq L\|x-x'\|^t,\quad 0<t\leq1.
+\]
+Impose the catalogue's additional $t$-H\"older restriction on $\tau$ and its fixed variance lower bound. Constants are compatible with the Bernoulli subfamily used below. Their precise values change only rate constants. The inference agenda and its bias issue are discussed in \cite[Section 3.3.3]{challenge}. All bounds here explicitly include smoothing bias.
+
+\section{An implementable finite-sample band}
+Partition the cube into $J=q^d$ half-open cubes of side $h=1/q$; fix the boundary convention at the upper faces. For cell $A_j$ and treatment $w$, let $N_{jw}$ be the number of observations in that cell and arm. If $N_{jw}>0$, let $\widehat m_{jw}$ be their mean outcome. Put $\widehat\tau_j=\widehat m_{j1}-\widehat m_{j0}$ when both counts are positive.
+
+For $0<\eta<1$ and positive counts set
+\[
+ a_j=2Ld^{t/2}h^t+
+       \sqrt{\frac{2\log(4J/\eta)}{N_{j1}}}
+       +\sqrt{\frac{2\log(4J/\eta)}{N_{j0}}},
+\]
+and use the interval $[\widehat\tau_j-a_j,\widehat\tau_j+a_j]\cap[-2,2]$ at every $x\in A_j$. If either count is zero, use $[-2,2]$. The procedure uses no estimate of $e$.
+
+\begin{theorem}[Finite-sample coverage and width]\label{upper}
+This band covers $\tau(x)$ for every $x$ with probability at least $1-\eta$, uniformly over the declared class. If $\mathcal W_n$ is its maximum full width, then
+\[
+ \sup_P\E_P\mathcal W_n
+ \leq C\left\{h^t+
+        \sqrt{\frac{\log(4J/\eta)}{nh^d}}\right\}
+        +8J\exp(-cnh^d),\tag{1}
+\]
+where $C,c>0$ depend only on the fixed class constants and $d$.
+For fixed $\eta$, choosing $q$ of order $(n/\log n)^{1/(2t+d)}$ yields expected width at most
+$C(\log n/n)^{t/(2t+d)}$.
+\end{theorem}
+\begin{proof}
+Conditional on the labels recording cell and treatment membership, outcomes within each nonempty group are independent and identically distributed according to the corresponding conditional law. Its mean $\bar m_{jw}$ is an average of $m_w(x)$ over $x\in A_j$, using the actual conditional covariate law. Therefore
+$|\bar m_{jw}-m_w(x)|\leq Ld^{t/2}h^t$ throughout the cell, regardless of variation of $e$ or $f_X$ inside it. Hoeffding's inequality for outcomes in $[-1,1]$ gives
+\[
+ \Pr\left\{|\widehat m_{jw}-\bar m_{jw}|>
+      \sqrt{2\log(4J/\eta)/N_{jw}}\ \middle|\ \text{labels}\right\}
+      \leq\eta/(2J).
+\]
+A union bound over at most $2J$ groups and the two deterministic arm-bias bounds prove simultaneous coverage. Empty groups already have a covering interval. Intersecting with $[-2,2]$ preserves coverage because the true effect lies there.
+
+Each cell-arm probability is at least $p_*=\varepsilon f_*h^d$. Binomial lower-tail concentration gives
+$\Pr\{N_{jw}<np_*/2\}\leq\exp(-np_*/8)$. On the event that all counts exceed this threshold, the formula for $a_j$ bounds every full width by the first term of (1). Off that event the width is at most four. A union bound over $2J$ groups proves (1). Under the stated $q$, $nh^d$ grows as a positive power of $n$ times a logarithmic factor; the exponential remainder is smaller than the asserted rate.
+\end{proof}
+
+\section{A logarithmic lower bound in the causal experiment}
+\begin{theorem}[Matching width lower bound]\label{lower}
+Fix $0<\eta<1/2$. For the diagonal class above, suppose its constants allow uniform covariates, $e=1/2$, $m_0=0$ and sufficiently small $t$-H\"older bumps in $m_1$. Every asymptotically honest band satisfies
+\[
+ \liminf_{n\to\infty}
+ \frac{\sup_P\E_P\mathcal W_n}{(\log n/n)^{t/(2t+d)}}>0.
+\]
+Thus the order in Theorem~\ref{upper} is sharp on this diagonal, for any propensity smoothness $\alpha$ whose ball contains $1/2$.
+\end{theorem}
+\begin{proof}
+Take a fixed nonnegative Lipschitz bump $\varphi$ supported strictly inside $(0,1)^d$, with maximum one and $\int\varphi^2=c_\varphi>0$. A Lipschitz bounded function is $t$-H\"older for $t\leq1$, after changing its constant. In the $J=q^d$ grid cubes define disjoint bumps
+$f_j(x)=a\varphi((x-x_j)/h)$, where $x_j$ is the cell's lower corner and $a=\kappa h^t$. With sufficiently small fixed $\kappa$, all $f_j$ and zero satisfy the prescribed radii, including the bounds across cell boundaries.
+
+Let $P_j$ have uniform $X$, randomized treatment, and $Y\in\{-1,1\}$ with conditional mean zero in control and $f_j(X)$ in treatment. Let $P_0$ have mean zero in both arms. These laws are generated by independent potential outcomes conditional on $X$ and independent treatment; their variances are at least $1-a^2$, bounded away from zero. The one-observation likelihood ratio of $P_j$ to $P_0$ is
+$L_j=1+\Ind\{W=1\}Yf_j(X)$. Hence
+\[
+ \E_0 L_jL_k=1\ (j\ne k),\qquad
+ \E_0 L_j^2=1+\tfrac12c_\varphi a^2h^d.
+\]
+For the mixture $\overline P=J^{-1}\sum_jP_j^{\otimes n}$,
+\[
+ \chi^2(\overline P,P_0^{\otimes n})
+ =\frac{(1+c_\varphi a^2h^d/2)^n-1}{J}
+ \leq\frac{\exp(Cna^2h^d)-1}{J}.\tag{2}
+\]
+Choose $q$ to be the integer ceiling of
+$A(n/\log n)^{1/(2t+d)}$ for a sufficiently large fixed $A$. Then $a$ is a constant multiple of the asserted rate and $Cna^2h^d\leq\tfrac12\log J$ for all large $n$. The right side of (2) tends to zero, so $\TV(\overline P,P_0^{\otimes n})\to0$ by Cauchy--Schwarz.
+
+Use the band to test the null: reject if it contains at least one entire function $f_j$. Each alternative is then rejected with probability at least $1-\eta-o(1)$ by uniform honesty. Therefore under $P_0$ the rejection probability is at least $1-\eta-o(1)$. If the band contains zero and has maximum width less than $a$, it cannot contain any $f_j$, since that function equals $a$ somewhere. Under $P_0$, coverage of zero has probability at least $1-\eta-o(1)$. It follows that
+\[
+ P_0\{\mathcal W_n\geq a\}\geq1-2\eta-o(1).
+\]
+Multiplication by $a$ gives the expected-width lower bound. This argument applies to randomized procedures by adjoining their independent random seed to all laws.
+\end{proof}
+
+\section{A sufficient route to a smoother-effect benchmark}
+When $s>\beta$, the armwise band discards useful structure. Suppose independent training supplies clipped estimates
+$\widehat e\in[\varepsilon/2,1-\varepsilon/2]$ and $\widehat m_w\in[-1,1]$. The augmented response is
+\[
+ Z=\widehat m_1(X)-\widehat m_0(X)
+    +\frac{W\{Y-\widehat m_1(X)\}}{\widehat e(X)}
+    -\frac{(1-W)\{Y-\widehat m_0(X)\}}{1-\widehat e(X)}.
+\]
+It obeys $|Z|\leq K:=2+4/\varepsilon$.
+
+\begin{proposition}[Uniform remainder and an honest corrected band]\label{dr}
+Conditional on training,
+\[
+ \E[Z\mid X=x]-\tau(x)
+ =\{\widehat e(x)-e(x)\}
+ \left\{\frac{\widehat m_1(x)-m_1(x)}{\widehat e(x)}
+       +\frac{\widehat m_0(x)-m_0(x)}{1-\widehat e(x)}\right\}.
+\]
+If a training event of probability at least $1-\delta$ gives uniform errors $u_e,u_0,u_1$, this remainder has supremum at most
+$b=(2/\varepsilon)u_e(u_0+u_1)$ on that event. For $0<s\leq1$ and $\tau\in\mathcal H_d^s(L)$, bin the inference observations by $X$, average $Z$, clip this average to $[-2,2]$, and use radius
+\[
+ Ld^{s/2}h^s+b+K\sqrt{2\log(2J/\eta)/N_j}
+\]
+in nonempty cells, with the whole range $[-2,2]$ in empty cells. Clipping interval endpoints to $[-2,2]$ gives simultaneous coverage at least $1-\eta-\delta$ and expected width bounded by
+\[
+ C\{h^s+b+\sqrt{\log(2J/\eta)/(nh^d)}\}
+       +4J e^{-cnh^d}+4\delta.
+\]
+\end{proposition}
+\begin{proof}
+Take conditional expectations of the displayed augmented response, substitute $m_w=\E[Y\mid X,W=w]$, and collect coefficients of $\widehat m_w-m_w$. This proves the identity and the stated denominator-based bound. A cell average of its conditional mean differs from $\tau(x)$ by at most $Ld^{s/2}h^s+b$. Hoeffding for $Z\in[-K,K]$, union over cells, and conditioning on the training event prove coverage. The binomial-count argument in Theorem~\ref{upper} uses cell probabilities at least $f_*h^d$ here and gives the width bound on that event. Width is at most four elsewhere, which supplies the $4\delta$ term.
+\end{proof}
+
+For example, if independent training can establish uniform nuisance errors of orders
+\[(\log n/n)^{\alpha/(2\alpha+d)}\quad\hbox{and}\quad
+(\log n/n)^{\beta/(2\beta+d)},\]
+with sufficiently small failure probability, this construction attains the oracle band order whenever
+\[
+ \frac{\alpha}{2\alpha+d}+\frac{\beta}{2\beta+d}
+                         \geq\frac{s}{2s+d}.
+\]
+This is a sufficient first-order condition conditional on the asserted nuisance bounds, not a necessary threshold or a theorem about arbitrary machine-learning fits. The sharper regimes, higher smoothness with bias-corrected local polynomials, and matching causal nuisance lower bounds remain unresolved. The diagonal theorem also shows why low propensity smoothness by itself need not widen a band when both arm means are already as smooth as the target.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.3.3, ``Inference.'' Source paragraph inspected 9 October 2026. The source motivates the problem; the diagonal rate and proofs above are self-contained restricted arguments, not a claim of new priority. \url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}.
+\end{thebibliography}
+
+\end{document}

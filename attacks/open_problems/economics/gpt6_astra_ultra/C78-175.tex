@@ -1,0 +1,200 @@
+% ECONOMICS_PROBLEM: {"id": "C78-175", "title": "Output-sensitive enumeration of weakly stable matchings with ties", "jel_code": "C78", "source_id": "OP-0558"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Enumerating weakly stable matchings\\\large A tie-parameter delay bound with polynomial space}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C78-175}. \textbf{Status:} Unresolved; restricted results and reductions.
+
+\section{Target and parameter}
+The target asks for duplicate-free total-output-polynomial enumeration
+for complete tied preference lists, with polynomial delay and space as
+stronger goals. There are $n$ agents on each side. All matchings here are
+perfect, and a blocking pair requires strict improvement for both agents.
+The verified source \cite[Section 3.2.4]{survey} separates this question
+from strict-list enumeration and from finding one different matching.
+
+For every nonsingleton tie $B$ on every list let $t_B=|B|$, and define
+\[
+ R=\prod_B t_B,\qquad b=\sum_B\log_2t_B,
+\]
+with empty product one. We prove delay $R\operatorname{poly}(L)$ and
+polynomial space. Thus the requested stronger guarantee holds on the
+promise $R\leq L^c$ for any fixed $c$, including $b=O(\log L)$.
+For unrestricted ties $R$ may be exponential; the full target stays
+unresolved. We do not claim this parameterization is new.
+
+\section{A small covering family of strict refinements}
+Fix a base ordering of the members of each tie. Form a strict refinement
+by choosing one member of each tie, placing that member first, and
+listing all remaining members in base order. There are exactly $R$
+choices (ties of size two included).
+
+\begin{lemma}[Partner-first covering]\label{cover}
+Every matching stable in any strict refinement is weakly stable in the
+original tied instance. Conversely every weakly stable matching is
+stable in at least one of the $R$ refinements just constructed. Both
+assertions remain valid when one requires the matching to contain an
+arbitrary fixed set of disjoint pairs $P$.
+\end{lemma}
+\begin{proof}
+An original strict blocking pair stays strict in every refinement, which
+proves the first assertion. Given a weakly stable $M$, put each agent's
+partner first in the tie containing that partner. For every other tie
+choose its base-first member. If $(u,w)\notin M$ blocked in this
+refinement, neither agent could be tied with her assigned partner:
+that partner was placed first in the relevant tie. Thus both agents
+would strictly prefer the other in the original instance, contradicting
+weak stability. The argument never alters $M$, so it also preserves $P$.
+\end{proof}
+
+Only the first position in a tie is needed for this coverage. Enumerating
+all $\prod_B t_B!$ strict refinements is unnecessary for the construction.
+Coverage alone does not yet control duplicate outputs; the search tree
+below supplies that control.
+
+\section{A strict-list completion oracle, proved explicitly}
+Fix a strict refinement and a set $P$ of disjoint forced pairs. First
+reject if two agents in distinct forced pairs form a blocking pair.
+Remove all endpoints of $P$. For each remaining agent $a$, examine each
+forced agent $b$ on the other side who strictly prefers $a$ to $P(b)$.
+Require that the eventual partner of $a$ be strictly preferred by $a$
+to every such $b$. Delete all residual edges violating any requirement
+at either endpoint. The remaining strict instance can have incomplete
+lists. Run the usual proposing-side deferred acceptance procedure:
+an unmatched proposer offers to her best untried acceptable receiver;
+a receiver keeps her preferred proposal and rejects the other, if any.
+
+\begin{lemma}[Forced-pair oracle]\label{forced}
+The strict complete instance has a stable perfect matching containing
+$P$ if and only if the residual deferred-acceptance matching is perfect
+and the initial forced-pair blocking test passed. This can be decided
+in $O(n^2)$ operations after preference ranks are available.
+\end{lemma}
+\begin{proof}
+Any stable completion must satisfy every deletion requirement: otherwise
+its residual agent and the corresponding forced endpoint would block.
+Its residual restriction must also be stable among residual agents.
+Conversely a perfect residual stable matching plus $P$ has no blocking
+pair inside $P$, none between $P$ and the residual set by the deletion
+requirements, and none within the residual set. Pairs deleted from the
+residual graph cannot block this union either. If an edge $(a,c)$ was
+deleted because $a$ had to beat a forced endpoint $b$, then the retained
+partner of $a$ is above $b$, whereas $c$ is not above $b$; strict orders
+make the retained partner strictly better than $c$.
+
+Deferred acceptance terminates after at most $n^2$ proposals and is
+stable: a proposer who prefers another acceptable receiver proposed to
+her earlier and was rejected, and that receiver's held partner only
+improved thereafter. To justify the perfectness test, prove by induction
+on rejections that a rejected pair belongs to no stable matching of the
+residual instance. Suppose receiver $w$ rejects $u$ for $v$. If a stable
+matching $S$ contained $(u,w)$, all receivers preferred by $v$ to $w$
+have previously rejected $v$, so the induction hypothesis forbids their
+being $S(v)$. Since $w$ is paired to $u$ in $S$, proposer $v$ must be
+unmatched or assigned below $w$. Then $(v,w)$ blocks $S$, a
+contradiction. At the end any unmatched proposer has been rejected by
+every acceptable receiver, and hence is unmatched in every stable
+matching. Therefore a perfect residual stable matching exists exactly
+when the deferred-acceptance output is perfect.
+
+All forced-pair comparisons and residual edge deletions use $O(n^2)$
+rank comparisons, and the proposal bound gives the claimed complexity.
+\end{proof}
+
+\begin{corollary}[Weak completion oracle]\label{weakoracle}
+Whether a weakly stable perfect matching contains a specified set $P$
+of disjoint pairs is decidable in $O(R n^2)$ time and polynomial space.
+\end{corollary}
+\begin{proof}
+Loop through the $R$ refinements using a mixed-radix counter and apply
+Lemma~\ref{forced}. Lemma~\ref{cover} proves equivalence of a successful
+strict completion and a weak completion. Only one refinement, one rank
+array, and one deferred-acceptance state need be stored at a time.
+\end{proof}
+
+\section{Duplicate-free search and its delay}
+Order the agents on side $U$ as $u_1,\ldots,u_n$, and the agents of $W$
+by labels. A node at depth $j$ records the distinct partners of
+$u_1,\ldots,u_j$. Its children append an unused labeled partner for
+$u_{j+1}$. Keep a child precisely when the weak completion oracle says
+it has an extension. Traverse the surviving tree depth first, outputting
+the matching at each leaf.
+
+\begin{theorem}[Parameterized delay and total time]\label{delay}
+The search outputs every weakly stable perfect matching exactly once,
+uses polynomial working space, and terminates. Including initial and
+final delay, each delay is $O(R n^4+\operatorname{poly}(L))$.
+Consequently its total running time is
+\[
+ O\bigl(\operatorname{poly}(L)+(|\mathcal S(I)|+1)R n^4\bigr).
+\]
+For a fixed polynomial bound on $R$, it meets the target's polynomial
+delay, polynomial space, and total-output-polynomial requirements.
+\end{theorem}
+\begin{proof}
+A leaf uniquely specifies the partner of every labeled proposer, so
+different leaves cannot represent the same matching. Every surviving
+leaf is weakly stable by the oracle, and every weakly stable matching
+has all its prefixes accepted, so every such matching is output.
+
+Between consecutive outputs, depth-first search ascends at most $n$
+levels and descends at most $n$ levels along surviving edges. At any
+visited level it tests at most $n$ candidate children. A failed child
+is discarded immediately and has no explored subtree. A successful
+child has a leaf descendant, so descending through successful children
+cannot consume a second large subtree before producing the next output.
+Thus at most $2n^2$ completion tests occur between outputs. The same
+bound applies before the first output and after the last one. Multiplying
+by Corollary~\ref{weakoracle} proves the delay bound. The original
+complete tied instance has a weakly stable matching by applying deferred
+acceptance to any strict refinement, but the bound also covers an empty
+surviving tree under additional forced pairs.
+
+Store the depth-first stack of length at most $n$, the used-partner
+array, and the polynomial-space oracle. Refinements are regenerated
+as needed, so no list of previously output matchings is stored.
+Termination follows from finiteness of the depth-$n$ tree. Summing the
+delay bounds proves total time.
+\end{proof}
+
+\section{The exact unresolved gap}
+The parameter counts local tie choices rather than outputs. There is
+no argument here bounding $R$ by a polynomial of $L$ or
+$|\mathcal S(I)|$ on unrestricted instances. A single tie of size $n$
+contributes only $n$, while many unrelated ties can multiply the cost.
+The extension oracle is a sufficient route to polynomial delay; an
+unrestricted total-output algorithm need not implement that oracle.
+Accordingly neither general hardness nor a general efficient enumerator
+has been established. No finite computational checks are substituted
+for these quantified algorithmic proofs.
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh, and D. F. Manlove (2019).
+\emph{Selected open problems in Matching Under Preferences}.
+Bulletin of EATCS 128, Sections 3.1.1 and 3.2.4.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\end{thebibliography}
+\end{document}
