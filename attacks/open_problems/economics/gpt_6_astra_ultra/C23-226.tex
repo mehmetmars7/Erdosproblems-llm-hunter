@@ -1,0 +1,89 @@
+% ECONOMICS_PROBLEM: {"id": "C23-226", "title": "Continuous treatment histories and dose responses in panels", "jel_code": "C23", "source_id": "OP-0602"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Continuous treatment histories and dose responses in panels: overlap is insufficient, but integrated derivatives can be regular}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Scope}
+For a terminal potential outcome under a continuous treatment history $d\in[0,1]^t$, let $\mu(d)=E[Y_t(d)]$. The marginal path perturbation target is
+\[
+ \Psi_t(h)=\left.\frac{d}{d\eta}E_{D\sim Q}\mu(D+\eta h(D))\right|_{\eta=0}.
+\]
+Section 10.5 of \cite{panel} identifies continuous treatments as a frontier in panel causal models. The first result shows that overlap and smooth dose response do not identify this target in a latent-confounding model. The second provides an identification and inference route under exogeneity, without pretending that exogeneity follows from observing a long panel.
+
+\begin{proposition}[Smooth observational equivalence with full overlap]
+Fix $t\ge1$ and $0<a<1$. There exist models with a continuously distributed dose history, conditional dose density between $1-a$ and $1+a$, and smooth mean potential outcomes that induce the same distribution of the entire observed panel but different $\Psi_t(h)$ for any smooth, interior-supported $h$ with $E_Qh_t(D)\ne0$.
+\end{proposition}
+\begin{proof}
+Let $U\in\{-1,1\}$ be equally likely, let $v(d)=2d_t-1$, and draw $D$ conditionally on $U$ with density $1+Ua v(d)$ on the unit cube. This density integrates to one and has the stated bounds. Its marginal is uniform, and Bayes' rule gives $E[U\mid D=d]=av(d)$. Let $R$ be uniform on $[0,1]$, independent of $(U,D)$, and define
+\[
+ Y_t^{\theta}(d)=1\{R\le1/2+\theta[U-av(d)]\},
+ \qquad |\theta|\le\{4(1+a)\}^{-1}.
+\]
+All thresholds lie in $[1/4,3/4]$. By consistency and conditioning on the actual dose,
+$P(Y_t^{\theta}(D)=1\mid D)=1/2$, independently of $\theta$. Set all earlier observed and potential outcomes to independent fair Bernoulli variables, with the same law in every model. Thus the whole observed panel law is identical across $\theta$; the joint assignment density can also be generated sequentially by its conditional densities. The last conditional density given $U$ and earlier doses retains the same overlap bounds.
+
+Under intervention on $d$, however, $U$ keeps its marginal distribution, and
+$\mu_\theta(d)=1/2-\theta av(d)$. This is linear and smooth. Differentiating along the compactly supported path yields
+$\Psi_t^{\theta}(h)=-2a\theta E_Qh_t(D)$, which varies with $\theta$. All structural outcome randomness is represented by the independent $R$, while confounding arises through the common latent $U$.
+\end{proof}
+In particular no estimator based on this observed panel can consistently estimate the target over the class. If two such targets differ by $d_0>0$, their data laws coincide, and every estimator has maximum squared risk at least $d_0^2/4$: for any real number $z$, the average of its squared distances to the two targets is at least $d_0^2/4$.
+
+\begin{proposition}[An integration-by-parts identification formula]
+Suppose the evaluation data consist of $n$ iid panels. Suppose within each panel the dose vector $D$ is independent of the entire potential-response object, has supplied density $p>0$ on $[0,1]^t$, and $|Y|\le B$. Let $Q$ have continuously differentiable density $q$, and let $h$ be continuously differentiable with $qh$ supported in the cube's interior. Suppose $\mu$ is continuously differentiable with bounded gradient. Put
+\[
+ k(d)=-\operatorname{div}\{q(d)h(d)\}.
+\]
+If $\int k^2/p<\infty$, then
+\[
+ \Psi_t(h)=\int\mu(d)k(d)\,dd
+ =E\left[Y\frac{k(D)}{p(D)}\right].
+\]
+The sample average of the last score is unbiased with mean squared error at most $B^2n^{-1}\int k^2/p$.
+\end{proposition}
+\begin{proof}
+The bounded gradient and compact support justify differentiation under the integral and keep the perturbation inside the domain for sufficiently small $\eta$. Thus the derivative is $\int qh'\nabla\mu$. Coordinatewise integration by parts has no boundary term, giving $\int\mu k$. Exogeneity and consistency imply $E[Y\mid D=d]=\mu(d)$. Multiply by $k/p$ and integrate to obtain the score representation. Independence of observations gives the stated variance bound, since $E[Y^2k(D)^2/p(D)^2]\le B^2\int k^2/p$.
+\end{proof}
+Consequently a Chebyshev interval with radius $B\sqrt{\int k^2/p/(n\alpha)}$ is honest. If $k/p$ is bounded, Hoeffding gives an exponential-tail alternative. This target can be regular even when pointwise derivatives are difficult to estimate; history length affects the norm of the weight and overlap, rather than imposing a derivative-estimation rate automatically.
+
+\begin{proposition}[The unknown-density remainder]
+Let an independent training sample supply a bounded $\widehat m$ and $\widehat p\ge c>0$. Define
+\[
+ \widehat\Psi=\int\widehat m(d)k(d)\,dd+
+ \frac1n\sum_i\frac{k(D_i)}{\widehat p(D_i)}\{Y_i-\widehat m(D_i)\}.
+\]
+Conditional on training, its bias is exactly
+\[
+ \int k(d)\frac{\widehat p(d)-p(d)}{\widehat p(d)}
+                 \{\widehat m(d)-\mu(d)\}\,dd.
+\]
+If $\widehat p\ge c>0$ and $|k|\le K$, the absolute bias is at most
+$(K/c)\|\widehat p-p\|_{L^2(dd)}\|\widehat m-\mu\|_{L^2(dd)}$.
+\end{proposition}
+\begin{proof}
+Take conditional expectation of the sample average, subtract $\int\mu k$, and combine the two terms multiplying $\widehat m-\mu$. The result is the displayed expression. Apply Cauchy--Schwarz and the two supremum bounds. All norms here are with respect to Lebesgue measure, so no unstated equivalence between design and reference norms is being used.
+\end{proof}
+For a nonzero $k$, choose a smooth bounded $f$ with $\int fk\ne0$ and Bernoulli mean $\mu_u=1/2+uf$. Small parameters $u=\pm c/\sqrt n$ yield target separation of order $n^{-1/2}$ and bounded relative entropy, proving an $n^{-1}$ squared-risk lower bound in this exogenous submodel by two-point testing.
+
+\section*{Remaining gap}
+The counterexample leaves open which panel restrictions, instruments, or sequential assumptions identify effects under endogeneity. The positive result uses full exogeneity and either supplied design density or an independently trained density with a controlled product remainder. It does not solve uniform inference with unknown high-dimensional treatment assignment or establish the original problem's sharp dependence on history length and smoothness.
+
+\begin{thebibliography}{9}
+\bibitem{panel} D. Arkhangelsky and G. Imbens. Causal models for longitudinal and panel data: A survey. \emph{The Econometrics Journal} 27 (2024), C1--C61. Author version, Section 10.5: \url{https://arxiv.org/pdf/2311.15458}.
+\end{thebibliography}
+\end{document}

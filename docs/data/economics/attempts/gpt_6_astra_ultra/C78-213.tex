@@ -1,0 +1,162 @@
+% ECONOMICS_PROBLEM: {"id": "C78-213", "title": "Approximating the minimum repair budget for one-failure supermatches", "jel_code": "C78", "source_id": "OP-0560"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Approximating the minimum repair budget for one-failure supermatches: Exact repair budgets on acceptability graphs of degree two}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{The pair-count objective}
+For a solvable strict roommates instance let $\mathcal S(I)$ be its stable
+matchings. A fixed pair occurs in every member of $\mathcal S(I)$.
+The canonical repair budget is
+\[
+ b_I(M)=\max_{e\in M\text{ non-fixed}}
+       \min_{N\in\mathcal S(I),\ e\notin N}(|M\setminus N|-1),
+ \qquad b^*(I)=\min_{M\in\mathcal S(I)}b_I(M),             \tag{1}
+\]
+with empty maximum zero. The failed original pair is removed before
+counting additional broken pairs. The approximation question is identified
+in \cite[Section 3.3.2]{survey}; \cite{robust} develops the one-failure
+roommates model. Here the acceptability graph has maximum degree two.
+This permits arbitrary strict rankings on its edges, incomplete lists,
+and non-bipartite components. We obtain an exact formula, including
+infeasibility and zero optima.
+
+\section*{Forced pairs and terminal cycles}
+\begin{lemma}
+If two agents rank one another first among their remaining acceptable
+partners, their pair belongs to every stable matching of that remaining
+instance. Deleting both agents and their incident edges gives a bijection
+between stable matchings of the remaining instance and stable matchings
+of the reduced instance, by adjoining the forced pair.
+\end{lemma}
+\begin{proof}
+If the two agents were not paired, both would strictly prefer one another
+to their assignments, including being unmatched. Thus their pair is
+forced. Removing it from a stable matching leaves no blocking pair among
+remaining agents. Conversely, adjoin it to any stable reduced matching.
+A putative blocking pair among remaining agents is excluded by reduced
+stability; a pair involving a deleted endpoint is excluded because that
+endpoint has its first choice. This proves both directions and the
+bijection.
+\end{proof}
+
+Repeatedly remove mutual first-choice pairs and discard isolated agents.
+In a graph of maximum degree two, every surviving nontrivial component is
+a cycle on which everyone ranks the same cyclic direction first.
+Indeed, in any component direct each vertex toward its first choice.
+A finite directed graph with outdegree one contains a directed cycle.
+In a path the only possible directed cycle is a mutual pair. In an
+undirected cycle, if there is no mutual pair, its directed cycle must use
+every vertex, in one of the two consistent orientations. Removing a
+forced pair from a cycle breaks it into paths, so no other terminal
+component type can appear.
+
+\begin{lemma}
+A consistently oriented cycle of length $s\ge3$, with each agent ranking
+its successor above its predecessor, has no stable matching when $s$ is
+odd, and exactly two stable matchings when $s$ is even. In the even case
+they are the two alternating perfect matchings and share no edge.
+\end{lemma}
+\begin{proof}
+No agent $i$ can be unmatched in a stable matching. Its predecessor ranks
+$i$ first, and hence would form a blocking pair with unmatched $i$.
+Therefore any stable matching must be perfect. An odd cycle has none;
+an even cycle has exactly its two alternating perfect matchings.
+To verify their stability, consider an unused edge $(i,i+1)$ in cyclic
+notation. Agent $i$ prefers this edge to its predecessor, but agent $i+1$
+is matched to its successor and prefers that assignment. Thus the edge
+does not block. These are all acceptable unmatched pairs.
+\end{proof}
+
+\section*{The exact optimum}
+\begin{theorem}
+Apply the forced-pair deletion procedure to a strict roommates instance
+whose acceptability graph has maximum degree two. If a terminal cycle
+has odd length, the instance is infeasible. Otherwise let the terminal
+cycle lengths be $2\ell_1,\ldots,2\ell_r$. Every stable matching has
+the same repair budget, namely
+\[
+ b_I(M)=b^*(I)=
+ \begin{cases}
+ 0,&r=0,\\
+ \max_{1\le j\le r}(\ell_j-1),&r>0.
+ \end{cases}                                               \tag{2}
+\]
+A stable matching and this optimum can be found in linear time in the
+number of vertices and edges.
+\end{theorem}
+\begin{proof}
+Successive applications of the forced-pair lemma express every stable
+matching as the union of a fixed set of removed pairs and one stable
+matching in each surviving component. The cycle lemma proves infeasibility
+exactly in the stated odd-cycle case. Otherwise each terminal even cycle
+contributes an independent binary choice, so there are $2^r$ stable
+matchings. The removed pairs are fixed, while every terminal cycle edge
+used by a matching is non-fixed.
+
+Let $e$ fail in the cycle of length $2\ell_j$. Any stable repair avoiding
+$e$ must switch to that cycle's other alternating matching, thereby
+removing all $\ell_j$ original pairs in the component. Keeping every other
+component unchanged gives a repair removing exactly these pairs. The
+inner minimum in (1) is therefore $\ell_j-1$. Taking the maximum proves
+(2), independently of the initial binary choices.
+
+Maintain the at most two neighbors and current top choice of each vertex
+in a queue of mutual pairs. A vertex and edge is deleted once; updating
+the affected neighboring top choices uses constant time per deletion.
+Traversing the remaining cycles identifies their lengths and orientations.
+Choosing alternating edges and adjoining the forced pairs completes the
+construction within linear time.
+\end{proof}
+
+\begin{corollary}
+On this class, zero optimum is equivalent to a unique stable matching.
+On a consistently oriented cycle with $2\ell$ agents the repair budget
+is $\ell-1$, so it can grow linearly with market size even though finding
+an optimal initial matching is easy.
+\end{corollary}
+\begin{proof}
+Every terminal even cycle has length at least four, so its contribution
+in (2) is at least one. Thus zero budget means $r=0$, when all stable
+pairs are forced; if $r>0$ there are at least two stable matchings.
+The cycle assertion follows directly from (2).
+\end{proof}
+
+\section*{Boundary of the result}
+The proof identifies the exact number of removed original pairs, rather
+than the number of affected agents or the symmetric difference, which
+would change constants. Bipartite degree-two instances are included;
+odd terminal cycles explain a specifically roommates obstruction.
+For higher-degree acceptability graphs, choices need not decompose into
+independent cycles, and a repair can depend strongly on the initial stable
+matching. Neither a constant approximation for that setting nor a hardness
+threshold follows from (2). The result isolates a fully solved structural
+subclass of the stated optimization agenda and does not assign an
+approximation ratio to infeasible instances.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences} (2019), Section 3.3.2.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{robust} B. Genc, M. Siala, G. Simonin and B. O'Sullivan.
+\emph{An Approach to Robustness in the Stable Roommates Problem and Its
+Comparison with the Stable Marriage Problem}, CPAIOR 2019, 320--336.
+\url{https://siala.github.io/preprints/19-CPAIOR.pdf}.
+\end{thebibliography}
+
+\end{document}

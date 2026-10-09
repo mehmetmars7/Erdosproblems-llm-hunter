@@ -1,0 +1,84 @@
+% ECONOMICS_PROBLEM: {"id": "C21-210", "title": "Sparse conditional-average-treatment-effect estimation and inference", "jel_code": "C21", "source_id": "OP-0497"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Sparse conditional-average-treatment-effect estimation and inference: finite sparse aggregation and a matching combinatorial obstruction}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Scope}
+The target model is
+\[
+ \tau(x)=\phi(x)'\beta,\qquad \|\beta\|_0\le s,\quad \|\beta\|_1\le L,
+ \quad \max_j|\phi_j(x)|\le1.
+\]
+The question combines sparse effect estimation with approximate nuisance sparsity and honest inference. Section 3.3.3 of \cite{agenda} explicitly raises sparsity beyond smoothness. This note gives a finite aggregation upper bound with a transparent nuisance remainder, and a sparse packing lower bound. These are estimation results; adaptation of confidence sets is a further issue.
+
+\begin{lemma}[Finite least squares with a perturbed conditional mean]
+Let $(X_i,Z_i)$ be iid, $|Z_i|\le A$, and $E[Z_i\mid X_i]=f(X_i)+R(X_i)$, where $|f|\le L$. Let $\mathcal F$ be a finite collection of functions bounded by $L$, containing $f_0$ with $\|f_0-f\|_\infty\le u$. If $\widehat f$ minimizes empirical squared loss over $\mathcal F$, then with probability at least $1-\alpha$,
+\[
+ \|\widehat f-f\|_2^2\le C_{A,L}\left\{u^2+\|R\|_2^2+
+ \frac{\log(2|\mathcal F|/\alpha)}n\right\}.
+\]
+The same conclusion in expectation holds with the logarithm replaced by $\log(2|\mathcal F|)$ and an additional $C_{A,L}/n$.
+\end{lemma}
+\begin{proof}
+Set $g=E[Z\mid X]$ and $D_h=(Z-h)^2-(Z-f_0)^2$. Its mean is $\|h-g\|_2^2-\|f_0-g\|_2^2$. Moreover $|D_h|\le4L(A+L)$ and
+$E D_h^2\le C_{A,L}\|h-f_0\|_2^2\le 2C_{A,L}(\|h-g\|_2^2+\|f_0-g\|_2^2)$.
+Bernstein's inequality and a union bound imply, simultaneously for all $h$, that the difference between empirical and population $D_h$ is bounded by
+$\tfrac14\|h-g\|_2^2+C\|f_0-g\|_2^2+C\log(2|\mathcal F|/\alpha)/n$; use $2ab\le a^2+b^2$ to absorb the square-root term. Empirical minimization gives $P_nD_{\widehat f}\le0$, hence $\|\widehat f-g\|_2^2\le C\|f_0-g\|_2^2+C\log(2|\mathcal F|/\alpha)/n$. Apply the triangle inequality squared twice and $\|f_0-g\|_2^2\le2u^2+2\|R\|_2^2$. Integrating the exponential tail yields the expectation statement.
+\end{proof}
+
+\begin{proposition}[An attainable sparse risk bound]
+Suppose outcomes are bounded, treatment ignorability holds, and the supplied propensity is in $[\epsilon,1-\epsilon]$. For integers $1\le s\le p$, there is an estimator satisfying
+\[
+ E\|\widehat\tau-\tau\|_2^2\le C\left\{\frac{s\log(ep/s)+s\log(2+nLs)}n+n^{-2}\right\}.
+\]
+With independent trained nuisance functions clipped to fixed bounds and the doubly robust score, the corresponding conditional bound has the additional term $C\|R\|_2^2$, where
+\[
+ R=(\widehat e-e)\left\{\frac{\widehat m_1-m_1}{\widehat e}
+ +\frac{\widehat m_0-m_0}{1-\widehat e}\right\}.
+\]
+\end{proposition}
+\begin{proof}
+For each support of size at most $s$, round each nonzero coefficient toward zero to a grid of spacing $1/(ns)$. The rounded vector remains in the $\ell^1$ ball and changes the regression function by at most $1/n$. The union of grids has logarithmic cardinality at most
+$C s\log(ep/s)+C s\log(2+nLs)$; zero coordinates may be counted repeatedly without invalidating this upper bound. Apply the lemma to the inverse-probability score, whose conditional mean is $\tau$ and whose absolute value is at most $B/\epsilon$. For the second assertion, taking conditional expectations of the doubly robust score gives the displayed $R$, and training independence permits the same lemma conditionally. In particular, if realized supremum errors are $u_e,u_0,u_1$, then $\|R\|_2\le\epsilon^{-1}u_e(u_0+u_1)$.
+\end{proof}
+The proposition does not convert nominal nuisance sparsity into a rate without checking a nuisance estimator's design and approximation conditions. Approximation errors in the original statement enter through these actual prediction errors, and can create a nonvanishing product remainder.
+
+\begin{proposition}[Sparse packing lower bound]
+Consider $X$ uniform on $\{-1,1\}^p$, $\phi_j(X)=X_j$, $e=1/2$, $m_0=0$, and $Y\in\{-1,1\}$. There are constants $c,C>0$ such that, for $p\ge4s$ and
+$n\ge C s^2\log(p/s)/\min\{L,1\}^2$,
+\[
+ \inf_{\widehat\tau}\sup_{\beta}
+ E\|\widehat\tau-\phi'\beta\|_2^2
+ \ge c\frac{s\log(p/s)}n.
+\]
+The supremum is over the displayed sparse model with means bounded away from $-1$ and $1$.
+\end{proposition}
+\begin{proof}
+Let $q=\lfloor p/s\rfloor$, partition $sq$ coordinates into $s$ blocks of size $q$, and choose one coordinate per block with coefficient $a>0$. A greedy $q$-ary code of length $s$ and Hamming separation at least $s/4$ has logarithmic cardinality at least $c_0s\log q$: balls of radius $s/4$ have cardinality at most $\exp\{sH(1/4)+(s/4)\log(q-1)\}$, strictly smaller in exponential order than $q^s$ for $q\ge4$. Bounded exceptional values of $s$ are handled by the single-block code directly. Since $E[XX']=I$, pairwise squared $L^2$ distances are at least $sa^2/2$. Every mean has supremum at most $sa$.
+
+Set $a^2=c_1\log q/n$. The sample-size condition and small $c_1$ ensure $sa\le\min(L,1/2)$. Relative entropy to the experiment with $\beta=0$ is at most $C_1nsa^2$, because only treated outcomes change and Bernoulli probabilities stay in $[1/4,3/4]$. Choose $c_1$ so that this is a small fraction of the code logarithm. Fano's inequality gives a fixed positive lower bound on decoding error. Nearest-neighbor decoding from any estimator has error only if its $L^2$ error exceeds half the packing separation; this proves the risk bound. For bounded code cardinality use two-point testing, which gives the same order after changing constants.
+\end{proof}
+
+\section*{Remaining gap}
+The extra grid logarithm in the upper bound is not matched by the lower bound. Neither result establishes honest confidence sets adaptive to unknown sparsity or nuisance approximation errors, and no beta-min condition has been silently assumed. The lower bound concerns a well-conditioned dictionary, so restricted eigenvalues alone cannot remove the combinatorial cost. Obtaining the exact frontier with approximate nuisances and adaptive inference remains open here.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025). \url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}
