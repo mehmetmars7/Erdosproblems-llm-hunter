@@ -257,7 +257,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C73-1_v3.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C73-1_v3.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C72-2": {
     "id": "C72-2",
@@ -301,7 +303,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C72-2.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C72-2.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D63-3": {
     "id": "D63-3",
@@ -351,7 +355,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/D63-3.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/D63-3.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C72-4": {
     "id": "C72-4",
@@ -394,7 +400,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C72-4.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C72-4.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C73-5": {
     "id": "C73-5",
@@ -438,7 +446,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C73-5.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C73-5.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C65-6": {
     "id": "C65-6",
@@ -482,7 +492,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C65-6.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C65-6.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C78-7": {
     "id": "C78-7",
@@ -569,7 +581,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C73-8.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C73-8.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D71-9": {
     "id": "D71-9",
@@ -613,7 +627,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/D71-9.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/D71-9.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-10": {
     "id": "C73-10",
@@ -672,7 +688,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_pro/C73-10_v2.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_pro/C73-10_v2.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C73-11": {
     "id": "C73-11",
@@ -729,7 +747,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-11.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-11.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C71-12": {
     "id": "C71-12",
@@ -786,7 +806,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C71-12.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C71-12.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C79-13": {
     "id": "C79-13",
@@ -843,7 +865,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C79-13.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C79-13.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C72-14": {
     "id": "C72-14",
@@ -909,7 +933,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C72-14.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C72-14.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-15": {
     "id": "C73-15",
@@ -966,7 +992,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-15.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-15.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D81-16": {
     "id": "D81-16",
@@ -1023,7 +1051,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D81-16.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D81-16.tex"
       }
-    ]
+    ],
+    "completion": 60.0,
+    "completion_source": "llm"
   },
   "C73-17": {
     "id": "C73-17",
@@ -1080,7 +1110,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-17.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-17.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C61-18": {
     "id": "C61-18",
@@ -1137,7 +1169,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C61-18.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C61-18.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C73-19": {
     "id": "C73-19",
@@ -1194,7 +1228,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-19.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-19.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-20": {
     "id": "C73-20",
@@ -1251,7 +1287,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-20.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-20.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D86-21": {
     "id": "D86-21",
@@ -1308,7 +1346,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D86-21.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D86-21.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D63-22": {
     "id": "D63-22",
@@ -1365,7 +1405,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D63-22.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D63-22.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "O33-23": {
     "id": "O33-23",
@@ -1409,7 +1451,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/O33-23.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/O33-23.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-24": {
     "id": "C73-24",
@@ -1466,7 +1510,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-24.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-24.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C73-25": {
     "id": "C73-25",
@@ -1523,7 +1569,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-25.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-25.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C65-26": {
     "id": "C65-26",
@@ -1567,7 +1615,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C65-26.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C65-26.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-27": {
     "id": "C73-27",
@@ -1624,7 +1674,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-27.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-27.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-28": {
     "id": "C73-28",
@@ -1681,7 +1733,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-28.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-28.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C65-29": {
     "id": "C65-29",
@@ -1725,7 +1779,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C65-29.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C65-29.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C73-30": {
     "id": "C73-30",
@@ -1782,7 +1838,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-30.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-30.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C72-31": {
     "id": "C72-31",
@@ -1839,7 +1897,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C72-31.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C72-31.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-32": {
     "id": "C73-32",
@@ -1883,7 +1943,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-32.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-32.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C65-33": {
     "id": "C65-33",
@@ -1927,7 +1989,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C65-33.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C65-33.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "D44-34": {
     "id": "D44-34",
@@ -1971,7 +2035,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D44-34.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D44-34.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C63-35": {
     "id": "C63-35",
@@ -2015,7 +2081,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C63-35.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C63-35.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C72-36": {
     "id": "C72-36",
@@ -2059,7 +2127,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C72-36.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C72-36.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C65-37": {
     "id": "C65-37",
@@ -2103,7 +2173,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C65-37.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C65-37.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-38": {
     "id": "C73-38",
@@ -2147,7 +2219,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-38.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-38.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D63-39": {
     "id": "D63-39",
@@ -2204,7 +2278,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D63-39.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D63-39.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C73-40": {
     "id": "C73-40",
@@ -2248,7 +2324,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-40.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-40.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C73-41": {
     "id": "C73-41",
@@ -2292,7 +2370,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-41.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-41.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C90-42": {
     "id": "C90-42",
@@ -2336,7 +2416,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C90-42.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C90-42.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C73-43": {
     "id": "C73-43",
@@ -2380,7 +2462,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-43.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-43.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "E52-44": {
     "id": "E52-44",
@@ -2424,7 +2508,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/E52-44.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/E52-44.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C65-45": {
     "id": "C65-45",
@@ -2468,7 +2554,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C65-45.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C65-45.tex"
       }
-    ]
+    ],
+    "completion": 100.0,
+    "completion_source": "llm"
   },
   "D82-46": {
     "id": "D82-46",
@@ -2512,7 +2600,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D82-46.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D82-46.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C63-47": {
     "id": "C63-47",
@@ -2556,7 +2646,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C63-47.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C63-47.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C62-48": {
     "id": "C62-48",
@@ -2600,7 +2692,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C62-48.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C62-48.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C73-49": {
     "id": "C73-49",
@@ -2644,7 +2738,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-49.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-49.tex"
       }
-    ]
+    ],
+    "completion": 55.0,
+    "completion_source": "llm"
   },
   "C14-50": {
     "id": "C14-50",
@@ -2688,7 +2784,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C14-50.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C14-50.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-51": {
     "id": "C73-51",
@@ -2732,7 +2830,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-51.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-51.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C72-52": {
     "id": "C72-52",
@@ -2776,7 +2876,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C72-52.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C72-52.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C62-53": {
     "id": "C62-53",
@@ -2820,7 +2922,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C62-53.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C62-53.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C14-54": {
     "id": "C14-54",
@@ -2864,7 +2968,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-54.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-54.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C14-55": {
     "id": "C14-55",
@@ -2908,7 +3014,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-55.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-55.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D82-56": {
     "id": "D82-56",
@@ -2952,7 +3060,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D82-56.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D82-56.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C21-57": {
     "id": "C21-57",
@@ -2996,7 +3106,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C21-57.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C21-57.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "H21-58": {
     "id": "H21-58",
@@ -3040,7 +3152,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/H21-58.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/H21-58.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D63-59": {
     "id": "D63-59",
@@ -3084,7 +3198,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-59.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-59.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "F38-60": {
     "id": "F38-60",
@@ -3128,7 +3244,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/F38-60.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/F38-60.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "Q58-61": {
     "id": "Q58-61",
@@ -3172,7 +3290,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/Q58-61.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/Q58-61.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D78-62": {
     "id": "D78-62",
@@ -3216,7 +3336,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D78-62.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D78-62.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C73-63": {
     "id": "C73-63",
@@ -3260,7 +3382,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-63.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-63.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "D82-64": {
     "id": "D82-64",
@@ -3304,7 +3428,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D82-64.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D82-64.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C44-65": {
     "id": "C44-65",
@@ -3348,7 +3474,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C44-65.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C44-65.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "G28-66": {
     "id": "G28-66",
@@ -3392,7 +3520,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/G28-66.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/G28-66.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D83-67": {
     "id": "D83-67",
@@ -3436,7 +3566,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D83-67.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D83-67.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "E10-68": {
     "id": "E10-68",
@@ -3480,7 +3612,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/E10-68.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/E10-68.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C33-69": {
     "id": "C33-69",
@@ -3524,7 +3658,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C33-69.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C33-69.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "D63-70": {
     "id": "D63-70",
@@ -3568,7 +3704,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-70.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-70.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-71": {
     "id": "C73-71",
@@ -3612,7 +3750,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-71.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-71.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D63-72": {
     "id": "D63-72",
@@ -3656,7 +3796,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-72.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-72.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C61-73": {
     "id": "C61-73",
@@ -3700,7 +3842,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C61-73.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C61-73.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "L94-74": {
     "id": "L94-74",
@@ -3748,7 +3892,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/L94-74.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/L94-74.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "G28-75": {
     "id": "G28-75",
@@ -3792,7 +3938,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/G28-75.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/G28-75.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "L13-76": {
     "id": "L13-76",
@@ -3836,7 +3984,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/L13-76.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/L13-76.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-77": {
     "id": "C73-77",
@@ -3880,7 +4030,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-77.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-77.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D82-78": {
     "id": "D82-78",
@@ -3924,7 +4076,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D82-78.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D82-78.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C14-79": {
     "id": "C14-79",
@@ -3968,7 +4122,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-79.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-79.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C32-80": {
     "id": "C32-80",
@@ -4012,7 +4168,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C32-80.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C32-80.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "G12-81": {
     "id": "G12-81",
@@ -4060,7 +4218,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/G12-81.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/G12-81.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-82": {
     "id": "C73-82",
@@ -4104,7 +4264,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-82.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-82.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D44-83": {
     "id": "D44-83",
@@ -4161,7 +4323,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D44-83.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D44-83.tex"
       }
-    ]
+    ],
+    "completion": 50.0,
+    "completion_source": "llm"
   },
   "D63-84": {
     "id": "D63-84",
@@ -4205,7 +4369,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-84.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-84.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "H21-85": {
     "id": "H21-85",
@@ -4249,7 +4415,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/H21-85.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/H21-85.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D63-86": {
     "id": "D63-86",
@@ -4293,7 +4461,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-86.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-86.tex"
       }
-    ]
+    ],
+    "completion": 5.0,
+    "completion_source": "llm"
   },
   "C44-87": {
     "id": "C44-87",
@@ -4337,7 +4507,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C44-87.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C44-87.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "Q54-88": {
     "id": "Q54-88",
@@ -4381,7 +4553,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/Q54-88.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/Q54-88.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "L22-89": {
     "id": "L22-89",
@@ -4425,7 +4599,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/L22-89.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/L22-89.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D63-90": {
     "id": "D63-90",
@@ -4469,7 +4645,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-90.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-90.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C14-91": {
     "id": "C14-91",
@@ -4513,7 +4691,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-91.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-91.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "D82-92": {
     "id": "D82-92",
@@ -4557,7 +4737,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D82-92.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D82-92.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C61-93": {
     "id": "C61-93",
@@ -4601,7 +4783,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C61-93.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C61-93.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D82-94": {
     "id": "D82-94",
@@ -4645,7 +4829,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D82-94.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D82-94.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D47-95": {
     "id": "D47-95",
@@ -4689,7 +4875,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D47-95.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D47-95.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "J65-96": {
     "id": "J65-96",
@@ -4733,7 +4921,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/J65-96.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/J65-96.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D63-97": {
     "id": "D63-97",
@@ -4777,7 +4967,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-97.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-97.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-98": {
     "id": "C73-98",
@@ -4821,7 +5013,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-98.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-98.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C22-99": {
     "id": "C22-99",
@@ -4865,7 +5059,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C22-99.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C22-99.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "G18-100": {
     "id": "G18-100",
@@ -4909,7 +5105,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/G18-100.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/G18-100.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C21-101": {
     "id": "C21-101",
@@ -4953,7 +5151,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C21-101.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C21-101.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "D44-102": {
     "id": "D44-102",
@@ -4997,7 +5197,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D44-102.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D44-102.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "Q58-103": {
     "id": "Q58-103",
@@ -5041,7 +5243,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/Q58-103.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/Q58-103.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C31-104": {
     "id": "C31-104",
@@ -5085,7 +5289,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C31-104.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C31-104.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "F34-105": {
     "id": "F34-105",
@@ -5129,7 +5335,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/F34-105.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/F34-105.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C78-106": {
     "id": "C78-106",
@@ -5173,7 +5381,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-106.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-106.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C73-107": {
     "id": "C73-107",
@@ -5217,7 +5427,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-107.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-107.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "D44-108": {
     "id": "D44-108",
@@ -5261,7 +5473,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D44-108.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D44-108.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "L41-109": {
     "id": "L41-109",
@@ -5305,7 +5519,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/L41-109.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/L41-109.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D51-110": {
     "id": "D51-110",
@@ -5349,7 +5565,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D51-110.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D51-110.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C14-111": {
     "id": "C14-111",
@@ -5393,7 +5611,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-111.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-111.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "G28-112": {
     "id": "G28-112",
@@ -5437,7 +5657,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/G28-112.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/G28-112.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C73-113": {
     "id": "C73-113",
@@ -5481,7 +5703,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-113.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-113.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C55-114": {
     "id": "C55-114",
@@ -5525,7 +5749,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C55-114.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C55-114.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C22-115": {
     "id": "C22-115",
@@ -5569,7 +5795,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C22-115.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C22-115.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C78-116": {
     "id": "C78-116",
@@ -5613,7 +5841,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-116.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-116.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C14-117": {
     "id": "C14-117",
@@ -5657,7 +5887,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-117.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-117.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "F33-118": {
     "id": "F33-118",
@@ -5701,7 +5933,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/F33-118.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/F33-118.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "Q55-119": {
     "id": "Q55-119",
@@ -5745,7 +5979,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/Q55-119.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/Q55-119.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "L23-120": {
     "id": "L23-120",
@@ -5793,7 +6029,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/L23-120.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/L23-120.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C31-121": {
     "id": "C31-121",
@@ -5837,7 +6075,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C31-121.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C31-121.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C78-122": {
     "id": "C78-122",
@@ -5881,7 +6121,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-122.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-122.tex"
       }
-    ]
+    ],
+    "completion": 10.0,
+    "completion_source": "llm"
   },
   "C61-123": {
     "id": "C61-123",
@@ -5925,7 +6167,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C61-123.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C61-123.tex"
       }
-    ]
+    ],
+    "completion": 65.0,
+    "completion_source": "llm"
   },
   "C31-124": {
     "id": "C31-124",
@@ -5969,7 +6213,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C31-124.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C31-124.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C54-125": {
     "id": "C54-125",
@@ -6013,7 +6259,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C54-125.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C54-125.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C12-126": {
     "id": "C12-126",
@@ -6057,7 +6305,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C12-126.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C12-126.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "D44-127": {
     "id": "D44-127",
@@ -6101,7 +6351,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D44-127.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D44-127.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C45-128": {
     "id": "C45-128",
@@ -6145,7 +6397,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C45-128.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C45-128.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C31-129": {
     "id": "C31-129",
@@ -6189,7 +6443,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C31-129.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C31-129.tex"
       }
-    ]
+    ],
+    "completion": 55.0,
+    "completion_source": "llm"
   },
   "D63-130": {
     "id": "D63-130",
@@ -6233,7 +6489,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-130.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-130.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C72-131": {
     "id": "C72-131",
@@ -6277,7 +6535,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C72-131.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C72-131.tex"
       }
-    ]
+    ],
+    "completion": 100.0,
+    "completion_source": "llm"
   },
   "D86-132": {
     "id": "D86-132",
@@ -6321,7 +6581,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D86-132.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D86-132.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "H87-133": {
     "id": "H87-133",
@@ -6365,7 +6627,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/H87-133.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/H87-133.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C78-134": {
     "id": "C78-134",
@@ -6409,7 +6673,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-134.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-134.tex"
       }
-    ]
+    ],
+    "completion": 100.0,
+    "completion_source": "llm"
   },
   "C72-135": {
     "id": "C72-135",
@@ -6453,7 +6719,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C72-135.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C72-135.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C78-136": {
     "id": "C78-136",
@@ -6497,7 +6765,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-136.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-136.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "E63-137": {
     "id": "E63-137",
@@ -6541,7 +6811,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/E63-137.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/E63-137.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C78-138": {
     "id": "C78-138",
@@ -6585,7 +6857,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C78-138.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C78-138.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C32-139": {
     "id": "C32-139",
@@ -6629,7 +6903,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C32-139.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C32-139.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D62-140": {
     "id": "D62-140",
@@ -6673,7 +6949,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D62-140.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D62-140.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "E71-141": {
     "id": "E71-141",
@@ -6721,7 +6999,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/E71-141.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/E71-141.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C72-142": {
     "id": "C72-142",
@@ -6765,7 +7045,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C72-142.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C72-142.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "H26-143": {
     "id": "H26-143",
@@ -6813,7 +7095,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/H26-143.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/H26-143.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D63-144": {
     "id": "D63-144",
@@ -6857,7 +7141,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/D63-144.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/D63-144.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-145": {
     "id": "C73-145",
@@ -6901,7 +7187,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C73-145.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C73-145.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C31-146": {
     "id": "C31-146",
@@ -6945,7 +7233,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C31-146.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C31-146.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C21-147": {
     "id": "C21-147",
@@ -6989,7 +7279,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C21-147.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C21-147.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "C14-148": {
     "id": "C14-148",
@@ -7033,7 +7325,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C14-148.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C14-148.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C63-149": {
     "id": "C63-149",
@@ -7077,7 +7371,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/C63-149.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/C63-149.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "H63-150": {
     "id": "H63-150",
@@ -7121,7 +7417,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt_6_astra_ultra/H63-150.tex",
         "download_url": "data/economics/attempts/gpt_6_astra_ultra/H63-150.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D82-151": {
     "id": "D82-151",
@@ -7165,7 +7463,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D82-151.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D82-151.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "E58-152": {
     "id": "E58-152",
@@ -7209,7 +7509,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/E58-152.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/E58-152.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C72-153": {
     "id": "C72-153",
@@ -7253,7 +7555,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C72-153.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C72-153.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C21-154": {
     "id": "C21-154",
@@ -7297,7 +7601,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-154.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-154.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "O31-155": {
     "id": "O31-155",
@@ -7341,7 +7647,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/O31-155.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/O31-155.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C12-156": {
     "id": "C12-156",
@@ -7385,7 +7693,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C12-156.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C12-156.tex"
       }
-    ]
+    ],
+    "completion": 45.0,
+    "completion_source": "llm"
   },
   "E52-157": {
     "id": "E52-157",
@@ -7429,7 +7739,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/E52-157.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/E52-157.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D63-158": {
     "id": "D63-158",
@@ -7477,7 +7789,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D63-158.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D63-158.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C73-159": {
     "id": "C73-159",
@@ -7521,7 +7835,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C73-159.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C73-159.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C21-160": {
     "id": "C21-160",
@@ -7565,7 +7881,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-160.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-160.tex"
       }
-    ]
+    ],
+    "completion": 55.0,
+    "completion_source": "llm"
   },
   "F12-161": {
     "id": "F12-161",
@@ -7613,7 +7931,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/F12-161.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/F12-161.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "D31-162": {
     "id": "D31-162",
@@ -7661,7 +7981,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D31-162.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D31-162.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "Q54-163": {
     "id": "Q54-163",
@@ -7705,7 +8027,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/Q54-163.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/Q54-163.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "I18-164": {
     "id": "I18-164",
@@ -7749,7 +8073,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/I18-164.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/I18-164.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C78-165": {
     "id": "C78-165",
@@ -7793,7 +8119,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C78-165.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C78-165.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "L94-166": {
     "id": "L94-166",
@@ -7841,7 +8169,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/L94-166.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/L94-166.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "E62-167": {
     "id": "E62-167",
@@ -7885,7 +8215,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/E62-167.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/E62-167.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C31-168": {
     "id": "C31-168",
@@ -7929,7 +8261,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C31-168.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C31-168.tex"
       }
-    ]
+    ],
+    "completion": 55.0,
+    "completion_source": "llm"
   },
   "C14-169": {
     "id": "C14-169",
@@ -7973,7 +8307,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C14-169.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C14-169.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "D73-170": {
     "id": "D73-170",
@@ -8023,7 +8359,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D73-170.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D73-170.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "D44-171": {
     "id": "D44-171",
@@ -8067,7 +8405,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D44-171.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D44-171.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "D82-172": {
     "id": "D82-172",
@@ -8111,7 +8451,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D82-172.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D82-172.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C21-173": {
     "id": "C21-173",
@@ -8155,7 +8497,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-173.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-173.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "D47-174": {
     "id": "D47-174",
@@ -8199,7 +8543,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D47-174.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D47-174.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C78-175": {
     "id": "C78-175",
@@ -8243,7 +8589,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C78-175.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C78-175.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "Q54-176": {
     "id": "Q54-176",
@@ -8287,7 +8635,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/Q54-176.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/Q54-176.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D63-177": {
     "id": "D63-177",
@@ -8331,7 +8681,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D63-177.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D63-177.tex"
       }
-    ]
+    ],
+    "completion": 25.0,
+    "completion_source": "llm"
   },
   "C78-178": {
     "id": "C78-178",
@@ -8375,7 +8727,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C78-178.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C78-178.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C21-179": {
     "id": "C21-179",
@@ -8419,7 +8773,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-179.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-179.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "D71-180": {
     "id": "D71-180",
@@ -8463,7 +8819,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D71-180.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D71-180.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C26-181": {
     "id": "C26-181",
@@ -8507,7 +8865,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C26-181.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C26-181.tex"
       }
-    ]
+    ],
+    "completion": 50.0,
+    "completion_source": "llm"
   },
   "C62-182": {
     "id": "C62-182",
@@ -8551,7 +8911,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C62-182.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C62-182.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "H24-183": {
     "id": "H24-183",
@@ -8595,7 +8957,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/H24-183.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/H24-183.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C21-184": {
     "id": "C21-184",
@@ -8639,7 +9003,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-184.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-184.tex"
       }
-    ]
+    ],
+    "completion": 45.0,
+    "completion_source": "llm"
   },
   "J42-185": {
     "id": "J42-185",
@@ -8683,7 +9049,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/J42-185.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/J42-185.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C44-186": {
     "id": "C44-186",
@@ -8727,7 +9095,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C44-186.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C44-186.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "H11-187": {
     "id": "H11-187",
@@ -8771,7 +9141,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/H11-187.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/H11-187.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C23-188": {
     "id": "C23-188",
@@ -8815,7 +9187,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C23-188.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C23-188.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "D82-189": {
     "id": "D82-189",
@@ -8859,7 +9233,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D82-189.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D82-189.tex"
       }
-    ]
+    ],
+    "completion": 40.0,
+    "completion_source": "llm"
   },
   "D71-190": {
     "id": "D71-190",
@@ -8903,7 +9279,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D71-190.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D71-190.tex"
       }
-    ]
+    ],
+    "completion": 15.0,
+    "completion_source": "llm"
   },
   "C21-191": {
     "id": "C21-191",
@@ -8947,7 +9325,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-191.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-191.tex"
       }
-    ]
+    ],
+    "completion": 45.0,
+    "completion_source": "llm"
   },
   "Q51-192": {
     "id": "Q51-192",
@@ -8991,7 +9371,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/Q51-192.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/Q51-192.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "G28-193": {
     "id": "G28-193",
@@ -9035,7 +9417,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/G28-193.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/G28-193.tex"
       }
-    ]
+    ],
+    "completion": 35.0,
+    "completion_source": "llm"
   },
   "C21-194": {
     "id": "C21-194",
@@ -9079,7 +9463,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C21-194.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C21-194.tex"
       }
-    ]
+    ],
+    "completion": 45.0,
+    "completion_source": "llm"
   },
   "L42-195": {
     "id": "L42-195",
@@ -9123,7 +9509,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/L42-195.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/L42-195.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "D44-196": {
     "id": "D44-196",
@@ -9167,7 +9555,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D44-196.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D44-196.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "D72-197": {
     "id": "D72-197",
@@ -9211,7 +9601,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/D72-197.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/D72-197.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "G21-198": {
     "id": "G21-198",
@@ -9255,7 +9647,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/G21-198.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/G21-198.tex"
       }
-    ]
+    ],
+    "completion": 30.0,
+    "completion_source": "llm"
   },
   "C72-199": {
     "id": "C72-199",
@@ -9299,7 +9693,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C72-199.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C72-199.tex"
       }
-    ]
+    ],
+    "completion": 20.0,
+    "completion_source": "llm"
   },
   "C83-200": {
     "id": "C83-200",
@@ -9343,7 +9739,9 @@ window.ECONOMICS_DATA = {
         "file_path": "attacks/open_problems/economics/gpt6_astra_ultra/C83-200.tex",
         "download_url": "data/economics/attempts/gpt6_astra_ultra/C83-200.tex"
       }
-    ]
+    ],
+    "completion": 45.0,
+    "completion_source": "llm"
   },
   "L52-201": {
     "id": "L52-201",

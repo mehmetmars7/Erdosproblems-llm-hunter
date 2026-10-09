@@ -225,6 +225,9 @@
         }
         const problem = data[id];
         const shared = window.ProblemHunting;
+        const completion = shared.getMathematicalAttempts(problem.attacks).length
+            ? shared.formatCompletion(problem.completion) : '';
+        const completionSource = completion ? shared.getCompletionSourceLabel(problem) : '';
         const jelDescription = window.ECONOMICS_JEL_LABELS?.[problem.jel_code] || '';
         const ordered = orderedProblems(data);
         const currentIndex = ordered.findIndex(record => record.id === id);
@@ -236,6 +239,8 @@
             '<p><strong>Rank:</strong> ' + escapeHtml(problem.rank) + '</p>' +
             '<p><strong>Problem Status:</strong> ' + escapeHtml(shared.getOpenProblemStatusLabel({ ...problem, status: problem.status || 'open' })) + '</p>' +
             '<p><strong>LLM Claim:</strong> ' + escapeHtml(shared.getOpenProblemClaimLabel(problem)) + '</p>' +
+            '<p><strong>Completion:</strong> ' + escapeHtml(completion || '—') +
+                (completionSource ? ' (' + escapeHtml(completionSource) + ')' : '') + '</p>' +
             '<p><strong>Community Review:</strong> ' + escapeHtml(shared.getReviewLabel(problem.review)) + '</p>';
         const statement = document.getElementById('problem-links');
         statement.innerHTML = '<div class="problem-statement-text tex-content">' + formatTeX(normalizedStatement(problem.definition_tex), false, false) + '</div>';
