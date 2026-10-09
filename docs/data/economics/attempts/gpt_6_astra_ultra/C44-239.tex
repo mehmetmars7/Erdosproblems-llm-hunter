@@ -1,0 +1,90 @@
+% ECONOMICS_PROBLEM: {"id": "C44-239", "title": "Policy learning with explicit resource and fairness constraints", "jel_code": "C44", "source_id": "OP-0510"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Policy learning with explicit resource and fairness constraints: a feasibility discontinuity and a convex repair}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Scope}
+For randomized policies $\pi(X)\in[0,1]$, define value, budget, and group treatment disparity by
+\[
+ V_P(\pi)=E_P[\pi(X)\tau(X)],\quad B_P(\pi)=E_P[c(X)\pi(X)],
+ \quad D_P(\pi)=E[\pi\mid S=1]-E[\pi\mid S=0].
+\]
+Feasibility means $B_P(\pi)\le b$ and $|D_P(\pi)|\le\zeta$. Section 3.3.3 of \cite{agenda} raises policy learning with new optimization goals. A strictly feasible policy is useful, but without a closure property of the policy class it does not suffice for uniform learnability under exact population feasibility.
+
+\begin{proposition}[Strict slack alone permits constant minimax regret]
+Fix $0<\eta<1/2$. There is a finite policy class of VC dimension one, a policy with fixed strict budget and fairness slack, and a smooth bounded-overlap statistical submodel for which every learner taking values in that class and satisfying
+\[
+ P^n\{\widehat\pi\text{ is population feasible}\}\ge1-\eta
+\]
+for every law has worst-case expected regret bounded below by a positive constant, uniformly in $n$.
+\end{proposition}
+\begin{proof}
+Take $X\in[0,1]$, $A=[0,1/2]$, $\Pi=\{0,1_A\}$, cost $c=1$, and budget $b=1/2$. Let $S$ be an independent fair group label and choose any fixed fairness tolerance $\zeta>0$. The zero policy has slack at least $\min(1/2,\zeta)$. Set propensity $e=1/2$ and constant treatment effect $\tau=a>0$, implemented by two bounded Bernoulli outcome means in the interior of $[0,1]$.
+
+Let the covariate density be $p_\theta(x)=1+\theta\sin(2\pi x)$, $|\theta|\le1/2$. These densities are smooth and bounded away from zero; the other nuisances are constant. Since $\int_A\sin(2\pi x)dx=1/\pi$,
+$P_\theta(A)=1/2+\theta/\pi$. Thus $1_A$ is feasible at $\theta_-=-h/\sqrt n$ and infeasible at $\theta_+=h/\sqrt n$. Both policies have zero fairness disparity.
+
+Only the covariate distribution differs between the two experiments. The inequality $\operatorname{KL}(p,q)\le\int(p-q)^2/q$ bounds their $n$-sample relative entropy by $C h^2$, and their total variation by $C'h$. At $\theta_+$, feasibility requires selection of zero with probability at least $1-\eta$. Choose $h>0$ so small that total variation is at most $(1-\eta)/2$. At $\theta_-$ the learner therefore chooses zero with probability at least $(1-\eta)/2$. The optimal feasible policy there is $1_A$, with value $a(1/2-h/(\pi\sqrt n))$, bounded below by a positive constant after reducing $h$. The expected regret is consequently bounded below uniformly in $n$.
+\end{proof}
+This obstruction concerns the exact feasibility requirement and a policy class that does not contain attenuated versions of $1_A$. It persists despite a known safe policy. It does not assert that convex randomized policy classes have the same obstruction.
+
+\begin{proposition}[A finite convex policy class admits a repair]
+Suppose $\Pi$ is the convex hull of $M$ supplied policies $\pi_1,\ldots,\pi_M$, $|\tau|\le T$, $0\le c\le1$, and $P(S=s)\ge s_0>0$. Suppose a supplied $\pi^\circ\in\Pi$ satisfies
+$B_P(\pi^\circ)\le b-\sigma$ and $|D_P(\pi^\circ)|\le\zeta-\sigma$.
+Assume on an event $E$ that empirical linear estimates obey, uniformly over $\Pi$,
+\[
+ |\widehat V-V|\le t_V,\quad |\widehat B-B|\le t,
+ \quad |\widehat D-D|\le t,\qquad 2t\le\sigma.
+\]
+Let $\widehat\pi$ maximize $\widehat V$, up to error $\xi$, subject to
+$\widehat B\le b-t$ and $|\widehat D|\le\zeta-t$. On $E$ the empirical feasible set is nonempty, $\widehat\pi$ is population feasible, and
+\[
+ \sup_{\pi\in\Pi:\,\pi\text{ feasible}}V(\pi)-V(\widehat\pi)
+ \le2t_V+\frac{4Tt}{\sigma}+\xi.
+\]
+\end{proposition}
+\begin{proof}
+For any population feasible $\pi$, mix it with the safe policy using
+$\pi_\lambda=(1-\lambda)\pi+\lambda\pi^\circ$, $\lambda=2t/\sigma$. Convexity keeps it in $\Pi$. Linearity of budget gives a population margin $2t$. Convexity of absolute disparity gives
+$|D(\pi_\lambda)|\le(1-\lambda)\zeta+\lambda(\zeta-\sigma)=\zeta-2t$.
+The empirical errors leave margin $t$ in both constraints, so $\pi_\lambda$ is empirically admissible. Conversely the conservative empirical constraints imply true feasibility on $E$. Empirical optimality and the two value errors show
+$V(\widehat\pi)\ge V(\pi_\lambda)-2t_V-\xi$.
+Finally $|V(\pi)-V(\pi_\lambda)|\le2T\lambda$, a conservative bound since each value lies in $[-T,T]$. Take the supremum over population feasible $\pi$; attainment is unnecessary.
+\end{proof}
+
+\begin{lemma}[The required event is attainable]
+With bounded outcomes, supplied propensity in $[\epsilon,1-\epsilon]$, iid observations, and the preceding group-probability bound, empirical inverse-probability values, empirical budgets, and empirical within-group treatment rates satisfy the required event with probability at least $1-\alpha$ for
+\[
+ t_V\le C\epsilon^{-1}\sqrt{\frac{\log(8M/\alpha)}n},\qquad
+ t\le C\sqrt{\frac{\log(8M/\alpha)}{ns_0}},
+\]
+provided $ns_0\ge C\log(8/\alpha)$; constants depend on the outcome bound.
+\end{lemma}
+\begin{proof}
+Hoeffding's inequality and a union bound control the bounded value and budget scores for all $M$ base policies. Chernoff's inequality makes each group count at least $ns_0/2$ except with probability at most $\alpha/4$, after adjusting $C$. Conditional on group counts, the covariates within each group are iid from their group distribution. Hoeffding and a union bound over policies and the two groups therefore control both conditional treatment rates, and their difference. Each estimate and each population functional is linear in the convex mixture weights, so a uniform error bound over base policies extends to their whole convex hull.
+\end{proof}
+Choose a safe fallback when the conservative program is empty. For large enough $n$, $2t\le\sigma$; the preceding event proves feasibility with probability $1-\alpha$ and the regret bound on that event. Taking $\alpha\le\min(\eta,n^{-1})$ yields a vanishing expected-regret upper bound since off-event regret is bounded by $2T$.
+
+\section*{Remaining gap}
+The negative result answers a genuine obstruction in the stated broad class, while the positive result adds convex closure and a supplied safe policy. Sharp dependence on general VC complexity, unknown nuisances, vanishing slack, and fairness constraints with rare groups is not characterized. No full constrained-policy minimax theorem is claimed.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025). \url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

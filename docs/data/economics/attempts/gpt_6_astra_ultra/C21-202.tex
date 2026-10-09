@@ -1,0 +1,97 @@
+% ECONOMICS_PROBLEM: {"id": "C21-202", "title": "Adaptive inference for CATE projection surrogates", "jel_code": "C21", "source_id": "OP-0509"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Adaptive inference for CATE projection surrogates: conditional coverage and the cost of nuisance bias}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Scope}
+The target is the population projection of the conditional average treatment effect $\tau$ onto a selected finite-dimensional space:
+\[
+ G_K=E[b_K(X)b_K(X)'],\qquad
+ \beta_K=G_K^{-1}E[b_K(X)\tau(X)],\qquad \tau_K=b_K'\beta_K.
+\]
+Selection of $K$ uses a training sample independent of the evaluation sample. The question asks for honest inference together with adaptation of approximation and estimation error. The inference discussion in Section 3.3.3 of \cite{agenda} motivates this distinction between a complicated effect and a simpler surrogate. Here the Gram matrix and propensity are first supplied; a sharp fixed-dimension obstruction and an exact nuisance-bias identity then delimit what this simplification achieves.
+
+\begin{proposition}[An exactly conditionally honest projection ball]
+Let the evaluation observations be iid, independent of the training sigma-field $\mathcal T$. Suppose $|Y|\le B$, $\epsilon\le e(X)\le1-\epsilon$, and $G_K$ is positive definite and supplied for every available $K$. Assume consistency and conditional ignorability, so that the inverse-probability score
+\[
+ Z=\frac{WY}{e(X)}-\frac{(1-W)Y}{1-e(X)}
+\]
+has conditional mean $\tau(X)$. For any $\mathcal T$-measurable choice $\widehat K$, define
+\[
+ \widehat\beta_K=G_K^{-1}\frac1n\sum_{i=1}^n b_K(X_i)Z_i,
+ \qquad r_K=\frac B\epsilon\sqrt{\frac K{n\eta}}.
+\]
+The ball $C_K=\{v:(v-\widehat\beta_K)'G_K(v-\widehat\beta_K)\le r_K^2\}$ satisfies
+$P(\beta_{\widehat K}\in C_{\widehat K}\mid\mathcal T)\ge1-\eta$ almost surely. Its diameter in the population $L^2(P_X)$ norm of the corresponding surrogates is $2r_{\widehat K}$.
+\end{proposition}
+\begin{proof}
+Write $A=B/\epsilon$. Independence and $|Z|\le A$ give
+\[
+ E\|\widehat\beta_K-\beta_K\|_{G_K}^2
+ =\frac1n\operatorname{tr}\{G_K^{-1}\operatorname{Var}(b_K Z)\}
+ \le \frac{A^2}n\operatorname{tr}(G_K^{-1}G_K)=\frac{A^2K}n.
+\]
+Markov's inequality proves the claim for each fixed $K$. Conditional on $\mathcal T$, the selected integer is fixed and the evaluation law is unchanged, so the same bound applies without a union bound over dimensions. Finally $\|b_K'(v-u)\|_{L^2}^2=(v-u)'G_K(v-u)$.
+\end{proof}
+
+\begin{proposition}[The realized nuisance remainder]
+Suppose instead that training supplies bounded functions $\widehat m_0,\widehat m_1$ and $\widehat e\in[\epsilon,1-\epsilon]$. Use the doubly robust score
+\[
+ Z^*=\widehat m_1-\widehat m_0+
+ \frac W{\widehat e}(Y-\widehat m_1)
+ -\frac{1-W}{1-\widehat e}(Y-\widehat m_0).
+\]
+Conditional on training, its conditional mean is $\tau+R$, where
+\[
+ R=(\widehat e-e)\left\{
+ \frac{\widehat m_1-m_1}{\widehat e}
+ +\frac{\widehat m_0-m_0}{1-\widehat e}\right\}.
+\]
+If $|Z^*|\le A^*$ and a training-measurable bound $u\ge\|R\|_{L^2(P_X)}$ holds almost surely, replacing the radius above by
+$A^*\sqrt{K/(n\eta)}+u$ gives the same conditional coverage conclusion. In particular,
+\[
+ \|R\|_2\le\epsilon^{-1}\|\widehat e-e\|_4
+ (\|\widehat m_1-m_1\|_4+\|\widehat m_0-m_0\|_4).
+\]
+\end{proposition}
+\begin{proof}
+Take the conditional expectation of each residual term to obtain the displayed remainder. The projection of $R$ has coefficient vector $G_K^{-1}E[b_KR]$. Orthogonal projection is a contraction in $L^2$, so its $G_K$ norm is at most $\|R\|_2$. Apply the preceding variance proof around this biased conditional mean and then the triangle inequality. The last assertion follows from Holder's inequality separately for the two products.
+\end{proof}
+A nuisance rate holding with probability $1-o(1)$ is not the almost-sure realized bound in this proposition. It can yield unconditional coverage after paying its failure probability; it does not by itself establish the stronger conditional assertion in the question.
+
+\begin{proposition}[A fixed-dimension diameter obstruction]
+Fix $s>0$, a positive Holder radius, and $\eta<1/4$. For uniform covariates on $[0,1]^d$, consider projections onto the indicators of $K$ congruent cubes, where $K$ is a $d$th power. There are constants $c,C>0$ such that, if $n\ge C K^{1+2s/d}$, every confidence set honest at level $1-\eta$ over the bounded Holder regression submodel below has worst-case expected surrogate diameter at least $c\sqrt{K/n}$.
+\end{proposition}
+\begin{proof}
+Take $e=1/2$, $m_0=0$, and outcomes in $\{-1,1\}$. Choose a fixed smooth bump $k$, supported strictly inside the unit cube, with nonzero integral. In cube $j$ of side $h=K^{-1/d}$ put
+$\tau_\omega(x)=a\sqrt{K/n}\,\omega_j k((x-z_j)/h)$,
+where $\omega_j\in\{-1,1\}$ and $a$ is a small constant. The sample-size condition ensures the Holder bound, including derivatives across cube boundaries; the means also remain strictly between $-1$ and $1$. With normalized indicator basis, the $j$th projection coefficient is $a\omega_j\int k/\sqrt n$.
+
+A greedy Hamming packing of the hypercube has at least $\exp(c_0K)$ elements with pairwise distance at least $K/8$, for all sufficiently large $K$: delete Hamming balls of radius $K/8$ successively, whose cardinality is at most $\exp(K H(1/8))$, where $H(1/8)<\log2$. The projected parameters therefore have pairwise distance at least $c_1a\sqrt{K/n}$. Bernoulli relative entropy, with probabilities bounded away from zero and one, is at most a constant times squared mean separation. Thus each experiment has relative entropy at most $C_1a^2K$ from the zero-mean experiment. Choosing $a$ small, the elementary Fano bound makes every decoder's average error at least $1/2$.
+
+A confidence set of diameter less than the packing separation contains at most one packing point. Decoding that point when present has error at most $\eta+P(\operatorname{diam}C\ge c_1a\sqrt{K/n})$. Consequently this probability is at least $1/2-\eta$ for at least one packing law, proving the expectation bound. For the remaining bounded values of $K$, two opposite bumps and the two-point testing inequality give the same conclusion after decreasing $c$.
+\end{proof}
+
+\section*{Remaining gap}
+The results match the fixed-$K$ diameter order for fixed confidence level in a genuine smooth submodel. They do not provide an adaptive rule balancing unknown smoothness against approximation error, estimate the population Gram matrix, or prove attainable almost-sure conditional nuisance bounds. Coverage of $\tau_K$ also does not cover the approximation error $\tau-\tau_K$. The full adaptive inference problem remains unresolved. The calculations here are self-contained restricted results, not a claim that the survey posed or proved these particular lemmas.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025). \url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}
