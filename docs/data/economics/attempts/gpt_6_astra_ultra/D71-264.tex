@@ -1,0 +1,129 @@
+% ECONOMICS_PROBLEM: {"id": "D71-264", "title": "Constant distortion using one round of linearly many comparisons", "jel_code": "D71", "source_id": "OP-0226"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{One-round metric voting: two achievable benchmarks and a sharp information obstruction}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{D71-264}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\section{Question}
+There are $n\geq1$ voters and $m\geq2$ candidates. Each voter has a strict ranking consistent with an unknown pseudometric $d$ on the disjoint union of voters and candidates: ranking $a$ above $b$ implies $d(v,a)\leq d(v,b)$. Distance ties may be resolved strictly. The social cost of $a$ is $\mathrm{SC}(a)=\sum_v d(v,a)$. The target is a deterministic protocol of constant distortion that asks each voter $O(m)$ pairwise comparisons in one round. Within a round, queries to a voter may depend on that voter's previous answers, but not on answers from other voters.
+
+Frank and Peters~\cite{fp} pose the unrestricted one-round question. We give a randomized protocol for the general domain, a deterministic protocol on a structured domain, and an obstruction showing why merely eliciting each top choice cannot solve the unrestricted deterministic question. These results do not combine into a solution of the original deterministic problem.
+
+\section{One-round randomized dictatorship}
+The favorite of a voter is found by a sequential tournament: retain the preferred candidate after each comparison with a new candidate. This requires exactly $m-1$ comparisons and depends only on the answers of that voter. Conduct all local tournaments in parallel, choose a uniformly random voter, and elect that voter's favorite. The randomization is independent of the metric and rankings.
+
+\begin{theorem}[Expected cost bound]\label{th:rd}
+For every ranking profile and every consistent pseudometric, randomized dictatorship satisfies
+\[
+ \E[\mathrm{SC}(\widehat a)]\leq(3-2/n)\min_a\mathrm{SC}(a).
+\]
+The protocol uses one round and $m-1$ comparisons per voter. The inequality includes instances with optimal cost zero and is uniform over all $n,m$.
+\end{theorem}
+\begin{proof}
+Fix a social-cost minimizer $a^*$, and let $t_v$ be voter $v$'s favorite. Ranking consistency gives $d(v,t_v)\leq d(v,a^*)$. For $u\ne v$, the triangle inequality gives
+\[
+ d(u,t_v)\leq d(u,a^*)+d(a^*,v)+d(v,t_v)
+ \leq d(u,a^*)+2d(v,a^*).
+\]
+For $u=v$ use the sharper direct inequality. Summing over voters yields
+\[
+ \mathrm{SC}(t_v)\leq \mathrm{SC}(a^*)+2(n-1)d(v,a^*).
+\]
+Averaging over uniform $v$ proves the result. No division by $\mathrm{SC}(a^*)$ was used, so zero optimal cost causes no exception.
+\end{proof}
+
+The constant is sharp as a uniform bound over instances with at least three candidates when $n\geq2$. For completeness, place $n-1$ voters and candidates $a^*,b$ at coordinate $0$, one voter at coordinate $1$, and candidate $c$ at coordinate $2$ on the line. Break the distant voter's distance tie in favor of $c$, and give all other voters favorite $a^*$ or $b$. Then $\mathrm{SC}(a^*)=1$, $\mathrm{SC}(c)=2n-1$, and the expected cost equals $((n-1)+(2n-1))/n=3-2/n$. The same construction works with two candidates $a^*,c$; additional coincident candidates are unnecessary. Strict rankings remain compatible with the resulting pseudometric.
+
+\section{A deterministic structured-domain solution}
+Suppose that a common candidate order $a_1<\cdots<a_m$ is known publicly. A ranking is \emph{single-peaked} with peak $t$ if among candidates on either side of $t$, preference strictly decreases as one moves away from $t$ in this order. No assumption is made about comparisons across the two sides. This is an ordinal restriction in addition to consistency with the unknown metric; it does not assert that the metric itself is a line metric.
+
+\begin{lemma}[Median peak is a weak majority winner]\label{le:median}
+If every ranking is single-peaked in the public order, take the peak at position $\lceil n/2\rceil$ among the ordered list of voter peaks, with multiplicities. Call it $c$. For every candidate $a\ne c$, at least $n/2$ voters rank $c$ above $a$.
+\end{lemma}
+\begin{proof}
+If $a<c$, every voter whose peak is at or to the right of $c$ prefers $c$ to $a$: both candidates are on the same side of that peak, and $c$ is closer in the public order. There are at least $n-\lceil n/2\rceil+1\geq n/2$ such voters. If $a>c$, every voter whose peak is at or to the left of $c$ prefers $c$ to $a$, and there are at least $\lceil n/2\rceil\geq n/2$ such voters.
+\end{proof}
+
+\begin{lemma}[Metric cost of a majority comparison]\label{le:majority}
+Let $a,c$ be candidates, and suppose $s>0$ of the $n$ voters rank $c$ above $a$. Then
+\[
+ \mathrm{SC}(c)\leq\left(1+\frac{2(n-s)}s\right)\mathrm{SC}(a).
+\]
+In particular, $s\geq n/2$ implies $\mathrm{SC}(c)\leq3\mathrm{SC}(a)$.
+\end{lemma}
+\begin{proof}
+Put $D=d(a,c)$ and let $S$ be the supporting set. For $v\in S$, consistency and the triangle inequality imply
+\[
+ D\leq d(a,v)+d(v,c)\leq2d(v,a).
+\]
+For these voters $d(v,c)-d(v,a)\leq0$. For other voters the difference is at most $D$. Thus
+\[
+ \mathrm{SC}(c)-\mathrm{SC}(a)\leq(n-s)D
+ \leq\frac{2(n-s)}s\sum_{v\in S}d(v,a)
+ \leq\frac{2(n-s)}s\mathrm{SC}(a).
+\]
+All inequalities remain valid if $D$ or the social cost vanishes.
+\end{proof}
+
+\begin{theorem}[One-round deterministic distortion on the single-peaked domain]
+On profiles single-peaked in a known common order, finding all peaks by local tournaments and electing their median is a deterministic one-round protocol with $m-1$ comparisons per voter and distortion at most $3$ for every consistent pseudometric.
+\end{theorem}
+\begin{proof}
+The local tournament identifies each peak because it identifies the top-ranked candidate. The coordinator can order the peaks without further voter queries. Apply Lemma~\ref{le:median} against a cost minimizer and then Lemma~\ref{le:majority}.
+\end{proof}
+
+The assumption is doing the information-theoretic work: the coordinator reconstructs the relevant majority comparisons from peaks and the shared order. Arbitrary rankings do not permit this inference.
+
+\section{Why a deterministic favorite-only rule fails}
+Call a deterministic rule \emph{favorite-only} if its elected candidate is a function only of the vector of voter favorites and the candidate labels. This restriction is stronger than the original query bound: local tournaments may incidentally reveal other comparisons, and a general protocol may use them.
+
+\begin{proposition}[Favorite-only lower bound]\label{pr:lower}
+For every deterministic favorite-only rule on $m$ candidates and $n=m$ voters, there is a strict ranking profile and a consistent pseudometric for which its distortion is $2m-1$. Consequently, no such family of rules has constant distortion uniformly in $m$.
+\end{proposition}
+\begin{proof}
+Specify one distinct favorite per voter. The rule elects some candidate $c$. Put $c$ at coordinate $2$ on the real line and every other candidate at coordinate $0$. Put the voter whose prescribed favorite is $c$ at coordinate $1$, and all other voters at coordinate $0$. Give the first voter favorite $c$ by tie-breaking; rank all other candidates arbitrarily afterwards. Every other voter can place its prescribed favorite first among the coincident coordinate-$0$ candidates and put $c$ last. These are strict consistent rankings realizing exactly the fixed favorite vector. The metric on points, pulled back to the distinct voters and candidates, is an admissible pseudometric.
+
+The chosen candidate has cost $1+2(m-1)=2m-1$. Every other candidate has cost $1$. Since the favorite vector has not changed, the rule selects $c$ and incurs the stated ratio.
+\end{proof}
+
+This is an adversarial completion of a particular information summary, not a lower bound for all one-round comparison protocols. In particular it does not keep the entire transcript of an arbitrary tournament algorithm fixed. Treating that stronger indistinguishability claim as automatic would be incorrect.
+
+\section{What remains}
+The randomized result uses expectation over an independent voter draw; it does not select a deterministic candidate with the same guarantee from the elicited data. The structured deterministic theorem relies on a known order and single-peaked rankings, which the catalogue does not assume. The lower bound rules out the simplest favorite-only aggregation but leaves $O(m)$ strategically chosen local comparisons available. Producing a constant-distortion deterministic candidate from that richer one-round information, or proving it impossible, remains the original gap. No claim of novelty is made for randomized dictatorship or the median-voter argument; the proofs isolate precisely which portions of the catalogue are already elementary.
+
+\begin{thebibliography}{9}
+\bibitem{fp} F. Frank and J. Peters (2026), ``A Constant Metric Distortion Protocol for Approval Voting Given Plurality Polls,'' arXiv:2608.28340v1, especially Sections 1.2 and 5. \url{https://arxiv.org/abs/2608.28340v1}. The one-round deterministic $O(m)$ question is the source problem; the theorems above concern its randomized or restricted-domain variants.
+\end{thebibliography}
+
+\end{document}

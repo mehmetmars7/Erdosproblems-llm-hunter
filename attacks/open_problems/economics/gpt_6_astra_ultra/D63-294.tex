@@ -1,0 +1,98 @@
+% ECONOMICS_PROBLEM: {"id": "D63-294", "title": "EFX existence for chores with binary submodular costs", "jel_code": "D63", "source_id": "OP-0194"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Binary submodular chores: two-agent construction and matroid subclasses}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\section{Question and achieved scope}
+For normalized monotone submodular integer costs with marginal increments in $\{0,1\}$, must every finite chore instance admit a complete EFX allocation? Here EFX tests removal of \emph{every} chore from the envious agent's own bundle, including zero-marginal chores. We prove a constructive two-agent result, even without submodularity, and two all-agent subclasses. The arbitrary-agent, arbitrary-matroid-rank question remains unresolved. These restricted statements are not asserted to be new in the fair-division literature.
+
+\section{Why matroid rank is the relevant representation}
+Write $c$ for one agent's normalized binary submodular cost, and let $m$ be the number of chores.
+
+\begin{lemma}[Rank representation]
+The family $\mathcal I=\{S:c(S)=|S|\}$ is the independent-set family of a matroid, and $c(S)$ is its rank for every $S$.
+\end{lemma}
+\begin{proof}
+Binary increments give $c(S)\leq|S|$. If $I\in\mathcal I$ and $J\subseteq I$, then $c(I)\leq c(J)+|I\setminus J|$, forcing $c(J)=|J|$; hence the family is hereditary. If $I,J\in\mathcal I$ and $|I|<|J|$, suppose no $g\in J\setminus I$ raises the rank of $I$. Submodularity makes all those zero increments remain zero as elements are added. Thus $c(I\cup J)=c(I)=|I|<|J|=c(J)$, contrary to monotonicity. This proves augmentation.
+
+To find an independent subset of a given $S$, scan its elements and retain an element exactly when it increases the cost of the retained set. Each retention adds one to both size and cost. A rejected element has zero marginal cost at rejection and still has zero marginal cost at the final retained set by submodularity. Adding all rejected elements therefore changes nothing. The retained independent subset has size $c(S)$, while monotonicity shows no independent subset of $S$ can be larger. This proves the rank assertion.
+\end{proof}
+
+A zero marginal upon removal need not mean a chore is a loop: it can be redundant inside a dependent bundle. Treating rank costs as additive binary item costs would lose this distinction.
+
+\section{Two agents: an explicit cut-and-choose construction}
+First consider two bundles evaluated by a \emph{single} normalized monotone integer cost $c$ with binary increments; submodularity is not needed. For a partition $(B_1,B_2)$ put $r=\max_j c(B_j)$ and $s=\min_j c(B_j)$. If $r>s$, let $h$ be the number of chores in the unique higher-cost bundle; if $r=s$, set $h=0$. Order the integer triples $(r,-s,h)$ lexicographically.
+
+\begin{lemma}[A decreasing finite potential]
+If the two-bundle partition is not EFX for $c$, there is a move of one chore from the higher-cost bundle to the lower-cost bundle that strictly decreases $(r,-s,h)$. Repeated such moves stop at an EFX partition after at most $(m+1)^3$ moves.
+\end{lemma}
+\begin{proof}
+The lower-cost bundle cannot violate EFX, by monotonicity. Thus $r>s$ and some chore $g$ in the higher bundle $H$ has $c(H\setminus\{g\})>s$. Move it to the other bundle $L$. Binary increments imply
+$c(H\setminus\{g\})\in\{r-1,r\}$ and $c(L\cup\{g\})\in\{s,s+1\}$.
+If the former is $r-1$, the violation inequality gives $s\leq r-2$, so both new costs are at most $r-1$ and the first potential coordinate decreases. Otherwise the higher cost stays $r$. If the lower cost rises, either the costs become equal or the second coordinate strictly decreases. If the lower cost does not rise, both costs stay unchanged and the unique higher bundle loses one chore, decreasing the third coordinate. Every case is a strict lexicographic improvement. There are at most $(m+1)^3$ possible triples, so the procedure terminates. At termination there is no violating chore, which is exactly EFX for both bundles under $c$.
+\end{proof}
+
+\begin{theorem}[Complete EFX for two binary-marginal agents]
+For any two normalized monotone integer cost functions with binary increments, a complete EFX allocation exists and can be found with $O(m^4)$ value-oracle calls.
+\end{theorem}
+\begin{proof}
+Agent 1 constructs a partition EFX under its own cost using the lemma. Agent 2 chooses the bundle of smaller cost according to its own function; agent 1 receives the other. Agent 1 satisfies EFX for either possible assignment because both sides of its partition satisfied the removal inequalities. Agent 2 is envy-free, and removing any own chore cannot increase its cost, so it is EFX as well. Completeness is preserved by every move. Checking all candidate removals takes $O(m)$ oracle calls per step, and the lemma bounds the number of steps by $O(m^3)$. Choosing the cheaper bundle requires two further calls.
+\end{proof}
+
+\section{Two subclasses for arbitrary numbers of agents}
+\begin{proposition}[Agent-specific uniform ranks]
+Suppose $c_i(S)=\min\{k_i,|S|\}$ for integers $k_i\geq0$. Any complete allocation whose bundle cardinalities differ by at most one is EFX, for any number of agents.
+\end{proposition}
+\begin{proof}
+For every nonempty own bundle and every $g\in A_i$, balanced cardinalities give $|A_i|-1\leq|A_j|$. Applying the increasing map $t\mapsto\min\{k_i,t\}$ gives $c_i(A_i\setminus\{g\})\leq c_i(A_j)$. Empty bundles impose no removal condition. Such balanced partitions exist by distributing chores cyclically.
+\end{proof}
+
+\begin{proposition}[Divisible common partition classes]
+Let $C_1,\ldots,C_d$ partition the chores, with each $|C_\ell|$ divisible by the number $n$ of agents. Suppose
+\[
+ c_i(S)=\sum_{\ell=1}^d\min\{k_{i\ell},|S\cap C_\ell|\}
+\]
+for arbitrary nonnegative integer capacities. Giving each agent exactly $|C_\ell|/n$ chores of every class is envy-free and hence EFX.
+\end{proposition}
+\begin{proof}
+Each agent evaluates every bundle by the same vector of class counts, so all bundles have the same cost under its own function. Monotonicity preserves the weak inequality after any removal. Divisibility makes the proposed complete allocation feasible.
+\end{proof}
+
+\section{Remaining obstruction and reference}
+The two-agent proof uses one common evaluation for the cutting step; a third agent cannot generally be accommodated by the same choice argument. The uniform-rank proof uses cardinality alone, whereas general matroid rank depends on which chores are together. The divisible-class proof does not handle arbitrary remainders or unrelated matroids. None of these arguments licenses dropping zero-marginal removals from the EFX definition.
+
+Zehan Lin, Shengxin Liu, Biaoshuai Tao and Shengwei Zhou (2026), \emph{Non-Existence of EFX Chore Allocations for Monotone Cost Functions with Binary Marginals}, arXiv:2608.10572v1, Sections 2 and 4. \url{https://arxiv.org/html/2608.10572v1}. The paper distinguishes its negative results from the remaining binary-submodular question. The proofs above address precisely the subclasses stated, with no inference from negative examples in other cost classes.
+
+\end{document}

@@ -1,0 +1,169 @@
+% ECONOMICS_PROBLEM: {"id": "C90-284", "title": "Adaptive experimental inference", "jel_code": "C90", "source_id": "OP-0428"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{Adaptive experimental inference\\[4pt]\large Dynamic-regret upper bounds with simultaneous inference and a width lower bound}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Question and scope}
+In a two-arm adaptive experiment, the goal is joint control of participant regret and uncertainty about the running average treatment effect under bounded drift. Existence of valid intervals is already established. This attempt proves an explicit pair of bounds using restarted exponential weights and a variance-sensitive martingale interval, then derives a stationary regret--width obstruction. It does not characterize the exact nonstationary Pareto frontier.
+
+\section*{Model}
+At dates $t=1,\ldots,T$, potential outcomes $Y_t(a)\in[0,1]$ have conditional means $\mu_{a,t}=\E[Y_t(a)\mid\mathcal H_{t-1}]$. Conditional randomization means $A_t$ is independent of the current potential outcomes given recorded history, with predictable probability $p_t$ of arm 1. Assume
+\[
+ \epsilon\le p_t\le1-\epsilon,\quad 0<\epsilon<1/2,
+ \qquad \sum_{t=2}^T\max_a|\mu_{a,t}-\mu_{a,t-1}|\le V
+\]
+almost surely. Means may depend on past assignments and outcomes. Regret is evaluated along the realized history:
+$R_T=\sum_t[\max_a\mu_{a,t}-\mu_{A_t,t}]$.
+The inferential target is the predictable running average
+$\tau_t=t^{-1}\sum_{s\le t}(\mu_{1,s}-\mu_{0,s})$.
+
+\section*{A self-contained Bernstein bound}
+\begin{lemma}[Bounded martingale Bernstein inequality]
+If $D_t$ are martingale differences, $|D_t|\le b$, and
+$\sum_{s\le t}\E[D_s^2\mid\mathcal H_{s-1}]\le v_t$ for deterministic $v_t$, then for $L>0$,
+\[
+ \Prb\left(\left|\sum_{s\le t}D_s\right|>
+ \sqrt{2v_tL}+\frac{2bL}{3}\right)\le2e^{-L}.
+\]
+\end{lemma}
+\begin{proof}
+For $|x|<3$, the exponential series and $k!\ge2\,3^{k-2}$ for integers $k\ge2$ give $e^x\le1+x+x^2/[2(1-|x|/3)]$. Thus for $0<\lambda<3/b$,
+\[
+ \E[e^{\lambda D_s}\mid\mathcal H_{s-1}]
+ \le\exp\left\{\frac{\lambda^2\E[D_s^2\mid\mathcal H_{s-1}]}{2(1-\lambda b/3)}\right\}.
+\]
+Iteration and Markov's inequality yield the upper tail
+$\exp\{-x^2/[2(v_t+bx/3)]\}$ by choosing
+$\lambda=x/(v_t+bx/3)$ (the zero-variance case is trivial).
+The positive root of $x^2=2L(v_t+bx/3)$ is
+$bL/3+\sqrt{2v_tL+b^2L^2/9}$, which is at most the cutoff in the lemma. Apply the same calculation to $-D_s$ and add tails.
+\end{proof}
+
+Define the inverse-probability score
+$X_t=A_tY_t/p_t-(1-A_t)Y_t/(1-p_t)$ and let
+$L=\log(2T/\alpha)$, $0<\alpha<1$. Use the confidence interval
+\[
+ C_t=\left[\frac1t\sum_{s\le t}X_s-r_t,
+ \frac1t\sum_{s\le t}X_s+r_t\right]\cap[-1,1],
+\quad
+ r_t=\sqrt{\frac{2L}{t\epsilon(1-\epsilon)}}+
+ \frac{4L}{3\epsilon t}.
+\]
+An empty intersection is allowed on the failure event and has length zero.
+
+\begin{theorem}[Simultaneous coverage and cumulative width]
+For every admissible assignment policy, whether or not it is chosen for regret,
+\[
+ \Prb(\tau_t\in C_t\text{ for all }t\le T)\ge1-\alpha.
+\]
+Moreover, pathwise,
+\[
+ \sum_{t=1}^T|C_t|\le
+ \min\left\{2T,
+ 4\sqrt{\frac{2TL}{\epsilon(1-\epsilon)}}+
+ \frac{8L}{3\epsilon}(1+\log T)\right\}.
+\]
+\end{theorem}
+\begin{proof}
+Conditional randomization gives $\E[X_t\mid\mathcal H_{t-1}]=\mu_{1,t}-\mu_{0,t}$. Its centered difference is bounded by $1/\epsilon+1\le2/\epsilon$. Also
+\[
+ \E[X_t^2\mid\mathcal H_{t-1}]
+ \le\frac1{p_t}+\frac1{1-p_t}
+ =\frac1{p_t(1-p_t)}\le\frac1{\epsilon(1-\epsilon)}.
+\]
+The lemma with $b=2/\epsilon$, $v_t=t/[\epsilon(1-\epsilon)]$ gives failure probability at most $\alpha/T$ at each time. A union bound proves coverage, since the true target belongs to $[-1,1]$. Width is at most $\min(2,2r_t)$. Sum using $\sum_{t\le T}t^{-1/2}\le2\sqrt T$ and $\sum_{t\le T}t^{-1}\le1+\log T$.
+\end{proof}
+
+\section*{A compatible assignment rule}
+Partition time into consecutive blocks of length at most $h$, where $1\le h\le T$ is an integer. At a block start set arm weights to one. Let $q_{a,t}$ be normalized weights and assign arm $a$ with probability
+$p_{a,t}=\epsilon+(1-2\epsilon)q_{a,t}$. Observe loss $L_t=1-Y_t$ and set
+$\widehat\ell_{a,t}=\ind\{A_t=a\}L_t/p_{a,t}$.
+Update the weight of arm $a$ by multiplication by $e^{-\eta\widehat\ell_{a,t}}$, with $\eta=\sqrt{(1-2\epsilon)\log2/h}$. The same observations supply the preceding confidence intervals.
+
+\begin{theorem}[Explicit dynamic-regret bound]
+The stated rule satisfies
+\[
+ \E R_T\le\epsilon T+
+ 2\left\lceil\frac Th\right\rceil\sqrt{(1-2\epsilon)h\log2}
+ +2hV.
+\]
+Consequently the excess above the unavoidable exploration term can be bounded by optimizing the displayed finite set of $h$. For $V=0$, $h=T$ gives $O(\sqrt T)$. Away from endpoint truncations, $h$ of order $(T/V)^{2/3}$ gives $O(T^{2/3}V^{1/3})$, with an additional $O(\sqrt T)$ term covering small $V$.
+\end{theorem}
+\begin{proof}
+Within one block, comparison of the total exponential weight with the weight of a fixed arm, using $e^{-x}\le1-x+x^2/2$ for $x\ge0$ and $\log(1+x)\le x$, gives
+\[
+ \sum_t\sum_a q_{a,t}\widehat\ell_{a,t}
+ -\sum_t\widehat\ell_{j,t}
+ \le\frac{\log2}{\eta}
+ +\frac\eta2\sum_t\sum_aq_{a,t}\widehat\ell_{a,t}^2.
+\]
+This is an algebraic inequality for every realized sequence. Conditional expectations of the estimates are the arm's current expected loss. Furthermore
+$\E[\sum_aq_{a,t}\widehat\ell_{a,t}^2\mid\mathcal H_{t-1}]
+\le\sum_aq_{a,t}/p_{a,t}\le2/(1-2\epsilon)$.
+A block comparator may be selected from history at the start of that block; it is then fixed during the block, so the same expectation argument applies.
+
+The expected loss of the actual assignment, less comparator loss, is at most $1-2\epsilon$ times the corresponding $q$-weighted difference plus $\epsilon$ at each date, because each of the two arm losses lies in $[0,1]$. For a block of length $b\le h$, this gives regret against a fixed comparator at most
+$\epsilon b+(1-2\epsilon)\log2/\eta+\eta b
+\le\epsilon b+2\sqrt{(1-2\epsilon)h\log2}$.
+Choose the comparator as the arm with highest conditional mean at the block's first date. If $V_b$ is the realized total variation within that block, each later mean differs from its initial value by at most $V_b$. The per-date loss of using this initial best arm instead of the current best is at most $2V_b$. Hence the additional block regret is at most $2hV_b$. Summing and using $\sum_bV_b\le V$ proves the bound. Balancing $T/\sqrt h$ with $hV$, and clipping $h$ to $[1,T]$, gives the stated orders.
+\end{proof}
+
+\section*{A stationary regret--width obstruction}
+This lower bound applies to any adaptive policy and any terminal interval, not only the above construction. Let arm 1 have Bernoulli mean $3/4$, and arm 0 have Bernoulli mean $\theta$, independently over dates and arms. Let $P_0$ denote $\theta=1/4$. Write $n_0=\E_0\sum_t\ind\{A_t=0\}$, so $\E_0 R_T=n_0/2$. Suppose a terminal interval $C$ covers $3/4-\theta$ with probability at least $1-\alpha$ for all $\theta\in[1/4,3/8]$, where $0<\alpha<1/2$.
+
+\begin{theorem}[Learning the underassigned arm requires regret]
+For every $h_0\in(0,1/8]$,
+\[
+ \E_0|C|\ge h_0\{1-2\alpha-2h_0\sqrt{n_0}\}_+.
+\]
+In particular choose
+$h_0=\min\{1/8,(1-2\alpha)/(4\sqrt{n_0})\}$, interpreting the second entry as infinity when $n_0=0$. Then
+$\E_0|C|\ge(1-2\alpha)h_0/2$.
+\end{theorem}
+\begin{proof}
+Compare $P_0$ with $P_1$ having $\theta=1/4+h_0$. The adaptive assignment kernels are identical functions of observed history under both laws, so the chain rule for log likelihood gives
+$\KL(P_0,P_1)=n_0\,\mathrm{kl}(1/4,1/4+h_0)$.
+The elementary inequality $\log x\le x-1$ gives
+$\mathrm{kl}(p,q)\le(p-q)^2/[q(1-q)]\le8h_0^2$ in this interval. Thus $\TV(P_0,P_1)\le\sqrt{\KL/2}\le2h_0\sqrt{n_0}$. To recall the last inequality's justification, collapse each law onto a set achieving total variation; the log-sum inequality decreases relative entropy, and the binary relative entropy is at least twice the squared probability difference, by its second derivative $1/[p(1-p)]\ge4$ and integration from its minimum.
+
+Under $P_0$, the interval contains the $P_0$ target with probability at least $1-\alpha$, and the $P_1$ target with probability at least $1-\alpha-\TV(P_0,P_1)$. The intersection of these events has probability at least $1-2\alpha-\TV$. On it the interval length is at least the target separation $h_0$. This proves the first bound. The chosen $h_0$ makes the bracket at least $(1-2\alpha)/2$.
+\end{proof}
+
+Under fixed exploration $n_0\ge\epsilon T$, so regret is already at least $\epsilon T/2$ in this example. The lower theorem does not match every upper-bound dependence on $V,\epsilon$ or accumulated width. It identifies a concrete obstruction to obtaining arbitrarily narrow effect intervals while almost never assigning the inferior arm.
+
+\section*{Remaining gap and references}
+The joint bounds are compatible and hold with conditional drift, but no optimality claim is made for the full frontier. Sharper variance adaptation, unknown drift budgets, declining exploration and confidence-width objectives at every time remain to be optimized. This work concerns regret along realized histories, not policy values under alternative state trajectories.
+
+The primary preprint and published metadata of the survey below were checked. It describes established adaptive-inference methods; the exponential-weights and martingale calculations above are proved here as a restricted construction, without a novelty claim.
+\begin{thebibliography}{9}
+\bibitem{bk} A. Bibaut and N. Kallus (2025), Demystifying Inference After Adaptive Experiments, \emph{Annual Review of Statistics and Its Application} 12, 407--423. DOI: \url{https://doi.org/10.1146/annurev-statistics-040522-015431}. Preprint arXiv:2405.01281v1 (2024; title spelled ``Demistifying'' there): \url{https://arxiv.org/html/2405.01281v1}.
+\end{thebibliography}
+
+\end{document}

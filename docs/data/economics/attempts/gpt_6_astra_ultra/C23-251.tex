@@ -1,0 +1,110 @@
+% ECONOMICS_PROBLEM: {"id": "C23-251", "title": "Causal effects of treatment histories in panel data", "jel_code": "C23", "source_id": "OP-0599"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{How treatment-history complexity limits panel identification}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C23-251}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and restricted experiment}
+The problem asks when causal effects of treatment histories are identified and estimable in panels with selection, carryover, and latent heterogeneity. The survey \cite{AI} motivates the broader question. We isolate the information cost of allowing unrestricted interactions among the last $k$ treatments. Identification in this experiment is deliberately stronger than identification from an observational factor model.
+
+There are $n$ independent experimental units. Each has binary treatments $D_1,\ldots,D_k$ and terminal potential outcomes $Y(h)\in[0,1]$, $h\in\{0,1\}^k$. Consistency means $Y=Y(D_1,\ldots,D_k)$. Earlier treatments have no effect on these outcomes; this is an exact finite-memory assumption, including indirect carryover. The observed history $H_{j-1}$ includes past treatments and any covariates used by the experiment. Known assignment probabilities satisfy
+\[
+ q_j(d\mid H_{j-1})\ge\varepsilon>0.
+\]
+Conditional on $H_{j-1}$ and the entire vector of potential outcomes, the probability of $D_j=d$ is still $q_j(d\mid H_{j-1})$. This sequential randomization assumption allows observed adaptive assignment but excludes latent selection. Baseline groups can be analyzed by conditioning the whole experiment on a pre-treatment group and replacing $n$ by its sample size. Set $\theta_h=\E Y(h)$.
+
+\section{Identification and a simultaneous bound}
+Define
+\[
+ L_h=\prod_{j=1}^k\frac{\ind\{D_j=h_j\}}{q_j(h_j\mid H_{j-1})},\qquad
+ \widehat\theta_h=n^{-1}\sum_{i=1}^nL_{i,h}Y_i.
+\]
+\begin{theorem}[Finite-history estimation]
+Under the preceding assumptions, $\E[L_hY]=\theta_h$. Put $J=2^k$ and $x=\log(2J/\alpha)$. With probability at least $1-\alpha$, simultaneously for every history,
+\[
+ |\widehat\theta_h-\theta_h|
+ \le \sqrt{\frac{2\varepsilon^{-k}x}{n}}
+       +\frac{2\varepsilon^{-k}x}{3n}.
+\]
+Clipping each estimate to $[0,1]$ preserves this bound. The error for every pairwise treatment-history contrast is at most twice this radius.
+\end{theorem}
+\begin{proof}
+On the event selected by $L_h$, consistency replaces $Y$ by $Y(h)$. Conditional on the potential-outcome vector and the observed history before the last assignment, the last likelihood-ratio factor has expectation one. Remove it, and repeat backwards. This proves $\E[L_hY(h)]=\E Y(h)$ and, by the same argument, $\E L_h=1$. Since $0\le L_hY\le\varepsilon^{-k}$ and $L_h^2\le\varepsilon^{-k}L_h$, its variance is at most $\varepsilon^{-k}$. For independent centered variables bounded in absolute value by $B$, the exponential-series inequality
+\[
+ \E e^{\lambda X}\le
+ \exp\left\{\frac{\lambda^2\E X^2}{2(1-|\lambda|B/3)}\right\},\quad |\lambda|B<3,
+\]
+follows by $|\E X^m|\le B^{m-2}\E X^2$ and $m!\ge2\,3^{m-2}$. Multiplication over units and Markov's inequality give the two-sided Bernstein bound with radius $\sqrt{2\varepsilon^{-k}x/n}+2\varepsilon^{-k}x/(3n)$. Union-bound the $J$ histories. Clipping cannot increase distance to a number in $[0,1]$; the triangle inequality gives the contrast assertion.
+\end{proof}
+
+\section{An information lower bound}
+The exponential dependence on memory is not solely a defect of weighting. Consider the subexperiment in which treatments are independent fair coins and, conditional on history $h$, the terminal observation is Bernoulli with unrestricted mean $\theta_h$. Potential outcomes with these marginals can be generated independently before randomization, so this is a submodel of the preceding experiment.
+
+\begin{theorem}[Cost of unrestricted history interactions]
+For universal positive constants $c,C$, and $k\ge1$, the minimax squared sup-norm risk in this fair-assignment subexperiment satisfies
+\[
+ c\min\left\{1,\frac{J\log J}{n}\right\}
+ \le \inf_{\widetilde\theta}\sup_{\theta\in[0,1]^J}
+ \E_\theta\|\widetilde\theta-\theta\|_\infty^2
+ \le C\min\left\{1,\frac{J\log J}{n}\right\}.
+\]
+For a specified contrast between two distinct histories, the corresponding minimax squared-error risk is bounded below by $c\min\{1,J/n\}$.
+\end{theorem}
+\begin{proof}
+For $J\ge4$, let $P_j$ have means $1/2$ except at coordinate $j$, whose mean is $1/2+\delta$, and let $P_0$ have every mean $1/2$. For $0<\delta\le1/4$, the Bernoulli divergence to $1/2$ is at most $4\delta^2$, by $\KL(P,Q)\le\sum (p-q)^2/q$. Thus
+\[
+ \KL(P_j^{\otimes n},P_0^{\otimes n})\le4n\delta^2/J.
+\]
+Choose $\delta^2=c_0\min\{1,J\log J/n\}$ with a sufficiently small universal $c_0$. Under a uniform random index $U\in\{1,\ldots,J\}$, its mutual information with the data is at most the average of these divergences. Indeed, subtracting the divergence of the mixture to $P_0^{\otimes n}$ from that average gives exactly the mutual information. Any classifier with error probability $p_e$ obeys
+\[
+ \log J-I(U;\text{data})=H(U\mid\text{data})
+ \le\log2+p_e\log J.
+\]
+To see the last inequality, append the error indicator; its entropy is at most $\log2$, and conditional on an error there are at most $J$ possible indices. Our choice makes $p_e$ bounded below by a positive constant. The $J$ parameter vectors are pairwise separated by $\delta$ in sup norm, so nearest-parameter decoding succeeds whenever estimation error is less than $\delta/2$. This proves the lower bound for $J\ge4$.
+
+For $J=2$, or for one specified contrast at any $J$, compare $P_0$ with the law changing only its first specified history by $\delta$. Their $n$-sample divergence is at most $4n\delta^2/J$. Taking $\delta^2=c_1\min\{1,J/n\}$ makes their total variation at most $1/2$, using $\TV^2\le\KL/2$. Every test then has sum of its two error probabilities at least $1-\TV$. Decoding the two parameter values from an estimate proves the claimed squared-error lower bound. For completeness, the stated variation inequality follows by grouping the sample space into the event attaining total variation and its complement, applying the log-sum inequality, and using that binary relative entropy is at least twice the squared difference of its probabilities.
+
+For the upper bound, use the clipped weighting estimates. The preceding Bernstein argument, with $\varepsilon=1/2$, gives
+\[
+ \Prob\{\|\widehat\theta-\theta\|_\infty>
+ \sqrt{2J(\log(2J)+u)/n}+2J(\log(2J)+u)/(3n)\}\le e^{-u}.
+\]
+Integrating this tail and using the clipping bound of one yields $C J\log J/n$ when $n\ge J\log J$, and one otherwise. These are the asserted regimes.
+\end{proof}
+
+\section{Why a low-rank panel assumption does not replace assignment information}
+Let $U$ be a fair Bernoulli variable and set $D_t=U$, $Y_t=U$ at every observed date. In model A define $Y_t(d_1,\ldots,d_t)=d_t$; in model B define it to equal $U$. Both satisfy consistency, no anticipation, and memory at most one. Both produce exactly the same joint distribution of the entire observed panel. Their current-treatment effects are respectively one and zero. The untreated outcome panels have rank at most one in both models (zero in A, a unit-specific constant in B). Thus a rank-one restriction by itself does not identify these causal effects.
+
+The positive theorem does not extend to observational panels simply by estimating propensity scores. Unmeasured confounding, unknown carryover length, and structural restrictions that compress history interactions remain separate questions. Even in the randomized submodel, simultaneous consistent estimation of unrestricted history means requires $2^k k/n\to0$. The catalogue's more ambitious identification and efficiency claims remain open here.
+
+\begin{thebibliography}{9}
+\bibitem{AI} D. Arkhangelsky and G. W. Imbens (2024), ``Causal models for longitudinal and panel data: a survey,'' \emph{The Econometrics Journal} 27(3), C1--C61. \href{https://doi.org/10.1093/ectj/utae014}{doi:10.1093/ectj/utae014}. See also \href{https://arxiv.org/abs/2311.15458}{arXiv:2311.15458}, version 3, Section 10.1. The information bounds above are proved for the stated experiment and are not attributed to the survey.
+\end{thebibliography}
+
+\end{document}
