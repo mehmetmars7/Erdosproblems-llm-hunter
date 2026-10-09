@@ -1,0 +1,166 @@
+% ECONOMICS_PROBLEM: {"id": "C78-353", "title": "A matching with highest stability probability in the lottery model", "jel_code": "C78", "source_id": "OP-0545"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{A matching with highest stability probability in the lottery model: NP-hardness via MAX-2SAT}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We prove that deciding whether some perfect matching has stability probability at least $\tau$
+in the lottery model is NP-hard. Hence computing $M^*\in\arg\max p_I(M)$ is NP-hard. The hardness holds
+even when every man has a single deterministic order. In that case $p_I(M)$ can be evaluated in polynomial time,
+so the threshold problem is NP-complete. Women's lotteries use at most $K+1$ orders, and all probabilities are
+$1/2$ or a single small rational $\varepsilon$. In general, the threshold problem lies in
+$\mathrm{NP}^{\mathrm{PP}}$. The threshold $\tau=1$ is special: it is equivalent to super-stability with respect to
+intersection partial orders. The exact complexity class of the general threshold problem is left open.
+\end{abstract}
+
+\section*{1. Two structural facts}
+For an agent $a$ with support orders $P_a^1,\dots,P_a^{k_a}$, write
+$x\rhd_a y$ when $x$ is above $y$ in \emph{every} supported order. This intersection relation is a strict partial order.
+
+\begin{lemma}[Certain stability]\label{lem:cert}
+$p_I(M)=1$ iff no pair $(m,w)\notin M$ satisfies both
+$\neg(M(m)\rhd_m w)$ and $\neg(M(w)\rhd_w m)$. That is, $M$ is super-stable for the partial orders $\rhd$.
+\end{lemma}
+\begin{proof}
+The pair $(m,w)$ blocks with positive probability iff $m$ has a supported order with $w$ above $M(m)$ and
+$w$ has a supported order with $m$ above $M(w)$. Lotteries are independent and finite, so this probability is positive
+exactly when both conditions hold. The first is $\neg(M(m)\rhd_m w)$ and the second is $\neg(M(w)\rhd_w m)$.
+There are finitely many pairs, so $p_I(M)=1$ iff no pair blocks with positive probability.
+\end{proof}
+Thus the case $\tau=1$ reduces to super-stability under partially ordered lists, a classical
+deterministic problem with known polynomial algorithms in the matching-under-preferences literature
+\cite{irving94,manlove}. The case $\tau=0$ is trivial, because some matching is stable for each realised profile.
+The difficulty lies strictly between these thresholds.
+
+\begin{lemma}[One deterministic side]\label{lem:prod}
+If every man has a single order, then for every perfect matching $M$
+\[
+p_I(M)=\prod_{w}\Pr\bigl(M(w)\text{ is above every }m\in A_w(M)\setminus\{M(w)\}\text{ in }w\text{'s random order}\bigr),
+\]
+where $A_w(M)=\{m:\ w\succ_m M(m)\}$ is deterministic. Each factor is a sum over $w$'s listed orders, so $p_I(M)$ is
+polynomial-time computable.
+\end{lemma}
+\begin{proof}
+With men deterministic, $(m,w)$ blocks iff $m\in A_w(M)$ and $w$'s realised order puts $m$ above $M(w)$.
+``No blocking pair'' is therefore the intersection over $w$ of events depending only on $w$'s order, and these are independent.
+\end{proof}
+
+\section*{2. The reduction}
+MAX-2SAT asks, for 2-clauses $c_1,\dots,c_K$ over variables $x_1,\dots,x_N$ and an integer $V^*$, whether some assignment
+violates at most $V^*$ clauses. It is NP-complete \cite{gjs}. Unit clauses $(\ell)$ may be replaced by
+$(\ell\vee z)$ and $(\ell\vee\neg z)$ with a fresh $z$; exactly one of these is violated iff $\ell$ is false.
+Hence we may assume every clause has two distinct variables. Fix the variable order and \emph{orient} each clause on
+variables $u<v$: its $u$-literal is the \emph{man literal} and its $v$-literal the \emph{woman literal}.
+
+\begin{definition}[Instance $I(\Phi,\varepsilon)$]
+For each variable $x$ create men $a_x,b_x$ and women $\alpha_x,\beta_x$. State T is $\{a_x\alpha_x,b_x\beta_x\}$ and
+state F is $\{a_x\beta_x,b_x\alpha_x\}$. Note that $a_x$ is unhappy (holds $\alpha_x$) exactly in T, and $b_x$ exactly in F.
+\begin{itemize}
+\item For a clause $c$ with man literal $\ell_1$ on $u$, let $m_c=a_u$ if $\ell_1=\neg u$ and $m_c=b_u$ if $\ell_1=u$.
+Then $m_c$ holds $\alpha_u$ iff $\ell_1$ is false.
+\item \emph{Men (deterministic).} A man $m$ of gadget $u$ ranks $\beta_u$ first. Next come the women
+$\alpha_v$ of all clauses with $m_c=m$ (the \emph{slot}), then $\alpha_u$, and then all other women arbitrarily.
+\item \emph{$\beta_x$:} orders $a_x\succ b_x\succ\cdots$ and $b_x\succ a_x\succ\cdots$, each with probability $1/2$.
+\item \emph{$\alpha_x$:} for each clause $c$ whose woman literal $\ell_2$ is on $x$, an order with probability
+$\varepsilon$. This order is $b_x\succ m_c\succ a_x\succ\cdots$ if $\ell_2=\neg x$, and $a_x\succ m_c\succ b_x\succ\cdots$ if
+$\ell_2=x$. The \emph{main} order $a_x\succ b_x\succ\cdots$ receives the remaining probability.
+\end{itemize}
+Take $\varepsilon=2^{-(N+2)}(K+1)^{-2}$; it has $O(N+\log K)$ bits.
+\end{definition}
+
+\begin{lemma}[Gadget-respecting matchings]\label{lem:resp}
+If $M$ puts every gadget in state T or F, then
+\[
+p_I(M)=2^{-N}\prod_x\bigl(1-\varepsilon v_x(M)\bigr),
+\]
+where $v_x(M)$ is the number of clauses with woman literal on $x$ that the induced assignment violates.
+\end{lemma}
+\begin{proof}
+We use Lemma~\ref{lem:prod}. The man holding $\beta_x$ wants nobody. The other man holds $\alpha_x$ and wants
+$\beta_x$ and his slot. All other men hold women ranked above every woman outside their own gadget and slot.
+Hence $A_{\beta_x}$ is the unhappy gadget man, and the factor of $\beta_x$ is $1/2$ in both states.
+For $\alpha_x$, the main order ranks her own gadget men first. Her partner is either first, or second behind the happy gadget man,
+who does not want her; so the main order never fails. In the clause order of $c$, the only man placed above her partner
+who might want her is $m_c$. He is placed above the partner exactly when $\ell_2$ is false, and he wants $\alpha_x$ exactly
+when he is unhappy, i.e.\ when $\ell_1$ is false. The clause orders are disjoint events, so the factor of $\alpha_x$ is
+$1-\varepsilon v_x(M)$.
+\end{proof}
+
+\begin{lemma}[Leaks are costly]\label{lem:leak}
+If $M$ is not gadget-respecting, then $p_I(M)\le\varepsilon K$.
+\end{lemma}
+\begin{proof}
+Suppose first that $\beta_x$ is matched outside $\{a_x,b_x\}$. One of $a_x,b_x$ does not hold $\beta_x$ and ranks her first,
+while $\beta_x$ ranks both gadget men above every other man in both orders. This pair blocks surely, so $p_I(M)=0$.
+Otherwise $\beta_x$ is matched inside its gadget for every $x$. Pick a gadget $y_1$ whose $\alpha$ is matched outside;
+its other man $m_{y_1}$ then holds a woman outside his gadget. If she is in his slot, she is $\alpha_{y_2}$ with $y_2>y_1$, by
+the orientation, and $\alpha_{y_2}$ is also matched outside its gadget. Iterate. The indices increase, so we reach some $y_k$
+whose man $m_{y_k}$ holds a woman below $\alpha_{y_k}$ in his list. He wants $\alpha_{y_k}$. In her main order, which has
+probability at least $1-\varepsilon K$, she ranks $m_{y_k}$ above her partner, who is outside her gadget. Hence
+$p_I(M)\le\varepsilon K$.
+\end{proof}
+
+\begin{theorem}\label{thm:main}
+Let $\tau=2^{-N}(1-\varepsilon V^*)$. Then $\Phi$ has an assignment violating at most $V^*$ clauses iff some perfect matching of
+$I(\Phi,\varepsilon)$ has $p_I(M)\ge\tau$. Consequently the lottery-model HighestProbability threshold problem is NP-hard. It is
+NP-complete when one side is deterministic, and computing $M^*$ is NP-hard.
+\end{theorem}
+\begin{proof}
+($\Rightarrow$) For the gadget-respecting matching of an assignment with $V\le V^*$ violations,
+$\prod_x(1-\varepsilon v_x)\ge1-\varepsilon V\ge1-\varepsilon V^*$, because $\prod(1-t_i)\ge1-\sum t_i$ for $t_i\in[0,1]$.
+($\Leftarrow$) Suppose every assignment violates at least $V^*+1$ clauses. Every respecting matching then has
+$\prod_x(1-\varepsilon v_x)\le e^{-\varepsilon(V^*+1)}\le1-\varepsilon(V^*+1)+\varepsilon^2(V^*+1)^2/2<1-\varepsilon V^*$,
+since $\varepsilon<2/(K+1)^2$. Every other matching has $p_I\le\varepsilon K\le2^{-N}/4<\tau$, since
+$1-\varepsilon V^*\ge3/4$.
+For the search problem, an optimal $M^*$ is gadget-respecting by the same bounds, and it encodes an assignment
+minimising violations. With deterministic men, Lemma~\ref{lem:prod} places the threshold problem in NP.
+\end{proof}
+
+\begin{proposition}[General upper bound]
+For arbitrary independent lotteries, the threshold problem lies in $\mathrm{NP}^{\mathrm{PP}}$.
+\end{proposition}
+\begin{proof}
+Guess $M$. Let $D$ be the product of all the lotteries' denominators. Then $D\,p_I(M)$ counts the weighted
+choices of one support order per agent under which $M$ has no blocking pair. Each choice is checkable in polynomial time,
+so comparing $D\,p_I(M)$ with $D\tau$ is a PP query.
+\end{proof}
+
+\section*{3. Verification and remaining questions}
+We implemented $I(\Phi,\varepsilon)$ for random 2-CNFs on three variables (six men), including unsatisfiable ones with $V_{\rm opt}=1,2$.
+We enumerated all $720$ perfect matchings with exact rational arithmetic. In every case the maximiser was
+gadget-respecting, $\max_Mp_I(M)\ge2^{-N}(1-\varepsilon V_{\rm opt})$ and $<2^{-N}(1-\varepsilon(V_{\rm opt}-1))$,
+and all non-respecting matchings satisfied the leak bound.
+
+Open: (i) whether the general problem is $\mathrm{NP}^{\mathrm{PP}}$-complete, or remains in NP under a natural
+restriction with both sides random; (ii) bounded-list-length and bounded-support restrictions. Our gadgets use lists in
+which only $O(1+\deg)$ positions matter, but complete lists are formally required. (iii) Approximation. Since
+$\log p_I$ is additive over women in the one-sided case, the hardness of approximating MAX-2SAT transfers to additive
+approximation of $\log p_I$ only with care about the $\varepsilon$ scaling, which we do not pursue.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove, Selected open problems in Matching Under Preferences,
+\emph{Bulletin of the EATCS} (2019), Section 3.1.2, Table 1. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{abgdmr} H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei and B. Rastegari, Stable matching with uncertain
+linear preferences, \emph{Algorithmica} 82 (2020), 1410--1433. \url{https://doi.org/10.1007/s00453-019-00650-0}.
+\bibitem{gjs} M. R. Garey, D. S. Johnson and L. Stockmeyer, Some simplified NP-complete graph problems,
+\emph{Theoretical Computer Science} 1 (1976), 237--267.
+\bibitem{irving94} R. W. Irving, Stable marriage and indifference, \emph{Discrete Applied Mathematics} 48 (1994), 261--272.
+\bibitem{manlove} D. F. Manlove, \emph{Algorithmics of Matching Under Preferences}, World Scientific (2013), chapters on
+indifference and partial orders.
+\end{thebibliography}
+\end{document}

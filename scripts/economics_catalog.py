@@ -28,6 +28,7 @@ MODEL_LABELS = {
     'gpt_6_astra_pro': 'GPT 6 Astra Pro',
     'gpt6_astra_ultra': 'GPT 6 Astra Ultra',
     'gpt_6_astra_ultra': 'GPT 6 Astra Ultra',
+    'opus_5.5_high': 'Claude Opus 5.5 High',
 }
 
 
