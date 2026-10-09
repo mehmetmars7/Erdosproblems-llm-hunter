@@ -1,0 +1,324 @@
+% ECONOMICS_PROBLEM: {"id": "C44-65", "title": "Sharp regret guarantees for dynamic treatment regimes", "jel_code": "C44", "source_id": "OP-0506"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Sharp regret guarantees for dynamic treatment regimes: Variance-sensitive VC learning and a sharp horizon obstruction}
+\author{GPT 6 Astra Ultra\\Version 2}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C44-65}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+
+\section*{Target and scope}
+For dynamic deterministic policies $\pi=(\pi_1,\ldots,\pi_T)$ with
+history-dependent decisions, the canonical target is minimax regret
+\[
+ \inf_{\widehat\pi\in\Pi}\sup_{P\in\mathcal P}
+ \mathbb E_P\{\sup_{\pi\in\Pi}V_P(\pi)-V_P(\widehat\pi)\}.
+\]
+Each stage class has VC dimension $v_t$; outcomes satisfy $|Y|\le1$ and
+per-stage assignment overlap is $\varepsilon$.
+The dynamic-policy agenda appears in \cite[Section 3.3.3]{agenda}.
+We prove known-assignment bounds for finite and VC policy classes,
+including a variance-sensitive VC bound with a square-root overlap factor,
+and matching horizon dependence already for two policies in smooth submodels. The
+weighting and empirical-maximization method is standard; no unknown-
+propensity minimax theorem is asserted.
+
+\section*{Uniform evaluation with known assignment laws}
+Let the supplied observational assignment probabilities be
+$q_t(a\mid H_t)\ge\varepsilon$. Set
+\[
+ R_\pi(O)=\prod_{t=1}^T\frac{\mathbf1\{A_t=\pi_t(H_t)\}}
+                                  {q_t(A_t\mid H_t)},\qquad
+ f_\pi=R_\pi Y.
+\]
+Consistency and sequential exchangeability identify
+$V_P(\pi)=\mathbb E f_\pi$. This follows by factoring the trajectory
+density and canceling each assignment factor; the transition factors are
+retained at the policy-generated histories. Thus natural covariate
+responses to preceding policy decisions are included.
+If $R_\pi\le B$ almost surely for all policies, then
+$\mathbb E R_\pi=1$ and $\mathbb E f_\pi^2\le B$.
+The universal choice from per-stage overlap is $B=\varepsilon^{-T}$.
+
+\begin{theorem}
+For a finite policy class of size $M$, let $\widehat\pi$ maximize
+$n^{-1}\sum_i f_\pi(O_i)$, or maximize it to deterministic error $\xi$.
+Then
+\[
+ \mathbb E\{\sup_\pi V_P(\pi)-V_P(\widehat\pi)\}
+ \le C\left\{\sqrt{\frac{B\log(2M)}n}
+                    +\frac{B\log(2M)}n\right\}+\xi,       \tag{1}
+\]
+with a universal constant $C$. Regret is also bounded by two.
+\end{theorem}
+\begin{proof}
+For every fixed policy, $|f_\pi-\mathbb Ef_\pi|\le2B$ and
+$\operatorname{Var}(f_\pi)\le B$. The exponential-moment proof of
+Bernstein's inequality gives, for $z>0$,
+\[
+ P\left\{|(P_n-P)f_\pi|>
+       \sqrt{2Bz/n}+4Bz/(3n)\right\}\le2e^{-z}.
+\]
+For completeness its moment bound uses
+$\mathbb E|Z|^k\le(2B)^{k-2}\mathbb E Z^2$ for centered
+$Z=f_\pi-\mathbb E f_\pi$, expands $\mathbb E e^{tZ}$, and sums the
+geometric upper bound on terms $k\ge2$; optimizing Markov's bound gives
+the displayed inequality. Union bound at $z=\log(2M)+s$ gives failure
+probability at most $e^{-s}$ for all policies simultaneously. Integrating
+this tail bounds the expected supremum by a constant times the two terms
+in (1). Empirical maximality implies regret at most
+$2\sup_\pi|(P_n-P)f_\pi|+\xi$, proving (1).
+\end{proof}
+
+\begin{proposition}
+For the pointwise-separable product class in the canonical statement,
+let $G_t(n)=\sum_{k=0}^{\min(v_t,n)}\binom nk$ and
+$G(n)=\prod_t G_t(n)$. An approximate empirical maximizer satisfies
+\[
+ \mathbb E\{\sup_\pi V_P(\pi)-V_P(\widehat\pi)\}
+ \le4B\sqrt{\frac{2\log(2G(n))}{n}}+\xi.               \tag{2}
+\]
+For $1\le v_t\le n$, one may use $G_t(n)\le(en/v_t)^{v_t}$;
+$G_t(n)=1$ for $v_t=0$. This bound is generally weaker in $B$ than (1).
+\end{proposition}
+\begin{proof}
+On any observed sample, each stage class has at most $G_t(n)$ binary
+label vectors by the VC growth bound. One elementary proof of that bound
+uses the recursion $G_v(n)\le G_v(n-1)+G_{v-1}(n-1)$, obtained by
+splitting labelings according to whether the last coordinate can be both
+labels; induction yields the binomial sum. The vectors of complete-path
+indicators therefore number at most $G(n)$.
+Weights $Y_i\prod_tq_t(A_{it}\mid H_{it})^{-1}$ are fixed on this
+sample and do not depend on the policy. Each corresponding score vector
+has Euclidean norm at most $B\sqrt n$. For independent Rademacher signs,
+the exponential inequality
+$\mathbb E_\sigma\exp(t\sum_i\sigma_i a_i)
+\le\exp(t^2\sum_i a_i^2/2)$ and a union bound give an expected absolute
+maximum at most $B\sqrt{2n\log(2G(n))}$.
+An independent ghost sample and Jensen's inequality symmetrize
+$\mathbb E\sup|(P_n-P)f|$ to at most twice that maximum divided by $n$.
+Pointwise separability makes the suprema measurable. The same empirical-
+maximization inequality as before proves (2). The standard binomial sum
+bound follows by expanding $(1+x)^n$ at $x=v_t/n$.
+\end{proof}
+
+\section*{Exponential information loss with one decision to learn}
+\begin{theorem}
+For every $T\ge1$ and $0<\varepsilon<1/2$, there is a known-assignment
+model with $v_1=1$, $v_t=0$ for $t>1$, and smooth continuous-coordinate
+nuisances of every order, for which minimax regret is
+\[
+ \asymp\min\{1,(n\varepsilon^T)^{-1/2}\}.               \tag{3}
+\]
+The constants can be chosen universal. The policy class has exactly two
+policies and includes all combinations of its specified stage classes.
+\end{theorem}
+\begin{proof}
+Let assignments be independent Bernoulli$(\varepsilon)$ and histories,
+if continuous coordinates are required, include independent uniforms
+irrelevant to outcomes. One policy always assigns one; the other assigns
+zero at the first stage and one thereafter. Their stage classes are
+$\Pi_1=\{0,1\}$ and $\Pi_t=\{1\}$ for $t>1$.
+Let $Y\in\{-1,1\}$ have mean zero off the all-one assignment path and
+mean $\theta$ on that path. Choose two laws $\theta=\pm\Delta$.
+Sequential exchangeability holds by independent randomization, and
+conditional outcome means are constant within each discrete history
+stratum, satisfying any fixed H\"older index with an adequate radius.
+The policy values are respectively $\theta$ and zero. Choosing the wrong
+policy incurs regret $\Delta$.
+The laws differ only on a path with probability $q=\varepsilon^T$.
+For $\Delta\le1/2$, one-observation KL is at most $Cq\Delta^2$.
+Choose $\Delta=b\min\{1,(nq)^{-1/2}\}$ with $b$ sufficiently small.
+Pinsker's inequality bounds sample total variation by $1/2$; the sum of
+wrong-policy probabilities is at least $1/2$. Maximal regret is therefore
+at least $\Delta/4$.
+For the upper bound, (1) with $M=2$, $B=q^{-1}$ gives
+$C\{(nq)^{-1/2}+(nq)^{-1}\}$. When $nq\ge1$ the second term is smaller
+than the first; when $nq<1$ the universal regret bound two applies.
+This proves (3).
+\end{proof}
+
+\section*{A variance-sensitive bound for the infinite VC product class}
+The finite-class Bernstein bound (1) scales with $\sqrt B$ in its leading
+term, whereas the elementary VC bound (2) scales with $B$. The following
+argument closes that difference for expected regret, still with supplied
+assignment laws. It does not replace an empirical growth count by an
+unjustified union bound over random representative policies.
+
+Let $\mathcal F$ be a pointwise separable class of measurable score
+functions. Define its expected Rademacher average, with an absolute
+supremum, by
+\[
+ \mathcal R_n(\mathcal F)
+ =\mathbb E_{O,\sigma}\sup_{f\in\mathcal F}
+             \left|\frac1n\sum_{i=1}^n\sigma_i f(O_i)\right|,
+\]
+where the signs are independent of the sample and of one another.
+Boundedness and separability allow reduction to a countable determining
+class, so the suprema and expectations below are measurable.
+
+\begin{lemma}[Contraction with an explicit safe constant]
+For any finite set $A\subset\mathbb R^n$ and maps $\varphi_i$ with
+$\varphi_i(0)=0$ and Lipschitz constant at most $L$ on the needed
+coordinate range,
+\[
+ \mathbb E_\sigma\sup_{a\in A}
+        \left|\sum_i\sigma_i\varphi_i(a_i)\right|
+ \le2L\,\mathbb E_\sigma\sup_{a\in A}
+        \left|\sum_i\sigma_i a_i\right|.              \tag{4}
+\]
+The same bound holds for pointwise-separable bounded score vectors.
+\end{lemma}
+\begin{proof}
+First consider a supremum without absolute values. Conditional on the
+other signs, let $U_a$ denote their contribution. For one coordinate,
+\[
+ \frac12\sup_a[U_a+\varphi_i(a_i)]
+ +\frac12\sup_b[U_b-\varphi_i(b_i)]
+ =\frac12\sup_{a,b}[U_a+U_b+\varphi_i(a_i)-\varphi_i(b_i)].
+\]
+Lipschitz continuity bounds this by
+$\tfrac12\sup_{a,b}[U_a+U_b+L|a_i-b_i|]$.
+Since the pair $(a,b)$ ranges over all ordered pairs, exchanging it
+shows that the latter supremum equals
+$\sup_{a,b}[U_a+U_b+L(a_i-b_i)]$. Dividing by two and separating the
+suprema gives the sign average with $L a_i$ instead of
+$\varphi_i(a_i)$. Repeat for every coordinate. Thus nonabsolute
+Rademacher suprema contract with factor $L$.
+
+Adjoin the zero vector to $A$; this does not change either absolute
+supremum. Because $\varphi_i(0)=0$, both nonabsolute suprema of the
+transformed sum and its negative are nonnegative. Their maximum, the
+absolute supremum, is at most their sum. Sign symmetry makes their
+expected values equal. Apply the nonabsolute contraction result to one
+of them, then bound its untransformed supremum by the absolute one.
+This proves (4). For countable classes apply it to increasing finite
+subsets containing zero and use monotone convergence; a determining
+countable subclass proves the separable case.
+\end{proof}
+
+\begin{theorem}[The square-root overlap scale for VC regret]
+Use the known-assignment setup above and let
+$\mathcal F=\{f_\pi:\pi\in\Pi\}$, where $|f_\pi|\le B$,
+$P f_\pi^2\le B$, and $B\ge1$. Put
+\[
+ H_n=\log(2G(n)),\qquad
+ G(n)=\prod_{t=1}^T\sum_{k=0}^{\min(v_t,n)}\binom nk.
+\]
+Any measurable empirical maximizer to error $\xi\ge0$ satisfies
+\[
+ \mathbb E\{\sup_\pi V_P(\pi)-V_P(\widehat\pi)\}
+ \le 4\sqrt{\frac{2B H_n}{n}}+
+                         \frac{64B H_n}{n}+\xi.       \tag{5}
+\]
+It also obeys the universal regret bound two. The guarantee is uniform
+in every observational law satisfying the displayed assumptions.
+\end{theorem}
+\begin{proof}
+Condition on the observed sample. Its distinct policy-score vectors
+number at most $G(n)$ by the growth argument already proved. Let
+$S_n=\sup_f P_n f^2$. For a fixed score vector, the sign-sum exponential
+moment is bounded by
+$\exp(t^2\sum_i f(O_i)^2/2)$. Applying this to both signs of each
+of the at most $G(n)$ vectors and optimizing $t$ gives
+\[
+ \mathbb E_\sigma\sup_f\left|n^{-1}\sum_i\sigma_i f(O_i)\right|
+ \le\sqrt{2H_n S_n/n}.                              \tag{6}
+\]
+If every vector is zero, both sides are zero and no optimization is
+needed. This is a conditional sign bound, not a population concentration
+claim for the data-dependent representatives.
+
+Write $R=\mathcal R_n(\mathcal F)$. Jensen's inequality in (6) yields
+$R^2\le (2H_n/n)\mathbb E S_n$. Since $P f^2\le B$,
+\[
+ \mathbb E S_n\le B+
+                   \mathbb E\sup_f|(P_n-P)f^2|.       \tag{7}
+\]
+For completeness, the usual ghost-sample step gives, for any bounded
+class $\mathcal G$,
+\[
+ \mathbb E\sup_g|(P_n-P)g|
+ \le\mathbb E\sup_g|(P_n-P_n')g|
+ \le2\mathcal R_n(\mathcal G).
+\]
+The first inequality is conditional Jensen over an independent sample.
+For the second, swap each original/ghost pair with an independent sign;
+the joint distribution is unchanged. Triangle inequality for the two
+signed sums and their identical distributions gives the factor two.
+Apply this with $\mathcal G=\{f^2:f\in\mathcal F\}$.
+On $[-B,B]$ the square map vanishes at zero and is $2B$-Lipschitz.
+Lemma (4), conditional on the sample, therefore gives
+\[
+ \mathbb E\sup_f|(P_n-P)f^2|
+ \le2\mathcal R_n(\mathcal F^2)\le8BR.                \tag{8}
+\]
+Combining (6)--(8),
+\[
+ R^2\le\frac{2BH_n}{n}+\frac{16BH_n}{n}R.
+\]
+For nonnegative $R$, an inequality $R^2\le a+bR$ implies
+$R\le\sqrt a+b$, by its positive quadratic root or direct expansion.
+Thus $R\le\sqrt{2BH_n/n}+16BH_n/n$.
+
+Finally for every $\pi$, empirical maximality yields
+\[
+ Pf_\pi-Pf_{\widehat\pi}
+ \le |(P_n-P)f_\pi|+|(P_n-P)f_{\widehat\pi}|+\xi.
+\]
+Taking the supremum on the left is valid even if a population optimum
+is not attained. Take expectations and symmetrize the class
+$\mathcal F$ to obtain regret at most $4R+\xi$, proving (5).
+The original bounded outcomes imply the additional cap of two.
+\end{proof}
+
+For $B H_n/n\le1$, (5) is of order
+$\sqrt{B H_n/n}+\xi$, improving the leading overlap factor of (2).
+With $B=\varepsilon^{-T}$ the square-root horizon dependence agrees
+with the two-policy lower bound (3), up to the policy-complexity factor
+in this upper bound. It does not prove that $H_n$ is the sharp minimax
+complexity for every supplied policy class. In particular no matching
+lower dependence on every $v_t$ is claimed, and no high-probability
+concentration conclusion is inferred from an expected-regret theorem.
+
+\section*{Interpretation and remaining task}
+Fixed VC complexity and smoothness do not prevent exponential horizon
+loss: the uncertain value is observed only on a complete treatment path.
+In the known-assignment finite-class experiment, a polynomial bound on
+the cumulative ratios $B_T$, together with polynomial $\log M_T$,
+is a sufficient condition for polynomial sample requirements by (1).
+For increasing horizons the exact subexperiment in (3) is consistent
+precisely when $n\varepsilon^{T_n}\to\infty$.
+These are statistical guarantees conditional on an optimization oracle;
+finite enumeration costs $M$ and can itself be exponential in $T$.
+The new argument supplies a stronger variance-sensitive VC guarantee for
+known assignments. Unknown assignments, joint transition/smoothness and
+history-dimension dependence, sharp lower policy-complexity bounds, and
+polynomial-time optimization over infinite policy classes remain unresolved
+parts of the original target.
+
+\section{Completion Estimate}
+40\%
+
+This is a heuristic estimate for the full catalogue target. The new VC argument closes the proved overlap-factor gap between finite and infinite policy classes, with a complete treatment of sample-dependent score vectors and expected regret. The full unknown-nuisance minimax rates, sharp policy-complexity lower bounds and computational guarantees remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}
