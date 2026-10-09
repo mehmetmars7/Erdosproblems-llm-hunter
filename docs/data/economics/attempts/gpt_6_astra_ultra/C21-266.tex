@@ -1,0 +1,170 @@
+% ECONOMICS_PROBLEM: {"id": "C21-266", "title": "Heterogeneous causal effects on metric covariate spaces", "jel_code": "C21", "source_id": "OP-0503"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Metric-space treatment effects: finite covers, nuisance products and honest oracle bands}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C21-266}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\section{Question and statistical model}
+The catalogue asks for sharp estimation and inference for heterogeneous causal effects on compact metric covariate spaces, including unknown nuisance functions and independently learned metrics. The challenge discussion in Cinelli et al.~\cite{cinelli} motivates nonstandard covariates; the precise minimax class is the catalogue's formulation. We establish constructive upper bounds and oracle bands, but do not identify the full minimax phase diagram.
+
+Let $(\mathcal X,d)$ be compact with diameter at most one. Assume constants $q,c_0,C_0>0$ satisfy
+\begin{equation}\label{eq:balls}
+ c_0r^q\leq P_X(B_d(x,r))\leq C_0r^q
+ \quad(x\in\mathcal X,\ 0<r\leq1).
+\end{equation}
+Use closed balls. Observations $O=(X,W,Y)$ are independent and identically distributed, $W\in\{0,1\}$, $|Y|\leq1$, and $\epsilon\leq e(x)=\Prb(W=1\mid X=x)\leq1-\epsilon$ for fixed $\epsilon\in(0,1/2]$. Consistency and conditional ignorability identify
+\[
+ \tau(x)=m_1(x)-m_0(x),\qquad m_w(x)=\E[Y\mid X=x,W=w].
+\]
+Assume $|\tau(x)-\tau(x')|\leq Ld(x,x')^s$, $0<s\leq1$. Norms below are in $L^p(P_X)$. Additional H\"older restrictions on $e$ and $m_w$ may be imposed, but are not needed for the conditional inequalities proved here.
+
+\section{A geometrically controlled partition}
+\begin{lemma}[Finite metric cells]\label{le:cells}
+For $0<h\leq1$, there is a finite set of centers $z_1,\ldots,z_N$, with pairwise distances greater than $h$, whose closed $h$-balls cover $\mathcal X$. Assign every point to its nearest center, breaking ties by index, and call the resulting Borel cells $A_j$. Then
+\[
+ \operatorname{diam}(A_j)\leq2h,\qquad
+ p_j:=P_X(A_j)\geq c_0(h/3)^q,\qquad
+ N\leq\{c_0(h/3)^q\}^{-1}.
+\]
+\end{lemma}
+\begin{proof}
+A greedy separated set must be finite: the closed balls of radius $h/3$ around its centers are disjoint and each has probability at least $c_0(h/3)^q$. Extend greedily until no further center can be added; finiteness forces termination and maximality implies the covering property. Distances to a finite collection of centers are continuous, so indexed nearest-center cells are Borel. Every cell lies within distance $h$ of its center. If $d(x,z_j)\leq h/3$, then for $k\ne j$,
+\[
+ d(x,z_k)\geq d(z_j,z_k)-d(x,z_j)>2h/3>d(x,z_j),
+\]
+so this entire ball belongs to $A_j$. The diameter, mass and count bounds follow.
+\end{proof}
+
+The probability lower bound is what excludes arbitrarily empty regions from a uniform band. The upper small-ball inequality in~\eqref{eq:balls} is not needed for these upper bounds; it is relevant to a sharp geometric minimax theory.
+
+\section{Doubly robust cell regression}
+An independent training sample produces functions $\widehat e,\widehat m_0,\widehat m_1$, clipped to $[\epsilon,1-\epsilon]$ and $[-1,1]$ respectively. On a fresh sample of size $n$, form
+\[
+ \psi=\widehat m_1(X)-\widehat m_0(X)
+       +\frac{W\{Y-\widehat m_1(X)\}}{\widehat e(X)}
+       -\frac{(1-W)\{Y-\widehat m_0(X)\}}{1-\widehat e(X)}.
+\]
+Thus $|\psi|\leq M:=2+2/\epsilon$. On each $A_j$, average the observed $\psi$ values, use zero if the count $N_j$ is zero, and finally clip the estimate to $[-2,2]$. Denote the resulting function by $\widehat\tau_h$.
+
+\begin{theorem}[Finite-sample integrated error]\label{th:risk}
+Conditionally on the training sample, put
+\[
+ b(x)=(\widehat e(x)-e(x))\left\{
+ \frac{\widehat m_1(x)-m_1(x)}{\widehat e(x)}+
+ \frac{\widehat m_0(x)-m_0(x)}{1-\widehat e(x)}\right\}.
+\]
+For the partition in Lemma~\ref{le:cells},
+\begin{equation}\label{eq:risk}
+ \E[\|\widehat\tau_h-\tau\|_2^2\mid\text{training}]
+ \leq\frac{6M^2N}{n+1}+4L^2(2h)^{2s}+4\|b\|_2^2.
+\end{equation}
+Moreover,
+\[
+ \|b\|_2\leq\epsilon^{-1}\|\widehat e-e\|_4
+  \bigl(\|\widehat m_1-m_1\|_4+\|\widehat m_0-m_0\|_4\bigr).
+\]
+In particular, if propensity is known, choosing $h$ proportional to $n^{-1/(2s+q)}$ gives an $O(n^{-2s/(2s+q)})$ integrated-risk upper bound, regardless of the smoothness of the outcome regressions.
+\end{theorem}
+\begin{proof}
+Direct conditional expectation gives $\E[\psi\mid X]=\tau(X)+b(X)$. Let $\nu_j=\E[\psi\mid X\in A_j]$. Given $N_j=k>0$, the cell observations are independent draws from the conditional cell law, so their average has mean $\nu_j$ and variance at most $M^2/k$. When $N_j=0$, squared error relative to $\nu_j$ is at most $M^2$. Since $N_j$ is binomial $(n,p_j)$,
+\[
+ \E[\ind\{N_j>0\}/N_j]\leq2\E[1/(N_j+1)]
+ \leq\frac{2}{(n+1)p_j},
+\]
+and $p_j\Prb(N_j=0)=p_j(1-p_j)^n\leq1/(n+1)$. Hence the integrated mean squared error around the cell means is at most $3M^2N/(n+1)$.
+
+Write $\tau_j=\E[\tau(X)\mid X\in A_j]$ and $b_j=\E[b(X)\mid X\in A_j]$. For every $x\in A_j$, $|\tau_j-\tau(x)|\leq L(2h)^s$. Jensen's inequality gives $\sum_jp_jb_j^2\leq\|b\|_2^2$, and thus
+\[
+ \sum_j\int_{A_j}(\nu_j-\tau(x))^2dP_X(x)
+ \leq2L^2(2h)^{2s}+2\|b\|_2^2.
+\]
+Combining the two error terms with $(a+b)^2\leq2a^2+2b^2$ proves~\eqref{eq:risk} for the raw estimate. Clipping cannot increase error because $\tau(x)\in[-2,2]$. The product bound is H\"older's inequality and the lower bounds on both estimated denominators. If $\widehat e=e$, then $b=0$ exactly. Balancing $h^{2s}$ and $h^{-q}/n$ proves the asserted rate.
+\end{proof}
+
+The product bound requires $L^4$ nuisance accuracy, not merely two $L^2$ rates silently multiplied. With estimated propensity, the theorem gives a sufficient condition for oracle performance when the product is $O(n^{-s/(2s+q)})$ in the relevant mean-square sense. It does not assert this condition is necessary or minimax sharp.
+
+\section{A finite-sample honest band with known propensity}
+When $e$ is known, use the simpler variable
+\[
+ Z=WY/e(X)-(1-W)Y/(1-e(X)),\qquad |Z|\leq M_0:=1/\epsilon.
+\]
+Let $\overline Z_j$ be its cell average. For $N_j>0$, set
+\[
+ r_j=L(2h)^s+M_0\sqrt{\frac{2\log(2N/\alpha)}{N_j}},\qquad
+ C_h(x)=[\overline Z_j-r_j,\overline Z_j+r_j]\cap[-2,2]
+ \quad(x\in A_j),
+\]
+and use $C_h(x)=[-2,2]$ on empty cells.
+
+\begin{theorem}[Coverage and informative width]\label{th:band}
+For every law satisfying the preceding known-propensity assumptions,
+\[
+ \Prb\{\tau(x)\in C_h(x)\text{ for every }x\in\mathcal X\}\geq1-\alpha.
+\]
+Put $p_*=c_0(h/3)^q$. If $np_*\geq8\log(N/\eta)$, then with probability at least $1-\eta$ all cells are nonempty and every interval has length at most
+\[
+ 2L(2h)^s+4M_0\sqrt{\frac{\log(2N/\alpha)}{np_*}}.
+\]
+For fixed $\alpha,\eta$, the choice $h$ of order $(\log n/n)^{1/(2s+q)}$ therefore gives a uniform width upper bound of order $(\log n/n)^{s/(2s+q)}$ for sufficiently large $n$.
+\end{theorem}
+\begin{proof}
+Conditional on all cell counts, Hoeffding's inequality for variables in $[-M_0,M_0]$ bounds each cell-average error around $\tau_j$ by the displayed stochastic radius except with probability $\alpha/N$. A union bound, followed by the cell oscillation bound, proves simultaneous coverage, including empty cells. For width, the binomial lower-tail inequality gives
+\[
+ \Prb(N_j<np_j/2)\leq e^{-np_j/8}.
+\]
+The union bound and the hypothesis imply $N_j\geq np_*/2$ in every cell with probability at least $1-\eta$. Substitute this lower bound into $2r_j$. The asserted order follows from the net-size and mass bounds.
+\end{proof}
+
+This is an oracle band with known $L,s,q,c_0$ sufficient for its construction and width statement. It is not an adaptive band over unknown smoothness classes, and it does not cover nuisance bias without an additional uniform bound on that bias.
+
+\section{Independent metric learning}
+\begin{proposition}[Additive metric error]\label{pr:metric}
+Suppose an independently learned metric $\rho$ is jointly measurable in its training data and $(x,y)$ for the original Borel sigma-field. Assume also that the finite net centers below are selected measurably from that training data. Suppose $\rho$ satisfies
+$\sup_{x,y}|\rho(x,y)-d(x,y)|\leq\delta$ on an event $E$, and take $h\geq6\delta$, $0<h\leq1$. A maximal $\rho$-separated $h$-net and its indexed $\rho$-Voronoi cells have true diameter at most $2(h+\delta)$, cell mass at least $c_0(h/6)^q$, and at most $\{c_0(h/6)^q\}^{-1}$ cells. Conditionally on the learned metric and $E$, the preceding risk proof applies with these constants. With known propensity and $h$ of order $\max\{n^{-1/(2s+q)},6\delta\}$, whenever this is at most one, the resulting risk is
+\[
+ O\bigl(n^{-2s/(2s+q)}+\delta^{2s}\bigr).
+\]
+If $\Prb(E^c)\leq\eta$ and the final estimate is clipped to $[-2,2]$, unconditional risk has an additional upper bound $16\eta$.
+\end{proposition}
+\begin{proof}
+A $\rho$-cell lies within $\rho$-distance $h$ of its center and hence true distance $h+\delta$. A true ball of radius $h/3-\delta\geq h/6$ lies within $\rho$-distance $h/3$ of its center; the metric triangle inequality and center separation assign it uniquely to that center. These balls are disjoint, giving the count bound and ensuring greedy construction terminates. The sample remains independent of this random partition. Repeat the proof of Theorem~\ref{th:risk}. The bias is $O(h^{2s})$ and variance is $O(1/(nh^q))$; the chosen $h$ bounds these by the asserted expression. On $E^c$, the squared pointwise error between two values in $[-2,2]$ is at most $16$.
+\end{proof}
+
+The unresolved parts are sharp lower bounds for the full unknown-nuisance metric class, exploitation of nuisance smoothness beyond this product bound, honest bands with estimated nuisances, and metric learning without independent training. The results above provide explicit geometric conditions and finite-sample guarantees rather than asserting an unproved minimax rate for all these tasks.
+
+\begin{thebibliography}{9}
+\bibitem{cinelli} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), ``Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference,'' arXiv:2508.17099v1, Section 3.3.3, ``New data structures.'' \url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}. The elementary partition and concentration arguments here are proved in full and are not attributed as new literature results.
+\end{thebibliography}
+
+\end{document}

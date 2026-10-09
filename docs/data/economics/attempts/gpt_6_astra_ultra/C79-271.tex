@@ -1,0 +1,148 @@
+% ECONOMICS_PROBLEM: {"id": "C79-271", "title": "Winning positions and nim-values in Circular Nim", "jel_code": "C79", "source_id": "OP-0220"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Circular Nim: exact zero-face nim-values and certified losing families}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C79-271}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\section{Question and convention}
+In $\mathrm{CN}(n,k)$ the $n$ heap positions remain on a fixed circle, including zero heaps. A legal move chooses $k$ consecutive positions and reduces at least one of those heaps by a positive integer; any subset of the chosen heaps may be reduced. The last player able to move wins. We use the canonical fixed-position convention: removing a heap does not make its neighbors adjacent.
+
+The catalogue seeks structural losing positions, particularly for $\mathrm{CN}(6,2)$, and nim-values and winning moves. Dufour and Heubach~\cite{dh} supply the original circular game; Hora~\cite{hora}, Section 5.4.2, discusses the unresolved six-heap problem. The results below solve invariant zero faces, prove a general mirror family and certify a positive nonmirror example. They do not classify all six-heap positions.
+
+For any finite position $x$, define its Sprague--Grundy value recursively by
+\[
+ g(x)=\operatorname{mex}\{g(y):x\longrightarrow y\},
+\]
+where $\operatorname{mex}$ is the least nonnegative integer absent from the set. This recursion is well founded because total stones strictly decreases. A position is losing, or $P$, exactly when $g(x)=0$: every follower then has nonzero value, and every nonzero-value position has a zero-value follower.
+
+\section{Exact decomposition at permanent zero separators}
+For $k=2$, a move can affect at most two adjacent positive heaps. An initially zero heap remains zero in every descendant. Therefore blocks separated by zero heaps are independent components. We first prove the nim-value needed to use that observation.
+
+\begin{lemma}[One- and two-heap blocks]\label{le:block}
+A single heap of size $a$ has nim-value $a$. A two-position block in which a move may reduce either or both adjacent heaps, of sizes $a,b\geq0$, has nim-value $a+b$.
+\end{lemma}
+\begin{proof}
+For one heap, induction on $a$ gives follower values $0,\ldots,a-1$, so the mex is $a$. For two heaps, every follower has strictly smaller total. Conversely, for every integer $0\leq t<a+b$, choose $a'=\min\{a,t\}$ and $b'=t-a'$. Then $0\leq a'\leq a$, $0\leq b'\leq b$, and at least one heap is reduced. This is a legal follower of total $t$. Inductively its value is $t$, while no follower has value at least $a+b$. The mex is $a+b$.
+\end{proof}
+
+\begin{lemma}[Xor of independent components]\label{le:xor}
+If a move changes exactly one component of a finite disjunctive sum, whose component nim-values are $g_1,\ldots,g_r$, then the sum has nim-value $g_1\mathbin\oplus\cdots\mathbin\oplus g_r$, where $\oplus$ is binary xor.
+\end{lemma}
+\begin{proof}
+Induct on the total number of remaining moves along the longest possible path. Put $G=\bigoplus_jg_j$. A move in component $j$ changes its value to $g'_j\ne g_j$, by the mex definition, so the resulting xor differs from $G$. For any integer $t<G$, let $b$ be the highest bit at which $t$ differs from $G$. That bit is one in $G$ and zero in $t$, so some $g_j$ has bit one there. Set $g'_j=g_j\oplus G\oplus t$. Higher bits are unchanged and bit $b$ decreases, giving $g'_j<g_j$. The mex definition ensures a follower of component $j$ with exactly this value. Its whole-game xor is $t$, and by induction this is its actual nim-value. Thus all values below $G$ occur among followers and $G$ does not, proving the mex formula.
+\end{proof}
+
+\begin{theorem}[A solved family of invariant faces]\label{th:faces}
+In $\mathrm{CN}(n,2)$, $n\geq4$, suppose there is at least one zero heap and every maximal block of positive heaps has length at most two. Let $T_1,\ldots,T_r$ be the sums of the heaps in these blocks. Then
+\[
+ g(x)=T_1\oplus\cdots\oplus T_r.
+\]
+If this xor is nonzero, an explicit winning move is obtained by selecting a block whose total $T_j$ has a one in the highest nonzero xor bit, replacing its total by
+$T'_j=T_j\oplus(\bigoplus_\ell T_\ell)<T_j$, and reducing the block's one or two heaps to this total.
+
+In particular, throughout the four-dimensional face of $\mathrm{CN}(6,2)$ with opposite zero heaps,
+\begin{equation}\label{eq:face}
+ g(0,a,b,0,c,d)=(a+b)\oplus(c+d).
+\end{equation}
+Rotations of this formula are equally valid.
+\end{theorem}
+\begin{proof}
+Use the initial zero positions as fixed separators. No legal length-two interval can contain positive heaps from two different blocks, so every move changes only one block. Conversely every reduction of a singleton or adjacent pair is legal in the circle, even if a reduced heap becomes zero. These are therefore exactly the independent components covered by Lemmas~\ref{le:block} and~\ref{le:xor}. The xor reduction rule gives a zero xor, and the construction in Lemma~\ref{le:block} realizes the desired smaller total with a legal move. The target face has two blocks of length at most two, so its formula follows directly.
+\end{proof}
+
+The condition on zero positions is essential. It is not enough that two zero heaps occur somewhere on the circle: adjacent zeros can leave a long positive block with a different game. Formula~\eqref{eq:face} is a full nim-value result on the specified face, not just a losing-position test.
+
+\section{An infinite positive losing family}
+\begin{theorem}[Antipodal copy strategy]\label{th:mirror}
+For $n=2m$ and $1\leq k\leq m$, every antipodally equal position
+\[
+ (a_1,\ldots,a_m,a_1,\ldots,a_m),\qquad a_j\geq0,
+\]
+is a $P$-position of $\mathrm{CN}(2m,k)$. In particular, $(a,b,c,a,b,c)$ is losing in $\mathrm{CN}(6,2)$, including cases in which all six heaps are positive.
+\end{theorem}
+\begin{proof}
+Maintain antipodal equality immediately before the opponent's turn. The opponent selects a block of $k\leq m$ consecutive positions. Its antipodal block is disjoint: no block of at most $m$ consecutive positions contains a pair of antipodes. Copy every actual reduction onto the corresponding antipodal heap. Those heaps have not been altered by the opponent, and before the opponent's move had equal sizes to the originals, so each copied reduction is feasible. The antipodal block is another legal block of length $k$, and at least one copied reduction is positive. The reply restores antipodal equality.
+
+This strategy is available after every opponent move, so the opponent can never make the last move. Total stones decreases strictly on each move, ensuring termination and a win for the responding player. If the initial position is zero there is no first move, and it is already losing. Thus all displayed positions have outcome $P$.
+\end{proof}
+
+The mirror theorem is an outcome result; it does not give nim-values of positions near that family. Nor do these positions exhaust $P$. For example $(0,2,0,0,1,1)$ is losing by~\eqref{eq:face} but is not antipodally equal. The following finite certificate shows that nonmirror losing positions also occur with every heap positive.
+
+\begin{proposition}[A positive nonmirror certificate]\label{pr:positive}
+The position $x=(1,1,1,2,1,2)$ is losing in $\mathrm{CN}(6,2)$.
+\end{proposition}
+\begin{proof}
+The following table lists every distinct one-move follower $y$ of $x$ and one legal response $z$. Every $z$ is either antipodally equal or has opposite zeros with equal complementary block totals, and is therefore losing by Theorem~\ref{th:mirror} or~\ref{th:faces}.
+\[
+\begin{array}{c|c}
+ y&z\\\hline
+(0,0,1,2,1,2)&(0,0,1,1,0,2)\\
+(0,1,1,2,1,0)&(0,1,0,0,1,0)\\
+(0,1,1,2,1,1)&(0,1,1,0,1,1)\\
+(0,1,1,2,1,2)&(0,1,1,0,0,2)\\
+(1,0,0,2,1,2)&(1,0,0,2,0,1)\\
+(1,0,1,2,1,2)&(1,0,1,2,0,2)\\
+(1,1,0,0,1,2)&(0,1,0,0,1,0)\\
+(1,1,0,1,1,2)&(1,1,0,1,1,0)\\
+(1,1,0,2,1,2)&(1,1,0,2,0,0)\\
+(1,1,1,0,0,2)&(0,1,1,0,0,2)\\
+(1,1,1,0,1,2)&(0,1,1,0,1,1)\\
+(1,1,1,1,0,2)&(0,0,1,1,0,2)\\
+(1,1,1,1,1,2)&(1,1,1,1,1,1)\\
+(1,1,1,2,0,0)&(1,1,0,2,0,0)\\
+(1,1,1,2,0,1)&(1,0,0,2,0,1)\\
+(1,1,1,2,0,2)&(1,0,1,2,0,2)\\
+(1,1,1,2,1,0)&(1,1,0,1,1,0)\\
+(1,1,1,2,1,1)&(1,1,1,1,1,1)
+\end{array}
+\]
+To check exhaustiveness without trusting a search program, singleton reductions give eight followers: one for each size-one heap and two for each of the size-two heaps. Reducing both heaps of an edge gives ten more: the six adjacent size products are $1,1,2,2,2,2$, whose sum is ten. Such two-heap followers have different changed supports from singleton followers and from other edges, so all eighteen are distinct and all are listed. Each table response decreases only one heap or two circularly adjacent heaps, with no increase, and at least one strict decrease. Thus each follower $y$ has a move to a proved losing position and is winning. No follower of $x$ is losing, so $x$ is losing by the recursive outcome definition.
+\end{proof}
+
+\section{A further boundary classification and the remaining obstruction}
+\begin{proposition}[A single three-heap path]
+Suppose the only possibly nonzero heaps of $\mathrm{CN}(6,2)$ are three consecutive positions with values $(a,b,c)$. The position is losing exactly when $b=0$ and $a=c$. If it is not losing, a winning move sets $b$ to zero and reduces the larger of $a,c$ to the smaller, using the adjacent pair containing that larger endpoint.
+\end{proposition}
+\begin{proof}
+At $(a,0,a)$ the positive endpoints are nonadjacent, so any legal move changes exactly one of them and destroys equality. From any other position, the stated move is feasible: if $a\geq c$, use the left endpoint and middle heap to reach $(c,0,c)$; if $c>a$, use the middle and right endpoint to reach $(a,0,a)$. At least one heap decreases. This establishes that no position in the proposed losing set moves to that set, while every position outside it has a move into it. Induction on total stones proves the classification.
+\end{proof}
+
+This last outcome classification does not supply the nim-value of a three-heap path. If a separated singleton is added, its xor with the path requires that missing nim-value, precisely the type of subgame highlighted in~\cite{hora}. A bounded dynamic-programming check of all $4^6=4096$ positions with heap sizes at most three verified the face formula and mirror family and found 214 zero nim-values; that finite check is supplementary and no infinite claim rests on it. The eighteen-row certificate is self-contained. A complete structural description and efficient winning move rule for arbitrary $\mathrm{CN}(6,2)$, and the wider requested nim-value theory, remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{dh} M. Dufour and S. Heubach (2013), ``Circular Nim Games,'' \emph{The Electronic Journal of Combinatorics} 20(2), P22. \url{https://doi.org/10.37236/2765}. Primary journal page: \url{https://www.combinatorics.org/ojs/index.php/eljc/article/view/v20i2p22}.
+\bibitem{hora} R. Hora, ``Games as recursive coalgebras: A categorical view on the Nim-sum,'' arXiv:2510.22886v3, Section 5.4.2. \url{https://arxiv.org/html/2510.22886v3}. The cited version supplies the six-heap motivation; no novelty claim is made for the elementary mirror or disjunctive-sum arguments.
+\end{thebibliography}
+
+\end{document}

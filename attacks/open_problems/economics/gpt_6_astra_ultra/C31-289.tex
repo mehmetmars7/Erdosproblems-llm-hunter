@@ -1,0 +1,128 @@
+% ECONOMICS_PROBLEM: {"id": "C31-289", "title": "Identification and inference with mismeasured spillover exposure", "jel_code": "C31", "source_id": "OP-0490"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Mismeasured spillover exposure: inversion, weak information and honest regions}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\section{Question and scope}
+How do exposure misclassification and a finite validation sample affect causal spillover identification and inference? We give general finite-exposure inversion and an exact binary experiment exhibiting the deterioration in the smallest singular value. The rate statements concern that declared experiment; they do not solve the entire covariate-dependent, weak-positivity agenda.
+
+\section{Population inversion}
+Let $W$ be own treatment, $E\in\{1,\ldots,r\}$ true exposure, $\widetilde E\in\{1,\ldots,r'\}$ the proxy, and $Y\in[0,1]$. Impose the catalogue's conditional exchangeability and positivity, and nondifferential misclassification
+\[
+ \Prob(\widetilde E=a\mid E=e,W=w,X=x,Y)=K_{ae}(w,x).
+\]
+For fixed $(w,x)$ define vectors
+\[
+ q_a=\Prob(W=w,\widetilde E=a\mid x),\quad
+ h_a=\E[Y\ind_{\{W=w,\widetilde E=a\}}\mid x],
+\]
+$p_e=\Prob(W=w,E=e\mid x)$ and $t_e=p_e\mu(w,e,x)$.
+
+\begin{proposition}[Identification with a known full-rank matrix]
+If $K$ has full column rank and $p_e>0$, then
+\[
+ p=(K^\top K)^{-1}K^\top q,\quad
+ t=(K^\top K)^{-1}K^\top h,\quad \mu(w,e,x)=t_e/p_e.
+\]
+Integrating these means against a declared covariate law identifies standardized direct and spillover contrasts.
+\end{proposition}
+\begin{proof}
+Total probability gives $q=Kp$. Nondifferentiality allows the conditional mean of $Y$ to factor out of the proxy probabilities and gives $h=Kt$. Exchangeability and consistency identify the conditional observed means with the potential-outcome means. Full column rank gives the displayed left inverse; positivity permits division. Integration is then a functional of identified quantities.
+\end{proof}
+
+\section{A weak-inversion experiment}
+Now $X$ is constant. Independent clusters provide $n$ independent copies of $(W,\widetilde E,Y)$. Encode $E,\widetilde E$ as signs in $\{-1,1\}$. Let $W$ and $E$ be independent fair draws, and independently generate binary potential outcomes so that
+\[
+ \E[Y\mid W=0,E]=\tfrac12,\qquad
+ \E[Y\mid W=1,E]=\tfrac12+\theta E,\quad |\theta|\leq\tfrac14.
+\]
+The proxy flips the true sign with probability $(1-\lambda)/2$, independently of all outcomes. Its matrix has singular values $1,\lambda$. Assume $\lambda\in[\kappa,2\kappa]$, $0<\kappa\leq1/4$. Each joint treatment-exposure cell has probability $1/4$. The target is the spillover contrast $\delta=2\theta$. Validation supplies $v$ independent copies of $(E,\widetilde E)$ from the same proxy process, \emph{without outcomes}. This last observation rule matters for the lower bound.
+
+The main law depends on the two unknown parameters only through $b=\lambda\theta$: conditional on $(W=1,\widetilde E)$, the outcome is Bernoulli with mean $1/2+b\widetilde E$. Define
+\[
+ \widehat b=\frac2n\sum_{i=1}^n W_i\widetilde E_i(Y_i-1/2),\qquad
+ \widehat\lambda=\frac1v\sum_{j=1}^v E_j\widetilde E_j.
+\]
+Both are unbiased for their named targets, and every summand in the two averages belongs to $[-1,1]$.
+
+\begin{theorem}[Minimax squared-error rates]
+There exist numerical constants $0<c<C<\infty$ such that, uniformly over $n,v\geq1$ and $0<\kappa\leq1/4$,
+\[
+ c\min\{1,\kappa^{-2}(n^{-1}+v^{-1})\}
+ \leq\inf_{\widehat\delta}\sup_{\lambda,\theta}\E(\widehat\delta-2\theta)^2
+ \leq C\min\{1,\kappa^{-2}(n^{-1}+v^{-1})\}.\tag{1}
+\]
+For known $\lambda$, the corresponding rate is $\min\{1,(n\lambda^2)^{-1}\}$.
+\end{theorem}
+\begin{proof}
+Use $\widetilde\lambda=\max\{\widehat\lambda,\kappa/2\}$ and project $2\widehat b/\widetilde\lambda$ onto $[-1/2,1/2]$. Projection cannot increase error. Since $\lambda\geq\kappa$,
+\[
+ |\widetilde\lambda-\lambda|\leq|\widehat\lambda-\lambda|,\qquad
+ \left|\frac{2\widehat b}{\widetilde\lambda}-2\theta\right|
+ \leq\frac4\kappa|\widehat b-b|+\frac1\kappa|\widehat\lambda-\lambda|.
+\]
+The variances are at most $1/n$ and $1/v$, giving the upper bound together with bounded target diameter. The known-matrix argument omits the second term.
+
+For completeness, two elementary two-point arguments give the lower bounds. If two laws have total variation at most $1/2$ and their targets differ by $d$, every estimator has maximum squared risk at least $d^2/16$: threshold the estimator at the midpoint, use the squared error on a wrong decision, and use that the sum of testing errors is at least $1-\operatorname{TV}$. For Bernoulli parameters in $[1/4,3/4]$, the log-sum bound $\operatorname{KL}(P_p,P_q)\leq(p-q)^2/[q(1-q)]$ bounds KL by a constant times $(p-q)^2$. Product KL adds, and Pinsker's inequality bounds total variation by the square root of half the KL.
+
+First fix $\lambda=\kappa$ and use $\theta=\pm d_0$, where $d_0=c_0\min\{1,(\sqrt n\kappa)^{-1}\}$ for a sufficiently small absolute $c_0$. Validation laws coincide, and main-sample KL is at most a constant times $n\kappa^2d_0^2$, giving the $\min\{1,(n\kappa^2)^{-1}\}$ bound.
+
+Second take $\lambda_0=3\kappa/2$, $\lambda_1=\lambda_0+d_1$, with $d_1=c_0\min\{\kappa,v^{-1/2}\}$, and $\theta_0=1/8$, $\theta_1=\theta_0\lambda_0/\lambda_1$. These points are admissible and have identical main laws. Validation KL is at most a constant times $vd_1^2$, whereas target separation is bounded below by a constant times $d_1/\kappa$. This gives $\min\{1,(v\kappa^2)^{-1}\}$. The maximum of the two lower bounds is at least half a constant multiple of the left expression in (1). The same first argument proves the known-$\lambda$ claim.
+\end{proof}
+
+\begin{proposition}[Sharp partial identification and an honest region]
+With exact main law but only $\lambda\in[\kappa,2\kappa]$ known, the identified set is
+\[
+ \{2b/\lambda:\lambda\in[\max\{\kappa,4|b|\},2\kappa]\}.
+\]
+It is empty precisely when the lower endpoint exceeds the upper endpoint. For finite data and $\eta\in(0,1)$, set
+$r_n=\sqrt{2\log(4/\eta)/n}$ and $r_v=\sqrt{2\log(4/\eta)/v}$. The projection onto $2\theta$ of
+\[
+ \{(\theta,\lambda):|\theta|\leq1/4,\ \kappa\leq\lambda\leq2\kappa,
+ |\widehat b-\lambda\theta|\leq r_n,
+ |\widehat\lambda-\lambda|\leq r_v\}\tag{2}
+\]
+has coverage at least $1-\eta$, uniformly over the experiment, and diameter at most $C\min\{1,(r_n+r_v)/\kappa\}$.
+\end{proposition}
+\begin{proof}
+The population restrictions are exactly $b=\lambda\theta$ and the stated parameter box. Every feasible pair defines the independent Bernoulli and proxy construction above, proving sharpness. Hoeffding's inequality and a union bound put the true pair in (2) with the claimed probability. For two feasible pairs, $|\lambda-\lambda'|\leq2r_v$ and $|\lambda\theta-\lambda'\theta'|\leq2r_n$; dividing the triangle inequality by $\lambda\geq\kappa$ gives $|\theta-\theta'|\leq(2r_n+r_v/2)/\kappa$. Bounded target diameter gives the remaining cap.
+\end{proof}
+
+\section{Remaining gap and references}
+The construction separates main-sample noise from calibration noise and remains valid near singularity. It does not provide the full minimax dependence on arbitrary exposure count, covariate smoothness or vanishing joint-treatment positivity. Validation observing outcomes may contain extra information and is a different experiment. Uncertain covariate-dependent matrices require coupled feasibility constraints, rather than unrelated cellwise divisions.
+
+Carlos Cinelli, Avi Feller, Guido Imbens, Edward Kennedy, Sara Magliacane and Jose Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.2.3. \url{https://arxiv.org/html/2508.17099v1}. This supplies the causal-measurement agenda; the binary minimax experiment and proofs are explicitly specified here. The concentration and testing inequalities used in the argument are stated explicitly above; no empirical precision claim follows from them.
+
+\end{document}

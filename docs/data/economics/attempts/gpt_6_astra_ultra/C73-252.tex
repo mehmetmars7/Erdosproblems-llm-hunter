@@ -1,0 +1,97 @@
+% ECONOMICS_PROBLEM: {"id": "C73-252", "title": "Learning in games and convergence", "jel_code": "C73", "source_id": "OP-0002"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Learning through predictable algorithm switches}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C73-252}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and scope}
+Can populations using different learning algorithms, and changing them over time, converge to equilibrium? This requires distinguishing empirical distributions from current play. We prove a finite-time result for full-feedback learning restarted at predictable switch times, and give a last-iterate obstruction. Regret matching and correlated equilibrium originate in \cite{HM}; the reset analysis below is supplied for an explicitly restricted class.
+
+Consider a finite normal-form game with $N$ players, finite action sets $A_i$ of size $m_i\ge2$, and payoffs in $[0,1]$. At round $t$, players choose distributions using the public past and then sample independently conditional on that past. Full feedback reveals $g_{i,t}(a)=u_i(a,a_{-i,t})$ for every $a\in A_i$. Player $i$ partitions time into blocks, with switches determined before drawing that round's actions. Let $K_i(T)$ be the number of completed switches by round $T$. We assume a deterministic upper bound $K_i(T)\le K_i$ when stating probability bounds.
+
+\section{An explicit reset-tolerant learner}
+Within each block run exponential weights in epochs of scheduled lengths $1,2,4,\ldots$, resetting weights at each epoch. At an epoch of scheduled length $L$, use uniform initial weights and learning rate $\eta=\sqrt{8\log(m_i)/L}$. A block-ending switch may truncate its final epoch.
+
+\begin{lemma}[An epoch and a block]
+Against every full-feedback payoff sequence, including adaptive sequences, the learner's expected-action payoff satisfies, on a block of actual length $\ell\ge1$,
+\[
+ \max_{a\in A_i}\sum_{t\text{ in block}}g_{i,t}(a)
+ -\sum_{t\text{ in block}}\langle p_{i,t},g_{i,t}\rangle
+ \le C_0\sqrt{\ell\log m_i},\qquad C_0=4.
+\]
+Here the inequality is pathwise for the realized vectors $g_{i,t}$; it does not average over the opponents.
+\end{lemma}
+\begin{proof}
+For an epoch of actual length $l\le L$, let $W$ be the sum of exponential weights. The inequality
+$\log\sum_a p_a e^{\eta g_a}\le\eta\langle p,g\rangle+\eta^2/8$ for $g_a\in[0,1]$ follows by the bounded-variable exponential bound: the second derivative of the log moment-generating function is a variance at most $1/4$, and integrate twice from zero. Comparing the terminal weight of any fixed action to the total weight gives regret at most $\log m_i/\eta+\eta l/8\le\sqrt{L\log m_i/2}$. The sum of square roots of the scheduled lengths through the final epoch is at most $\sqrt{2L}/(\sqrt2-1)$. Since entering that epoch requires at least $L-1$ prior rounds, $L\le\ell$. Therefore the total is at most $(\sqrt2-1)^{-1}\sqrt{\ell\log m_i}<4\sqrt{\ell\log m_i}$. The maximum of a sum is no larger than the sum of the blockwise maxima, which completes the argument.
+\end{proof}
+
+Let $\widehat\mu_T=T^{-1}\sum_{t\le T}\delta_{a_t}$ be the empirical joint-action law. A law $\mu$ is an $\epsilon$-coarse correlated equilibrium if
+\[
+ \sum_a\mu(a)[u_i(b,a_{-i})-u_i(a)]\le\epsilon
+ \quad\text{for all }i,b\in A_i.
+\]
+\begin{theorem}[Sublinear switching preserves empirical convergence]
+With probability at least $1-\alpha$, $\widehat\mu_T$ is an $\epsilon_T$-coarse correlated equilibrium, where
+\[
+ \epsilon_T=\max_i\left\{
+ 4\sqrt{\frac{(K_i+1)\log m_i}{T}}
+ +\sqrt{\frac{\log(N/\alpha)}{2T}}\right\}.
+\]
+In particular, if $K_i(T)=o(T)$ deterministically, the coarse-correlated-equilibrium deviation inequalities vanish in probability.
+\end{theorem}
+\begin{proof}
+Sum the block lemma and apply Cauchy--Schwarz to the block lengths to bound pseudo-regret by $4\sqrt{(K_i+1)T\log m_i}$. The difference between pseudo-payoff and realized payoff is
+\[
+ M_{i,T}=\sum_{t\le T}\left(\langle p_{i,t},g_{i,t}\rangle-u_i(a_{i,t},a_{-i,t})\right).
+\]
+Conditional on the past and the opponents' current actions, each increment has mean zero and range of length at most one. Conditional independence of current draws is used precisely here. The same exponential bound as in the lemma, followed by iteration and Markov's inequality, gives
+$\Prob(M_{i,T}\ge z)\le\exp(-2z^2/T)$. A union bound over players proves the formula after division by $T$. Each fixed-action deviation of $\widehat\mu_T$ is exactly the corresponding realized average regret.
+\end{proof}
+
+This implies distance to the equilibrium set in any fixed norm tends to zero in probability. To justify that implication without a quantitative polyhedral constant, let $r(\mu)$ be the maximum of zero and all displayed deviation expressions. On the compact probability simplex, it is continuous and its zero set is the coarse correlated equilibrium set $E$. If measures with $r\to0$ stayed a positive distance from $E$, a convergent subsequence would have a limit in $E$, a contradiction. The theorem gives a rate for the economically meaningful deviation incentives; it does not claim a game-uniform distance constant.
+
+The same deterministic summation works for swap-regret blocks: if each block of length $\ell$ guarantees realized swap regret at most $B_i\sqrt\ell$ for every map $\phi:A_i\to A_i$, then total swap regret is at most $B_i\sqrt{(K_i+1)T}$. Consequently the empirical law satisfies every correlated-equilibrium deviation inequality with that divided by $T$. This is a conditional extension, not a construction or a claim that external-regret learners automatically control swap regret.
+
+\section{Two limitations that cannot be removed by terminology}
+\begin{proposition}[Empirical success need not imply convergence of current play]
+There is a two-player zero-sum game and a deterministic play path with bounded external and swap regret at every horizon, whose empirical distribution converges to a correlated equilibrium, but whose current mixed-action profile never approaches the unique Nash equilibrium.
+\end{proposition}
+\begin{proof}
+Use matching pennies, with row payoff one on matches and zero otherwise, and column payoff its complement. Cycle through the four action pairs once each and repeat. In a full cycle, each player's actual payoff is two. Every fixed action also earns two. Conditional on either own action, the opponent uses each action once, so every swap map earns two as well. A partial cycle contains at most three rounds, and every payoff difference per round has absolute value at most one. Hence all cumulative regrets are at most three. The empirical law tends to the uniform law on the four pairs, a correlated equilibrium. At each date the current strategies are point masses. The unique Nash strategies are both uniform, so each current marginal is at $\ell^1$ distance one from its Nash marginal. Uniqueness follows because an opponent not mixing equally induces a strict pure best response, which cannot be part of equilibrium in matching pennies.
+\end{proof}
+The constructed path has low regret along itself; it is not asserted to be a universally no-regret algorithm. It suffices to show that realized regret inequalities alone cannot imply last-iterate convergence.
+
+Switching restrictions also matter. In a one-player game with payoffs one and zero, resetting a uniform-initialized learner before every round yields expected regret $T/2$. Each uninterrupted exponential-weights instance has the block guarantee, but linear resetting prevents learning. Additional assumptions on policy retention, dwell times, feedback, and opponents are therefore substantive. Arbitrary heterogeneous switching and convergence to Nash equilibrium remain outside the result.
+
+\begin{thebibliography}{9}
+\bibitem{HM} S. Hart and A. Mas-Colell (2000), ``A simple adaptive procedure leading to correlated equilibrium,'' \emph{Econometrica} 68(5), 1127--1150. \href{https://doi.org/10.1111/1468-0262.00153}{doi:10.1111/1468-0262.00153}; \href{https://math.huji.ac.il/hart/abs/adapt.html}{author's publication page}.
+\end{thebibliography}
+
+\end{document}

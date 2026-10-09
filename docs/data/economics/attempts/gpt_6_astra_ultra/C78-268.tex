@@ -1,0 +1,129 @@
+% ECONOMICS_PROBLEM: {"id": "C78-268", "title": "House exchanges along longer social-network cycles", "jel_code": "C78", "source_id": "OP-0550"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Improving cycle exchanges: short certificates, global reachability and a terminal trap}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C78-268}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\section{Question and notation}
+There are $n$ applicants, $n$ houses and an initial bijection $M_0$. Applicant $i$ has a strict preference order on an acceptable set containing $M_0(i)$. A legal move follows a simple cycle $(i_1,\ldots,i_\ell)$ of an undirected social graph $G$, with $2\leq\ell\leq k$, and gives $i_t$ the house currently held by $i_{t+1}$, cyclically. Every participating applicant must strictly improve. A two-agent exchange is allowed along one edge. For unbounded cycle size set $k=n$.
+
+The catalogue asks about reachability of a specified allocation or assignment and about finding an allocation Pareto optimal \emph{within the entire set reachable from $M_0$}. The survey~\cite{survey} motivates extending swap dynamics to longer cycles;~\cite{swaps} supplies the social-network swap setting. We prove a short-witness upper bound, solve the complete-graph unrestricted-cycle case, and exhibit a terminal allocation that is dominated by another reachable allocation.
+
+\section{A polynomial certificate bound}
+For applicant $i$, assign each acceptable house a score $r_i(h)$ in $\{0,\ldots,n-1\}$, with larger score exactly equivalent to strict preference. Unacceptable houses can never be received. Define $\Phi(M)=\sum_i r_i(M(i))$.
+
+\begin{theorem}[No long improving paths]\label{th:length}
+For every graph, strict preference profile and bound $2\leq k\leq n$, every sequence of legal moves has length at most
+\[
+ T_n=\left\lfloor\frac{n(n-1)}2\right\rfloor.
+\]
+The decisions ``is allocation $M$ reachable?'' and ``can applicant $i$ receive house $h$?'' belong to $\mathrm{NP}$ under an explicit finite input encoding, both for fixed $k$ and for $k$ supplied as input. The decision ``is some reachable allocation of potential at least $t$?'' also belongs to $\mathrm{NP}$.
+\end{theorem}
+\begin{proof}
+A legal cycle of length $\ell$ increases each of its $\ell$ scores by at least one and leaves the other scores unchanged. Thus it increases $\Phi$ by at least $\ell\geq2$. The potential always lies between zero and $n(n-1)$, proving the path bound.
+
+A certificate lists at most $T_n$ cycles, each of length at most $n$. A verifier starts from $M_0$, checks distinct participants, graph adjacency including the closing edge, the length restriction, acceptability and all strict improvements, and then updates the allocation. Each check uses polynomial time in the explicit input size. At the endpoint it tests the requested allocation, assignment, or potential threshold. Conversely every reachable endpoint has a certificate of this bounded length by the first part. The result does not depend on $k$ being constant.
+\end{proof}
+
+This upper bound uses strict preference improvement at every move. It would be invalid for dynamics admitting indifferent trades or externally imposed resets.
+
+\begin{corollary}[An oracle upper bound for reachable Pareto optimality]\label{co:oracle}
+An allocation Pareto optimal among all allocations reachable from $M_0$ can be found in deterministic polynomial time with an $\mathrm{NP}$ oracle, that is, in $\mathrm{FP}^{\mathrm{NP}}$.
+\end{corollary}
+\begin{proof}
+Use the threshold decision from Theorem~\ref{th:length} and binary search the integer interval $[0,n(n-1)]$ to find the largest reachable potential $t^*$. Recover a witnessing path by standard certificate-prefix queries, described explicitly as follows. Encode a path by exactly $T_n$ move slots, allowing a padding symbol after the last move. Each slot has a polynomial number of bits. Ask whether an accepting certificate with the current prefix followed by bit zero exists; append zero if yes and one otherwise. Each query is an NP question because the remaining bits can be guessed and the full certificate verified in polynomial time. Polynomially many queries recover a path ending at potential $t^*$.
+
+If another reachable allocation weakly improved every applicant and strictly improved at least one, strict rankings would give it strictly larger total score. This contradicts maximality of $t^*$. Hence the recovered endpoint is Pareto optimal in the required global reachable set.
+\end{proof}
+
+The corollary is an upper bound, not a hardness classification, and it does not assert that maximizing this arbitrary ordinal score is the unique welfare criterion. Any maximizer serves as a valid Pareto selection.
+
+\section{A polynomially solvable unrestricted complete network}
+Call an allocation \emph{individually rational} if every applicant weakly prefers its assigned house to its initial house. Because rankings are strict, any different acceptable house in such an allocation is strictly better than the initial house.
+
+\begin{theorem}[Reachability equals individual rationality]\label{th:complete}
+If $G$ is complete and $k=n$, an allocation is reachable from $M_0$ if and only if it is individually rational. A reachable target allocation can be realized in at most $\lfloor n/2\rfloor$ moves. A specified applicant--house assignment is reachable if and only if it extends to a perfect matching in the bipartite graph
+\[
+ E_{\mathrm{IR}}=\{(i,h):h\text{ acceptable to }i,\ h\succeq_i M_0(i)\}.
+\]
+A reachable Pareto-optimal allocation can be found by a maximum-weight perfect matching in this graph, with weight $r_i(h)$ on edge $(i,h)$.
+\end{theorem}
+\begin{proof}
+Every legal path improves each participant from its previous holding, so each endpoint is individually rational. Conversely, for an individually rational allocation $M$, let $\pi$ be the permutation defined by $M(i)=M_0(\pi(i))$. Decompose $\pi$ into disjoint cycles. Ignore singleton cycles. In each remaining cycle every applicant receives a different house and hence strictly improves relative to $M_0$. Its length is at most $n$ and every edge exists in a complete graph. Execute these cycles one after another. Their participant sets are disjoint, so before its cycle each participant still has its initial house; every move is legal. There are at most $\lfloor n/2\rfloor$ nontrivial cycles, and the final allocation is $M$.
+
+For a prescribed assignment, delete all competing incident edges at its applicant and house and test for a perfect matching. Every retained perfect matching is individually rational and thus reachable, and every reachable extension is such a perfect matching. Polynomial-time bipartite matching therefore decides the question. Finally maximize the integer edge weights over perfect matchings. Such matchings exist because $M_0$ is one. A Pareto-dominating reachable allocation would also be an individually rational perfect matching and have strictly larger weight, a contradiction. The standard augmenting-path and minimum-cost-flow algorithms give polynomial-time matching and weighted matching; the economic part of the reduction is the equivalence already proved.
+\end{proof}
+
+The theorem does not extend to fixed $k<n$ merely by decomposing a long cycle into shorter permutations: intermediate shorter trades may fail the strict improvement condition. Nor can the complete-graph assumption be dropped, as the next example shows.
+
+\section{A terminal allocation can be globally dominated}
+\begin{proposition}[Four-agent terminal trap]\label{pr:trap}
+For $n=4$ there is a graph and complete strict preferences such that a legal sequence of swaps reaches a terminal allocation $T$, while another sequence of swaps reaches $D$ that Pareto dominates $T$. Terminality holds even when cycles of all possible lengths are allowed.
+\end{proposition}
+\begin{proof}
+Label applicants and their initial houses $1,2,3,4$, so $M_0=(1,2,3,4)$. Let $G$ contain every edge except $\{2,3\}$. Preferences, from best to worst, are
+\[
+\begin{array}{c|cccc}
+1&2&3&1&4\\
+2&4&3&2&1\\
+3&1&4&3&2\\
+4&2&1&3&4
+\end{array}
+\]
+and all houses are acceptable. First swap applicants $3,4$, giving $(1,2,4,3)$: applicant 3 improves from 3 to 4 and applicant 4 from 4 to 3. Then swap $2,4$, giving
+\[
+ T=(1,3,4,2).
+\]
+Applicant 2 improves from 2 to 3 and applicant 4 from 3 to its top house 2. Both graph edges exist.
+
+At $T$, applicant 4 is already at its top choice and cannot participate in an improving cycle. The subgraph induced by $1,2,3$ has only edges $\{1,2\}$ and $\{1,3\}$, so it has no cycle of length three. Neither permitted swap improves both sides: in a $1,2$ swap applicant 2 would receive house 1, its worst; in a $1,3$ swap applicant 1 would receive house 4, its worst. Thus $T$ is terminal even for $k=4$.
+
+Alternatively, from $M_0$ swap $1,3$, obtaining $(3,2,1,4)$, and then swap $2,4$, obtaining
+\[
+ D=(3,4,1,2).
+\]
+The first swap improves applicant 1 from 1 to 3 and applicant 3 from 3 to 1. The second improves applicant 2 from 2 to 4 and applicant 4 from 4 to 2. Relative to $T$, applicants 1,2,3 strictly improve and applicant 4 keeps house 2. Therefore $D$ is reachable and Pareto dominates $T$.
+\end{proof}
+
+The example has an additional useful feature: the desired improvement from $T$ to $D$ would require the three-agent rotation on $1,2,3$, but its missing social edge blocks it. Returning to the initial allocation is forbidden by strict improvement, so a different reachable branch cannot be recovered by simply continuing from $T$.
+
+\section{Remaining complexity gap}
+The potential argument gives polynomial witnesses for all cycle bounds and an oracle search method. It does not settle NP-hardness versus polynomial solvability of reachability on general graphs, nor the exact complexity of producing a globally reachable Pareto optimum. The complete-network theorem resolves a substantial special case. The terminal trap rules out a naive greedy completion argument even with unbounded cycles on a small noncomplete graph. Establishing classifications for fixed $k\geq3$ and for graph classes remains open in this attempt.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), ``Selected open problems in Matching Under Preferences,'' Section 3.1.3. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{swaps} L. Gourv\`es, J. Lesca and A. Wilczynski (2017), ``Object Allocation via Swaps along a Social Network,'' \emph{IJCAI 2017}, 213--219. \url{https://doi.org/10.24963/ijcai.2017/31}. Primary proceedings record: \url{https://www.ijcai.org/proceedings/2017/31}. The general cycle bounds and example above are proved directly, without importing a swap-hardness result to a different cycle model.
+\end{thebibliography}
+
+\end{document}
