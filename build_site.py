@@ -1396,7 +1396,7 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
     # Changing the generated content changes the URL, so a new page cannot
     # accidentally pair with a pre-TeX copy of the index in the browser cache.
     assets = ['data/open_problems_data.js', 'app.js', 'data/economics_data.js',
-              'economics.js', 'economics-detail.js']
+              'economics.js', 'economics-detail.js', 'economics.css']
     versions = {asset: hashlib.sha256((DATA_DIR.parent / asset).read_bytes()).hexdigest()[:16]
                 for asset in assets if (DATA_DIR.parent / asset).exists()}
     for page in DATA_DIR.parent.glob('*.html'):

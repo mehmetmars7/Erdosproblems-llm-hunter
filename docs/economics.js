@@ -13,13 +13,28 @@
         R: 'Urban, Rural, Regional, Real Estate and Transportation Economics',
         Y: 'Miscellaneous Categories', Z: 'Other Special Topics'
     };
-    const validSorts = ['rank', 'title', 'jel_code', 'id'];
+    const validSorts = ['rank', 'title', 'jel_code', 'status', 'review', 'claim', 'completion', 'models'];
     const escape = value => window.ProblemHunting.escapeHtml(value);
     const href = record => `problem.html?type=economics&id=${encodeURIComponent(record.id)}`;
     const familyLabel = code => families[String(code).charAt(0)] || 'Economics';
+    function columnValue(record, key) {
+        const shared = window.ProblemHunting;
+        switch (key) {
+            case 'status': return shared.getOpenProblemStatusLabel(record);
+            case 'review': return shared.getReviewLabel(record.review);
+            case 'claim': return shared.getOpenProblemClaimLabel(record);
+            case 'completion': return shared.getMathematicalAttempts(record.attacks).length ? record.completion : null;
+            case 'models': return shared.getModelLabels(record.attacks).join(', ');
+            default: return record[key];
+        }
+    }
     function compare(a, b, key = 'rank', direction = 'asc') {
-        const order = key === 'rank' ? a.rank - b.rank
-            : String(a[key]).localeCompare(String(b[key]), undefined, { numeric: true, sensitivity: 'base' });
+        const x = columnValue(a, key), y = columnValue(b, key);
+        const missing = value => value === null || value === undefined || value === '' ||
+            (typeof value === 'number' && !Number.isFinite(value));
+        if (missing(x) || missing(y)) return Number(missing(x)) - Number(missing(y)) || a.rank - b.rank;
+        const order = typeof x === 'number' && typeof y === 'number' ? x - y
+            : String(x).localeCompare(String(y), undefined, { numeric: true, sensitivity: 'base' });
         return (direction === 'desc' ? -order : order) || a.rank - b.rank || String(a.id).localeCompare(String(b.id));
     }
     function filter(records, options = {}) {
@@ -37,20 +52,29 @@
         });
     }
     function rows(records) {
-        if (!records.length) return '<tr><td colspan="4">No problems match these filters.</td></tr>';
-        return records.map(record => `<tr>
+        if (!records.length) return '<tr><td colspan="8">No problems match these filters.</td></tr>';
+        const shared = window.ProblemHunting;
+        return records.map(record => {
+            const attempts = shared.getMathematicalAttempts(record.attacks);
+            const models = shared.getModelLabels(record.attacks);
+            return `<tr>
             <td>${escape(record.rank)}</td>
             <td class="catalogue-problem"><a href="${href(record)}">${escape(record.title)}</a></td>
             <td><span title="${escape(familyLabel(record.jel_code))}">${escape(record.jel_code)}</span></td>
-            <td>${escape(record.id)}</td>
-        </tr>`).join('');
+            <td>${escape(columnValue(record, 'status'))}</td>
+            <td class="${escape(shared.getReviewClass(record.review))}">${escape(columnValue(record, 'review'))}</td>
+            <td class="claim-status"><a href="${href(record)}">${escape(columnValue(record, 'claim'))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td>${attempts.length ? escape(shared.formatCompletion(record.completion)) || '—' : '—'}</td>
+            <td>${models.length ? models.map(escape).join(', ') : '—'}</td>
+        </tr>`;
+        }).join('');
     }
     function init() {
         const body = document.getElementById('economics-tbody');
         if (!body) return;
         const count = document.getElementById('results-count');
         if (!window.ECONOMICS_DATA) {
-            body.innerHTML = '<tr><td colspan="4">Unable to load the Economics catalogue.</td></tr>';
+            body.innerHTML = '<tr><td colspan="8">Unable to load the Economics catalogue.</td></tr>';
             count.textContent = 'Catalogue unavailable';
             return;
         }

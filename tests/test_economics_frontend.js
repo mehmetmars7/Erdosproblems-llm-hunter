@@ -10,7 +10,7 @@ const elements = Object.fromEntries(ids.map(id => [id, {
     value: '', textContent: '', innerHTML: '', handlers: {},
     addEventListener(type, handler) { this.handlers[type] = handler; }
 }]));
-const headers = Object.fromEntries(['rank', 'title', 'jel_code', 'id'].map(key => {
+const headers = Object.fromEntries(['rank', 'title', 'jel_code', 'status', 'review', 'claim', 'completion', 'models'].map(key => {
     const header = { attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } };
     const indicator = { textContent: '' };
     return [key, { dataset: { sort: key }, header, indicator, handlers: {},
@@ -22,7 +22,7 @@ const document = {
     addEventListener() {}, getElementById(id) { return elements[id] || null; },
     querySelectorAll() { return Object.values(headers); }
 };
-const window = { location: new URL('https://example.org/economics.html?jel=C73&sort=id&dir=desc'),
+const window = { location: new URL('https://example.org/economics.html?jel=C73&sort=status&dir=desc'),
     history: { replaceState(state, title, url) { window.location = url; } } };
 const context = vm.createContext({ window, document, URL, URLSearchParams, setTimeout, clearTimeout });
 vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
@@ -44,12 +44,28 @@ assert.deepEqual(resultIds(api.filter(records, { family: 'C', jel: 'C72' })), ['
 assert.deepEqual(resultIds(api.filter(records, { family: 'D', jel: 'C72' })), []);
 assert.match(api.rows(records), /Beta &amp; &lt;target&gt;/);
 assert.match(api.rows(records), /problem\.html\?type=economics&id=C73-1/);
-assert.match(api.rows([]), /colspan="4"/);
+assert.match(api.rows([]), /colspan="8"/);
+const statementRow = api.rows([records[0]]);
+assert.equal((statementRow.match(/<td\b/g) || []).length, 8);
+assert.doesNotMatch(statementRow, /<td>C73-1<\/td>/);
+assert.match(statementRow, />unreviewed<\/td>/);
+assert.match(statementRow, />no attempt<\/a>/);
+assert.match(statementRow, />0 attempts<\/span>/);
+assert.equal((statementRow.match(/>—<\/td>/g) || []).length, 2);
+const attempted = { ...records[0], completion: 25, attacks: [{ model: 'GPT', status: 'unresolved' }] };
+assert.match(api.rows([attempted]), />25%<\/td>/);
+for (const direction of ['asc', 'desc']) {
+    assert.deepEqual(resultIds([records[1], attempted].sort((a, b) => api.compare(a, b, 'completion', direction))), ['C73-1', 'C72-2']);
+}
+const html = fs.readFileSync(path.join(root, 'docs/economics.html'), 'utf8');
+assert.deepEqual(Array.from(html.matchAll(/data-sort="([^"]+)"/g), match => match[1]), Object.keys(headers));
+assert.match(html, /data-sort="rank">Rank /);
+assert.doesNotMatch(html, /Difficulty rank|<option value="id">|UnsolvedMath #|data-sort="source"/);
 window.ECONOMICS_DATA = Object.fromEntries(records.map(record => [record.id, record]));
 api.init();
 assert.equal(elements['results-count'].textContent, '1 of 3 entries · Statements only');
 assert.match(elements['economics-tbody'].innerHTML, /C73-1/);
-assert.equal(headers.id.header.attributes['aria-sort'], 'descending');
+assert.equal(headers.status.header.attributes['aria-sort'], 'descending');
 elements['reset-filters'].handlers.click();
 assert.equal(elements['results-count'].textContent, '3 of 3 entries · Statements only');
 assert.equal(elements['sort-by'].value, 'rank');
