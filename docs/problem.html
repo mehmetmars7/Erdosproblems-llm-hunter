@@ -777,11 +777,57 @@
                 return /\\(left|right|bigl|bigr|Bigl|Bigr|big|Big|bigg|Bigg|biggl|Biggl|biggr|Biggr)\s*$/.test(lookback);
             }
 
+            function normalizeEquationTags(math) {
+                // AMS inner environments cannot own equation tags. Move each
+                // tag beyond the enclosing inner block, retaining its alignment.
+                const inner = new Set(['aligned', 'alignedat', 'gathered', 'split']);
+                const stack = [];
+                const blocks = [];
+                const tokens = /\\(?:begin\{([^}]+)\}|end\{([^}]+)\}|tag(\*)?(?![a-zA-Z])|[\\{}])/g;
+                let token;
+                while ((token = tokens.exec(math))) {
+                    if (token[1]) {
+                        const block = { environment: token[1], tags: [] };
+                        stack.push(block);
+                        blocks.push(block);
+                    } else if (token[2]) {
+                        if (stack.at(-1)?.environment !== token[2]) return math;
+                        stack.pop().end = tokens.lastIndex;
+                    } else if (/^\\tag/.test(token[0])) {
+                        let start = tokens.lastIndex;
+                        while (/\s/.test(math[start] || '') && start < math.length) start += 1;
+                        const argument = parseBracedArg(math, start);
+                        if (!argument) continue;
+                        // Nested inner blocks must share the outermost owner;
+                        // a numbered align/equation between them ends that scope.
+                        let owner;
+                        for (let i = stack.length - 1; i >= 0 && inner.has(stack[i].environment); i -= 1) owner = stack[i];
+                        if (owner) owner.tags.push({ start: token.index, end: argument.end,
+                            value: math.slice(token.index, argument.end) });
+                        tokens.lastIndex = argument.end;
+                    }
+                }
+                if (stack.length) return math;
+                const edits = [];
+                for (const block of blocks) {
+                    // Multiple row tags need a numbered outer environment;
+                    // don't turn them into duplicate tags on a single equation.
+                    if (block.tags.length !== 1) continue;
+                    const tag = block.tags[0];
+                    edits.push({ start: tag.start, end: tag.end, value: '' },
+                        { start: block.end, end: block.end, value: tag.value });
+                }
+                for (const edit of edits.sort((a, b) => b.start - a.start)) {
+                    math = math.slice(0, edit.start) + edit.value + math.slice(edit.end);
+                }
+                return math;
+            }
+
             function normalizeMath(math) {
                 // Fixed-size delimiters may intentionally span alignment rows.
                 // Converting them to left/right makes otherwise valid TeX fail.
                 const spansRows = /\\[Bb]igg?l[\s\S]*?\\\\[\s\S]*?\\[Bb]igg?r/.test(math);
-                let normalized = math
+                let normalized = normalizeEquationTags(math)
                     .replace(/\\label\{[^}]+\}/g, '')
                     .replace(/\\(eqref|ref|cref|Cref)\{([^}]+)\}/g, (match, kind, key) => {
                         const visible = key.replace(/[\\{}%#_$&]/g, '\\$&');
