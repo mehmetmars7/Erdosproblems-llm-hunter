@@ -1,0 +1,117 @@
+% ECONOMICS_PROBLEM: {"id": "C21-437", "title": "Heterogeneity under multivariate treatment", "jel_code": "C21", "source_id": "OP-0501"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\title{Sparse response estimation without estimating the assignment density}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C21-437}. \textbf{Status:} Partial. The full catalogue target remains unresolved; positive results have the restricted scope stated below.
+
+\section{A restricted minimax result and a normalization issue}
+The canonical experiment observes independent $(X,W,Y)$, with $W\in[0,1]^k$, $X\in[0,1]^d$, $|Y|\le1$, conditional treatment density $g(w\mid x)\ge\varepsilon>0$, and the stated causal exchangeability and continuity assumptions. Hence the response surface $m(w,x)=\E[Y(w)\mid X=x]$ is the observed conditional mean. It depends on at most $r$ unknown treatment coordinates and is H\"older smooth in those coordinates and $x$.
+
+We prove a matching rate for the restricted case $1\le r\le k$, fixed $r,d$, and $0<\beta\le1$. Constants may depend on $r,d,\beta,L,\varepsilon$ and an interior margin $0<\delta<1/2$, but not on $n$ or $k$. Assume the class permits uniform treatment assignment and uniform covariates for the lower bound. The assignment density may otherwise have arbitrary allowed full-dimensional smoothness: the estimator will not estimate it. The proof gives statistical, not computational, adaptivity to the unknown coordinate set.
+
+Write $I=[\delta,1-\delta]$ and $q=1-2\delta$. Define normalized target loss
+\[
+ \|f-m\|_T^2=q^{-k}\int_{I^k}\int(f(w,x)-m(w,x))^2\,dP_X(x)\,dw.
+ \tag{1}
+\]
+The catalogue's unnormalized loss is exactly $q^k$ times (1). For growing $k$, the zero estimator has unnormalized risk at most $q^k\to0$ regardless of sample size. Thus consistency for that raw loss alone is vacuous along $k\to\infty$. Both normalizations will be reported explicitly.
+
+\section{A finite sparse sieve and its complexity}
+Let $s=r+d$ and $K_{k,r}=\sum_{j=0}^r\binom{k}{j}$. For every treatment-coordinate subset of size at most $r$, construct a sup-norm $\eta$-net for the bounded H\"older functions on its coordinates and $x$. The net elements may be clipped piecewise-constant functions; estimators need not themselves belong to the H\"older class.
+
+\begin{lemma}[A net with no logarithmic smoothness penalty]
+For fixed $s$ and $0<\beta\le1$, a sup-norm $C\eta$-net can be chosen so that its logarithmic cardinality is at most $C\eta^{-s/\beta}$. The union over coordinate subsets has
+\[
+ \log N\le\log K_{k,r}+C\eta^{-s/\beta}. \tag{2}
+\]
+\end{lemma}
+\begin{proof}
+Use a regular grid of spacing $h$ proportional to $\eta^{1/\beta}$, with constants small enough depending on $s,L$. Quantize grid values to multiples of $\eta$. The first value has at most $C/\eta$ possibilities. Traverse grid vertices along a spanning tree whose edges join neighboring vertices. H\"older continuity bounds neighboring true values by $Lh^\beta$, so each quantized value has only a fixed number of possibilities given its parent. There are at most $Ch^{-s}$ vertices. Hence the number of quantized tables is at most $(C/\eta)C^{Ch^{-s}}$, and its logarithm is bounded by $C\eta^{-s/\beta}$. Constant interpolation within each cell has error bounded by the quantization error plus $L(\sqrt{s}h)^\beta$. Clipping preserves the bound and the range $[-1,1]$. Lower-dimensional subsets use no larger entropy order. Taking a union gives (2).
+\end{proof}
+
+Choose a measurable minimizer of empirical squared loss over this finite union, using a fixed tie rule. It requires no propensity or density estimate. To see why this suffices, let $P$ denote the observed design law and set $R_P(f)=\E[(f(W,X)-m(W,X))^2]$.
+
+\begin{lemma}[Finite-class regression risk]
+For any such finite class containing a function within sup-norm $C\eta$ of $m$, empirical squared-loss minimization satisfies
+\[
+ \E R_P(\widehat f)\le C\{\eta^2+(1+\log N)/n\}. \tag{3}
+\]
+\end{lemma}
+\begin{proof}
+For each candidate define $Z_f=(Y-f)^2-(Y-m)^2$. Its mean is $R_P(f)$, its absolute value is at most four, and $\E Z_f^2\le16R_P(f)$, since $Z_f=(f-m)(f+m-2Y)$. Bernstein's inequality, a union bound over candidates and the inequality $2ab\le a^2+b^2$ give, simultaneously with probability at least $1-e^{-u}$,
+\[
+ |(P_n-P)Z_f|\le\tfrac12R_P(f)+C(\log(2N)+u)/n.
+\]
+Compare the empirical minimizer to a sup-norm approximant $f_0$. The common empirical loss of $m$ cancels, so the inequality gives $R_P(\widehat f)\le3R_P(f_0)+C(\log(2N)+u)/n$. Since $R_P(f_0)\le C\eta^2$, integration of the exponential tail proves (3).
+\end{proof}
+
+\section{Why the ambient assignment dimension does not return}
+For any candidate $f$, the difference $f-m$ depends on a treatment-coordinate union $S$ of size at most $2r$. Integrating out the remaining coordinates and using positivity yields
+\[
+ \|f-m\|_T^2
+ =q^{-|S|}\int_{I^S}\int(f-m)^2dP_X\,dw_S
+ \le q^{-2r}\varepsilon^{-1}R_P(f). \tag{4}
+\]
+The first equality is exact because the integrand does not depend on the other coordinates. For the inequality, extend the integral to $[0,1]^S$ and use $g\ge\varepsilon$ on the entire original cube. The argument works separately for every candidate, so it applies to the selected estimator without assuming its support is independent of the sample.
+
+Taking $\eta\asymp n^{-\beta/(2\beta+s)}$ in (2)--(4), and using the zero estimator when the bound exceeds a constant, gives
+\[
+ \sup\E\|\widehat f-m\|_T^2
+ \le C\min\left\{1, n^{-2\beta/(2\beta+r+d)}+
+                         \frac{\log K_{k,r}}n\right\}. \tag{5}
+\]
+There is no assignment-density estimation term and no smoothness index $\alpha$ in this upper bound. Full-dimensional assignment can change the design, but uniform positivity and a sparse outcome regression permit direct prediction-risk control. This conclusion concerns the specified response-surface loss, not an arbitrary functional requiring density weighting.
+
+\section{Matching lower bounds for fixed sparsity}
+We give the constructions to delimit the scope of sharpness. Restrict to uniform independent treatment and covariates, with $Y\in\{-1,1\}$ having conditional mean $m$. This is a subclass of the stated experiment, realizable through an independent uniform latent variable and the threshold $\Prb(Y=1\mid w,x)=(1+m(w,x))/2$.
+
+First fix an active set of size $r$. Place disjoint scaled smooth bumps on a grid of cells of width $h$ within $I^r\times[0,1]^d$. Give each bump independently either coefficient zero or $c h^\beta$, where $c>0$ is small. Their disjoint supports and fixed smooth shape make all resulting surfaces members of the H\"older ball with absolute value at most $1/2$. There are $M\asymp h^{-(r+d)}$ bumps. Adjacent bit vectors differ on one cell; their squared normalized target distance is at least $c_1h^{2\beta+r+d}$. Their one-observation Bernoulli KL is at most $c_2h^{2\beta+r+d}$, since success probabilities stay bounded away from zero and one.
+
+Choose $h\asymp n^{-1/(2\beta+r+d)}$ with small amplitude so the $n$-sample adjacent KL is at most $1/8$. Pinsker's inequality then bounds adjacent total variation by $1/4$. Any estimator can be decoded to the closer bump choice separately on each cell. An erroneous bit requires squared error at least one quarter of the cell's squared separation, by the triangle inequality. For each adjacent pair, the sum of testing errors is at least $1-\operatorname{TV}\ge3/4$. Averaging over all bit vectors and summing cells gives minimax risk at least
+\[
+ cMh^{2\beta+r+d}=c n^{-2\beta/(2\beta+r+d)}. \tag{6}
+\]
+These bump arguments integrate unused treatment coordinates under (1), so their constants depend on $r$ and $\delta$, not on $k$.
+
+For coordinate selection, use $k$ alternatives $m_j(w,x)=a(w_j-1/2)$. They belong to the class for sufficiently small $a$ and use only one active coordinate. Under the normalized interior loss, distinct alternatives have squared distance $a^2q^2/6$. Their KL relative to the zero-mean model is at most $Cna^2$. Choose $a^2=c\min\{1,\log k/n\}$. For $k$ above a fixed constant, the entropy testing bound gives a classification error bounded away from zero: if the alternative index is uniform, its entropy is $\log k$, information from the data is at most $Cna^2$, and an error probability $p_e$ must satisfy $\log k\le Cna^2+\log2+p_e\log k$. Small $c$ makes $p_e$ bounded below. Decoding by the closest surface converts this to risk at least $c\min\{1,\log k/n\}$. For bounded $k$ this term is absorbed by (6).
+
+For fixed $r\ge1$, $\log K_{k,r}$ and $\log k$ have comparable growth with constants depending on $r$. Combining the two lower bounds, using that maximum and sum differ by at most a factor two, matches (5):
+\[
+ \mathcal R_{n,T}\asymp
+ \min\left\{1, n^{-2\beta/(2\beta+r+d)}+
+                          \frac{\log K_{k,r}}n\right\}. \tag{7}
+\]
+The unnormalized minimax risk is exactly $q^k\mathcal R_{n,T}$, because the loss itself is multiplied by that known constant.
+
+\section{Remaining scope and consistency}
+For fixed positive $r,d$ and $0<\beta\le1$, normalized consistency holds exactly when $\log k=o(n)$ as $n\to\infty$. The proof shows that an unknown full-dimensional assignment density does not necessarily reintroduce its ambient smoothness dimension into this target. Computational feasibility is unresolved: the finite sieve may enumerate an enormous number of subsets and tables.
+
+The full catalogue asks for growing $r_n$, more general $\beta$, and sharp dependence on nuisance and dimension constants. Our constants, including $q^{-2r}$ and covering constants, are not uniform in growing sparsity; (7) must not be extrapolated to that regime. Higher smoothness requires polynomial rather than constant sieves and careful uniform entropy control. Weakening positivity can also invalidate (4). The raw-loss normalization issue applies independently of these unresolved extensions and should be addressed before interpreting growing-dimensional consistency as scientific progress.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.3.3. \url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}. The checked primary text motivates new treatment structures. The fixed-sparsity rate is proved here using elementary covering and testing arguments; no novelty priority over sparse nonparametric regression literature is claimed.
+\end{thebibliography}
+
+\end{document}

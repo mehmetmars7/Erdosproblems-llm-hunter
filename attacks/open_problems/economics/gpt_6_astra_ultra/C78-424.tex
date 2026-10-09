@@ -1,0 +1,136 @@
+% ECONOMICS_PROBLEM: {"id": "C78-424", "title": "Efficient Birkhoff representation of two-sided robust stable matchings", "jel_code": "C78", "source_id": "OP-0198"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newcommand{\R}{\mathbb R}
+\title{Computing robust Birkhoff generators through coordinate faces}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C78-424}. \textbf{Status:} Solved for the precise finite algorithmic question in the catalogue, using the cited robust-polytope integrality theorem. The construction below is a proposed deduction from that theorem and the stated sublattice property; its publication novelty has not been established.
+
+\section{Target and orientation}
+There are $n$ workers and $n$ firms, strict complete preferences $A,B$, and at most one changed worker list and at most one changed firm list. Write
+\[
+ \mathcal R=\mathcal M_A\cap\mathcal M_B,
+ \qquad r_w(f)=\text{position of }f\text{ in worker }w\text{'s list in }A.
+\]
+Position one is best. Consequently $\mu\le_A\nu$ means
+$r_w(\mu(w))\le r_w(\nu(w))$ for every worker. The worker-optimal matching is the \emph{bottom} of this order. Meet takes coordinatewise minimum ranks; join takes coordinatewise maximum ranks. We keep this convention throughout, even when a source uses different top/bottom names.
+
+Two established inputs are used. First, nonempty $\mathcal R$ is a distributive sublattice with these coordinate operations, as in the catalogue. Second, Theorem 12 of \cite{source} gives integrality of the simultaneous stability polytope when at most one worker changes preferences; any number of firm lists may change. This includes the present regime. The source's Remark 16 nevertheless asks for an efficient Birkhoff poset in the one-worker, one-firm regime. The argument here uses coordinate faces of its integral polytope to compute all join-irreducibles directly. It does not enumerate all matchings.
+
+For clarity, the polytope $Q$ has variables $x_{wf}\ge0$, row and column sums one, and, for $C=A,B$, the constraints
+\[
+ x_{wf}+\sum_{f'\succ_w^C f}x_{wf'}+
+             \sum_{w'\succ_f^C w}x_{w'f}\ge1
+ \quad(w\in W,f\in F).                                      \tag{1}
+\]
+For an integral matching, (1) is precisely absence of the blocking pair $(w,f)$. It is the row-sum rearrangement of LP (2) in the cited source. Thus the integral vertices are exactly jointly stable matchings, and the cited theorem says
+\[
+ Q=\operatorname{conv}\{\mathbf 1_\mu:\mu\in\mathcal R\}.    \tag{2}
+\]
+In particular $Q$ is empty exactly when $\mathcal R$ is empty. All data in (1) are integers of absolute value at most one.
+
+\section{A general lemma for sublattices of products of chains}
+The essential construction is not specific to rotations. Let
+$L\subseteq\prod_{i=1}^d\{1,\ldots,m_i\}$ be a nonempty finite family closed under coordinatewise minimum and maximum, with bottom $b$. For a coordinate $i$ and integer threshold $t$, put
+\[
+ L_{i,t}=\{x\in L:x_i\ge t\}.
+\]
+When this set is nonempty, define $q_{i,t}=\bigwedge L_{i,t}$, its coordinatewise minimum. Closure and finiteness put $q_{i,t}$ in $L_{i,t}$. In particular it is the least element satisfying that threshold.
+
+\begin{lemma}[Threshold minima are exactly the join-irreducibles]
+After repetitions and occurrences of $b$ are removed, the elements $q_{i,t}$ are exactly the join-irreducible elements of $L$. Here $q\ne b$ is join-irreducible if $q=u\vee v$ implies $q=u$ or $q=v$.
+\end{lemma}
+\begin{proof}
+Suppose $q=q_{i,t}=u\vee v$. Since $q_i=\max(u_i,v_i)\ge t$, at least one of $u,v$, say $u$, belongs to $L_{i,t}$. Minimality gives $q\le u$, while $u\le u\vee v=q$. Hence $u=q$. Every nonbottom threshold minimum is therefore join-irreducible.
+
+For arbitrary $x\in L$, every $L_{i,x_i}$ is nonempty because it contains $x$. Thus $q_{i,x_i}\le x$. Their join $z$ is at most $x$, but its $i$th coordinate is at least $(q_{i,x_i})_i\ge x_i$. Hence
+\[
+ x=\bigvee_{i=1}^d q_{i,x_i}.                              \tag{3}
+\]
+If $x$ is nonbottom and join-irreducible, applying its defining property repeatedly to the finite join (3) shows that $x$ equals one of its factors. This proves the reverse inclusion.
+\end{proof}
+
+The lemma also bounds the number of join-irreducibles by
+$\sum_i(m_i-1)$: thresholds $t=1$ always return $b$. It does not require the sublattice to contain the ambient product's bottom or top. That distinction matters for robust matchings, whose extreme matchings need not be the extreme matchings of $\mathcal M_A$.
+
+\section{Computing every threshold minimum by linear programming}
+Run feasibility for (1). If infeasible, report no robust matching. Otherwise minimize
+\[
+ c(x)=\sum_{w,f}r_w(f)x_{wf}                               \tag{4}
+\]
+over $Q$ to obtain the robust bottom $b$. For each $w$ and $t=2,\ldots,n$, define
+\[
+ Q_{w,t}=\{x\in Q:x_{wf}=0\text{ whenever }r_w(f)<t\}.      \tag{5}
+\]
+If nonempty, minimize the same objective (4) over (5), recording the resulting matching $q_{w,t}$.
+
+\begin{lemma}[The LP optimizer is the required lattice minimum]
+Every nonempty $Q_{w,t}$ is an integral face of $Q$. Its unique optimizer in (4) is the incidence vector of $\bigwedge\mathcal R_{w,t}$, where
+$\mathcal R_{w,t}=\{\mu\in\mathcal R:r_w(\mu(w))\ge t\}$.
+The unconstrained optimizer similarly gives the robust bottom.
+\end{lemma}
+\begin{proof}
+All coordinates of $Q$ are nonnegative, so imposing selected zero coordinates intersects supporting hyperplanes. The result is a face; it may be empty. More explicitly, in any convex decomposition from (2), a zero coordinate forces that coordinate to be zero in every matching receiving positive weight. Therefore
+\[
+ Q_{w,t}=\operatorname{conv}\{\mathbf1_\mu:
+                                   \mu\in\mathcal R_{w,t}\}.
+\]
+This proves both the face claim and integrality without applying an integrality theorem to a newly modified preference instance.
+
+The finite family $\mathcal R_{w,t}$ is closed under meet, because the minimum of two ranks each at least $t$ remains at least $t$. Its meet $q$ belongs to the family and has every worker's rank no larger than that worker's rank in any other member. For another member $\nu\ne q$, strict preferences imply that some worker's rank is strictly larger. Consequently $c(\mathbf1_\nu)>c(\mathbf1_q)$. Any fractional feasible point is a convex combination of these integral matchings; unless it equals $\mathbf1_q$, its objective is strictly larger. This proves uniqueness over the entire face. The same argument applies to all of $\mathcal R$.
+\end{proof}
+
+It would be incorrect to replace (5) by the inequality
+$\sum_f r_w(f)x_{wf}\ge t$: that cuts on an \emph{average} rank and need not define a face. The explicit zero coordinates are what make the argument work.
+
+\section{Poset and effective conversions}
+Let $P$ be the distinct recorded matchings other than $b$, ordered by $\le_A$. The preceding lemmas show that $P$ is exactly the poset of nonbottom join-irreducibles of $\mathcal R$, with at most $n(n-1)$ elements. Store each as its list of $n$ partners, and determine comparisons by rank lookup.
+
+For an ideal $D\subseteq P$, output
+\[
+ \Phi(D)=\bigvee_{q\in D}q,\qquad\Phi(\varnothing)=b.       \tag{6}
+\]
+The partner of each worker is the worst-ranked among that worker's partners in the selected matchings, or the bottom partner for an empty ideal. Sublattice closure guarantees this coordinate selection is a perfect robust matching. For $\mu\in\mathcal R$, output
+\[
+ \Psi(\mu)=\{q\in P:q\le_A\mu\}.                         \tag{7}
+\]
+This is an ideal by transitivity.
+
+\begin{theorem}[Polynomial effective Birkhoff representation]
+The described algorithm either correctly reports $\mathcal R=\varnothing$ or produces a polynomial-size poset whose ideals are effectively lattice-isomorphic to $(\mathcal R,\le_A)$. Both conversions are polynomial time, with meet corresponding to intersection and join to union.
+\end{theorem}
+\begin{proof}
+Equation (3) gives $\Phi(\Psi(\mu))=\mu$. To prove the other direction, use distributivity to show that a join-irreducible $q$ is join-prime: if $q\le u\vee v$, then
+\[
+ q=q\wedge(u\vee v)=(q\wedge u)\vee(q\wedge v),
+\]
+so join-irreducibility implies $q\le u$ or $q\le v$. Repeating over a finite join, $q\le\Phi(D)$ implies $q\le d$ for some $d\in D$, except that for $D=\varnothing$ no nonbottom $q$ lies below $b$. Since $D$ is an ideal, $q\in D$. The converse inclusion is immediate, giving $\Psi(\Phi(D))=D$. The same join-prime argument gives $\Psi(\mu\vee\nu)=\Psi(\mu)\cup\Psi(\nu)$; the meet identity follows directly from the order.
+
+There are $1+n(n-1)$ optimization problems after the feasibility check. Each has $n^2$ variables, $O(n^2)$ constraints and coefficient bit length $O(\log n)$, including objective (4). Rational linear programming is polynomial in this encoding. The optimum is unique and integral, so exact rational optimization returns its incidence vector; no exponentially small perturbation, unspecified real arithmetic, or enumeration of vertices is needed. Comparing all stored matchings and checking an input ideal require polynomially many rank comparisons. The explicit comparison relation has $O(n^4)$ entries; transitive reduction, if desired, is also polynomial. Equations (6)--(7) take $O(n|P|)$ rank comparisons. All claimed output and conversion bounds follow.
+\end{proof}
+
+\section{Boundary checks and scope}
+For $n=1$, the feasible set consists of its sole matching, $P$ is empty, and its single ideal maps to that matching. If the robust lattice is a singleton for larger $n$, every feasible threshold minimum equals $b$, so the same empty-poset representation is returned. If the lattice is a chain, thresholds may produce duplicates, which must be removed; one distinct generator remains for each nonbottom chain element. In a diamond, incomparable generators stay incomparable, and their joint ideal maps to their coordinatewise join.
+
+As a concrete two-worker check, take both workers to rank their own-index firm first, and both firms to rank the other-index worker first. The two stable matchings are $b=(f_1,f_2)$ and $q=(f_2,f_1)$. Both threshold-$2$ problems produce $q$. Removing the duplicate gives one poset element, whose two ideals yield exactly the two stable matchings. When a changed list eliminates one of these matchings, the construction either leaves the appropriate singleton lattice or detects infeasibility; it does not retain the old ambient bottom by assumption.
+
+An additional finite computational check enumerated all 144 ordered pairs of two-worker preference profiles satisfying the one-changed-list-per-side restriction; 104 had nonempty robust sets. It also checked 400 random three-worker pairs, 250 four-worker pairs and 100 five-worker pairs, with respectively 254, 151 and 44 nonempty robust sets (pseudorandom seed 4242026). Each random pair began with independently uniform preference permutations, then independently selected one worker and one firm and replaced each selected list by a uniform permutation. For each pair, every perfect matching was enumerated and tested for stability in both profiles. The threshold minima were compared with the definition of join-irreducibility by testing every pair of robust matchings; all ideals of the resulting small poset were then checked against both conversion formulas. All checks passed. These finite checks validate the generator and conversion implementation on the listed instances; they are not a replacement for the general proof or a numerical test of LP integrality.
+
+The result uses the strong integrality theorem for the simultaneous polytope, not merely polynomial-time existence of one robust matching. A general membership oracle would not provide the threshold minima. Conversely, the same proof applies whenever an explicitly described integral matching polytope and the stated coordinate sublattice structure are available, including the cited one-changed-worker regime with multiple changed firms. No analogous claim follows in regimes where either hypothesis fails. The precise catalogue question has no remaining algorithmic gap under its hypotheses and the cited integrality result; independent review of the deduction is appropriate because the cited source explicitly lists the representation as open.
+
+\begin{thebibliography}{9}
+\bibitem{source} R. R. Gangam, T. Mai, N. Raju and V. V. Vazirani, \emph{Stable Matching: Dealing with Changes in Preferences}, arXiv:2304.02590v3 (21 December 2025). Section 4.3, LP (2), Lemma 7 and Theorem 12 supply the simultaneous-polytope integrality input; Section 4.4, Remark 16 states the representation question. \url{https://arxiv.org/html/2304.02590v3}. The coordinate-face construction and proof above are the deduction attempted here.
+\end{thebibliography}
+\end{document}

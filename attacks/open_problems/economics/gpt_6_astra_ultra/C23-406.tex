@@ -1,0 +1,155 @@
+% ECONOMICS_PROBLEM: {"id": "C23-406", "title": "Staggered adoption with dynamic heterogeneous effects", "jel_code": "C23", "source_id": "OP-0107"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\title{Staggered adoption with dynamic heterogeneous effects}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and scope}
+This attempt separates the established absorbing-adoption comparison from the
+harder announced-history problem with reversals and spillovers. It derives a
+sharp cumulative-trend sensitivity interval for one cohort, a valid simultaneous
+confidence construction, and an explicit nonidentification example for treatment
+reversal. No pretrend diagnostic is treated as proof of an unobserved trend.
+
+\section*{An uncontaminated comparison with anticipation}
+Fix cohort $G=g$, anticipation horizon $a$, and outcome date $t\ge g$.
+Assume $b=g-a-1\ge1$ is observed. Use a fixed comparison group
+$C=\{G>t+a\}$ (including never treated) so its observations through $t$ have
+neither own treatment nor permitted anticipation. Work without covariates first.
+Let $Y_s^0$ be never-treated potential outcomes, and assume no anticipation
+before $g-a$ for the treated cohort. Define
+\[
+ d_{g,t}=\E[Y_t-Y_b\mid G=g]-\E[Y_t-Y_b\mid C].
+\]
+For $s=b+1,\ldots,t$ let the untreated one-period trend difference be
+\[
+ \gamma_{g,s}=\E[Y_s^0-Y_{s-1}^0\mid G=g]
+              -\E[Y_s^0-Y_{s-1}^0\mid C].
+\]
+By consistency and uncontaminated baselines,
+\[
+ d_{g,t}=\operatorname{ATT}(g,t)+\sum_{s=b+1}^t\gamma_{g,s}. \tag{1}
+\]
+This is an algebraic identity; equality of trends is an extra restriction.
+Using a cohort treated before $t+a$ would generally break the identity because
+its observed endpoint includes its own response or anticipation.
+
+\begin{theorem}[Sharp one-cohort sensitivity interval]
+Suppose potential outcomes have finite means but no support bound, and impose
+only the supplied restrictions $|\gamma_{g,s}|\le\delta_{g,s}$ on missing
+untreated outcomes after $b$. Then, at a compatible observed law,
+\[
+ \operatorname{ATT}(g,t)\in
+ [d_{g,t}-\Delta_{g,t},d_{g,t}+\Delta_{g,t}],\qquad
+ \Delta_{g,t}=\sum_{s=b+1}^t\delta_{g,s},                 \tag{2}
+\]
+and this interval is sharp.
+\end{theorem}
+\begin{proof}
+Necessity follows by (1) and the triangle inequality. For any vector of trend
+violations inside the box, start at each cohort unit's observed $Y_b^0=Y_b$.
+After $b$, recursively assign its unobserved $Y_s^0$ a common increment equal
+to the comparison group's mean untreated increment plus $\gamma_{g,s}$.
+Keep the actual cohort-regime outcomes equal to their observed values.
+This preserves the full observed panel law, imposes exactly the chosen mean
+trend violations, and violates no post-$b$ no-anticipation restriction because
+$b+1=g-a$. Fill other unobserved regimes arbitrarily. Every number in (2) is
+obtained by varying the sum continuously over its full box range.
+\end{proof}
+If potential outcomes are bounded, this construction can leave their support;
+intersecting (2) with crude effect bounds is valid but need not be sharp.
+Sharp bounds then require a joint feasible-potential-outcome program. Likewise,
+multiple cohorts sharing potential outcomes or restrictions cannot automatically
+be assigned independent endpoint violations.
+
+For prespecified weights $\omega_{g,t}\ge0$ summing to one, aggregation gives
+the valid interval with center $\sum\omega_{g,t}d_{g,t}$ and radius
+$\sum\omega_{g,t}\Delta_{g,t}$. Sharpness of that aggregate requires simultaneous
+attainability of its endpoints, a property explicitly proved for independent
+missing-mean boxes but not asserted for arbitrary histories. For example, one
+cohort with two post-baseline increments each bounded by $0.03$ and observed
+$d=0.10$ gives $[0.04,0.16]$. Doubling the number of unrestricted increments
+doubles the worst-case sensitivity radius.
+
+\section*{Honest sampling uncertainty for a bounded observed panel}
+For inference now additionally assume observed $Y_s\in[0,1]$, independent units,
+and use fixed positive group sample sizes $n_g,n_C$. Differences $Y_t-Y_b$
+lie in $[-1,1]$. For $K$ declared cohort-time comparisons, let each of the
+at most $2K$ sample mean errors have bound
+\[
+ r(n)=\sqrt{\frac{2\log(4K/\alpha)}{n}}.
+\]
+Hoeffding's inequality gives failure probability at most $\alpha/(2K)$ per
+mean. Reusing a comparison group across cells introduces dependence but a union
+bound remains valid. With probability at least $1-\alpha$, every $d_{g,t}$ lies
+within $r(n_g)+r(n_C)$ of its sample analogue. Expanding each interval (2) by
+this amount therefore covers every compatible ATT, and the weighted interval
+covers every compatible weighted target, uniformly over the stated bounded
+independent-unit class. Conditional group sampling or conditioning on group
+labels justifies the fixed sizes; empty groups yield no finite estimate.
+This is a conservative finite-sample statement. It makes no Gaussian or
+large-cluster approximation. Serial dependence within one unit is already
+included in its bounded difference, while dependence across units is excluded.
+
+With covariates, conditional comparisons require overlap and standardization
+to the treated cohort's baseline covariate distribution. Averaging untreated
+changes over the raw control distribution does not generally identify the
+standardized contrast. Bounds on a fitted propensity or regression introduce
+additional uncertainty absent from the simple formula above.
+
+\section*{Why reversal needs fresh support}
+Take $T=3$, all units observed with regime $d=(0,1,1)$ and no anticipation.
+Suppose all observed outcomes are zero. Construct model A with all potential
+outcomes zero and model B identical except
+$Y_3(0,1,0)=1$. They have the same entire observed law and the same untreated
+outcomes and pretrends. Yet the date-three contrast between keeping treatment
+and reversing it is zero in A and $-1$ in B. This remains true if many never
+treated controls are added with identically zero outcomes. Parallel trends for
+never-treated outcomes do not restrict the response to an unobserved reversal.
+
+A sufficient alternative for $a=0$ uses histories explicitly. Let $H_s$ contain
+past treatment, exposures, covariates and outcomes before assignment at $s$.
+Under consistency, positivity for each intended history, and sequential
+exchangeability of treatment/exposure assignment given $H_s$, the distribution
+under a fixed regime is the product of observed conditional transition laws,
+with each treatment/exposure argument replaced by the regime. Iterated
+conditioning proves this g-computation formula step by step. Anticipation
+$a>0$ requires information on announcements and future intended assignments in
+the state; conditioning only on past realized treatment is insufficient.
+Spatial interference similarly requires cluster assignments or a defended
+exposure map and its support. These stronger assumptions are not consequences
+of the DiD trend restriction.
+
+\section*{What remains unresolved}
+The one-cohort interval supplies a precise sensitivity answer under a declared
+class, including a sharpness construction. It does not identify arbitrary
+announced treatment histories. The broader target still needs credible
+exposure/announcement measurements, support, and dependence assumptions, and
+potentially coupled bounds that respect outcome support. Established staggered
+adoption estimators should not be relabeled as new solutions.
+\begin{thebibliography}{9}
+\bibitem{source} B. Callaway and P. H. C. Sant'Anna,
+\emph{Difference-in-Differences with Multiple Time Periods}, author version
+arXiv:1803.09015v4 (2020), journal publication 2021.
+\url{https://arxiv.org/abs/1803.09015v4}.
+This is context for group-time identification and aggregation. The restricted
+sensitivity calculation and reversal counterexample above are self-contained.
+\end{thebibliography}
+
+\end{document}
