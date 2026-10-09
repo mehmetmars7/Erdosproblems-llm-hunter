@@ -1,0 +1,97 @@
+% ECONOMICS_PROBLEM: {"id": "I22-533", "title": "Effective uses of school funding", "jel_code": "I22", "source_id": "OP-0452"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\title{School-funding allocation: identification, capacity and decision regret}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{I22-533}. \textbf{Status: Unresolved.} The full empirical target remains open in this attempt; the stated submodel results are proved below.
+
+\section{A response surface must precede optimization}
+The target is the best use of additional annual funding per baseline pupil, repeated for five years, with a fixed learning-and-attainment index. Write $F(x)=\E[Y_i(x)-Y_i(0)]$ for that fixed cohort and horizon. School context, local fiscal substitution and teacher recruitment spillovers are part of the intervention definition. Handel and Hanushek's review motivates the concern that funding effects from convenient settings need not transport to a new allocation problem \cite{hh}. Neither the source nor the present calculation supplies the unknown statewide response surface.
+
+A simple exact nonidentification argument shows why total funding effects are insufficient. Suppose two feasible uses have the common response form
+\[
+ F_a(x)=a_1x_1+a_2x_2-\tfrac12(x_1^2+x_2^2).
+\]
+All observed reforms spend in the fixed proportions $x=(b/2,b/2)$. The two coefficient vectors $a=(2,0)$ and $a'=(0,2)$ then imply the same effect $b-b^2/4$ for every observed budget, even if this entire dose response is known exactly. They can share the same additive outcome-noise law, so the full observed response law agrees. At budget $b=1$, however, their unique optima are respectively $(1,0)$ and $(0,1)$. To verify the first, substitute $x_2=1-x_1$: the derivative is $3-2x_1>0$ throughout $[0,1]$. The second follows by symmetry. Infinite data on one spending ray therefore do not identify allocation across uses.
+
+\section{An exactly solved capacity-constrained submodel}
+Assume instead that data or maintained restrictions identify
+\[
+ F(x)=\sum_{j=1}^J\left(a_jx_j-\tfrac12c_jx_j^2\right),
+ \quad c_j>0,\quad 0\le x_j\le u_j,\quad \sum_jx_j=b,   \tag{1}
+\]
+where finite staffing/procurement capacities satisfy $\sum_j u_j\ge b>0$. The separability is substantive: it excludes complementarity between facilities and instruction or displacement of teachers across districts. Coefficients incorporate the fixed five-year treatment and outcome horizon, not a one-year effect silently repeated five times.
+
+\begin{proposition}[Capacity water filling]
+There is a multiplier $\lambda$ such that
+\[
+ x_j^*=\min\{u_j,\max\{0,(a_j-\lambda)/c_j\}\},\qquad
+ \sum_jx_j^*=b.                                      \tag{2}
+\]
+The resulting allocation is the unique maximizer of (1).
+\end{proposition}
+\begin{proof}
+The sum in (2) is continuous and nonincreasing in $\lambda$, equals zero for sufficiently large $\lambda$, and equals $\sum_j u_j$ for sufficiently negative $\lambda$. The intermediate value theorem gives the required sum, including the full-capacity endpoint. At an interior coordinate the derivative $a_j-c_jx_j^*$ is $\lambda$. At a zero coordinate with positive capacity it is at most $\lambda$, and at a positive capacity coordinate it is at least $\lambda$. Coordinates with $u_j=0$ cannot move and contribute zero to the comparison below. Thus for every feasible $x$,
+\[
+ \sum_j(a_j-c_jx_j^*)(x_j-x_j^*)\le
+ \lambda\sum_j(x_j-x_j^*)=0.
+\]
+Concavity bounds $F(x)-F(x^*)$ above by this expression. Strict concavity, since every $c_j>0$, makes the optimizer unique even if a nonunique multiplier lies in a flat portion of the sum map.
+\end{proof}
+
+For a worked check take $a=(3,2)$, $c=(1,1)$, capacities $(1,3)$ and $b=2$. Formula (2) gives $\lambda=1$ and $x^*=(1,1)$: the first use hits capacity, and the second marginal return is one. The first marginal return is two, which correctly exceeds the multiplier because additional first-use spending is infeasible. Ignoring capacity would prescribe $(1.5,0.5)$, an unavailable allocation.
+
+Randomized packages can identify a parametric response only when their feature matrix has sufficient rank. Under (1), the regression features are $(x_1,\ldots,x_J,x_1^2,\ldots,x_J^2)$, with a baseline intercept if needed. Positive assignment probabilities and full column rank of the population feature second moment identify coefficients under mean-zero treatment-independent errors. If all packages have the same budget, adding a common constant to every $a_j$ changes effects by the same amount on that simplex; an intercept can absorb it, although the optimizer at that budget is unchanged. Observing only a few packages never identifies unrestricted interpolation between them.
+
+\section{Indivisible packages and error certificates}
+For an integer-capacity variant, let use $j$ have a finite menu of options $l\in L_j$, integer cost $k_{jl}\ge0$, and known incremental value $g_{jl}$. Include a zero option. If values add and options do not interfere, define $V_0(0)=0$ and $V_0(k)=-\infty$ otherwise. For exact budget $B$ the recursion
+\[
+ V_j(k)=\max_{l\in L_j:\,k_{jl}\le k}
+          \{V_{j-1}(k-k_{jl})+g_{jl}\}                \tag{3}
+\]
+returns the optimum as $V_J(B)$ whenever a feasible exact-cost package exists. The proof is induction: any feasible package uses one final option and an optimal or inferior prefix, while every feasible term constructs a package. If unspent funding is allowed, maximize $V_J(k)$ over $k\le B$. The runtime is proportional to $B\sum_j|L_j|$, polynomial in the numerical budget but not necessarily its bit length. Complementarities require an expanded state or a different finite optimization; (3) is not valid merely because packages have integer costs.
+
+The connection from estimation to policy is especially simple under uniform error. Let $\mathcal X_b$ be the actual feasible set and suppose
+$\sup_{x\in\mathcal X_b}|\widehat F(x)-F(x)|\le\epsilon$.
+If $\widehat x$ maximizes $\widehat F$ and $x^*$ maximizes $F$, then
+\[
+ F(x^*)-F(\widehat x)
+ \le [F(x^*)-\widehat F(x^*)]
+     +[\widehat F(\widehat x)-F(\widehat x)]\le2\epsilon. \tag{4}
+\]
+An optimization tolerance $\zeta$ adds $\zeta$. Thus a credible simultaneous response band yields a decision-regret certificate; pointwise standard errors at the selected optimum do not establish its premise.
+
+\section{Transport and what is still missing}
+Suppose a separately declared target district population assigns mass $1-q$ to contexts represented in the trial. Under conditional response invariance, their integrated treatment effect is an identified quantity $\theta_{\rm rep}$, using target weights without renormalizing. If outcomes are scaled to $[0,1]$, no-assumption contributions from the unrepresented mass lie in $[-q,q]$, giving
+\[
+ \theta_T\in[\theta_{\rm rep}-q,\theta_{\rm rep}+q].    \tag{5}
+\]
+Endpoints are attained by setting all missing-context treated/baseline outcomes to $(0,1)$ or $(1,0)$; hence the bound is sharp absent further cross-context restrictions. This bound concerns a fixed package contrast. Optimizing across packages requires joint restrictions or uniform bands for their whole response collection.
+
+Actual school spending may substitute for local funds, face staffing constraints, or recruit teachers away from other eligible schools. The intervention must specify net resources and the geographic scope of these effects before (1) or (5) has the intended meaning. No package experiment, coefficient estimates or target context distribution is available here. The counterexample proves an identification obstacle and (2)--(5) solve restricted optimization and inference steps; they do not identify the empirically effective uses of funding in the catalogue population.
+
+\begin{thebibliography}{9}
+\bibitem{hh} D. V. Handel and E. A. Hanushek (2024), \emph{Contexts of Convenience: Generalizing from Published Evaluations of School Finance Policies}, Evaluation Review 48(3), 461--494. \href{https://www.hanushek.net/publications/contexts-convenience-generalizing-published-evaluations-school-finance-policies-1}{Author record and abstract}. The source supplies agenda context; the allocation, counterexample and bounds here are self-contained illustrations.
+\end{thebibliography}
+
+\end{document}
