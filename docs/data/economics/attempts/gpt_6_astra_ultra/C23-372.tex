@@ -1,0 +1,98 @@
+% ECONOMICS_PROBLEM: {"id": "C23-372", "title": "Synthetic-control inference with few treated units", "jel_code": "C23", "source_id": "OP-0106"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Synthetic-control inference with few treated units: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The target is honest uncertainty for a realized post-treatment effect with one treated unit, including counterfactual approximation and unpredictable shocks. This attempt proves a finite-sample prediction interval under conditional sub-Gaussian residuals, explains when its diameter shrinks, and gives a two-model nonidentification bound when post-treatment latent structure is unrestricted. It also states a separate valid randomization procedure. These results do not cover the catalogue's full class of dependent factor models and data-dependent donor searches.
+
+Synthetic difference-in-differences \cite{sdid} is an established estimator with stated factor-model asymptotic conditions; its primary publication abstract was inspected. The interval below is a deliberately narrower derivation, not an assertion that the established estimator automatically has finite-sample one-treated-unit coverage.
+
+\section*{A prediction model with explicit selection control}
+Write $H=T-T_0$ and let $\mathcal F_0$ contain all pretreatment observations and any donor-selection decisions. Choose nonnegative weights $w_j$ summing to one and an intercept $\widehat a$, all measurable with respect to $\mathcal F_0$. For post-treatment dates assume the true untreated gap obeys
+\[
+ Y_{1t}(0)-\widehat a-\sum_{j=2}^{N+1}w_jY_{jt}(0)=b_t+\xi_t,
+ \qquad \left|H^{-1}\sum_t b_t\right|\leq\Delta.       \tag{1}
+\]
+This bound includes intercept-estimation error and imperfect factor spanning. It is an assumption about the counterfactual post period, not a conclusion from pretreatment fit.
+
+Assume conditionally on $\mathcal F_0$, the errors have the joint average concentration property
+\[
+ \E\left[\exp\left\{s\sum_{t>T_0}\xi_t\right\}
+ \middle|\mathcal F_0\right]\leq
+ \exp\{s^2H\sigma^2/2\}\quad\text{for all }s\in\R.    \tag{2}
+\]
+Independent conditionally mean-zero sub-Gaussian errors with variance proxy $\sigma^2$ suffice. Martingale differences with uniformly bounded conditional moment generating functions also suffice by iteration. More general time dependence must change the right side, for example to an explicit variance proxy for the sum.
+
+Define the observed estimator
+\[
+ \widehat\theta=H^{-1}\sum_{t>T_0}
+ \left(Y_{1t}^{\rm obs}-\widehat a-\sum_jw_jY_{jt}^{\rm obs}\right).
+\]
+Under no donor spillovers and the catalogue's realized-effect target,
+$\widehat\theta-\theta=H^{-1}\sum_t(b_t+\xi_t)$ exactly. Outcome variation in treated potential outcomes is part of the realized target and cancels from this identity.
+
+\begin{proposition}[Conditional coverage]
+Under (1)--(2),
+\[
+ C=\left[\widehat\theta-\Delta-
+ \sigma\sqrt{\frac{2\log(2/\alpha)}H},\quad
+ \widehat\theta+\Delta+
+ \sigma\sqrt{\frac{2\log(2/\alpha)}H}\right]
+\]
+has coverage at least $1-\alpha$ conditionally on $\mathcal F_0$ and hence unconditionally.
+\end{proposition}
+\begin{proof}
+Apply the exponential Markov inequality to (2), optimize over positive $s$, and repeat for the negative tail. The resulting bound is
+$\Pr(|H^{-1}\sum_t\xi_t|>x\mid\mathcal F_0)\leq2\exp(-Hx^2/(2\sigma^2))$. Add the deterministic approximation bound and use the exact estimator-error identity.
+\end{proof}
+
+Pretreatment donor selection is covered only because (1)--(2) are required conditional on the entire selection information. They can fail if selected weights exploit persistent noise. One alternative is a prespecified finite family of $K$ candidate controls with valid unconditional tail bounds for each. A union bound with $\log(2K/\alpha)$ produces simultaneous intervals, after which any selection is valid. This pays explicitly for selection; it does not repair invalid individual counterfactual models.
+
+\section*{When more data help}
+The interval diameter is
+\[
+ 2\Delta+2\sigma\sqrt{2\log(2/\alpha)/H}.
+\]
+It tends to zero if $\Delta\to0$, $H\to\infty$, and the variance proxy stays bounded. Increasing $N$ can reduce donor noise and approximation error, but cannot remove an independent treated-unit innovation. For example, if post errors are $u_{1t}-\sum_jw_ju_{jt}$ with independent normal unit shocks of variance $s^2$, their variance is $s^2(1+\sum_jw_j^2)\geq s^2$. Even with infinitely many equal-weight donors, a fixed $H$ leaves treated counterfactual prediction noise of order $s/\sqrt H$.
+
+If residual shocks share a persistent common component $\xi_t=Z$, then $H^{-1}\sum_t\xi_t=Z$ and averaging never removes it. Formula (2) with a fixed $\sigma$ would be false; its variance proxy must grow proportionally to $H$. This example isolates why a weakly stated time-series assumption cannot support shrinking intervals.
+
+\section*{An exact nonidentification lower bound}
+Take all observed donor and treated outcomes to be zero. In model $m_0$, the treated untreated post outcomes are also zero, so $\theta_0=0$. In model $m_1$, set the treated untreated post outcomes to $a>0$ while keeping its treated outcomes zero, so $\theta_1=-a$. Both have zero pretreatment outcomes. The second model fits the factor form by using one treated loading equal to one, every donor loading zero, and a factor that is zero before treatment and $a$ afterwards. The first model uses the same loading and the zero factor.
+
+The observable laws are identical. For any possibly randomized confidence set with at least $1-\alpha$ coverage in both models, the common observable probability law satisfies
+\[
+ \Pr\{0\in C\text{ and }-a\in C\}\geq1-2\alpha.
+\]
+Hence its diameter is at least $a$ with probability at least $1-2\alpha$. If $a$ is unrestricted, no uniformly informative finite-width interval exists on this enlarged class. A factor-spanning or explicit approximation restriction excludes exactly this ambiguity; pretreatment fit alone does not.
+
+\section*{A distinct random-assignment guarantee}
+If the treated label was actually randomized with known assignment probabilities, a sharp null $Y_{it}(1)=Y_{it}(0)+\tau$ for every candidate unit and post date imputes every potential outcome under every assignment. Recompute the entire donor-selection and fitting procedure under each assignment, and compare its statistic with the observed one using the true design weights. The resulting randomization test is finite-sample valid; ties make it conservative unless randomized.
+
+Inverting these tests gives a confidence set for the constant sharp-effect parameter $\tau$. It is not automatically an interval for the treated unit's realized average effect under arbitrary heterogeneous effects. Nor can one manufacture the design by relabelling a country whose treatment was selected politically. Addressing weak dependence, growing donor dictionaries, model ambiguity and heterogeneous-effect randomization inference together remains the unresolved part of the catalogue question.
+\begin{thebibliography}{9}
+\bibitem{sdid} D. Arkhangelsky, S. Athey, D. A. Hirshberg, G. W. Imbens and S. Wager (2021), Synthetic Difference-in-Differences, American Economic Review 111(12), 4088--4118. Primary publisher abstract inspected:
+\url{https://www.aeaweb.org/articles?id=10.1257/aer.20190159}.
+\end{thebibliography}
+\end{document}

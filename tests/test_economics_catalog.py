@@ -418,6 +418,39 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertIn(r'\begin{proof}', source.read_text())
                 self.assertNotRegex(source.read_text(), r'/Users/|/private/tmp/|/home/|/mnt/data|TODO|proof omitted')
 
+    def test_opus_rank_351_to_400_batch_preserves_identities_and_downloads(self):
+        # Frozen IDs of the ranks 351--400 batch; later rank changes do not change its identity.
+        expected = '''J62-351 C78-352 C78-353 G12-354 F33-355 D74-356 D31-357 L13-358
+            D43-359 C55-360 R23-361 K42-362 Q51-363 G12-364 I18-365 C72-366 R38-367
+            C81-368 C78-369 O25-370 Q54-371 C23-372 C78-373 O17-374 E21-375 O34-376
+            H24-377 O31-378 D31-379 R23-380 F12-381 L13-382 C33-383 H24-384 D73-385
+            D82-386 C78-387 L94-388 D72-389 C31-390 C73-391 C78-392 I13-393 Q25-394
+            E52-395 D63-396 G11-397 Q52-398 F31-399 J23-400'''.split()
+        self.assertEqual(len(set(expected)), 50)
+        data = build_economics_data()
+        opus = {problem_id for problem_id, record in data.items()
+                if any(attack['model'] == 'Claude Opus 5.5 High' for attack in record['attacks'])}
+        self.assertEqual(opus, set(expected))
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attempts = [attack for attack in data[problem_id]['attacks']
+                            if attack['model'] == 'Claude Opus 5.5 High']
+                self.assertEqual(len(attempts), 1)
+                attack = attempts[0]
+                self.assertEqual(attack['version'], 1)
+                self.assertEqual(attack['status'], 'unresolved')
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                self.assertEqual(attack['date_posted'], '2026-10-09')
+                self.assertEqual(data[problem_id]['status'], 'open')
+                source = BASE_DIR / attack['file_path']
+                self.assertEqual(source.parent.name, 'opus_5.5_high')
+                self.assertEqual(source.name, problem_id + '.tex')
+                self.assertEqual(source.read_bytes(), (BASE_DIR / 'docs' / attack['download_url']).read_bytes())
+                public = source.read_text()
+                self.assertIn(r'\begin{proof}', public)
+                self.assertIn(r'\begin{thebibliography}', public)
+                self.assertNotRegex(public, r'/Users/|/private/tmp/|/home/|/mnt/data|TODO|proof omitted')
+
     def test_ultra_batch_preserves_problem_identity_and_public_downloads(self):
         data = build_economics_data()
         ultra = {problem_id: [attack for attack in record['attacks']

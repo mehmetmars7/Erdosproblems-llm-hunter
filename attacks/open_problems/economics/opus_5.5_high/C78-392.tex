@@ -1,0 +1,119 @@
+% ECONOMICS_PROBLEM: {"id": "C78-392", "title": "Parameterized reachability of allocations by improving swaps", "jel_code": "C78", "source_id": "OP-0551"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{Parameterized reachability of allocations by improving swaps: a mover kernel, interval structure and the one-swap case}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $D=\{a:M_0(a)\ne M_*(a)\}$ be the set of \emph{movers}. We prove that every legal sequence from $M_0$ to $M_*$ uses
+only swaps between adjacent movers. During the sequence, each mover holds only houses in its \emph{interval}
+$[M_0(a),M_*(a)]$ of its preference list. Consequences:
+(i) a polynomial kernel with at most $2k$ agents for the parameter $k$ = total swap budget;
+(ii) fixed-parameter tractability in $|D|$, in time $O(|D|!\,|D|^2)$, and in $k$;
+(iii) a polynomial algorithm when each agent may swap at most once, together with an exact characterisation;
+(iv) an $O^*(\prod_a|I_a|)$ algorithm, which is FPT in the combined parameter $(|D|,\lambda)$, where $\lambda$ is the maximum
+interval length, and which also bounds each agent's number of swaps by $|I_a|-1$.
+The source records polynomial time on trees. We leave treewidth $\ge2$, alone or combined with $\lambda$, open.
+\end{abstract}
+
+\section*{1. Movers and intervals}
+For a mover $a$, let $I_a=\{h:\ M_0(a)\preceq_a h\preceq_a M_*(a)\}$. For a non-mover, $I_a=\{M_0(a)\}$.
+\begin{lemma}[Mover lemma]\label{lem:mover}
+Let $M_0=N_0,N_1,\dots,N_s=M_*$ be a legal swap sequence. Then (a) every swap is between two adjacent agents of $D$;
+(b) $N_t(a)\in I_a$ for all $a,t$; (c) agent $a$ participates in at most $|I_a|-1$ swaps.
+\end{lemma}
+\begin{proof}
+Each participant strictly improves, and nobody else changes house. Hence $a$'s house sequence is non-decreasing in $\succ_a$
+and strictly increases at each of $a$'s swaps. If $a$ ever participates, then $N_s(a)\succ_aM_0(a)$, so $a\in D$; this gives (a).
+The sequence starts at $M_0(a)$, ends at $M_*(a)$ and never decreases; this gives (b). Each swap moves $a$ strictly up
+within $I_a$; this gives (c).
+\end{proof}
+
+\begin{corollary}[Kernel]\label{cor:kernel}
+For the problem ``reach $M_*$ with at most $k$ swaps'', answer \emph{no} if $|D|>2k$. Otherwise delete all non-movers and
+restrict lists to $\bigcup_{a\in D}I_a$. The result is an equivalent instance with at most $2k$ agents, $O(k^2)$ edges and
+lists of length at most $2k$.
+\end{corollary}
+\begin{proof}
+Each swap involves two agents, and every mover participates in some swap; so $|D|\le2s\le2k$. By the mover lemma, deleting
+non-movers loses no legal swap of any sequence reaching $M_*$. Restricting lists preserves the comparisons used by swaps
+whose houses lie in the intervals. Every house used lies in an interval, by (b).
+\end{proof}
+
+\begin{theorem}[FPT algorithms]\label{thm:fpt}
+$M_0\leadsto_GM_*$ is decidable in time $O(\Lambda\cdot|D|^2)$, where
+$\Lambda=\#\{\text{bijections }N:D\to M_0(D)\text{ with }N(a)\in I_a\}\le\min(|D|!,\prod_{a\in D}|I_a|)$.
+A witness sequence of minimum length is produced. In particular, the problem is FPT in $|D|$, in $k$, and in
+$(|D|,\lambda)$ with $\lambda=\max|I_a|$.
+\end{theorem}
+\begin{proof}
+By the mover lemma, run breadth-first search over the $\Lambda$ admissible allocations of $D$'s houses. From each state,
+try the at most $|D|^2$ adjacent mover pairs, keeping a swap if it is legal and stays admissible. Every legal path to $M_*$
+stays inside this graph, and conversely every path in it is legal.
+\end{proof}
+
+\section*{2. One swap per agent}
+\begin{proposition}\label{prop:one}
+Suppose each agent may participate in at most one swap. Then $M_0\leadsto M_*$ iff the permutation
+$\pi=M_0^{-1}\circ M_*$ on $D$ is a product of disjoint transpositions $(a\,b)$ with $ab\in F$,
+$M_0(b)\succ_aM_0(a)$ and $M_0(a)\succ_bM_0(b)$. This can be checked in linear time. If the cap is removed, $M_*$ with this
+structure is still reachable, by performing the transpositions in any order.
+\end{proposition}
+\begin{proof}
+With one swap each, mover $a$ swaps once and must receive $M_*(a)$ directly from its partner $b$. Then $M_*(a)=M_0(b)$ and
+$M_*(b)=M_0(a)$, so $\pi$ consists of such transpositions. Disjoint transpositions commute, and each is legal at $M_0$.
+\end{proof}
+
+\begin{remark}[Two swaps per agent]
+With a cap of two, a mover may pass through one intermediate house, and the order of swaps then matters. For example,
+on a triangle a 3-cycle of $\pi$ needs two transpositions in a specific order. We do not know whether the two-swap case
+is polynomial in general graphs. The BFS of Theorem~\ref{thm:fpt} runs in polynomial time when each agent's
+interval has at most $3$ houses \emph{and} the movers split into connected pieces of bounded size. Without the second
+condition the state space is exponential.
+\end{remark}
+
+\section*{3. Structural parameters}
+The source records polynomial time on trees, hence on paths and stars \cite{glw,ccm}. Proposition~\ref{prop:one} and
+Theorem~\ref{thm:fpt} are independent of graph structure. Two consequences are worth separating. First, the swap-budget
+parameter has a polynomial kernel (Corollary~\ref{cor:kernel}), so budget-constrained variants are never harder than
+their kernelised core. Second, $|D|$ dominates the budget: any yes-instance has $k\ge|D|/2$. For treewidth, we note that
+the intervals give a \emph{local} view: on a tree decomposition, a bag's state is the current house of each bag agent,
+from at most $\lambda^{w+1}$ possibilities. But legality depends on the global order of swaps across bags, so a
+standard DP over bags would have to synchronise time. We therefore do not obtain an algorithm FPT in $(w,\lambda)$, and
+we pose it as the central open question. Is $M_0\leadsto M_*$ FPT, or W[1]-hard, parameterized by treewidth plus maximum
+interval length?
+
+\section*{4. Summary of classification}
+\begin{center}
+\begin{tabular}{ll}
+Parameter & Status \\\hline
+total swaps $k$ & FPT, polynomial kernel ($\le2k$ agents) \\
+movers $|D|$ & FPT, $O(|D|!\,|D|^2)$ \\
+$(|D|,\lambda)$ & FPT, $O(\lambda^{|D|}|D|^2)$ \\
+at most 1 swap per agent & polynomial \\
+trees & polynomial \cite{glw} \\
+treewidth $\ge2$; treewidth $+\lambda$; max list length alone & open here
+\end{tabular}
+\end{center}
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh, D. F. Manlove, Selected open problems in Matching Under Preferences,
+\emph{Bull. EATCS} (2019), Section 3.1.3, Theorem 5, Table 2. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{glw} L. Gourv\`es, J. Lesca, A. Wilczynski, Object allocation via swaps along a social network, \emph{IJCAI}
+2017. \url{https://doi.org/10.24963/ijcai.2017/31}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,102 @@
+% ECONOMICS_PROBLEM: {"id": "C78-387", "title": "Popularity probability under uncertain house-allocation preferences", "jel_code": "C78", "source_id": "OP-0546"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Popularity probability under uncertain house-allocation preferences: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and outcome}
+\textbf{Status: partial; the two compact-encoding complexity classifications remain unresolved.}
+I give a polynomial popularity test, an exact polynomial algorithm for a listed joint lottery, counting and threshold upper bounds for the compact encodings, an exponential algorithm exploiting only comparisons with the fixed matching, and a polynomial additive approximation. I do not prove a counting-hardness reduction for either compact encoding. In particular, hardness of uncertain Pareto optimality or stability is not transferred without a reduction to popularity.
+
+The inspected Cechl\'arov\'a--Cseh--Manlove survey explicitly suggests extending uncertainty questions to popularity \cite{ccm}. Its classifications for other matching concepts are background rather than proofs of the present problem. Acceptable pairs are fixed throughout, and all matchings considered below use those pairs.
+
+\section*{Testing one realized preference profile}
+For each applicant $a$ and acceptable house $h$, define a vote weight relative to the fixed matching $M$:
+\[
+ v_a(h)=\begin{cases}1&h\succ_aM(a),\\0&h=M(a),\\-1&M(a)\succ_ah.\end{cases}
+\]
+Add a private dummy house $\bot_a$ representing unmatched status. Give it weight zero if $a$ is unmatched in $M$, and weight $-1$ otherwise. Dummies are private, so each applicant may always be assigned one. Real houses have capacity one. If $M(a)=\bot_a$, all acceptable real houses have weight $+1$.
+
+Find a maximum-weight assignment giving each applicant one real or private dummy house. For an assignment corresponding to matching $N$, its total weight is exactly
+\[
+ \sum_av_a(N(a))=\phi_P(N,M)-\phi_P(M,N).
+\]
+Because the assignment corresponding to $M$ has weight zero, the maximum is nonnegative. It equals zero exactly when $M$ is popular. This gives a polynomial-time test by a maximum-weight bipartite matching or min-cost-flow algorithm with integer weights in $\{-1,0,1\}$. It handles unmatched applicants and unused houses without assuming a perfect matching exists.
+
+The reduction also shows that, for a fixed $M$, only each applicant's partition of houses into better and worse than $M(a)$ matters. Relative order between two houses on the same side of $M(a)$ never changes any vote weight. Exploiting this observation can be much cheaper than expanding complete preference profiles.
+
+\section*{Explicit joint lotteries are polynomial}
+Suppose the input lists profiles $P_1,\ldots,P_L$ and rational probabilities $p_1,\ldots,p_L$. Compute popularity indicators $I_\ell$ using the assignment test and return
+\[
+ \pi(M)=\sum_{\ell=1}^Lp_\ell I_\ell.
+\]
+There are exactly $L$ polynomial tests. Rational arithmetic is also polynomial in the actual input length: a common denominator can be the product of the listed denominators, whose bit length is their summed bit length. Comparing the resulting fraction with the supplied binary rational threshold is then polynomial. An explicit joint lottery is therefore a fully solved cell of the requested classification, not a compact uncertainty model disguised by support expansion.
+
+\section*{Independent listed lotteries: exact upper bounds}
+For applicant $a$, let there be $k_a$ listed strict orders with rational probabilities. Choose a common positive denominator $D_a$ and integer weights $n_{aj}$ summing to $D_a$. The exact probability has the form
+\[
+ \pi(M)=\frac{F(I,M)}{D},\qquad D=\prod_aD_a,
+\]
+where $F$ counts tuples of integer tickets $t_a\in\{0,\ldots,D_a-1\}$ whose induced preference profile makes $M$ popular. Each ticket determines an order by cumulative-weight intervals. The sum of binary ticket lengths is polynomial in the input length, and the final popularity test is polynomial. A nondeterministic machine guesses the ticket bits, rejects out-of-range guesses, and accepts exactly the popular tuples. Thus $F$ is a \#P function and the denominator is explicitly computable in polynomial time.
+
+For threshold $\tau=u/v$, the decision is $vF-uD\geq0$. Integer multiplication and subtraction of counting functions give a GapP sign test; shifting by one converts non-strict to strict comparison for this integer quantity. Equivalently, the problem belongs to PP. This is an upper bound, not a PP-completeness result. Exact brute-force evaluation takes $\prod_ak_a$ popularity tests before compression, generally exponential in the encoded number of applicants.
+
+\section*{Uniform refinements can be compressed sharply}
+Suppose $M(a)$ is a real house lying in a tie block $C_a$ of size $r_a$. Houses in higher and lower blocks have fixed vote signs. Inside $C_a$, only the subset $S_a\subseteq C_a\setminus\{M(a)\}$ ranked above $M(a)$ matters. Under a uniform random refinement,
+\[
+ \Prb(S_a=S)=\frac{|S|!(r_a-1-|S|)!}{r_a!}
+ =\frac{1}{r_a\binom{r_a-1}{|S|}}.\tag{1}
+\]
+Indeed, for a specified subset of size $s$, its members can be ordered above $M(a)$ in $s!$ ways and all remaining block members below it in $(r_a-1-s)!$ ways, out of $r_a!$ refinements. Other blocks cancel from the probability because their internal orders do not affect votes against $M$.
+
+If $M(a)$ is unmatched, every acceptable house beats it and no uncertainty for that applicant matters. If $M(a)$ is in a singleton block, all its vote weights are deterministic even if other blocks are very large. These observations can collapse factorial support to one relevant configuration.
+
+Enumerate the relevant subsets for all matched applicants, run the assignment test for each resulting vote matrix, and sum the products of (1). If
+\[
+ k=\sum_{a:M(a)\ne\bot_a}(r_a-1),
+\]
+the algorithm uses at most $2^k$ polynomial tests and exact rational arithmetic. It is fixed-parameter tractable in this total relevant-tie size. Large ties away from the assigned house do not enter $k$.
+
+For counting-class membership, a common denominator is the product of all tie-block factorials, with polynomial bit length because $\log(r!)=O(r\log r)$. Guess a permutation for every block with a unique encoding, reject invalid encodings, and test popularity. The accepted refinement count is a \#P function. The same rational-threshold argument gives PP membership. Compression improves exact computation but does not by itself imply polynomial complexity when $k$ grows with the input.
+
+\section*{A small exact example and an approximation guarantee}
+Take two applicants, two acceptable houses $a,b$, and $M=(a,b)$. Each independently ranks the two houses uniformly. The only rival capable of strictly beating $M$ is the swap $(b,a)$; it wins by two votes exactly when both applicants prefer their swapped house. A one-vote-to-one-vote tie does not defeat popularity. Hence
+\[
+ \pi(M)=1-(1/2)^2=3/4.
+\]
+This checks both the strict inequality in the definition and the tie-block formula. Replacing popularity by Pareto optimality would ask a different question, even though this particular tiny instance is easy under both notions.
+
+For either compact encoding, draw $m$ independent profiles, test each, and average the resulting indicators. Listed lotteries can be sampled by exact integer tickets; weak-order refinements by uniform permutations. Hoeffding's inequality gives
+\[
+ \Prb(|\widehat\pi-\pi|>\varepsilon)\leq2e^{-2m\varepsilon^2}.
+\]
+Thus $m\geq\log(2/a)/(2\varepsilon^2)$ yields additive error $\varepsilon$ with probability at least $1-a$ in polynomial expected sampling time. This is not a relative-error approximation when popularity is rare, and it does not decide an exact threshold with no promised separation. With a promised gap $|\pi-\tau|>\varepsilon$, an additive estimate of accuracy below that gap does give a randomized decision procedure.
+
+\section*{What remains open in this attempt}
+The upper bounds leave a genuine classification gap: a polynomial algorithm or an appropriate counting-hardness reduction is still needed for each independent compact encoding. The vote-matrix compression suggests searching for structure in the maximum-weight assignment event, but its inequalities couple applicants through house capacity. Treating these events as independent would be wrong. No statement about current literature completeness is inferred from the older source; this attempt reports exactly the algorithms and inclusions proved here.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove (2019), \emph{Selected Open Problems in Matching Under Preferences}, Section 3.1.2 and its concluding uncertainty paragraph. Primary PDF inspected on 9 October 2026. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,92 @@
+% ECONOMICS_PROBLEM: {"id": "C73-391", "title": "Threshold-constrained infinite-horizon equilibrium realizability", "jel_code": "C73", "source_id": "OP-0160"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Threshold-constrained infinite-horizon equilibrium realizability: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved for the remaining classification program.} The unrestricted threshold-constrained Nash language in the statement is already undecidable. This attempt gives a direct finite algebraic decision procedure for stationary profiles, explains how to verify deviations with arbitrary memory, and isolates why this does not decide unrestricted subgame-perfect realizability. It does not claim a new undecidability theorem or a classification of the unrestricted SPE language.
+
+Ummels and Wojtczak's Theorem 4.9 \cite{uw} establishes non-recursive-enumerability for ten-player simple stochastic multiplayer games with the designated player required to win almost surely. Those absorbing, turn-based games are a subclass of the present input model; setting that player's threshold to one and all others to zero transfers the negative result. This short reduction is the only use here of that source theorem. The algebraic construction below is derived explicitly for finite concurrent reachability games.
+
+\section*{Fixing the stationary supports}
+Let $S$ be the finite state set and $A_i(s)$ the nonempty finite action sets. Write $p(s'\mid s,a)$ for the rational transition probabilities. A stationary independent profile is represented by $x_{i,s,a_i}\geq0$, with each player's probabilities summing to one. Its transition matrix is
+\[
+ P_x(s,s')=\sum_{a\in\prod_i A_i(s)}p(s'\mid s,a)\prod_i x_{i,s,a_i}.
+\]
+Enumerate all nonempty supports $K_i(s)\subseteq A_i(s)$, imposing $x>0$ on the support and $x=0$ elsewhere. Within a support choice, the directed graph of positive entries of $P_x$ is constant: a transition is positive exactly when one supported joint action has a positive primitive transition. Nonnegative summands ensure that there is no cancellation.
+
+For player $i$, make $F_i$ absorbing only in the evaluation of her reachability payoff. This is an analytical modification to her payoff process, not a change to opponents' strategies or the original game. Let $R_i$ be the states that can reach $F_i$ in the resulting positive-transition graph. Introduce variables $v_i(s)$ and require
+\[
+ v_i(s)=1\ (s\in F_i),\qquad v_i(s)=0\ (s\notin R_i),\qquad
+ v_i(s)=\sum_{s'}P_x(s,s')v_i(s')\ (s\in R_i\setminus F_i).
+\]
+Include $0\leq v_i\leq1$.
+
+\begin{lemma}[Selecting the correct reachability solution]
+For each fixed supported profile, these equations uniquely determine its actual reachability probabilities.
+\end{lemma}
+\begin{proof}
+Every state in $R_i\setminus F_i$ has a finite positive-probability path to $F_i$. No closed communicating class can be wholly contained in this set: a state in such a class could not have a path leaving it to $F_i$. Hence this set is transient in the finite chain stopped upon hitting $F_i$ or exiting $R_i$. The associated substochastic matrix $Q$ has $Q^t\to0$. The equations on transient states consequently have the unique solution $\sum_{t\geq0}Q^tb$, with $b$ the one-step success probabilities. First-step decomposition identifies it with the probability of eventually hitting the target.
+\end{proof}
+
+Ordinary Bellman equalities alone would be insufficient. At a non-target absorbing state, the equation is merely $v=v$, admitting every value in $[0,1]$, although actual success is zero. Graph-based boundary conditions remove this spurious freedom.
+
+\section*{A certificate excluding every unilateral deviation}
+Freeze opponents at $x_{-i}$, and define the controlled transition law
+\[
+ P_{i,a_i,x_{-i}}(s,s')=
+ \sum_{a_{-i}}p(s'\mid s,a_i,a_{-i})\prod_{j\ne i}x_{j,s,a_j}.
+\]
+Introduce $w_i(s)\in[0,1]$ and the inequalities
+\[
+ w_i(s)=1\quad(s\in F_i),\qquad
+ w_i(s)\geq\sum_{s'}P_{i,a_i,x_{-i}}(s,s')w_i(s')
+ \quad(s\notin F_i,\ a_i\in A_i(s)),
+\]
+\[
+ w_i(s_0)\leq v_i(s_0),\qquad v_i(s_0)\geq t_i.
+\]
+These inequalities are polynomial in $x,w,v$.
+
+\begin{proposition}[Exact stationary-profile criterion]
+A support choice admits a feasible solution to these constraints if and only if it admits a stationary Nash equilibrium meeting the thresholds, where deviations may use arbitrary behavioral strategies.
+\end{proposition}
+\begin{proof}
+For sufficiency, the inequalities for pure actions imply the inequality for any conditional mixture chosen after any history. Stop at the first target hit $\tau_i$. Repeated conditional expectation gives
+$\E[w_i(s_{T\wedge\tau_i})]\leq w_i(s_0)$ for every finite $T$ and every deviation. Nonnegativity and the target boundary imply $\Pr(\tau_i\leq T)\leq w_i(s_0)$. Monotone convergence yields eventual success probability at most $w_i(s_0)\leq v_i(s_0)$. The candidate profile realizes $v_i(s_0)$, so no deviation is profitable.
+
+For necessity, choose $v_i$ as the actual profile value and $w_i(s)$ as the supremum probability of reaching $F_i$ in the finite Markov decision process with opponents fixed. First-step optimization gives the displayed inequalities (in fact equality after maximizing over actions). To justify the reverse first-step bound, select continuations within any prescribed $\varepsilon>0$ of each successor state's supremum and then let $\varepsilon$ decrease to zero. At an equilibrium, best-response value equals profile value at $s_0$. Thus all constraints hold.
+\end{proof}
+
+There are finitely many supports, and each yields an existential formula over real polynomial equalities and strict or weak inequalities with rational coefficients. Decidability of real closed fields gives a terminating procedure. Strict support inequalities must remain strict; replacing them by nonnegativity invalidates the precomputed reachability graph. This proves decidability, not an efficient complexity bound, rationality of equilibria, or stationary sufficiency for the original problem.
+
+\section*{Why neither truncation nor memory enumeration finishes the task}
+Consider one non-target state, a target, and a stationary action mixture causing success with probability $p$ each period. For every $p>0$, eventual success is one, while the $T$-period success probability is $1-(1-p)^T\leq Tp$. Choosing $p<\varepsilon/T$ makes the finite-horizon value below $\varepsilon$. At $p=0$, eventual success is zero. Consequently no uniform finite horizon over this strategy simplex approximates all eventual reachability values. This example concerns evaluation; it is not by itself an impossibility theorem about every approximation algorithm.
+
+For SPE, prefix achievements matter. Enlarge the state to $(s,B)$, where $B$ records players whose targets were already visited; update $B$ at each transition. A stationary profile on this finite enlarged state space can be checked by the same construction, imposing the best-response comparison at every feasible enlarged state, and setting already-successful players' continuation payoff to one. This verifies every full-history continuation because the opponents' future behavior then depends only on the enlarged state. It describes a specific finite-memory strategy family. It does not show that every SPE has such a representation.
+
+The original remaining questions ask for other player, memory, and equilibrium restrictions and, separately, the unrestricted SPE language. Establishing completeness of an admissible strategy representation, or proving a reduction tailored to SPE, remains necessary. Neither enumeration of larger memory bounds nor the equations above supplies that missing theorem.
+
+\begin{thebibliography}{9}
+\bibitem{uw} M. Ummels and D. Wojtczak (2011), The Complexity of Nash Equilibria in Stochastic Multiplayer Games, \emph{Logical Methods in Computer Science} 7(3:20). Primary PDF inspected, Theorem 4.9, printed p.27: \url{https://arxiv.org/pdf/1109.4017}.
+\end{thebibliography}
+\end{document}
