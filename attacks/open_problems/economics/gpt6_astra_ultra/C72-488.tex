@@ -1,0 +1,145 @@
+% ECONOMICS_PROBLEM: {"id": "C72-488", "title": "Critical Bernoulli densities for expected-polynomial Nash computation", "jel_code": "C72", "source_id": "OP-0138"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf1}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sat}{\operatorname{sat}}
+\title{Keeping the exact zero-row tail improves the sparse critical constant}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C72-488}.
+
+\section{A strict advance on one of the remaining lines}
+Let $A,B$ be independent $n\times n$ Bernoulli payoff matrices, with common entry probability $p_n=\min\{1,c/n\}$. The canonical question asks for always-correct exact Nash computation with polynomial expected running time, including constants $c>0.3849$ and a separate critical line $p_n=c/\sqrt n$.
+
+We retain the exact probability in the source's all-zero-row argument instead of its final linear relaxation. This proves expected polynomial time on the larger interval
+\[
+ 0<c\leq\log(13/8)=0.485507\ldots,
+\]
+using a conservative exponential fallback base $13/5=2.6$. The larger-$c$ part of the $1/n$ line and the remaining $1/\sqrt n$ gap are unresolved. No claim is made that this constant is optimal or best in subsequent literature.
+
+\section{The deterministic computational ingredient}
+The source uses a Lemke--Howson fallback with an exponential base approximately $2.598$ \cite[equation (1.1), Section 2.2]{clvz}. We also checked the underlying original chapter's treatment of degeneracy and the polytope bound \cite[Sections 2.6--2.7]{stengel}. Here is the deterministic consequence needed, using the conservative base $2.6$ rather than a rounded decimal equality.
+
+\begin{lemma}[An exact fallback with polynomial bit overhead]\label{fallback}
+Every rational $n\times n$ win--lose game has an exact equilibrium algorithm with worst-case running time $n^{O(1)}(2.6)^n$ in bit operations.
+\end{lemma}
+\begin{proof}
+Add one to every payoff of each player; this preserves all best responses and gives strictly positive entries. The standard labeled best-response polytopes of Lemke--Howson each have dimension $n$, at most $2n$ facets, and are bounded. By the polytope upper-bound theorem \cite[Theorem 2.12]{stengel}, each has at most $\Phi(n,2n)$ vertices, where
+\[
+ \Phi(n,2n)=O\left((27/4)^{n/2}/\sqrt n\right).
+\]
+First consider the nondegenerate case, with simple polytopes. Fix the algorithm's missing label. Every intermediate path state is a pair of vertices containing every other label and omitting that label. Fix its vertex in the first polytope. That vertex has $n$ labels, so the second vertex must have the $n-1$ remaining nonmissing labels. Their facets specify an edge in the second simple polytope, if the state exists at all, with at most two endpoints. Thus there are at most two intermediate path states per first-polytope vertex. The noncycling complementary path consequently makes at most $2\Phi(n,2n)+O(1)$ pivots.
+
+For a degenerate input, apply the symbolic lexicographic right-hand-side perturbation in \cite[Section 2.6]{stengel}. It simulates simple polytopes with the same dimension and number of inequalities, preserves noncycling, and at termination returns the unperturbed basic solution of the original complementarity problem. Hence the same vertex count applies to its symbolic path. No numerical perturbation of the answer is retained.
+
+Each basic tableau is obtained by inverting an $O(n)$-dimensional matrix whose original entries are bounded integers. Cramer's rule and the determinant bound $|\det C|\leq\prod_i\|C_{i\cdot}\|_2$ give polynomial-bit numerators and denominators. The symbolic perturbation adds $O(n)$ rational coefficients per row, with the same determinant bounds. A pivot and its lexicographic ratio comparisons therefore take polynomial bit time. Normalizing the terminal positive vectors produces exact rational mixed strategies. Finally $\sqrt{27/4}<2.6$, so the pivot bound times its polynomial bit overhead has the claimed form.
+\end{proof}
+
+The correctness and path construction of Lemke--Howson and the polytope upper-bound theorem are standard imported ingredients. The counting and bit-overhead argument states explicitly how they yield the fallback used here. The probability theorem is also parameterized by any other certified fallback base.
+
+\section{An exact failure probability for a simple certificate}
+\begin{lemma}\label{zero}
+If column $j$ of $A$ and row $i$ of $B$ are both identically zero, then $(i,j)$ is a pure Nash equilibrium. Set $q_n=(1-p)^n$ and $t_n=1-q_n$. The probability that no such pair exists is exactly
+\[
+ 2t_n^n-t_n^{2n}\leq2t_n^n.
+\]
+\end{lemma}
+\begin{proof}
+Against column $j$, every row gives the row player zero, so row $i$ is optimal. Against row $i$, every column gives the column player zero, so column $j$ is optimal.
+
+A specified column of $A$ is all zero with probability $q_n$. Distinct columns involve disjoint independent entries; thus the probability of no all-zero column is $(1-q_n)^n=t_n^n$. Similarly the probability of no all-zero row of $B$ is $t_n^n$. These two events are independent because $A$ and $B$ are independent. Their union has probability $2t_n^n-t_n^{2n}$ and is exactly failure of the stated certificate.
+\end{proof}
+
+Failure of this certificate need not mean absence of all pure equilibria. An algorithm that scans for every pure equilibrium has failure probability no larger, which is all the following argument needs.
+
+\begin{theorem}[Sparse-density interval with its endpoint]\label{main}
+Suppose an exact equilibrium fallback is correct on every $n\times n$ win--lose game. Assume its worst-case bit running time is at most $K n^d\rho^n$, for fixed $K,d$ and $\rho>1$. Put
+\[
+ c_\rho=-\log(1-\rho^{-1}).
+\]
+For every fixed $0<c\leq c_\rho$, the algorithm that first scans for a pure equilibrium and then invokes the fallback has polynomial expected running time on $p_n=\min\{1,c/n\}$. The assertion includes equality $c=c_\rho$.
+\end{theorem}
+\begin{proof}
+A pure-equilibrium scan takes polynomial time and, by Lemma~\ref{zero},
+\[
+ \E T\leq n^{O(1)}+2Kn^d\left\{\rho[1-(1-p_n)^n]\right\}^{n}.
+\]
+For any fixed $c$, finitely many $n$ may have $p_n=1$; those games have every entry equal to one and a pure equilibrium. Finitely many remaining small sizes can also be absorbed into the constant.
+
+For $n>c$, the elementary series bound
+\[
+ -\log(1-x)=\sum_{k\geq1}\frac{x^k}{k}
+ \leq x+\frac{x^2}{1-x}\qquad(0\leq x<1)
+\]
+gives
+\[
+ (1-c/n)^n\geq\exp\left(-c-\frac{c^2}{n-c}\right).
+\]
+As $\rho(1-e^{-c})\leq1$ and $1-e^{-z}\leq z$ for $z\geq0$,
+\[
+ \rho[1-(1-c/n)^n]
+ \leq1+\frac{\rho c^2}{n-c}.
+\]
+For $n\geq2c+1$, its $n$th power is at most
+$\exp\{\rho c^2 n/(n-c)\}\leq\exp(2\rho c^2)$.
+Thus the fallback contribution is at most a constant times $n^d$, including the endpoint. Correctness on every input follows because the initial scan only returns a verified pure equilibrium and the fallback is always correct.
+\end{proof}
+
+\begin{corollary}\label{numeric}
+Using the source's exact-equilibrium fallback with the conservative base $\rho=13/5$, every fixed $c\leq\log(13/8)$ on the $p_n=\min\{1,c/n\}$ line has an always-correct expected-polynomial algorithm. In particular this covers the nonempty interval
+$0.3849<c\leq\log(13/8)$ from the stated residual scope.
+\end{corollary}
+\begin{proof}
+Substitute $1-\rho^{-1}=8/13$ into Theorem~\ref{main}. The strict comparison with $0.3849$ follows, for instance, from $\log(13/8)>0.48>0.3849$; these numerical inequalities can be certified directly by the exponential series.
+\end{proof}
+
+\section{What the calculation does and does not establish}
+The source's Section 3 already derives a bound involving
+$1-\exp\{-np/(1-p)\}$, and then bounds $1-e^{-x}$ by $x$, obtaining the displayed sufficient condition $c\leq1/c_{\rm LH}$. Our derivation keeps the nonlinear dependence. Thus the advance is a sharper use of the same certificate, rather than a new equilibrium-existence mechanism.
+
+\begin{proposition}[The endpoint is sensitive to the density sequence]
+Under the same fallback assumption, the proof still gives expected polynomial time whenever
+\[
+ \rho[1-(1-p_n)^n]\leq1+C\frac{\log n}{n}
+\]
+for a fixed $C$. The weaker assumption $np_n\to c_\rho$ alone does not imply this displayed bound.
+\end{proposition}
+\begin{proof}
+The $n$th power is at most $\exp(C\log n)=n^C$, giving the first assertion. For the second, take $p_n=(c_\rho+n^{-1/2})/n$ for large $n$. Taylor expansion of $n\log(1-p_n)$, with remainder $O(1/n)$, gives
+\[
+ \rho[1-(1-p_n)^n]=1+\rho e^{-c_\rho}n^{-1/2}+O(n^{-1}).
+\]
+The positive $n^{-1/2}$ term exceeds $C\log n/n$ for every fixed $C$ eventually. This disproves implication of the sufficient bound, not expected-polynomial solvability of that sequence by some other argument.
+\end{proof}
+
+At $p_n=c/\sqrt n$, a zero column has probability exponentially small in $\sqrt n$, so the zero-column/row certificate is ineffective. Mutual-one cells instead have no-occurrence probability $(1-p_n^2)^{n^2}\leq e^{-c^2n}$; balancing this against a fallback recovers only a sufficient threshold $c^2\geq\log\rho$. It does not close the middle gap. Nor does failure of either probability estimate establish computational hardness: an upper bound too large to pay for a worst-case fallback can coexist with a much faster conditional fallback algorithm.
+
+\section{Source verification}
+The complete source PDF was opened on 9 October 2026. The consulted passages were equation (1.1), Table 1, Section 2.2 and equation (2.1), and the full zero-row/column calculation in the proof of Theorem 1, printed pages 6--7. Its residual-density discussion is in Section 1.2. The exact probability and endpoint inequalities above are proved here. The original von Stengel chapter was independently inspected at Section 2.6 (lexicographic treatment of degeneracy), Theorem 2.12 and Corollary 2.13, including the asymptotic vertex count on PDF page 20. Its source theorem is used explicitly in Lemma~\ref{fallback}. No numerical search or simulated success rate is used to justify expected running time.
+
+\begin{thebibliography}{9}
+\bibitem{clvz} A. Collevecchio, G. Lugosi, A. Vetta and R.-R. Zhang, \emph{Finding a Nash equilibrium of a random win-lose game in expected polynomial time}, arXiv:2510.12846 (2025), equation (1.1), Table 1, Section 2.2, Theorem 1 and its proof. \url{https://arxiv.org/pdf/2510.12846}.
+\bibitem{stengel} B. von Stengel, \emph{Computing Equilibria for Two-Person Games}, Handbook of Game Theory with Economic Applications, vol. 3, Chapter 45, 1723--1759 (2002), Sections 2.6--2.7, Theorem 2.12 and Corollary 2.13. \url{https://ranger.uta.edu/~weems/NOTES6319/PAPERSONE/vonStengel.pdf}.
+\end{thebibliography}
+
+\end{document}
