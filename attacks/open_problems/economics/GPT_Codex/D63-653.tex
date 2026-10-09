@@ -1,0 +1,167 @@
+% ECONOMICS_PROBLEM: {"id": "D63-653", "title": "Complexity of verifying epistemic EFX for additive goods", "jel_code": "D63", "source_id": "OP-0193"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\EEFX}{\mathrm{EEFX}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Recognizing epistemic EFX allocations of goods}\\[5pt]
+{\small A short proof for catalogue problem D63-653}\\[3pt]
+{\small Prepared by OpenAI Codex with automated collaboration\quad---\quad10 October 2026}
+\end{center}
+
+An allocation $A=(A_1,\ldots,A_n)$ is an ordered partition of a finite
+set of goods $M$. Agent $i$ has an additive valuation
+$v_i(S)=\sum_{g\in S}v_i(g)$, explicitly encoded in binary.
+Following Caragiannis et al.~\cite[Definitions 1--2]{fairness},
+$A$ is \emph{epistemic EFX} (EEFX) if, for each $i$, there is an allocation
+$Y^{(i)}$ with $Y^{(i)}_i=A_i$ such that
+\[
+ v_i(A_i)\geq v_i\bigl(Y^{(i)}_j\setminus\{g\}\bigr)
+ \qquad\text{for every }j\ne i\text{ and }g\in Y^{(i)}_j
+ \text{ with }v_i(g)>0.
+\]
+Different agents may use different witnesses. The final paragraph of
+\cite[Section 4]{fairness} asks for the complexity of recognizing such an
+allocation of goods. Its Section 6 treats chores separately.
+
+\begin{theorem}
+Deciding whether a supplied allocation is EEFX is NP-complete even for
+exactly three agents with strictly positive integer item values, nonempty
+supplied bundles, and a singleton supplied bundle for agent 1.
+\end{theorem}
+
+\begin{proof}
+\textbf{Membership in $\NP$.}
+A certificate supplies one witness allocation for each agent.
+With $t$ goods it contains $nt$ recipient labels, each using
+$O(\log n)$ bits. Check completeness, the fixed own bundle, and all EFX
+inequalities. There are polynomially many checks, and binary integer
+sums and comparisons take polynomial time. For nonnegative rational
+values in the unrestricted problem, a common denominator has polynomial
+bit length, so the same verifier remains polynomial.
+
+\textbf{Reduction.}
+Use the NP-complete problem \textsc{Partition}~\cite{karp}: given positive
+integers $a_1,\ldots,a_m$ with sum $2B$, ask whether some subset sums to
+$B$. This restricted source remains NP-complete. Indeed, a signed
+equal-partition instance is unchanged by taking absolute values and
+discarding zero entries; doubling all remaining entries makes the total
+even. An all-zero input can be replaced by $(1,1)$.
+Thus $m,B\geq1$.
+
+Put $H=B+1$ and $V=mH+B$. Introduce $m$ regular goods
+$g_1,\ldots,g_m$, $m+2$ dummy goods $z_1,\ldots,z_{m+2}$, and a good $d$.
+Agent 1's item values are
+\[
+ v_1(g_\ell)=H+a_\ell,\qquad v_1(z_r)=H,\qquad v_1(d)=V.
+\]
+Supply the allocation
+\[
+ A_1=\{d\},\qquad
+ A_2=\{g_1,\ldots,g_m,z_2,\ldots,z_{m+2}\},\qquad
+ A_3=\{z_1\}.
+\]
+For each $j=2,3$, let $L=2m+3$ and set $v_j(g)=L$ if $g\in A_j$,
+and $v_j(g)=1$ otherwise. Agent $j$ values its own bundle at least $L$
+and its entire complement at most $L-1$. Therefore $A$ itself is an
+EEFX witness for each of these two agents. Every item value is positive.
+
+\textbf{Correctness.}
+For positive additive values, EFX against a nonempty bundle $C$ is
+equivalent to
+\[
+ v_1(C)-\min_{g\in C}v_1(g)\leq V,
+ \tag{1}\label{eq:residual}
+\]
+because deleting a minimum-valued good leaves the largest residual.
+An agent-1 witness partitions the $2m+2$ outside goods into two bundles.
+A bundle with at least $m+2$ goods leaves at least $m+1$ goods after
+any one deletion, giving a residual of at least
+$(m+1)H>mH+B=V$. Hence both bundles have at most $m+1$ goods, and
+counting forces each to have exactly $m+1$.
+
+There are only $m$ regular goods, so each bundle contains a dummy and
+has minimum value $H$. If $S_j$ indexes its regular goods, its residual is
+\[
+ mH+\sum_{\ell\in S_j}a_\ell.
+\]
+Condition \eqref{eq:residual} bounds both regular sums by $B$.
+Together they sum to $2B$, so both equal $B$, giving a partition solution.
+
+Conversely, divide the regular goods according to a partition solution,
+and pad each side to $m+1$ goods with dummies. Each side needs at least
+one dummy; the two sides need exactly $m+2$ in total. Their minimum
+value is $H$, and both residuals equal $mH+B=V$. They give a witness
+for agent 1, and the auxiliary witnesses already established show that
+$A$ is EEFX.
+
+\textbf{Size.}
+The construction has $2m+3$ goods and three valuation rows.
+Since $a_\ell\leq2B$, every value uses
+$O(\log(m+1)+\log(B+1))$ bits. Constructing the explicit allocation and
+valuation matrix therefore takes polynomial time. This proves the claim.
+\end{proof}
+
+\textbf{Formalization scope.}
+The Lean companion verifies the original three-agent EEFX reduction
+equivalence in \texttt{EEFX.reduction\_correct\_iff}, together with
+strict positivity, the singleton own bundle, nonempty supplied bundles,
+and the count $2m+3$ of goods. The complexity classes, the polynomial-time
+encoding and verifier analysis, and the classical NP-completeness of
+\textsc{Partition} are supplied by this hand proof and its cited source;
+they are not claimed as Lean theorems.
+% Public pinned source and reproduction links are appended in the catalogue submission.
+This note and its mathematical proof were generated through automated
+Codex collaboration, with no human edits to the proof. It makes no
+claim about priority over literature beyond the cited source.
+
+\paragraph{Lean source and reproduction.}
+The \href{https://github.com/jbaelaw/eefx-recognition-lean/tree/fffcf03e8bb948982d058275f87c9b80c3f13324}{complete pinned Lean project}
+contains \href{https://github.com/jbaelaw/eefx-recognition-lean/blob/fffcf03e8bb948982d058275f87c9b80c3f13324/EEFX/Reduction.lean}{the main reduction theorem}
+and the \href{https://github.com/jbaelaw/eefx-recognition-lean/blob/fffcf03e8bb948982d058275f87c9b80c3f13324/original/initial-research-note.tex}{complete original generated note}.
+Reproduction uses Lean 4.35.0-rc3 and
+\href{https://github.com/leanprover-community/mathlib4/tree/b84a70d6a5ed793cc46184160f4d4188d8c825fb}{mathlib commit b84a70d6},
+with all dependencies locked in the project manifest.
+The remote commands \texttt{lake build} and \texttt{lake env lean Verify.lean}
+both exited successfully, without warnings. There are no
+\texttt{sorry}/\texttt{admit} placeholders or added axioms;
+the main theorem uses only \texttt{propext}, \texttt{Classical.choice},
+and \texttt{Quot.sound}.
+\href{https://github.com/jbaelaw/eefx-recognition-lean/blob/fffcf03e8bb948982d058275f87c9b80c3f13324/verification/LeanVerification.json}{The checking record}
+identifies the exact scope and source hashes. Attribution is GPT Codex;
+the exact serving model revision was not exposed. This is a complete
+proof claim awaiting expert review, and is not a verification claim
+by the catalogue maintainers.
+
+\section*{Completion Estimate}
+100\%
+For the recognition-complexity question, as an unreviewed proof claim.
+This estimate does not assert a Lean formalization of complexity classes.
+
+\begin{thebibliography}{2}
+\small
+\bibitem{fairness}
+I. Caragiannis, J. Garg, N. Rathi, E. Sharma, and G. Varricchio.
+\emph{New Fairness Concepts for Allocating Indivisible Items}.
+arXiv:2206.01710v3, 14 January 2025.
+Definitions 1--2; Section 4, final paragraph.
+\url{https://arxiv.org/html/2206.01710v3}.
+
+\bibitem{karp}
+R. M. Karp. \emph{Reducibility Among Combinatorial Problems}.
+In \emph{Complexity of Computer Computations}, Plenum Press, 1972,
+pp.~85--103. Section 4: Main Theorem (p.~94), problem 20 (p.~97),
+and the Knapsack-to-Partition reduction (p.~100).
+\href{https://doi.org/10.1007/978-1-4684-2001-2_9}{doi:10.1007/978-1-4684-2001-2\_9}.
+\href{https://www.cs.umd.edu/~gasarch/BLOGPAPERS/Karp.pdf}{Original-page scan in the 2010 reprint}.
+\end{thebibliography}
+\end{document}
