@@ -14,6 +14,7 @@ import re
 BASE_DIR = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = Path('lists/economics/problems.json')
 RANKINGS_PATH = Path('lists/economics/rankings.csv')
+JEL_CODES_PATH = Path('lists/economics/jel_codes.json')
 STATEMENTS_PATH = Path('attacks/open_problems/economics/statements')
 PUBLIC_STATEMENTS_PATH = Path('docs/data/economics/statements')
 STATEMENT_START = '% BEGIN ECONOMICS STATEMENT\n'
@@ -171,6 +172,9 @@ def build_economics_data(base_dir=BASE_DIR):
             'id': problem_id,
             'title': record['title'],
             'jel_code': record['jel_code'],
+            'domain_label': 'Game theory' if record.get('source_catalog') == 'Game theory' else 'Economics',
+            'status': 'open',
+            'llm_status': 'none',
             'rank': rankings[problem_id],
             'source_id': record['source_id'],
             'source_catalog': record.get('source_catalog'),
@@ -197,10 +201,22 @@ def generate_economics_data(base_dir=BASE_DIR, data_dir=None):
     base_dir = Path(base_dir)
     data_dir = Path(data_dir) if data_dir is not None else base_dir / 'docs/data'
     data = build_economics_data(base_dir)
+    classification = json.loads((base_dir / JEL_CODES_PATH).read_text(encoding='utf-8'))
+    if classification.get('schema_version') != 1 or not isinstance(classification.get('labels'), dict):
+        raise ValueError('Unsupported JEL classification format')
+    labels = classification['labels']
+    used_codes = sorted({record['jel_code'] for record in data.values()})
+    for code in used_codes:
+        if not isinstance(labels.get(code), str) or not labels[code].strip():
+            raise ValueError(f'Missing JEL description for {code}')
+    # Store each description once, alongside the already-loaded catalogue data.
+    jel_labels = json.dumps({code: labels[code] for code in used_codes}, ensure_ascii=False,
+                            indent=2).replace('</', '<\\/')
     serialized = json.dumps(data, ensure_ascii=False, indent=2).replace('</', '<\\/')
     data_dir.mkdir(parents=True, exist_ok=True)
     (data_dir / 'economics_data.js').write_text(
         '// Generated from fixed Economics identities and mutable rankings.\n'
+        'window.ECONOMICS_JEL_LABELS = ' + jel_labels + ';\n'
         'window.ECONOMICS_DATA = ' + serialized + ';\n', encoding='utf-8')
     download_dir = data_dir / 'economics/statements'
     download_dir.mkdir(parents=True, exist_ok=True)

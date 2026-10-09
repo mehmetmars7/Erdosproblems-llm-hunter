@@ -1,4 +1,4 @@
-// Economics statements share the site's TeX renderer, but have no claims or discussions.
+// Economics statements share the site's TeX renderer and status labels.
 (function () {
     'use strict';
 
@@ -224,18 +224,20 @@
             return;
         }
         const problem = data[id];
+        const shared = window.ProblemHunting;
+        const jelDescription = window.ECONOMICS_JEL_LABELS?.[problem.jel_code] || '';
         const ordered = orderedProblems(data);
         const currentIndex = ordered.findIndex(record => record.id === id);
         title.textContent = problem.title;
         document.title = problem.title + ' (' + problem.id + ') - Economics';
         metadata.innerHTML = '<p><a href="economics.html">&larr; Economics</a></p>' +
-            '<p><strong>Problem ID:</strong> ' + escapeHtml(problem.id) + '</p>' +
-            '<p><strong>JEL code:</strong> <a href="economics.html?jel=' + encodeURIComponent(problem.jel_code) + '">' + escapeHtml(problem.jel_code) + '</a></p>' +
+            '<p><strong>Field:</strong> ' + escapeHtml(problem.domain_label || 'Economics') + '</p>' +
+            '<p><strong>JEL code:</strong> <a href="economics.html?jel=' + encodeURIComponent(problem.jel_code) + '">' + escapeHtml(problem.jel_code) + '</a>' +
+                (jelDescription ? ' (' + escapeHtml(jelDescription) + ')' : '') + '</p>' +
             '<p><strong>Difficulty rank:</strong> ' + escapeHtml(problem.rank) + ' of ' + ordered.length + '</p>' +
-            (problem.source_id ? '<p><strong>Source catalogue ID:</strong> ' + escapeHtml(problem.source_id) + '</p>' : '') +
-            (problem.source_catalog ? '<p><strong>Original catalogue:</strong> ' + escapeHtml(problem.source_catalog) +
-                (problem.source_original_id ? ' · ' + escapeHtml(problem.source_original_id) : '') + '</p>' : '') +
-            '<p class="status-note">Difficulty ranks can change; this problem\'s ID stays fixed.</p>';
+            '<p><strong>Problem Status:</strong> ' + escapeHtml(shared.getOpenProblemStatusLabel({ ...problem, status: problem.status || 'open' })) + '</p>' +
+            '<p><strong>LLM Claim:</strong> ' + escapeHtml(shared.getOpenProblemClaimLabel(problem)) + '</p>' +
+            '<p><strong>Community Review:</strong> ' + escapeHtml(shared.getReviewLabel(problem.review)) + '</p>';
         const statement = document.getElementById('problem-links');
         statement.innerHTML = '<div class="problem-statement-text tex-content">' + formatTeX(normalizedStatement(problem.definition_tex), false, false) + '</div>';
         const statementUrl = problem.statement_url || '';

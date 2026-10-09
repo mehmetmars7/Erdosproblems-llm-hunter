@@ -48,10 +48,12 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
         } }
     };
     const context = vm.createContext({
-        document, URL, URLSearchParams, console,
+        document, URL, URLSearchParams, console, setTimeout, clearTimeout,
         window: { location: new URL('file:///site/problem.html' + query),
+            ECONOMICS_JEL_LABELS: JSON.parse(fs.readFileSync(path.join(root, 'lists/economics/jel_codes.json'), 'utf8')).labels,
             ...(lazy ? {} : { ECONOMICS_DATA: data }) }
     });
+    vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
     vm.runInContext(scripts.find(script => script.includes('window.MathJax =')), context);
     vm.runInContext(economicsScript, context);
     vm.runInContext(detailScript, context);
@@ -65,16 +67,21 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
         reference('local:eq', 'eqref'), reference('game:GT-050'), reference('problem:OP-0042'),
         reference('app:audited-crosswalk')
     ];
-    await callbacks[0]();
+    await callbacks[callbacks.length - 1]();
     return { element, context, createdScripts };
 }
 
 async function main() {
     let page = await render('?type=economics&id=C73-1');
     assert.equal(page.element('page-title').textContent, 'Game <one>');
-    assert.match(page.element('problem-meta').innerHTML, /Problem ID:<\/strong> C73-1/);
+    assert.match(page.element('problem-meta').innerHTML, /Field:<\/strong> Economics/);
+    assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
+    assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> no attempt/);
+    assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
+    assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:|Source catalogue ID:|Original catalogue:|Difficulty ranks can change/);
     assert.match(page.element('problem-meta').innerHTML, /Difficulty rank:<\/strong> 3 of 3/);
     assert.match(page.element('problem-meta').innerHTML, /economics\.html\?jel=C73/);
+    assert.match(page.element('problem-meta').innerHTML, /C73<\/a> \(Stochastic and Dynamic Games - Evolutionary Games - Repeated Games\)/);
     assert.match(page.element('problem-links').innerHTML, /<h3>Definitions and assumptions<\/h3>/);
     assert.match(page.element('problem-links').innerHTML, /<h3>Formal question<\/h3>/);
     assert.match(page.element('problem-links').innerHTML, /\$x &lt; 1\$/);
@@ -130,7 +137,7 @@ async function main() {
     const reordered = Object.fromEntries(Object.entries(sample).map(([id, record]) =>
         [id, { ...record, rank: 4 - record.rank }]));
     page = await render('?type=economics&id=C73-1', reordered);
-    assert.match(page.element('problem-meta').innerHTML, /Problem ID:<\/strong> C73-1/);
+    assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:/);
     assert.match(page.element('problem-meta').innerHTML, /Difficulty rank:<\/strong> 1 of 3/);
     assert.equal(page.element('prev-problem').style.visibility, 'hidden');
     assert.equal(page.element('next-problem').href, 'problem.html?type=economics&id=H41-4');

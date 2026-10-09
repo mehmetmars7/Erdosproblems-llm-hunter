@@ -61,6 +61,9 @@ class EconomicsCatalogueTests(unittest.TestCase):
         self.temp = TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
+        classification = self.root / 'lists/economics/jel_codes.json'
+        classification.parent.mkdir(parents=True)
+        classification.write_bytes((BASE_DIR / 'lists/economics/jel_codes.json').read_bytes())
         self.tex = self.root / 'source.tex'
         self.tex.write_text(source_fixture(), encoding='utf-8')
         self.csv = self.root / 'original.csv'

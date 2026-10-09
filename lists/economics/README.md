@@ -20,6 +20,12 @@ difficulty labels and the superseded top-level classification command are
 removed. There are no research attempts. Run the ordinary site build to emit
 embedded browser data and identical local downloadable statement copies.
 
+`jel_codes.json` stores the JEL descriptions from the supplied classification
+text, with its source hash. The build includes one shared lookup containing the
+codes used by the catalogue in `economics_data.js`. Problem pages display the
+description in parentheses after the linked JEL code; no additional request or
+runtime XML parsing is needed. Edit this JSON and rebuild to update descriptions.
+
 ## Updating ranks
 
 1. Copy `rankings.csv` and edit only `New rank`. Include every permanent Problem
