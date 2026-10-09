@@ -535,6 +535,33 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertIn(r'\begin{thebibliography}', source.read_text())
                 self.assertNotRegex(source.read_text(), r'/Users/|/private/tmp/|/mnt/data/|TODO')
 
+    def test_astra_ultra_rank_551_to_600_attempts_preserve_identity_and_claim_scope(self):
+        # Freeze the selected identities, so later reranking cannot reassign proofs.
+        expected = set('I11-551 E62-552 C21-553 C78-554 L13-555 E43-556 H41-557 D91-558 D84-559 J13-560 I11-561 J62-562 O41-563 C73-564 F13-565 L11-566 D81-567 I38-568 C21-569 Q23-570 D83-571 E52-572 F37-573 J42-574 F35-575 E31-576 I11-577 D91-578 L94-579 M12-580 C21-581 G14-582 E62-583 G41-584 J24-585 D83-586 D91-587 C73-588 C72-589 J24-590 I21-591 J16-592 O32-593 E37-594 L26-595 O47-596 C73-597 O33-598 M21-599 E58-600'.split())
+        self.assertEqual(len(expected), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                source_path = f'attacks/open_problems/economics/gpt_6_astra_ultra/{problem_id}.tex'
+                attempts = [a for a in data[problem_id]['attacks']
+                            if a['file_path'] == source_path]
+                self.assertEqual(len(attempts), 1)
+                attempt = attempts[0]
+                self.assertEqual(attempt['model'], 'GPT 6 Astra Ultra')
+                self.assertEqual(attempt['entry_kind'], 'research_attempt')
+                self.assertEqual(attempt['date_posted'], '2026-10-09')
+                claim = 'solved' if problem_id == 'C78-554' else 'unresolved'
+                self.assertEqual(attempt['status'], claim)
+                # A model proof claim does not change the external problem status.
+                self.assertEqual(data[problem_id]['status'], 'open')
+                source = BASE_DIR / source_path
+                self.assertEqual(source.read_bytes(),
+                                 (BASE_DIR / 'docs' / attempt['download_url']).read_bytes())
+                text = source.read_text()
+                self.assertIn(r'\begin{proof}', text)
+                self.assertIn(r'\begin{thebibliography}', text)
+                self.assertNotRegex(text, r'/Users/|/private/tmp/|/mnt/data/|TODO|proof omitted')
+
     def test_specialized_and_merged_source_conventions_are_present(self):
         data = build_economics_data()
         self.assertIn('BSDE conventions for SC-01--SC-06', data['C65-6']['definition_tex'])

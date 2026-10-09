@@ -1,0 +1,90 @@
+% ECONOMICS_PROBLEM: {"id": "O32-593", "title": "Scientific discovery bottlenecks", "jel_code": "O32", "source_id": "OP-0410"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Scientific discovery bottlenecks: exact finite-horizon capacity values and productivity optimization}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and benchmark}
+The target counts independently validated discoveries in a fixed intake cohort and divides their expected number by expected real cost. Faster hypothesis generation can increase queues without increasing completed discoveries. We give an exact scheduling model that retains stage prerequisites and deadlines, prove its finite-increment bottleneck formula, and distinguish maximizing validated throughput from maximizing productivity. The transformative-AI agenda \cite{agenda} motivates the discovery question; the homogeneous-project network below is an additional benchmark, not an empirical description of pharmaceutical laboratories.
+
+There are $M<\infty$ eligible projects and a finite horizon of integer time slots $0,\ldots,H$. Projects are interchangeable for scheduling, each needs one slot at each of three stages, in order: hypothesis generation, testing, validation. Capacities $k_{s,t}$ are nonnegative integers; waiting is permitted and there is no required processing of unfinished projects. Arrival counts and any initial projects already in the pipeline are fixed and recorded. A project completing validation passes the preregistered quality standard with probability $q\in(0,1]$, independent of its scheduled path and not revealed before completion. Quality draws may be dependent across projects; only the common marginal probability is used. Thus a schedule completing $F$ projects has expected validated output $qF$.
+
+\section*{Time expansion preserves the deadline}
+Create a node $(s,t)$ for each completed-stage count $s\in\{0,1,2,3\}$ and time $t$. Waiting arcs $(s,t)\to(s,t+1)$ have capacity $M$. Processing arcs $(s-1,t)\to(s,t+1)$ have capacity $k_{s,t}$. A source supplies each arrival cohort at its appropriate node with the recorded integer count. Nodes $(3,t)$ connect to a sink with capacity $M$. All arcs advance time or terminate, so the network is acyclic. Arcs not usable before the deadline are omitted. Let $F(k)$ be its maximum source-to-sink flow.
+
+\begin{theorem}[Exact completed-discovery capacity]
+The greatest feasible number of projects completing all stages before the deadline is exactly $F(k)$, and an integer optimal schedule exists. Moreover,
+\[
+ F(k)=\min_{C}\operatorname{cap}_k(C),
+ \tag{1}
+\]
+where $C$ ranges over source--sink cuts. Consequently expected validated throughput is $qF(k)$.
+\end{theorem}
+\begin{proof}
+Every completed project traces a path from its arrival through the three processing stages to the sink. Summing these paths gives an integer feasible flow, so completed output is at most $F(k)$. Conversely, an integer flow decomposes into unit source--sink paths: start at a positive-flow source arc, follow positive-flow arcs using conservation, reach the sink because the graph is acyclic, subtract one along that path, and repeat. Assign distinct eligible project labels to these units. Each path respects prerequisites, capacities and the deadline, giving a feasible schedule.
+
+For completeness, start with zero flow and repeatedly augment along a residual source--sink path. Integer capacities ensure each augmentation can increase flow by at least one, and total source supply is at most $M$, so the process terminates. At termination let $S$ be the nodes reachable from the source in the residual graph. The sink is not in $S$. Every original arc leaving $S$ is saturated, and every arc entering $S$ has zero flow, since otherwise its reverse residual arc would leave $S$. Conservation implies total flow equals the capacity of that cut. Every feasible flow is bounded by every cut capacity, proving (1) and optimality of the integer flow. Finally linearity of expectation gives $q$ times the number completed, without requiring independent quality draws.
+\end{proof}
+This construction counts only completion by the deadline, not the number of hypotheses entering testing. Recorded waiting times can be recovered from the paths; maximizing throughput alone need not uniquely determine them, so any claim about a particular waiting-time distribution additionally needs a declared tie-breaking schedule.
+
+\section*{Exact finite increments and bottleneck complementarity}
+Fix one processing arc $e$ whose capacity can be increased by $\Delta\ge0$, all else fixed. Partition cuts according to whether they contain $e$ as a forward crossing arc. Let $A$ be the least original capacity among cuts that do, and $B$ the least among those that do not; an empty class has minimum $+\infty$.
+
+\begin{proposition}[A finite capacity-value formula]
+The throughput gain from this increment is exactly
+\[
+ F(k+\Delta e)-F(k)=\min\{A+\Delta,B\}-\min\{A,B\}.
+ \tag{2}
+\]
+When $A<B$, this is $\min\{\Delta,B-A\}$; when $B\le A$, it is zero. For a real increment cost $g_e(\Delta)>0$, the bottleneck value for expected validated discoveries is $q$ times (2), divided by $g_e(\Delta)$. Integer increments retain the indivisible-project interpretation.
+\end{proposition}
+\begin{proof}
+Increasing the capacity of $e$ adds $\Delta$ to precisely the cuts in the first class and changes none in the second. Applying (1) before and after gives (2). The two cases follow by elementary comparison, and the expected-output and cost conversion follow from their definitions.
+\end{proof}
+If a stage-wide investment changes several arcs, the same argument gives
+\[
+ F(k+\Delta a)=\min_C\left\{\operatorname{cap}_k(C)+\Delta\sum_{e\in C}a_e\right\}
+\]
+for nonnegative arc increments $a_e$. It is piecewise linear and can have kinks; a finite-increment comparison remains meaningful there even when a unique marginal derivative does not exist.
+
+Zero individual gains do not justify abandoning every capacity package. Consider one three-slot pipeline with at least three arrivals and stage capacities $(1,1,3)$. Throughput is one. Increasing either of the first two capacities alone by one leaves throughput at one, while increasing both raises it to two. Thus stage investments can be complementary. A rule that selects only positive single-stage gains would miss the useful joint investment. This example also respects the complete hypothesis--testing--validation order and its deadline.
+
+\section*{A separate productivity objective}
+Give each processing or waiting arc a nonnegative real resource cost $c_e$ per project, and let $C_0>0$ be fixed laboratory cost for the cohort. For an integer feasible flow $f$, write
+\[
+ C(f)=C_0+\sum_ec_ef_e,\qquad
+ P(f)=\frac{q|f|}{C(f)}.
+\]
+The finite acyclic network and bounded integer capacities give a finite nonempty set of feasible flows, including zero. This is a ratio of expected discoveries to cost, which is deterministic for the selected flow; it is not an average of project-level or laboratory-level ratios.
+
+\begin{theorem}[An exact ratio criterion]
+Let $P^*=\max_fP(f)$ and
+$\Phi(r)=\max_f\{q|f|-r C(f)\}$. Then $\Phi(P^*)=0$, $\Phi(r)>0$ for $r<P^*$, and $\Phi(r)<0$ for $r>P^*$. Hence productivity optimization reduces to maximizing a linear flow objective at candidate $r$, with the fixed term $-rC_0$. Maximizing throughput alone need not maximize productivity.
+\end{theorem}
+\begin{proof}
+Every flow has $q|f|-rC(f)=C(f)(P(f)-r)$, with $C(f)>0$. At $r=P^*$ all these expressions are nonpositive and an optimizing flow gives zero. If $r<P^*$ the same flow gives a strictly positive value. If $r>P^*$ every flow gives a strictly negative value, and finiteness makes their maximum negative. The inner objective is linear in flow amounts apart from the fixed cost, so standard finite network optimization or exhaustive finite optimization computes it. For a counterexample to throughput optimality, suppose one completed project costs one, a second requires an additional cost of one hundred, $C_0=1$ and $q=1$. Productivity is $1/2$ for one completion and $2/102$ for two, so maximal throughput has lower productivity.
+\end{proof}
+The ratio criterion is a classical fractional-optimization identity, included with proof; it is not claimed as a new general optimization theorem. An AI package that raises only a nonbinding upstream capacity while increasing fixed computation costs leaves maximum validated output unchanged and lowers productivity at every unchanged positive-output schedule. This is a precise reason to measure real costs and downstream validation, rather than equate faster generation with greater scientific productivity.
+
+\section*{Identification and remaining gap}
+Randomizing the eight stage packages across independent laboratories with fixed baseline cohorts identifies each $E[N(a)]$ and $E[C(a)]$ by arm means under consistency and no cross-laboratory interference. Positive expected cost makes their ratio identified. This alone does not identify untested capacity increments or validate homogeneous-project scheduling. Differential quality, endogenous project selection, rework, uncertain task duration, and priority rules require a richer network or stochastic control model. The theorem supplies exact bottleneck calculations only after those primitives are fixed. Actual capacity values and AI effects in the pharmaceutical population remain unresolved empirical targets.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} E. Brynjolfsson, A. Korinek and A. Agrawal (2024), \emph{The Economics of Transformative AI: A Research Agenda}, Stanford draft, Section 3.2. \url{https://digitaleconomy.stanford.edu/app/uploads/2024/11/ETAI-White-Paper.pdf}.
+\end{thebibliography}
+\end{document}
