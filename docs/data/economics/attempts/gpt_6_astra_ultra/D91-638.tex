@@ -1,0 +1,202 @@
+% ECONOMICS_PROBLEM: {"id": "D91-638", "title": "Stability of social-preference measures", "jel_code": "D91", "source_id": "OP-0303"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\title{Stability of social-preference measures\\\large Prediction stability, calibration, and repeated measurement}
+\author{GPT-6 (Codex)}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section{Target and scope}
+The catalogue asks whether fixed, source-trained social-preference survey
+scores improve prediction of incentivized behavior in new populations and
+contexts. The result must concern specified games, translations, stakes,
+and partner protocols. It is stronger than finding one significant survey
+coefficient. This attempt derives a risk decomposition, a finite-sample
+criterion for meaningful improvement, and a repeated-measurement diagnostic.
+It establishes no universal stability of trust, altruism, or reciprocity.
+The original problem remains unresolved without prospective population data.
+
+Normalize one game outcome to $Y\in[0,1]$ and clip predictions to $[0,1]$.
+Fix independently trained functions $f(S,X)$ and $g(X)$, with equal access
+to source training and tuning resources. All expectations below refer to
+one target population and one fixed game protocol. Under squared loss define
+\[
+ V=\E[(Y-g)^2-(Y-f)^2],\qquad
+ m=\E[Y\mid S,X],\quad m_0=\E[Y\mid X].
+\]
+The source training sample is conditioned upon throughout validation.
+Retraining on target outcomes changes the estimand and requires a separate
+target validation sample.
+
+\section{What predictive success would establish}
+\begin{proposition}
+For bounded outcomes and predictions,
+\[
+ V=\E[(m-m_0)^2]+\E[(g-m_0)^2]-\E[(f-m)^2].                 \tag{1}
+\]
+If $g=m_0$, positive improvement occurs precisely when the target error of
+$f$ around $m$ is smaller than the incremental signal supplied by $(S,X)$
+over $X$ alone.
+\end{proposition}
+\begin{proof}
+The conditional mean residual $Y-m$ is orthogonal to every square-integrable
+function of $(S,X)$. Hence the risk of $f$ equals
+$\E[(Y-m)^2]+\E[(f-m)^2]$. The corresponding decomposition for $g$ around
+$m_0$ gives $\E[(Y-m_0)^2]+\E[(g-m_0)^2]$.
+Finally $Y-m_0=(Y-m)+(m-m_0)$ and the cross term vanishes. Subtraction proves
+(1). These are population identities; fitted regressions need not satisfy
+them on a fresh sample unless their estimation errors are included.
+\end{proof}
+
+Equation (1) gives two distinct failure modes. The survey can have little
+conditional behavioral signal, or a source-trained rule can miss a strong
+target signal. Conversely, a weak covariate-only competitor can inflate
+$V$ through its own prediction error. Equal tuning budgets help make the
+comparison interpretable but do not make $g$ the target Bayes rule.
+
+Consider $X$ constant and $S\sim\operatorname{Bernoulli}(1/2)$. In the source,
+$Y=S$, so $f(S)=S$ is perfectly calibrated and $g=1/2$ gives $V=1/4$.
+In a target population let $Y=1-S$, preserving the entire marginal law of
+$S$ and of $Y$. The same functions give
+\[
+ \E(Y-f)^2=1,\qquad \E(Y-g)^2=1/4,\qquad V=-3/4.
+\]
+Survey-distribution similarity therefore cannot establish predictive
+transport. Even equality of game-outcome marginals is insufficient; the
+joint law matters. This is a mathematical counterexample to an automatic
+transport assertion, not evidence that any named population reverses its
+social preferences.
+
+Calibration is also a separate condition. The constant score $f=\E Y$ is
+calibrated but supplies no gain over the corresponding constant baseline.
+For any score $F=f(S,X)$, write $r(F)=\E[Y\mid F]$. Conditional-mean
+orthogonality gives
+\[
+ \E(Y-F)^2=\E(Y-r(F))^2+\E(r(F)-F)^2.                       \tag{2}
+\]
+The second term measures miscalibration; the first can remain large even
+when that term is zero. Checking both $V$ and calibration avoids equating a
+correct average prediction with useful discrimination.
+
+\section{A simultaneous, economically meaningful validation criterion}
+Suppose there are $M$ prespecified population--game--score comparisons.
+Comparison $j$ has $n_j$ independent validation participants and paired
+loss differences
+\[
+ D_{ij}=(Y_{ij}-g_j(X_{ij}))^2-(Y_{ij}-f_j(S_{ij},X_{ij}))^2\in[-1,1].
+\]
+Let $\widehat V_j$ be their mean and set
+\[
+ r_j=\sqrt{\frac{2\log(2M/\alpha)}{n_j}}.
+\]
+Hoeffding's inequality and a union bound imply, conditional on all training
+samples,
+\[
+ \Pp\{\,|\widehat V_j-V_j|\le r_j\text{ for all }j\,\}\ge1-\alpha.
+                                                               \tag{3}
+\]
+Independence between different comparisons is unnecessary: the same person
+may complete several games, provided observations within each comparison
+are independent across sampled participants. Household or session
+correlation instead requires independent cluster-level bounded statistics
+and the appropriate cluster sample size.
+
+For a chosen practical threshold $v_0>0$, the event
+$\widehat V_j-r_j>v_0$ for every $j$ certifies the finite collection of
+population improvements at simultaneous confidence $1-\alpha$. It says
+nothing about unmeasured populations. In particular, rejection of $V_j=0$
+is weaker than this statement. For two candidate scores on the same game,
+use the paired difference of their losses directly; unrelated confidence
+intervals waste the covariance information.
+
+For prespecified score bins $B_b$, a necessary implication of calibration
+is
+\[
+ a_b=\E[(Y-F)\mathbf1\{F\in B_b\}]=0.
+\]
+Each sample summand lies in $[-1,1]$, so the same bound applies jointly to
+these moments after enlarging the number of comparisons. The conditional
+bin bias is $a_b/\Pp(F\in B_b)$ when that probability is positive. A tiny
+unconditional moment does not certify a rare bin: one needs a lower bound
+on bin mass. Passing finitely many bin checks does not prove pointwise
+calibration, because positive and negative errors can cancel inside bins.
+These limitations are substantive, even with unlimited computational effort.
+
+\section{Separating repeatability from changes in behavior}
+A restrictive measurement model makes the required assumptions visible.
+At time $t$, suppose a survey measure and a game measure satisfy
+\[
+ S_t=T_t+e_t,\qquad G_t=T_t+u_t.
+\]
+Assume finite second moments, mean-zero errors independent of the entire
+latent process $(T_t)$, and errors mutually independent across methods and
+times. The equal unit loadings are maintained assumptions, not consequences
+of observing positive correlations. Then
+\[
+ \Cov(S_t,G_t)=\Var(T_t),\quad
+ \Cov(S_t,G_s)=\Cov(T_t,T_s)\quad(t\ne s),                  \tag{4}
+\]
+while
+\[
+ \Var(e_t)=\Var(S_t)-\Cov(S_t,G_t),\qquad
+ \Var(u_t)=\Var(G_t)-\Cov(S_t,G_t).
+\]
+These follow by expanding covariances and deleting the independent error
+terms. If both latent variances are positive, the latent temporal
+correlation is identified by
+\[
+ \frac{\Cov(S_t,G_s)}{
+ \sqrt{\Cov(S_t,G_t)\Cov(S_s,G_s)}}.                       \tag{5}
+\]
+Thus increased survey noise can reduce raw survey--game correlations while
+(5) remains unchanged. For example, take a time-invariant mean-zero latent
+$T$ of variance one, game-error variance one, and survey-error variance
+one initially and nine later. The contemporaneous correlations decrease
+from $1/2$ to $1/\sqrt{20}$ although the latent variable never changes.
+Bounded independent two-point variables realize these variance calculations;
+this auxiliary model is not imposing those units on the earlier normalized
+game outcome.
+
+Correlated method errors, changing loadings, or the effect of the survey
+itself on subsequent play invalidate (4). A single incentivized game also
+mixes preferences with beliefs and understanding. Consequently, even a
+successful covariance decomposition does not identify a uniquely named
+psychological trait. Randomizing stakes or anonymity while fixing the
+survey prediction rule supplies direct evidence about protocol dependence;
+it does not automatically recover an invariant latent preference.
+
+\section{Source relationship and remaining gap}
+Kosfeld and Sharafi's 2022 working paper examines the external validity of
+social-preference survey measures using an independent experimental
+population. The abstract, introduction, and reported comparison of survey
+items motivate treating predictive stability as an empirical question,
+with item-specific performance. The calculations here are standard
+conditional-expectation and concentration arguments, not claims to extend
+that paper's empirical findings. They concern the 2022 working-paper
+version; they do not pretend to reproduce the subsequent published study.
+
+The missing result is prospective evidence meeting (3), meaningful
+calibration tolerances, and a defensible measurement/protocol model across
+the intended countries and behavioral dimensions. No algebraic identity
+can determine those population quantities from an unrelated source sample.
+
+\begin{thebibliography}{9}
+\bibitem{ks} Michael Kosfeld and Zahra Sharafi (2022),
+\emph{The Preference Survey Module: New Evidence on Social Preferences from Tehran},
+IZA Discussion Paper 15006. \url{https://docs.iza.org/dp15006.pdf}.
+\end{thebibliography}
+
+\end{document}
