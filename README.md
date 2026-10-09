@@ -1,6 +1,6 @@
 # Problem Hunting with LLMs
 
-A collection of attempts by advanced Large Language Models (LLMs) to solve [Erdos Problems](https://www.erdosproblems.com/) and **Top Open Problems** across mathematics and theoretical computer science. MathOverflow is retained as a subset of the open-problems collection.
+A collection of attempts by advanced Large Language Models (LLMs) to solve [Erdos Problems](https://www.erdosproblems.com/) and **Top Open Problems** across mathematics and theoretical computer science, alongside an **Economics** catalogue of open problem statements. MathOverflow is retained as a subset of the open-problems collection.
 
 
 **Live Site:** [mehmetmars7.github.io/Erdosproblems-llm-hunter](https://mehmetmars7.github.io/Erdosproblems-llm-hunter)
@@ -21,6 +21,10 @@ The Erdos index and the [GPT_6_Astra_Ultra collection](attacks/open_problems/erd
   - The build reads these TeX files and the website displays their mathematical definitions, summaries, and sources, with a link to each original `.tex` file. Research-attempt subsections appear as separate research notebooks. Permanent numerical UnsolvedMath IDs identify statements, attempts, links and reviews. Display positions come only from `lists/unsolvedmath/display_order.json`; catalog quotations are excluded from the page display.
   - The existing 100 [MathOverflow](https://mathoverflow.net/) problems remain available as a separate source subset within this collection, preserving their attempts and links. Entries from different sources may refer to related mathematical questions.
   - Catalog inclusion does not count as an LLM attempt. A ranked problem with no submitted mathematical writeup is shown without an attempt.
+
+- **Economics**: Problem statements from the supplied merged TeX catalogue, organized by JEL code and difficulty rank. Each statement has its own detail page. These entries contain statements only and do not count as LLM attempts.
+  - Permanent problem IDs use the primary JEL code and the initial revised rank, such as `C73-1`. Subsequent ranking changes preserve IDs, filenames and links.
+  - See [Economics catalogue maintenance](lists/economics/README.md) for the source files and validation rules.
 
 ### Accepted LLM Models
 
@@ -58,11 +62,13 @@ Erdosproblems-llm-hunter/
 │   │   ├── erdos_data.js
 │   │   ├── mo_data.js
 │   │   ├── open_problems_data.js
+│   │   ├── economics_data.js        # Generated statement-only Economics catalogue
 │   │   ├── stats.js
 │   │   └── top_problems/           # Per-problem JSON detail records
 │   ├── index.html
 │   ├── erdos.html
 │   ├── open_problems.html          # Ranked problems and MathOverflow subset
+│   ├── economics.html              # Economics statements with JEL and difficulty filters
 │   ├── mo.html                     # Compatible MathOverflow listing
 │   ├── problem.html               # Shared problem and attempt detail page
 │   ├── about.html
@@ -76,6 +82,10 @@ Erdosproblems-llm-hunter/
 │   ├── erdos_problems.csv
 │   ├── erdos_status.json           # Saved collaborative database status
 │   ├── mo_problems.csv
+│   ├── economics/
+│   │   ├── problems.json           # Permanent IDs and statement metadata
+│   │   ├── rankings.csv            # Mutable difficulty ranks keyed by permanent ID
+│   │   └── README.md               # Economics catalogue maintenance
 │   └── unsolvedmath/
 │       ├── problems.json           # Portable canonical catalogue subset
 │       └── display_order.json      # Ordered canonical IDs, independent of identity
@@ -130,6 +140,24 @@ Previously published `problem.*` URLs resolve to the permanent numeric ID.
 Newly allocated local records have no public
 UnsolvedMath URL until published upstream; this migration does not publish to
 that third-party site. Their local detail pages remain available.
+
+## Updating Economics difficulty ranks
+
+Economics identities are stored in `lists/economics/problems.json`; current
+difficulty ranks are stored separately in `lists/economics/rankings.csv`.
+Prepare a CSV with `Problem ID` and `New rank` columns, using the existing IDs
+and one unique rank for every problem. Apply it and rebuild:
+
+```bash
+python3 scripts/update_economics_ranks.py /path/to/ranks.csv
+python3 build_site.py
+```
+
+An ID such as `C73-1` remains `C73-1` even if its difficulty rank later changes.
+Do not rename IDs or statement files when reordering. The initial ranks were
+matched against the supplied revised-ranking CSV; the original catalogue ranks
+are retained for audit. See [Economics catalogue maintenance](lists/economics/README.md)
+for source details and validation.
 
 ## Importing Research Batches
 

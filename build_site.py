@@ -16,6 +16,8 @@ from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 
+from scripts.economics_catalog import generate_economics_data
+
 # Directories
 BASE_DIR = Path(__file__).parent
 ATTACKS_DIR = BASE_DIR / "attacks"
@@ -1393,14 +1395,15 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
 
     # Changing the generated content changes the URL, so a new page cannot
     # accidentally pair with a pre-TeX copy of the index in the browser cache.
-    assets = ['data/open_problems_data.js', 'app.js']
+    assets = ['data/open_problems_data.js', 'app.js', 'data/economics_data.js',
+              'economics.js', 'economics-detail.js']
     versions = {asset: hashlib.sha256((DATA_DIR.parent / asset).read_bytes()).hexdigest()[:16]
                 for asset in assets if (DATA_DIR.parent / asset).exists()}
     for page in DATA_DIR.parent.glob('*.html'):
         original = page.read_text(encoding='utf-8')
         versioned = original
         for asset, version in versions.items():
-            versioned = re.sub(r'(?<=src=")' + re.escape(asset) + r'(?:\?v=[a-zA-Z0-9_-]+)?(?=")',
+            versioned = re.sub(r'(?<==")' + re.escape(asset) + r'(?:\?v=[a-zA-Z0-9_-]+)?(?=")',
                                f'{asset}?v={version}', versioned)
         if versioned != original:
             page.write_text(versioned, encoding='utf-8')
@@ -1469,6 +1472,8 @@ def main():
     open_catalog = load_open_problems_catalog()
     open_problems = build_open_problems_data(mo_problems, open_catalog)
 
+    economics = generate_economics_data()
+    print(f"  Economics problems: {len(economics)} (statements only)")
     generate_js_data(erdos_problems, mo_problems, open_problems, open_catalog)
 
     print("Build complete!")

@@ -1,0 +1,222 @@
+% ECONOMICS_PROBLEM: {"id": "C72-4", "title": "Computational complexity of optimin in finite games", "jel_code": "C72", "source_id": "OP-0589"}
+% !TeX program = xelatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=23mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Latin Modern Roman}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{xcolor,enumitem,booktabs,longtable,array,xurl,hyperref}
+\definecolor{muted}{HTML}{53636C}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\entrymeta}[3]{{\sffamily\small\color{muted}\textbf{\texttt{#1}}\quad|\quad #2\par #3\par}}
+\newcommand{\Problemref}[1]{\texttt{#1}}
+\newcommand{\JELref}[2]{\texttt{#2} (JEL \texttt{#1})}
+\begin{document}
+\section*{Computational complexity of optimin in finite games}
+\textbf{Problem ID:} \texttt{C72-4}\quad \textbf{JEL:} \texttt{C72}\par
+% BEGIN ECONOMICS STATEMENT
+\label{problem:OP-0589}
+\noindent\textbf{Addendum ID:} OPT-COMP-1. \textbf{Formulation:} editorial family of precise computational problems motivated by Ismail (2025), not a conjecture attributed verbatim to that article.
+
+\subsection*{Definitions and assumptions}
+
+Let $G=(N,(A_i)_{i\in N},(v_i)_{i\in N})$ be a finite normal-form game, with $N=\{1,\ldots,n\}$, $n\ge2$, $m_i=|A_i|\ge2$, $A=\prod_i A_i$, and rational payoffs $v_i:A\to[-1,1]\cap\mathbb Q$. Set $\Delta_i=\Delta(A_i)$ and $\Delta=\prod_i\Delta_i$. Write $u_i(p)$ for the multilinear expected-payoff extension of $v_i$ at $p\in\Delta$. The default encoding is the explicit table of the $n|A|$ payoff entries in binary, of total bit length $L$. All complexity assertions refer to $L$ (and to the bit length of any additional rational inputs), not merely to the number of pure actions.
+
+For each player $j$ and mixed profile $p$, define the correspondence of permitted \emph{strictly profitable unilateral deviations from the baseline $p$}, including non-deviation, by
+\[
+B_j(p)=\{p_j\}\ \cup\
+\bigl\{q_j\in\Delta_j:
+u_j(q_j,p_{-j})>u_j(p)\bigr\},
+\qquad B_{-i}(p)=\prod_{j\in N\setminus\{i\}}B_j(p).
+\]
+The \emph{optimin performance} of player $i$ and the mixed-strategy optimin correspondence are, respectively,
+\[
+\pi_i^G(p)=\inf_{q_{-i}\in B_{-i}(p)}u_i(p_i,q_{-i}),
+\]
+\[
+\begin{aligned}
+\mathcal O^{\mathrm{mix}}(G)=\bigl\{p\in\Delta:\;&\nexists q\in\Delta\text{ such that }
+\pi_i^G(q)\ge\pi_i^G(p)\ \forall i\in N,\\
+&\hspace{21mm}\text{and }
+\pi_j^G(q)>\pi_j^G(p)\text{ for some }j\in N\bigr\}.
+\end{aligned}
+\]
+Each $q_j\in B_j(p)$ is assessed against the \emph{original} profile $p_{-j}$, even when several opponents deviate in the product $B_{-i}(p)$. Thus the definition permits combinations of independently profitable unilateral deviations; it does not require the combination to be jointly profitable. In particular, a Nash equilibrium $p$ has $B_j(p)=\{p_j\}$ for all $j$. The strict inequality in $B_j(p)$ must not silently be replaced by a weak inequality.
+
+The \emph{pure-restricted} variant is defined separately: replace $\Delta_j$ by $A_j$ in every deviation set and in the set of candidate profiles, denote the resulting performance by $\pi_i^{G,\mathrm{pure}}(a)$, and let $\mathcal O^{\mathrm{pure}}(G)\subseteq A$ consist of the profiles Pareto undominated under $\pi^{G,\mathrm{pure}}$. Membership in $\mathcal O^{\mathrm{pure}}(G)$ does not imply membership in $\mathcal O^{\mathrm{mix}}(G)$.
+
+For exact mixed-strategy search, specify a finite algebraic-number representation of each output probability, or an explicitly equivalent exact real-algebraic representation. For approximate search, output rational probabilities. The required error notion and its binary-encoded rational tolerance $\varepsilon>0$ are always stated explicitly.
+
+\subsection*{Formal research question}
+
+\textbf{Central problem.} Determine the exact worst-case computational complexity of constructing one element of $\mathcal O^{\mathrm{mix}}(G)$ for a rational finite game $G$. Classify the following interrelated, but distinct, search, decision, verification, and approximation problems. Any proposed completeness claim must specify its many-one, Turing, or search-reduction notion and its output encoding.
+
+\begin{enumerate}[label=\textbf{(\Alph*)},leftmargin=2.7em]
+
+\item \textbf{Two-player general-sum mixed optimin.}
+For the input class $n=2$ with arbitrary rational bimatrix payoffs, determine the complexity of the total search task
+\[
+\mathsf{MIXED\text{-}OPTIMIN}_2:\quad
+G\longmapsto p\in\mathcal O^{\mathrm{mix}}(G).
+\]
+Does an algorithm run in time polynomial in the bimatrix input length $L$ under a suitable exact output model? Otherwise, establish a sharp hardness or completeness classification, distinguishing arbitrary $m_1,m_2$ from bounded-action subfamilies. Investigate membership or hardness relative to appropriately defined total-search classes such as $\mathsf{PPAD}$ and exact real-algebraic search classes such as $\mathsf{FIXP}$; neither classification is assumed.
+
+\item \textbf{Three-player and general $n$-player mixed optimin.}
+For each fixed $n\ge3$, and separately when $n$ is part of the input, determine the search complexity of
+\[
+\mathsf{MIXED\text{-}OPTIMIN}_n:\quad
+G\longmapsto p\in\mathcal O^{\mathrm{mix}}(G).
+\]
+Identify the least player count at which the complexity provably differs from the two-player problem, if such a separation exists. Distinguish general-sum games from $n$-player constant-sum games ($\sum_i v_i(a)=c$ for every $a\in A$), and distinguish a fixed number of actions per player from unrestricted action counts. In particular, determine whether the three-player problem admits a $\mathsf{FIXP}$-type characterization, a different real-algebraic search characterization, or a strictly simpler algorithmic description; no transfer from Nash-equilibrium complexity is presumed.
+
+\item \textbf{Approximation by strategy distance versus performance efficiency.}
+Let $d=\sum_i m_i$, and use the sup norm on the coordinates of $\Delta\subseteq\mathbb R^d$. Classify the total rational-output approximation problem
+\[
+\mathsf{NEAR\text{-}OPTIMIN}_n:\quad
+(G,\varepsilon)\longmapsto\widehat p\in\Delta\cap\mathbb Q^d
+\quad\text{with}\quad
+\inf_{p^*\in\mathcal O^{\mathrm{mix}}(G)}
+\|\widehat p-p^*\|_\infty\le\varepsilon.
+\]
+Separately, investigate the \emph{performance-based} requirement that there be no $q\in\Delta$ for which
+\[
+\pi_i^G(q)\ge\pi_i^G(\widehat p)\quad\forall i,
+\qquad \max_i\bigl(\pi_i^G(q)-\pi_i^G(\widehat p)\bigr)>\varepsilon.
+\]
+Determine the conditions under which such a performance-based approximation admits a rational output and, when it does, its complexity. Compare polynomial dependence on $L$ and $\log(1/\varepsilon)$ with polynomial dependence on $L$ and $1/\varepsilon$; do not conflate closeness in strategies with closeness in performance.
+
+\item \textbf{Performance thresholds and scalarized optimization.}
+For $r\in([-1,1]\cap\mathbb Q)^n$, determine the decision complexity of
+\[
+\mathsf{OPTIMIN\text{-}GUARANTEE}_n(G,r):\quad
+\exists p\in\Delta\ \forall i\in N:\ \pi_i^G(p)\ge r_i\,?
+\]
+For rational weights $\lambda_i>0$ satisfying $\sum_i\lambda_i=1$, define
+\[
+V_\lambda(G)=\max_{p\in\Delta}\sum_{i=1}^n\lambda_i\pi_i^G(p).
+\]
+Classify deciding $V_\lambda(G)\ge t$ for a rational threshold $t$, computing $V_\lambda(G)$ exactly or within $\varepsilon$, and constructing a maximizing profile. Every exact maximizer for strictly positive weights is an optimin point, but varying $\lambda$ need not generate every Pareto-undominated performance vector. Determine sharp complexity bounds, including those based on quantified polynomial inequalities over the reals, for these precisely formulated tasks.
+
+\item \textbf{Checking and certifying a proposed mixed optimin.}
+Given $G$ and a rational profile $p\in\Delta$, classify the decision problem
+\[
+\mathsf{IS\text{-}OPTIMIN}_n(G,p):\quad p\in\mathcal O^{\mathrm{mix}}(G)\,?
+\]
+Also classify the feasibility of polynomial-size, polynomial-time-verifiable certificates of optimin membership or nonmembership under declared exact and approximate encodings. Distinguish this global Pareto-nondominance test from evaluation of the individual numbers $\pi_i^G(p)$ and from checking ordinary Nash inequalities.
+
+\item \textbf{Succinct input and the pure-strategy boundary.}
+If the game is given as an \emph{explicit payoff table}, computing some $a\in\mathcal O^{\mathrm{pure}}(G)$ is already polynomial-time solvable, even with variable $n$; this is a settled baseline, not an open complexity classification. Instead, let the game be encoded by a Boolean or arithmetic circuit $C$ returning the rational payoff $v_i(a)$ given a player index $i$ and a pure action profile $a$. Determine the complexity of finding $a\in\mathcal O^{\mathrm{pure}}(G_C)$ and of deciding
+\[
+\exists a\in\mathcal O^{\mathrm{pure}}(G_C)
+\quad\forall i:\quad \pi_i^{G_C,\mathrm{pure}}(a)\ge r_i,
+\]
+particularly when every player has two actions and the number of players grows. Record the circuit and payoff bit lengths, distinguish succinct from tabular input, and examine bounded-degree graphical or other compact representations separately.
+
+\item \textbf{Structural restrictions and parameterized complexity.}
+For every stated game representation, characterize tractable and hard subfamilies among two-person zero-sum, $n$-person constant-sum ($n\ge3$), common-interest, potential, symmetric, polymatrix, anonymous, and bounded-interaction graphical games. Determine, where meaningful, whether exact or approximate mixed optimin admits fixed-parameter tractability with respect to $n$, $\max_i m_i$, graph width, payoff rank, or a specified structural parameter. The finite two-person zero-sum case, where mixed optimin coincides with Nash equilibrium and can be computed by linear programming, is a settled boundary case.
+
+\item \textbf{Sensitivity to permitted deviations.}
+Repeat the exact-search, approximation, threshold, and verification questions after replacing each $B_j(p)$, consistently throughout the performance function, by either
+\[
+\widehat B_j^{\mathrm{weak}}(p)
+=\{q_j\in\Delta_j:u_j(q_j,p_{-j})\ge u_j(p)\},
+\]
+\[
+\widehat B_j^{\mathrm{best}}(p)
+=\{p_j\}\cup\argmax_{q_j\in\Delta_j}u_j(q_j,p_{-j}).
+\]
+Both induce \emph{modified} performance functions and modified Pareto-undominated sets; they are not definitions of the benchmark strict-deviation optimin. Identify which complexity changes are caused by strict-profitability tests, boundary degeneracies, and simultaneous products of individually defined deviation sets.
+\end{enumerate}
+
+\subsection*{Interpretation and scope}
+
+The questions concern \emph{finding one} optimin point, not necessarily enumerating the entire Pareto frontier. Exact mixed-strategy search, a rational $\varepsilon$-approximation to an exact point, additive performance efficiency, weighted-value computation, and global membership testing are different computational tasks. Complexity for a succinctly encoded pure game cannot be inferred from polynomial time for the explicitly tabulated version. Two-player zero-sum games must not be used to infer tractability of arbitrary two-player general-sum games; likewise, the fact that every Nash equilibrium of an $n$-person constant-sum game is optimin does not by itself transfer any hardness theorem in the opposite direction. An algorithm for approximate mixed optimin without a worst-case running-time or approximation theorem does not resolve these classifications.
+
+\subsection*{Source audit and status}
+
+Ismail (2025, Definitions 1--3, Theorem 1, Remark 1, Remark 5, and Proposition 2/Corollary 1) supplies the optimin definition, existence, the pure-restricted benchmark, and the two-person zero-sum identification. It expressly does \emph{not} infer the complexity of mixed optimin from the hardness of computing Nash equilibria. The author's \emph{Optimin-Solver} repository advertises algorithms for pure optimin and approximate mixed optimin in two-player games, but its existence does not establish any worst-case complexity classification. Chen--Deng--Teng (2009), Daskalakis--Goldberg--Papadimitriou (2009), and Etessami--Yannakakis (2010) classify distinct \emph{Nash} computation tasks; their $\mathsf{PPAD}$ and $\mathsf{FIXP}$ results are comparative benchmarks, not theorems about optimin. \`Alvarez--Gabarro--Serna (2011) motivates careful separation of explicit and succinct game representations; it does not classify optimin computation.
+
+The eight subquestions above are newly specified research targets, not eight individually verified open conjectures from the cited papers. On the reviewed sources, a tight worst-case classification for the general mixed-strategy optimin search problem is not established. The explicit-table pure case and the two-person zero-sum case are excluded from the unresolved core. No proof, reduction, or algorithm is asserted in this entry.
+
+\subsection*{References}
+
+\begin{enumerate}
+\item[S1] Mehmet S. Ismail (2025). \emph{Super-Nash Performance}. International Economic Review 66(4), 1487--1503. \url{https://doi.org/10.1111/iere.12764}. \textit{Locator:} Section 2, Definitions 1--3 (pp.~1488--1489); Section 3, Theorem 1 and Remark 1 (pp.~1490--1491), Remark 5 and Proposition 2/Corollary 1 (pp.~1492--1493). \textit{Establishes:} the benchmark solution concept and existence/zero-sum properties. \textit{Does not establish:} polynomial-time, hardness, or completeness results for general mixed optimin computation.
+
+\item[S2] Mehmet S. Ismail. \emph{Optimin-Solver} (public software repository). \url{https://github.com/drmehmetismail/Optimin-Solver}. \textit{Locator:} README; \texttt{optimin\_pure.py} and \texttt{optimin\_mixed\_approximate.py}. \textit{Establishes:} availability of implementation examples for pure and approximate mixed optimin in two-person games. \textit{Does not establish:} a worst-case complexity classification.
+
+\item[S3] Xi Chen, Xiaotie Deng and Shang-Hua Teng (2009). \emph{Settling the Complexity of Computing Two-Player Nash Equilibria}. Journal of the ACM 56(3), Article 14. \url{https://doi.org/10.1145/1516512.1516516}. \textit{Locator:} central $\mathsf{PPAD}$-completeness theorem. \textit{Establishes:} complexity of two-player Nash equilibrium. \textit{Does not establish:} the same complexity for two-player optimin.
+
+\item[S4] Constantinos Daskalakis, Paul W. Goldberg and Christos H. Papadimitriou (2009). \emph{The Complexity of Computing a Nash Equilibrium}. SIAM Journal on Computing 39(1), 195--259. \url{https://doi.org/10.1137/070699652}. \textit{Locator:} abstract and principal $\mathsf{PPAD}$-completeness statements. \textit{Establishes:} Nash-computation complexity. \textit{Does not establish:} optimin-computation complexity.
+
+\item[S5] Kousha Etessami and Mihalis Yannakakis (2010). \emph{On the Complexity of Nash Equilibria and Other Fixed Points}. SIAM Journal on Computing 39(6), 2531--2597. \url{https://doi.org/10.1137/080720826}. \textit{Locator:} abstract and the definition of $\mathsf{FIXP}$; exact versus near-equilibrium distinctions. \textit{Establishes:} real-algebraic search benchmarks for Nash equilibria. \textit{Does not establish:} $\mathsf{FIXP}$ membership or hardness for optimin.
+
+\item[S6] Carme \`Alvarez, Joaquim Gabarro and Maria Serna (2011). \emph{Equilibria Problems on Games: Complexity versus Succinctness}. Journal of Computer and System Sciences 77(6), 1172--1197. \url{https://doi.org/10.1016/j.jcss.2011.01.001}. \textit{Locator:} abstract; comparisons of explicit and succinct representations of games. \textit{Establishes:} representation-sensitive equilibrium complexity in other solution concepts. \textit{Does not establish:} the corresponding complexity of optimin.
+\end{enumerate}
+
+\subsection*{Common conventions: Source mathematical conventions}
+
+\textbf{Finite games.} For a finite set $A$, $\Delta(A)$ is its probability
+simplex. Players choose independent mixed strategies in Nash equilibrium;
+correlation is allowed only when explicitly part of the solution concept.
+In a game with payoff functions $u_i$ and strategy profile $x$, an additive
+$\varepsilon$ Nash equilibrium satisfies
+\[
+ u_i(x)\geq u_i(x_i',x_{-i})-\varepsilon
+ \quad\text{for every player $i$ and every admissible deviation $x_i'$}.
+\]
+For numerical approximation, payoffs are normalized as locally specified.
+An $\varepsilon$ payoff residual is distinct from distance at most
+$\varepsilon$ to the set of exact equilibria. Point convergence, convergence
+of empirical play, and convergence in distance to an equilibrium set are
+also distinct.
+
+\textbf{Computational representations.} Unless stated otherwise, a complexity
+question takes rational data with binary encoding; polynomial time is measured
+in total bit length. A fixed-accuracy polynomial algorithm is not necessarily
+polynomial in $1/\varepsilon$, and neither is necessarily polynomial in
+$\log(1/\varepsilon)$. Succinct games and value, demand, or sampling oracles
+must declare their interfaces. Exact real solutions require an explicit
+representation; an unspecified list of arbitrary real numbers is not a
+finite computational output. A claimed algorithmic barrier is meaningful
+only for its specified model and reductions.
+
+\textbf{Dynamic games.} Histories, information, observation, and allowable
+randomization are part of the model. A stationary strategy depends only on
+the current state; a positional strategy in a deterministic graph game
+chooses one action at each controlled vertex. Nash equilibrium at an initial
+state and equilibrium after every history are different requirements.
+An expectation of a pathwise $\liminf$ payoff, a $\liminf$ of expected averages,
+a limiting expected average, and a uniform finite-horizon equilibrium are
+different criteria. None is silently substituted for another.
+
+\textbf{Allocation and mechanisms.} A complete allocation assigns every item
+exactly once unless otherwise stated. Zero-valued goods, negative values,
+capacity constraints, feasibility, lotteries, and copies of goods affect
+fairness definitions and are specified locally. Dominant-strategy incentive
+compatibility, Bayesian incentive compatibility, universal truthfulness,
+and truthfulness in expectation impose different inequalities. Whenever
+an objective ratio has zero denominator, its convention is stated or those
+instances are excluded.
+
+\textbf{Infinite-dimensional models.} Expectations, integrals, stochastic
+equations, and optimization objectives require their local regularity,
+integrability, filtrations, and admissible domains. A backward--forward
+mean-field system is a boundary-value problem; it is not an initial-value
+semiflow without an additional construction. Long-time, large-population,
+and vanishing-noise limits require an order of limits and a convergence
+topology. If a minimum need not be attained, the objective is its infimum
+or supremum and the approximation requirement is stated separately.
+% END ECONOMICS STATEMENT
+\end{document}
