@@ -1,0 +1,158 @@
+% ECONOMICS_PROBLEM: {"id": "C73-492", "title": "Speed of learning in games", "jel_code": "C73", "source_id": "OP-0280"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf1}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sat}{\operatorname{sat}}
+\title{Learning horizons: finite-window certification and an explicit tail model}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C73-492}.
+
+\section{The empirical target needs a tail assumption}
+For a finite game with payoffs in $[0,1]$, let $\widehat\sigma_t$ be the product of players' empirical marginal action distributions and let $e_G$ be its Nash exploitability. The target horizon is
+\[
+ T_{\varepsilon,\delta}=\inf\{T\in\mathbb N:\sup_{t\geq T}
+ \Pr(e_G(\widehat\sigma_t)>\varepsilon)\leq\delta\}.
+\]
+The population and information regime are part of the behavioral law. The source specifically calls for studying learning speed \cite[p.153]{fl}; it does not supply this statistical horizon or identify its unobserved tail.
+
+We prove a finite-window nonidentification result, give simultaneous confidence statements valid under arbitrary temporal dependence within sessions, and derive an infinite-tail certificate for a declared full-information learning model with uniformly dominant actions. These are mathematical benchmarks, not empirical estimates for human populations.
+
+\section{Finite observation cannot identify an unrestricted tail}
+\begin{theorem}\label{tail}
+Fix any finite observation horizon $H$, any $0<\varepsilon<1$, and any $0<\delta<1$. There exist two deterministic behavioral processes in the same finite game with identical observed action histories through $H$, but with $T_{\varepsilon,\delta}=1$ in one process and $T_{\varepsilon,\delta}=\infty$ in the other.
+\end{theorem}
+\begin{proof}
+Use two players, each with actions $0,1$ and payoff $u_i(a_i,a_{-i})=\Ind\{a_i=0\}$. Action zero is strictly dominant. In the first process both players always choose zero. Empirical exploitability is zero at every date, giving horizon one.
+
+In the second process both choose zero through $H$ and one at every later date. For $t>H$, each empirical marginal places mass $(t-H)/t$ on its inferior action, and exploitability is exactly $(t-H)/t$. This exceeds $\varepsilon$ for every sufficiently large $t$, with probability one. Hence no finite $T$ satisfies the tail condition. The observed histories through $H$ agree exactly, including any beliefs or feedback measurements that are defined identically there.
+\end{proof}
+
+The construction permits fixed population composition and a fixed protocol. Thus an observed short-run learning pattern alone cannot justify an unrestricted infinite-tail guarantee. A finite window can give a valid lower bound on the horizon; an upper bound requires a maintained restriction linking the future to the observed process.
+
+\section{Simultaneous finite-window inference}
+Suppose $B$ independent groups are observed through $H$ under the same game, protocol and population sampling law. Dependence across dates and among players in each group is arbitrary. Compute
+\[
+ Z_{bt}=\Ind\{e_G(\widehat\sigma_{b,t})>\varepsilon\},
+ \quad p_t=\E Z_{bt},\quad
+ \widehat p_t=B^{-1}\sum_{b=1}^B Z_{bt}.
+\]
+Let $r=\sqrt{\log(2H/\alpha)/(2B)}$, $L_t=\max\{0,\widehat p_t-r\}$, and $U_t=\min\{1,\widehat p_t+r\}$.
+
+\begin{theorem}[Window and lower-horizon certificates]\label{window}
+With probability at least $1-\alpha$, all $p_t$ lie in $[L_t,U_t]$ simultaneously, $1\leq t\leq H$. On that event:
+\begin{enumerate}
+\item If $L_s>\delta$ at any date $s$, then $T_{\varepsilon,\delta}>s$.
+\item If $\max_{T\leq t\leq H}U_t\leq\delta$, then the finite-window criterion holds at $T$.
+\item Choosing $s$ or $T$ after inspecting these bands does not invalidate either conclusion.
+\end{enumerate}
+The second assertion is a window upper certificate, not an infinite-tail upper certificate.
+\end{theorem}
+\begin{proof}
+For every fixed $t$, the variables $Z_{1t},\ldots,Z_{Bt}$ are independent Bernoulli variables with common mean $p_t$. Hoeffding gives failure probability at most $2e^{-2Br^2}=\alpha/H$. A union bound over dates proves simultaneous coverage without assumptions on temporal dependence.
+
+If $p_s>\delta$, every candidate horizon at most $s$ fails because its supremum includes date $s$. This proves the first conclusion. The second follows from $p_t\leq U_t$ at every date in the selected window. Simultaneity establishes both statements for every possible $s,T$ on one event, so subsequent selection among them incurs no extra error. Theorem~\ref{tail} prevents promoting the second conclusion to the infinite tail without more structure.
+\end{proof}
+
+The bands are informative when $B$ is large enough relative to $\log H$ and the distance of $p_t$ from $\delta$. Pooling all periods as if they were independent would incorrectly replace the number of independent groups by a much larger count.
+
+\section{An explicit maintained learning law}
+For each player $i$, suppose action $a_i^*$ has a uniform dominance gap $\Delta>0$:
+\[
+ u_i(a_i^*,a_{-i})-u_i(a_i,a_{-i})\geq\Delta
+ \quad(a_i\ne a_i^*,\ a_{-i}\in A_{-i}).
+\]
+At the end of date $s$, player $i$ observes full-information scores $Y_{i,a,s}\in[0,1]$ for every own action. With $\mathcal F_{s-1}$ containing the entire past, assume
+\[
+ \E[Y_{i,a_i^*,s}-Y_{i,a,s}\mid\mathcal F_{s-1}]\geq\Delta
+ \quad(a\ne a_i^*).
+\]
+These scores may be noisy counterfactual payoffs against the realized opponents, provided the displayed conditional inequality holds. They need not be independent across players, actions or dates. At date $t\geq2$, each player chooses an action maximizing its accumulated score through $t-1$, with any deterministic tie rule. The first actions are arbitrary. This is a specified learning mechanism; its validity for a human population would require empirical testing.
+
+\begin{lemma}[Score errors]\label{score}
+Let $K=\sum_i(|A_i|-1)$ and $\lambda=\Delta^2/2$. For $t\geq2$,
+\[
+ \Pr(\text{some player chooses }a_i\ne a_i^*\text{ at }t)
+ \leq K e^{-\lambda(t-1)}.
+\]
+\end{lemma}
+\begin{proof}
+For a fixed competing action write $D_s=Y_{i,a_i^*,s}-Y_{i,a,s}\in[-1,1]$ and $m_s=\E[D_s\mid\mathcal F_{s-1}]\geq\Delta$. Conditional Hoeffding's lemma gives
+$\E[\exp\{-\theta(D_s-m_s)\}\mid\mathcal F_{s-1}]\leq e^{\theta^2/2}$ for $\theta>0$, since the conditional range has length at most two. Iterating this inequality and applying Markov's inequality yields
+\[
+ \Pr\left(\sum_{s=1}^{t-1}D_s\leq0\right)
+ \leq\exp\{-(t-1)\theta\Delta+(t-1)\theta^2/2\}.
+\]
+Choose $\theta=\Delta$. Selecting that inferior action requires its cumulative score to be at least the dominant action's score, which is the displayed bad event, including ties. Union over all $K$ inferior actions proves the result.
+\end{proof}
+
+\begin{theorem}[A simultaneous infinite-tail horizon]\label{model}
+Assume $K\geq1$, and choose an integer $m\geq1$ with
+\[
+ \frac{K e^{-\lambda m}}{1-e^{-\lambda}}\leq\delta.
+\]
+Then with probability at least $1-\delta$, for every $t\geq1$,
+$e_G(\widehat\sigma_t)\leq\min\{1,m/t\}$.
+Consequently
+\[
+ T_{\varepsilon,\delta}\leq\left\lceil\frac m\varepsilon\right\rceil,
+\quad
+ m=\max\left\{1,\left\lceil\lambda^{-1}
+ \log\frac{K}{\delta(1-e^{-\lambda})}\right\rceil\right\}
+\]
+is a valid choice. If $K=0$, exploitability is identically zero.
+\end{theorem}
+\begin{proof}
+Summing Lemma~\ref{score} over $t\geq m+1$ gives probability at most $K e^{-\lambda m}/(1-e^{-\lambda})$ that any player ever makes an inferior choice after the first $m$ dates. On the complementary event, each empirical marginal assigns at most $m/t$ mass to inferior actions.
+
+Against any opponents' mixed profile, the dominant action is a best response. Thus player $i$'s exploitability equals
+\[
+ \sum_{a_i\ne a_i^*}\widehat\sigma_{i,t}(a_i)
+ \bigl[u_i(a_i^*,\widehat\sigma_{-i,t})-
+ u_i(a_i,\widehat\sigma_{-i,t})\bigr].
+\]
+Each bracket is between zero and one, so this quantity is at most that player's inferior-action mass. Taking the maximum over players proves the asserted bound simultaneously at every date. For $t\geq\lceil m/\varepsilon\rceil$, it is at most $\varepsilon$, so the probability of strict exceedance is at most $\delta$ at every such date. This proves the horizon claim; the explicit $m$ satisfies the preceding exponential inequality.
+\end{proof}
+
+This bound accounts for the empirical distribution's inertia: even after all players learn the dominant action, early mistakes contribute $m/t$. A rate for current actions is therefore not the same as a rate for empirical product exploitability. Games with no uniformly dominant action do not satisfy this theorem's premises.
+
+\section{Why joint external regret is not a substitute}
+\begin{proposition}\label{regret}
+There is a two-player game and an empirical joint action law with nonpositive external regret for both players whose product marginals have exploitability $1/8$.
+\end{proposition}
+\begin{proof}
+Both players have actions $A,B$ and receive one when their actions agree, zero otherwise. Consider a history with joint frequencies $3/4$ on $(A,A)$ and $1/4$ on $(B,B)$, for instance every four periods. Actual average payoff is one. Deviating to a fixed $A$ would give $3/4$, and deviating to fixed $B$ would give $1/4$, so every external-regret difference is nonpositive.
+
+Each empirical marginal assigns $3/4$ to $A$. Under their product, actual expected payoff is $(3/4)^2+(1/4)^2=5/8$, while the best response $A$ gives $3/4$. The gain is $1/8$. Thus a joint-regret certificate does not imply the product-marginal condition used in the target.
+\end{proof}
+
+\section{Source verification and remaining empirical work}
+The original MIT-hosted PDF was consulted on 9 October 2026. Printed page 153 explicitly highlights limited knowledge about learning speed, and pages 165--166 discuss the research program. The paper motivates the question; the sampling model, confidence bands and score-learning law are explicit additions. No experiment or participant data were supplied, so no feedback effect, heterogeneity effect or empirical horizon has been estimated.
+
+A next empirical step is to preregister a group sampling scheme and measured horizons, estimate the simultaneous finite-window bands, and test the full-information model's held-out predictions. Extending a tail certificate to non-dominance games requires substantive stability or no-regret structure compatible with product-marginal exploitability, rather than relabeling joint regret.
+
+\begin{thebibliography}{9}
+\bibitem{fl} D. Fudenberg and D. K. Levine, \emph{Whither Game Theory? Towards a Theory of Learning in Games}, Journal of Economic Perspectives 30(4), 151--170 (2016), especially pp.153, 165--166. \url{https://economics.mit.edu/sites/default/files/2022-09/Whither%20Game%20Theory%20Towards%20a%20Theory%20of%20Learning%20in%20Games.pdf}.
+\end{thebibliography}
+
+\end{document}

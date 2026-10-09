@@ -1,0 +1,130 @@
+% ECONOMICS_PROBLEM: {"id": "C78-464", "title": "Rank-maximality probability under uncertain preferences", "jel_code": "C78", "source_id": "OP-0548"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf1}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sat}{\operatorname{sat}}
+\title{Rank-maximality probability: counting bounds and an exact path algorithm}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C78-464}.
+
+\section{The probability event and the progress obtained}
+Acceptability is fixed; a random strict profile determines the ranks. A given feasible matching $M$ is successful exactly when its padded rank vector is lexicographically maximal over all matchings, without a preliminary cardinality objective. We establish polynomial evaluation for listed joint support, exact counting and threshold upper bounds for both independent encodings, and a polynomial exact algorithm on a nontrivial unbounded family of acceptability paths. A matching is assumed feasible; if it is not, its success probability is zero by convention.
+
+The source defines rank maximality in Section 2.1 and proposes uncertain-preference versions in the final paragraph of Section 3.1.2 \cite{ccm}. It does not supply the hardness classification asked here. In particular, hardness results for stability or Pareto optimality are not transferred to this event.
+
+\section{A polynomial verification predicate}
+Let $n=|A|$ and $R$ be the largest acceptable degree. For $n\geq1$, put $B=n+1$ and
+\[
+ w_P(a,h)=B^{R-r_P(a,h)},\qquad W_P(N)=\sum_{(a,h)\in N}w_P(a,h).
+\]
+For $E=\varnothing$ every feasible matching is empty and the answer is one, so assume $R\geq1$.
+
+\begin{lemma}\label{scalar}
+For every profile $P$, $W_P$ orders matchings exactly as their padded rank vectors do. Rank maximality of a specified matching is decidable in time polynomial in the deterministic profile's bit length.
+\end{lemma}
+\begin{proof}
+Suppose rank vectors first differ at coordinate $j$ and the first matching has at least one more rank-$j$ edge. The corresponding weight advantage is at least $B^{R-j}$. The absolute possible loss from lower coordinates is at most
+\[
+ n\sum_{\ell=j+1}^R B^{R-\ell}
+ =B^{R-j}-1.
+\]
+The first difference therefore determines the sign. Equal vectors give equal weights.
+
+Each weight has at most $1+R\log_2 B$ bits. A maximum-weight bipartite matching can be found in polynomial bit time, for example by a min-cost-flow algorithm with unit capacities, allowing unmatched vertices via zero-weight dummy edges. Comparing its weight with $W_P(M)$ verifies the event. This allows arbitrary matching cardinalities exactly as required.
+\end{proof}
+
+\begin{proposition}[Listed joint-profile support]
+For an explicitly listed joint lottery with rational masses $p_s$, exact probability and comparison with a rational threshold are polynomial-time computable.
+\end{proposition}
+\begin{proof}
+Run Lemma~\ref{scalar} on each listed profile and sum its mass if $M$ is successful. The number of checks is the input support size. A common denominator formed by multiplying the input denominators has bit length at most their total bit length; exact rational summation and comparison are therefore polynomial.
+\end{proof}
+
+\section{Independent encodings: exact counting upper bounds}
+\begin{theorem}\label{count}
+For independent explicit rational lotteries, there is a polynomial-bit computable positive integer $D$ such that $D\eta_I(M)$ is a \#P function of the encoded instance. The same assertion holds for independent uniform refinements of weak orders, with
+$D=\prod_{a}\prod_{T\text{ a tie of }a}|T|!$.
+In either encoding, exact evaluation is in $\mathrm{FP}^{\#\mathrm P}$ and rational-threshold comparison is in PP, including nonstrict comparison $\eta_I(M)\geq q$.
+\end{theorem}
+\begin{proof}
+For explicit lotteries, choose for each applicant a common denominator $d_a$, the product of its listed denominators. Write its masses as nonnegative integers $w_{a,s}/d_a$, so $\sum_s w_{a,s}=d_a$. A nondeterministic machine guesses a fixed-length binary integer $b_a$ for each applicant; reject if $b_a\notin\{0,\ldots,d_a-1\}$. Partition that interval into consecutive blocks of lengths $w_{a,s}$ and assign preference $s$ when $b_a$ belongs to its block. Then each profile has exactly $\prod_a w_{a,s_a}$ surviving branches. Accept precisely those satisfying Lemma~\ref{scalar}. The number of accepting branches is $N=D\eta_I(M)$ with $D=\prod_a d_a$. All branch lengths and computations are polynomial, since $\log D$ is bounded by input bit length.
+
+For weak orders, guess within each tie a full list of its distinct elements, using a fixed binary representation and rejecting repeated or invalid indices. Every permutation has exactly one valid encoding; concatenating ties gives each strict refinement exactly one valid branch. The denominator is the product of factorials, whose logarithm is polynomial in the stated lists' length. Apply the same verification predicate.
+
+The numerator can be obtained from a \#P oracle and divided by $D$. For a rational threshold $q=u/v$, $v>0$, the desired inequality is $vN-uD\geq0$. Counts multiplied by a polynomial-bit nonnegative integer remain \#P counts by adding a bounded integer guess; polynomial-bit integers themselves are such counts. Thus $vN-uD$ is a difference of \#P functions (a GapP function), with signed $u$ handled by moving its sign. The condition is equivalent to strict positivity of the GapP function $2(vN-uD)+1$. The sign characterization of PP gives membership. Thresholds outside $[0,1]$ may alternatively be handled directly.
+\end{proof}
+
+These are upper bounds, not completeness claims. The proof does not produce a parsimonious reduction from a known hard counting problem, and no such reduction is asserted.
+
+\section{An exact algorithm on acceptability paths}
+Consider a connected instance with houses $h_0,\ldots,h_m$ and applicants $a_1,\ldots,a_m$, where $a_i$ accepts exactly $h_{i-1}$ and $h_i$. Preferences are independent and may have arbitrary rational probabilities of the two possible orders. This covers independent explicit lotteries, after consolidating duplicate orders, and weak-order refinements (probability zero, one, or one half). The path has unbounded length and exponentially many possible strict profiles.
+
+Here $R=2$. Use $B=m+1$, so each applicant's pair of weights is either $(B,1)$ or $(1,B)$. For a realized prefix of $i$ applicants, let $D_i(0)$ be the largest weight of a matching in that prefix with $h_i$ unused; let $D_i(1)$ be the largest weight with $h_i$ used. At $i=0$ set $D_0(0)=0$ and $D_0(1)=-\infty$. Let $S_i$ be the weight contributed by the specified matching $M$ on applicants $a_1,\ldots,a_i$.
+
+\begin{lemma}[Prefix recursion]\label{pathrec}
+Writing $L_i=w(a_i,h_{i-1})$ and $R_i=w(a_i,h_i)$,
+\begin{align*}
+ D_i(0)&=\max\{D_{i-1}(0)+L_i,D_{i-1}(1)\},\\
+ D_i(1)&=\max\{D_{i-1}(0),D_{i-1}(1)\}+R_i,\\
+ S_i&=S_{i-1}+s_i,
+\end{align*}
+where $s_i$ is $L_i$, $R_i$, or zero according as $M$ assigns $a_i$ left, right, or not at all.
+\end{lemma}
+\begin{proof}
+If $h_i$ is used, it must be used by $a_i$, which takes its right edge; all previous matching choices remain available. This gives the second equation. If $h_i$ is unused, $a_i$ is either unmatched or takes its left edge. The latter requires $h_{i-1}$ unused and yields $D_{i-1}(0)+L_i$. Leaving $a_i$ unmatched gives the maximum of the two previous states; its $D_{i-1}(0)$ term is dominated by $D_{i-1}(0)+L_i$ because $L_i>0$. This proves the first equation. The third is the definition of the candidate's score.
+\end{proof}
+
+\begin{theorem}[Polynomial exact path evaluation]\label{path}
+For the path family just described, exact rank-maximality probability and rational-threshold comparison are polynomial in $m$ and the total rational input length, even though joint support may have size $2^m$.
+\end{theorem}
+\begin{proof}
+Maintain a probability table on triples $(D_i(0),D_i(1),S_i)$. Initialize the table with mass one at $(0,-\infty,0)$. For each applicant and each of its two possible orders, apply Lemma~\ref{pathrec} to each current triple, multiply its mass by that order's probability, and combine equal resulting triples. Independence makes this transition exact: the new order distribution is the same conditional on every previous triple. Induction therefore proves that the table is the joint distribution of the three indicated quantities.
+
+All finite coordinates are integers in $[0,mB]$. There are at most $(mB+2)^3=O(m^6)$ triples, where the extra value permits the initialization symbol $-\infty$. Each of the $m$ stages has at most two transitions per triple, so $O(m^7)$ arithmetic operations suffice. The bound is deliberately conservative; no efficient-state-compression claim is needed.
+
+All probability denominators divide the product of the applicants' input common denominators. That product has polynomial bit length. Numerators are bounded by the denominator because table masses are probabilities. Exact operations therefore have polynomial bit complexity. Finally sum the masses of triples with $S_m=\max\{D_m(0),D_m(1)\}$. Lemma~\ref{scalar} proves that this is exactly the target probability.
+\end{proof}
+
+\begin{proposition}[Independent connected components]\label{components}
+For either independent uncertainty encoding, if acceptability decomposes into components $I_1,\ldots,I_s$, then
+$\eta_I(M)=\prod_{t=1}^s\eta_{I_t}(M\cap E(I_t))$.
+Thus disjoint unions of the paths in Theorem~\ref{path} also have polynomial exact evaluation.
+\end{proposition}
+\begin{proof}
+A matching is rank-maximal globally exactly when its restriction is rank-maximal in every component. Necessity follows by improving one component while retaining all others. For sufficiency, compare to an arbitrary matching: every component's rank vector is lexicographically no better. If any differs, take the earliest coordinate where any component differs. At that coordinate each differing component contributes a negative difference and no component contributes a positive one, so their sum is negative. The global matching cannot improve. Component events depend on disjoint independent sets of applicants, so their probabilities multiply. Products of rational probabilities of polynomial total encoding length can be computed in polynomial bit time.
+\end{proof}
+
+\section{Independent finite implementation check}
+The distribution recursion was checked against a separate exhaustive matching and profile enumeration for every path length $m=1,\ldots,6$, every feasible candidate matching, and all $2^m$ preference profiles. The numbers of candidate matchings were respectively $3,8,21,55,144,377$. The probability that applicant $i$ prefers its left house was $i/(i+2)$ for $i=1,\ldots,m$, and all arithmetic used exact fractions. Every computed probability agreed. This is a check of the implementation over the stated finite scope, separate from the proof for all path lengths.
+
+\section{Remaining gap and source audit}
+The path recursion works because the boundary has only one house and the two-rank scalar weights are polynomially bounded in $m$. General bounded-rank graphs do not automatically inherit this recursion: a larger separator carries many possible matching states. Conversely, large scalar weights alone do not imply counting hardness, since their bit lengths are small. Establishing \#P-hardness or a general polynomial algorithm for either independent encoding, and the corresponding threshold lower bounds, remains the classification gap.
+
+The original PDF \cite{ccm} was inspected on 9 October 2026, including the rank-vector definition on PDF page 5 and the three uncertainty models and final research suggestion on PDF pages 8--9. Those are definition and agenda sources. The verification, counting construction and path recursion above are proved explicitly; neither a source's open table for other solution concepts nor finite tests are used as lower-bound evidence.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove, \emph{Selected open problems in Matching Under Preferences} (2019), Sections 2.1 and 3.1.2. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\end{thebibliography}
+
+\end{document}

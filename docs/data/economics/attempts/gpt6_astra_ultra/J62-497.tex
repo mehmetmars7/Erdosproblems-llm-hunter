@@ -1,0 +1,175 @@
+% ECONOMICS_PROBLEM: {"id": "J62-497", "title": "Social connections as a causal mobility tool", "jel_code": "J62", "source_id": "OP-0366"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\title{Testing connectedness as a mobility intervention\\\large Total effects, continuous first stages, attrition, and displacement}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{J62-497}. \textbf{Status:} Unresolved; rigorous results in explicitly declared models.
+\section{A policy effect and a friendship effect are different targets}
+The source's discussion explicitly calls for direct tests of whether increasing economic connectedness improves intergenerational mobility. We inspected the published author PDF of Chetty et al. \cite{chetty}, printed page 120, final research paragraph. Its area-level associations do not supply an exclusion restriction for a friendship intervention. The results here formalize what a randomized network-forming program would identify, what a continuous first-stage ratio can mean, and what additional observations are needed for attrition and opportunity displacement.
+
+Fix the baseline cohort and socioeconomic labels. In each population, treatment regime $z\in\{0,1\}$ specifies an entire assignment and network-forming protocol, with undirected graph $G(z)$. For a baseline low-income child $i$, let $A_i(z)$ be the share of high-income friends, using $A_i(z)=0$ for isolates and recording their isolate status separately. Let adult outcome $Y_i(z)\in[0,1]$ be the midrank of raw adult income in a fixed reference population. The target total effect and first stage are
+\[
+ \tau=\E[\overline Y(1)-\overline Y(0)],\qquad
+ \phi=\E[\overline A(1)-\overline A(0)],
+\]
+where bars average over a fixed equal-sized baseline low-income cohort within each population. Population sampling gives these equal weights; unequal sizes require a declared alternative weighting rule.
+
+\section{Randomization identifies the joint policy effect and first stage}
+Assume $K$ independent, identically distributed populations, with no interference between them, but unrestricted interference within each one. Independently assign the complete regime $Z_k$ with known probability $\pi\in(0,1)$. Graphs and ranks are observed for every baseline child at the declared follow-up horizon, including nonparticipants and school movers. Randomization is independent of all potential graphs and outcomes.
+Define
+\[
+ \widehat\tau=\frac1K\sum_k\left\{
+       \frac{Z_k\overline Y_k}{\pi}
+          -\frac{(1-Z_k)\overline Y_k}{1-\pi}\right\},
+ \quad
+ \widehat\phi=\frac1K\sum_k\left\{
+       \frac{Z_k\overline A_k}{\pi}
+          -\frac{(1-Z_k)\overline A_k}{1-\pi}\right\}.
+\]
+
+\begin{proposition}[Design-based identification and joint uncertainty]\label{trial}
+These estimators are unbiased for $(\tau,\phi)$. Set
+$L_\pi=1/\pi+1/(1-\pi)$ and
+$r= L_\pi\sqrt{\log(4/\alpha)/(2K)}$.
+Then both errors have magnitude at most $r$ jointly with probability at least $1-\alpha$, uniformly over all bounded potential outcomes and all within-population interference. This gives shrinking uncertainty as $K\to\infty$ with fixed $\pi$.
+\end{proposition}
+\begin{proof}
+Conditional on the population's two potential regime outcomes,
+$\E[Z\overline Y/\pi]=\overline Y(1)$ and
+$\E[(1-Z)\overline Y/(1-\pi)]=\overline Y(0)$, by consistency and randomization. The same holds for $A$, proving unbiasedness after averaging. Each summand lies in $[-1/(1-\pi),1/\pi]$, an interval of length $L_\pi$. Independence across populations and Hoeffding's inequality bound each two-sided error event by $2\exp(-2Kr^2/L_\pi^2)=\alpha/2$. Union bounding the two events proves joint coverage.
+\end{proof}
+
+The experimental unit is the whole randomized regime. Individual standard errors treating children as independent would not have this guarantee. Observed first stages alone cannot establish that their friendship shares are sufficient exposure summaries of the full graph.
+
+\section{Exactly what a continuous first-stage ratio averages}
+To give $\tau/\phi$ a friendship-share interpretation, impose a strong extra model. For a uniformly selected baseline child, suppose there exists a random absolutely continuous function $f_i:[0,1]\to[0,1]$ such that
+\[
+ Y_i(z)=f_i(A_i(z)),\quad z=0,1.\tag{E}
+\]
+This share-only exclusion allows heterogeneous response functions but excludes every policy and network route not mediated by that child's own share. In particular it excludes peer outcomes, friend identities and mentor quality except insofar as their effects are fully summarized by the share. Suppose $A_i(1)\geq A_i(0)$ almost surely and
+$\E\int_0^1|f_i'(a)|\,da<\infty$. Take the same child weighting as in the total-effect target.
+
+\begin{theorem}[Local average response representation]\label{lar}
+If $\phi>0$, then
+\[
+ \frac\tau\phi=
+ \frac{\displaystyle\int_0^1
+   \E[\Ind\{A_i(0)\leq a<A_i(1)\}f_i'(a)]\,da}
+      {\displaystyle\int_0^1
+   \Pr\{A_i(0)\leq a<A_i(1)\}\,da}.
+\]
+Equivalently it is the average of the derivatives under the probability measure on child--dose pairs proportional to
+$\Ind\{A_i(0)\leq a<A_i(1)\}\,dP(i)\,da$.
+If $l\leq f_i'(a)\leq u$ on the crossed dose intervals almost everywhere, then $l\leq\tau/\phi\leq u$.
+\end{theorem}
+\begin{proof}
+Absolute continuity and exclusion give
+\[
+ Y_i(1)-Y_i(0)=\int_{A_i(0)}^{A_i(1)}f_i'(a)\,da
+ =\int_0^1\Ind\{A_i(0)\leq a<A_i(1)\}f_i'(a)\,da.
+\]
+The integrability assumption permits Fubini. Apply it again to the nonnegative indicator to write
+$\phi=\E[A_i(1)-A_i(0)]=\int_0^1\Pr(A_i(0)\leq a<A_i(1))\,da$.
+Divide by the positive denominator. The normalized nonnegative weights integrate to one, so derivative lower and upper bounds pass to their average.
+\end{proof}
+
+The ratio does not identify a derivative at a specified share, an effect per added edge, or the response of never-changing children. Without monotonicity the same integral identity has oriented, possibly negative weights and no convex-average interpretation. A larger high-income friendship share can result from losing low-income friends, changing total degree, or leaving isolation, so the intervention's graph changes must be measured separately.
+
+\begin{proposition}[Sensitivity to other policy routes and weak first stages]\label{sensitivity}
+Suppose monotonicity holds and a candidate share-response family $f_i$ obeys the preceding integrability conditions, but allow
+\[
+ d_i=Y_i(1)-Y_i(0)
+      -\{f_i(A_i(1))-f_i(A_i(0))\},\qquad |\E d_i|\leq\kappa.
+\]
+Let $\beta$ be its local average response. Then
+$|\tau/\phi-\beta|\leq\kappa/\phi$ for $\phi>0$.
+On any event $|\widehat\tau-\tau|\leq r$,
+$|\widehat\phi-\phi|\leq r$ with $\phi\geq\phi_*>r$, one also has
+\[
+ \left|\frac{\widehat\tau}{\widehat\phi}-\frac\tau\phi\right|
+ \leq\frac{r}{\phi_*-r}
+           +\frac{r}{\phi_*(\phi_*-r)}.
+\]
+\end{proposition}
+\begin{proof}
+The proof of Theorem~\ref{lar} gives $\tau=\phi\beta+\E d_i$; dividing proves the sensitivity statement. For sampling error, $\widehat\phi\geq\phi_*-r>0$ and $|\tau|\leq1$. Decompose the ratio difference as
+$(\widehat\tau-\tau)/\widehat\phi
+ +\tau(\phi-\widehat\phi)/(\phi\widehat\phi)$
+and apply the two error bounds.
+\end{proof}
+
+If the first-stage interval contains zero, a bounded ratio interval should not be asserted from these inequalities. A robust confidence set instead retains every ratio $t/f$ for $(t,f)$ in the joint confidence rectangle with $f>0$, and applies any predeclared response bounds. Its possible large diameter is information about a weak friendship-share first stage.
+
+An intervention can raise $A$ and $Y$ while violating (E): a group activity might teach skills directly, with friendship shares incidental to the outcome improvement. Conversely it can raise $A$ without affecting $Y$. For a concrete pair of observed arm means, take $A(0)=0$, $A(1)=1$ and $Y(0)=0$, $Y(1)=1$. The share-only model $f(a)=a$ and a model with $Y(z,a)=z$ induce the same randomized data but assign, respectively, unit and zero causal response to changing share while holding assignment fixed. The latter policy changes skills rather than directly transferring income; both are compatible with a network-forming activity. Thus randomization alone cannot distinguish the friendship mechanism.
+
+\section{Attrition bounds retain the baseline cohort}
+Let $R_i(z)$ indicate whether the adult rank is observed. Randomization identifies, for each regime,
+\[
+ h_z=\E\left[\frac1m\sum_i R_i(z)Y_i(z)\right],\qquad
+ a_z=\E\left[\frac1m\sum_i R_i(z)\right].
+\]
+The product $RY$ is observed by setting it to zero when rank is missing. No missing-at-random assumption is made.
+
+\begin{theorem}[Sharp bounds under unrestricted outcome attrition]\label{attrition}
+Assume the fixed-reference rank model permits every value in $[0,1]$. Given the observable graph data and the observed ranks and response indicators, and absent further restrictions connecting missing ranks to them,
+\[
+ \tau\in[h_1-h_0-(1-a_0),                     h_1-h_0+(1-a_1)]
+\]
+is the sharp total-effect interval. Its width is the sum of the two regime-specific missing fractions. These bounds are separate from the share-only exclusion model (E).
+\end{theorem}
+\begin{proof}
+For each regime,
+$\E\overline Y(z)=h_z+\E[m^{-1}\sum_i(1-R_i(z))Y_i(z)]$
+and the second term lies between zero and $1-a_z$. Subtract the resulting mean intervals. To attain either endpoint, assign all unobserved ranks in one regime zero and all in the other one, retaining every observed rank and all graphs. These assignments are valid bounded potential outcomes; couple the two regime vectors arbitrarily and maintain independent randomized assignment. Convex mixtures of compatible potential-outcome laws realize every intermediate mean difference while preserving the observable law. This proves sharpness in the declared bounded-rank model.
+\end{proof}
+
+If the fixed reference rank map has a smaller attainable range $[r_-,r_+]\subseteq[0,1]$, use those endpoints instead; the proof is unchanged and the width becomes $(r_+-r_-)[(1-a_0)+(1-a_1)]$. For the displayed sharpness statement the rank model allows all values in $[0,1]$ (for example through a continuous reference distribution with achievable endpoint ranks); if endpoints are only limits, the bounds are sharp as infimum and supremum. Restricting analysis to observed adult incomes would silently replace the baseline-cohort effect by a selected-population contrast.
+
+\section{Saturation experiments reveal displacement}
+A low-income child's improved access to a scarce referral may reduce another child's chance. To identify such effects, randomize complete population policies at multiple saturation levels. For each saturation $s$, suppose the regime assigns individual participation with marginal probability $s$, and define
+$\mu_z(s)=\E[Y_i\mid\text{the declared regime at }s,                                    Z_i=z]$.
+These are policy-specific participant and nonparticipant means, averaging over the regime's peer assignments; they are not controlled individual potential outcomes unless an additional exposure model justifies that reading. Baseline population sampling and the law of total expectation give
+\[
+ V(s)=s\mu_1(s)+(1-s)\mu_0(s).
+\]
+If these functions are differentiable on an interval, elementary differentiation gives
+\[
+ V'(s)=\mu_1(s)-\mu_0(s)+s\mu_1'(s)+(1-s)\mu_0'(s).
+\]
+The latter two terms show why scaling an intervention is not determined by its within-saturation participant contrast. Randomizing saturation identifies $V(s)$ directly at tested levels, without asserting this derivative exists.
+
+For an exact displacement example, suppose every population has exactly $r$ fixed high-income adult slots and $m-r$ low-income slots under every network regime, with corresponding fixed-reference ranks $y_H>y_L$. Then
+$\sum_iY_i(z)=ry_H+(m-r)y_L$ in every regime, so the total average effect is zero. Any subset's positive sum of rank gains must be offset by the complementary subset's negative sum, by subtracting the two fixed sums. Network rewiring can change who receives the slots and can raise connectedness without creating additional slots. This is a restricted allocation model, not a claim that aggregate opportunities are actually fixed.
+
+The design identifies the program's total mobility effect and its network first stage. The share-response ratio requires additional exclusion and monotonicity, durable connections require repeated network measurement, and scaling requires peer outcomes and saturation variation. Establishing those economic restrictions and obtaining long-horizon mobility evidence remain unresolved; an area correlation or a nonzero first stage cannot supply them.
+
+\begin{thebibliography}{9}
+\bibitem{chetty} R. Chetty, M. O. Jackson, T. Kuchler, J. Stroebel, N. Hendren and coauthors (2022), \emph{Social capital I: measurement and associations with economic mobility}, Nature 608, 108--121. Published author PDF, Discussion, printed p. 120 (PDF p. 13), final research paragraph inspected 9 October 2026. \url{https://tomrutter42.github.io/assets/pdf/sc1.pdf}. DOI: \url{https://doi.org/10.1038/s41586-022-04996-4}.
+\end{thebibliography}
+\end{document}

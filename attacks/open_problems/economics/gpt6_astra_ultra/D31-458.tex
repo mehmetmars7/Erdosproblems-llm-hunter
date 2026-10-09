@@ -1,0 +1,149 @@
+% ECONOMICS_PROBLEM: {"id": "D31-458", "title": "Reconciling income-inequality measurement", "jel_code": "D31", "source_id": "OP-0360"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\title{Reconciling top income shares with accounting totals\\\large Exact allocation programs and stability under measurement uncertainty}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{D31-458}. \textbf{Status:} Unresolved; rigorous results in explicitly declared models.
+\section{A fixed-concept measurement experiment}
+The question concerns top income shares when tax records, surveys and national accounts do not assign the same amounts to the same adults. Clarke and Kopczuk \cite{clarke} emphasize the distinction between choosing an income concept and allocating its components. We inspected their publisher abstract and citation, not the full article. The results below are self-contained for a linked finite-population model; they do not establish that an allocation convention is empirical truth.
+
+Fix an income concept, $N$ baseline adults, positive population weights $w_i$ with $\sum_iw_i=1$, and $p\in(0,1)$. Let $y\in\R^N$ be the vector of true concept-specific incomes; negative values are allowed. Linked tax and survey data, residual allocation bounds, and accounting restrictions define a nonempty bounded polytope
+\[
+ \mathcal Y=\{y:Ay\leq d,\ By=e\},\qquad
+                  \sum_iw_i y_i=M>0\quad(y\in\mathcal Y).
+\]
+For example $y_i=b_i+r_i$, lower and upper bounds on $r_i$, subgroup totals, and $\sum_iw_ir_i=R$ all fit this model. Missing adults must be included with supplied weights and income bounds. Without those inputs, this finite model is not a solution to population coverage uncertainty.
+
+Let $T_p(y)$ be the upper-$p$ quantile integral of the distribution placing mass $w_i$ at $y_i$. The target is $Q_p(y)=T_p(y)/M$.
+
+\section{Top shares without assuming the identity of top earners}
+Define the compact selection polytope
+\[
+ \mathcal Z_p=\{z\in\R^N:0\leq z_i\leq w_i,                              \textstyle\sum_i z_i=p\}.
+\]
+The entries $z_i$ represent population mass, not binary indicators. They correctly handle fractional allocation at ties.
+
+\begin{lemma}[Two exact representations]\label{rep}
+For every $y\in\R^N$,
+\[
+ T_p(y)=\max_{z\in\mathcal Z_p}\sum_i z_i y_i
+       =\min_{t\in\R}\left\{pt+\sum_iw_i(y_i-t)_+\right\}.
+\]
+Every extreme point of $\mathcal Z_p$ has at most one coordinate strictly between $0$ and $w_i$.
+\end{lemma}
+\begin{proof}
+Order the incomes from largest to smallest. If a feasible selection gives positive mass to a smaller income while a larger income has unused capacity, transfer the smaller of those two available amounts to the larger income; the objective cannot decrease. Repeating finitely many such transfers yields all mass above a threshold, a possibly fractional threshold mass, and zero mass below. Its value is exactly the quantile integral, including any tied values.
+For any feasible $z$ and any $t$,
+$\sum_i z_i y_i=pt+\sum_i z_i(y_i-t)
+\leq pt+\sum_iw_i(y_i-t)_+$.
+Choosing $t$ at the threshold of the ordered selection makes the inequality an equality, proving the second representation and attainment. Finally, if two coordinates are strictly inside their capacities, a sufficiently small opposite perturbation of the two preserves feasibility in both directions and writes the point as the midpoint of two distinct feasible points. It is therefore not extreme.
+\end{proof}
+
+\begin{theorem}[Sharp interval and finite optimization]\label{program}
+The sharp top-share set in the declared model is a closed interval $[q_-,q_+]$. Its lower endpoint is the value, divided by $M$, of the linear program
+\[
+ \begin{split}
+ \text{minimize }&pt+\sum_iw_i s_i,\\
+ \text{subject to }&y\in\mathcal Y,\quad s_i\geq0,\quad s_i\geq y_i-t.
+ \end{split}
+\]
+If $V_p$ is the finite set of extreme points of $\mathcal Z_p$, its upper endpoint is
+\[
+ q_+=\frac1M\max_{z\in V_p}\left\{\max_{y\in\mathcal Y}z^Ty\right\}.
+\]
+Thus the upper endpoint can be calculated by a finite family of linear programs; no assertion of polynomial running time is made for enumerating that family.
+\end{theorem}
+\begin{proof}
+The first formula follows by minimizing the second expression of Lemma~\ref{rep} jointly over $y,t$, and replacing positive parts by epigraph variables. Since the threshold can always be chosen between the smallest and largest income, compactness of $\mathcal Y$ also permits a common compact restriction on $t$, proving attainment. For the maximum, a linear objective over $\mathcal Z_p$ attains its maximum at an extreme point, so maximizing jointly over $y,z$ and exchanging two maxima gives the stated finite expression. All feasible vectors represent distributions compatible with the supplied measurement constraints by definition, so these extrema are attainable and sharp. Finally, $T_p$ is continuous as the maximum of finitely many linear functions. The convex set $\mathcal Y$ is connected; along the segment between endpoint optimizers, the continuous function $Q_p$ attains every value between them by the intermediate value theorem. There are no holes in the identified set.
+\end{proof}
+
+Minimizing $z^Ty$ after first selecting the currently richest adults would generally be wrong: their ranks can change under residual allocations. The epigraph program accounts for that change. For a finite predeclared family of concepts, one constructs a separate $\mathcal Y_\theta$ and $M_\theta$ for each. The union of the resulting intervals can be disconnected, and there is no statistical reason to replace it by a single preferred concept.
+
+\section{A transparent accounting example}
+\begin{proposition}[A total does not determine a top share]
+Take two equally weighted adults with baseline incomes $(0,2)$, $p=1/2$, and an unassigned nonnegative total of two individual income units:
+\[
+ \mathcal Y=\{(r,4-r):0\leq r\leq2\}.
+\]
+The population mean is $M=2$ for every allocation, but the sharp top-half share set is $[1/2,1]$.
+\end{proposition}
+\begin{proof}
+The upper-half quantile integral is half the larger income, so
+$Q_{1/2}(r,4-r)=\max(r,4-r)/4=1-r/4$ on $[0,2]$. Its continuous image is exactly $[1/2,1]$. Both the equal-income and maximally concentrated allocations obey the same nonnegative residual and accounting-total restrictions.
+\end{proof}
+This example is not an empirical claim about retained earnings. It isolates exactly the unidentified allocation decision that a comprehensive-income total cannot supply.
+
+\section{Stability, negative incomes, and uncertain means}
+For distributions on the real line with finite first moments define
+$W_1(F,G)=\int_0^1|F^{-1}(u)-G^{-1}(u)|\,du$. Let
+$T_p(F)=\int_{1-p}^1F^{-1}(u)\,du$ and $\mu_F=\int_0^1F^{-1}$.
+
+\begin{proposition}[Measurement sensitivity]\label{stability}
+If $\mu_F,\mu_G\geq\underline\mu>0$ and
+$\int|y|\,dG(y)\leq H$, then
+\[
+ |Q_p(F)-Q_p(G)|
+ \leq\left(\frac1{\underline\mu}+
+                   \frac{H}{\underline\mu^2}\right)W_1(F,G).
+\]
+If the means are equal to $M>0$, the sharper constant $1/M$ suffices. For weighted finite populations,
+$W_1(F_y,F_{y'})\leq\sum_iw_i|y_i-y'_i|$.
+\end{proposition}
+\begin{proof}
+Integrating the absolute difference of quantile functions gives
+$|T_p(F)-T_p(G)|\leq W_1(F,G)$ and
+$|\mu_F-\mu_G|\leq W_1(F,G)$. Therefore
+\[
+ \left|\frac{T_p(F)}{\mu_F}-\frac{T_p(G)}{\mu_G}\right|
+ \leq\frac{|T_p(F)-T_p(G)|}{\mu_F}
+  +\frac{|T_p(G)|\,|\mu_G-\mu_F|}{\mu_F\mu_G},
+\]
+which gives the first claim because $|T_p(G)|\leq H$. For equal means the second term vanishes. To prove the finite-population coupling bound directly, use the identity
+$\int|F-G|=\int_0^1|F^{-1}-G^{-1}|$ obtained by integrating the region between their subgraphs in both coordinate orders. The pointwise difference of the two empirical CDFs is bounded by
+$\sum_iw_i|\Ind\{y_i\leq t\}-\Ind\{y'_i\leq t\}|$.
+Integrating in $t$ yields the desired inequality.
+\end{proof}
+
+A positive-mean lower bound is essential for ratio stability. For example, income vectors $(-1,1+2\epsilon)$ and $(-1,1+4\epsilon)$ with equal weights have means $\epsilon$ and $2\epsilon$, their weighted absolute difference is $\epsilon$, and their top-half shares differ by $1/(4\epsilon)$. Negative incomes also explain why imposing $Q_p\leq1$ without an additional assumption would invalidate the sharp program.
+
+If national accounts only constrain the mean to a positive interval, the continuity and connectedness argument still applies to $T_p(y)/(w^Ty)$ on a compact convex feasible set with $w^Ty\geq\underline\mu$. Exact extrema remain computationally available: for the maximum, enumerate $z\in V_p$ and solve each linear-fractional program by the substitution $v=y/(w^Ty)$, $s=1/(w^Ty)$. Its constraints are linear, including $w^Tv=1$, $Av\leq ds$, $Bv=es$ and positive bounds on $s$. For the minimum introduce $r$ and constraints $r\geq z^Tv$ for all $z\in V_p$. These statements follow by the invertible substitution $y=v/s$ and the first representation in Lemma~\ref{rep}; they do not rely on selecting a fixed rank ordering.
+
+\section{Uncertainty in measurement restrictions}
+Suppose the observable restrictions are $Ay\leq d(P)$ and $By=e(P)$, with known matrices. A data procedure supplies simultaneous intervals
+$\underline d\leq d(P)\leq\overline d$ and
+$\underline e\leq e(P)\leq\overline e$ with probability at least $1-\alpha$. Replace the restrictions by
+$Ay\leq\overline d$ and
+$\underline e\leq By\leq\overline e$, retaining predeclared bounds and positive-mean restrictions. The resulting random feasible set contains the true feasible set on that event. Computing its minimum and maximum top shares therefore gives a confidence interval covering the entire true identified set with probability at least $1-\alpha$. This follows simply by set inclusion, and remains true with dependent source errors if the supplied simultaneous intervals are valid for that dependence.
+
+This prescription separates a sampling problem from the allocation problem; it does not manufacture valid source-error intervals. Unknown record linkage creates a union of feasible polytopes, one per permitted matching. Each matching can be analyzed by Theorem~\ref{program}, but their union need not be connected. Audits that restrict linkages or bound unreported incomes have a mathematically explicit role: they remove feasible allocations. The broad question of choosing and validating those restrictions for real national data remains open.
+
+\begin{thebibliography}{9}
+\bibitem{clarke} C. Clarke and W. Kopczuk (2025), \emph{Measuring Income and Income Inequality}, Journal of Economic Perspectives 39(2), 103--126. Publisher abstract and citation inspected 9 October 2026. \url{https://www.aeaweb.org/articles?id=10.1257/jep.20241424}.
+\end{thebibliography}
+\end{document}

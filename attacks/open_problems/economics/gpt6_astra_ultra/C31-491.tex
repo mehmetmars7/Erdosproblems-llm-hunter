@@ -1,0 +1,152 @@
+% ECONOMICS_PROBLEM: {"id": "C31-491", "title": "Distributional causal effects under network interference", "jel_code": "C31", "source_id": "OP-0539"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\title{Distributional policy effects in independent networks\\\large Sharp population-level rates and explicit conditions for node-level gains}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C31-491}. \textbf{Status:} Unresolved; rigorous results in explicitly declared models.
+\section{The effective sample size is a model property}
+The target is the mixture of node marginal outcome distributions under a supplied policy, not the distribution of individual treatment effects. We prove a $K^{-1}$ minimax squared sup-norm risk under arbitrary within-population dependence and a fixed bounded policy likelihood ratio. The result has no logarithmic factor and holds for every population size $m$. We also give explicit block and dependency-graph restrictions under which more nodes improve precision, together with simultaneous CDF and quantile conclusions.
+
+Bhadra and Schweinberger \cite{bs}, revised Section 8.5, was inspected. Its call to study distributional features beyond means motivates the question; the independent-population benchmark and the rate proofs below are separate derivations.
+
+Observe $K$ independent, identically distributed populations. Within population $k$, all $m$ bounded outcomes, covariates and assignment are observed. Let $R_k=q(W_k\mid G_k,A_k)/p(W_k\mid G_k,A_k)$, with $0\leq R_k\leq C$ and $\E[R_k\mid G_k,A_k]=1$. Positivity of $p$ on the support of $q$, randomized assignment independent of vector potential outcomes given $(G,A)$, and consistency imply
+\[
+ F^q(y)=\E[R_kH_k(y)],\qquad
+ H_k(y)=\frac1m\sum_{i=1}^m\Ind\{Y_{ki}\leq y\}.
+ \tag{2}
+\]
+Indeed, condition on $(G,A)$ and all potential outcomes, sum over assignment vectors, cancel $p$ in $p(q/p)$, and then integrate. This uses the full assignment vector and permits unrestricted interference within populations.
+
+\section{A no-log upper bound for weighted empirical CDFs}
+Suppose the known outcome range is $[a,b]$. Define the raw estimator
+$\overline F(y)=K^{-1}\sum_kR_kH_k(y)$.
+It is monotone but its total mass need not be exactly one. Form a proper CDF $\widehat F$ by clipping $\overline F$ to $[0,1]$ for $a\leq y<b$, putting zero for $y<a$ and one for $y\geq b$. This adds any missing terminal mass at the known upper endpoint. It does not increase sup-norm error relative to $F^q$.
+
+\begin{lemma}[Weighted threshold process]\label{threshold}
+Let $(R_j,V_j)$, $j=1,\ldots,N$, be independent, not necessarily identically distributed, with $0\leq R_j\leq C$ and $\E R_j=1$. Then
+\[
+ \E\sup_y\left|\frac1N\sum_j
+       \{R_j\Ind\{V_j\leq y\}-\E[R_j\Ind\{V_j\leq y\}]\}\right|^2
+                       \leq\frac{16C}{N}.
+\]
+\end{lemma}
+\begin{proof}
+Use independent copies $Z'_j(y)$ of $Z_j(y)=R_j\Ind\{V_j\leq y\}$. Jensen's inequality for the convex functional $\|\cdot\|_\infty^2$ bounds the centered process's expected squared norm by that of $N^{-1}\sum_j(Z_j-Z'_j)$. Symmetry of each difference lets us insert independent Rademacher signs $\xi_j$. The squared triangle inequality then bounds it by
+$4N^{-2}\E\|\sum_j\xi_j Z_j\|_\infty^2$.
+Conditional on $(R_j,V_j)$, order the observations by $V_j$, breaking ties deterministically. The threshold sums are among the partial sums of the independent mean-zero increments $\xi_jR_j$. Doob's $L^2$ maximal inequality bounds the conditional expected squared maximum by $4\sum_jR_j^2$. One may verify that inequality directly: for a square-integrable martingale $S_l$, stopping at its first crossing of $t$ gives $t\Pr(\max|S_l|>t)\leq\E[|S_N|\Ind\{\max|S_l|>t\}]$; integration and Cauchy--Schwarz give $\E\max|S_l|^2\leq4\E|S_N|^2$. Finally $R_j^2\leq CR_j$, so $\sum_j\E R_j^2\leq NC$. Combining the factors proves the result. All suprema are measurable because the sample threshold paths are right-continuous and the same supremum can be taken over a countable dense set including the endpoints.
+\end{proof}
+
+\begin{theorem}[Risk and a simultaneous band]\label{mainupper}
+For every $K,m$ in the declared experiment,
+\[
+ \E\|\widehat F-F^q\|_\infty^2\leq\min\{1,16C/K\}.
+\]
+For any $\alpha\in(0,1)$ the CDF band
+\[
+ [\max(0,\widehat F(y)-r_K),\min(1,\widehat F(y)+r_K)]
+\]
+covers $F^q(y)$ simultaneously for all $y$ with probability at least $1-\alpha$, where
+\[
+ r_K=\min\left\{1,4\sqrt{C/K}
+                     +C\sqrt{\frac{\log(1/\alpha)}{2K}}\right\}.
+\]
+\end{theorem}
+\begin{proof}
+Independently select a uniform node index $J_k$ in each observed population. The pairs $(R_k,Y_{kJ_k})$ are independent across $k$ and have $\E R_k=1$. Their weighted empirical CDF has mean $F^q$ by (2). Its conditional expectation given all the observed populations is $\overline F$. Conditional Jensen and Lemma~\ref{threshold} give expected squared sup error at most $16C/K$ for $\overline F$, and clipping preserves the bound for $\widehat F$. The bound one follows because both $\widehat F$ and $F^q$ are CDFs.
+
+For the raw error $Z=\|\overline F-F^q\|_\infty$, Cauchy--Schwarz gives $\E Z\leq4\sqrt{C/K}$. Replacing one entire population changes $R_kH_k(y)$ by at most $C$ at every $y$, so it changes $Z$ by at most $C/K$. The bounded-differences inequality yields
+$\Pr\{Z>\E Z+t\}\leq\exp(-2Kt^2/C^2)$.
+Use the displayed square-root value of $t$ and the pointwise clipping argument. If the resulting radius exceeds one, the radius-one band covers surely.
+\end{proof}
+
+Randomly selecting one node is only a proof device: the estimator uses every observed node and is the conditional average of that less efficient procedure. No within-population independence or graph sparsity has entered the proof.
+
+\begin{theorem}[Matching lower bound]\label{lower}
+If the model allows arbitrary common within-population outcome shocks, its minimax squared sup-norm risk is bounded below by $c/K$ for a numerical $c>0$, independently of $m$. For fixed $C$, Theorem~\ref{mainupper} is therefore rate optimal.
+\end{theorem}
+\begin{proof}
+Take outcomes in $\{0,1\}$ and set all potential outcomes of all nodes in a population equal to a single Bernoulli variable $B_k$ independent of assignment and covariates. Let its success probability be $\theta$. Every target policy has $F^q(1/2)=1-\theta$, and the entire population contributes just one Bernoulli observation about $\theta$. Compare $\theta_-=1/2-h$ and $\theta_+=1/2+h$ with $h=c_0/\sqrt K$. Their $K$-sample KL divergence is at most $C_0Kh^2$, so choosing $c_0$ small gives total variation at most $1/2$. For any CDF estimator, decode the nearer of the two CDF values at $1/2$. On a testing error its squared sup loss is at least $h^2$. The sum of the two testing errors is at least $1/2$, so the maximum risk is at least $h^2/4$. Assignment data have the same independent law in both models and cannot improve this test.
+\end{proof}
+
+\section{Restrictions that make additional nodes informative}
+A useful sufficient restriction must concern the full observed weighted contributions. Conditional independence of outcomes given a shared graph, assignment or environment is not enough by itself.
+
+\begin{proposition}[Independent interference blocks]\label{blocks}
+Suppose each population is partitioned into $B=m/b_0$ equal-sized blocks, there is no interference across blocks, and the observed blocks, including all their covariates and assignments, are independent across all $KB$ blocks. Suppose the observed and target policies factor over blocks and their block likelihood ratios satisfy $0\leq R_{kr}^{\rm block}\leq C_0$, with conditional mean one. Assume these policies also satisfy the original population likelihood-ratio restriction when remaining in the canonical model. Then the estimator averaging the block-weighted empirical CDFs has risk at most
+\[
+ 16C_0/(KB)=16C_0b_0/(Km).
+\]
+If the class permits identical outcomes within each block, its minimax rate for fixed $C_0$ is exactly $b_0/(Km)$.
+\end{proposition}
+\begin{proof}
+No cross-block interference and policy factorization give the analogue of (2) for each block using its local ratio; weights for other blocks integrate to one. Equal block sizes mean that averaging these targets equals the target average across all nodes. Apply the independent-node-selection proof of Theorem~\ref{mainupper} to the $KB$ independent blocks, using Lemma~\ref{threshold}, which permits different block distributions. The lower bound uses an independent Bernoulli outcome common to the nodes of each block and invariant under policy, reducing to $KB$ Bernoulli observations as in Theorem~\ref{lower}. The submodel $q=p$ meets both the global and block ratio conditions.
+\end{proof}
+
+A more flexible restriction can be expressed directly through local policy contributions. Let $N=Km$ and suppose there are valid local weights $0\leq R_i\leq C_0$, $\E R_i=1$, such that the target is
+$N^{-1}\sum_i\E[R_i\Ind\{Y_i\leq y\}]$.
+Assume the pairs $(R_i,Y_i)$ have a supplied dependency graph with a proper coloring into $\chi$ independent color classes. Independence means joint independence of every collection inside a color class, including covariates and weights; sparse observed friendship edges alone do not imply it.
+For a class of size $N_l$, Lemma~\ref{threshold} bounds its centered-process root mean squared sup norm by $4\sqrt{C_0/N_l}$. The triangle inequality in $L^2$ and Cauchy--Schwarz give
+\[
+ \left(\E\|\overline F-F^q\|_\infty^2\right)^{1/2}
+ \leq\frac{4\sqrt{C_0}}N\sum_{l=1}^\chi\sqrt{N_l}
+ \leq4\sqrt{\frac{C_0\chi}{N}}.
+\]
+Clipping gives a proper CDF as before. Markov's inequality supplies a simultaneous band of radius
+$\min(1,4\sqrt{C_0\chi/(N\alpha)})$. Thus $\chi=o(Km)$ suffices for shrinking bands under these explicit restrictions. We do not assert a matching minimax rate for every dependency graph.
+
+\section{Shared weights and composition cannot be ignored}
+For any shared information $V$ making the population ratio $R$ measurable, the exact variance decomposition for a fixed $y$ is
+\[
+ \Var(RH(y))=\E[R^2\Var(H(y)\mid V)]
+                   +\Var(R\E[H(y)\mid V]).
+\]
+Even if node outcomes are conditionally independent, only the first term is necessarily of order $1/m$. The second can remain positive. For example, let an observed population-level assignment $W$ be a fair coin, take $q=p$, and set every node outcome deterministically equal to $W$. Outcomes are conditionally independent given $W$ (each is degenerate), but the raw empirical CDF at $1/2$ has variance $1/(4K)$. In this particular known-response example a model-aware estimator can do better, so this calculation is an obstruction to an unjustified variance argument, not a universal minimax lower bound. Theorem~\ref{lower}'s unobserved common shock supplies the actual minimax obstruction.
+
+If $R$ is independent of $m$ independent node outcomes with CDF $F$, the same identity gives
+$\Var(RH(y))=\E[R^2]F(y)(1-F(y))/m+\Var(R)F(y)^2$.
+Self-normalization or design stratification can sometimes remove that second component. Therefore a shared weighting penalty of the raw estimator must not automatically be described as information-theoretically unavoidable.
+
+\section{Quantiles and contrasts}
+Let $Q^q(u)=\inf\{y:F^q(y)\geq u\}$ for fixed $u\in(0,1)$. Assume uniformly over the class that $F^q$ has a density at least $c_*>0$ throughout
+$[Q^q(u)-h_0,Q^q(u)+h_0]$, for supplied common $h_0>0$, and this interval lies inside the outcome range. Then on any event $\|\widehat F-F^q\|_\infty\leq r<c_*h_0$,
+\[
+ |\widehat Q(u)-Q^q(u)|\leq r/c_*.
+\]
+To prove it, continuity gives $F^q(Q^q(u))=u$, and integrating the density lower bound gives $F^q(Q^q(u)+t)\geq u+c_*t$ and $F^q(Q^q(u)-t)\leq u-c_*t$ for $0\leq t\leq h_0$. The sup-norm bound brackets the first point where $\widehat F$ reaches $u$, with endpoint equality obtained by a limit. A directly usable inversion interval is
+$[\widehat Q(u-r),\widehat Q(u+r)]$ when $r<\min(u,1-u)$, by the defining CDF inequalities.
+
+For two policies, construct both CDF bands with failure budgets summing to $\alpha$. Their difference of quantile estimators has absolute error at most
+$r_1/c_1+r_0/c_0$ on the joint event. This is a contrast of marginal quantiles. No cross-world coupling is needed, and no distribution of individual policy effects is identified. The common neighborhood requirement matters: a merely positive density at one point, without a uniform neighborhood, does not imply a uniform quantile risk or interval-width guarantee.
+
+The unrestricted independent-population benchmark is resolved at the level of rates. General dependence-decay models, optimal policy reweighting when global ratios grow, and uniform quantile results without the stated density neighborhoods remain outside these results and keep the broader target unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{bs} S. Bhadra and M. Schweinberger (2026), \emph{Causal Inference Under Network Interference}, arXiv:2508.06808v2, 9 August 2026, Section 8.5, ``Random Potential Outcomes: More than Means,'' inspected 9 October 2026. \url{https://arxiv.org/html/2508.06808v2#S8.SS5}.
+\end{thebibliography}
+\end{document}
