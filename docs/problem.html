@@ -177,16 +177,19 @@
     <script src="tex-references.js?v=3"></script>
     <script src="tex-bare-math.js"></script>
     <script src="catalog-math.js"></script>
-    <script id="economics-detail-script" src="economics-detail.js?v=b10fff0261d545eb" data-economics-src="data/economics_data.js?v=b34201249d5c9367"></script>
+    <script id="economics-detail-script" src="economics-detail.js?v=716c8c2c3a305fdd" data-economics-src="data/economics_data.js?v=b34201249d5c9367"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             const params = new URLSearchParams(window.location.search);
             let type = params.get('type');
             let id = params.get('id');
             // Economics has its own fixed IDs, statements and model attempts.
-            // Keep its rendering outside claims, review and discussion setup.
+            // Render its content separately, then initialize the shared comments.
             if (type === 'economics') {
-                await window.EconomicsDetail.render(id);
+                if (await window.EconomicsDetail.render(id)) {
+                    document.getElementById('comments').hidden = false;
+                    initGiscus(type, id);
+                }
                 return;
             }
             // Share historical MO discussions and reviews across both routes.
@@ -1321,7 +1324,7 @@
             const container = document.querySelector('.giscus');
             if (!container) return;
 
-            const prefix = type === 'mo' ? 'MO' : type === 'open_problems' ? 'OpenProblem' : 'Erdos';
+            const prefix = type === 'economics' ? 'Economics' : type === 'mo' ? 'MO' : type === 'open_problems' ? 'OpenProblem' : 'Erdos';
             const term = `${prefix}-${id}`;
             const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
 

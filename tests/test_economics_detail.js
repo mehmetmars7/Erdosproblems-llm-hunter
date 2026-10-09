@@ -24,12 +24,13 @@ See \Problemref{OP-0050}. Local references [S1].
         definition_tex: String.raw`\label{game:GT-050}Third statement.` }
 };
 
-async function render(query, data = sample, lazy = false, loadError = false, assetUrl = '') {
+async function render(query, data = sample, lazy = false, loadError = false, assetUrl = '', theme = 'light') {
     const elements = new Map();
     let createdScripts = 0;
     function element(id) {
         if (!elements.has(id)) elements.set(id, {
-            innerHTML: '', textContent: '', style: {}, hidden: false, labels: [], references: [],
+            innerHTML: '', textContent: '', style: {}, hidden: false, labels: [], references: [], children: [],
+            appendChild(child) { this.children.push(child); },
             querySelectorAll(selector) {
                 return selector === '.tex-label' ? this.labels : this.references;
             }
@@ -40,7 +41,9 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
     const document = {
         addEventListener(name, callback) { if (name === 'DOMContentLoaded') callbacks.push(callback); },
         getElementById: element,
-        createElement(name) { assert.equal(name, 'script'); createdScripts += 1; return {}; },
+        querySelector: element,
+        documentElement: { getAttribute() { return theme; } },
+        createElement(name) { assert.equal(name, 'script'); createdScripts += 1; return { dataset: {} }; },
         head: { appendChild(script) {
             assert.equal(script.src, assetUrl || 'data/economics_data.js');
             if (loadError) script.onerror();
@@ -94,10 +97,19 @@ async function main() {
     assert.equal(page.element('prev-problem').href, 'problem.html?type=economics&id=H41-4');
     assert.equal(page.element('next-problem').style.visibility, 'hidden');
     assert.match(page.element('problem-statement-source').innerHTML, /href="data\/economics\/statements\/C73-1\.tex" download="C73-1\.tex"/);
-    for (const id of ['llm-attempts-section', 'comments', 'contribute-cta', 'other-llm-attacks']) {
+    for (const id of ['llm-attempts-section', 'contribute-cta', 'other-llm-attacks']) {
         assert.equal(page.element(id).hidden, true);
     }
-    assert.equal(page.createdScripts, 0, 'Embedded data needs neither fetch nor a script request');
+    assert.equal(page.element('comments').hidden, false);
+    assert.equal(page.createdScripts, 1, 'Embedded data loads only the shared comment widget');
+    const comments = page.element('.giscus').children;
+    assert.equal(comments.length, 1);
+    assert.equal(comments[0].src, 'https://giscus.app/client.js');
+    assert.equal(comments[0].dataset.repo, 'mehmetmars7/Erdosproblems-llm-hunter');
+    assert.equal(comments[0].dataset.category, 'Comments');
+    assert.equal(comments[0].dataset.mapping, 'specific');
+    assert.equal(comments[0].dataset.term, 'Economics-C73-1');
+    assert.equal(comments[0].dataset.theme, 'light');
     assert.equal(page.context.window.MathJax.tex.macros.E, '{\\mathbb{E}}');
     assert.equal(page.context.window.MathJax.tex.macros.argmin, '{\\operatorname*{arg\\,min}}');
     const targets = page.context.window.EconomicsDetail.referenceTargets(sample);
@@ -159,7 +171,9 @@ async function main() {
     assert.equal(attackReferences[0].href, '#economics-attempt-tex-label-1');
     assert.equal(attackReferences[1].href, '#economics-attempt-tex-label-2');
     assert.equal(page.element('problem-links').references[0].href, '#economics-tex-label-1');
-    assert.equal(page.element('comments').hidden, true);
+    assert.equal(page.element('comments').hidden, false);
+    assert.match(attackHtml, /href="#comments">comments<\/a>/);
+    assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-1');
 
     // A new ordering changes navigation and displayed rank while retaining every fixed route.
     const reordered = Object.fromEntries(Object.entries(sample).map(([id, record]) =>
@@ -169,18 +183,29 @@ async function main() {
     assert.match(page.element('problem-meta').innerHTML, /Rank:<\/strong> 1<\/p>/);
     assert.equal(page.element('prev-problem').style.visibility, 'hidden');
     assert.equal(page.element('next-problem').href, 'problem.html?type=economics&id=H41-4');
+    assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-1', 'Reordering retains the same discussion');
 
     page = await render('?type=economics&id=C73-2', sample, true);
-    assert.equal(page.createdScripts, 1);
+    assert.equal(page.createdScripts, 2);
+    assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-2');
     assert.equal(page.element('next-problem').href, 'problem.html?type=economics&id=H41-4');
     page = await render('?type=economics&id=C73-2', sample, true, false, 'data/economics_data.js?v=test');
-    assert.equal(page.createdScripts, 1, 'The lazy loader uses the build-versioned data URL');
+    assert.equal(page.createdScripts, 2, 'The lazy loader uses the build-versioned data URL and loads comments');
     page = await render('?type=economics&id=C73-2', sample, true, true);
     assert.match(page.element('problem-meta').innerHTML, /could not be loaded/);
+    assert.equal(page.element('comments').hidden, true);
+    assert.equal(page.element('.giscus').children.length, 0);
     page = await render('?type=economics&id=__proto__');
     assert.match(page.element('problem-meta').innerHTML, /not found/);
+    assert.equal(page.element('comments').hidden, true);
+    assert.equal(page.element('.giscus').children.length, 0);
     page = await render('?type=economics');
     assert.match(page.element('problem-meta').innerHTML, /not found/);
+    assert.equal(page.element('.giscus').children.length, 0);
+    page = await render('?type=economics&id=C72-4', { 'C72-4': { ...sample['C73-1'], id: 'C72-4' } }, false, false, '', 'dark');
+    assert.equal(page.element('comments').hidden, false);
+    assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C72-4');
+    assert.equal(page.element('.giscus').children[0].dataset.theme, 'dark');
     console.log('Economics detail tests passed');
 }
 
