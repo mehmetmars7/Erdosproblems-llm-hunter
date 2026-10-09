@@ -57,6 +57,17 @@ assert.match(api.rows([attempted]), />25%<\/td>/);
 for (const direction of ['asc', 'desc']) {
     assert.deepEqual(resultIds([records[1], attempted].sort((a, b) => api.compare(a, b, 'completion', direction))), ['C73-1', 'C72-2']);
 }
+const estimatedRecords = [attempted,
+    { ...records[1], completion: 0, attacks: [{ model: 'GPT', status: 'unresolved' }] },
+    { ...records[2], completion: 45.5, attacks: [{ model: 'GPT', status: 'unresolved' }] },
+    { id: 'C73-4', rank: 4, attacks: [{ model: 'GPT', status: 'solved' }] }
+];
+assert.deepEqual(resultIds(estimatedRecords.slice().sort((a, b) => api.compare(a, b, 'completion', 'asc'))),
+    ['C72-2', 'C73-1', 'D63-3', 'C73-4']);
+assert.deepEqual(resultIds(estimatedRecords.slice().sort((a, b) => api.compare(a, b, 'completion', 'desc'))),
+    ['D63-3', 'C73-1', 'C72-2', 'C73-4']);
+assert.match(api.rows(estimatedRecords), />0%<\/td>/);
+assert.match(api.rows(estimatedRecords), />45.5%<\/td>/);
 const html = fs.readFileSync(path.join(root, 'docs/economics.html'), 'utf8');
 assert.deepEqual(Array.from(html.matchAll(/data-sort="([^"]+)"/g), match => match[1]), Object.keys(headers));
 assert.match(html, /data-sort="rank">Rank /);
