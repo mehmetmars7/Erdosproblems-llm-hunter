@@ -1,0 +1,192 @@
+% ECONOMICS_PROBLEM: {"id": "D44-654", "title": "Improving approximation for distance-based RAG data auctions", "jel_code": "D44", "source_id": "OP-0183"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Improving approximation for distance-based RAG data auctions}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Status and restricted result}
+The general constant-improvement question remains unresolved. This attempt
+proves a factor strictly above $1-1/e$ when every positively weighted
+neighborhood contains at most a fixed number $d$ of data points. It also
+gives a truthful-in-expectation implementation and an exact payment formula
+using linear-program values. The advantage vanishes as $d$ grows, so this
+does not establish the absolute improvement required on arbitrary inputs.
+All approximation statements assume nonnegative rational public weights
+and nonnegative single-parameter private values.
+
+The database is a finite set $D$. Bidder $i$ has public neighborhoods
+$B_{ij}\subseteq D$ defined by the stated distance thresholds and public
+weights $w_{ij}\geq0$. Its coverage and value are
+\[
+ C_i(S)=\sum_j w_{ij}\ind\{S\cap B_{ij}\ne\varnothing\},
+ \qquad v_i(S)=\theta_i C_i(S).
+\]
+Allocated sets must be pairwise disjoint; unallocated points are allowed.
+The proof uses the explicit neighborhoods and therefore applies to any
+distance representation that produces them. It does not assume that every
+abstract coverage instance is representable by the restricted geometry.
+Empty neighborhoods contribute zero and can be deleted.
+
+\section*{The relaxation and its rounding guarantee}
+For submitted types $b_i\geq0$, solve the rational linear program
+\[
+ \begin{aligned}
+ V(b)=\max\quad&\sum_i b_i\sum_j w_{ij}c_{ij}\\
+ \text{subject to}\quad&x_{ik}\geq0,\quad \sum_i x_{ik}\leq1
+                                      &&(k\in D),\\
+ &0\leq c_{ij}\leq1,\quad c_{ij}\leq\sum_{k\in B_{ij}}x_{ik}.
+ \end{aligned}                                                   \tag{1}
+\]
+Fix a deterministic rule selecting an optimal rational vertex. Let
+$L_i(b)=\sum_jw_{ij}c_{ij}(b)$. Every integral allocation supplies a feasible
+solution to (1) with its exact coverage, hence $V(b)\geq\mathrm{OPT}(b)$.
+
+Independently for each point $k$, assign it to bidder $i$ with probability
+$x_{ik}$ and leave it unassigned with the remaining probability. Assignments
+for different bidders at the same point are mutually exclusive, while
+assignments across different points are independent. Thus the expected
+coverage of bidder $i$ before any further modification is exactly
+\[
+ Q_i(b)=\sum_j w_{ij}
+       \left[1-\prod_{k\in B_{ij}}(1-x_{ik})\right].                \tag{2}
+\]
+
+\begin{proposition}
+Suppose $|B_{ij}|\leq d$ whenever $w_{ij}>0$, where $d\geq1$. Put
+\[
+                 \alpha_d=1-(1-1/d)^d.
+\]
+Then $Q_i(b)\geq\alpha_d L_i(b)$ for every bidder, and the rounded
+allocation has expected welfare at least $\alpha_d\mathrm{OPT}(b)$.
+\end{proposition}
+\begin{proof}
+For one neighborhood pad its list of probabilities with zeros to length
+$d$, and let $s$ be their sum. The arithmetic--geometric mean inequality
+applied to their complements gives
+\[
+ 1-\prod_{k\in B_{ij}}(1-x_{ik})
+       \geq f_d(s):=1-(1-s/d)^d.
+\]
+On $0\leq s\leq1$, concavity and $f_d(0)=0$ imply
+$f_d(s)\geq s f_d(1)=\alpha_d s$. On $1\leq s\leq d$, monotonicity gives
+$f_d(s)\geq\alpha_d$. Since $c_{ij}\leq\min\{1,s\}$, each coverage
+probability is at least $\alpha_d c_{ij}$. Multiply by nonnegative weights,
+sum, and then sum again with the nonnegative submitted types.
+\end{proof}
+
+For example, $\alpha_1=1$, $\alpha_2=3/4$, and $\alpha_3=19/27$.
+For finite $d$, $(1-1/d)^d<e^{-1}$ (with $d=1$ immediate), so the factor
+strictly exceeds $1-1/e$. The proof is an explicit cardinality refinement
+of the usual coverage rounding calculation, not an assertion that fixed
+dimension or metric structure bounds cardinality.
+
+\section*{Making expected coverage monotone}
+The $Q_i$ produced by rounding an optimal LP solution need not itself have
+the monotonicity needed for payments. There is a direct correction. After
+rounding, keep bidder $i$'s entire tentative bundle with independent
+probability
+\[
+ \rho_i(b)=\frac{\alpha_d L_i(b)}{Q_i(b)}
+                         \quad\text{if }Q_i(b)>0,
+\]
+and discard that bundle otherwise. Set $\rho_i=0$ when $Q_i=0$; then the
+proposition implies $L_i=0$ too. Each probability belongs to $[0,1]$.
+Discarding whole bundles preserves disjointness. The resulting expected
+coverage is exactly
+\[
+                         z_i(b)=\alpha_d L_i(b).                  \tag{3}
+\]
+Consequently the welfare guarantee survives without any additional loss.
+
+To prove monotonicity, hold $b_{-i}$ fixed and compare $t<t'$. Let $R$ and
+$R'$ be the other bidders' contributions at the selected LP optima.
+Optimality at the two reports implies
+\[
+ tL_i(t)+R\geq tL_i(t')+R',\qquad
+ t'L_i(t')+R'\geq t'L_i(t)+R.
+\]
+Adding yields $(t'-t)(L_i(t')-L_i(t))\geq0$. This uses only optimality,
+including at ties; it does not assume a differentiable optimizer. Equation
+(3) is therefore monotone as required for a single-parameter mechanism.
+
+\section*{Exact payments without listing all parametric breakpoints}
+Fix bidder $i$ and define $V_i(t)=V(t,b_{-i})$. A finite rational polytope
+has finitely many vertices, so $V_i$ is a continuous convex piecewise-linear
+function. On every interval where it is differentiable its derivative is
+$L_i(t,b_{-i})$: all optimal vertices there have that same coefficient of
+$t$. Choices at finitely many slope-change points do not affect integration.
+It follows that
+\[
+ \int_0^{b_i}L_i(t,b_{-i})\,dt=V(b_i,b_{-i})-V(0,b_{-i}).           \tag{4}
+\]
+The normalized expected payment is consequently
+\[
+ p_i(b)=\alpha_d\bigl[b_iL_i(b)-V(b)+V(0,b_{-i})\bigr].            \tag{5}
+\]
+This formula needs the common LP optimum and one additional LP solve per
+bidder. It avoids an unjustified assertion that there are only polynomially
+many breakpoints along the type axis. Their number is irrelevant to (5).
+
+For completeness, if a true type is $\theta_i$ and a lower report is $r$,
+truthful expected utility minus utility at $r$ equals
+\[
+ \int_r^{\theta_i}\bigl[z_i(t,b_{-i})-z_i(r,b_{-i})\bigr]dt\geq0.
+\]
+For $r>\theta_i$ the analogous expression is
+$\int_{\theta_i}^r[z_i(r,b_{-i})-z_i(t,b_{-i})]dt\geq0$.
+These identities follow by substituting
+$p_i(r)=rz_i(r)-\int_0^r z_i(t)dt$ into the quasilinear utility.
+Thus truthful reporting is optimal in expectation. Truthful utility is
+$\int_0^{\theta_i}z_i(t)dt\geq0$, establishing individual rationality in
+expectation. Neither claim implies truthfulness for each realized random
+seed or nonnegative realized utility after every allocation outcome.
+
+\section*{Bit complexity and the boundary of the result}
+LP solutions, $\alpha_d$, and (2)--(5) are rational with polynomial bit
+length in the explicit input: multiplying a polynomial number of rational
+factors adds their bit lengths. Exact rational categorical choices and
+retention coins can be sampled with fair random bits in expected polynomial
+time by rejection sampling. A claim of a deterministic worst-case bound
+on the number of fair bits for every non-dyadic probability would be
+incorrect. The LP and payment computations themselves have polynomial
+bit complexity. The neighborhood lists must be computable from the input
+within the stated polynomial resource bound.
+
+Allowing $d$ to grow with the database still gives $\alpha_d$, but
+$\alpha_d\downarrow1-1/e$. It therefore gives no fixed $\eta>0$ on arbitrary
+instances. Even a line metric can contain arbitrarily many data points
+inside one radius, so fixed-dimensional Euclidean input alone does not
+supply the hypothesis. A different geometric invariant, a stronger
+relaxation, or an appropriate hardness construction is still needed for
+the full question. In particular, representing arbitrary coverage sets
+by added query points must account for the fact that those points may
+themselves become allocatable; ignoring that effect is not a valid reduction.
+
+\section*{Source relationship}
+The baseline LP-rounding and monotonicity approach is developed by Han,
+Esmaeili, Albert, and Xu, \emph{Data Auctions for Retrieval Augmented Generation}, arXiv:2508.16007v2 (2025), Section 4.
+\url{https://arxiv.org/html/2508.16007v2}.
+The bounded-neighborhood bound and LP-value payment calculation above
+state precisely the additional result verified in this attempt. No novelty
+or general resolution claim is made.
+\end{document}

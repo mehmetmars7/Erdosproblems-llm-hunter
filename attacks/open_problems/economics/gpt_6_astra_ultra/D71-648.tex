@@ -1,0 +1,172 @@
+% ECONOMICS_PROBLEM: {"id": "D71-648", "title": "The midpoint satisfaction threshold in budget division", "jel_code": "D71", "source_id": "OP-0225"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\title{The midpoint satisfaction threshold in budget division: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+
+\section*{Target and source status}
+There are $n$ agents, an even number $m=2h$ of projects, and rational
+demands $d_{ij}\geq0$ with $\sum_jd_{ij}\leq1$ for each agent. We seek
+$x\geq0$ with $\sum_jx_j\leq1$ such that every agent meets at least $h$
+coordinate demands. Equality counts as satisfaction, including
+$x_j=d_{ij}=0$. Both $n$ and $m$ vary in the complexity question.
+
+The inspected second version of Gourv\`es, Lampis, Melissinos, and
+Pagourtzis' \emph{Satisfactory Budget Division} still identifies this
+midpoint decision problem as open. Its hardness result for minimizing
+the required budget does not by itself settle feasibility at budget one
+under the normalized-row promise. This attempt proves exact algorithms
+when either dimension is fixed, a sharp universal budget bound, and a
+finite infeasible instance. These are restricted results, not a
+polynomial algorithm or an NP-hardness proof for the requested language.
+
+\section*{Finite certificates and an exact dynamic program}
+Let $D_j=\{0,d_{1j},\ldots,d_{nj}\}$. Any successful allocation can be
+rounded downward in each coordinate to the largest element of $D_j$
+that it reaches. Every previously met demand remains met and expenditure
+weakly decreases. Consequently a solution, if one exists, has a rational
+certificate drawn from the input, proving membership in NP. Enumerating
+$D_1\times\cdots\times D_m$ gives an $(n+1)^m$-candidate algorithm,
+polynomial for fixed $m$.
+
+A different exact algorithm is polynomial for fixed $n$. For each
+$j=0,\ldots,m$, use count states
+$c\in\{0,\ldots,h\}^n$. Let $F_j(c)$ be the minimum cost of assigning
+the first $j$ projects with capped satisfaction counts exactly $c$.
+Unreachable states have value $+\infty$; initialize
+$F_0(0,\ldots,0)=0$. For each finite state and each $v\in D_{j+1}$ set
+\[
+ c'_i=\min\{h,c_i+\mathbf 1\{v\geq d_{i,j+1}\}\},\qquad
+ F_{j+1}(c')\leftarrow
+ \min\{F_{j+1}(c'),F_j(c)+v\}.
+ \tag{1}
+\]
+The instance is feasible exactly when
+$F_m(h,\ldots,h)\leq1$. Retaining a predecessor recovers an allocation.
+
+\begin{proposition}
+Recurrence (1) is exact and can be implemented using
+$O(mn(n+1)(h+1)^n)$ rational arithmetic operations and
+$O((h+1)^n)$ values of storage, apart from reconstruction pointers.
+\end{proposition}
+\begin{proof}
+For one coordinate, only membership in the threshold sets
+$\{v:v\geq d_{ij}\}$ matters, so the rounding argument loses no solution.
+For $j$ processed coordinates, future satisfaction depends only on the
+capped counts, not on how those counts were obtained. Keeping the
+cheapest predecessor of each count vector is therefore valid. Induction
+on $j$ proves that the recurrence considers precisely the feasible
+partial count vectors at minimum cost. There are $(h+1)^n$ states and
+at most $n+1$ choices per coordinate, with $n$ count updates per choice.
+\end{proof}
+
+Every stored finite cost is the sum of at most $m$ input rationals.
+Its numerator and denominator have polynomial bit length in the total
+input encoding, even without a common small denominator. Thus the
+fixed-$n$ assertion concerns bit complexity, not an unrealistically
+unit-cost operation on exponentially long numbers. The exponent depends
+on $n$; this is not a fixed-parameter tractability claim in $n$, and it
+does not solve the case when both dimensions grow.
+
+\section*{Easy boundary cases and a universal augmented budget}
+For $m=2$, every nonnegative allocation with total one satisfies each
+agent on at least one project. Failing both would imply
+$1=x_1+x_2<d_{i1}+d_{i2}\leq1$, a contradiction. For two agents and any
+even $m$, choose one of their demand vectors: if the first weakly
+dominates the second on at least $h$ coordinates, choose the first;
+otherwise the second strictly dominates the first on more than $h$
+coordinates, so choose the second. The selected agent meets all demands,
+and the other meets at least half.
+
+There is also a useful exact bound when additional budget is permitted.
+\begin{proposition}
+For arbitrary many normalized demand rows, the common allocation
+$x_j=1/(h+1)$ satisfies every row on at least $h$ coordinates. Its total
+budget is $m/(h+1)=2m/(m+2)$. No smaller total budget works for one
+allocation required to satisfy every possible normalized demand row.
+\end{proposition}
+\begin{proof}
+An agent failing on at least $h+1$ coordinates would have demands whose
+sum is strictly greater than $(h+1)/(h+1)=1$. This proves sufficiency.
+For necessity, consider any $x\geq0$ with
+$\sum_jx_j<m/(h+1)$. The sum of its $h+1$ smallest coordinates is less
+than one, since their average is at most the average of all coordinates.
+Choose $\varepsilon>0$ sufficiently small that increasing each of these
+coordinates by $\varepsilon$ still gives total at most one. Declare
+those increased values to be one agent's demands and set the other
+demands to zero. That agent fails on $h+1$ coordinates and meets at most
+$h-1$. This is an admissible normalized row.
+\end{proof}
+
+Necessity quantifies over the whole family of possible demand rows. It
+does not say every fixed finite input needs that budget. The following
+construction supplies a finite negative instance at the original budget.
+
+\section*{An explicit finite infeasible instance}
+Take $m=4$ and include every demand row
+\[
+ (r_1,r_2,r_3,r_4)/12,
+ \qquad r_j\in\mathbb Z_{\geq0},\quad \sum_jr_j=12.
+ \tag{2}
+\]
+There are $\binom{15}{3}=455$ agents, all with row sum one.
+
+\begin{proposition}
+No allocation of total budget at most one satisfies all agents in (2)
+on two projects each.
+\end{proposition}
+\begin{proof}
+Given such an allocation, let $J$ index its three smallest coordinates.
+Their sum is at most $3/4$. For $j\in J$ put
+$r_j=\lfloor12x_j\rfloor+1$. Then
+\[
+ \sum_{j\in J}r_j\leq12\sum_{j\in J}x_j+3\leq12.
+\]
+Put the remaining nonnegative integer mass in the fourth coordinate.
+This produces a row in (2). On every $j\in J$ its demand is strictly
+greater than $x_j$, so the agent is satisfied on at most one coordinate.
+\end{proof}
+
+The strict inequality survives allocations lying exactly on grid
+thresholds because of the added one. This example also prevents an
+incorrect universal existence proof based solely on every demand row
+being individually affordable. Individual affordability and simultaneous
+half-coordinate satisfaction are different constraints.
+
+\section*{Why the general complexity question remains}
+The two algorithms expose two sources of growth: choosing one threshold
+on every project, or tracking a count for every agent. Neither procedure
+compresses both dimensions to polynomial size. The explicit negative
+instance supplies no hardness reduction; having both positive and
+negative instances is much weaker than NP-completeness.
+
+A tempting argument is to import hardness of minimum-budget optimization
+and scale its threshold $B$ to one. Scaling demands by $1/B$ preserves
+comparisons, but if $B<1$ it may violate the promised row sums. For the
+hardness conclusion one must establish that the reduction respects every
+normalization and preserves the midpoint threshold. Adding zero-demand
+projects is also not neutral: they satisfy every agent automatically,
+while the required number of satisfied projects changes with $m$.
+These are concrete checks a valid reduction still has to pass.
+
+The original variable-dimension decision problem remains unresolved by
+this attempt. The finite algorithms and counterexample are independently
+proved calculations, with no claim of novelty.
+
+Laurent Gourv\`es, Michael Lampis, Nikolaos Melissinos, and Aris
+Pagourtzis, \emph{Satisfactory Budget Division}, arXiv:2502.00484v2.
+Inspected locators: the midpoint discussion in Section 4 and the
+conclusion; the minimum-budget result is a separate optimization claim.
+\url{https://arxiv.org/html/2502.00484v2}.
+
+\end{document}

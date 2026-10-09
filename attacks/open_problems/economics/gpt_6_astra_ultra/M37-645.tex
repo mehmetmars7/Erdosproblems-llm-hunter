@@ -1,0 +1,91 @@
+% ECONOMICS_PROBLEM: {"id": "M37-645", "title": "Incremental effects of digital advertising", "jel_code": "M37", "source_id": "OP-0075"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\title{Incremental effects of digital advertising: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+
+\section{Target and statistical experiment}
+The goal is incremental campaign profit for a fixed eligible population and horizon, together with precision sufficient to decide whether profit exceeds a prespecified threshold. It is not the number of purchases credited by an attribution rule. Let $M_i(z)$ denote contribution margin before campaign costs and let $K_i(z)$ denote campaign expenditure, both normalized per eligible consumer. Set $W_i(z)=M_i(z)-K_i(z)$ and
+\[
+ \Delta=\mathbb E[W_i(1)-W_i(0)].
+\]
+The same population denominator is essential: dividing treated spending by exposed consumers and margin by eligible consumers creates two incompatible units. An implementation with shared campaign costs may require market-level observations rather than fictitious independent consumer-level cost records.
+
+This attempt supplies an exact bounded-outcome inference guarantee, a sample-size calculation, an exposure-effect identification check and a multichannel interference analysis. The original scalable market-level measurement agenda remains unresolved. The inspected Lewis--Rao--Reiley primary record distinguishes causal measurement from digital activity metrics; the calculations below are explicit restricted results, not measurements of any advertiser.
+
+\section{Eligibility identifies a policy effect}
+Assume independent draws of consumers from a stated target population, consistency, no interference, and randomized allocation of $n_1$ consumers to eligibility and $n_0$ to control, with sample sizes fixed in advance. Outcomes include purchases across the declared measurement channels. Then
+\[
+ \widehat\Delta=\frac1{n_1}\sum_{i:Z_i=1}W_i-rac1{n_0}\sum_{i:Z_i=0}W_i
+\]
+is unbiased for $\Delta$. Assignment independence implies each arm mean has the relevant potential-outcome mean; linearity proves the claim. Randomization over a fixed finite population instead targets its finite-population mean and requires its corresponding randomization analysis. The following independent-sample bound is for the stated superpopulation experiment.
+
+Suppose $W_i(z)\in[L,U]$ almost surely for known endpoints and put $B=U-L$. Applying Hoeffding's inequality to the signed weighted sum gives
+\[
+ \Pr(|\widehat\Delta-\Delta|>h)
+ \leq2\exp\left[-\frac{2h^2}{B^2(1/n_1+1/n_0)}\right].
+\]
+Thus the interval with radius
+\[
+ h_\alpha=B\sqrt{\frac{1/n_1+1/n_0}{2}\log\frac2\alpha}
+\]
+has finite-sample coverage at least $1-\alpha$. Cost and margin need not be independent: bounding their combined potential outcome is sufficient. If each component is analyzed separately, their covariance must enter the variance of profit; adding two standard errors without a joint argument is generally inefficient or incorrect.
+
+\section{A profitability decision and sample-size guarantee}
+Fix the commercial threshold $\kappa$ before seeing results. Report evidence of profitability only if $\widehat\Delta-h_\alpha>\kappa$. Whenever $\Delta\leq\kappa$, the probability of this claim is at most $\alpha$, by interval coverage. To demand power, specify a meaningful margin $g>0$: no finite uniform sample size can reliably distinguish effects arbitrarily close to the threshold.
+
+For balanced allocation with total size $n$, $h_\alpha=B\sqrt{2\log(2/\alpha)/n}$. If the actual effect is at least $\kappa+g$, then with probability at least $1-\beta$ the decision succeeds whenever
+\[
+ n>\frac{2B^2}{g^2}
+       \left(\sqrt{\log(2/\alpha)}+\sqrt{\log(2/\beta)}\right)^2.
+\]
+Indeed, with probability at least $1-\beta$, estimation error is no smaller than $-h_\beta$, so the lower confidence limit exceeds $\kappa$ when $h_\alpha+h_\beta<g$. This sufficient bound is conservative, particularly for rare purchases; its role is a transparent guarantee rather than a claimed optimal power calculation.
+
+With positive known arm variances $\sigma_z^2$, the usual independent-sample variance is $\sigma_1^2/n_1+\sigma_0^2/n_0$. Minimizing it at fixed total sample gives $n_1/n_0=\sigma_1/\sigma_0$, by differentiating with respect to $n_1$. This variance allocation is not the same as a finite-sample guarantee when variances are estimated or assignment costs differ. Bounding outcomes by silently winsorizing large orders changes the estimand; the excluded tail contribution needs a bound if the original profit target is retained.
+
+\section{Why exposure conditioning and a Wald ratio are different}
+Let $A_i(z)\in\{0,1\}$ indicate actual exposure. Suppose additionally that eligibility changes margin only through exposure, that $A_i(1)\geq A_i(0)$, and that exposure has a well-defined binary version with potential margins $M_i(a)$. Under these restrictions,
+\[
+ \mathbb E[M\mid Z=1]-\mathbb E[M\mid Z=0]
+ =\Pr(\text{complier})\,\mathbb E[M(1)-M(0)\mid\text{complier}],
+\]
+while the exposure-rate difference equals $\Pr(\text{complier})$. Partitioning the population into always-exposed, never-exposed and complier types proves both identities. Their ratio identifies the complier exposure effect when the denominator is positive.
+
+Neither the exclusion nor binary exposure is guaranteed by an advertising holdout. Eligibility can change auctions, frequency, rival impressions or prices. A fixed campaign setup cost may change profit without changing any consumer's exposure, so an exposure interpretation for margin does not automatically extend to profit. The eligibility-profit estimand remains meaningful even when the Wald interpretation fails.
+
+For a simple selection example, suppose half the population would purchase regardless of advertising and half would never purchase. Let exposure target only the first half. Advertising has zero effect on everyone, yet exposed consumers have purchase probability one and unexposed consumers zero. A comparison conditioned on exposure estimates one instead of zero. Randomized eligibility removes this selection bias for its own effect; it does not legitimize conditioning on the post-assignment exposure variable.
+
+\section{Multichannel interactions and market spillovers}
+For two randomized campaign components, write $\mu_{ab}=\mathbb E[W(a,b)]$. The combined policy effect is $\mu_{11}-\mu_{00}$. The interaction is
+\[
+ I=\mu_{11}-\mu_{10}-\mu_{01}+\mu_{00}.
+\]
+Adding the two isolated effects omits $I$. An order-averaged allocation gives channel one
+$\tfrac12\{\mu_{10}-\mu_{00}+\mu_{11}-\mu_{01}\}$ and gives channel two the analogous expression; they add to the combined effect. These are attribution conventions for identified policy contrasts, not claims that individual purchases possess unique causal owners. All four arms need common cost accounting and cross-platform deduplication.
+
+Interference changes the estimand even in a linear example:
+\[
+ W_i(\mathbf z)=a_i+\tau z_i+
+   \gamma\frac1{|N_i|}\sum_{j\in N_i}z_j+\varepsilon_i.
+\]
+Assume each fixed neighbor set $N_i$ is nonempty and excludes $i$, and assignment is independent of $(a_i,\varepsilon_i)$. Under independent individual assignment, neighbors have the same assignment distribution in either own-treatment arm, so the own-assignment contrast is $\tau$. Switching everybody from zero to one changes the mean by $\tau+\gamma$. These differ unless spillovers vanish. Randomizing isolated geographic clusters can identify the latter type of contrast within clusters, but the effective number of independent observations is the number of clusters; millions of consumers do not create millions of independent treatment assignments.
+
+Missing outcomes create a further gap. Randomization identifies observed-record effects without automatically identifying purchases absent from the record. If missing outcomes lie in known bounds, arm-specific worst-case means provide valid bounds; recovering point effects requires an observation or linkage model. Post hoc selection of profitable segments similarly needs simultaneous inference or a fresh evaluation sample.
+
+\section{Status and sources}
+The eligibility estimator, finite-sample decision guarantee and multichannel identities are established under their explicit assumptions. Auction interference, missing cross-platform outcomes, long-horizon effects and transport to new campaigns are not solved here. No empirical profit estimate or new discovery is claimed.
+
+Randall Lewis, Justin M. Rao and David H. Reiley, \emph{Measuring the Effects of Advertising: The Digital Frontier}, NBER WP 19520 (2013), subsequently Chapter 7 of \emph{Economic Analysis of the Digital Economy} (2015), pp.191--218. Primary NBER record, abstract and chapter metadata inspected:
+\url{https://www.nber.org/papers/w19520}.
+
+\end{document}
