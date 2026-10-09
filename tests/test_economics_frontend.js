@@ -54,6 +54,15 @@ assert.match(statementRow, />0 attempts<\/span>/);
 assert.equal((statementRow.match(/>—<\/td>/g) || []).length, 2);
 const attempted = { ...records[0], completion: 25, attacks: [{ model: 'GPT', status: 'unresolved' }] };
 assert.match(api.rows([attempted]), />25%<\/td>/);
+const solvedClaim = { ...records[0], status: 'solved', source_status: 'open', status_source: 'llm_claim',
+    llm_status: 'solved', completion: 100, completion_source: 'llm_claim',
+    attacks: [{ model: 'GPT 6 Astra Pro', status: 'solved', completion: 100 },
+        { model: 'GPT 6 Astra Ultra', status: 'unresolved', completion: 15 }] };
+assert.match(api.rows([solvedClaim]), />solved \(LLM claim\)<\/td>/);
+assert.match(api.rows([solvedClaim]), />100%<\/td>/);
+assert.match(api.rows([solvedClaim]), />solved<\/a>/);
+assert.equal(window.ProblemHunting.getOpenProblemSourceStatusLabel(solvedClaim), 'open');
+assert.equal(window.ProblemHunting.getCompletionSourceLabel(solvedClaim), 'LLM claim');
 for (const direction of ['asc', 'desc']) {
     assert.deepEqual(resultIds([records[1], attempted].sort((a, b) => api.compare(a, b, 'completion', direction))), ['C73-1', 'C72-2']);
 }

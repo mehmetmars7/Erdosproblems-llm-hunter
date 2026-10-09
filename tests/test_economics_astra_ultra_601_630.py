@@ -19,7 +19,8 @@ class EconomicsAstraUltra601To630Tests(unittest.TestCase):
                 self.assertEqual(attempt['status'], 'solved' if problem_id == 'C78-619' else 'unresolved')
                 self.assertEqual(attempt['entry_kind'], 'research_attempt')
                 self.assertEqual(attempt['date_posted'], '2026-10-09')
-                self.assertEqual(record['status'], 'open')
+                self.assertEqual(record.get('source_status', record['status']), 'open')
+                self.assertEqual(record['status'], 'solved' if problem_id == 'C78-619' else 'open')
                 if problem_id == 'C78-619':
                     self.assertEqual(record['llm_status'], 'solved')
                 source = BASE_DIR / attempt['file_path']
