@@ -1,0 +1,76 @@
+% ECONOMICS_PROBLEM: {"id": "C78-392", "title": "Parameterized reachability of allocations by improving swaps", "jel_code": "C78", "source_id": "OP-0551"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Parameterized reachability of allocations by improving swaps: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved overall; exact parameterized subcases established.} The specified target allocation, strict preferences, and bilateral improving swaps together permit a useful reduction: anyone whose initial and target houses agree cannot participate in a successful sequence. This yields fixed-parameter tractability in the number of displaced applicants, hence in a total-swap budget. It also gives polynomial algorithms when each applicant may swap at most once or has at most two acceptable houses. The full classification by treewidth, list length, and participation bounds is not settled here.
+
+The primary IJCAI record \cite{swaps} treats reachability, individual object acquisition and Pareto efficiency as distinct tasks. The present arguments concern a specified complete target, as in the catalogue. They do not transfer automatically to the problem of finding any reachable efficient allocation, whose eventual participants are unknown.
+
+\section*{The fixed-agent lemma}
+Let $M_0,M_*$ be acceptable bijections. Define
+\[
+ D=\{a:M_0(a)\ne M_*(a)\},\quad k=|D|,\quad H_D=M_0(D).
+\]
+For every $a\in D$, reject immediately unless $M_*(a)\succ_a M_0(a)$.
+
+\begin{lemma}
+In any legal sequence from $M_0$ to $M_*$, every participating applicant belongs to $D$. The houses held by $D$ remain exactly $H_D$.
+\end{lemma}
+\begin{proof}
+An applicant's house strictly improves each time she participates. By transitivity and strictness, after one participation she can never again hold her original house. Thus $a\notin D$ cannot participate. With every other applicant fixed, all swaps occur inside $D$ and only permute their initially endowed houses. As both endpoint allocations are bijections and agree on the complement, $M_*(D)=H_D$ as well.
+\end{proof}
+
+Delete applicants outside $D$, delete their houses and incident edges, and restrict each remaining preference list to $H_D$, retaining the original relative order and acceptability. This loses no feasible successful sequence. Conversely every reduced-instance sequence is a legal original sequence by keeping the deleted agents fixed. Houses lying strictly below an applicant's initial house or strictly above her target house can additionally be removed from that applicant's admissible intermediate assignments; neither could occur on an increasing trajectory ending at the target.
+
+\section*{A finite-state algorithm and its certificate}
+Enumerate acceptable bijections between $D$ and $H_D$; there are at most $k!$. Starting at the reduced $M_0$, perform breadth-first search. For every current assignment and every induced network edge $ab$, generate its transposition exactly when both agents prefer the other's current house. Store a predecessor and the generating edge when a state is first reached. Stop when the target is reached or the queue is exhausted.
+
+\begin{proposition}
+The algorithm decides target reachability in $k!\,k^{O(1)}+|I|^{O(1)}$ time and produces a shortest sequence when one exists. In particular it is fixed-parameter tractable in $k$.
+\end{proposition}
+\begin{proof}
+Every generated edge is a legal swap, so predecessor paths certify acceptance. By the lemma, every successful original path lies in the enumerated state space. Induction on its length shows that breadth-first search reaches each of its states, proving completeness. There are at most $k!$ states and at most $\binom k2$ swap candidates per state; preference comparisons use precomputed ranks. Copying or indexing assignments contributes only a polynomial in $k$. Initial reading and reduction are polynomial in the original binary input size. Breadth-first search gives a shortest path because every edge has unit length.
+\end{proof}
+
+For $k=0$ the empty sequence succeeds. For $k=1$ a bijection cannot differ at exactly one position, so a correctly formed input never reaches that case. The graph of allocations has no directed cycle: the sum of agents' preference-rank improvements strictly increases at each edge. The algorithm does not require this observation for correctness, but it prevents mistaken claims about beneficial cycles or the need for arbitrarily long certificates.
+
+\section*{The total-swap budget has a small kernel}
+Suppose at most $\ell$ swaps are permitted. Every one of the $k$ displaced agents must participate, and each swap involves exactly two agents; thus $k\leq2\ell$ is necessary. If it fails, reject. Otherwise use the reduced instance and accept exactly when the breadth-first-search distance is at most $\ell$.
+
+The reduced graph and $k$ preference lists can be relabeled using $O(k^2\log k)$ bits, plus a capped budget. Each applicant can change to at most $k-1$ distinct better houses, giving at most $k(k-1)/2$ swaps in any reduced sequence. Replace $\ell$ by the smaller of $\ell$ and this bound. The resulting encoding has size polynomial in $\ell$ after the immediate rejection rule. Its running time is at most $(2\ell)!\,\ell^{O(1)}+|I|^{O(1)}$, with the usual constant-time convention at $\ell=0$. This is an exact, albeit impractical for large budgets, fixed-parameter algorithm. Merely branching over all original network edges for $\ell$ rounds would instead give an exponent depending on $\ell$ and would not establish this conclusion.
+
+\section*{One participation per applicant and short acceptable lists}
+If every applicant may swap at most once, successful swaps have disjoint endpoints. The permutation taking initial houses to target houses must therefore consist of disjoint transpositions and fixed points. This necessary condition is sufficient provided every target transposition is an edge of $G$ and both participating applicants strictly improve. Execute those disjoint swaps in any order; their houses and legal status do not interact. All conditions can be checked in polynomial time.
+
+If every acceptable list has length at most two, each applicant can improve at most once, so the preceding criterion solves unrestricted reachability for that class. This argument assumes unacceptable houses cannot be held as intermediate assignments, precisely as in the catalogue. It does not prove an algorithm for list length three: those agents may take two improving steps, allowing chains of interdependent swaps.
+
+For example, three applicants initially holding $a,b,c$ can reach $(b,c,a)$ through swaps $12$ then $23$ when applicant 1 prefers $b$ to $a$, applicant 2 has $c\succ a\succ b$, and applicant 3 prefers $a$ to $c$. The second applicant must participate twice. If her acceptable list omitted the intermediate house $a$, the first swap would be illegal; final improvements alone would not suffice.
+
+\section*{What still needs proof}
+The displacement parameter depends on both endpoints. Small treewidth or short lists need not bound $k$, so the factorial algorithm says nothing about FPT for those parameters alone. A bound on each applicant's participation likewise permits many distinct participants. Conversely, ordinary token-swapping hardness cannot be imported without checking strict improvements, since the lemma forbids temporary movement of a correctly placed agent. Full classifications require reductions respecting these monotonicity constraints or dynamic programs with sufficient history information at graph separators. No claim of literature priority is made for the elementary parameterized deductions above.
+
+\begin{thebibliography}{9}
+\bibitem{swaps} L. Gourv\`es, J. Lesca and A. Wilczynski (2017), Object Allocation via Swaps along a Social Network, \emph{IJCAI}, 213--219. Primary proceedings record and abstract inspected: \url{https://www.ijcai.org/proceedings/2017/31}. The parameterized proofs above are supplied here rather than attributed to the abstract.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,103 @@
+% ECONOMICS_PROBLEM: {"id": "C81-368", "title": "LLM-based economic measurement", "jel_code": "C81", "source_id": "OP-0427"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{LLM-based economic measurement: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The proposed problem combines human audit design, deployment drift, model updates, leakage checks and a confidence-interval width target. This attempt supplies a finite-sample interval and an explicit audit-refresh optimum for an intercept-only projection under a known total-variation drift rate. It explains why opaque automated labels cannot replace probability validation. The result is a feasible benchmark, not a minimum-budget theorem for all covariates, sampling designs or drift classes.
+
+Ludwig, Mullainathan and Rambachan \cite{llm} already establish the importance of validation for downstream estimation and distinguish it from training leakage in prediction. Their arXiv registry and abstract were inspected; v4 is registered 5 December 2025, following the December 2024 first submission. The derivation below is independent and does not claim to reproduce their full corrections.
+
+\section*{A deployment interval from audited moments}
+Take the covariate basis to contain only an intercept. Let $L,Y\in[0,1]$ and impose $V_t=\Var_t(L)\geq\kappa>0$ at every target deployment date. Then
+\[
+ \beta_t=\frac{C_t}{V_t},\qquad C_t=\operatorname{Cov}_t(L,Y).
+\]
+At a refresh date $s$, obtain $n$ independent probability draws from that date's document population and adjudicate $L$ using a fixed protocol. Simple random draws are a special case of the catalogue's known-inclusion-probability condition. The audit measures the four moments
+\[
+ m_s=(\E_s L,\E_s L^2,\E_sY,\E_s LY).
+\]
+Suppose the joint law of $(L,Y)$ at deployment date $t$ has total-variation distance at most $\rho$ from its law at $s$. Total variation is defined as $\sup_A|P_t(A)-P_s(A)|$; expectations of functions in $[0,1]$ then change by at most $\rho$.
+
+Hoeffding's inequality and a union bound over the four moments imply that with probability at least $1-\alpha$,
+\[
+ \|\widehat m_s-m_t\|_\infty\leq d_n(\rho):=
+ \sqrt{\frac{\log(8/\alpha)}{2n}}+\rho.             \tag{1}
+\]
+Let $\widehat V=\widehat m_2-\widehat m_1^2$ and $\widehat C=\widehat m_4-\widehat m_1\widehat m_3$. Because all raw moments and sample moments lie in $[0,1]$,
+\[
+ |\widehat V-V_t|\leq3d_n,\qquad
+ |\widehat C-C_t|\leq3d_n.                         \tag{2}
+\]
+These constants use the identities $|x^2-y^2|\leq2|x-y|$ and $|xy-zw|\leq|x-z|+|y-w|$ on the unit square.
+
+\begin{proposition}[Uniform finite-sample interval]
+Put $K_\kappa=6\kappa^{-1}(1+1/(2\sqrt\kappa))$. If $d_n\leq\kappa/6$, report
+\[
+ C_t=\left[\widehat C/\widehat V-K_\kappa d_n,
+ \widehat C/\widehat V+K_\kappa d_n\right]
+ \cap[-1/(2\sqrt\kappa),1/(2\sqrt\kappa)]
+\]
+when $\widehat V\geq\kappa/2$, and the full latter interval otherwise. Coverage is at least $1-\alpha$, uniformly over the specified drift and variance class.
+\end{proposition}
+\begin{proof}
+On the event (1), $\widehat V\geq\kappa/2$. Cauchy--Schwarz and $\Var(Y)\leq1/4$ imply $|\beta_t|\leq1/(2\sqrt\kappa)$. Therefore
+\[
+ \left|\frac{\widehat C}{\widehat V}-\beta_t\right|
+ \leq\frac{3d_n}{\widehat V}(1+|\beta_t|)
+ \leq K_\kappa d_n.
+\]
+Intersection with a known parameter range preserves coverage. The fallback prevents division by an unstable empirical denominator off the concentration event.
+\end{proof}
+
+For an unconditional expected-width guarantee $w$, the simple interval can instead always have length at most $2K_\kappa d_n$ by returning any interval of at most that length inside the known range on the fallback event; coverage remains because that event cannot occur on (1). Alternatively retain the conservative full-range fallback and use the explicit bound
+\[
+ \E|C_t|\leq2K_\kappa d_n+\alpha/\sqrt\kappa.
+\]
+The distinction matters: a high-probability width guarantee alone is not the expected-length condition requested by the catalogue.
+
+\section*{Optimizing refresh frequency in a declared class}
+Assume drift grows at known speed $v>0$, so $\rho\leq v(t-s)$ until the next refresh. An audit budget supplies $b$ labels per unit calendar time. A periodic design with interval $\Delta$ therefore uses approximately $n=b\Delta$ labels at each refresh, ignoring integer rounding and initial startup. Its worst-date moment radius is
+\[
+ d(\Delta)=a\Delta^{-1/2}+v\Delta,
+ \qquad a=\sqrt{\frac{\log(8/\alpha)}{2b}}.
+\]
+Strict convexity and differentiation give the unique positive minimizer
+\[
+ \Delta^*=\left(\frac a{2v}\right)^{2/3},\qquad
+ d(\Delta^*)=3\,2^{-2/3}a^{2/3}v^{1/3}.             \tag{3}
+\]
+Thus the optimal certified radius within this periodic class scales as $(v/b)^{1/3}$, up to logarithms. Frequent tiny audits have sampling error; infrequent large audits have drift error. For $v=0$, the optimum moves toward pooling more labels rather than periodic forgetting. A finite horizon caps $\Delta$, and multiple-date simultaneous coverage replaces $\alpha$ by a valid allocation such as $\alpha/J$ for $J$ refreshes. Equation (3) must be recomputed with that allocation; it is not a claim of optimality over all adaptive schedules.
+
+\section*{Why automatic agreement is insufficient}
+Take $Y$ Bernoulli with probability one half and an automated label always equal to zero. In one deployment population the adjudicated label is $L=Y$; in another it is $L=1-Y$. The entire observed law of $(Y,\widehat L)$ is identical, but $\Var(L)=1/4$ and the true projection coefficients are $+1$ and $-1$. No quantity of unlabelled deployment data distinguishes these models. Both have the same conditional automated-label kernel, so an error-kernel drift restriction alone does not transport the regression coefficient when the joint latent population changes.
+
+The deliberately human-only interval above sacrifices efficiency to remain valid even after an unannounced model update. Automated labels can serve as auxiliary variables in a design-unbiased difference estimator, but valid variance and drift control then concern its residuals and the deployment joint law. Disproportionate audits require inclusion-weighted moments and a design-specific concentration bound, not reuse of the iid formula.
+
+\section*{Remaining work}
+With general bounded covariates, the covariance matrix and residualization operator also require stability bounds. Optimal inclusion probabilities depend on unknown residual variation. Adjudicator disagreement changes the target unless a latent-label model is added. Temporal or private holdouts address leakage separately from regression measurement error; corrected moments cannot demonstrate that future text was absent from training. No deployment documents, labels or drift measurements are supplied here, so the minimum real audit budget and a complete joint update policy remain unresolved.
+\begin{thebibliography}{9}
+\bibitem{llm} J. Ludwig, S. Mullainathan and A. Rambachan, Large Language Models: An Applied Econometric Framework, arXiv:2412.07031v4. Primary registry and abstract inspected:
+\url{https://arxiv.org/abs/2412.07031}.
+\end{thebibliography}
+\end{document}
