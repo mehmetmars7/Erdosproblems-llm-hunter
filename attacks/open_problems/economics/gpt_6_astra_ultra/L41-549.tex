@@ -1,0 +1,203 @@
+% ECONOMICS_PROBLEM: {"id": "L41-549", "title": "Merger prediction accuracy", "jel_code": "L41", "source_id": "OP-0392"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\dist}{dist}
+\title{Evaluating merger forecasts against noisy causal benchmarks}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Status: Partial; the full catalogue target remains unresolved.}
+\begin{abstract}
+The catalogue asks whether merger screening models reliably predict causal price
+effects at a fixed horizon. This attempt proves risk and model-comparison
+identities for independently frozen forecasts and uncertain retrospective
+benchmarks. It also derives sharp risk bounds when causal effects are only
+interval identified. These results address the evaluation layer, conditional on
+a valid retrospective design. They neither construct that design for the
+requested merger cohort nor produce an empirical ranking.
+\end{abstract}
+
+\section{Target and information discipline}
+Fix the prespecified cohort of $M$ closed mergers, common product-equivalent
+baskets, and 24-month horizon. Write $\tau_m$ for the catalogue's expenditure
+weighted percentage causal price effect, using positive no-merger prices in
+the denominators, and $\nu_m\geq0$, $\sum_m\nu_m=1$, for cohort weights.
+For $K$ frozen models let $f_{km}=f_k(X_m)$ and
+\[
+ R_k=\sum_m\nu_m(f_{km}-\tau_m)^2.
+\]
+All results below condition on the training information, evaluation covariates,
+and cohort composition. Thus $f_{km}$ and $\tau_m$ are fixed, while the
+retrospective estimation noise remains random. Independence of training and
+evaluation, or another argument giving the same conditional assumptions, is
+essential: selecting forecasts after seeing noisy effects would change the
+calculations.
+
+Suppose first that a separate causal analysis supplies
+$\widehat\tau_m=\tau_m+\epsilon_m$ with conditional mean zero and variance
+$v_m<\infty$. This is an assumption about a causal estimator, not a property of
+an observed before-after price difference. Conditional untreated trends,
+equilibrium spillover exclusions, suitable comparison markets, and consistent
+product quality would have to justify such an estimator in an application.
+
+\section{Unbiased scoring and the advantage of paired comparisons}
+\begin{proposition}
+If $\E\widehat v_m=v_m$, then
+\[
+ \widehat R_k=\sum_m\nu_m
+       \{(f_{km}-\widehat\tau_m)^2-\widehat v_m\}
+ \quad\hbox{satisfies}\quad \E\widehat R_k=R_k.
+\]
+Independence between $\widehat v_m$ and $\widehat\tau_m$ is unnecessary for this
+expectation identity. For a common benchmark the uncorrected difference
+\[
+ \widehat D_{k\ell}=\sum_m\nu_m
+   \{(f_{km}-\widehat\tau_m)^2-(f_{\ell m}-\widehat\tau_m)^2\}
+\]
+is unbiased for $D_{k\ell}=R_k-R_\ell$, and exactly
+\[
+ \widehat D_{k\ell}-D_{k\ell}
+       =-2\sum_m\nu_m(f_{km}-f_{\ell m})\epsilon_m.             \tag{1}
+\]
+\end{proposition}
+\begin{proof}
+Expand the first square as
+$(f_{km}-\tau_m)^2-2(f_{km}-\tau_m)\epsilon_m+\epsilon_m^2$,
+take expectations, and subtract $\E\widehat v_m$. Subtracting the two
+expanded squares cancels $\epsilon_m^2$ before any expectation is taken,
+which proves (1). Linearity of expectation explains why covariance with the
+variance estimate does not enter the first identity.
+\end{proof}
+A corrected score can be negative in a particular sample even though population
+risk is nonnegative. Truncating it at zero generally destroys unbiasedness.
+Moreover the variance correction is the same for every model, so it changes
+estimated risk levels but never their ranking when all models use exactly the
+same mergers, weights, and benchmark estimates.
+
+For honest uncertainty quantification, suppose the $\epsilon_m$ are independent
+across mergers and conditionally sub-Gaussian with known upper proxies
+$\sigma_m^2$, meaning
+$\E e^{t\epsilon_m}\leq e^{t^2\sigma_m^2/2}$ for every real $t$.
+Set
+\[
+ V_{k\ell}=4\sum_m\nu_m^2(f_{km}-f_{\ell m})^2\sigma_m^2.
+\]
+The moment generating function of (1) is at most
+$\exp(t^2V_{k\ell}/2)$, by multiplying the individual bounds.
+The exponential Markov inequality, optimized at $t=x/V_{k\ell}$, yields
+\[
+ \Prob\{|\widehat D_{k\ell}-D_{k\ell}|>x\}
+       \leq 2e^{-x^2/(2V_{k\ell})}.                          \tag{2}
+\]
+If $V_{k\ell}=0$, the corresponding error is zero almost surely.
+
+For $K\geq2$, let $P=K(K-1)/2$ and define
+$r_{k\ell}=\sqrt{2V_{k\ell}\log(2P/\alpha)}$. A union bound gives simultaneous
+coverage for every pair with probability at least $1-\alpha$. Consequently,
+if $\widehat k$ minimizes the observed common-benchmark squared loss and
+$k^*$ minimizes true risk, then on that same event
+\[
+ 0\leq R_{\widehat k}-R_{k^*}\leq r_{\widehat k k^*}
+                  \leq\max_{k,\ell}r_{k\ell}.                \tag{3}
+\]
+Indeed the observed difference for the selected pair is nonpositive, and its
+true difference exceeds it by at most the simultaneous radius. This proof
+handles selection among the prespecified models without pretending the
+selected index was fixed beforehand. Shared macroeconomic shocks would
+invalidate the independence-based proxy; a justified joint sub-Gaussian
+covariance bound or independent market clusters must replace it.
+
+\section{Bias sensitivity and partial identification}
+Suppose instead $\epsilon_m=b_m+\xi_m$, with $|b_m|\leq\eta_m$, and independent
+centered $\xi_m$ satisfying the preceding noise conditions. Equation (1) gives
+the additional deterministic comparison error
+\[
+ B_{k\ell}=2\sum_m\nu_m|f_{km}-f_{\ell m}|\eta_m.
+\]
+Replacing $r_{k\ell}$ by $r_{k\ell}+B_{k\ell}$ preserves the simultaneous
+comparison guarantee. This explicitly displays how plausible violations of a
+retrospective design affect model rankings. It supplies no data-driven value
+for $\eta_m$ by itself.
+
+A different situation is identification without a credible centered estimator.
+Assume the compatible causal-effect vectors are exactly the box
+$\prod_m[L_m,U_m]$, with finite endpoints. Then
+\[
+ \begin{split}
+ \inf R_k&=\sum_m\nu_m\dist(f_{km},[L_m,U_m])^2,\\
+ \sup R_k&=\sum_m\nu_m
+       \max\{(f_{km}-L_m)^2,(f_{km}-U_m)^2\}.
+ \end{split}\tag{4}
+\]
+The first optimizer projects each forecast onto its interval. The second
+chooses its farther endpoint. Both are compatible because the identified set
+is a product, proving sharpness and attainment. If merger effects instead
+obey joint restrictions, (4) gives valid outer bounds and is not generally
+sharp.
+
+Comparative risk admits especially transparent bounds:
+\[
+ D_{k\ell}=\sum_m\nu_m
+       [f_{km}^2-f_{\ell m}^2-2(f_{km}-f_{\ell m})\tau_m].
+                                                               \tag{5}
+\]
+Each coefficient selects the upper or lower endpoint independently to maximize
+or minimize (5). These bounds are sharp under the same box assumption. A
+negative upper bound certifies that model $k$ dominates model $\ell$ throughout
+the identified set, even when their separate risk intervals overlap.
+
+For a single equally weighted merger, forecasts $0$ and $2$, and
+$\tau\in[0,2]$, equation (5) gives $D=-4+4\tau\in[-4,4]$.
+Either model can be superior while all maintained information remains true.
+Reporting a definitive winner would add an unsupported identifying assumption.
+
+\section{What remains unresolved}
+The formulas separate three obstacles: identification of each equilibrium
+price effect, statistical error in estimating it, and error in the frozen
+forecast. Observed price growth confounds merger effects with unrelated demand
+and cost shocks. A blocked transaction reveals an outcome under no merger;
+it does not reveal that proposal's missing merger outcome, nor does it
+automatically represent the approved cohort. Likewise discontinued products
+need the catalogue's replacement convention before a numerical effect is
+well defined.
+
+No requested cohort data, valid comparison-market design, or independent
+training sample has been supplied here. Error heterogeneity by concentration,
+entry conditions, or substitution patterns therefore remains an empirical
+question requiring prespecified or separately validated subgroup analysis.
+The established results are finite-cohort evaluation certificates conditional
+on explicitly stated benchmark properties. Generalizing to future mergers
+also requires a sampling or transport model beyond the fixed-cohort risk.
+
+\begin{thebibliography}{9}
+\bibitem{sy} C. Shapiro and A. Yurukoglu (2024),
+\emph{Trends in Competition in the United States: What Does the Evidence Show?},
+24 August author draft.
+\url{https://web.stanford.edu/~ayurukog/trendsincompetition.pdf}.
+Primary working-paper record:
+\url{https://www.gsb.stanford.edu/faculty-research/working-papers/trends-competition-united-states-what-does-evidence-show}.
+This is the catalogue's agenda source; the conditional scoring proofs here
+are self-contained statistical calculations.
+\end{thebibliography}
+
+\end{document}

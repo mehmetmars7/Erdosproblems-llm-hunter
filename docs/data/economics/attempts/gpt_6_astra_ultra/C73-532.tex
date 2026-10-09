@@ -1,0 +1,181 @@
+% ECONOMICS_PROBLEM: {"id": "C73-532", "title": "Sharper approximation rates with stochastic action sets", "jel_code": "C73", "source_id": "OP-0153"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+
+\title{A batch conversion bound for compact stochastic-action equilibria}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C73-532}. \textbf{Status: Proposed solved for the canonical oracle and sample-rate target.} The proof below replaces the stochastic-approximation conversion step. It uses the same sampling oracles but more deterministic computation. It does not assert a faster one-pass implementation of the source algorithm.
+
+\section{Claim, oracle accounting, and the source input}
+Let $m_i=|A_i|$, $d=m_1+m_2$, take an integer $T\ge4$ and confidence parameter $0<p<1$, and use the canonical independent availability laws and normalized payoff matrix. An implementable marginal is induced by a conditional policy on the nonempty available sets. Write $M_i$ for the population marginal polytope and $\mu_i(w)$ for the marginal of positive proportional weights. All norms below are Euclidean unless marked $1$ or $\infty$.
+
+Run the source CAT-FTPL learner for $T$ rounds with its original full available-action utility feedback and its permitted availability-sampling oracle. Record
+\[
+ z_i=T^{-1}\sum_{t=1}^T e_{a_i^t},\qquad
+ \bar\mu_i=T^{-1}\sum_{t=1}^T\E_{S\sim\rho_i}\pi_i^t(\cdot\mid S).
+\]
+Here $e_a$ is the action-indicator vector, so the recorded input uses only actually played actions and is rational. The second vector is an analysis object, not an algorithm input. Policies are predictable before their current availability draw; the two players' availability draws are independent. Conditional on the complete training history, the average policy is fixed and implements $\bar\mu_i\in M_i$.
+
+The only imported learning bound is the source's Proposition 5.3 and Theorem 5.5, which together give
+\[
+ \E\operatorname{SPR}(\bar\mu_1,\bar\mu_2)
+ \le \frac{8\sum_i\sqrt{m_i\log m_i}}{\sqrt T}. \tag{1}
+\]
+Singleton action sets contribute zero. The saddle gap is nonnegative, so Markov's inequality applies to the sum even if an individual regret can be negative. All subsequent conversion arguments are provided below.
+
+For each player draw $T$ fresh independent availability sets $S^1,\ldots,S^T$ after training. No payoff observations, opponent availability, or probabilities of availability patterns are requested in this stage. These are the same kind of extra draws used by the source RSA converter. The CAT-FTPL oracle costs are unchanged. Thus the new stage uses $T$ availability draws per player, not a hidden growing number of independent sample batches.
+
+\section{Step 1: project onto an empirical feasible polytope}
+Suppress the player subscript and let $m=|A|$. Define
+\[
+ \widehat M=\left\{T^{-1}\sum_{s=1}^Tq_s:
+       q_s\in\Delta(S^s)\right\}.
+\]
+This polytope uses at most $Tm$ conditional-probability variables and is nonempty. Set $\delta=T^{-1/2}$. Compute feasible $q_s$ whose marginal $\nu$ satisfies
+\[
+ \tfrac12\|\nu-z\|^2
+ \le \min_{v\in\widehat M}\tfrac12\|v-z\|^2+\tfrac12\delta^2. \tag{2}
+\]
+An approximate convex quadratic program suffices; exact projection is not necessary.
+
+For completeness, a polynomial real-arithmetic implementation of (2) is conditional gradient. At marginal $\nu$, the linear oracle chooses in each sampled set an action minimizing the coordinate of $\nu-z$. Update all conditional distributions toward these choices with step $2/(k+2)$. The objective is one-smooth in $\nu$, and the simplex diameter is $\sqrt2$, so
+\[
+ f(\nu_{k+1})-f^*\le(1-\gamma_k)(f(\nu_k)-f^*)+\gamma_k^2.
+\]
+Convexity bounds the linear term and smoothness bounds the quadratic term. Induction gives a gap at most $4/(k+2)$, so $\lceil8T\rceil$ iterations ensure (2). Each oracle and conditional-distribution update uses $O(Tm)$ arithmetic operations. Store the feasible distributions, not only their marginal, because the next step uses them.
+
+\begin{lemma}[Projection does not require knowing the population polytope]
+Let $\bar\mu$ be implemented by a fixed policy $\bar\pi$, independent of the fresh sample. Set $\bar\nu=T^{-1}\sum_s\bar\pi(\cdot\mid S^s)$. If $\|z-\bar\mu\|\le e_0$ and $\|\bar\nu-\bar\mu\|\le e_1$, then the output of (2) obeys
+\[
+ \|\nu-\bar\mu\|\le2e_0+e_1+\delta. \tag{3}
+\]
+\end{lemma}
+\begin{proof}
+The comparison vector $\bar\nu$ belongs to $\widehat M$, although it need not be computed. Taking square roots in (2), and using $\sqrt{x^2+\delta^2}\le x+\delta$, gives $\|\nu-z\|\le\|\bar\nu-z\|+\delta\le e_0+e_1+\delta$. Add $\|z-\bar\mu\|$ to obtain (3).
+\end{proof}
+
+\section{Step 2: a bounded log-weight representation}
+Let $\eta=1/\lceil\sqrt T\rceil$ and smooth the feasible conditionals:
+\[
+ r_s=(1-\eta)q_s+\eta\operatorname{Unif}(S^s),\qquad
+ \nu^\eta=T^{-1}\sum_sr_s.
+\]
+Then $\|\nu^\eta-\nu\|_1\le2\eta$. For $m\ge2$ put
+$R=(m-1)\log(m/\eta)$. The case $m=1$ is deterministic and needs no conversion.
+
+\begin{lemma}[Finite-sample proportional representation with bounded logs]
+There exists $\theta^*\in[-R,0]^m$ such that, writing
+$p_\theta(a\mid S)=\ind\{a\in S\}e^{\theta_a}/\sum_{b\in S}e^{\theta_b}$,
+\[
+ T^{-1}\sum_sp_{\theta^*}(\cdot\mid S^s)=\nu^\eta. \tag{4}
+\]
+\end{lemma}
+\begin{proof}
+Maximize the average conditional entropy over the finite product of simplices subject to marginal $\nu^\eta$. The displayed $r_s$ is strictly positive on every allowed edge. An entropy maximizer also has that property: mixing a positive feasible point into a zero coordinate gains order $\epsilon\log(1/\epsilon)$, dominating the order-$\epsilon$ change of positive coordinates. First-order conditions on the affine feasible subspace therefore give positive weights $v_a$ with conditional probabilities $v_a/\sum_{b\in S}v_b$. This follows even with redundant constraints: a gradient orthogonal to the constraint nullspace lies in the row space of the constraint matrix.
+
+Order weights decreasingly. If an adjacent ratio $v_{j+1}/v_j<\eta/m$, take the cut between its first $j$ actions and the rest. In every sampled set crossing the cut, with $h$ upper and $l$ lower actions, the proportional lower mass is at most $(l/h)(v_{j+1}/v_j)<l\eta/(hm)\le l\eta/(h+l)$. The smoothed conditional lower mass is at least $l\eta/(h+l)$. Noncrossing sets give equal total lower mass, zero or one. Averaging contradicts equality of marginals unless no sampled set crosses that cut. In that latter case rescale all weights below the cut until this adjacent ratio equals $\eta/m$; no sampled conditional probability changes. These rescalings leave other adjacent ratios unchanged and preserve ordering. After all cuts are treated, largest-to-smallest log ratio is at most $(m-1)\log(m/\eta)$. Divide by the largest weight and take logs, proving (4).
+\end{proof}
+
+The bounded-log argument is the finite empirical counterpart of the source's representation lemma; it is included to avoid assuming that all boundary marginals have exact positive representations. Smoothing is essential. For an always-available two-action set, the boundary marginal $(1,0)$ cannot be implemented by strictly positive weights.
+
+Define the convex objective
+\[
+ F(\theta)=T^{-1}\sum_s\log\sum_{a\in S^s}e^{\theta_a}
+                         -\langle\nu^\eta,\theta\rangle.
+\]
+Its gradient is the empirical proportional marginal minus $\nu^\eta$. Its Hessian is an average of categorical covariance matrices and has operator norm at most one: for every vector $v$, each quadratic form is $\Var(v_A)\le\E v_A^2\le\|v\|^2$. Thus $F$ is one-smooth, and (4) is a global minimizer with zero gradient.
+
+Choose a positive rational upper bound $B$ with $R\le B\le R+1/2$, computed using certified rational bounds on the logarithm. Minimize $F$ by projected gradient descent, step one, on $[-B,B]^m$, starting at zero. The standard one-step projection and smoothness inequalities give $F(\theta_K)-F(\theta^*)\le\|\theta^*\|^2/(2K)\le mB^2/(2K)$. To check this bound, combine the projection optimality inequality with the smooth upper bound on $F(\theta_{k+1})$, telescope squared distances to $\theta^*$, and use monotonicity of objective values to bound the last iterate by their average. With $K=\lceil4mB^2T\rceil$,
+\[
+ \|\nabla F(\theta_K)\|\le T^{-1/2}. \tag{5}
+\]
+Indeed, global smoothness gives $F(\theta-\nabla F(\theta))\le F(\theta)-\|\nabla F(\theta)\|^2/2$; comparing with the global minimum proves (5). This uses a global zero-gradient minimizer, not a possibly nonzero gradient at a constrained optimum.
+
+\section{Uniform generalization of the fitted marginal}
+The fitted weights depend on the sample, so a pointwise concentration statement is insufficient. Put $R_*=(d-1)\log(d/\eta)+1$, $N=(3+2R_*T)^d$, and
+\[
+ c_T=\sqrt{\frac{\log(8d/p)}{2T}},\qquad
+ u_T=\sqrt{\frac{\log(8dN/p)}{2T}}.
+\]
+Each rational box radius $B$ is below $R_*$. A grid of mesh at most $1/T$ covers each player's log-weight box, with at most $N$ points. Conditional softmax coordinates are two-Lipschitz in the maximum norm: their derivative has absolute row sum $2p_a(1-p_a)\le2$. Consequently empirical and population marginal coordinates each vary by at most $2/T$ between a point and its nearest grid point. Hoeffding's inequality and a union bound give, with probability at least $1-p/4$, simultaneously for both players and every log vector in their boxes,
+\[
+ \|\mu(e^\theta)-\widehat\mu(e^\theta)\|_1
+ \le m(u_T+4/T). \tag{6}
+\]
+The extra constant three in $N$ covers endpoint and integer rounding of grid sizes.
+
+The training action-frequency vector is a bounded martingale average around $\bar\mu_i$, incorporating both random availability and the learner's action randomization. Conditional Hoeffding bounds, unioned over the $d$ coordinates, give $\|z_i-\bar\mu_i\|\le\sqrt{m_i}c_T$ with failure probability at most $p/4$. Conditional on training, the fixed average policy evaluated on fresh sets gives the same bound for $\bar\nu_i-\bar\mu_i$, again with total failure probability at most $p/4$. Combining (3), smoothing, (5), and (6), each output before numerical rounding satisfies
+\[
+ \|\mu_i(w_i)-\bar\mu_i\|_1
+ \le m_i(u_T+4/T)+3m_ic_T+
+                   2\sqrt{m_i/T}+2/\sqrt T. \tag{7}
+\]
+No lower bound on an action's availability probability, and no restriction on the number of possible availability sets, appears here.
+
+\section{The resulting statistical improvement}
+For any two pairs of marginal probability vectors, normalized payoffs imply
+\[
+ |\operatorname{SPR}(x_1,x_2)-\operatorname{SPR}(y_1,y_2)|
+ \le\|x_1-y_1\|_1+\|x_2-y_2\|_1. \tag{8}
+\]
+For example, the maximizing term changes by at most $\|x_2-y_2\|_1$ uniformly over its feasible comparator; the minimizing term is handled identically. The true feasible sets in the gap stay fixed.
+
+By (1) and Markov, the training gap is at most $32\sum_i\sqrt{m_i\log m_i}/(p\sqrt T)$ except on an event of probability $p/4$. Union with the three concentration events above gives total failure probability at most $p$. Let
+\[
+ E_T=d(u_T+3c_T+4/T)+\frac{2\sqrt{2d}+4}{\sqrt T}+\frac8T.
+\]
+The final $8/T$ allows proportional-weight rounding as described next. Equations (1)--(8), with the stated union bound, prove the following theorem.
+\begin{theorem}[Polynomial batch conversion]
+Under the canonical independent-availability, normalized-payoff and source CAT-FTPL feedback assumptions, for every integer $T\ge4$ and $0<p<1$, the described learner and converter output positive rational proportional weights satisfying
+\[
+ \Prb\left\{\operatorname{SPR}^2\le
+ \left[\frac{32\sum_i\sqrt{m_i\log m_i}}{p\sqrt T}+E_T\right]^2\right\}
+ \ge1-p. \tag{9}
+\]
+The converter uses $T$ fresh availability draws per player and polynomial deterministic computation in addition to the unchanged CAT-FTPL stage.
+\end{theorem}
+In particular it is of order
+\[
+ O\left(\frac{d\log d}{p^2T}
+       +\frac{d^2\{d\log(dT)+\log(1/p)\}}T\right). \tag{10}
+\]
+For each fixed $d,p$, (10) is $O(\log T/T)=o(T^{-1/2})$. This improves the catalogue's squared-gap target, not merely its unsquared notation. Counting $2T$ rather than $T$ for the learning-plus-conversion stages changes constants only; extra CAT-FTPL resampling costs are the same as in the baseline comparison.
+
+\section{Computation, precision, and interpretation}
+For $1\le T<4$, output arbitrary positive weights; the normalized saddle gap is at most two, giving the trivial squared-gap bound four. The nonasymptotic improvement (9) is asserted for $T\ge4$.
+
+The projection routine takes $O(T)$ conditional-gradient iterations, and the log-weight fit takes $O(mB^2T)$ projected-gradient iterations, each using the stored $T$ sets. These are polynomial in $T$ and action count; they can be much slower in practice than a one-pass RSA update. The result is a sample-rate improvement achieved by multiple deterministic passes, not a simultaneous running-time improvement.
+
+Weights are strictly positive because log coordinates stay bounded. A proportional rule is unchanged by common normalization. If each unnormalized weight is rounded to a positive rational with relative error at most $1/T$ (take $T\ge4$), then every conditional distribution changes in $\ell_1$ by at most $2/(T-1)\le4/T$: divide numerator and denominator by the original set sum and use their common relative-error bound. This holds uniformly over all sets, including rare ones. Two players account for the $8/T$ term above. The required absolute precision has $O(B+\log(mT))$ bits per coordinate, because the smallest unnormalized weight is at least $e^{-B}$. This is polynomial, despite potentially very unequal weight magnitudes.
+
+Convex numerical subproblems must meet the explicit tolerances (2) and (5); an unchecked optimizer message is not a certificate. Exact projected-gradient updates are nonexpansive in their iterates for convex one-smooth $F$. Thus errors of norm at most $1/(10K\sqrt T)$ per gradient call perturb the final iterate by at most $1/(10\sqrt T)$; the factor four in the declared iteration count leaves room for this error in (5). Elementary exponential evaluation on $[-B,B]$ to the corresponding polynomial precision suffices. Similarly, the declared finite conditional-gradient iteration count implements (2) with feasible rational conditional distributions. The recorded training action frequencies are rational multiples of $1/T$ and require no irrational storage. These bit-precision statements concern the new converter; the source learner retains its original randomized oracle model and computational guarantees.
+
+\section{A concrete conversion check}
+Take one player with two actions and the four stored availability sets $\{1\},\{1,2\},\{2\},\{1,2\}$. Then $\widehat M=\{(v,1-v):1/4\le v\le3/4\}$. For recorded action frequency $z=(1,0)$, exact projection gives $\nu=(3/4,1/4)$, implemented by choosing action one in both joint sets. With $T=4$, $\eta=1/2$: smoothing changes the joint-set probabilities to $(3/4,1/4)$ while singleton choices remain forced. Hence $\nu^\eta=(5/8,3/8)$. Proportional weights $(3,1)$ implement this marginal exactly, with normalized logs $(0,-\log3)$ inside the proved radius $R=\log4$. This directly checks the projection, smoothing and representation steps. It does not estimate their sampling error; that is covered by (6). A population distribution uniform over the three distinct sets could indeed produce this fresh sample while an independent training run produced $z=(1,0)$, so the example is compatible with the sampling model.
+
+This establishes the stated statistical improvement for the formalized independent-availability target, conditional on the cited CAT-FTPL learning theorem. It does not extend to correlated private availability, bandit-only payoffs, restricted memory, one-pass conversion, or arbitrary changing availability laws. The solved status refers to this mathematical oracle model and sample-rate comparison; no claim of publication or priority is made.
+
+\begin{thebibliography}{9}
+\bibitem{source} T. Schwarz, J. Li, R. Sim and C. K. Ling (2026), \emph{Computing Equilibria in Games with Stochastic Action Sets}, arXiv:2602.16234v5. \url{https://arxiv.org/html/2602.16234v5}. Imported results: Proposition 5.3 and Theorem 5.5 for (1); Lemma D.3 motivates the bounded-log representation. Theorem 5.8 and Appendix B.13 provide the comparison RSA bound and its sampling convention. The empirical projection, uniform concentration and batch-conversion bound above are the proposed argument in this attempt.
+\end{thebibliography}
+\end{document}
