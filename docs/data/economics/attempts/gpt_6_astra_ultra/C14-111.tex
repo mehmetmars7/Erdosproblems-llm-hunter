@@ -1,0 +1,148 @@
+% ECONOMICS_PROBLEM: {"id": "C14-111", "title": "Minimax estimation of counterfactual outcome densities", "jel_code": "C14", "source_id": "OP-0529"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{A nuisance lower bound for counterfactual density estimation}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C14-111}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and result obtained}
+Given independent observations $(X,W,Y)$, overlap and conditional exchangeability identify
+\[
+ f_*(y)=\int f_1(y\mid x)p(x)\,dx.
+\]
+The original problem asks for its minimax integrated and supremum risks over smooth outcome-density, propensity, and covariate-density classes. We prove a lower bound using perturbations of both the propensity and the conditional density in the actual observed-data experiment. This can be slower than the ordinary one-dimensional density benchmark. We also give an elementary oracle upper bound. No matching general upper bound with unknown propensity is claimed.
+
+Fix $d\ge1$ and $0<s\le1$. The lower bound applies when the declared $s_f=s_e=s$, while $s_p>0$ can be arbitrary, since $p\equiv1$ throughout. Constants in the class must permit a fixed neighborhood of the uniform densities and propensity $1/2$; in particular take the H\"older radius and upper bounds larger than one and the overlap bound smaller than $1/2$. All constants below are independent of sample size. Write $\|f\|_2^2=\int_0^1f(y)^2dy$.
+
+\begin{theorem}[Observed-data nuisance lower bound]
+For this class and all sufficiently large $n$,
+\[
+ \inf_{\widehat f}\sup_P\E_P\|\widehat f-f_*\|_2^2
+ \ge c_0 n^{-8s/(4s+d)}.
+ \tag{1}
+\]
+The same lower bound holds for squared supremum loss on every fixed interior interval $I=[\eta,1-\eta]$, $0<\eta<1/2$. It holds even when the covariate density is supplied to the estimator. Its proof perturbs the treatment probability, so it is not a reduction to ordinary complete-data density estimation.
+\end{theorem}
+
+\section{Construction inside the causal model}
+Choose a nonzero smooth function $\phi$ supported strictly inside $(0,1)^d$, with $\|\phi\|_\infty\le1$, such that reflection of the first coordinate changes its sign. Thus $\int\phi=0$ and the distribution of $\phi$ under uniform volume is symmetric. Partition the covariate cube into $k=q^d$ cubes of side $h=1/q$. In cube $j$, let $\phi_j(x)$ be the translated and rescaled copy of $\phi$, zero elsewhere. For $\vartheta\in\{-1,1\}^k$, put
+\[
+ a_\vartheta(x)=\delta\sum_{j=1}^k\vartheta_j\phi_j(x),
+ \qquad \delta=\epsilon h^s,
+ \qquad\psi(y)=2y-1.
+\]
+Choose a fixed sufficiently small $\epsilon>0$, hence $|a_\vartheta|\le1/4$. Let $X$ be uniform, and set
+\begin{align*}
+ e_\vartheta(x)&=(1+a_\vartheta(x))/2,\\
+ f_{1,\vartheta}(y\mid x)&=1+\frac{a_\vartheta(x)}{1+a_\vartheta(x)}\psi(y),\\
+ f_{0,\vartheta}(y\mid x)&=1-\frac{a_\vartheta(x)}{1-a_\vartheta(x)}\psi(y).
+\end{align*}
+Both conditional densities integrate to one and stay bounded above and away from zero. Their H\"older constants of order $s$ are bounded independently of $q$: within a cube, the scale is $\delta h^{-s}=\epsilon$; across cube boundaries the bumps vanish in a fixed relative neighborhood of the boundaries. Composition with $z/(1\pm z)$ preserves these bounds on $[-1/4,1/4]$, and the smooth $y$ factor preserves isotropic order $s$ in $(x,y)$. Taking $\epsilon$ small puts every law inside the stated balls.
+
+Generate potential outcomes by independent uniform random variables and the inverse conditional distribution functions of $f_{0,\vartheta},f_{1,\vartheta}$. Draw $W$ independently of these uniforms conditional on $X$, with probability $e_\vartheta(X)$. This explicitly supplies consistency and conditional exchangeability; no extra observational model is substituted for the causal one.
+
+At the null law $P_0$, $a=0$ and $X,Y,W$ are independent, with $W$ fair. With respect to that law the likelihood ratio of one observation is exactly
+\[
+ L_\vartheta(X,W,Y)=1+a_\vartheta(X)T(W,Y),
+ \qquad T(W,Y)=(2W-1)(1+\psi(Y)). \tag{2}
+\]
+It is positive. Under $P_0$, $\E T=0$ and $v_T=\E T^2=4/3$.
+
+\begin{lemma}[Equal alternative targets]
+Every sign vector gives the same counterfactual density
+\[
+ f_{*,\vartheta}(y)=1-b_\delta\psi(y),\qquad
+ b_\delta=\delta^2\int_{[0,1]^d}
+ \frac{\phi(u)^2}{1-\delta^2\phi(u)^2}\,du.
+\]
+In particular $c_1\delta^2\le b_\delta\le c_2\delta^2$ with strictly positive fixed constants.
+\end{lemma}
+\begin{proof}
+Reflection symmetry makes $\int \delta\vartheta_j\phi/(1+\delta\vartheta_j\phi)$ independent of the sign. Averaging the integrands at $\phi$ and $-\phi$ gives $-\delta^2\phi^2/(1-\delta^2\phi^2)$. All $k$ cubes have volume $1/k$, so their sum is the displayed integral. Bounding the denominator between $15/16$ and one gives the inequalities.
+\end{proof}
+
+\section{Mixture indistinguishability and the proof}
+Let $\overline P_n$ be the uniform mixture of the $n$-sample laws over all $2^k$ sign vectors. From (2), for two independent sign vectors $\vartheta,\vartheta'$, independence across observations gives
+\[
+ 1+\chi^2(\overline P_n,P_0^{\otimes n})
+ =\E_{\vartheta,\vartheta'}
+ \left(1+\frac{A\delta^2}{k}\sum_{j=1}^k\vartheta_j\vartheta'_j\right)^n,
+ \quad A=v_T\int\phi^2.
+\]
+The base is positive because it is an inner product of positive likelihood ratios. Using $1+z\le e^z$ and independent Rademacher products,
+\[
+ 1+\chi^2\le
+ \left[\cosh\left(\frac{nA\delta^2}{k}\right)\right]^k
+ \le \exp\left(\frac{n^2A^2\delta^4}{2k}\right). \tag{3}
+\]
+The last inequality follows from $\log\cosh z\le z^2/2$: its derivative is $\tanh z$, bounded in absolute value by $|z|$, and both functions vanish at zero.
+
+Choose $q=\lceil n^{2/(4s+d)}\rceil$. Then $n^2\delta^4/k$ is bounded by $\epsilon^4$. Choose $\epsilon$ further so that the right-hand side of (3) minus one is at most $1/4$. Cauchy--Schwarz yields $\TV(\overline P_n,P_0^{\otimes n})\le\tfrac12\sqrt{\chi^2}\le1/4$.
+
+\begin{proof}[Proof of Theorem 1.1]
+The null target is $1$ and every mixture component has target $1-b_\delta\psi$. Their $L^2$ distance is $D=b_\delta\|\psi\|_2$. Any density estimator defines a test by selecting the nearer of these two targets. Whenever this test is wrong its squared estimation loss is at least $D^2/4$, by the triangle inequality. The sum of the null and mixture testing errors is at least $1-\TV\ge3/4$: for a rejection set $A$, that sum is $P_0(A)+\overline P_n(A^c)=1-(\overline P_n(A)-P_0(A))$.
+Thus the larger of the null risk and the average alternative risk is at least $3D^2/32$, which lower-bounds the minimax risk. Since $D^2\asymp\delta^4\asymp n^{-8s/(4s+d)}$, (1) follows. For interior supremum loss replace $D$ by $b_\delta\|\psi\|_{\infty,I}$; this constant is positive for every specified $\eta<1/2$.
+\end{proof}
+
+\section{Oracle benchmark with a complete elementary upper bound}
+Suppose the propensity $e$ is supplied, but $p$ and the conditional outcome density are not. Partition $[0,1]$ into $J$ equal bins $B_j$ of width $h=1/J$, and use
+\[
+ \widehat f(y)=\frac1{nh}\sum_{i=1}^n
+ \frac{\ind\{W_i=1,Y_i\in B_j\}}{e(X_i)},\qquad y\in B_j.
+\]
+This estimator is not constrained to integrate exactly to one; that restriction is unnecessary for the loss bounds.
+
+\begin{proposition}[Oracle risk]
+If $e\ge\varepsilon_0>0$, $f_1\le C$, and $f_1$ is uniformly $s$-H\"older in $y$ with $0<s\le1$, then
+\[
+ \E\|\widehat f-f_*\|_2^2\le C_3\{h^{2s}+(nh)^{-1}\}.
+\]
+Moreover its squared supremum risk is at most
+\[
+ C_4\left\{h^{2s}+\frac{\log(2J)}{nh}
+ +\frac{\log^2(2J)}{n^2h^2}\right\}.
+\]
+The constants depend only on the stated bounds. These yield the oracle rates $n^{-2s/(2s+1)}$ and $(\log n/n)^{2s/(2s+1)}$ respectively.
+\end{proposition}
+\begin{proof}
+Conditional expectation of the weighted indicator equals $\int_{B_j}f_*(y)dy$, so the mean estimate is the bin average. Its pointwise bias is at most $Lh^s$. The unscaled summand is bounded by $1/\varepsilon_0$, and its second moment is at most $Ch/\varepsilon_0$, giving variance at most $C/(nh)$ in each bin. Integrating proves the first bound.
+For the supremum, Bernstein's exponential-moment inequality for centered bounded independent summands gives, with probability at least $1-2Je^{-u}$,
+\[
+ \max_j|\widehat f_j-\E\widehat f_j|
+ \le C\left(\sqrt{u/(nh)}+u/(nh)\right).
+\]
+This inequality follows by expanding each centered summand's exponential series, bounding moments of order $k\ge2$ by its variance times its bound to power $k-2$, and optimizing the exponential Markov bound. Set $u=\log(2J)+v$, integrate the resulting $e^{-v}$ tail over $v\ge0$, and square with the bias bound. Balancing the terms gives the stated bandwidths.
+\end{proof}
+
+For equal smoothness $s$, the nuisance lower bound is slower than the integrated oracle rate when $d>4s+4$. This comparison follows by comparing the two exponents; it does not assert the lower bound is sharp. The unresolved work is an upper bound exploiting all nuisance regularities, the unequal-smoothness lower-bound frontier, higher-order smoothness, and the interaction of outcome localization with nuisance uncertainty under supremum loss.
+
+\begin{thebibliography}{9}
+\bibitem{source} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.5.3. \url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}. The primary text identifies counterfactual densities and nuisance-distribution complexity as research directions. The finite-mixture proof above is given in full and is not attributed to that survey.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,112 @@
+% ECONOMICS_PROBLEM: {"id": "C54-125", "title": "Robust structural counterfactuals", "jel_code": "C54", "source_id": "OP-0426"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C54-125}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Robust structural counterfactuals}
+
+\textbf{Status.} Unresolved in the general structural family. We solve a bounded, explicitly specified weak-IV experiment, including matching orders for confidence-set width. These are deductions for that experiment, not claims of new general IV theory.
+
+\subsection*{Target and restriction}
+The catalogue asks for honest coverage of all structural counterfactuals within observational total variation $\delta$, while instruments become weak. We retain full identified-set coverage and measure expected diameter. Our restriction is that the observed law belongs to the following one-parameter family; misspecification enlarges the compatible structural family, but the sampling law itself is on the family. Instrument strength $\kappa\in[0,1/2]$ is known.
+
+For $\theta\in[-1,1]$ and $(z,d,y)\in\{-1,1\}^3$, set
+\[
+ P_\theta(z,d,y)=\frac18(1+\kappa zd)(1+\kappa\theta zy).
+\]
+Thus $Z$ is symmetric, and $D,Y$ are conditionally independent given $Z$. Define $U=Y-\theta D$ and structural responses $Y(d)=\theta d+U$ for real interventions $d$. The moment restriction is $\E[ZU]=0$; full independence of $Z$ and $U$ is \emph{not} assumed. A policy increasing each unit's treatment by one has average effect $\psi=\theta$, bounded by one. This is a scalar linear-IV model with $\E[ZD]=\kappa$ and $\E[ZY]=\kappa\theta$. It specifies its latent law by the above construction; endogenous $D$ is permitted.
+
+For actual law $P_\eta$, define
+\[
+ I_\delta(\eta)=\{\theta\in[-1,1]:\TV(P_\theta,P_\eta)\leq\delta\}.
+\]
+All intervals below can be empty on exceptional samples; their diameter is then zero. Such emptiness is a statistical event, not a claim that the population identified set is empty.
+
+\begin{proposition}[Exact observational geometry]
+For every $\theta,\eta\in[-1,1]$,
+\[
+ \TV(P_\theta,P_\eta)=\frac\kappa2|\theta-\eta|.
+\]
+Consequently, for $\kappa>0$,
+\[
+ I_\delta(\eta)=[-1,1]\cap[\eta-2\delta/\kappa,\eta+2\delta/\kappa].
+\]
+If $\kappa=0$, the set is $[-1,1]$, including when $\delta=0$.
+\end{proposition}
+\begin{proof}
+Subtract the displayed mass functions and sum absolute values. The difference has magnitude $\kappa|\theta-\eta|(1+\kappa zd)/8$. Summing over the eight cells gives $\kappa|\theta-\eta|$; total variation is half that sum. The interval description follows by solving the resulting scalar inequality. At zero strength all mass functions coincide.
+\end{proof}
+
+\begin{theorem}[Finite-sample coverage and width]
+Observe $n$ independent draws from $P_\eta$. For $\kappa>0$, put $\bar T=n^{-1}\sum_{j=1}^nZ_jY_j$ and $r_n=\sqrt{2\log(2/\alpha)/n}$. The interval
+\[
+ C_n=[-1,1]\cap\left[\frac{\bar T-2\delta-r_n}{\kappa},
+                         \frac{\bar T+2\delta+r_n}{\kappa}\right]
+\]
+satisfies, simultaneously for every $\eta\in[-1,1]$, $\delta\geq0$ and $\kappa\in(0,1/2]$,
+\[
+ \Prb_\eta\{I_\delta(\eta)\subseteq C_n\}\geq1-\alpha,
+ \qquad \diam C_n\leq\min\{2,(4\delta+2r_n)/\kappa\}.
+\]
+At $\kappa=0$, set $C_n=[-1,1]$.
+\end{theorem}
+\begin{proof}
+The variables $Z_jY_j\in[-1,1]$ have mean $\kappa\eta$. Hoeffding's inequality gives $\Prb(|\bar T-\kappa\eta|>r_n)\leq\alpha$. On its complement, every $\theta\in I_\delta(\eta)$ obeys
+$|\kappa\theta-\bar T|\leq2\delta+r_n$. Intersection with the parameter range proves coverage; the deterministic width bound follows from the two interval lengths. Hoeffding's bound has no inverse-strength remainder, so coverage is uniform even when $\kappa$ tends to zero.
+\end{proof}
+
+\begin{theorem}[Width cannot improve in order]
+Fix $0<\alpha\leq1/8$ and $\kappa>0$. Let $C$ be any measurable random set satisfying whole-set coverage at least $1-\alpha$ for every $\eta\in[-1,1]$. Then
+\[
+ \sup_\eta\E_\eta\diam C\ \geq
+ \max\left\{(1-\alpha)\min(2,4\delta/\kappa),
+ \frac12\min\left(\frac12,\frac1{4\kappa\sqrt n}\right)\right\}.
+\]
+In particular, for fixed $\alpha$, minimax expected diameter has order
+$\min\{1,(\delta+n^{-1/2})/\kappa\}$, up to constants independent of $n,\delta,\kappa$.
+\end{theorem}
+\begin{proof}
+At $\eta=0$, covering the whole identified interval forces diameter at least $\min(2,4\delta/\kappa)$ on an event of probability $1-\alpha$.
+For the sampling term, let $h=\min(1/2,1/(4\kappa\sqrt n))$ and compare $\eta=-h$ and $\eta=h$. The only changing factor in the likelihood is $T=ZY$, whose mean is $\pm a$ with $a=\kappa h$. Its one-observation divergence is
+\[
+ \KL(P_{-h},P_h)=a\log\frac{1+a}{1-a}\leq4a^2
+\]
+for $0\leq a\leq1/2$: integrate $2/(1-t^2)\leq 8/3<4$ from zero to $a$. Independence and Pinsker's inequality imply $\TV(P_{-h}^n,P_h^n)\leq\sqrt{2na^2}\leq1/2$.
+Each $\eta$ belongs to its own identified set. Under $P_{-h}^n$, the events $-h\in C$ and $h\in C$ therefore hold together with probability at least $1-2\alpha-1/2\geq1/4$. Their intersection forces diameter at least $2h$, giving $h/2$. The maximum of the two lower bounds is comparable to the claimed capped sum, and the preceding theorem gives the upper bound.
+\end{proof}
+
+\subsection*{What the result does and does not identify}
+The calculation distinguishes the observational uncertainty $\delta$ from the counterfactual amplification $1/\kappa$. Even infinitely many observations leave diameter $\min(2,4\delta/\kappa)$ at the central law. A validation experiment that bounds $\delta$ improves this component; additional observations from the same experiment improve only the sampling component. The calculation also shows why reporting only coverage would conceal the central weak-identification issue.
+
+The general problem still permits sampling laws outside this curve, unknown first-stage strength, nonlinear equilibrium counterfactuals and latent restrictions stronger than one IV moment. None is covered by this minimax theorem. Under arbitrary off-curve laws, a confidence set for the full eight-cell distribution followed by TV inversion would be valid, but a sharp general excess-width result needs further analysis.
+
+\subsection*{References and provenance}
+Isaiah Andrews, Nano Barahona, Matthew Gentzkow, Ashesh Rambachan and Jesse M. Shapiro, \emph{Structural Estimation Under Misspecification: Theory and Implications for Practice}, January 2025 author draft, Section 4, Definition 6 and Proposition 3. \url{https://web.stanford.edu/~gentzkow/research/includediv.pdf}. The inspected draft maintains strong identification in that robustness result; it is background for the question, not the source of our finite experiment or its bounds. All substantive model-specific arguments are given above.
+
+\end{document}

@@ -27,6 +27,7 @@ ID_RE = re.compile(r'[A-Z][0-9]{2}-[1-9][0-9]*')
 MODEL_LABELS = {
     'gpt_6_astra_pro': 'GPT 6 Astra Pro',
     'gpt6_astra_ultra': 'GPT 6 Astra Ultra',
+    'gpt_6_astra_ultra': 'GPT 6 Astra Ultra',
 }
 
 

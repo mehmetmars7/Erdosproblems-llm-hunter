@@ -273,19 +273,25 @@ class CompleteEconomicsImportTests(unittest.TestCase):
             self.assertNotIn('difficulty-rank:', record['definition_tex'])
             self.assertNotIn('\\ProblemClassification', record['definition_tex'])
             self.assertNotIn('Primary JEL index', record['definition_tex'])
-            if record['id'] not in {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'} | ULTRA_BATCH_IDS:
-                self.assertEqual(record['attacks'], [])
+            for attack in record['attacks']:
+                self.assertTrue(Path(attack['file_path']).stem == record['id'] or
+                                Path(attack['file_path']).stem.startswith(record['id'] + '_v'))
 
     def test_six_public_attacks_cover_five_canonical_problems(self):
         data = build_economics_data()
-        attacked = {problem_id: dict(record, attacks=[attack for attack in record['attacks']
-                                                     if attack['model'] == 'GPT 6 Astra Pro'])
-                    for problem_id, record in data.items()
-                    if any(attack['model'] == 'GPT 6 Astra Pro' for attack in record['attacks'])}
+        imported_files = {'C73-1.tex', 'C73-1_v2.tex', 'C72-4.tex',
+                          'C73-10.tex', 'C72-14.tex', 'D44-83.tex'}
+        attacked = {
+            problem_id: {**record, 'attacks': pro_attacks}
+            for problem_id, record in data.items()
+            if (pro_attacks := [attack for attack in record['attacks']
+                                if attack['model'] == 'GPT 6 Astra Pro'
+                                and Path(attack['file_path']).name in imported_files])
+        }
         self.assertEqual(set(attacked), {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'})
         self.assertEqual(sum(len(record['attacks']) for record in attacked.values()), 6)
         self.assertEqual([attack['version'] for attack in attacked['C73-1']['attacks']], [1, 2])
-        self.assertEqual(data['D63-97']['attacks'], [])  # Reused auction source OP-0592.
+        self.assertNotIn('D63-97', attacked)  # Reused auction source OP-0592.
         for record in attacked.values():
             self.assertEqual(record['status'], 'open')
             self.assertEqual(record['llm_status'], 'unresolved')
@@ -301,10 +307,62 @@ class CompleteEconomicsImportTests(unittest.TestCase):
         self.assertIn(r'\bibitem{isaksen2015}', catchup)
         self.assertIn('small-deficit strategy fails', catchup)
 
+    def test_astra_ultra_rank_51_to_100_batch_has_complete_public_attempts(self):
+        # Frozen IDs of the October 2026 batch; ranks may subsequently change.
+        expected = '''C73-51 C72-52 C62-53 C14-54 C14-55 D82-56 C21-57 H21-58
+            D63-59 F38-60 Q58-61 D78-62 C73-63 D82-64 C44-65 G28-66 D83-67 E10-68
+            C33-69 D63-70 C73-71 D63-72 C61-73 L94-74 G28-75 L13-76 C73-77 D82-78
+            C14-79 C32-80 G12-81 C73-82 D44-83 D63-84 H21-85 D63-86 C44-87 Q54-88
+            L22-89 D63-90 C14-91 D82-92 C61-93 D82-94 D47-95 J65-96 D63-97 C73-98
+            C22-99 G18-100'''.split()
+        self.assertEqual(len(set(expected)), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attacks = [attack for attack in data[problem_id]['attacks']
+                           if attack['model'] == 'GPT 6 Astra Ultra' and attack['version'] == 1]
+                self.assertEqual(len(attacks), 1)
+                attack = attacks[0]
+                self.assertEqual(attack['status'], 'unresolved')
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                public = (BASE_DIR / attack['file_path']).read_text()
+                self.assertIn(r'\begin{proof}', public)
+                self.assertIn(r'\begin{thebibliography}', public)
+                self.assertNotRegex(public, r'/Users/|/private/tmp/|/home/|/mnt/data|MERGED_PROBLEM')
+
+    def test_astra_ultra_rank_101_to_150_batch_preserves_identities_and_claim_statuses(self):
+        # Frozen IDs of this batch; later rank changes do not change its identity.
+        expected = '''C21-101 D44-102 Q58-103 C31-104 F34-105 C78-106 C73-107
+            D44-108 L41-109 D51-110 C14-111 G28-112 C73-113 C55-114 C22-115
+            C78-116 C14-117 F33-118 Q55-119 L23-120 C31-121 C78-122 C61-123
+            C31-124 C54-125 C12-126 D44-127 C45-128 C31-129 D63-130 C72-131
+            D86-132 H87-133 C78-134 C72-135 C78-136 E63-137 C78-138 C32-139
+            D62-140 E71-141 C72-142 H26-143 D63-144 C73-145 C31-146 C21-147
+            C14-148 C63-149 H63-150'''.split()
+        self.assertEqual(len(set(expected)), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attempts = [attack for attack in data[problem_id]['attacks']
+                            if attack['model'] == 'GPT 6 Astra Ultra' and attack['version'] == 1]
+                self.assertEqual(len(attempts), 1)
+                attack = attempts[0]
+                claim = 'solved' if problem_id in {'C72-131', 'C78-134'} else 'unresolved'
+                self.assertEqual(attack['status'], claim)
+                self.assertEqual(data[problem_id]['llm_status'], claim)
+                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                self.assertEqual(attack['date_posted'], '2026-10-09')
+                source = BASE_DIR / attack['file_path']
+                self.assertEqual(source.name, problem_id + '.tex')
+                self.assertEqual(source.read_bytes(), (BASE_DIR / 'docs' / attack['download_url']).read_bytes())
+                self.assertIn(r'\begin{proof}', source.read_text())
+                self.assertNotRegex(source.read_text(), r'/Users/|/private/tmp/|/home/|/mnt/data|TODO|proof omitted')
+
     def test_ultra_batch_preserves_problem_identity_and_public_downloads(self):
         data = build_economics_data()
         ultra = {problem_id: [attack for attack in record['attacks']
-                              if attack['model'] == 'GPT 6 Astra Ultra']
+                              if attack['file_path'].startswith('attacks/open_problems/economics/gpt6_astra_ultra/')]
                  for problem_id, record in data.items()}
         self.assertEqual({problem_id for problem_id, attacks in ultra.items() if attacks}, ULTRA_BATCH_IDS)
         for problem_id in ULTRA_BATCH_IDS:

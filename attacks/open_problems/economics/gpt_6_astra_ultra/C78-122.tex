@@ -1,0 +1,147 @@
+% ECONOMICS_PROBLEM: {"id": "C78-122", "title": "The approximation threshold for MAX-SMTI with one-sided ties", "jel_code": "C78", "source_id": "OP-0556"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Tie-refinement search and certificates for large stable matchings}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{C78-122}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\begin{abstract}
+We give an exact fixed-parameter algorithm when the total excess size of nontrivial ties is bounded, and an additive optimality certificate depending on the number of tied agents. An alternating-path criterion explains a sufficient condition for a $5/4$ guarantee, while a small example shows why ordinary augmentation need not preserve weak stability. These results do not improve the general polynomial-time approximation threshold.
+\end{abstract}
+\section{Question and precise scope}
+There are two sides $U,W$ and an acceptable graph $E\subseteq U\times W$. Members of $U$ have strict preferences; members of $W$ may have ties. Every acceptable partner is better than being unmatched. A matching is weakly stable if there is no acceptable pair whose endpoints both strictly prefer one another to their current assignments. The target is a weakly stable $M$ with
+\[
+ \tfrac54|M|\ge\operatorname{OPT}(I),
+\]
+in polynomial time on all instances, including arbitrary tie locations and sizes. The 2019 survey poses this target \cite{Survey}; Lam and Plaxton prove a $1+1/e$ guarantee \cite{LP}. These are source-specific established bounds, not an assertion that a complete current-literature search has ruled out all later developments.
+
+A \emph{strict refinement} orders members of each tied group while retaining all strict comparisons and all acceptable pairs. Let the lengths of nontrivial tied groups, over all lists, be $\ell_1,\ldots,\ell_s\ge2$, and define
+\[
+ k=\sum_{j=1}^s(\ell_j-1).
+\]
+Also let $q$ be the number of women whose lists contain at least one nontrivial tie. The two parameters differ: one very long tie has $q=1$ but large $k$.
+\section{Two elementary matching lemmas}
+\begin{lemma}[Stability and refinement]
+Every stable matching of a strict refinement is weakly stable in the original instance. Conversely, every weakly stable matching $N$ is stable in at least one strict refinement.
+\end{lemma}
+\begin{proof}
+A pair that blocks weak stability has strict comparisons on both original lists, which remain strict in every refinement. It would also block any refined matching, proving the first statement.
+
+For the converse, in each woman's tied group containing her assigned partner under $N$, put that partner first. Refine all other ties arbitrarily. Suppose $uw$ blocked $N$ in this refinement. Man $u$ strictly prefers $w$ to $N(u)$ in the original list. If woman $w$ originally strictly preferred $u$ to $N(w)$, the original matching was not weakly stable. If she originally tied them, her assigned partner was put first, so the refined blocking comparison is impossible. An unmatched woman has no assigned acceptable partner, and her comparison with any acceptable man is already strict in the original instance. These cases exhaust possible blocking pairs.
+\end{proof}
+
+\begin{lemma}[Equal cardinality under strict preferences]
+All stable matchings in a fixed strict bipartite instance have the same cardinality.
+\end{lemma}
+\begin{proof}
+Suppose stable $N$ is larger than stable $M$. A component of $M\triangle N$ must be an $M$-augmenting alternating path
+\[
+ u_0,w_1,u_1,w_2,\ldots,u_{r-1},w_r,
+\]
+where its $N$ edges are $u_{i-1}w_i$, its $M$ edges are $u_iw_i$ for $i<r$, and the two endpoints are unmatched in $M$. If $r=1$, its single edge blocks $M$. Otherwise stability of $M$ at $u_0w_1$ forces $w_1$ to prefer $u_1$ to $u_0$. Stability of $N$ at $u_1w_1$ then forces $u_1$ to prefer $w_2$ to $w_1$. Alternating these two implications propagates along the path. The final man prefers $w_r$ to his $M$ partner, and $w_r$ is unmatched in $M$, so the last edge blocks $M$. This contradiction proves the claim.
+\end{proof}
+
+For completeness, a stable matching of a strict instance is found by deferred acceptance: each free man proposes down his list, and every woman retains her best proposal received. Every edge is proposed along at most once. If $u$ prefers $w$ to his final partner, he proposed to $w$ and was rejected; her final retained partner is better than $u$, so that pair cannot block. This proves stability and the $O(|E|)$ proposal bound.
+\section{An exact parameterized algorithm}
+Enumerate every strict ordering inside each nontrivial tie. For each resulting refinement, run deferred acceptance and retain a largest output.
+
+\begin{theorem}[Exact optimization with bounded total tie excess]
+The algorithm returns a maximum-cardinality weakly stable matching. Its running time is
+\[
+ O\left(\left[\prod_{j=1}^s\ell_j!\right]\operatorname{poly}(|E|+|U|+|W|)\right).
+\]
+For $k\ge1$, the product is at most $(k+1)^{2k}$, so this is fixed-parameter tractable in $k$. For $k=0$ only one run is needed.
+\end{theorem}
+\begin{proof}
+Every output is weakly stable by the first lemma. Let $N$ be an optimum weakly stable matching. The second direction of that lemma supplies an enumerated refinement in which $N$ is stable. By the equal-cardinality lemma, deferred acceptance on that refinement has exactly $|N|$ pairs. Thus the largest enumerated output is optimal.
+
+Since every nontrivial tie has length at least two, $s\le k$, $\sum_j\ell_j=k+s\le2k$, and each $\ell_j\le k+1$. Hence
+$\prod_j\ell_j!\le\prod_j\ell_j^{\ell_j}\le(k+1)^{2k}$.
+Enumeration and each matching computation have the claimed total cost.
+\end{proof}
+
+This result is exact but exponential in its structural parameter. It is not a polynomial algorithm for arbitrary ties, and it does not imply tractability parameterized only by $q$.
+
+\section{An additive certificate and a path-length criterion}
+\begin{theorem}[Additive tie-agent certificate]
+Every weakly stable matching $M$ satisfies
+\[
+ \operatorname{OPT}(I)\le |M|+q.
+\]
+In particular, if $|M|\ge4q$, it already satisfies the $5/4$ target. If $|M|=0$ and $q=0$, the optimum is zero and the ratio condition holds without division.
+\end{theorem}
+\begin{proof}
+Let $N$ be an optimal weakly stable matching. Decompose $M\triangle N$ into alternating paths and cycles. Its net cardinality gain is at most the number of $M$-augmenting components. Each such component must contain a woman with a nontrivial tie. Otherwise every woman's comparisons along that component are strict, as are all men's, and the preference-propagation proof of the equal-cardinality lemma gives a blocking pair in $M$ or $N$. Distinct components have disjoint vertices, so at most $q$ components can be charged to tied women. This proves the additive bound and its ratio consequence. In the zero case the bound itself gives zero optimum.
+\end{proof}
+
+The certificate can be sharpened for a particular comparison by charging only ties that actually interrupt a strict comparison along its paths, but the global number $q$ is observable without knowing $N$.
+
+\begin{proposition}[Sufficient short-path exclusion]
+Let $M$ be weakly stable. Suppose that for every weakly stable $N$, every $M$-augmenting component of $M\triangle N$ contains at least four edges of $M$. Then $\operatorname{OPT}(I)\le(5/4)|M|$.
+\end{proposition}
+\begin{proof}
+For an optimum $N$, let $a$ be the number of $M$-augmenting components. They are edge-disjoint and consume at least $4a$ edges of $M$, so $a\le|M|/4$. Every cycle and balanced path has zero cardinality difference; each $M$-augmenting path adds one, and a reverse augmenting path subtracts one. Hence $|N|-|M|\le a\le|M|/4$.
+\end{proof}
+
+This is a sufficient certificate expressed through stable comparison matchings. Checking its universal condition is not supplied as a polynomial procedure. Replacing that condition by absence of all short ordinary augmenting paths would be stronger and easier to check, but finding a weakly stable matching with that property is a separate problem.
+
+\section{Why simply augmenting fails}
+Consider men $u_1,u_2,u_3$ and women $w_1,w_2,w_3$ with lists
+\[
+\begin{array}{c|l@{\qquad}c|l}
+ u_1&w_1>w_3>w_2&w_1&u_1\sim u_2\\
+ u_2&w_1&w_2&u_1\\
+ u_3&w_3&w_3&u_1>u_3
+\end{array}
+\]
+and no other acceptable pairs. The matching
+$M=\{u_1w_1,u_3w_3\}$ is weakly stable. Its unmatched man $u_2$ and matched woman $w_1$ do not block because she is indifferent; $u_1$ rejects both of his other acceptable partners in favor of $w_1$. These are all possible missing pairs.
+
+There is a length-three ordinary augmenting path
+$u_2,w_1,u_1,w_2$. Flipping it produces
+$N=\{u_2w_1,u_1w_2,u_3w_3\}$, but $u_1w_3$ now blocks: both strictly prefer one another to their new partners. Thus increasing cardinality along the short path sacrifices weak stability through an edge outside that path. The example does not prove impossibility of sophisticated exchange rules; it pinpoints why an ordinary matching augmentation proof cannot simply be imported.
+
+\section{What remains unresolved}
+The exact algorithm handles bounded total tie excess, and the additive bound certifies instances with relatively few tied women. Neither gives $5/4$ for unrestricted instances with a linear number of substantial ties. The path criterion identifies a sufficient structural property but no procedure that enforces it while preserving stability. No hardness improvement, no new general approximation ratio, and no resolution of the conditional approximation gap is claimed.
+\begin{thebibliography}{9}
+\bibitem{Survey} K. Cechl\'arov\'a, \ A. Cseh, and D. F. Manlove (2019).
+\emph{Selected open problems in Matching Under Preferences}, Section 3.2.3.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{LP} C.-K. Lam and C. G. Plaxton (2019).
+A $(1+1/e)$-Approximation Algorithm for Maximum Stable Matching with One-Sided Ties and Incomplete Lists.
+\emph{SODA 2019}, 2823--2840.
+\href{https://doi.org/10.1137/1.9781611975482.175}{doi:10.1137/1.9781611975482.175}.
+\url{https://www.cs.utexas.edu/~plaxton/pubs/2019/soda.pdf}.
+\end{thebibliography}
+
+\end{document}

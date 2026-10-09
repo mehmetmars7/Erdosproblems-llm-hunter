@@ -1,0 +1,206 @@
+% ECONOMICS_PROBLEM: {"id": "C22-99", "title": "Time-varying stochastic mediation effects", "jel_code": "C22", "source_id": "OP-0520"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Time-varying stochastic mediation effects: Mixed-history identification and separate treatment/mediator overlap costs}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Stochastic mediation target}
+Treatments precede finite mediators, which precede the next measured
+covariates. Let $q_t^a(h)=P(A_t=a_t\mid H_t=h)$ and
+$r_t^b(m\mid h)=P(M_t=m\mid H_t=h,A_t=b_t)$.
+For treatment sequence $a$ and reference sequence $b$, write
+\[
+ \psi(a,g^b)=\mathbb E[Y^{a,g^b}],\quad
+ D=\psi(a,g^{a'})-\psi(a',g^{a'}),\quad
+ I=\psi(a,g^a)-\psi(a,g^{a'}).
+\]
+The longitudinal mediation agenda is in \cite[Section 3.4.3]{agenda}.
+We prove the mixed-history identification formula, an exact second-moment
+bound with supplied kernels, finite-state honest inference with estimated
+kernels, and rare-path lower bounds. Full continuous-history H\"older
+minimax rates are not obtained.
+
+\section*{Identification without freezing intermediate covariates}
+Write $f_{t+1}(dl\mid h,a_t,m)$ for the observed next-covariate kernel
+and $\mu(h_T,a_T,m_T)$ for the terminal conditional mean.
+Let $p_1$ be the initial covariate law. Under consistency, sequential
+exchangeability for treatment and mediator interventions, and support on
+all generated histories, the identified formula is
+\[
+ \psi(a,g^b)=\int \mu(h_T,a_T,m_T)\,p_1(dl_1)
+       \prod_{t=1}^T r_t^b(dm_t\mid h_t)
+       \prod_{t=1}^{T-1}f_{t+1}(dl_{t+1}\mid h_t,a_t,m_t).        \tag{1}
+\]
+All $h_t$ in this formula contain the actual intervened past. In particular,
+$r_t^b$ is evaluated on that history, not on a separately simulated natural
+history under $b$.
+\begin{proposition}
+Under the stated assumptions and absolute continuity of each replaced
+kernel, define the weight
+\[
+ R^{a,b}=\prod_{t=1}^T
+ \frac{\mathbf1\{A_t=a_t\}}{q_t^a(H_t)}
+ \frac{r_t^b(M_t\mid H_t)}{r_t^a(M_t\mid H_t)}.
+\]
+Then $\psi(a,g^b)=\mathbb E[R^{a,b}Y]$ and $\mathbb E R^{a,b}=1$.
+\end{proposition}
+\begin{proof}
+The observed density factors into $p_1$, the treatment kernels $q_t$,
+the mediator kernels $r_t^{A_t}$, covariate transitions $f_{t+1}$,
+and the terminal outcome law. Multiplication by $R^{a,b}$ restricts every
+treatment to $a_t$, cancels $q_t^a$ and $r_t^a$, and inserts $r_t^b$.
+Integrating the outcome gives (1). The same cancellation with terminal
+integrand one gives expectation one. Sequential exchangeability and
+consistency justify interpreting this replaced factorization as the causal
+intervention law; the algebra alone would not establish that interpretation.
+\end{proof}
+
+\section*{A cumulative information bound}
+\begin{theorem}
+Assume $|Y|\le1$, all relevant assignment and mediator kernels are supplied,
+and for each stage
+\[
+ c_t=\sup_{h}\frac1{q_t^a(h)}
+             \sum_m\frac{r_t^b(m\mid h)^2}{r_t^a(m\mid h)}<\infty,
+                                                               \tag{2}
+\]
+where the supremum is over supported intervened histories.
+Then the empirical weighted mean has risk at most
+$C_T/n$, where $C_T=\prod_{t=1}^T c_t$.
+If $q_t^a\ge\varepsilon$ and $r_t^b/r_t^a\le\Lambda_t$,
+then $C_T\le\varepsilon^{-T}\prod_t\Lambda_t$.
+For $b=a$, the mediator factors disappear and one can take
+$C_T=\varepsilon^{-T}$.
+\end{theorem}
+\begin{proof}
+For the one-stage factor $Z_t$ of $R^{a,b}$,
+$\mathbb E[Z_t^2\mid H_t]=
+(q_t^a(H_t))^{-1}\sum_m r_t^b(m\mid H_t)^2/r_t^a(m\mid H_t)$.
+Starting from the last stage, bound this conditional expectation by $c_T$,
+then iterate backward through the natural covariate transition kernels.
+This proves $\mathbb E(R^{a,b})^2\le\prod_t c_t$.
+Since $Y^2\le1$, variance of its iid empirical mean is at most $C_T/n$.
+The ratio bound gives
+$\sum_m r_t^b(m)^2/r_t^a(m)\le\Lambda_t\sum_mr_t^b(m)=\Lambda_t$.
+For equal mediator kernels the sum is exactly one.
+\end{proof}
+For contrasts, taking the difference of two weighted means on the same
+sample yields variance at most $2(C_T^{(1)}+C_T^{(2)})/n$.
+Chebyshev intervals using this bound are finite-sample honest.
+The cardinality of mediator support alone cannot bound (2): with two
+mediator states a reference kernel can concentrate on a state whose
+actual-treatment probability is arbitrarily small.
+These are oracle-kernel results; estimating the law-dependent reference
+kernels requires additional analysis, supplied next in a restricted case.
+
+\section*{Finite-state plug-in inference}
+Assume all covariate and mediator states are finite, each conditional
+kernel has at most $B$ possible outputs, and every history/assignment
+configuration needed to evaluate (1) under the three required interventions
+has observed probability at least $\beta>0$. Let $C$ count these
+configurations, also including initial and terminal configurations.
+Estimate all probabilities and terminal means by empirical conditional
+frequencies and averages. The plug-in expression uses these estimates
+at the mixed histories in (1).
+\begin{proposition}
+If $n\beta\ge8\log(4C/\alpha)$, set
+\[
+ t=\sqrt{\frac{4\log(4BC/\alpha)}{n\beta}},\qquad
+ E=4T\min\{1,Bt/2\}+t.
+\]
+With probability at least $1-\alpha$, all three plug-in values have error
+at most $E$, and the plug-in estimates of $D,I$ have error at most $2E$.
+Thus their respective intervals of radius $2E$ are simultaneously honest.
+\end{proposition}
+\begin{proof}
+A binomial lower-tail union bound makes every required count at least
+$n\beta/2$ with failure probability at most $\alpha/4$.
+Conditional Hoeffding bounds then simultaneously bound every category
+probability error by $t$ and terminal mean error by $t$, with remaining
+failure probability at most $3\alpha/4$; for $[-1,1]$ outcomes the exponent
+is at least $n\beta t^2/4$. Each kernel therefore has total variation
+error at most $\min(1,Bt/2)$.
+The initial, mediator and intermediate-covariate kernels total $2T$.
+Couple the true and estimated simulated intervention histories stage by
+stage. The probability of any first disagreement is at most the sum of
+these $2T$ total variation bounds. An outcome mean in $[-1,1]$ changes
+by at most twice that probability, plus its own estimation error $t$.
+This proves the error $E$ for every intervention simultaneously on the
+same kernel-estimation event. Taking differences proves the contrast bound.
+\end{proof}
+This procedure includes estimation of $g^b$, unlike the supplied-kernel
+weighted mean. Its dependence on $C$ and $\beta$ can still be exponential
+in $T$ because full histories are counted.
+
+\section*{Necessary loss from rare treatment trajectories}
+\begin{theorem}
+Within smooth continuous-coordinate submodels of the canonical class,
+for each of the targets $D$ and $I$ there is a sequence of experiments
+with per-stage treatment overlap $\varepsilon$ such that its minimax
+squared risk is at least
+\[
+ c\min\{1,(n\varepsilon^T)^{-1}\}.                     \tag{3}
+\]
+For $0<\alpha<1/2$, any uniformly honest confidence interval in these
+subexperiments has worst-case expected length at least
+$c_\alpha\min\{1,(n\varepsilon^T)^{-1/2}\}$.
+\end{theorem}
+\begin{proof}
+Take independent Bernoulli$(\varepsilon)$ treatments, $a=(1,\ldots,1)$,
+$a'=(0,\ldots,0)$, and let all continuous coordinates be independent
+uniforms. For the direct effect, take mediator kernels independent of
+treatment, and terminal Bernoulli mean $1/2+\theta$ on the all-one path,
+$1/2$ on every other path. Then $D=\theta$.
+For the indirect effect, let only the final mediator differ by treatment:
+its probability of one is $3/4$ for treatment one and $1/4$ for treatment
+zero; all earlier mediator kernels agree. Give the outcome mean
+$1/2+\theta M_T$ on the all-one path and $1/2$ elsewhere. Then
+$I=\theta/2$. Both mediator values are supported under both treatments.
+Means and transition densities are constant in continuous coordinates,
+so satisfy every smoothness index when the fixed radii admit these constants.
+In either construction, the two laws $\theta=\pm\Delta$ differ only on
+an event of probability at most $\varepsilon^T$ and have sample KL at
+most $Cn\varepsilon^T\Delta^2$. Choose
+$\Delta=b\min\{1,(n\varepsilon^T)^{-1/2}\}$.
+A sufficiently small $b$ makes total variation at most $1/2$, and
+two-point testing yields (3).
+For intervals reduce $b$ further so that total variation is at most
+$(1-2\alpha)/2$. Under either one of the two laws, the probability
+that the interval contains both target values is at least
+$1-2\alpha-\operatorname{TV}>0$, by transferring the other law's coverage
+event. Multiplying this probability by target separation proves the
+expected-length bound. Uniform asymptotic coverage gives the same result
+with an $o(1)$ coverage term.
+\end{proof}
+
+\section*{Unresolved smoothness problem}
+The lower bound uses no roughness and therefore isolates cumulative
+positivity loss. The finite-state upper bound supplies a complete honest
+procedure, but does not determine the sharp dependence on continuous
+history dimension or the indices $s_f,s_y$. Higher-order treatment and
+mediator corrections, data-dependent reference-kernel estimation under
+H\"older restrictions, and matching nonparametric lower bounds remain
+unresolved. None of the calculations equates the stochastic kernels with
+a subject's counterfactual natural mediator trajectory.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

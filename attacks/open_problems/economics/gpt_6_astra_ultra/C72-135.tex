@@ -1,0 +1,127 @@
+% ECONOMICS_PROBLEM: {"id": "C72-135", "title": "Extending descent-and-mixing methods to a fixed number of players", "jel_code": "C72", "source_id": "OP-0133"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C72-135}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Extending descent-and-mixing methods to a fixed number of players}
+
+\textbf{Status.} Unresolved for the $1/3+\delta$ multiplayer approximation target. We give a polynomial-bit descent procedure for an explicit linearization certificate, and a strict local-minimum example showing that this certificate alone can stop above $1/3$, even in a dominance-solvable game.
+
+\subsection*{Short question and notation}
+Fix $k\geq3$. Player $i$ has $m_i$ actions and an explicitly tabulated rational payoff $u_i\in[0,1]$. Mixed profiles are $x\in X=\prod_i\Delta_{m_i}$, $d=\sum_i m_i$, and
+\[
+ r_{ia}(x)=u_i(a,x_{-i})-u_i(x),\qquad
+ f(x)=\max_{i,a}r_{ia}(x).
+\]
+The catalogue asks for a specified descent-and-mixing extension achieving $f\leq1/3+\delta$ in polynomial bit time for fixed $k$. The result here implements only the descent part, with its output guarantee stated independently of that payoff target.
+
+For $y\in X$ define the maximum of all linearized regrets
+\[
+ L_x(y)=\max_{i,a}\{r_{ia}(x)+\nabla r_{ia}(x)\cdot(y-x)\},
+ \quad \ell(x)=\min_{y\in X}L_x(y),\quad g(x)=f(x)-\ell(x).
+\]
+The gradients are those of the multilinear extension in ambient coordinates; only feasible differences $y-x$ are used, so equivalent simplex-coordinate representations give the same derivative. Computing $\ell(x)$ is a rational linear program. Since $L_x(x)=f(x)$, $g(x)\geq0$.
+
+\begin{lemma}[Uniform remainder and Lipschitz bounds]
+Put $C_k=2(k-1)^2$. For all $x,y\in X$ and $t\in[0,1]$,
+\[
+ f(x+t(y-x))\leq(1-t)f(x)+tL_x(y)+C_kt^2.             \tag{1}
+\]
+For all $x,z\in X$, $|f(x)-f(z)|\leq\sum_i\|x_i-z_i\|_1$.
+\end{lemma}
+\begin{proof}
+For a payoff involving $h$ independently mixed coordinates, along the simultaneous segment its second derivative is a sum over $h(h-1)$ ordered pairs. Each mixed difference replaces two coordinates and is an alternating sum of four expected payoffs in $[0,1]$, hence has absolute value at most two. The second derivative is therefore at most $2h(h-1)$ in absolute value, and the first-order Taylor remainder at step $t$ is at most $h(h-1)t^2$.
+For $r_{ia}$ subtract the full payoff ($h=k$) from the fixed-action payoff ($h=k-1$). The two remainder bounds sum to
+$k(k-1)+(k-1)(k-2)=C_k$. For each regret its linear part at step $t$ is
+$(1-t)r_{ia}(x)+t[r_{ia}(x)+\nabla r_{ia}(x)\cdot(y-x)]$.
+Taking the maximum and adding the common remainder gives (1).
+
+Changing one coordinate of an expectation of a $[0,1]$ function changes it by at most half the $\ell^1$ distance of its two distributions. Change coordinates successively. The two payoff terms in a regret together change by at most $\sum_i\|x_i-z_i\|_1$. Taking the maximum preserves that bound.
+\end{proof}
+
+\begin{theorem}[Polynomial-bit descent to small linearization gap]
+For fixed $k$ and rational $0<\eta<1$, an explicitly tabulated rational game admits an algorithm returning a rational $x$ with $g(x)\leq\eta$ after at most $1+\lceil8C_k/\eta^2\rceil$ linear programs. Its total bit complexity is polynomial in the table's binary length and $1/\eta$, with polynomial dependence on the input encoding of $\eta$.
+\end{theorem}
+\begin{proof}
+Choose the integer $Q=\lceil16C_kd/\eta^2\rceil$ and work on the grid with probabilities in multiples of $1/Q$. Start at any pure profile. At the current grid point solve the linear program defining $\ell(x)$, obtaining a minimizer $y$. If $g(x)\leq\eta$, output $x$. Otherwise set $t=\eta/(2C_k)$ and $x'=x+t(y-x)$.
+By (1),
+\[
+ f(x')\leq f(x)-tg(x)+C_kt^2
+           <f(x)-\eta^2/(4C_k).
+\]
+For each player round the first $m_i-1$ coordinates of $x'_i$ downward to multiples of $1/Q$ and put the remaining mass on the last coordinate. The resulting grid point $\widetilde x$ is feasible and
+$\sum_i\|\widetilde x_i-x'_i\|_1\leq2d/Q\leq\eta^2/(8C_k)$.
+The Lipschitz bound gives
+$f(\widetilde x)<f(x)-\eta^2/(8C_k)$.
+Since $0\leq f\leq1$, there can be at most $\lceil8C_k/\eta^2\rceil$ such updates before the stopping condition holds.
+
+Grid coordinates always have $O(\log Q)$ bits. Evaluating multilinear payoffs and their gradients from the full table uses polynomially many rational operations; for fixed $k$, product denominators and accumulated numerators have polynomial bit length in the table encoding and $\log Q$. Each LP has $d+1$ variables and polynomially many constraints of that bit length. Standard exact rational LP yields a polynomial-bit minimizer. The step and subsequent grid rounding likewise have polynomial bit complexity. Grid rounding is essential to this argument: simply iterating exact rational updates without controlling denominators would not supply the stated bit bound.
+\end{proof}
+
+\begin{proposition}[A strict local obstruction above $1/3$]
+For every $k\geq3$ and rational $c\in(1/3,1/2)$ there is a two-action $k$-player game with payoffs in $[0,1]$ and a pure profile $x^0$ such that
+\[
+ f(x^0)=c,\qquad g(x^0)=0,
+\]
+and $x^0$ is a strict local minimum of $f$ over $X$. Nevertheless each player has a strictly dominant action and the unique Nash equilibrium has zero regret.
+\end{proposition}
+\begin{proof}
+Index players cyclically, let $x_i$ be player $i$'s probability of action 1, and define pure payoffs by
+\[
+ u_i(0,a_{-i})=0,\qquad
+ u_i(1,a_{-i})=c+(1-c)a_{i+1}.
+\]
+Action 1 strictly dominates action 0. Thus the unique equilibrium is $x_i=1$ for all $i$. The positive best-action regret is
+\[
+ r_i(x)=(1-x_i)\{c+(1-c)x_{i+1}\},
+\]
+and the action-0 regret is nonpositive. At $x^0=0$, all $r_i=c$. Their linearizations at a feasible $y\in[0,1]^k$ are
+$c-cy_i+(1-c)y_{i+1}$, whose sum is
+$kc+(1-2c)\sum_i y_i\geq kc$.
+Their maximum is therefore at least $c$. Since $y=0$ attains $L_{x^0}(0)=c$, we have $\ell(x^0)=c$ and $g(x^0)=0$.
+
+For local minimality, sum the exact regrets:
+\[
+ \sum_i r_i(x)-kc
+ =(1-2c)\sum_i x_i-(1-c)\sum_i x_ix_{i+1}
+ \geq\{1-2c-(1-c)\max_i x_i\}\sum_i x_i.
+\]
+This is strictly positive for any nonzero feasible $x$ sufficiently close to zero, specifically when $\max_i x_i<(1-2c)/(1-c)$. Then $f(x)\geq k^{-1}\sum_i r_i(x)>c$. All payoffs and the specified profile are rational.
+\end{proof}
+
+\subsection*{What mixing still has to do}
+For the example, mixing every player toward its dominant action gives
+$f(t\mathbf1)=(1-t)\{c+(1-c)t\}$, which initially increases and eventually reaches zero. Thus accepting only improving sufficiently small steps traps this profile, while a suitable large mixed candidate escapes. The example is not a hardness result and does not rule out descent plus a carefully chosen candidate-mixing phase. It proves only that the rigorously computed certificate $g\leq\eta$ cannot by itself imply $f\leq1/3+\delta$ for small $\delta$.
+
+The outstanding mathematical step is a universally valid mixing rule with the requested approximation guarantee and polynomial bit complexity. The theorem supplies a bounded-bit descent component, and the example gives a concrete case that any such extension must address.
+
+\subsection*{Reference}
+Hanyu Li, Wenhan Huang, Zhijian Duan, David Henry Mguni, Kun Shao, Jun Wang and Xiaotie Deng (2023), \emph{A survey on algorithms for Nash equilibria in finite normal-form games}, arXiv:2312.11063, Section 3.4 and the concluding theoretical open directions. \url{https://arxiv.org/pdf/2312.11063}. The primary survey was inspected for the methodological agenda; the rounded descent guarantee and explicit cyclic obstruction are proved here and are not attributed as its $k$-player approximation theorem.
+
+\end{document}

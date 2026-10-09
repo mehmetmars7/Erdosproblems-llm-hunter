@@ -1,0 +1,118 @@
+% ECONOMICS_PROBLEM: {"id": "C31-129", "title": "Causal inference under interference and network spillovers", "jel_code": "C31", "source_id": "OP-0101"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C31-129}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Causal inference under interference and network spillovers}
+
+\textbf{Status.} Unresolved for unrestricted learned interference. We give simultaneous honest inference over a finite local exposure class, an explicit dependence/complexity rate, and a nonvanishing-width example when dependence is unrestricted.
+
+\subsection*{Short target and sampling assumptions}
+Fix $n$ units, a pretreatment network and covariates. All probabilities below condition on these fixed objects. Assignments $Z_1,\ldots,Z_n$ are independent Bernoulli with known probabilities. Potential outcomes are fixed functions of assignments. For each unit specify a set $B_i\subseteq[n]$ such that $Y_i(z)$ depends only on $z_{B_i}$ and $|Y_i(z)|\leq B$ for every assignment. The locality restriction is imposed on the actual outcome, not only on its exposure approximation.
+
+Let $\mathcal H$ be a prespecified finite set of $H$ exposure maps, each $h_i(z)$ depending only on $z_{B_i}$. For each $h$ fix two distinct exposure labels $e_h,e'_h$, and assume their probabilities $p_i^h(e_h),p_i^h(e'_h)$ are at least $p>0$. Set
+\[
+ \tau_h=\frac1n\sum_i\left\{\E[Y_i(Z)\mid h_i(Z)=e_h]
+             -\E[Y_i(Z)\mid h_i(Z)=e'_h]\right\}.
+\]
+This is a design-specific contrast even for insufficient maps. A learner may select $\widehat h$ using the entire realized experiment, provided it selects from $\mathcal H$.
+
+Join distinct units $i,j$ in a dependency graph when $B_i\cap B_j\ne\varnothing$. Let $\chi$ be any number of colors in a proper coloring of this graph; $\chi\leq\Delta+1$ for maximum graph degree $\Delta$. Define
+\[
+ \widehat\tau_h=\frac1n\sum_iY_i(Z)
+ \left\{\frac{\ind\{h_i(Z)=e_h\}}{p_i^h(e_h)}
+       -\frac{\ind\{h_i(Z)=e'_h\}}{p_i^h(e'_h)}\right\}.
+\]
+
+\begin{lemma}[Colored concentration]
+Suppose random variables $X_1,\ldots,X_n$ are independent within each class of a partition into $\chi$ classes and each lies in an interval of length at most $L$. Then, for every $t>0$,
+\[
+ \Prb\left(\left|n^{-1}\sum_i(X_i-\E X_i)\right|>t\right)
+ \leq2\exp\left(-\frac{2nt^2}{\chi L^2}\right).
+\]
+\end{lemma}
+\begin{proof}
+Write $S_c=\sum_{i\in c}(X_i-\E X_i)$. H\"older's inequality with exponents all equal to $\chi$ and the independent-variable Hoeffding moment bound give
+\[
+ \E e^{\lambda\sum_cS_c}
+ \leq\prod_c(\E e^{\chi\lambda S_c})^{1/\chi}
+ \leq\exp(\chi\lambda^2 nL^2/8).
+\]
+Markov's inequality with $\lambda=4t/(\chi L^2)$ gives the upper tail $e^{-2nt^2/(\chi L^2)}$. Apply the same argument to negatives and add the two tail probabilities. Independence between different color classes is not required.
+\end{proof}
+
+\begin{theorem}[A valid interval after exposure-map selection]
+Under the assumptions above, with probability at least $1-\alpha$, every $h\in\mathcal H$ satisfies
+\[
+ |\widehat\tau_h-\tau_h|\leq
+ r_n:=\frac{B}{p}\sqrt{\frac{2\chi\log(2H/\alpha)}n}.
+\]
+Consequently $[\widehat\tau_{\widehat h}-r_n,\widehat\tau_{\widehat h}+r_n]$ covers the selected contrast $\tau_{\widehat h}$ with the same probability, even when selection uses outcomes.
+\end{theorem}
+\begin{proof}
+Each summand is between $-B/p$ and $B/p$, because the two exposure indicators are disjoint. Its expectation is the corresponding difference of conditional means by the definition of conditional expectation. Within a color class the $B_i$ are disjoint; the summands are therefore independent functions of disjoint collections of independently assigned treatments. Apply the lemma with $L=2B/p$, then take a union bound over $H$ maps. The simultaneous event implies the selected-map statement for every possible selection rule.
+\end{proof}
+
+\begin{corollary}[Stable responses with bounded exposure error]
+For every $h$ for which functions $y_i^h$ satisfy
+$|Y_i(z)-y_i^h(h_i(z))|\leq\varepsilon_h$ for all assignments, put
+$\tau_h^*=n^{-1}\sum_i[y_i^h(e_h)-y_i^h(e'_h)]$.
+On the simultaneous event of the theorem,
+\[
+ |\widehat\tau_h-\tau_h^*|\leq r_n+2\varepsilon_h
+\]
+for all such maps. In particular this covers an outcome-selected map if its error bound holds uniformly and is known.
+\end{corollary}
+\begin{proof}
+Conditional averaging preserves the error bound at each exposure, so $|\tau_h-\tau_h^*|\leq2\varepsilon_h$. Add the simultaneous estimation bound. The error assumption is substantive and cannot be verified merely by selecting a map with a small observed residual.
+\end{proof}
+
+For an undirected network of maximum degree $d$, if each $B_i$ is its closed neighborhood, each has at most $d+1$ coordinates and any coordinate occurs in at most $d+1$ such sets. Hence each dependency-graph vertex has degree at most $(d+1)^2-1$. One obtains informative diameter whenever
+\[
+ \frac{(d+1)^2\log(2H/\alpha)}{np^2}\longrightarrow0,
+ \qquad\sup_h\varepsilon_h\longrightarrow0
+\]
+for the stable-response target. This sufficient condition need not be necessary, and better variance-based bounds can improve the $p$ dependence.
+
+\begin{proposition}[Overlap alone cannot make confidence sets shrink]
+For every $n$ there is a local-outcome experiment with two exposures of probability $1/2$, bounded outcomes in $[0,1]$, and parameter $\theta\in\{0,1\}$, such that every confidence set $C$ satisfying $\Prb_\theta(\theta\in C)\geq1-\alpha$ for both parameters obeys
+\[
+ \E_0\diam C\geq\frac12-2\alpha.
+\]
+\end{proposition}
+\begin{proof}
+Use $B_i=\{1\}$ for all $i$, $Z_1\sim\mathrm{Ber}(1/2)$, and $Y_i(z)=\theta z_1$. Other assignments can be independent Bernoulli and are irrelevant. The exposure map is $h_i(z)=z_1$, and the average exposure contrast is exactly $\theta$. On event $E=\{Z_1=0\}$ the full data laws coincide under $\theta=0$ and $\theta=1$; both give $E$ probability $1/2$. Thus, under $P_0$, the probability of $E$ and failure to include 1 is at most $\alpha$, by transferring that identical subprobability law from $P_1$. The probability of failure to include 0 is also at most $\alpha$. With probability at least $1/2-2\alpha$, both points belong to $C$, forcing diameter at least one. The dependency graph is complete despite exposure overlap being fixed.
+\end{proof}
+
+\subsection*{Remaining gap and reference}
+The result pays for outcome-based map selection through $\log H$ and for local dependence through $\chi$. It does not handle an unrestricted map learner, unknown global interference, treatment-induced network formation, or unidentified observational treatment assignment. The target after map selection is explicitly $\tau_{\widehat h}$; selecting a convenient map does not establish that its contrast equals a policy effect.
+
+Peter M. Aronow and Cyrus Samii (2017), \emph{Estimating Average Causal Effects Under General Interference, with Application to a Social Network Experiment}, Annals of Applied Statistics 11(4), 1912--1947. \url{https://doi.org/10.1214/16-AOAS1005}; author preprint record \url{https://arxiv.org/abs/1305.6156}. The primary abstract and bibliographic record were verified: they establish the role of known exposure mappings and local dependence. The elementary finite-class concentration and lower-bound calculations are proved here and not attributed as their exact theorems.
+
+\end{document}

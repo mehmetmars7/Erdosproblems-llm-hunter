@@ -1,0 +1,79 @@
+% ECONOMICS_PROBLEM: {"id": "C73-63", "title": "Minimax self-play regret under adversarially valid decentralized learning", "jel_code": "C73", "source_id": "OP-0147"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\title{Minimax self-play regret under adversarially valid decentralized learning: A constant lower bound and a robust constant-vector specialization}
+\author{GPT 6 Astra Ultra}
+\date{First posted: 9 October 2026}
+\begin{document}
+\maketitle
+
+Learners observe their own full payoff vectors and must retain adversarial guarantees. For a fixed tuple of action counts and an admissible regret constant $C_0$, the target is
+\[
+ \mathcal R_{k,m}(T)=\inf_{\mathcal A\in\mathfrak L}\sup_G
+ \max_i\mathbb E[(R_i(T))_+].
+\]
+The question is whether the dependence on $T$ can be bounded. The following separates an unavoidable initial information cost from the difficulty caused by strategically changing feedback. It does not establish a superconstant minimax lower bound.
+
+\begin{proposition}[A lower bound at every horizon]
+Suppose some player $i$ has $m_i\geq2$ actions and receives no payoff information before its first choice. For every $T\geq1$ and every admissible learner tuple,
+\[
+ \sup_G\max_j\mathbb E[(R_j(T))_+]\geq 1-\frac1{m_i}.
+\]
+Consequently $\mathcal R_{k,m}(T)\geq\max_{i:m_i\geq2}(1-1/m_i)$.
+\end{proposition}
+\begin{proof}
+Let $q_a=\mathbb E[x_i^1(a)]$. Choose an action $a^*$ with $q_{a^*}\leq1/m_i$. Choose a game in which player $i$ receives payoff one from $a^*$ and zero from its other actions, independently of the opponents. Give the other players arbitrary constant payoffs. The vector seen by $i$ is the same at every round. Its regret is exactly $\sum_{t=1}^T(1-x_i^t(a^*))$, a nonnegative quantity whose expected first term is at least $1-1/m_i$. The chosen game depends on the learner but not its private random outcome, as allowed by the supremum.
+\end{proof}
+
+\begin{theorem}[A switch wrapper]
+Fix $m\geq2$. Suppose a full-information learner $B$ has the pathwise guarantee
+\[
+ \left(\max_a\sum_{t=1}^{s}v^t(a)-\sum_{t=1}^{s}\langle z^t,v^t\rangle\right)_+
+ \leq C_B\sqrt{s\log m}
+\]
+for every $s\geq1$ and every nonanticipating sequence of vectors in $[0,1]^m$. Then there is a learner $W$ satisfying both of the following:
+\begin{enumerate}
+\item Against every such sequence, its positive regret is at most $2+C_B\sqrt{T\log m}$.
+\item If the vector is constant over time, its regret is at most one at every horizon.
+\end{enumerate}
+The wrapper adds $O(m)$ comparisons and arithmetic operations per round to $B$. It is admissible for any constant $C_0\geq C_B+2/\sqrt{\log 2}$ in the same computational model as $B$.
+\end{theorem}
+\begin{proof}
+At round one play any distribution and store the observed vector $v^1$. On each later round play a fixed maximizer of $v^1$, until the first round $\tau\geq2$ on which the observed vector differs from $v^1$. Starting at round $\tau+1$, run a fresh copy of $B$ forever. Equality is tested only after receiving the current feedback, so this rule uses no future information.
+
+For any comparator action $a$, its advantage over the wrapper in round one is at most one. In rounds $2,\ldots,\tau-1$ the stored maximizer gives at least as much as $a$. The advantage in the detection round is at most one. Thus the regret of the entire prefix ending at $\tau$ is at most two. On the suffix, the regret against every fixed action is bounded above by the suffix's maximum-action regret, hence by $C_B\sqrt{(T-\tau)\log m}$. Taking the maximum over the same comparator action after adding the two portions proves the first assertion, including the case in which detection occurs after the horizon. If no detection ever occurs, every round after the first has nonpositive comparator advantage, proving the second assertion.
+
+Finally $2\leq(2/\sqrt{\log2})\sqrt{T\log m}$ for $T\geq1$, $m\geq2$. The additive comparison cost does not change a polynomial per-round computational budget. The proof is pathwise, so it also implies the required expected positive-regret inequality.
+\end{proof}
+
+\begin{corollary}
+In every separable game $u_i(a_i,a_{-i})=h_i(a_i)$ with payoffs in $[0,1]$, the wrapped learners have self-play regret at most one per player, while preserving the preceding adversarial guarantee. Thus on this subclass the worst-case horizon dependence is $\Theta(1)$ whenever the allowed constant accommodates the wrapper.
+\end{corollary}
+\begin{proof}
+Each learner observes the fixed vector $h_i$, irrespective of all other players' choices. Apply the theorem and the preceding lower bound. Players with a single action have zero regret.
+\end{proof}
+
+\paragraph{Source relationship and remaining gap.}
+Soleymani, Piliouras, and Farina~\cite{source} study fast self-play regret with adversarial protection; their setting motivates the target. The wrapper is an elementary specialization, not an improvement of their general-game bounds. It depends explicitly on slack in $C_0$; admissibility for a prescribed smaller constant has not been established. In strategically coupled games payoff vectors can keep changing, and the wrapper may immediately revert to its adversarial rate. Neither bounded regret in the full class nor a diverging lower bound is proved here.
+
+\begin{thebibliography}{9}
+\bibitem{source} A. Soleymani, G. Piliouras, and G. Farina.
+\emph{Cautious Optimism: A Meta-Algorithm for Near-Constant Regret in General Games}, version 1, 2025.
+\url{https://arxiv.org/html/2506.05005v1}.
+\end{thebibliography}
+
+\end{document}

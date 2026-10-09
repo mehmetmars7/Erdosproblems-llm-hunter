@@ -1,0 +1,128 @@
+% ECONOMICS_PROBLEM: {"id": "D44-102", "title": "Revenue-optimal multi-item, multi-bidder auctions", "jel_code": "D44", "source_id": "OP-0171"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Certified revenue bounds and a two-item bundling comparison}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{D44-102}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and the deliverable here}
+For independent additive bidders with continuous densities on $[0,1]^m$, the original target is the best revenue among feasible mechanisms that are dominant-strategy truthful in expected utility, typewise individually rational, and never pay bidders. We construct a finite linear-program upper bound valid for this continuous experiment, prove its certificate property, and give an exact lower-bound comparison for two uniform bidders and two items. This does not characterize the optimal continuous mechanism or prove that the upper and lower bounds converge together.
+
+The source \cite{Jiang} studies multi-bidder DSIC dual certificates. The elementary averaging relaxation below is developed explicitly here and is not attributed to that paper's neural method. Independence across bidders, rather than independence of coordinates within a bidder, is used in the relaxation.
+
+\section{A finite upper relaxation of the continuous problem}
+For bidder $i$, partition $[0,1]^m$ into finitely many cells of maximum-norm diameter at most $h$. Retain cells of positive $F_i$ probability; let $S_i$ index them, $\pi_i(s)>0$ be their masses, and $a_i(s)$ a point in the cell. Write $S=\prod_iS_i$ and $\pi(s)=\prod_i\pi_i(s_i)$. The input to the linear program consists of these masses and representatives. Its variables are $X_{ij}(s)$ and $P_i(s)$, with objective
+\[
+ U_h=\max\sum_{s\in S}\pi(s)\sum_iP_i(s).
+\]
+Impose for all indicated indices
+\begin{align}
+ &X_{ij}(s)\ge0,\quad \sum_iX_{ij}(s)\le1,\quad 0\le P_i(s)\le m,\tag{1}\\
+ &a_i(s_i)\cdot X_i(s)-P_i(s)\ge-mh,\tag{2}\\
+ &a_i(s_i)\cdot[X_i(s_i,s_{-i})-X_i(r_i,s_{-i})]
+ -P_i(s_i,s_{-i})+P_i(r_i,s_{-i})\ge-2mh.\tag{3}
+\end{align}
+This is an explicit relaxation with finitely many inequalities, not a purported truthful mechanism for continuous reports. The zero mechanism is feasible and the feasible set is compact, so the displayed maximum is attained.
+
+\begin{theorem}[Validity for continuous DSIC revenue]
+Let $R_D(F)$ have the meaning in the catalogue. Then
+\[
+ R_D(F)\le U_h.
+\]
+For every continuous feasible mechanism, its conditional cell averages give a feasible point of (1)--(3) with exactly the same expected revenue.
+\end{theorem}
+\begin{proof}
+Set $X_{ij}(s)=\E[x_{ij}(V)\mid V\text{ lies in cells }s]$ and similarly $P_i(s)$. Feasibility and nonnegative payments pass to conditional expectations. Original IR gives $p_i(v)\le v_i\cdot x_i(v)\le m$, proving (1). Since $|v_i-a_i(s_i)|_\infty\le h$ and every allocation coordinate is in $[0,1]$, replacing $v_i$ by $a_i(s_i)$ in expected truthful utility changes it by at most $mh$, giving (2).
+
+Fix opponent values, draw the truthful type from cell $s_i$, and independently draw a deviating report from cell $r_i$. DSIC holds for every such pair. Integrate first over these two draws, then over opponents conditional on their cells. Because bidder types are independent, the deviating report and opponents have precisely the product conditional distribution defining $X_i(r_i,s_{-i}),P_i(r_i,s_{-i})$. Replacing the true valuation by $a_i(s_i)$ changes each of the truthful and deviation allocation terms by at most $mh$. The resulting inequality is (3). Finally, summing conditional payment means with cell probabilities gives the original expected revenue. Taking the supremum proves the assertion.
+\end{proof}
+
+This proof does not average DSIC into Bayesian IC: the opponent-cell index is retained in every inequality. Nevertheless averaging within an opponent cell weakens the original pointwise constraints and is used only for an upper bound. Cells of zero probability can be discarded for that purpose; doing so would not justify ignoring off-support deviations in a claimed mechanism.
+
+\begin{proposition}[Verifiable finite certificate]
+Encode (1)--(3), including nonnegativity, as $Az\le b$ with unrestricted vector $z$, and objective $c^Tz$. Every vector $\lambda\ge0$ satisfying $A^T\lambda=c$ certifies
+\[
+ R_D(F)\le U_h\le b^T\lambda.
+\]
+All constraints and the certificate are finite. If input masses and representatives are rational, verification uses rational arithmetic with their declared bit encodings.
+\end{proposition}
+\begin{proof}
+For every feasible $z$, $c^Tz=\lambda^TAz\le\lambda^Tb$. Maximize and use the preceding theorem. The verification consists only of checking the displayed linear equalities and inequalities; it is independent of how $\lambda$ was found.
+\end{proof}
+
+There is always at least the crude bound $R_D\le m$: in each profile, IR and feasibility imply $\sum_i p_i\le\sum_{ij}v_{ij}x_{ij}\le m$. Expected efficient welfare can strengthen it when $F$ is known. The LP may provide a sharper bound, but no unreported numerical LP optimum is asserted here. Exact access to arbitrary continuous cell probabilities is not a finite computational input model; an implementation must supply those masses or rigorous integration bounds.
+
+\section{An exact mechanism comparison: two uniform bidders}
+Now let $n=m=2$ and all four coordinates be independent uniform on $[0,1]$. Two feasible DSIC mechanisms can be compared analytically.
+
+\begin{proposition}[Separate-sale and bundle revenues]
+Selling each item separately by a second-price auction with reserve $1/2$ yields total expected revenue $5/6$. Selling the grand bundle by a second-price auction with reserve
+\[
+ r=\sqrt{2/3}
+\]
+yields
+\[
+ R_{\rm bundle}=\frac{23}{30}+\frac4{45}\sqrt{2/3}>\frac56.
+\]
+Both mechanisms have nonnegative payments and satisfy the catalogue's typewise IR and DSIC requirements. Consequently $R_D(F)\ge R_{\rm bundle}$ in this continuous instance.
+\end{proposition}
+\begin{proof}
+A second-price auction with reserve gives a bidder a fixed threshold determined by rival reports and the reserve. Winning above that threshold gives nonnegative utility, winning below it gives nonpositive utility, and losing gives zero. Reporting true value maximizes utility at every opponent report. For separate sales this argument applies coordinate by coordinate and adds because values are additive. For bundling it applies to the scalar sum of coordinates; a vector report induces only that sum. Feasibility and nonnegative payments are immediate.
+
+For one item and two uniform bids, exactly one bid exceeds reserve $r$ with probability $2r(1-r)$, contributing $2r^2(1-r)$. When both exceed it, the smaller bid has density $2(1-s)$ on $s\in[r,1]$, contributing $\int_r^1 2s(1-s)ds$. Their sum is $1/3+r^2-4r^3/3$, equal to $5/12$ at $r=1/2$. Two items therefore give $5/6$.
+
+For a bundle value $S$, its distribution and density are
+\[
+ F(s)=s^2/2,\ f(s)=s\ (0\le s\le1),\qquad
+ F(s)=1-(2-s)^2/2,\ f(s)=2-s\ (1\le s\le2).
+\]
+For any $r\le1$, expected second-price revenue with reserve $r$ is
+\[
+ 2rF(r)(1-F(r))+\int_r^2 2s(1-F(s))f(s)ds.
+\]
+This separates exactly one qualifying bidder from both qualifying bidders. On $[r,1]$ the integral is $7/15-2r^3/3+r^5/5$; on $[1,2]$ it is $3/10$. The first term is $r^3-r^5/2$, so total revenue is
+\[
+ \frac{23}{30}+\frac{r^3}{3}-\frac{3r^5}{10}.
+\]
+At $r^2=2/3$ this is the claimed value. Its excess over $5/6$ is $(4r-3)/45>0$, because $r>3/4$. No optimality among all multidimensional mechanisms follows from this comparison.
+\end{proof}
+
+For this instance efficient expected welfare is $2\E\max(V_1,V_2)=4/3$, since a maximum of two uniforms has mean $2/3$. Thus one completely analytic bracket is
+\[
+ \frac{23}{30}+\frac4{45}\sqrt{2/3}\le R_D(F)\le\frac43.
+\]
+Any feasible LP certificate can replace the upper endpoint if it is smaller. The bracket's gap is left visible rather than interpreted as a solution.
+
+\section{Why the remaining step is substantive}
+Naively rounding reported types and applying a finite LP allocation does not inherit exact DSIC for the original type space. Equations (2)--(3) explicitly tolerate incentive errors, and averaging discards information within cells. To meet the original constructive target one would need a feasible continuous mechanism and matching upper certificates with a proved vanishing revenue gap, or a different exact characterization. This attempt supplies neither that extension theorem nor an accuracy-dependent running-time guarantee. It does show how to obtain rigorous upper certificates without confusing Bayesian and dominant-strategy constraints, and how a simple multi-item comparison can strictly outperform coordinatewise selling.
+
+\begin{thebibliography}{9}
+\bibitem{Jiang} Y. Jiang, D. C. Parkes and T. Wang (2026), \emph{Duality for Optimal Multi-Item, Multi-Bidder Auction Design: Revenue Certificates through Deep Learning}, arXiv:2606.10112v1. Primary abstract and bibliographic record: \url{https://arxiv.org/abs/2606.10112v1}. Its DSIC certificate agenda motivates the entry. No theorem about our particular averaging relaxation is taken from the abstract.
+\end{thebibliography}
+
+\end{document}

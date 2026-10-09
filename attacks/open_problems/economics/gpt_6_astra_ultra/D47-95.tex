@@ -1,0 +1,104 @@
+% ECONOMICS_PROBLEM: {"id": "D47-95", "title": "Adaptive market maintenance", "jel_code": "D47", "source_id": "OP-0299"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\setlength{\parskip}{4pt}
+\title{Adaptive market maintenance: a contractive-state bound with a common switch budget}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem:} \texttt{D47-95}. \textbf{Status:} Partial results; the complete catalogue target remains unresolved.
+\section{Problem and scope}
+The target compares a market operator with rule sequences evaluated on their own counterfactual participation states. We prove a deterministic regret bound under known contractive dynamics and delayed observation of exogenous conditions. Both learner and comparator obey the same switch budget. We also give a constant-environment lower bound without contraction. Market maintenance motivates the application \cite{R}; the policy-regret distinction is developed in online learning by Arora, Dekel and Tewari \cite{ADT}.
+
+\section{Contractive primitives}
+Let the finite rule set be $\mathcal M$, the state space $(S,d_s)$ be nonempty, complete and of diameter at most $D$, and exogenous conditions lie in $(\Theta,d)$. The known deterministic transition $f:S\times\mathcal M\times\Theta\to S$ and welfare $W\in[0,1]$ satisfy
+\begin{align*}
+ d_s(f(s,m,\theta),f(s',m,\theta))&\le\kappa d_s(s,s'),\quad 0\le\kappa<1,\\
+ d_s(f(s,m,\theta),f(s,m,\theta'))&\le Fd(\theta,\theta'),\\
+ |W(m,s,\theta)-W(m,s',\theta')|&\le Ld_s(s,s')+Kd(\theta,\theta').
+\end{align*}
+The exogenous sequence is oblivious, with variation $\sum_{t=2}^T d(\theta_t,\theta_{t-1})\le V$. After period $t$, the operator observes $\theta_t$; before its first action it has no observation of $\theta_1$. Switching costs satisfy $0\le c(m,m')\le c_{\max}$ and $c(m,m)=0$. The initial rule $m_0$ and state $s_1$ are common to learner and comparator. The switch budget $B$ counts changes between successive periods, $t\ge2$; an initial change from $m_0$ may incur cost but is not counted in that budget. The learner begins with $m_0$.
+
+For each $(m,\theta)$ let $z(m,\theta)$ be the unique fixed point of $s\mapsto f(s,m,\theta)$, which exists by contraction on a complete metric space. Define steady-state welfare $g(m,\theta)=W(m,z(m,\theta),\theta)$ and $G=K+LF/(1-\kappa)$. Assume the fixed points and finite maximizations below can be computed exactly, or supplied with separately certified errors.
+
+\begin{lemma}[State tracking on each policy's own path]
+For any rule sequence with at most $b$ switches and states $s_{t+1}=f(s_t,m_t,\theta_t)$,
+\[
+ \sum_{t=1}^T d_s(s_t,z(m_t,\theta_t))
+ \le \frac{D(b+1)}{1-\kappa}+\frac{FV}{(1-\kappa)^2}.
+\]
+Also, $g(m,\cdot)$ and $\max_m g(m,\cdot)$ are $G$-Lipschitz.
+\end{lemma}
+\begin{proof}
+Comparing the fixed-point equations at $\theta,\theta'$ gives $d_s(z(m,\theta),z(m,\theta'))\le Fd(\theta,\theta')/(1-\kappa)$. Write $e_t=d_s(s_t,z(m_t,\theta_t))$. Then
+\[
+ e_{t+1}\le\kappa e_t+D\mathbf1_{\{m_{t+1}\ne m_t\}}
+ +\frac F{1-\kappa}d(\theta_{t+1},\theta_t).
+\]
+Here a rule change contributes at most the diameter $D$, after which a change of condition is controlled by the fixed-point bound. Sum this inequality for $t<T$, use $e_1\le D$ and $e_T\ge0$, and divide by $1-\kappa$. The Lipschitz assertion follows from the welfare bound and the fixed-point bound, followed by the elementary inequality $|\max_m a_m-\max_m b_m|\le\max_m|a_m-b_m|$.
+\end{proof}
+
+\section{A feasible block policy}
+Choose an integer block length $\tau\in[1,T]$ and put $J=\lceil T/\tau\rceil$, requiring $J-1\le B$. Use rule $m_0$ throughout the first block. At each later block beginning at date $a$, choose a maximizer of $g(m,\theta_{a-1})$ and retain it for that block. This uses at most $J-1$ switches, including when adjacent chosen rules coincide.
+
+\begin{theorem}[An explicit policy-regret upper bound]
+For the block policy and the catalogue's comparator class with at most $B$ switches, evaluated on each comparator's own state path,
+\begin{align*}
+ R_T\le{}&\tau+2G\tau V
+ +\frac{LD(B+J+1)}{1-\kappa}
+ +\frac{2LFV}{(1-\kappa)^2}
+ +c_{\max}(J-1).
+\end{align*}
+The bound holds pathwise for every exogenous sequence with the stated variation.
+\end{theorem}
+\begin{proof}
+Let $g^*(\theta)=\max_mg(m,\theta)$. For any comparator, the tracking lemma and state-Lipschitz welfare imply its cumulative welfare is at most
+\[
+ \sum_tg^*(\theta_t)+L\left\{\frac{D(B+1)}{1-\kappa}+\frac{FV}{(1-\kappa)^2}\right\}.
+\]
+Subtracting its nonnegative switching costs only reduces this upper bound. The learner's cumulative welfare is at least its sum of $g(m_t,\theta_t)$ minus the tracking bound with $b=J-1$. Its switching costs are at most $c_{\max}(J-1)$, since it starts at $m_0$.
+
+The first block loses at most $\tau$ relative to $g^*$ because both lie in $[0,1]$. At date $t$ of a later block starting at $a$, optimality for $\theta_{a-1}$ and the two Lipschitz bounds give
+\[
+ g^*(\theta_t)-g(m_t,\theta_t)
+ \le2G d(\theta_t,\theta_{a-1})
+ \le2G\sum_{r=a}^t d(\theta_r,\theta_{r-1}).
+\]
+Each variation increment is counted at most $\tau$ times over its block, so the total is at most $2G\tau V$. Adding the learner and comparator tracking errors and switching costs proves the result. No comparator was evaluated on the learner's endogenous states.
+\end{proof}
+
+For example, with fixed primitive constants, $V=O(1)$, $\tau$ of order $\sqrt T$, and a common budget $B$ of order $\sqrt T$ large enough that $J-1\le B$, this gives $R_T=O(\sqrt T)$. For arbitrary $B$ the displayed bound need not be sublinear or minimax sharp; it remains a valid quantified bound. In particular it does not promise adaptation with zero switches.
+
+\section{An obstruction when participation is irreversible}
+\begin{proposition}[Linear regret at zero exogenous variation]
+Without contraction there is a known finite-state, two-rule system, with $V=0$ and zero switching costs, whose minimax regret is at least $(T-1)/2$, even allowing at least one switch to both learner and comparator and revealing the constant condition after the first period.
+\end{proposition}
+\begin{proof}
+Let the unknown constant condition be $\theta\in\{0,1\}$. The initial state is $s$, with absorbing states good and bad. The first chosen rule $m\in\{0,1\}$ sends $s$ to good if $m=\theta$ and to bad otherwise. Both states subsequently remain unchanged under every rule. Welfare is zero initially, one in good, and zero in bad. All of these functions are known; only $\theta$ is initially hidden. A comparator knowing $\theta$ chooses it in period 1 and receives $T-1$, using no subsequent switches. If the learner chooses rule 1 initially with probability $q$, its expected regret is $(T-1)(1-q)$ for $\theta=1$ and $(T-1)q$ for $\theta=0$. Their maximum is at least $(T-1)/2$. Later information and switches cannot escape the absorbing state. The two distinct absorbing states also show why a common strict contraction constant is impossible.
+\end{proof}
+
+\section{Remaining gap}
+The upper bound relies on known dynamics, exogenous-condition feedback and steady-state computation. It does not solve the bandit case with unknown transitions, supply matching minimax lower bounds under contraction, or establish a model of how strategic participants produce the assumed transition law. The lower bound shows that variation control alone cannot replace a recoverability assumption.
+
+\begin{thebibliography}{9}
+\bibitem{ADT} R. Arora, O. Dekel and A. Tewari (2012), \emph{Online Bandit Learning against an Adaptive Adversary: from Regret to Policy Regret}, ICML. \url{https://arxiv.org/abs/1206.6400}. Related benchmark distinction and policy-regret framework; the contractive fixed-point bound above is derived directly.
+\bibitem{R} A. E. Roth (2023), \emph{Market Design and Maintenance}, NBER Working Paper 31947. \url{https://doi.org/10.3386/w31947}. This is the catalogue's economic motivation, not an attributed source for the online-control theorem; its full text was not available for this note's source check.
+\end{thebibliography}
+\end{document}

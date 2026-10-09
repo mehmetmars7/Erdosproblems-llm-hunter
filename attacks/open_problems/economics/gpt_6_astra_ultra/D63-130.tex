@@ -1,0 +1,91 @@
+% ECONOMICS_PROBLEM: {"id": "D63-130", "title": "Fair allocation across changing profiles", "jel_code": "D63", "source_id": "OP-0278"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{D63-130}\quad\textbf{Model:} GPT 6 Astra Ultra\quad\textbf{Version:} 1\par
+\section*{Fair allocation across changing profiles}
+
+\textbf{Status.} Unresolved for the full domain classification. We construct rules satisfying all four requirements on two explicit domains, distinguishing deterministic monotonicity from expected monotonicity.
+
+\subsection*{Short problem and axioms}
+A complete allocation gives each indivisible good to exactly one agent. Values are nonnegative and additive. EF1 means that, for every ordered pair $i,j$ with $A_j\ne\varnothing$, some $g\in A_j$ satisfies $v_i(A_i)\geq v_i(A_j\setminus\{g\})$. Pareto efficiency (PO) excludes a feasible allocation weakly improving everyone and strictly improving someone. Resource monotonicity (RM) requires each incumbent's value to weakly increase when one good is added. Population monotonicity (PM) requires each incumbent's value to weakly decrease when an agent is added. Goods, agents and their labels can vary over all finite sizes; ties are resolved by a fixed ordering of the ambient labels. All rules below are defined for every nonempty population, including zero goods.
+
+\subsection*{Deterministic construction for common unit goods}
+Fix a common subset $G^+$ of valued goods. Every agent values each good in $G^+$ at one and each other good at zero. The domain includes arbitrary finite populations and arbitrary restrictions of the common good universe; addition preserves old values. Order agents by their labels. For the currently available set $G$, if $q=|G\cap G^+|$ and $n=|N|$, give the $r$th agent
+\[
+ c_r(q,n)=\#\{\ell\geq0:r+\ell n\leq q\}
+\]
+valued goods. Order goods by their labels and allocate consecutively to realize these counts; assign all zero goods to the first agent. This is a rule on profiles, not a rule that remembers an arrival history. Its allocations can change identities of old goods, as the axioms compare values rather than ownership.
+
+\begin{theorem}[All four deterministic axioms on a transition-closed domain]
+The rule just defined is complete, EF1, PO, RM and PM for every finite profile of common binary additive valuations and every permitted single-good or single-agent transition.
+\end{theorem}
+\begin{proof}
+The positive-good counts sum to $q$ and differ by at most one. Completeness follows from their construction and assignment of zero goods. If agent $j$ has at least one valued good, deleting such a good leaves at most $c_j-1\leq c_i$ valued goods, proving EF1. If $j$ has only zero goods, deleting any one leaves zero value, again proving EF1.
+Every complete allocation has total value $q$ across agents. A Pareto improvement would increase that total while not decreasing any component, which is impossible; hence PO.
+When a valued good is added, $q$ increases by one and every count $c_r(q,n)$ is nondecreasing in $q$. Adding a zero good leaves counts unchanged. Thus RM holds even when label ordering changes which physical goods constitute the bundles.
+When an agent is inserted, an incumbent's rank changes from $r$ to $r'\in\{r,r+1\}$ and the population size becomes $n+1$. For every $\ell\geq0$,
+$r'+\ell(n+1)\geq r+\ell n$. Therefore the number of indices $\ell$ for which the left side is at most $q$ cannot exceed the corresponding old count. Every incumbent weakly loses value, proving PM.
+\end{proof}
+
+\begin{corollary}[Agent-specific positive scales]
+The same rule satisfies the four axioms when $v_i(g)=a_i\ind\{g\in G^+\}$, with $a_i>0$, and transitions preserve incumbent scales. For the catalogue's integer model restrict $a_i$ to positive integers at most $V$.
+\end{corollary}
+\begin{proof}
+EF1 and each incumbent's monotonicity inequalities are unchanged by multiplying all of that incumbent's bundle values by $a_i>0$. A Pareto improvement would weakly increase every incumbent's valued-good count and strictly increase at least one, contradicting conservation of $q$. Completeness is unaffected.
+\end{proof}
+This extension allows interpersonal cardinal scales to differ while preserving a common judgment of which goods have value. It does not cover arbitrary binary disagreement about individual goods.
+
+\subsection*{Expected monotonicity with arbitrary common additive values}
+Now let every agent share the same arbitrary nonnegative additive valuation $v$. Fix an ordering of goods. Starting with empty bins, assign each successive good to a bin of least current total value, breaking ties by bin index. This produces $n$ unlabeled bundles. Finally match these bundles to the $n$ agents using a uniformly random bijection. The rule is freshly randomized at each profile; RM and PM are imposed only in expectation.
+
+\begin{lemma}[The least-loaded-bin allocation is EF1]
+For common nonnegative additive valuations, assigning goods successively to a currently least-valued bin produces an EF1 complete allocation for any ordering of goods and any tie-breaking among minima.
+\end{lemma}
+\begin{proof}
+Consider any final nonempty bin $j$ and its last assigned good $g$. Immediately before that assignment, the bin's value equals its final value minus $v(g)$, because it receives nothing later. It was a minimum-value bin at that moment. Every other bin's final value is at least its value at that moment, since all subsequent additions have nonnegative value. Hence $v(A_j\setminus\{g\})\leq v(A_i)$ for every other bin $i$. This proves all EF1 comparisons, including a zero-valued last good.
+\end{proof}
+
+\begin{theorem}[Ex post fairness and efficiency, expected inter-profile monotonicity]
+The randomized rule is ex post complete, EF1 and PO on the domain of identical additive valuations at all finite sizes. Every agent has expected value $v(G)/n$. It satisfies expected RM and expected PM for every allowed transition.
+\end{theorem}
+\begin{proof}
+Completeness and EF1 follow from the construction and lemma, independently of the random relabeling. For PO, every complete allocation has the same sum $v(G)$ of agents' common bundle values, so no strict Pareto improvement exists.
+Under a uniform bijection, each agent is equally likely to receive each bin; its expected value is their average, $v(G)/n$. Adding good $g$ changes this to $(v(G)+v(g))/n\geq v(G)/n$. Adding an agent preserves $v(G)$ and changes the incumbent expectation to $v(G)/(n+1)\leq v(G)/n$. These inequalities hold for every profile pair, without a coupling between the lotteries being required.
+\end{proof}
+
+\subsection*{Why the quantifiers matter}
+The two constructions solve whole domain schemas, not isolated transitions. The first is deterministic and covers common unit goods, including positive rescalings. The second handles all identical additive profiles but weakens inter-profile comparisons to expectations while retaining ex post EF1 and PO. Its proof does not establish a coupling under which every incumbent improves in every realization after a good arrives, nor deterministic monotonicity for unequal common item values.
+
+The unresolved classification includes arbitrary binary valuations, heterogeneous additive valuations, maximal deterministic domains and incompatibility witnesses. These constructions establish compatibility on explicit subdomains without claiming maximality. Their proofs use elementary allocation and conservation arguments; no novelty relative to known fair-allocation rules is claimed.
+
+\subsection*{Reference}
+Dominik Peters (2024), ``Inter-profile Axioms in the Allocation of Indivisible Goods,'' Section 4.5 of \emph{Fair Division: Algorithms, Solution Concepts, and Applications}, Dagstuhl Reports 14(9), 145. \url{https://doi.org/10.4230/DagRep.14.9.145}. Primary text: \url{https://drops.dagstuhl.de/storage/04dagstuhl-reports/volume14/issue09/24401/html/DagRep.14.9.145/DagRep.14.9.145.html}. The inspected section proposes rule-level monotonicity questions; the four-axiom domain results above are proved here and are not attributed as that report's theorems.
+
+\end{document}
