@@ -272,6 +272,14 @@ def build_economics_data(base_dir=BASE_DIR):
             'entry_kind': 'statement_only',
             'attacks': attempts[problem_id],
         }
+        # parse_attack extracts the same TeX Completion Estimate sections used
+        # by Erdos. Match its per-problem rule: the highest stated estimate
+        # across models and versions, leaving absent estimates unset.
+        completions = [attack['completion'] for attack in attempts[problem_id]
+                       if type(attack.get('completion')) in (int, float)]
+        if completions:
+            data[problem_id]['completion'] = max(completions)
+            data[problem_id]['completion_source'] = 'llm'
     return data
 
 

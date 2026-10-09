@@ -247,6 +247,49 @@ class EconomicsCatalogueTests(unittest.TestCase):
         self.assertNotIn(r'\large', attempt['raw'])
         self.assertEqual((self.root / 'docs' / attempt['download_url']).read_text(), source)
 
+    def test_completion_uses_highest_tex_estimate_across_models_and_versions(self):
+        records = self.imported()['problems']
+        target = records[0]
+        sources = [self.write_attempt(target), self.write_attempt(target, 2)]
+        third = sources[0].parent.parent / 'gpt6_astra_ultra' / sources[0].name
+        third.parent.mkdir()
+        third.write_bytes(sources[0].read_bytes())
+        sources.append(third)
+        for source, estimate in zip(sources, [r'45.5\%', r'20\%', '0.35']):
+            source.write_text(source.read_text().replace(
+                r'\end{document}', r'\section{Completion Estimate}' + '\n'
+                + estimate + '\n' + r'\end{document}'))
+        data = generate_economics_data(self.root)
+        problem = data[target['id']]
+        self.assertEqual([attack['completion'] for attack in problem['attacks']],
+                         [45.5, 20, 35])
+        self.assertEqual(problem['completion'], 45.5)
+        self.assertEqual(problem['completion_source'], 'llm')
+        self.assertEqual(problem['status'], 'open')
+        self.assertEqual(problem['llm_status'], 'unresolved')
+        published = (self.root / 'docs/data/economics_data.js').read_text()
+        self.assertIn('"completion": 45.5', published)
+        self.assertNotIn('completion', data[records[1]['id']])
+        for attack, source in zip(problem['attacks'], sources):
+            self.assertEqual((self.root / 'docs' / attack['download_url']).read_bytes(),
+                             source.read_bytes())
+
+    def test_zero_completion_is_preserved_and_missing_estimates_stay_unset(self):
+        records = self.imported()['problems']
+        zero = self.write_attempt(records[0])
+        zero.write_text(zero.read_text().replace(
+            r'\end{document}', r'\section*{Completion Estimate}' + '\n0\\%\n'
+            + r'\end{document}'))
+        solved_without_estimate = self.write_attempt(records[1])
+        solved_without_estimate.write_text(solved_without_estimate.read_text().replace(
+            '% ATTEMPT_STATUS: unresolved', '% ATTEMPT_STATUS: solved'))
+        data = build_economics_data(self.root)
+        self.assertEqual(data[records[0]['id']]['completion'], 0)
+        self.assertEqual(data[records[0]['id']]['attacks'][0]['completion'], 0)
+        for record in records[1:]:
+            self.assertNotIn('completion', data[record['id']])
+            self.assertNotIn('completion_source', data[record['id']])
+
     def test_attempt_identity_and_explicit_status_are_required(self):
         target = self.imported()['problems'][0]
         path = self.write_attempt(target)
