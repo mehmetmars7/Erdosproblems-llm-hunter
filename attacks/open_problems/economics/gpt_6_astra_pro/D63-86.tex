@@ -1,0 +1,158 @@
+% ECONOMICS_PROBLEM: {"id": "D63-86", "title": "Exact original maximin shares using at most one duplicated good", "jel_code": "D63", "source_id": "OP-0195"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries One additional copy for original maximin shares}\par\medskip
+{\large D63-86.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0195}
+\label{game:GT-065}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+For every $n\ge1$, finite original good set $M$, and nonnegative additive values $v_i(S)=\sum_{g\in S}a_{ig}$, let
+\[
+\mu_i=\max_{(P_1,\ldots,P_n)\in\Pi_n(M)}\min_jv_i(P_j),
+\]
+where $\Pi_n(M)$ contains all ordered complete partitions, including empty parts. Is it always possible to choose subsets $A_i\subseteq M$ such that
+\[
+\bigcup_iA_i=M,\qquad
+\sum_{g\in M}\max\{0,|\{i:g\in A_i\}|-1\}\le1,\qquad
+v_i(A_i)\ge\mu_i\quad\forall i?
+\]
+Thus at most one original good is duplicated once, its two instances go to different agents, and the MMS benchmark is computed \emph{before} duplication. With no duplication the $A_i$ form a partition. Every original is used. Empty markets and zero MMS are allowed. An exact finite search below assumes rational input for a conventional executable representation; the existence statements allow real values.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Akrami et al., arXiv:2502.09377v3, Section 1.2, pose the one-copy question, and Corollary 3.9 proves it for three additive agents \cite{augmentation}. The general augmentation bounds in that work do not replace ``one copy'' by the same budget for arbitrary $n$. Here the two-agent, identical-value and agent-scaled binary subcases are proved directly; the three-agent conclusion is credited to the imported corollary.
+
+\section{ATTACK PLAN}
+This is discrete fair division with a tightly constrained resource augmentation. The proof track targets exact MMS partitions and Hall matchings for binary preferences. The disproof track searches four-agent instances and identifies the exact single-deficit structure that any one-copy solution must satisfy after the copy is removed.
+
+\begin{center}\begin{tabular}{p{.25\linewidth}p{.66\linewidth}}\toprule Tool&Role\\\midrule
+Finite MMS partition optimization&Defines exact benchmarks without approximation.\\
+Cut-and-choose&Solves the two-agent boundary case.\\
+Pigeonhole and averaging&Handle small item counts and bound MMS.\\
+Hall's matching condition&Allocates enough liked goods to every binary-valued agent.\\
+Augmenting paths&Prove the required matching theorem constructively.\\
+One-deficit reduction&Characterizes exactly what one extra copy can repair.\\
+Exact random-instance enumeration&Tests larger small cases without numerical MMS estimates.\\\bottomrule\end{tabular}\end{center}
+
+\section{WORK}
+\begin{lemma}[Elementary exact subcases]\label{lem:basicMMS}
+No extra copy is needed if $n=1$, if $m\le n$, or if all valuations are identical.
+\end{lemma}
+\begin{proof}
+For $n=1$, $\mu_1=v_1(M)$ and giving all goods to that agent works. If $m<n$, every $n$-partition has an empty part, so nonnegativity gives $\mu_i=0$. Every complete allocation works. If $m=n$, a partition with no empty part consists of singletons, and a partition with an empty part has minimum zero. Thus $\mu_i=\min_ga_{ig}$. Give each agent one good; each gets at least its own minimum. If all valuations equal $v$, choose a partition attaining $\max_P\min_jv(P_j)$, which exists because the partition set is finite. Give one part to each agent; all have that same MMS. These arguments include all-zero values and the empty market.
+\end{proof}
+
+\begin{theorem}[Two agents]\label{thm:twoMMS}
+For $n=2$, an unaugmented complete MMS allocation exists.
+\end{theorem}
+\begin{proof}
+Let agent 1 choose a partition $(P_1,P_2)$ attaining its MMS. Agent 2 receives its preferred part and agent 1 receives the other. Agent 1 values both parts at least $\mu_1$. Agent 2 receives at least $v_2(M)/2$. For every bipartition the smaller value is at most the average $v_2(M)/2$, so $\mu_2\le v_2(M)/2$. Both guarantees hold simultaneously, and no good is duplicated or discarded.
+\end{proof}
+
+\begin{theorem}[Agent-scaled binary valuations]\label{thm:binaryMMS}
+If for each agent $i$ there is $\lambda_i\ge0$ with $a_{ig}\in\{0,\lambda_i\}$ for every good, an unaugmented complete MMS allocation exists for every $n$.
+\end{theorem}
+\begin{proof}
+For $\lambda_i>0$, let $L_i$ be the liked goods, $d_i=|L_i|$, and $k_i=\lfloor d_i/n\rfloor$. Dividing the liked goods into $n$ parts as evenly as possible proves $\mu_i\ge\lambda_i k_i$. Conversely at least one part of any partition contains at most $\lfloor d_i/n\rfloor$ liked goods, proving equality. For $\lambda_i=0$, set $L_i=\varnothing$, $d_i=k_i=0$ and $\mu_i=0$.
+
+Create $k_i$ clones of agent $i$, each adjacent to every good in $L_i$. For any subset $X$ of clones, let $S$ be the agents represented. If $X$ is empty, its matching condition is automatic. Otherwise let $k_* =\max_{i\in S}k_i$. Its neighborhood has size
+\[
+|\Gamma(X)|=\left|\bigcup_{i\in S}L_i\right|\ge\max_{i\in S}d_i
+\ge nk_*\ge\sum_{i\in S}k_i\ge|X|.
+\]
+The second inequality uses an agent attaining $k_*$, whose liked count is at least $nk_*$. This is Hall's condition.
+
+For completeness, take a maximum matching. If some clone is unmatched, explore alternating paths from all unmatched clones, traversing unmatched edges from clones to goods and matched edges back. A reachable unmatched good would give an augmenting path and increase the matching, a contradiction. Every reached good is therefore matched to a reached clone. Every neighbor of a reached clone is reached: unmatched edges are explored, while its matched good, if any, lies on its entering alternating path. Thus the reachable clone set $X$ has neighborhood consisting of matched reachable goods and satisfies $|X|>|\Gamma(X)|$, because it contains at least one unmatched initial clone. This contradicts Hall's condition. Therefore a matching covers every clone.
+
+Give each agent the distinct goods matched to its clones. It receives at least $k_i$ liked goods and hence its MMS. Assign every remaining original good to any agent. Nonnegative values preserve all guarantees, and no copy is used.
+\end{proof}
+
+\begin{proposition}[An exact one-deficit characterization]\label{prop:oneDeficit}
+A one-copy MMS allocation exists if and only if there is a complete unaugmented partition $P$ such that either every agent already receives its MMS, or exactly one agent $i$ has deficit $\delta_i=\mu_i-v_i(P_i)>0$ and some $g\notin P_i$ satisfies $a_{ig}\ge\delta_i$, while every other agent receives its MMS.
+\end{proposition}
+\begin{proof}
+For sufficiency, the first case uses no copy. In the second case give an additional instance of $g$ to $i$. Completeness of $P$ places its original instance with a different agent, so this duplicates exactly one good once and gives no agent two instances of the same good. The inequality repairs the only deficit.
+
+Conversely suppose a feasible one-copy allocation is given. If there is no duplicate it is already a suitable partition. Otherwise remove one of the two instances of the duplicated good from its recipient $i$. The remaining allocation is a complete partition of the originals. Only $i$'s utility can decrease; every other agent retains its MMS. If $i$ becomes deficient, its loss is $a_{ig}$, so its deficit is at most that amount and the removed good is not in its remaining bundle. If it is not deficient, all agents already meet their benchmarks. This proves the characterization.
+\end{proof}
+
+\begin{corollary}[A finite exact decision procedure]
+For rational additive input, existence of a one-copy solution can be decided by enumerating $n^m$ original partitions, computing all MMS benchmarks exactly, and testing Proposition~\ref{prop:oneDeficit} for each partition. This is not a polynomial-time claim and does not prove all instances succeed.
+\end{corollary}
+\begin{proof}
+For each agent, enumerate the finite partition set to compute the largest of its minimum part values. Then enumerate the same set and test all agents' own values and the finitely many possible repairing goods. Rational additions and comparisons are exact, and Proposition~\ref{prop:oneDeficit} proves necessity and sufficiency. Finite termination decides each instance without a uniform positive existence conclusion.
+\end{proof}
+
+\section{VERIFICATION}
+The program tested 100 random four-agent, eight-good matrices with independent integer entries in $\{0,\ldots,10\}$, using seed 20261009. For each matrix it enumerated all $4^8=65{,}536$ complete partitions and computed every original MMS exactly. Every tested instance already admitted an unaugmented MMS allocation; hence none supplied a one-copy counterexample. This sample gives little evidence about adversarial instances requiring augmentation, and no such instance is claimed to have been found.
+\begin{lstlisting}
+partitions = all assignments of the m originals to n agents
+mu[i] = max_P min_j value_i(P[j])
+for P in partitions:
+    deficits = agents with value_i(P[i]) < mu[i]
+    if no deficits: return P
+    if exactly one deficit i:
+        if some g outside P[i] has value_i(g) >= deficit[i]:
+            return P plus one copy of g for i
+return NO for this particular input
+\end{lstlisting}
+The benchmark never changes after duplication. The binary proof matches clone demands, not agents one-to-one with goods, and explicitly checks Hall's condition for arbitrary clone subsets. Adding unused originals is safe because all item values are nonnegative. A disjoint union of hard subinstances does not automatically amplify the required copy count: changing the total number of agents changes each original MMS partition benchmark.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+The all-$n$ one-copy statement is not proved or disproved. The exact $n\le2$, $m\le n$, identical-value and agent-scaled binary subcases, together with the one-deficit characterization and exact decision procedure, are fully proved. The $n=3$ one-copy theorem is an imported result of \cite{augmentation}.
+
+\textbf{Exact first gap.} For every arbitrary additive nonnegative instance with $n\ge4$, no proof is obtained that a partition satisfying Proposition~\ref{prop:oneDeficit} must exist.
+
+\textbf{Three next moves.} (1) Construct a partition satisfying MMS for $n-1$ agents with the final deficit bounded by one outside good. (2) Find an exchange lemma preserving the first $n-1$ guarantees while reducing the last deficit. (3) Search structured four-agent matrices near incompatible MMS partitions, rather than dense uniformly random valuations, and verify every partition exactly.
+
+\textbf{Minimal counterexample constraints.} By the proved and imported subcases, it must have at least four agents and more goods than agents, and escape identical and agent-scaled binary preferences. Merely showing that no unaugmented MMS allocation exists does not disprove the one-copy claim.
+
+\section{Completion Estimate}
+20\%
+
+Several exact subdomains and a necessary-and-sufficient one-deficit reduction are proved; the arbitrary four-and-more-agent guarantee is not established.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{augmentation} H. Akrami, S. Barman, A. Eden, M. Feldman, A. Fiat, Y. Gal-Tzur, S. Rammohan and A. Sethia. \emph{Maximin-Share Fairness via Resource Augmentation}. arXiv:2502.09377v3 (2026), Section 1.2, Definition 2.5 and Corollary 3.9. \url{https://arxiv.org/html/2502.09377v3}.
+\end{thebibliography}
+\end{document}

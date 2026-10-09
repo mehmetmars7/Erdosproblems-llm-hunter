@@ -1,0 +1,203 @@
+% ECONOMICS_PROBLEM: {"id": "C63-35", "title": "Scalable heterogeneous-agent macroeconomics", "jel_code": "C63", "source_id": "OP-0016"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+% Self-contained: no external input or bibliography files required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,microtype,xurl,hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue,pdftitle={Checked research attempts: nine economics and stochastic-analysis problems}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{3em}
+\widowpenalty=10000\clubpenalty=10000\displaywidowpenalty=10000
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=3pt}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\F}{\mathcal F}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\cE}{\mathcal E}
+\newcommand{\Law}{\operatorname{Law}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Lip}{\operatorname{Lip}}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newcommand{\report}[3]{\clearpage\setcounter{theorem}{0}\renewcommand{\thetheorem}{#1.\arabic{theorem}}\renewcommand{\theHtheorem}{#1.\arabic{theorem}}\section*{#1: #2}\addcontentsline{toc}{section}{#1: #2}\textbf{Outcome:} #3.\par\textbf{Tools:} web browsing available; Python computation available. Literature checked on 9 October 2026.}
+\newcommand{\stage}[2]{\subsection*{#1) #2}}
+\newcommand{\unresolved}{\textbf{LABEL: UNRESOLVED.}}
+\newcommand{\disproof}{\textbf{LABEL: FULL SOLUTION. SUBLABEL: COUNTEREXAMPLE/DISPROOF.}}
+
+\begin{document}
+\section*{C63-35: Certified global nonlinear heterogeneous-agent computation}
+\textbf{Outcome:} UNRESOLVED; conditional global certificates and sharp obstructions proved.\par\textbf{Tools:} web browsing available; Python computation available. Literature checked on 9 October 2026.
+\subsection*{1) FORMAL RESTATEMENT}
+For a declared nonempty class $\mathcal H$ of heterogeneous-agent economies, let $D_h$ be the full relevant state domain, including the full distribution state, and let $\mathcal R_h$ be the declared equilibrium residual operator on a specified normed function space. Equalities, inequalities, and complementarity must all be encoded: for instance an inequality $a\le0$ has violation $a^+=\max(a,0)$; nonnegative complementarity $a\ge0,b\ge0,ab=0$ can be encoded by $(-a)^+,(-b)^+$ and $\min(a^+,b^+)$. A zero residual must be proved equivalent to the desired equilibrium conditions.
+
+The requested programme is to construct an algorithm such that for every $\varepsilon>0$,
+\[
+ \sup_{h\in\mathcal H}\|\mathcal R_h(\widehat f_h)\|_{D_h}\le\varepsilon,
+\]
+with explicit operation counts, error propagation into estimation, and, under appropriate stability hypotheses,
+\[
+ \dist(\widehat f_h,\mathcal E_h)
+       \le C\|\mathcal R_h(\widehat f_h)\|_{D_h},
+ \qquad \mathcal E_h=\{f:\mathcal R_h(f)=0\}.
+\]
+The coefficient $C$ must be uniform if the guarantee is uniform over $h$.
+
+\textbf{Specification issue.} The attachment is an editorial research family, not a fully specified operator, class $\mathcal H$, norm, or cost model. The minimal correction is to fix these objects and any claimed stability class. The conditional theorems below do so explicitly; they do not assert that arbitrary heterogeneous-agent equilibrium operators are contractions. Residual scaling is part of the data, not a harmless convention when a universal $C$ is requested.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Auclert--Bard\'oczy--Rognlie--Straub \cite{ABRS} provide an established sequence-space Jacobian solution and estimation method. That is not by itself a certificate of a supremum residual bound over an arbitrary global nonlinear state domain. This report supplies conditional numerical-analysis statements, not a claim that current heterogeneous-agent computation lacks powerful existing methods.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof routes.} Derive a uniform contraction-based residual bound, prove a small-gain condition for coupled household and aggregate blocks, and convert finite computations into supremum certificates using an explicit modulus of continuity.
+
+\textbf{Disproof routes.} Test a scalar residual with a degenerate derivative, rescale an otherwise regular residual, and hide a narrow residual spike between finitely many sampled states. These constructions show why stability and global approximation assumptions cannot be omitted.
+
+\textbf{Landscape and tools.} This is verified numerical analysis and equilibrium stability. Banach contraction supplies existence and an error bound; geometric-series estimates control inexact iteration; weighted product norms test coupled feedback; covering nets turn local evaluations into global estimates; residual counterexamples expose poor conditioning; triangle inequalities propagate moment error; and an identification modulus translates moment accuracy into parameter accuracy.
+
+\subsection*{4) WORK}
+\begin{theorem}[Uniform contraction certificate]
+For each $h\in\mathcal H$, let $S_h$ be a nonempty closed subset of a Banach space $X_h$, and let $F_h:S_h\to S_h$ satisfy
+\[
+ \|F_h(f)-F_h(g)\|\le q\|f-g\|\qquad(f,g\in S_h)
+\]
+with the same $0\le q<1$ for every $h$. For the explicitly normalized residual $R_h(f)=f-F_h(f)$, there is a unique fixed point $f_h^*\in S_h$, and
+\[
+ \|f-f_h^*\|\le\frac{\|R_h(f)\|}{1-q}\qquad(f\in S_h).
+\]
+\end{theorem}
+\begin{proof}
+Fix $h$ and $f_0\in S_h$ and iterate $f_{j+1}=F_h(f_j)$. Induction gives
+$\|f_{j+1}-f_j\|\le q^j\|f_1-f_0\|$.
+For $k>j$, the triangle inequality bounds $\|f_k-f_j\|$ by the tail of the resulting geometric series, which tends to zero. Closedness and completeness give a limit $f_h^*\in S_h$, and the Lipschitz inequality gives $F_h(f_h^*)=f_h^*$. Two fixed points have distance at most $q$ times that distance, and hence coincide. Finally,
+\[
+ \|f-f_h^*\|\le\|f-F_h(f)\|+\|F_h(f)-F_h(f_h^*)\|
+ \le\|R_h(f)\|+q\|f-f_h^*\|.
+\]
+Move the final term to the left. The same $q$ gives the uniform constant. If an economic residual $\mathcal R_h$ differs from $R_h$, a separately proved uniform bound $\|R_h(f)\|\le L\|\mathcal R_h(f)\|$ is required before transferring this certificate.
+\end{proof}
+
+\begin{proposition}[Inexact global evaluation and iteration]
+Suppose $\widehat F_h(f)\in S_h$ and a verified oracle bound
+$\|\widehat F_h(f)-F_h(f)\|\le\delta$ holds globally for all required inputs. Then
+\[
+ \|f-f_h^*\|\le\frac{\|f-\widehat F_h(f)\|+\delta}{1-q}.
+\]
+For $f_{j+1}=\widehat F_h(f_j)$,
+\[
+ \|f_j-f_h^*\|\le q^j\|f_0-f_h^*\|
+                         +\frac{\delta(1-q^j)}{1-q}.
+\]
+\end{proposition}
+\begin{proof}
+The first estimate follows from
+$\|f-F_h(f)\|\le\|f-\widehat F_h(f)\|+\delta$
+and the theorem. The iteration satisfies $e_{j+1}\le q e_j+\delta$. Substitution of this inequality repeatedly yields the second formula. If a verified initial bound $e_0\le E_0$ is available, choosing $\delta\le(1-q)\varepsilon/2$ and $q^jE_0\le\varepsilon/2$ certifies error at most $\varepsilon$. For $0<q<1$ one can take
+$j\ge\max\{0,\lceil\log(2E_0/\varepsilon)/\log(1/q)\rceil\}$; for $q=0$ one oracle evaluation suffices when $\delta\le\varepsilon$. If one globally certified oracle evaluation costs at most $C_h(\delta)$ operations, the iteration cost is at most $jC_h(\delta)$ plus explicitly charged certificate and initialization costs. No cost bound is asserted before such an oracle is supplied.
+\end{proof}
+
+\begin{proposition}[A coupled-block small-gain criterion]
+Suppose $F=(H,G)$ on an invariant closed product domain and
+\begin{align*}
+ \|H(x,y)-H(x',y')\|&\le a\|x-x'\|+b\|y-y'\|,\\
+ \|G(x,y)-G(x',y')\|&\le c\|x-x'\|+d\|y-y'\|,
+\end{align*}
+where $a,b,c,d\ge0$. For any $\lambda>0$, under the norm
+$\|(x,y)\|_\lambda=\max\{\|x\|,\|y\|/\lambda\}$, the map has Lipschitz constant at most
+\[
+ q_\lambda=\max\{a+b\lambda,\ d+c/\lambda\}.
+\]
+In particular, if $b,c>0$, $a,d<1$, and $bc<(1-a)(1-d)$, a $\lambda$ with $q_\lambda<1$ exists.
+\end{proposition}
+\begin{proof}
+Writing $r=\|(x-x',y-y')\|_\lambda$ gives $\|x-x'\|\le r$ and $\|y-y'\|\le\lambda r$. Substitute these in the first block bound and in the second bound divided by $\lambda$. For strict contraction choose
+$c/(1-d)<\lambda<(1-a)/b$; this interval is nonempty exactly under the displayed product inequality. If $b=0$, take $\lambda$ large enough to make $d+c/\lambda<1$, provided $a,d<1$; if $c=0$, take $\lambda$ small enough for $a+b\lambda<1$. If both vanish, $q=\max(a,d)$.
+\end{proof}
+
+Thus contraction of a household block alone does not prove contraction of the entire general-equilibrium calculation: the feedback constants $b,c$ must also be controlled.
+
+\begin{theorem}[From a finite net to a supremum certificate]
+Let $(D,d_D)$ be a compact metric state domain, $r:D\to\R^k$ an $L$-Lipschitz residual in a declared norm, and $\{s_1,\ldots,s_N\}$ an $\eta$-net. If certified computed values satisfy
+$\|\widehat r(s_j)-r(s_j)\|\le\delta$ and
+$\max_j\|\widehat r(s_j)\|\le\rho$, then
+\[
+ \sup_{s\in D}\|r(s)\|\le\rho+\delta+L\eta.
+\]
+\end{theorem}
+\begin{proof}
+For each $s\in D$, choose $s_j$ with $d_D(s,s_j)\le\eta$. The triangle inequality gives
+$\|r(s)\|\le\|r(s)-r(s_j)\|+\|r(s_j)-\widehat r(s_j)\|+\|\widehat r(s_j)\|\le L\eta+\delta+\rho$.
+Taking the supremum proves the result. The net construction and evaluation cost is part of any algorithmic claim, not suppressed in this bound.
+\end{proof}
+
+For a distribution state, compactness in a declared weak or Wasserstein metric does not bound the covering number cheaply. Truncation, quadrature, interpolation, distribution discretization, and floating-point errors can be added to $\delta$ only after individual bounds in compatible norms have been proved. Testing a simulated path is not the same as supplying a net of the full state domain.
+
+\begin{proposition}[Three explicit obstructions]
+Without additional hypotheses, neither a linear residual error bound nor a finite-sample supremum certificate is valid.
+\end{proposition}
+\begin{proof}
+First let $R(x)=x^2$ on $[-1,1]$ with root set $\{0\}$. A bound $|x|\le C|R(x)|$ for all small nonzero $x$ would imply $1\le C|x|$, contradicted by $0<|x|<1/C$. Thus even a smooth scalar residual with a unique root need not have a linear error bound.
+
+Second, for $R_\eta(x)=\eta x$, $\eta>0$, the exact ratio of error to residual is $1/\eta$. A class containing arbitrarily small $\eta$ has no uniform constant. For $R(x)=x(x-1)$, a zero residual at $x=1$ also cannot certify distance to the selected root $0$; an estimate must concern the root set unless a selection has been justified.
+
+Third, consider any deterministic finite-query procedure for continuous functions on $[0,1]$. Run it on the zero function and record its finitely many query points. Choose an open interval avoiding these points and a continuous triangular bump supported in that interval, of height $M>0$. The bump and zero give identical answers at every query; by induction the adaptive query transcript is identical. Nevertheless their suprema differ by $M$, which can be arbitrarily large. Therefore finite evaluations without a known modulus or another global enclosure do not prove a uniform supremum bound. This is a deterministic information obstruction, not a claimed randomized lower bound under an unstated oracle model.
+\end{proof}
+
+\begin{proposition}[A transparent estimation-error propagation bound]
+Suppose a numerical equilibrium error $\|\widehat f_\theta-f_\theta\|\le\delta_f$ holds uniformly in $\theta$, and a population moment functional obeys
+$\|m(f)-m(g)\|\le L_m\|f-g\|$. Its moment error is at most $L_m\delta_f$. More generally, let $m(\theta_0)=b$, suppose
+$\|m(\theta)-m(\theta_0)\|\ge\kappa\|\theta-\theta_0\|$ on the declared parameter domain, and assume
+\[
+ \sup_\theta\|\widehat m(\theta)-m(\theta)\|\le\eta_{\rm num},
+ \quad \|\widehat b-b\|\le\eta_{\rm data},
+ \quad \|\widehat m(\widehat\theta)-\widehat b\|\le\rho.
+\]
+Then $\|\widehat\theta-\theta_0\|\le(\eta_{\rm num}+\eta_{\rm data}+\rho)/\kappa$.
+\end{proposition}
+\begin{proof}
+The moment bound is the stated Lipschitz inequality. For the parameter claim, write $m(\widehat\theta)-m(\theta_0)$ as the sum of its numerical error, its numerical fitting residual, and the data-target error. The triangle inequality bounds its norm by the numerator. The identification inequality gives the asserted result. This is a deterministic or eventwise guarantee according to the meaning of the three input bounds; it does not manufacture a confidence statement. Likelihood error would likewise require its own continuity or density-lower-bound assumptions.
+\end{proof}
+
+\subsection*{5) VERIFICATION}
+For $F(f)=f/2+1/4$, the root is $f^*=1/2$. At $f=3$, the residual is $1.25$ and the error is $2.5$, attaining the contraction error bound exactly. A block test with $(a,b,c,d)=(0.2,0.1,0.15,0.3)$ and $\lambda=1$ gives $q=0.45$. For $R(x)=x^2$, the error/residual ratios at $x=10^{-1},10^{-2},10^{-3}$ are $10,100,1000$. These calculations are included in the script.
+
+The global certificates require self-mapping and completeness, not merely a Jacobian norm near a computed point. Approximation iterates must remain in the certified domain. No uniqueness of equilibrium is assumed for the generic residual family; the contraction theorem proves uniqueness only in its explicit subclass. Binding constraints are included in the residual definition but do not automatically preserve a smooth inverse or contraction. Every constant claimed uniform must be bounded over the specified class, including covering and oracle costs.
+
+\subsection*{6) FINAL}
+\unresolved
+
+\textbf{Strongest checked partial result.} We prove uniform global residual-to-solution and inexact-iteration certificates for a specified contraction class, a coupled-block criterion, finite-net supremum certification, and a conditional moment-to-parameter bound. Scalar and finite-query constructions rigorously refute unconditional versions of the desired guarantees.
+
+\textbf{Exact first gap for the intended economic application.} For a concrete rich nonlinear heterogeneous-agent model class, construct a globally valid equilibrium operator and verify a uniform stability estimate on its full invariant domain, together with a finite-cost globally certified evaluation oracle. Neither condition is supplied by the editorial problem statement or proved for that entire economic class here.
+
+\textbf{Next three moves.} (1) Bound the four household/aggregate feedback constants on an economically meaningful invariant domain and test the small-gain inequality. (2) Construct a distribution-state enclosure with explicit covering and quadrature error costs. (3) Where contraction fails, prove a metric-regularity error bound across occasionally binding constraints and track its constant into the actual estimation criterion.
+
+\textbf{Likely minimal obstruction.} A near-singular market-clearing response, a binding-constraint regime switch, or two equilibria in the same certification domain can invalidate a uniform selected-solution guarantee even when household optimization is easy. The scalar residual examples show the exact mathematical failure that must be ruled out.
+
+\clearpage
+\begin{thebibliography}{99}
+\bibitem{ABRS}
+Adrien Auclert, Bence Bard\'oczy, Matthew Rognlie and Ludwig Straub. \emph{Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models}. Econometrica 89(5) (2021), 2375--2408. DOI: 10.3982/ECTA17434. Author version: \url{https://web.stanford.edu/~aauclert/sequence_space_jacobian.pdf}.
+
+\end{thebibliography}
+\end{document}

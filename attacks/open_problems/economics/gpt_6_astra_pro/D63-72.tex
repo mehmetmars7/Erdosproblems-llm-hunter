@@ -1,0 +1,165 @@
+% ECONOMICS_PROBLEM: {"id": "D63-72", "title": "EFM with nonadditive mixed items and desirable cake", "jel_code": "D63", "source_id": "OP-0594"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Strong EFM with nonadditive mixed items and cake}\par\medskip
+{\large D63-72.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0594}
+\label{audited:ECON-008}
+\label{audited:conventions}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+For every $n\ge1$, finite $M$, and normalized set functions $v_i:2^M\to\R$, assume agent-specific partitions $M=G_i\sqcup B_i$ with every marginal of $g\in G_i$ nonnegative and every marginal of $g\in B_i$ nonpositive. This is doubly monotone; the marginal's magnitude may depend on its context, and its sign partition may differ between agents. Let $V_i(D)=\int_Df_i$ on $[0,1]$, with each $f_i\ge0$ Lebesgue integrable. A complete mixed allocation consists of an item partition $O$ and a measurable cake partition $D$. Its utility is $u_i(O,D)=v_i(O)+V_i(D)$.
+
+The literal strong EFM requirement, for every ordered pair $i,j$, is either
+\[
+v_i(O_i)+V_i(D_i)\ge v_i(O_j)+V_i(D_j),
+\]
+or
+\[
+V_i(D_j)=0,\qquad
+\exists g\in O_i\cup O_j:\quad v_i(O_i\setminus\{g\})\ge v_i(O_j\setminus\{g\}).
+\]
+The question asks whether an allocation exists for \emph{every} such instance. The fallback is item-only: adding $V_i(D_i)$ to its left side changes the statement. If there is no item eligible for deletion, only no envy can satisfy the definition. Zero marginal items can be classified either way. Divisible chores require another definition and are not included by changing a sign silently.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Aziz, Lu, Mackenzie and Suzuki \cite{cake} state the strong convention in Definition 2.3 and ask the doubly monotone extension, together with EF1 plus envy-freeability for indivisible items, in their discussion. Their additive mixed-item result is a settled subcase in that source, not the general nonadditive target. The common-preference theorem below is independently proved and explicitly allows nonadditive fixed-sign item effects.
+
+\section{ATTACK PLAN}
+The proof track first seeks an item EF1 allocation with a useful payment structure, then uses cake to remove envy toward cake recipients. The disproof track separates the two EFM definitions and tests whether arbitrary cake measures can play the role of money. The successful restricted route uses identical item and cake valuations, where a one-dimensional value comparison is legitimate.
+
+\begin{center}\begin{tabular}{p{.26\linewidth}p{.65\linewidth}}\toprule Tool&Role\\\midrule
+Pairwise deletion witnesses&Keeps the precise EFM fallback intact.\\
+Fixed-sign marginal induction&Allows nonadditive common item valuations.\\
+Water filling&Allocates common cake to the lowest item-value bundles.\\
+Continuity of cumulative measures&Ensures exact cuts and handles zero-density plateaus.\\
+Payment-to-cake conversion&Identifies a sufficient cake-budget condition.\\
+Robertson--Webb query accounting&Distinguishes existence from an implementable finite protocol.\\
+Finite allocation verification&Checks known interval endpoints without a perfect-partition oracle.\\
+Definition-separation examples&Prevents substituting weak EFM for strong EFM.\\\bottomrule\end{tabular}\end{center}
+
+\section{WORK}
+
+\subsection{A complete item-only construction for a common doubly monotone valuation}
+\begin{lemma}\label{lem:commonEF1}
+Suppose all agents have the same normalized doubly monotone item valuation $v$, with common fixed-sign partition $M=G\sqcup B$. No additivity or marginal-size bound is needed. Starting from empty bundles, assign each good to a bundle of minimum current value and each chore to a bundle of maximum current value. The resulting complete allocation is EF1 with the item-only either-side deletion convention.
+\end{lemma}
+\begin{proof}
+Prove the assertion after each item assignment. It holds for empty bundles. Suppose a good $g$ is added to a minimum-valued bundle $A_j$. Every other agent $i$ has $v(A_i)\ge v(A_j\setminus\{g\})$, so any new envy of $j$ is repaired by deleting $g$. For comparisons from $j$ to another agent, an existing no-envy inequality survives because its own value does not fall. If an old deletion witness $h$ was in its own bundle, the left value after deleting $h$ does not fall when $g$ is added, by the fixed positive marginal sign on every context. If $h$ was in the other bundle, the left value again does not fall. Comparisons between other agents are unchanged.
+
+If a chore $g$ is added to a maximum-valued bundle $A_j$, every new envy from $j$ to another agent is repaired by deleting $g$, returning to a value at least as large as that other bundle. For comparisons from another agent to $j$, the right value only falls. If an old deletion witness lies in $j$'s bundle, the right value after that deletion still only falls when $g$ is added, by the fixed negative marginal sign in every context. The other witness and no-envy cases are preserved for the same reason. This exhausts all ordered pairs and establishes the induction. Finitely many steps assign every item.
+\end{proof}
+
+\subsection{Cake as a common-value equalization resource}
+\begin{lemma}[Water filling with exact cuts]\label{lem:water}
+Let $\ell_1,\ldots,\ell_n$ be real item values and let all agents have the same finite nonnegative atomless cake measure $V$, of total $C$. If $C>0$, there is a unique $H>\min_i\ell_i$ satisfying
+\[
+\sum_i(H-\ell_i)_+=C.
+\]
+There is a complete interval cake partition with $V(D_i)=c_i=(H-\ell_i)_+$, assigning empty pieces to agents with $c_i=0$. All agents' resulting total values are $\max\{\ell_i,H\}$.
+\end{lemma}
+\begin{proof}
+The left side is a continuous piecewise-linear function of $H$, equals zero at $\min_i\ell_i$, is strictly increasing above that point, and tends to infinity. Existence and uniqueness follow from the intermediate value theorem and strict increase. Order the agents with $c_i>0$. Cut off a piece of value $c_i$ successively for all but the last such agent and give the last the remainder. The cumulative function $x\mapsto V([0,x])$ is continuous: continuity of a finite measure from above and below shows its jump at $x$ is exactly $V(\{x\})=0$. Thus each required cut exists, including across intervals of zero density. Nonnegative requested values sum to $C$, so no query asks for more value than remains. Endpoints have zero value and can be assigned once. The final value identity is immediate from $\ell_i+(H-\ell_i)_+=\max\{\ell_i,H\}$.
+\end{proof}
+
+\begin{theorem}[Strong EFM for common preferences]\label{thm:commonEFM}
+If all agents share a normalized doubly monotone item valuation $v$ and a nonnegative finite atomless cake measure $V$, then a complete strong EFM allocation exists. Each nonempty cake piece can be chosen to be an interval.
+\end{theorem}
+\begin{proof}
+Take the EF1 item partition from Lemma~\ref{lem:commonEF1}, and put $\ell_i=v(O_i)$. If $C>0$, apply Lemma~\ref{lem:water}. A recipient $j$ of positive cake value has final utility $H$, while every agent's own final utility is at least $H$. Since all valuations are common, nobody envies such a recipient. If $j$ receives zero cake value and an agent envies it, retain the original item-only EF1 witness; the strong fallback requires only that item comparison and zero cake value for the envied bundle, both of which hold.
+
+If $C=0$, give the entire cake to any one agent and use the item-only EF1 partition. Every cake piece has value zero to every agent, so each pair either has no envy or has its original item-only deletion witness. Both constructions are complete. The measure argument uses only finite atomlessness, so the common-preference subcase also covers singular atomless Borel measures, not merely densities.
+\end{proof}
+
+\begin{proposition}[A sufficient cake budget for exact envy-freeness]\label{prop:paymentsCake}
+Suppose all agents have the same cake measure of total $C$, but their item valuations may differ. If a complete item partition $O$ is envy-freeable with nonnegative payments $p$ of total at most $C$, then an exactly envy-free complete mixed allocation exists using that partition.
+\end{proposition}
+\begin{proof}
+Give agent $i$ cake value $c_i=p_i+(C-\sum_jp_j)/n$. These are nonnegative and sum to $C$, so they can be realized by the sequential-cut construction in Lemma~\ref{lem:water}. The added common amount cancels in every comparison, leaving the assumed inequalities $v_i(O_i)+p_i\ge v_i(O_j)+p_j$. Exact envy-freeness implies both EFM conventions.
+\end{proof}
+The sufficient condition is not automatically satisfied when the available cake value is small, and heterogeneous cake measures cannot be treated as a common transferable monetary unit.
+
+\begin{corollary}[The common-value indivisible-only compatibility variant]
+For identical doubly monotone item valuations, some complete allocation is both EF1 and envy-freeable, even without a marginal-size bound.
+\end{corollary}
+\begin{proof}
+Lemma~\ref{lem:commonEF1} gives EF1. For any common-value item allocation, set $p_i=\max_jv(O_j)-v(O_i)$. The payments are nonnegative and make every bundle-payment pair have identical value. Thus that same EF1 allocation is envy-freeable.
+\end{proof}
+
+\begin{proposition}[Weak and strong EFM are not equivalent]\label{prop:definitions}
+There is a complete allocation with additive nonnegative item values and desirable cake which is weak EFM but not strong EFM.
+\end{proposition}
+\begin{proof}
+Take agents 1 and 2 and goods $a,b$, each worth one to each agent. Let $f_1=1$ and $f_2=0$. Give all cake and no goods to agent 1, and both goods and no cake to agent 2. Agent 2 does not envy. Agent 1 has utility one and values agent 2's bundle at two. The envied bundle has zero cake value. In the weak fallback, deleting either good leaves value one, covered by agent 1's cake value. In the strong fallback, agent 1's item-only value is zero and the remaining good is worth one, so the inequality fails. For any $n\ge3$, add agents with identically zero utilities and empty allocations; all comparisons involving them satisfy no envy. This preserves the separation within larger markets.
+\end{proof}
+This is a counterexample to equivalence of definitions, not to existence of a strong EFM allocation for the same instance.
+
+\section{VERIFICATION}
+The executable test generated 200 common-valuation instances with $n=3$ or 4 and six items. Four goods had a nonadditive coverage value (the number of covered features); two chores had additive integer costs. The common cake total was a random integer from 0 to 20 divided by 3. The item allocation used the fixed-sign greedy algorithm and cake values were computed by exact rational water filling. Every ordered pair passed the \emph{strong item-only} EFM test. No rounding tolerance was used.
+\begin{lstlisting}
+assign each common good to a minimum-value bundle
+assign each common chore to a maximum-value bundle
+find H with sum(max(0,H-item_value[i])) = common_cake_total
+for each ordered pair i,j:
+    assert no envy OR
+      (cake_value[j] == 0 AND a valid item-only deletion exists)
+\end{lstlisting}
+For $n=1$ no-envy is automatic. For $C=0$, water filling is not invoked with a falsely unique level; the proof uses item EF1 directly. For positive $C$, zero-valued fringes of cake can be attached to a positive-value recipient without affecting comparisons. The common-preference proof cannot be extended merely by setting different $H_i$: agent $i$ evaluates every other agent's piece using its own measure, not that recipient's measure. The test domain is common-valued and cannot detect heterogeneous counterexamples.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+The arbitrary heterogeneous doubly monotone statement is not proved or disproved. The strong EFM common-preference theorem, its singular-atomless-measure extension, the common-value EF1/envy-freeability variant, and the large-common-cake sufficient condition are fully proved. The definition-separation example prevents an invalid substitution of weak EFM.
+
+\textbf{Exact first gap.} There is no proved mechanism that, for heterogeneous doubly monotone item valuations and heterogeneous nonnegative cake measures, eliminates all envy of positive-cake bundles while preserving an item-only deletion witness for every remaining envy pair.
+
+\textbf{Three next moves.} (1) Prove EF1 plus envy-freeability for two distinct doubly monotone item-valuation types. (2) Extend the common-cake budget lemma to heterogeneous measures with an explicit multi-agent cut feasibility certificate. (3) Search small nonadditive fixed-sign item tables coupled to cake measures with disjoint supports, testing the strong rather than weak fallback.
+
+\textbf{Minimal possible obstruction.} It must use heterogeneity beyond the common-preference theorem; disjoint cake supports and context-dependent item magnitudes are natural stress features. Negative cake densities are outside the main domain and cannot supply a valid counterexample.
+
+\section{Completion Estimate}
+25\%
+
+A nonadditive common-preference theorem and several specified variants are proved. Heterogeneous item and cake valuations, which form the main frontier, remain unresolved.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{cake} H. Aziz, X. Lu, S. Mackenzie and M. Suzuki. \emph{Fair Division with Indivisible Goods, Chores, and Cake}. arXiv:2511.04891v1 (2025), Definition 2.3 and Section 5. \url{https://arxiv.org/html/2511.04891v1}.
+\end{thebibliography}
+\end{document}

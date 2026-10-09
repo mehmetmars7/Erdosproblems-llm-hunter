@@ -1,0 +1,190 @@
+% ECONOMICS_PROBLEM: {"id": "D63-90", "title": "Finite exact cake-cutting protocols for mixed-resource EFM", "jel_code": "D63", "source_id": "OP-0595"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Finite exact Robertson--Webb protocols for mixed EFM}\par\medskip
+{\large D63-90.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0595}
+\label{audited:ECON-009}
+\label{audited:conventions}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+Let $n\ge3$, $M$ contain $m$ indivisible goods, and $v_i(O)=\sum_{g\in O}a_{ig}$ with known $a_{ig}\ge0$. Cake valuations are $V_i(D)=\int_Df_i$ for nonnegative integrable $f_i$ on $[0,1]$. The complete output is an item partition $O$ and cake pieces $D_i$ that are finite unions of intervals with endpoints among queried cuts and 0,1; endpoints have zero value and are assigned exactly once.
+
+Use \emph{weak} EFM: if $V_i(D_j)>0$, require $v_i(O_i)+V_i(D_i)\ge v_i(O_j)+V_i(D_j)$. If $V_i(D_j)=0$, require either no envy or a $g\in O_j$ such that
+\[
+v_i(O_i)+V_i(D_i)\ge v_i(O_j\setminus\{g\})+V_i(D_j).
+\]
+The Robertson--Webb interface gives exact evaluations of intervals and $\operatorname{Cut}_i(a,z)$, the leftmost $b\in[a,1]$ with $V_i([a,b])=z$; inadmissible requests fail. The questions are, separately,
+\[
+\exists\mathcal P\ \forall\text{ instances }I:\ \mathcal P(I)\text{ terminates exactly after finitely many queries},
+\]
+and whether such a protocol has a uniform finite bound $Q(n,m)$ independent of the measures. Quantifier order matters: instancewise finite termination is not a uniform bound.
+
+Variants requiring no envy toward any positive-physical-length cake piece (EFM$_0$), an item-only fallback, approximate envy, connected cake pieces, arbitrary valid cut answers, or singular atomless measures are not silently equated with this problem.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The AAAI survey's Open Question 4 asks the finite/bounded RW question \cite{survey}; the longer arXiv version has different numbering. Bei et al. establish mixed-resource EFM existence and distinguish exact special-case computation from approximation \cite{bei}. Pure-cake bounded protocols are established by Aziz--Mackenzie \cite{am}; the September 2026 preprint of Ye--Bai reports a single-exponential pure-cake query bound \cite{yb}. Neither pure-cake statement by itself allocates indivisible goods. Stromquist's connected-piece impossibility \cite{strom} resolves a stricter named variant, not the finite-union main question.
+
+\section{ATTACK PLAN}
+The proof track makes the common-value water-filling construction into actual RW queries and isolates finite verification of a proposed answer. The disproof track uses the pure-cake connected-piece restriction and checks that a perfect-partition oracle is not being hidden inside a finite-query argument. The main heterogeneous finite-union question remains separate from both tracks' partial successes.
+
+\begin{center}\begin{tabular}{p{.26\linewidth}p{.65\linewidth}}\toprule Tool&Role\\\midrule
+Pairwise deletion witnesses&Keeps the precise EFM fallback intact.\\
+Fixed-sign marginal induction&Allows nonadditive common item valuations.\\
+Water filling&Allocates common cake to the lowest item-value bundles.\\
+Continuity of cumulative measures&Ensures exact cuts and handles zero-density plateaus.\\
+Payment-to-cake conversion&Identifies a sufficient cake-budget condition.\\
+Robertson--Webb query accounting&Distinguishes existence from an implementable finite protocol.\\
+Finite allocation verification&Checks known interval endpoints without a perfect-partition oracle.\\
+Definition-separation examples&Prevents substituting weak EFM for strong EFM.\\\bottomrule\end{tabular}\end{center}
+
+\section{WORK}
+
+\subsection{A complete item-only construction for a common doubly monotone valuation}
+\begin{lemma}\label{lem:commonEF1}
+Suppose all agents have the same normalized doubly monotone item valuation $v$, with common fixed-sign partition $M=G\sqcup B$. No additivity or marginal-size bound is needed. Starting from empty bundles, assign each good to a bundle of minimum current value and each chore to a bundle of maximum current value. The resulting complete allocation is EF1 with the item-only either-side deletion convention.
+\end{lemma}
+\begin{proof}
+Prove the assertion after each item assignment. It holds for empty bundles. Suppose a good $g$ is added to a minimum-valued bundle $A_j$. Every other agent $i$ has $v(A_i)\ge v(A_j\setminus\{g\})$, so any new envy of $j$ is repaired by deleting $g$. For comparisons from $j$ to another agent, an existing no-envy inequality survives because its own value does not fall. If an old deletion witness $h$ was in its own bundle, the left value after deleting $h$ does not fall when $g$ is added, by the fixed positive marginal sign on every context. If $h$ was in the other bundle, the left value again does not fall. Comparisons between other agents are unchanged.
+
+If a chore $g$ is added to a maximum-valued bundle $A_j$, every new envy from $j$ to another agent is repaired by deleting $g$, returning to a value at least as large as that other bundle. For comparisons from another agent to $j$, the right value only falls. If an old deletion witness lies in $j$'s bundle, the right value after that deletion still only falls when $g$ is added, by the fixed negative marginal sign in every context. The other witness and no-envy cases are preserved for the same reason. This exhausts all ordered pairs and establishes the induction. Finitely many steps assign every item.
+\end{proof}
+
+\subsection{Cake as a common-value equalization resource}
+\begin{lemma}[Water filling with exact cuts]\label{lem:water}
+Let $\ell_1,\ldots,\ell_n$ be real item values and let all agents have the same finite nonnegative atomless cake measure $V$, of total $C$. If $C>0$, there is a unique $H>\min_i\ell_i$ satisfying
+\[
+\sum_i(H-\ell_i)_+=C.
+\]
+There is a complete interval cake partition with $V(D_i)=c_i=(H-\ell_i)_+$, assigning empty pieces to agents with $c_i=0$. All agents' resulting total values are $\max\{\ell_i,H\}$.
+\end{lemma}
+\begin{proof}
+The left side is a continuous piecewise-linear function of $H$, equals zero at $\min_i\ell_i$, is strictly increasing above that point, and tends to infinity. Existence and uniqueness follow from the intermediate value theorem and strict increase. Order the agents with $c_i>0$. Cut off a piece of value $c_i$ successively for all but the last such agent and give the last the remainder. The cumulative function $x\mapsto V([0,x])$ is continuous: continuity of a finite measure from above and below shows its jump at $x$ is exactly $V(\{x\})=0$. Thus each required cut exists, including across intervals of zero density. Nonnegative requested values sum to $C$, so no query asks for more value than remains. Endpoints have zero value and can be assigned once. The final value identity is immediate from $\ell_i+(H-\ell_i)_+=\max\{\ell_i,H\}$.
+\end{proof}
+
+\begin{theorem}[Strong EFM for common preferences]\label{thm:commonEFM}
+If all agents share a normalized doubly monotone item valuation $v$ and a nonnegative finite atomless cake measure $V$, then a complete strong EFM allocation exists. Each nonempty cake piece can be chosen to be an interval.
+\end{theorem}
+\begin{proof}
+Take the EF1 item partition from Lemma~\ref{lem:commonEF1}, and put $\ell_i=v(O_i)$. If $C>0$, apply Lemma~\ref{lem:water}. A recipient $j$ of positive cake value has final utility $H$, while every agent's own final utility is at least $H$. Since all valuations are common, nobody envies such a recipient. If $j$ receives zero cake value and an agent envies it, retain the original item-only EF1 witness; the strong fallback requires only that item comparison and zero cake value for the envied bundle, both of which hold.
+
+If $C=0$, give the entire cake to any one agent and use the item-only EF1 partition. Every cake piece has value zero to every agent, so each pair either has no envy or has its original item-only deletion witness. Both constructions are complete. The measure argument uses only finite atomlessness, so the common-preference subcase also covers singular atomless Borel measures, not merely densities.
+\end{proof}
+
+\subsection{A uniform query bound for common preferences}
+\begin{theorem}\label{thm:RWcommon}
+For the subdomain in which all item valuations are the same additive nonnegative function and all cake valuations are the same measure, a deterministic protocol uses at most one evaluation and $n-1$ cut queries and returns exact weak EFM. It can simultaneously satisfy the item-only strong fallback, EFM$_0$, and connected cake pieces.
+\end{theorem}
+\begin{proof}
+Compute the item allocation of Lemma~\ref{lem:commonEF1} from the known values; all items are goods. Make $\operatorname{Eval}_1(0,1)$ to get $C$. If $C>0$, compute the unique level and shares in Lemma~\ref{lem:water} by sorting the $n$ item loads and checking their finitely many linear intervals. For the agents with positive shares, use sequential cuts by agent 1 for all but the last, and give the last the remaining interval. Every query requests no more than the common value of the residue; at most $n-1$ are needed. Agents with zero shares receive empty cake pieces. Each cake recipient has final common value $H$, no larger than any agent's own value. Hence there is no envy toward any nonempty cake piece, which is stronger than both the positive-value and positive-physical-measure clauses. Remaining envy pairs retain their item-only deletion witnesses. Because items are nonnegative, if strict envy remains its useful witness can be chosen in the envied bundle: removing an item from the envier's own bundle cannot increase its value.
+
+If $C=0$, give the whole cake to an agent with minimum item value and give all others empty cake. No agent envies the cake recipient under common item values. The item EF1 witnesses handle all other envy. Thus even the physical-cake requirement holds in this zero-value case. The pieces are intervals or empty, all endpoints can be assigned consistently, and no perfect-division oracle is used.
+\end{proof}
+The same proof works if a cut query returns any valid endpoint rather than the leftmost one: only its exact value and nondecreasing position are used. The common-measure proof also covers finite nonnegative singular atomless Borel measures, although the main input assumes densities.
+
+
+\begin{proposition}[A sufficient cake budget for exact envy-freeness]\label{prop:paymentsCake}
+Suppose all agents have the same cake measure of total $C$, but their item valuations may differ. If a complete item partition $O$ is envy-freeable with nonnegative payments $p$ of total at most $C$, then an exactly envy-free complete mixed allocation exists using that partition.
+\end{proposition}
+\begin{proof}
+Give agent $i$ cake value $c_i=p_i+(C-\sum_jp_j)/n$. These are nonnegative and sum to $C$, so they can be realized by the sequential-cut construction in Lemma~\ref{lem:water}. The added common amount cancels in every comparison, leaving the assumed inequalities $v_i(O_i)+p_i\ge v_i(O_j)+p_j$. Exact envy-freeness implies both EFM conventions.
+\end{proof}
+The sufficient condition is not automatically satisfied when the available cake value is small, and heterogeneous cake measures cannot be treated as a common transferable monetary unit.
+
+\subsection{A finite verification certificate does not imply finite search}
+\begin{proposition}\label{prop:verifyEFM}
+Given a complete item partition and cake pieces described by a total of $r$ intervals with allowed endpoints, exact weak EFM can be verified with at most $nr$ evaluation queries and finite arithmetic on the known item values and query answers.
+\end{proposition}
+\begin{proof}
+For each agent evaluate every interval and sum the evaluations belonging to each recipient's piece. Endpoints contribute zero and the intervals are disjoint up to endpoints, so these sums equal all $V_i(D_j)$. For each pair, first test whether $V_i(D_j)>0$ and then the required inequality. When it is zero and there is envy, test each of the finitely many candidate goods in $O_j$ using the known additive values. Also check disjointness and coverage of the listed intervals and the item partition. These tests are exactly the definition.
+\end{proof}
+There are uncountably many possible interval endpoints before queries. Enumerating rational endpoints would neither find arbitrary exact cuts nor satisfy the specified output model. The verifier therefore supplies no bound on a search for a certificate.
+
+\subsection{The connected-piece variant is impossible in general}
+\begin{theorem}[Reduction from an explicitly imported impossibility]\label{thm:connected}
+No deterministic instancewise-finite RW protocol solves the connected-piece variant for every $n\ge3$ and every permitted input, even with $m=0$.
+\end{theorem}
+\begin{proof}
+Use Stromquist's theorem \cite{strom}: for three agents with strictly positive bounded cake densities, no protocol using finitely many exact evaluation/cut queries on every input always returns a complete envy-free allocation with one interval per agent. Its hard densities are strictly between $\sqrt2/2$ and $\sqrt2$, so they lie inside the present integrable-density domain and make cuts unique. The paper also permits marks calculated from previously obtained information, so allowing arbitrary evaluation endpoints does not evade its query obstruction.
+
+A protocol for the stated variant could be run at $n=3,m=0$ on these densities. With no goods available for deletion, weak EFM requires exact envy-freeness for every pair. Its output would be a complete connected envy-free cake partition after finitely many queries, contradicting that theorem. This proves the reduction and the variant's impossibility. It imposes no restriction on the main problem's finite unions of intervals.
+\end{proof}
+This is a theorem-based disproof of a variant; the imported impossibility proof is not represented as newly established here.
+
+\section{VERIFICATION}
+The exact rational tests in the accompanying script checked 200 common-preference, three/four-agent water-filling instances with nonadditive fixed-sign items, a larger item domain than needed by Theorem~\ref{thm:RWcommon}. All passed the strong item-only fallback. These tests check allocated \emph{values}; the cut implementation is justified by the measure-continuity proof, not by pretending a density discretization is an exact RW simulation.
+\begin{lstlisting}
+O = common-value greedy item allocation
+C = Eval_1(0,1)
+if C == 0: give all cake to a minimum-item-value agent
+else:
+    compute shares c_i = max(0,H-item_value[i]) summing to C
+    for all but the last positive-share agent i:
+        b = Cut_1(current_left_endpoint,c_i)
+        give [current_left_endpoint,b] to i
+    give the residue to the last positive-share agent
+\end{lstlisting}
+For $n=1$ the complete allocation is immediate; the main target starts at three. For $m=0$, the known pure-cake theorem applies only when disconnected pieces are allowed, consistently with Theorem~\ref{thm:connected}. When $C>0$, zero-valued fringes remain attached only to positive-share recipients; for $C=0$ the minimum-load recipient prevents physical-cake envy. An approximation theorem with error $\varepsilon>0$ is not an exact theorem obtained by setting $\varepsilon=0$. Failure of one construction using a perfect-partition oracle is not an impossibility result for all RW protocols.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED} for the main heterogeneous, finite-union exact RW question.
+\textbf{FULL SOLUTION / FULL PROOF for a restricted subcase:} the common-preference protocol uses at most $n$ queries and handles the stronger named fairness conventions as stated. \textbf{FULL SOLUTION / DISPROOF for a named variant, using an imported theorem:} a general connected-piece protocol is impossible by Theorem~\ref{thm:connected}. These labels are not applied to the main question.
+
+\textbf{Exact first gap.} No instancewise-finite exact RW replacement is supplied for the heterogeneous mixed-allocation step, without assuming an additional perfect-partition oracle.
+
+\textbf{Three next moves.} (1) Prove a finite-query way to allocate cake to a selected envy-closed agent set while preserving all outside comparisons. (2) Establish a discrete progress invariant that forces termination independently of arbitrarily small utility gaps. (3) Seek an adversarial transcript argument tailored to mixed EFM with \emph{disconnected} pieces, rather than reusing connected-cake hardness.
+
+\textbf{Minimal unresolved case.} Three heterogeneous agents, positive-value goods and heterogeneous cake densities already lie beyond the common-value theorem; the obstruction, if any, must survive the freedom to output finitely many disconnected intervals. Approximation and random protocols with weaker termination guarantees are not settled by this report.
+
+\section{Completion Estimate}
+25\%
+
+The common-preference exact protocol and several of its variants are proved, and the connected-piece variant is ruled out through a verified theorem. The central heterogeneous finite-union protocol question remains unresolved.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{survey} S. Liu, X. Lu, M. Suzuki and T. Walsh. \emph{Mixed Fair Division: A Survey}. AAAI 38 (2024), 22641--22649, Open Question 4. \url{https://ojs.aaai.org/index.php/AAAI/article/view/30274/32268}.
+\bibitem{bei} X. Bei, Z. Li, J. Liu, S. Liu and X. Lu. \emph{Fair Division of Mixed Divisible and Indivisible Goods}. Artificial Intelligence 293 (2021), 103436; arXiv:1911.07048v3. \url{https://arxiv.org/html/1911.07048v3}.
+\bibitem{am} H. Aziz and S. Mackenzie. \emph{A Discrete and Bounded Envy-Free Cake Cutting Protocol for Any Number of Agents}. FOCS 2016; arXiv:1604.03655. \url{https://arxiv.org/abs/1604.03655}.
+\bibitem{yb} Q. Ye and Y. Bai. \emph{Cutting Down the Tower: Single-Exponential Envy-Free Cake Cutting}. arXiv:2609.05191v1 (2026), Theorem 1.1; pure-cake result. \url{https://arxiv.org/html/2609.05191}.
+\bibitem{strom} W. Stromquist. \emph{Envy-Free Cake Divisions Cannot Be Found by Finite Protocols}. Electronic Journal of Combinatorics 15 (2008), R11, Sections 2, 4 and 5. \url{https://www.combinatorics.org/ojs/index.php/eljc/article/download/v15i1r11/pdf}.
+\end{thebibliography}
+\end{document}

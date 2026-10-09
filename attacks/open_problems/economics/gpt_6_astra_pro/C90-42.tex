@@ -1,0 +1,199 @@
+% ECONOMICS_PROBLEM: {"id": "C90-42", "title": "Sequential adaptive experiments with uncertain causal structure", "jel_code": "C90", "source_id": "OP-0480"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Adaptive causal experiments under graph uncertainty}\par\medskip
+{\large C90-42.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0480}
+\label{beyond:CI-01}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+Let $K\in\N$ be a fixed finite treatment horizon, with finite action sets $\mathcal W_k$, and standard Borel observed histories. A fixed structural model $m$ belongs to a declared class $\mathfrak M(\mathcal G)$ associated with a finite DAG family $\mathcal G$; latent variables are allowed. Each model defines unique measurable counterfactuals under a target regime $g$, and $0\le Y^g\le1$. Write
+\[
+\theta(m)=\E_m[Y^g].
+\]
+This notation corrects a potential ambiguity: before identification, $\theta$ belongs to a structural model, not to an observed-data law alone. Each of $n$ episodes draws a fresh independent copy of that model's structural errors. Assignment kernels may use previous episodes and current observed history but only external randomization conditionally independent of the structural errors. The allowable family $\mathcal Q$ specifies which such kernels can be implemented.
+
+Define experimental equivalence by
+\[
+m\sim_{\mathcal Q}m'\ \Longleftrightarrow\ P_m^q=P_{m'}^q\quad\text{for every allowable experiment }q.
+\]
+Identification means $m\sim_{\mathcal Q}m'\Rightarrow\theta(m)=\theta(m')$ for every $m,m'$. An observed family $Q$ has identified set $\{\theta(m):(P_m^q)_{q\in\mathcal Q}=Q\}$. For a specified design class the statistical target is
+\[
+R_n=\inf_{q,\widehat\theta}\sup_{m\in\mathfrak M(\mathcal G)}
+\E_m^q[(\widehat\theta-\theta(m))^2].
+\]
+The request asks for these objects across specified intervention families and for confidence sets and support/horizon lower bounds. Without fixing those families and structural restrictions, there is no one numerical minimax rate to prove. We supply exact results for two fully specified, contrasting families, plus a supported sequential-design bound.
+
+Intervals, expectations, and confidence coverage refer to the actual adaptive data law. Coverage of each possible parameter and simultaneous coverage of the entire identified set are distinguished. Empty data ($n=0$) are allowed only in explicitly identified boundary checks.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Cinelli et al. \cite{causal}, Section 3.1.3, explicitly discuss sequential treatments and increased adaptivity. The input is a formal research agenda built around that discussion, not a theorem claiming that arbitrary graph uncertainty is automatically eliminated by adaptive experiments. The exact minimax calculations below are independently derived for their stated structural submodels; they do not purport to settle all restricted-intervention identification problems.
+
+\section{ATTACK PLAN}
+This is a causal identification and statistical decision problem. The proof track first implements the target intervention, then derives an exact bounded-mean minimax rule; it also studies inverse-probability weighting under restricted support. The disproof track creates observationally identical models with different unobserved counterfactuals. A third construction varies action support while leaving the graph family fixed.
+
+\begin{center}\begin{tabular}{p{.24\linewidth}p{.67\linewidth}}\toprule Tool&Why relevant\\\midrule
+Experimental equivalence&States exactly what identification requires.\\
+Direct intervention&Removes graph ambiguity when the target is implementable.\\
+Beta--Bernoulli decision theory&Gives an exact, not merely order-wise, minimax lower bound.\\
+Conditional change of measure&Justifies sequential weighting despite latent variables.\\
+Martingale orthogonality&Handles dependence introduced across episodes.\\
+Two indistinguishable endpoints&Proves nonidentification and positive minimax risk.\\
+Tonelli's theorem&Converts common-law confidence coverage into a length lower bound.\\
+Variance inequalities&Supply finite-sample confidence guarantees without asymptotics.\\\bottomrule
+\end{tabular}\end{center}
+
+\section{WORK}
+\subsection{Fully implementable target: an exact minimax theorem}
+\begin{theorem}\label{thm:exactrisk}
+Assume every episode may be assigned regime $g$ itself. Assume the model class contains the following submodel for every $\theta\in[0,1]$: all observable variables other than $Y$ are fixed or generated by the design, and $Y\sim\operatorname{Bernoulli}(\theta)$ independently of every action and independently across episodes. Then, for $n\ge1$,
+\[
+R_n=\frac{1}{4(\sqrt n+1)^2}.
+\]
+An optimal design always implements $g$, and an optimal estimator is
+\[
+\widehat\theta_n=\frac{\sum_{i=1}^nY_i+\sqrt n/2}{n+\sqrt n}.
+\]
+In this design $\theta$ is identified by $\E[Y]$.
+\end{theorem}
+\begin{proof}
+Under regime $g$, consistency and independent replicated structural errors make the outcomes independent copies of $Y^g$. Put $\theta=\E[Y^g]$. Since $0\le Y^g\le1$, $(Y^g)^2\le Y^g$, so $\Var(Y^g)\le\theta(1-\theta)$. The estimator has variance $n\Var(Y^g)/(n+\sqrt n)^2$ and bias $\sqrt n(1/2-\theta)/(n+\sqrt n)$. Its mean squared error is therefore at most
+\[
+\frac{n\{\theta(1-\theta)+(1/2-\theta)^2\}}{(n+\sqrt n)^2}
+=\frac1{4(\sqrt n+1)^2}.
+\]
+
+For the lower bound, restrict to the stated Bernoulli submodel and put a proper $\operatorname{Beta}(a,a)$ prior on $\theta$, where $a=\sqrt n/2>0$. For any adaptive design, the joint likelihood factors into $\theta^{S}(1-\theta)^{n-S}$, $S=\sum Y_i$, times factors for assignments and auxiliary randomization that are independent of $\theta$ given the observed past. Thus the posterior density is proportional to $\theta^{S+a-1}(1-\theta)^{n-S+a-1}$. Its mean is $(S+a)/(n+2a)$; the identity follows by integrating the beta density, or by integrating the derivative of $\theta^{S+a}(1-\theta)^{n-S+a}$ over $[0,1]$.
+
+For squared error, conditional posterior risk of an estimate $d$ is $\Var(\theta\mid\text{data})+(d-\E[\theta\mid\text{data}])^2$, so this posterior mean is Bayes optimal. In the Bernoulli submodel the variance bound in the upper calculation is an equality for every $\theta$; hence this rule has constant frequentist risk equal to the displayed value. Its integrated Bayes risk is that value. The supremum risk of every other rule and every design is at least its Bayes risk, which is at least the minimum Bayes risk. This proves the lower bound for the full class. Identification follows because the law under the allowable experiment $g$ contains the distribution of $Y^g$ itself.
+\end{proof}
+
+\begin{corollary}[A finite-sample point-parameter confidence interval]
+Under this design, for $0<\alpha<1$,
+\[
+I_n=\left[\overline Y-\frac1{2\sqrt{n\alpha}},\
+\overline Y+\frac1{2\sqrt{n\alpha}}\right]\cap[0,1]
+\]
+has coverage at least $1-\alpha$ uniformly in the model class.
+\end{corollary}
+\begin{proof}
+Independence gives $\E[(\overline Y-\theta)^2]\le1/(4n)$. Applying Markov's inequality to the nonnegative square gives the claim. Intersecting with the known parameter space cannot remove the true $\theta$.
+\end{proof}
+The shrinkage estimator is used for exact minimax risk; the unshrunk mean is used for this elementary confidence interval. They are not silently interchanged in either calculation.
+
+\subsection{Restricted support: exact nonidentification and risk}
+\begin{theorem}\label{thm:nonid}
+Take $K=1$, no covariates, binary $W$, and a latent $U\sim\operatorname{Bernoulli}(\theta)$. Let $Y=WU$. Permit only $W=0$, and target $g=\operatorname{do}(W=1)$. Then the graph can be fixed, the identified set is exactly $[0,1]$, and $R_n=1/4$ for every $n\ge0$.
+\end{theorem}
+\begin{proof}
+The structural equations define unique counterfactuals; the DAG has arrows $U\to Y$ and $W\to Y$. Under every allowable experiment $W=Y=0$, so every $\theta$ induces the same observed law. Under $g$, $Y^g=U$, hence its expectation can be any $\theta\in[0,1]$. There are no values outside this range because outcomes are bounded; the identified set is sharp.
+
+The estimator $1/2$ has worst squared error $1/4$. Conversely, for any randomized estimator $D$ under the common data law, the average of its risks at $\theta=0$ and $\theta=1$ is
+\[
+\tfrac12\E[D^2+(D-1)^2]=\E[(D-1/2)^2]+\tfrac14\ge\tfrac14.
+\]
+The maximum of the two endpoint risks is at least their average. This proves equality.
+\end{proof}
+
+\begin{proposition}[Confidence-set obstruction]
+In Theorem~\ref{thm:nonid}, if a measurable random set $C_n\subseteq[0,1]$ has pointwise coverage at least $1-\alpha$ for every possible $\theta$, then
+$\E[\operatorname{Leb}(C_n)]\ge1-\alpha$. If it must cover the entire identified set with probability at least $1-\alpha$, it must equal $[0,1]$ up to endpoints on that event.
+\end{proposition}
+\begin{proof}
+All parameters have the same data law $Q$, so $Q(\theta\in C_n)\ge1-\alpha$ for all $\theta$. Tonelli's theorem applies to the nonnegative measurable membership indicator and gives $\E_Q\operatorname{Leb}(C_n)=\int_0^1Q(\theta\in C_n)\,d\theta\ge1-\alpha$. The second assertion follows directly from the definition of simultaneous set coverage.
+\end{proof}
+
+\subsection{Supported adaptive designs: a horizon-dependent upper bound}
+\begin{theorem}\label{thm:ipw}
+Let the target be a fixed action path $w_{1:K}$. Suppose every stage assignment has known probability $q_{i,k}(w_k\mid H_{i,k})\ge\varepsilon>0$ on all histories reachable under the target, and uses the external randomization specified above. Define
+\[
+L_i=\prod_{k=1}^K\frac{\ind\{W_{i,k}=w_k\}}{q_{i,k}(w_k\mid H_{i,k})},
+\quad Z_i=L_iY_i,\quad\widehat\theta=n^{-1}\sum_i Z_i,
+\]
+with a factor set to zero once the target path has not been followed. Then
+\[
+\E[Z_i\mid\mathcal F_{i-1}]=\theta,\qquad
+\E[(\widehat\theta-\theta)^2]\le\frac{\varepsilon^{-K}}n.
+\]
+\end{theorem}
+\begin{proof}
+Condition on previous episodes and on all the fresh episode's structural errors. These errors specify the realized history along the target path and its outcome. The conditional probability that successive external assignment draws follow that path is the product of their target probabilities evaluated at those histories. Multiplying the path indicator by their reciprocal therefore integrates to one. With an outcome factor, it integrates to that error realization's $Y^g$. Integrate over the fresh errors, which are independent of $\mathcal F_{i-1}$, to obtain $\E[L_i\mid\mathcal F_{i-1}]=1$ and $\E[Z_i\mid\mathcal F_{i-1}]=\theta$. This is a direct sequential change-of-measure calculation, not an assumption of no latent confounding in the observational distribution.
+
+On the event of following the target, $L_i\le\varepsilon^{-K}$ and $0\le Y_i\le1$, so $Z_i^2\le L_i^2\le\varepsilon^{-K}L_i$. Thus the conditional second moment is at most $\varepsilon^{-K}$. For $i<j$, the tower rule gives
+$\E[(Z_i-\theta)(Z_j-\theta)]=0$, since $Z_i-\theta$ is $\mathcal F_{j-1}$-measurable and the conditional mean of the other factor is zero. Summing variances gives the bound. The same argument with Markov's inequality yields a confidence radius $\sqrt{\varepsilon^{-K}/(n\alpha)}$, intersected with $[0,1]$.
+\end{proof}
+This bound need not be minimax sharp, and can exceed the trivial risk $1/4$. It supplies neither a universal exponential-in-$K$ lower bound nor a claim that inverse weighting is optimal.
+
+\section{VERIFICATION}
+For $n=1$, Theorem~\ref{thm:exactrisk} gives $(Y+1/2)/2$ and risk $1/16$ on Bernoulli observations; the formula gives $1/16$ as well. For $n=0$, a separate midpoint argument gives $1/4$; the beta-prior proof was deliberately stated only for $n\ge1$. In the nonidentification example, $n=1,2,3$ all produce exactly the same all-zero record, not merely close distributions.
+
+\begin{lstlisting}
+for theta in {0, 1/2, 1}:
+    enumerate S = 0,...,n with binomial probabilities
+    compute mean squared error of (S + sqrt(n)/2)/(n+sqrt(n))
+    compare with 1/(4*(sqrt(n)+1)^2)
+# For the restricted-support model enumerate the two latent endpoints:
+# both return W=Y=0, while E[Y under do(W=1)] is 0 or 1.
+\end{lstlisting}
+This is reproducible pseudocode for the closed-form finite checks; the proof uses exact identities, not an unreported large simulation. No algorithmic search over all causal graphs was run.
+
+Adversarial checks: the minimax lower bound requires the stated Bernoulli submodel to lie in the structural class; a graph restriction making $\theta$ known would invalidate that lower bound. The direct-intervention upper bound requires actual permission to implement $g$, not merely a wish to randomize. The weighting calculation conditions on fresh structural errors only to integrate external randomization and then removes that conditioning; it does not replace a causal conditional distribution with an observational one. Across-episode independence of observed records was never assumed for adaptive designs.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+\textbf{Fully proved subcases:} exact full-control risk $1/[4(\sqrt n+1)^2]$ under the explicit richness condition; exact restricted-support identified set $[0,1]$ and risk $1/4$; and a supported adaptive weighting bound with valid confidence intervals.
+
+\textbf{Exact first gap.} Given an arbitrary declared latent structural class and restricted intervention family, no necessary-and-sufficient usable criterion for constancy of $\theta$ on experimental equivalence classes is derived here.
+
+\textbf{Three next moves.} (1) Solve that criterion for finite latent-state models with a specified subset of manipulable nodes. (2) Derive testing lower bounds for pairs agreeing on accessible interventions but separated under $g$, tracking the smallest target-path support. (3) Optimize design over the resulting identified functional and prove matching risk and confidence-set bounds rather than assuming inverse weighting is minimax.
+
+\textbf{Minimal hard model.} One binary unmanipulable treatment coordinate, a latent parent, and a target counterfactual outside experimental support already create the first obstruction. Approximate rather than exact equivalence is the likely source of harder positive-identification rates.
+
+\section{Completion Estimate}
+30\%
+
+Two sharp opposite regimes and a general supported-design bound are proved; the requested classification over arbitrary restricted families and matching minimax bounds remain open within this attempt.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{causal} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}. arXiv:2508.17099v1 (2025), Section 3.1.3. \url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}

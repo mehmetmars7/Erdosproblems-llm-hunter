@@ -1,0 +1,162 @@
+% ECONOMICS_PROBLEM: {"id": "D47-95", "title": "Adaptive market maintenance", "jel_code": "D47", "source_id": "OP-0299"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Market maintenance with endogenous participant states}\par\medskip
+{\large D47-95.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0299}
+\label{definitions:problem:30007581}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+Fix a horizon $T\ge1$, a finite action set $\mathcal M$ of size $K$, state space $S$, exogenous-condition metric space $(\Theta,d)$, transition $f$, welfare $W\in[0,1]$, switching cost $c\ge0$, initial state $s_1$, and initial rule $m_0$. For each rule sequence $a$, recompute its own trajectory $s^a_{t+1}=f(s^a_t,a_t,\theta_t)$ and define
+\[
+J(a,\theta)=\sum_{t=1}^T[W(a_t,s^a_t,\theta_t)-c(a_{t-1},a_t)].
+\]
+The feasible set is $\mathcal C_B=\{a:\#\{t\ge2:a_t\ne a_{t-1}\}\le B\}$. Thus $a_1$ is chosen freely, while its switching cost from $m_0$ is still charged. This is the convention explicitly used in the supplied definition; forcing $a_1=m_0$ is a different variant. The learner has the same budget and initial rule. For a specified feedback model and an oblivious exogenous sequence,
+\[
+\mathfrak R_T=\inf_\pi\sup_{\sum_{t=2}^Td(\theta_t,\theta_{t-1})\le V}
+\left\{\max_{a\in\mathcal C_B}J(a,\theta)-\E_\pi J(a^\pi,\theta)\right\}.
+\]
+The input asks for rates and conditions across different persistence, information and transition models. It is not a single fully specified minimax problem. We state every additional restriction for our exact examples and positive theorem. In particular, learning from current welfare is not assumed to reveal the welfare of unplayed rules.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Roth's \emph{Market Design and Maintenance}, NBER Working Paper 31947, is a genuine source for the maintenance theme \cite{roth}. The online-control/minimax formulation in the input is editorial; this report does not attribute the regret theorems below to Roth. Policy regret must evaluate a comparator on its own endogenous state path, as opposed to reusing the learner's realized states. The examples below explicitly enforce that distinction.
+
+\section{ATTACK PLAN}
+This is online control with endogenous state and restricted switching. The proof track tests a contractive, constant-condition subcase by estimating fixed-point rewards. The disproof track uses an irreversible first decision and, separately, a zero-switch exploration constraint. A variation-only construction tests whether a metric budget has force without regularity of welfare in that metric.
+
+\begin{center}\begin{tabular}{p{.25\linewidth}p{.66\linewidth}}\toprule Tool&Role\\\midrule
+Two indistinguishable initial worlds&Produces exact minimax lower bounds.\\
+Absorbing-state constructions&Separates recovery from information acquisition.\\
+Contraction mapping&Defines and controls long-run rule-specific rewards.\\
+Geometric transient bounds&Charges switches for endogenous-state readjustment.\\
+Explore then commit&Supplies a feasible bandit-feedback policy.\\
+Comparator segmentation&Bounds an arbitrary budget-$B$ switching comparator.\\
+Metric regularity tests&Checks what bounded exogenous variation actually restricts.\\\bottomrule\end{tabular}\end{center}
+
+\section{WORK}
+\subsection{An exact irreversible-state lower bound}
+\begin{theorem}\label{thm:absorbing}
+There is a deterministic known-transition model with two actions, $V=0$, $B=0$, zero switching costs, and full post-action state observation for which $\mathfrak R_T=(T-1)/2$.
+\end{theorem}
+\begin{proof}
+Let $\mathcal M=\{0,1\}$ and let the unobserved constant condition be $h\in\{0,1\}$. The state space is $\{\bot,G,B\}$ and $s_1=\bot$. From $\bot$, action $a$ moves to $G$ exactly when $a=h$, otherwise to $B$; both $G$ and $B$ are absorbing. Reward is zero in $\bot$ or $B$, and one in $G$, independently of the current action. These functions are known, but $h$ is not observed before the first action. The condition sequence is constant, so its variation is zero.
+
+The comparator using the constant rule $h$ is feasible with $B=0$ and obtains $T-1$. Let the learner choose action 1 initially with probability $p$. Its regret is $(T-1)p$ in world $h=0$, and $(T-1)(1-p)$ in world $h=1$. Their maximum is at least $(T-1)/2$, with equality at $p=1/2$. Later observation of the state, or even of $h$, cannot undo absorption. The learner can keep its first rule throughout, so the upper-bound policy obeys the same budget.
+\end{proof}
+This refutes the implication ``$V=0$ alone gives sublinear regret.'' It does not refute the request to identify additional conditions.
+
+\begin{proposition}[No switching can defeat even a stateless learner]
+In a stateless model with hidden constant $h\in\{0,1\}$ and reward $\ind\{a=h\}$, zero costs and $B=0$, the exact minimax regret is $T/2$.
+\end{proposition}
+\begin{proof}
+Every feasible learner must repeat its first action. The two regrets are $Tp$ and $T(1-p)$, while the comparator chooses $h$. Minimize their maximum at $p=1/2$. Welfare feedback after round 1 identifies $h$ but cannot authorize a forbidden switch. A singleton state space is contractive for every $\kappa<1$, so contraction without an adequate exploration budget is insufficient.
+\end{proof}
+
+\subsection{A positive contraction theorem under declared restrictions}
+Assume now that $\theta_t=\theta$ is constant, feedback gives the realized welfare exactly, and $F_a(s)=f(s,a,\theta)$ is a $\kappa$-contraction on a complete metric space of finite diameter $D$, uniformly over $a$ and $\theta$, with $0\le\kappa<1$. Assume $W(a,\cdot,\theta)$ is $L$-Lipschitz, $c(a,a)=0$, and $c(a,b)\le\bar c$. The constants are known; $\theta$ and fixed-point rewards need not be. These are sufficient restrictions, not consequences of the original broad formulation.
+
+\begin{lemma}[Fixed points and transient accounting]\label{lem:transient}
+Each $F_a$ has a unique fixed point $z_a$. Put $\mu_a=W(a,z_a,\theta)$ and $C_0=LD/(1-\kappa)$. On any constant-action segment, starting from any state, the total absolute difference between rewards and the corresponding number of copies of $\mu_a$ is at most $C_0$. The segment's $H$th reward differs from $\mu_a$ by at most $LD\kappa^{H-1}$.
+\end{lemma}
+\begin{proof}
+Successive iterates of $F_a$ have distances bounded by a geometric sequence. Their tails are Cauchy, hence converge in the complete space. Continuity of a contraction makes the limit a fixed point. Two fixed points at distance $d_0$ would satisfy $d_0\le\kappa d_0$, forcing equality of the points. After $r$ transitions from any initial state, the distance to $z_a$ is at most $\kappa^rD$. Apply the Lipschitz reward bound and sum $LD\sum_{r\ge0}\kappa^r$. The final-reward bound uses $r=H-1$, because reward is observed before that round's transition.
+\end{proof}
+
+\begin{theorem}[An explicit feasible sublinear-regret regime]\label{thm:contract}
+Suppose $B\ge K$ and choose an integer $H\ge1$ with $KH\le T$. Explore each of the $K$ rules for $H$ consecutive rounds, starting with $m_0$, estimate its fixed-point reward by the last reward in that segment, and then use a rule with the largest estimate. This policy obeys the switch budget and has regret at most
+\[
+KH+2TLD\kappa^{H-1}+(B+2)\frac{LD}{1-\kappa}+K\bar c.
+\]
+For fixed $K,L,D,\kappa<1,\bar c$ and $B=o(T)$ with $B\ge K$, choosing $H$ of logarithmic order in $T$ gives $o(T)$ regret.
+\end{theorem}
+\begin{proof}
+There are at most $K-1$ switches between exploration blocks and at most one switch to exploitation; the first block equals $m_0$, so there is no initial switching cost. Thus at most $K$ switches occur. Set $e=LD\kappa^{H-1}$ and $\mu_* =\max_a\mu_a$. Lemma~\ref{lem:transient} bounds each estimation error by $e$. If $\widehat a$ maximizes estimated reward, then $\mu_{\widehat a}\ge\mu_*-2e$.
+
+The learner's exploration welfare is nonnegative. Its exploitation welfare is at least $(T-KH)(\mu_*-2e)-C_0$. Subtracting at most $K\bar c$ in costs, and using $\mu_*\le1$, gives
+\[
+J(\pi,\theta)\ge T\mu_*-KH-2Te-C_0-K\bar c.
+\]
+Any comparator with at most $B$ switches has at most $B+1$ constant-action segments. Lemma~\ref{lem:transient} bounds its welfare by $T\mu_*+(B+1)C_0$; its nonnegative costs can only reduce this. Subtract the learner lower bound to obtain the theorem.
+
+For $0<\kappa<1$ and $LD>0$, take
+$H=1+\lceil\log(\max\{1,TLD\})/(-\log\kappa)\rceil$; then $Te\le1$. For fixed parameters $KH\le T$ eventually. If $\kappa=0$, take $H=2$ so the last reward is exactly the fixed-point reward. If $LD=0$, every transient error is zero and $H=1$ suffices. These choices prove the asymptotic claim.
+\end{proof}
+The theorem neither estimates an unknown noisy transition kernel nor treats $V>0$. The assumptions make a positive result possible without assuming observed welfare is an unbiased sample of an unplayed alternative.
+
+\subsection{Why a variation metric needs regularity}
+\begin{proposition}
+Even with singleton state, zero costs and variation at most one, a discontinuous dependence of reward on the exogenous condition can yield minimax regret at least $T/2$ when $B=T-1$.
+\end{proposition}
+\begin{proof}
+Use real conditions with Euclidean metric, actions $\{-1,1\}$, and reward $W(a,\theta)=\ind\{a=\operatorname{sign}\theta\}$. Set $\theta_t=\xi_t/(2T)$ for independent equiprobable signs chosen in advance and hidden until after the action. Every realized sequence has total variation at most $(T-1)/T<1$. Conditional on the observed past the next sign is fair, so every learner has expected welfare $T/2$. The feasible comparator follows all the signs and gets $T$. Averaging over this finite distribution of oblivious sequences shows that at least one admissible deterministic sequence yields expected regret at least $T/2$. This uses no reactive adversary.
+\end{proof}
+
+\section{VERIFICATION}
+At $T=1$ the absorbing example has zero regret, as required because no post-decision reward is paid; the stateless example has regret $1/2$. At $T=2,3$ the absorbing values are $1/2,1$ by direct enumeration of the two conditions and two first actions. The minimax calculation can be checked by the following finite pseudocode:
+\begin{lstlisting}
+for h in {0,1}:
+    compute comparator trajectory using constant action h
+    compute both learner trajectories using constant actions 0 and 1
+    regret(p,h) = comparator - [(1-p)*learner0 + p*learner1]
+minimize max(regret(p,0),regret(p,1)) over 0 <= p <= 1
+\end{lstlisting}
+No extensive control simulation is claimed. The sharp lower bounds are exact two-world calculations. In the positive theorem the learner and comparator each start every segment from their own state, and the uniform diameter bound controls both. Charging transient cost once per segment is essential; treating all segments as if they begin at a fixed point would be incorrect. If $T<KH$, the displayed algorithm is not run with that $H$; the theorem explicitly excludes that parameter choice. An initial forced rule, noisy feedback, unbounded switching cost or noncontractive state is not smuggled into the theorem's domain.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+\textbf{Strongest checked results:} exact linear-regret countermodels for irreversible response and zero switching, and the explicit contraction/explore--commit bound of Theorem~\ref{thm:contract}. Each is a full proof for its stated model, not a full classification of the editorial agenda.
+
+\textbf{Exact first gap.} No matching minimax dependence on $(T,V,B)$ is established for a class with varying conditions, specified regularity in those conditions and a common feedback model.
+
+\textbf{Three next moves.} (1) Add Lipschitz dependence on $\theta$ and bound the error of replacing moving fixed points by piecewise-constant segments. (2) Derive a switching-budget lower bound in the same contractive model, rather than comparing to unrestricted online learning. (3) Replace noiseless final rewards by concentration-controlled estimates under an explicit finite-state mixing/reset assumption and account for identification costs.
+
+\textbf{Minimal hard instance.} Two actions and two persistent states with an initially hidden condition already suffice for an obstruction; in a recoverable model the key parameter is the recovery time relative to the exploration and switching budget.
+
+\section{Completion Estimate}
+35\%
+
+The principal failure mechanisms and one quantitative positive regime are fully proved. General varying-condition rates, matching lower bounds, and unknown noisy transitions remain unresolved.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{roth} A. E. Roth. \emph{Market Design and Maintenance}. NBER Working Paper 31947 (2023), DOI 10.3386/w31947. Primary abstract/index accessed 9 October 2026. \url{https://www.nber.org/papers/w31947}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,195 @@
+% ECONOMICS_PROBLEM: {"id": "D63-84", "title": "Linear total subsidies for general monotone goods valuations", "jel_code": "D63", "source_id": "OP-0591"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Linear total subsidies for monotone goods}\par\medskip
+{\large D63-84.tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0591}
+\label{audited:ECON-004}
+\label{audited:conventions}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+For every $n\ge1$, every finite item set $M$, and normalized monotone functions $v_i:2^M\to\R_{\ge0}$ with all one-item marginals in $[0,1]$, define
+\[
+s(v)=\inf_{A,p\in\R_{\ge0}^n}\left\{\sum_i p_i:
+ v_i(A_i)+p_i\ge v_i(A_j)+p_j\ \text{for all }i,j\right\},
+\]
+where $A$ is a complete partition. The question is
+\[
+\exists C<\infty\ \forall n\ \forall M\ \forall v\quad s(v)\le Cn.
+\]
+The constant is independent of the item count and all values. Subsidies move with the compared bundle, hence the right side contains $p_j$. The infimum convention is $+\infty$ for an empty feasible set; feasibility and attainment are proved below. Scaling the marginal bound, dropping monotonicity while retaining nonnegative bundle values, allowing negative transfers, and requiring efficient computation are distinct variants.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The full text of Dupr\'e la Tour and Suzuki is accessible: its Section 6 asks whether monotone goods admit a linear total bound \cite{subq}. The proved subquadratic estimate is still asymptotically larger than linear. Therefore it does not answer this input merely by removing the historical quadratic upper bound.
+
+\section{ATTACK PLAN}
+The proof track studies minimum payment potentials and common-value balancing; the disproof track searches for unavoidable accumulation of envy along long paths. One-good instances test the smallest possible linear constant, while zero-sum transfers test whether changing the payment domain trivializes the objective.
+
+\begin{center}\begin{tabular}{p{.25\linewidth}p{.66\linewidth}}\toprule Tool&Role\\\midrule
+Difference constraints&Characterize exactly which partitions admit subsidies.\\
+Longest-path potentials&Give minimal nonnegative payments and a certificate.\\
+Finite welfare-maximizing assignment&Ensures feasibility for at least one bundle assignment.\\
+Prefix crossing&Produces the sharp two-agent bound.\\
+Greedy load balancing&Solves identical monotone valuations.\\
+Oracle/bit-complexity accounting&Separates evaluation of a certificate from finding it.\\
+Small Lipschitz set-function search&Tests nonadditive and mixed-sign boundary cases.\\
+Topological/discrepancy methods&Possible route to global bounds, but not a polynomial algorithm by themselves.\\\bottomrule\end{tabular}\end{center}
+
+\section{WORK}
+
+\subsection{A complete payment certificate for a fixed partition}
+\begin{lemma}[Difference constraints, exact feasibility and attainment]\label{lem:graph}
+For a complete allocation $A$, put $w_{ij}=v_i(A_j)-v_i(A_i)$. There exist nonnegative subsidies making $A$ envy-free if and only if every directed cycle of this complete weighted graph has nonpositive total weight. In that case the coordinatewise smallest nonnegative feasible vector is
+\[
+p_i^*=\max\bigl\{0,\ \text{total weights of directed paths starting at }i\bigr\},
+\]
+where the maximum may be restricted to simple paths. In particular $\min_i p_i^*=0$. For every finite valuation instance there is at least one envy-freeable complete allocation, and the infimum defining $s(v)$ is attained.
+\end{lemma}
+\begin{proof}
+The envy inequalities are $p_i\ge w_{ij}+p_j$. Summing around a cycle gives zero on the payment side, so positive cycles are impossible. Conversely, when no cycle is positive, deleting a repeated-vertex segment from a walk does not decrease its weight. The largest walk weight is therefore attained by a simple path of length at most $n-1$, including the empty path of weight zero. Prepending edge $i\to j$ to a maximizing path from $j$ and deleting any resulting nonpositive cycles proves $p_i^*\ge w_{ij}+p_j^*$. Thus $p^*$ is feasible and nonnegative.
+
+Any nonnegative feasible $p$ dominates every path weight starting at $i$: sum the edge inequalities along that path and use nonnegativity of its final payment. Hence $p_i\ge p_i^*$ for every $i$. If the minimum coordinate of $p^*$ were positive, subtracting it from all coordinates would give a strictly smaller nonnegative feasible vector, a contradiction.
+
+To obtain some envy-freeable allocation, begin with any $n$ bundle occurrences, including empty occurrences, forming a partition. Choose an assignment of those bundles to the agents that maximizes total value over the finite set of $n!$ assignments. A positive cycle in its envy graph would reassign the bundles cyclically and strictly increase that total, an impossibility. Finally there are finitely many complete allocations. Each feasible one has the attained minimum total $\sum_i p_i^*$, and at least one is feasible; taking the smallest of finitely many such totals proves attainment of $s(v)$.
+\end{proof}
+
+\begin{corollary}[An item-dependent bound, not a uniform theorem]\label{cor:mdep}
+If $v_i(\varnothing)=0$ and every absolute one-item marginal is at most one, then some envy-free allocation has total subsidy at most $(n-1)^2m$, where $m=|M|$.
+\end{corollary}
+\begin{proof}
+Adding the items of a bundle one at a time gives $|v_i(S)|\le |S|$. Distinct allocated bundles are disjoint, so $|w_{ij}|\le|A_i|+|A_j|\le m$. On an envy-freeable allocation, every simple path has at most $n-1$ edges, whence $p_i^*\le(n-1)m$. At least one coordinate is zero, giving the bound. It is zero when $n=1$ or $m=0$.
+\end{proof}
+The supremum over all finite $M$ makes this estimate insufficient for any proposed bound depending only on $n$.
+
+\begin{lemma}[Exact evaluation with polynomial-size payments]\label{lem:compute}
+For a specified allocation with rational oracle values of bit length at most $L$, envy-freeability and the minimum payments can be computed with $n^2$ value queries and $O(n^3)$ rational arithmetic operations. The output bit length is polynomial in $n,m,L$.
+\end{lemma}
+\begin{proof}
+Set $p^{(0)}=0$ and iterate
+\[
+p_i^{(k+1)}=\max\{p_i^{(k)},\max_j(w_{ij}+p_j^{(k)})\}.
+\]
+An induction on $k$ identifies $p_i^{(k)}$ as the greatest weight of a walk starting at $i$ of length at most $k$, also allowing zero. If $p^{(n)}=p^{(n-1)}$, this vector satisfies all constraints and equals the minimum vector. If an entry increases, some length-$n$ walk improves on all shorter walks; it must contain a positive cycle, since deleting only nonpositive cycles could not lower its weight. Thus the allocation is infeasible. The recurrence has $n$ rounds of $n^2$ comparisons/additions. A path sums at most $n$ differences of input rationals. Forming common denominators by multiplication bounds its encoding length by $O(nL+\log n)$; each maximum selects one such rational. Query arguments are $m$-bit masks. These facts give polynomial bit complexity, not just a real-arithmetic claim.
+\end{proof}
+
+\subsection{A sharp theorem for two agents, even without monotonicity}
+\begin{theorem}\label{thm:two}
+For $n=2$, any normalized valuations with absolute one-item marginals at most one have an envy-free allocation with total subsidy at most one. This can be found with $O(m)$ value queries. The worst-case constant one is sharp.
+\end{theorem}
+\begin{proof}
+Order the items arbitrarily and let $S_k$ be the first $k$, $0\le k\le m$. Write $d_i(S)=v_i(S)-v_i(M\setminus S)$. Consecutive $d_1(S_k)$ differ in absolute value by at most two, because an item is added on one side and removed on the other. The first and last are $-v_1(M)$ and $v_1(M)$. Hence some $k$ has $|d_1(S_k)|\le1$: otherwise the sequence must cross from a number below $-1$ to a number above $1$, or in the reverse direction, in one step of absolute size greater than two. This also covers $v_1(M)=0$ and $m=0$ by choosing $k=0$.
+
+Fix this bipartition $S,T$. Write $d_i=v_i(S)-v_i(T)$. If $d_1\ge d_2$, assign $S$ to agent 1 and $T$ to agent 2. The constraints on the payment difference are
+\[
+d_2\le p_2-p_1\le d_1.
+\]
+Choose the element of this closed interval nearest zero; its absolute value is the minimum possible total nonnegative subsidy, by placing that amount on the appropriate agent and zero on the other. If $d_1<d_2$, reverse the bundles and apply the same argument to $-d_1,-d_2$. The resulting minimum total is zero if $d_1,d_2$ straddle zero, and otherwise $\min\{|d_1|,|d_2|\}$. It is therefore at most one. Scanning the prefixes requires $O(m)$ queries and the final pair of values for agent 2; all arithmetic is exact for rational inputs.
+
+For sharpness, use one good valued at one by both agents. Whichever receives it, the other needs a subsidy exactly one larger than the recipient's. Nonnegative payments therefore have total at least one, achieved by paying the nonrecipient one and the recipient zero.
+\end{proof}
+For monotone goods the sequence $d_1(S_k)$ is nondecreasing, so the sign crossing can instead be located by binary search with $O(\log(m+1))$ queries. This improvement is not asserted for arbitrary nonmonotone functions.
+
+\subsection{Identical monotone valuations: a linear constructive bound}
+\begin{theorem}\label{thm:identical}
+If all agents have the same normalized monotone valuation $v$ with marginals in $[0,1]$, there is an envy-free allocation with $p_i\in[0,1]$ and total subsidy at most $n-1$, obtainable with polynomially many value queries and bit operations for rational data.
+\end{theorem}
+\begin{proof}
+Initially all bundles are empty and their values are zero. Process the items in any order; give the next item to a bundle of minimum current value. If the old minimum is $a$ and all bundle values are in $[a,a+1]$, the receiving bundle's new value is also in $[a,a+1]$, by the marginal bounds, and every other value is unchanged. Thus by induction the spread of the final values $\ell_i=v(A_i)$ is at most one. Let $H=\max_i\ell_i$ and $p_i=H-\ell_i$. Every compared bundle-payment pair has the same value $H$ to every agent. These payments are nonnegative, at most one, and at least one is zero, so their sum is at most $n-1$. Only the changed bundle needs a new oracle query at each step. Minimum selection and rational subtraction have polynomial bit complexity. Equality of the agents' valuations is a promise for this subcase, not something proved by finitely many queries.
+\end{proof}
+
+\begin{proposition}[A universal linear lower example]\label{prop:lower}
+For every $n\ge1$, the instance consisting of one good valued at one by every agent has $s(v)=n-1$.
+\end{proposition}
+\begin{proof}
+If agent $r$ receives the good, envy-freeness between $r$ and any other agent $i$ imposes both $p_i\ge1+p_r$ and $p_i\le1+p_r$. Thus $p_i=1+p_r$ for all $i\ne r$. The minimum nonnegative vector has $p_r=0$ and all other coordinates one, giving total $n-1$. This includes $n=1$.
+\end{proof}
+
+\subsection{Scaling and the negative-transfer variant}
+\begin{proposition}\label{prop:scale}
+For every $B>0$, $s(Bv)=B s(v)$. If only feasibility is requested and arbitrary signed transfers $t_i$ with $\sum_i t_i=0$ are allowed, every finite valuation instance admits an envy-free bundle-transfer allocation.
+\end{proposition}
+\begin{proof}
+Multiplying all values and payments by $B$ sends a feasible solution for $v$ to one for $Bv$; dividing sends it back. Taking infima in both directions proves equality. Under a zero marginal bound, normalization forces every value to be zero and the optimal subsidy is zero, treated separately.
+
+For signed transfers, Lemma~\ref{lem:graph} supplies an allocation and feasible nonnegative payments $p$. Put $t_i=p_i-\overline p$, where $\overline p=n^{-1}\sum_i p_i$. Every pairwise inequality is unchanged by this common subtraction, and $\sum_i t_i=0$. Some agents can now be charged; no individual-rationality constraint was assumed. This proves the stated transfer feasibility, not a nonnegative-subsidy bound.
+\end{proof}
+The single-good example forces $C\ge1$ if one constant is to work for arbitrarily large $n$, since $(n-1)/n\to1$. It does not show that $C=1$ suffices. Nonnegative but nonmonotone functions are a genuinely larger domain: for example $v(\varnothing)=v(\{a,b\})=0$ and $v(\{a\})=v(\{b\})=1$ meet the absolute marginal bound but are not monotone. The greedy monotone proof is not extended to that domain without a separate argument.
+
+\section{VERIFICATION}
+
+The executable checks generated normalized integer set functions of the form
+\[
+v(S)=\min_r\{c_r+|S\triangle K_r|\}-\min_r\{c_r+|K_r|\}.
+\]
+Each cone is 1-Lipschitz for the Hamming metric, and the pointwise minimum is also 1-Lipschitz: using a minimizing index at one endpoint gives one direction of the inequality, and interchanging endpoints gives the other. The program additionally checked every one-item marginal explicitly. With seed 20261009, it tested 200 two-agent/five-item instances and 200 three-agent/four-item instances. It enumerated every complete allocation, computed exact minimum payments by the recurrence, and found largest observed optima of one in both batches. These are nonuniform small samples, not worst-case asymptotic bounds; many generated valuations are not monotone.
+\begin{lstlisting}
+for each sampled valuation table v:
+    best = infinity
+    for each complete allocation A:
+        w[i,j] = v[i,A[j]] - v[i,A[i]]
+        p = longest-walk recurrence from zero
+        if p passes all envy constraints: best = min(best,sum(p))
+    retain exact best and a witnessing allocation
+\end{lstlisting}
+The one-good lower example was verified algebraically for every $n$, not inferred from this sample. Boundary checks include $n=1$, no items, zero values, zero-weight cycles, and exact rational payment differences. No positive-cycle partition is declared feasible merely because one or more agents could be paid a large amount: a positive cycle makes every payment vector impossible.
+
+The item-dependent bound does not survive taking the supremum over $m$. The common-value proof controls the \emph{spread} of bundle values, not their absolute sizes; arbitrarily many goods are therefore harmless in that subcase. In heterogeneous instances, equating each agent's own utility with a number $H$ does not equate its evaluations of others' bundles, so that tempting extension fails. The signed-transfer argument is explicitly excluded from the main nonnegative-payment model.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+The full linear subsidy conjecture is not proved or disproved. Fully proved are finite feasibility and attainment, $n=2$ with sharp worst-case total one, the identical-monotone bound $n-1$, the universal lower example $n-1$, exact scaling and signed-transfer feasibility.
+
+\textbf{Exact first gap.} No bound on the minimum total subsidy uniform in $m$ and linear in $n$ is obtained for heterogeneous monotone valuations.
+
+\textbf{Three next moves.} (1) Seek a reallocation lemma that shortens high-weight envy paths without creating a positive cycle. (2) Prove a linear bound first for two distinct monotone valuation types, beyond identical agents. (3) Search families with growing $n$ and complementarities where every welfare-optimal assignment of every candidate partition has large minimum payment, rather than merely presenting a bad fixed partition.
+
+\textbf{Minimal potential counterexample.} It must defeat \emph{all} partitions and not just a chosen envy-freeable allocation. A single long positive path is insufficient unless no alternative allocation removes its accumulated deficit.
+
+\section{Completion Estimate}
+20\%
+
+The exact boundary cases, common-valuation theorem, scaling and transfer variants are handled; no general heterogeneous linear upper bound or superlinear lower family is established.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{subq} M. Dupr\'e la Tour and M. Suzuki. \emph{Subquadratic Subsidies for Nonnegative or Nonpositive Valuations}. arXiv:2609.08272v1, 8 September 2026, Theorem 1 and Section 6. \url{https://arxiv.org/html/2609.08272v1}.
+\end{thebibliography}
+\end{document}
