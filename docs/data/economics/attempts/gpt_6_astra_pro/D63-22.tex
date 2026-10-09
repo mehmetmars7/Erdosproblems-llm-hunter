@@ -1,0 +1,176 @@
+% ECONOMICS_PROBLEM: {"id": "D63-22", "title": "Polynomial-time exact EFX search for additive goods", "jel_code": "D63", "source_id": "OP-0187"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Exact EFX allocation of additive goods}\par
+\medskip
+{\large D63-22: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+For integers $n\ge1$ and $m\ge0$, let $v\in\Q_+^{n\times m}$ be explicitly binary encoded, of total input length $L$. Write $[m]=\{1,\ldots,m\}$, with $[0]=\varnothing$, and $v_i(B)=\sum_{g\in B}v_{ig}$. A complete allocation is a function $a:[m]\to[n]$, equivalently a partition $A=(A_1,\ldots,A_n)$ into pairwise disjoint, possibly empty bundles with union $[m]$.
+
+The allocation is EFX under the attachment's \emph{positive-good} convention when
+\[
+ \forall i,j\in[n]\ \forall g\in A_j:\quad
+ v_{ig}>0\ \Longrightarrow\ v_i(A_i)\ge v_i(A_j\setminus\{g\}).
+\]
+The target asks whether there exist one deterministic algorithm and one polynomial $p$ which, on every such input, output a complete EFX allocation in at most $p(L)$ bit operations. This asks for universal existence and efficient search simultaneously. The promise version restricted to instances admitting EFX is different.
+
+\textbf{Stress points.} Removing a zero-valued good is not required by the supplied definition. Goods are removed from the \emph{other} bundle, unlike the chore definition. A partial allocation with unassigned goods is not an output. Exact EFX is stronger than EF1 and is not an approximation guarantee. An efficient verifier does not give an efficient constructor. For $m=0$, the empty allocation is EFX; for $n=1$, every complete allocation is EFX.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The attachment's source by Aris Filos-Ratsikas, Georgios Kalantzis, and Alexandros A.~Voudouris, \emph{Approximate-EFX Allocations with Ordinal and Limited Cardinal Information}, arXiv:2602.08714v1, concerns approximation and information access; it is not treated as a source for the exact unrestricted polynomial-search assertion. \url{https://arxiv.org/abs/2602.08714v1}.
+
+Bhaskar Ray Chaudhury, Jugal Garg, and Kurt Mehlhorn, \emph{EFX Exists for Three Agents}, proves existence for three agents with additive valuations. Primary record: \url{https://arxiv.org/abs/2002.05119}. Zehan Lin, Xiaowei Wu, and Shengwei Zhou, \emph{When Maximum Nash Welfare Becomes Strongly Fair: Bi-valued Goods}, arXiv:2610.00122v1, Section 1.2, discusses the remaining general additive existence question: \url{https://arxiv.org/html/2610.00122v1}. Approximate, partial, three-agent, and bi-valued results are not substituted for the input's arbitrary-agent exact-search target.
+
+The unrestricted problem is not settled by the work below. The two-agent and proportional-valuation results are proved directly, without relying on the three-agent theorem.
+
+\section{ATTACK PLAN}
+\textbf{Proof track.} Compress EFX into worst-removal inequalities; search for an assignment invariant using decreasing-size scheduling; use a cut-and-choose construction for two agents; examine whether exhaustive exact search can be replaced by a polynomial update rule.
+
+\textbf{Disproof track.} Test common EF1 algorithms against the stronger inequalities; enumerate small positive matrices; reduce a putative real-valued nonexistence example to a positive integer matrix and a finite linear-arithmetic search specification.
+
+\textbf{Tools and roles.} Additivity compresses verification; least-load scheduling gives EFX for proportional valuations; cut-and-choose handles arbitrary two-agent valuations; exact enumeration avoids numerical false positives; strict-inequality perturbation removes irrational and zero-value obstructions; homogeneity normalizes violation margins; disjunctive linear constraints encode nonexistence; independent-agent scaling preserves fairness inequalities.
+
+\textbf{Tiny cases.} If $m\le n$, giving at most one good to each agent is EFX, since removing the only good from another nonempty bundle leaves value zero. The $n=2,m=3$ example below refutes a tempting round-robin argument, not existence.
+
+\section{WORK}
+\begin{lemma}[Worst-removal verification]\label{lem:verify}
+Let $B_{ij}=v_i(A_j)$. If $A_j$ contains at least one good with $v_{ig}>0$, put $d_{ij}=\min\{v_{ig}:g\in A_j,\ v_{ig}>0\}$. Then $A$ is EFX if and only if
+\[
+ B_{ii}\ge B_{ij}-d_{ij}
+\]
+for every such pair $(i,j)$. Pairs having no positively valued good in $A_j$ impose no constraint. The property can be checked in polynomial bit time.
+\end{lemma}
+\begin{proof}
+For fixed $i,j$, the largest residual value $v_i(A_j)-v_{ig}$ among admissible removals is attained at a smallest positive $v_{ig}$. Satisfying its inequality is necessary and sufficient for satisfying all the others. Compute all bundle sums and positive minima by inspecting the matrix and the allocation; at most $O(nm+n^2)$ additions and comparisons are needed after array initialization. Rational sums and comparisons involve a polynomial number of input rationals and therefore polynomial bit lengths. Checking that the input is a complete partition is also polynomial.
+\end{proof}
+
+\begin{theorem}[A strongly polynomial proportional-valuation construction]\label{thm:common}
+Suppose $v_{ig}=\alpha_iw_g$ for some $\alpha_i>0$ and $w_g\ge0$. Sort goods by nonincreasing $w_g$ and give each successive good to a bundle of minimum current $w$-load, resolving ties by a fixed rule. The resulting complete allocation is EFX. The arithmetic operation count is $O(m\log(m+1)+nm)$, and rational input gives polynomial-size encodings.
+\end{theorem}
+\begin{proof}
+All agents' EFX comparisons are equivalent after division by their positive $\alpha_i$, so it suffices to use the common weights $w$. Let $A_j$ contain a positive-weight good and let $g_j$ be the last positive-weight good assigned to it. Decreasing order makes $w_{g_j}$ a smallest positive weight in that bundle. Immediately before its assignment, bundle $j$ has load $\ell_j\le\ell_i$ for every bundle $i$. No later positive weight is assigned to $j$ by the definition of $g_j$; later zero weights do not change its load. Therefore
+\[
+ w(A_j)-w_{g_j}=\ell_j\le\ell_i\le w(A_i).
+\]
+This is the worst-removal inequality in Lemma~\ref{lem:verify}. Bundles with only zero-weight goods impose no positive-good constraint. Thus all EFX inequalities hold.
+
+Sorting takes $O(m\log(m+1))$ comparisons and finding a minimum load by scanning $n$ bundles per assignment takes $O(nm)$ operations. Loads are sums of at most $m$ rational weights, so encodings stay polynomial. From an explicit matrix known to be proportional, one can take any agent's row as the weights; positive scaling leaves both the ordering and EFX unchanged. The all-zero case can be allocated arbitrarily.
+\end{proof}
+
+\begin{theorem}[Two-agent exact algorithm]\label{thm:two}
+For two agents with arbitrary nonnegative rational additive valuations, a complete EFX allocation is computable with a strongly polynomial number of arithmetic operations and polynomial-size encodings.
+\end{theorem}
+\begin{proof}
+Agent 1 partitions the goods into two bundles using the preceding decreasing-weight least-load algorithm with weights $w_g=v_{1g}$. The proof of Theorem~\ref{thm:common}, applied to two copies of that row, shows that either assignment of these bundles is EFX from agent 1's perspective. Agent 2 receives a bundle of weakly greater value according to $v_2$, and agent 1 receives the other. Agent 1's EFX comparisons remain valid by the cutter's property. Agent 2 does not envy agent 1 even before a good is removed, and nonnegative values imply that removal cannot increase the other bundle's value. Hence agent 2 is EFX as well. Sorting, scheduling, and comparing the two bundle values use $O(m\log(m+1))$ operations with polynomial-size rational sums.
+\end{proof}
+
+\subsection{Explicit counterexample to an EF1-based proof strategy}
+Consider two agents and three goods, with rows
+\[
+ v_1=(10,1,2),\qquad v_2=(100,2,1).
+\]
+Round robin starting with agent 1 gives agent 1 good 1, agent 2 good 2, and agent 1 good 3. Thus $A_1=\{1,3\}$ and $A_2=\{2\}$. Agent 2 values its own bundle at 2. Removing good 3, which it values positively, from $A_1$ leaves value 100, so the EFX inequality fails. Removing good 1 instead leaves value 1, which is at most 2. Agent 1 already prefers its own bundle. Thus this allocation is EF1 (envy can be removed by \emph{some} good) but not EFX (envy must be removed by \emph{every} positively valued good). It is not a nonexistence counterexample: Theorem~\ref{thm:two} supplies an EFX allocation for the same instance.
+
+\begin{proposition}[A real counterexample would yield positive integer data]\label{prop:integer}
+For fixed finite $n,m$, if some real nonnegative additive valuation matrix admits no complete positive-good EFX allocation, then a strictly positive integer valuation matrix of the same dimensions also admits none.
+\end{proposition}
+\begin{proof}
+There are $n^m$ allocations. For each allocation $A$, non-EFX supplies indices $i,j$ and $g\in A_j$ with
+\[
+ v_{ig}>0,\qquad D_{A,i,j,g}(v):=
+ v_i(A_j\setminus\{g\})-v_i(A_i)>0.
+\]
+Choose one witness for each allocation. There are finitely many chosen strict inequalities, each depending continuously and linearly on the matrix entries. They all remain strict on a sufficiently small neighborhood of the given matrix. Adding a sufficiently small positive number to every entry produces a strictly positive matrix in that neighborhood. Approximate it closely enough by a strictly positive rational matrix that all chosen inequalities still hold. Each allocation retains its original selected violation, so none is EFX. Multiply every entry by a common positive integer denominator. This preserves all strict inequalities and produces the required positive integer matrix.
+\end{proof}
+
+\begin{corollary}[Exact finite linear-arithmetic counterexample search]\label{cor:search}
+For fixed $n,m$, existence of any non-EFX instance is equivalent to feasibility of the following disjunctive linear system in the entries of $v$:
+\[
+ v_{ig}\ge1\quad(i,g),\qquad
+ \bigwedge_{A\text{ complete}}
+ \bigvee_{\substack{i,j\in[n],\ g\in A_j}}
+ \bigl[D_{A,i,j,g}(v)\ge1\bigr].
+\]
+The disjunction for an empty set of potential witnesses is false.
+\end{corollary}
+\begin{proof}
+Every solution has all values positive and a strict EFX violation for each allocation. Conversely, Proposition~\ref{prop:integer} gives a positive integer counterexample whenever any counterexample exists. For each allocation its strictly positive integer violation is at least one, and every entry is at least one. Hence the system is feasible. Equivalently, one can scale the finitely many positive entries and selected positive margins of a real positive counterexample by a common sufficiently large factor.
+\end{proof}
+This formula has one disjunctive clause for every allocation. It is a complete search specification, not a polynomial-size algorithm when $n,m$ vary. Choosing one witness in every clause reduces it to finitely many rational linear-feasibility problems, but the number of choices can be enormous. Restricting to one bundle-size pattern would not test all allocations and would not certify nonexistence.
+
+\section{VERIFICATION}
+\textbf{Executed finite searches.} All $2^{12}=4,096$ matrices for $n=3,m=4$ with entries in $\{1,2\}$ were tested by exact integer allocation enumeration, and every matrix had an EFX witness. In addition, 1,000 generated positive integer matrices with $n=4,m=6$ and entries in $\{1,\ldots,50\}$ had EFX witnesses. These are finite tests, not a proof for all matrices or all dimensions. The round-robin violation was checked by the same verifier.
+
+For reproducibility, the bundled \texttt{checks/fairness\_check.cpp} enumerates allocation labels with good 1 as the least significant base-$n$ digit. It uses integer sums only. Generated matrices use unsigned 32-bit state initialized to 20261009, update $s\leftarrow1664525s+1013904223\pmod{2^{32}}$, and entry $1+(s\bmod50)$, in row-major order. The 1,000 goods instances are generated before the separate chores batch. The following smaller standalone checker reproduces the exhaustive goods grid:
+\begin{lstlisting}[language=Python]
+from itertools import product
+
+def efx_goods(v,a):
+    n,m=len(v),len(a)
+    bundles=[[g for g in range(m) if a[g]==i] for i in range(n)]
+    for i in range(n):
+        own=sum(v[i][g] for g in bundles[i])
+        for j in range(n):
+            positive=[v[i][g] for g in bundles[j] if v[i][g]>0]
+            if positive and own < sum(v[i][g] for g in bundles[j])-min(positive):
+                return False
+    return True
+
+allocations=list(product(range(3),repeat=4))
+checked=0
+for flat in product((1,2),repeat=12):
+    v=[flat[4*i:4*i+4] for i in range(3)]
+    assert any(efx_goods(v,a) for a in allocations)
+    checked+=1
+assert checked==4096
+assert not efx_goods(((10,1,2),(100,2,1)),(0,1,0))
+print('4096 positive goods matrices and round-robin failure verified')
+\end{lstlisting}
+
+\textbf{Adversarial audit.} The worst removal uses the smallest \emph{positive} value, not an arbitrary smallest entry. The common-weight proof handles zero-valued goods after positive assignments. The chooser's argument needs nonnegative values. The perturbation proof preserves a chosen strict violation for every allocation simultaneously; perturbing a single allocation would not suffice. No computational search result is extrapolated beyond its specified grid or sample. A deterministic exhaustive algorithm takes $n^m\operatorname{poly}(L)$ time to find a witness or report none; this does not meet the polynomial target.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest fully proved partial result.} Complete exact EFX allocations have strongly polynomial arithmetic constructions for arbitrary two-agent instances and for proportional valuations with any number of agents. Verification is polynomial. Any real nonexistence example can be converted to a strictly positive integer one of the same dimensions, and an exact finite counterexample-search formula is given. The executed finite searches found no nonexistence example.
+
+\textbf{Exact first gap.} No construction proves complete EFX existence for all nonnegative additive rational instances with arbitrary $n$, and no matrix with no complete EFX allocation is produced. Even a general existence argument would still require a polynomial bit-time search bound to solve the literal algorithmic question.
+
+\textbf{Three next targets.} First, test the disjunctive linear system in dimensions beyond established existence classes while retaining every allocation pattern. Second, seek an invariant for adding one good without leaving charity or weakening EFX; a proof must cover heterogeneous agent rankings, unlike the least-load argument. Third, if an existence process is found, prove a polynomial bound on its number of reassignments rather than using finite termination alone.
+
+\textbf{Minimal-counterexample information.} The elementary proofs exclude $n\le2$, $m\le n$, and proportional valuations. The cited three-agent existence theorem additionally excludes $n=3$; that external theorem is not independently reproved here. A putative nonexistence example can be taken to have strictly positive integer entries and heterogeneous valuation rows. A counterexample to polynomial-time search could instead be a complexity obstruction even when allocations exist; a slow round-robin repair rule would not establish it.
+
+\end{document}

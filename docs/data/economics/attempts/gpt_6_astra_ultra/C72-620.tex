@@ -1,0 +1,133 @@
+% ECONOMICS_PROBLEM: {"id": "C72-620", "title": "Structural classes with polynomial-time exact bimatrix Nash computation", "jel_code": "C72", "source_id": "OP-0135"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{Structural classes with polynomial-time exact bimatrix Nash computation\\[4pt]\large An exact convex-programming reduction for strategically symmetric stable games}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Question and scope}
+The recorded question seeks substantively motivated structural families of rational bimatrix games with polynomial-time exact Nash computation. The survey \cite{survey} proposes identifying further tractable classes. An algorithm for one familiar tractable structure does not settle that open classification agenda. Here a complete reduction is given for games strategically equivalent to symmetric games whose payoff map is nonincreasing on the simplex. The relation to the established stable-games literature \cite{stable} is explicit; no claim that this is a newly discovered class is made.
+
+The reduction is useful because it handles an unbounded number of actions, arbitrary rational coefficients, nonzero-sum games, degeneracy, and potentially multiple symmetric equilibria. Its output is an exact rational Nash equilibrium, not a numerical approximate equilibrium or a correlated equilibrium. The only algorithmic result invoked without reproving its general optimization machinery is polynomial-time rational convex quadratic programming \cite{qp}.
+
+\section*{A checkable structural promise}
+Let both players have $n\ge2$ actions; write $\Delta_n=\{x\ge0:\mathbf1^Tx=1\}$. The input consists of rational matrices $A,B$ and a rational witness $(a,b,M,r,s)$ satisfying
+\[
+ a,b>0,\quad A_{ij}=aM_{ij}+r_j,\quad B_{ij}=bM_{ji}+s_i,
+ \tag{1}
+\]
+where $M\in\mathbb Q^{n\times n}$ and $r,s\in\mathbb Q^n$. The structural inequality is
+\[
+ z^TMz\le0\quad\hbox{for every }z\in\R^n\hbox{ with }\mathbf1^Tz=0.
+ \tag{2}
+\]
+The running-time parameter is the total binary encoding length of the game and witness. The witness describes payoffs and a matrix inequality; it does not contain an equilibrium or its support. Offsets $r_j$ and $s_i$ depend only on the opponent's pure action, so they leave each player's incentives unchanged. Positive $a,b$ permit differing cardinal utility scales.
+
+\begin{proposition}[Recognition of the supplied promise]
+Conditions (1)--(2) can be checked in polynomial bit time. For a valid witness, $(x,x)$ is a Nash equilibrium of $(A,B)$ if and only if $x$ is a best response to itself in the symmetric game $(M,M^T)$.
+\end{proposition}
+\begin{proof}
+The equalities and positive scalars in (1) are checked by rational arithmetic. Let $R$ be the $n\times(n-1)$ matrix with columns $e_i-e_n$. Every tangent vector is uniquely $Ru$. Condition (2) is equivalent to positive semidefiniteness of the rational symmetric matrix
+\[
+ Q=-\tfrac12 R^T(M+M^T)R.
+\]
+This can be tested by exact symmetric elimination. A negative diagonal entry disproves positive semidefiniteness. If a diagonal is zero but its row has a nonzero off-diagonal entry, restricting to those two coordinates gives a quadratic taking negative values. A zero row and column may be removed. Otherwise a positive diagonal pivot is eliminated by completing the square; the original matrix is positive semidefinite exactly when its Schur complement is. There are at most $n-1$ eliminations. Fraction-free elimination, or determinant bounds on the rational Schur complements, bounds intermediate bit lengths polynomially in the input length. This establishes the promised recognition bound, without claiming an algorithm for discovering an unspecified witness.
+
+Against $y$, row payoffs are $aMy+\mathbf1(r^Ty)$, so best responses are exactly those for $My$. Against $x$, column payoffs are $bMx+\mathbf1(s^Tx)$ because $B^Tx=bMx+\mathbf1(s^Tx)$. This proves the equilibrium equivalence when $x=y$.
+\end{proof}
+
+\section*{A convex gap with an exact zero}
+Define the symmetric best-response gap
+\[
+ f(x)=\max_i(Mx)_i-x^TMx\quad(x\in\Delta_n).
+ \tag{3}
+\]
+It is nonnegative, since $x^TMx$ is the $x$-weighted average of the entries of $Mx$. It vanishes exactly when every action used by $x$ is a best response to $x$.
+
+\begin{theorem}[Zero-gap convex reduction]
+Under (2), $f$ is convex on $\Delta_n$, its minimum is zero, and every minimizer gives an exact Nash equilibrium $(x,x)$ of the original game. Equivalently one may solve
+\[
+ \min_{x,t}\ t-x^TMx\quad\text{subject to}\quad
+ x\in\Delta_n,\quad t\ge(Mx)_i\quad(i=1,\ldots,n).
+ \tag{4}
+\]
+The existence of a zero-gap point follows from the optimization problem itself, without requiring a separate fixed-point existence theorem.
+\end{theorem}
+\begin{proof}
+Along any feasible line with direction $z$ of coordinate sum zero, the second derivative of $-x^TMx$ is $-2z^TMz\ge0$. The maximum of linear functions is convex, proving convexity. Compactness gives a minimizer $x$ of (3). We give the optimality calculation carefully, including possible ties and zero coordinates.
+
+Eliminate $x_n=1-\sum_{i<n}x_i$ in (4). The remaining quadratic has positive semidefinite Hessian by (2), and the constraints are linear. There is a relative strictly feasible point for its inequalities: choose $x$ with all coordinates positive and choose $t$ greater than every $(Mx)_i$. Thus the convex multiplier optimality conditions apply. The multipliers on $t\ge(Mx)_i$ are nonnegative and, by stationarity in $t$, sum to one. Call their vector $y\in\Delta_n$. Complementarity means $y$ is supported on indices maximizing $(Mx)_i$. The remaining first-order condition is
+\[
+ (z-x)^T\{M^Ty-(M+M^T)x\}\ge0
+ \quad\hbox{for all }z\in\Delta_n.
+ \tag{5}
+\]
+This condition also follows from the subgradient of the finite maximum in (3) and the normal cone to the simplex; it includes boundary minimizers.
+
+Take $z=y$ in (5), and put $d=y-x$. Because $y$ is supported on best responses, $d^TMx=f(x)$. The left side becomes
+\[
+ d^T\{M^Td-Mx\}=d^TMd-f(x).
+\]
+It is nonnegative by (5), whereas $d^TMd\le0$ by (2). Hence $f(x)\le0$. The opposite inequality was already proved, so $f(x)=0$. The gap characterization and the first proposition now imply the Nash inequalities for both original players. Conversely a symmetric best response has zero gap and therefore minimizes (4).
+\end{proof}
+
+\begin{corollary}[Exact polynomial bit complexity]
+There is an algorithm polynomial in the total rational input length that, on every valid supplied witness, returns a rational pair $(x,x)$ satisfying all Nash inequalities exactly. It either rejects an invalid witness or performs the preceding reduction. This assertion is polynomial bit complexity, not strongly polynomial complexity.
+\end{corollary}
+\begin{proof}
+After eliminating $x_n$, (4) is a rational convex quadratic program with polynomially many variables and linear constraints and a positive semidefinite quadratic part. It is feasible and has an attained finite minimum. The rational convex quadratic programming theorem of Kozlov, Tarasov and Khachiyan \cite{qp} supplies an exact rational minimizer in polynomial bit time. There is no appeal to rounding a generic approximate Nash equilibrium.
+
+For completeness, rational output is consistent even with degeneracy. At an optimal point, fix the active linear constraints. Stationarity, feasibility of those equalities, dual nonnegativity and zero multipliers on inactive constraints form a rational linear system with inequalities in primal and dual variables: the gradient of the quadratic is linear. This system has a real solution and hence a rational basic solution after removal of lineality. Determinant bounds give polynomial bit lengths. Every such solution is optimal by convexity. Selecting the correct active face by exhaustive enumeration would be inefficient; the cited polynomial quadratic-programming algorithm is precisely what avoids that enumeration. Finally the preceding theorem converts its minimizer into an exact equilibrium.
+\end{proof}
+
+\begin{proposition}[Uniqueness under strict tangent negativity]
+If $z^TMz<0$ for every nonzero tangent vector, there is exactly one symmetric equilibrium. This does not imply uniqueness of the unrestricted bimatrix equilibrium.
+\end{proposition}
+\begin{proof}
+If $x,y$ are symmetric equilibria, best-response optimality gives $x^TMx\ge y^TMx$ and $y^TMy\ge x^TMy$. Adding yields $(x-y)^TM(x-y)\ge0$. Strict tangent negativity forces $x=y$. For the distinction, take $M=-I_n$. The symmetric equilibrium is uniform, but for $n\ge2$ each pure pair $(e_i,e_j)$ with $i\ne j$ is also a bimatrix equilibrium: each player obtains zero rather than minus one by avoiding the opponent's action.
+\end{proof}
+
+\section*{Scope beyond zero-sum examples}
+Take any rational skew-symmetric $C$ and any positive rational diagonal $D$, and set $M=C-D$. Then $z^TMz=-z^TDz<0$ for every nonzero $z$. The algorithm applies for every dimension, with $A=M$, $B=M^T$. Here $A+B=-2D$ has rank $n$, so this is not a bounded-rank-sum family and it is not literally zero-sum. With $C=0$, the unique symmetric equilibrium has $x_i=d_i^{-1}/\sum_jd_j^{-1}$, because all used payoffs $-d_ix_i$ must coincide; positivity of this vector verifies the formula directly.
+
+There are also nonpotential examples. For $n\ge3$, insert
+\[
+ C_{\{1,2,3\},\{1,2,3\}}=
+ \begin{pmatrix}0&2&-2\\-2&0&2\\2&-2&0\end{pmatrix}
+\]
+and put every other entry zero, with $D=I_n$. If a two-player exact potential existed, the mixed rectangular difference of $A-B$ on any two rows and two columns would vanish: this follows by summing the potential changes around the four unilateral deviations of that rectangle. On rows $1,2$ and columns $2,3$ that difference of $A-B=2C$ is $12$, so no such potential exists. In this particular example $C\mathbf1=0$, and the uniform vector is the unique symmetric equilibrium; the general reduction does not require this simplifying identity.
+
+The economic restriction is diminishing relative returns to a change in the population's action distribution: $(x-y)^T(Mx-My)\le0$. This is the linear stable-game condition studied in \cite{stable}. Consequently the construction clarifies an exact computational consequence of established structure, rather than supplying an unsupported novelty claim. Recognition without a supplied symmetrizing witness, asymmetric stable structures, and substantively new classes outside existing monotonicity and potential frameworks remain open parts of the recorded agenda.
+
+\begin{thebibliography}{9}
+\bibitem{survey} H. Li, W. Huang, Z. Duan, D. H. Mguni, K. Shao, J. Wang and X. Deng (2023), \emph{A survey on algorithms for Nash equilibria in finite normal-form games}, arXiv:2312.11063. The conclusion's theoretical directions motivate structural tractability. \url{https://arxiv.org/abs/2312.11063}.
+\bibitem{stable} J. Hofbauer and W. H. Sandholm (2009), Stable games and their dynamics, \emph{Journal of Economic Theory} 144(4), 1665--1693.e4. \url{https://doi.org/10.1016/j.jet.2009.01.007}.
+\bibitem{qp} M. K. Kozlov, S. P. Tarasov and L. G. Khachiyan (1980), The polynomial solvability of convex quadratic programming, \emph{USSR Computational Mathematics and Mathematical Physics} 20(5), 223--228. \url{https://doi.org/10.1016/0041-5553(80)90098-1}. Original journal record: \url{https://www.mathnet.ru/eng/zvmmf5189}.
+\end{thebibliography}
+
+\end{document}

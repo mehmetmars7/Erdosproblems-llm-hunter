@@ -1,0 +1,187 @@
+% ECONOMICS_PROBLEM: {"id": "C72-31", "title": "High-precision information-value-free coarse correlated equilibrium", "jel_code": "C72", "source_id": "OP-0145"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries High-precision information-value-free CCE}\par
+\medskip
+{\large C72-31: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+Fix a game representation with a \emph{uniform} polynomial-time exact expectation evaluator. An input $d$ of length $L$ lists $k\ge1$ players and nonempty finite action sets $S_i$ explicitly, and describes rational payoffs $u_i:S\to[0,1]$, where $S=\prod_iS_i$. For rational independent mixed strategies, the evaluator returns every pure-deviation expectation in time polynomial in $L$ and the strategies' encoding length. A common denominator $D$ for pure payoffs has polynomial bit length. Fixing this representation and its evaluator is necessary: an unbounded existential assertion that some evaluator exists for each encoding is not a uniform algorithmic interface.
+
+For a distribution $\mu$ on $S$, define the linear quantities
+\[
+ g_{i,b}(\mu)=\sum_{a\in S}\mu(a)[u_i(b,a_{-i})-u_i(a)],
+ \qquad r_i(\mu)=\max_{b\in S_i}g_{i,b}(\mu).
+\]
+The target output is a rational mixture of product distributions of polynomial total encoding length, with $|r_i(\mu)|\le\varepsilon$ for every $i$. Here $\varepsilon\in\Q\cap(0,1)$ is supplied in binary. The first question asks whether one deterministic algorithm runs in $\operatorname{poly}(L,\operatorname{len}(\varepsilon))$ on every input. The second asks whether the search problem is complete for $\mathsf{CLS}=\mathsf{PPAD}\cap\mathsf{PLS}$ under polynomial-time search reductions. These are different questions: class membership or completeness is not by itself a proof of the presence or absence of a polynomial-time algorithm.
+
+\textbf{Stress points.} Regret may be negative for correlated distributions. Ordinary CCE supplies only the upper bound. An exponential number of pure profiles can be described with polynomially many player actions. An exact Nash equilibrium need not be rational, but this does not imply that exact IVFCCEs require irrational outputs.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Ioannis Anagnostides and Weiqiang Zheng, \emph{Algorithmic Collusion and the Complexity of Information-Value-Free Equilibria}, arXiv:2609.22757v1, Section 4.2 and Theorems 4.1--4.2, state CLS membership and a reduction from rational P-matrix LCP, and conjecture CLS-completeness. The same paper distinguishes a $\operatorname{poly}(1/\varepsilon)$ approximation algorithm from the binary-precision question. \url{https://arxiv.org/html/2609.22757v1}. Its abstract reports earlier polynomial-time computation for explicitly represented games. None of these statements is a polynomial-time algorithm for the succinct high-precision target.
+
+The literature results are context, not used to certify a new hardness theorem here. The proofs below concern existence and output size, exact verification, explicit-game computation, and a counterexample to a natural convexification strategy.
+
+\section{ATTACK PLAN}
+\textbf{Proof strategies.} Analyze the regret geometry as a union of rational polytopes; compress an exact equilibrium witness; try to turn expectation access into a separation oracle that avoids enumerating pure profiles.
+
+\textbf{Disproof strategies.} Check whether the output specification itself is impossible at high precision; average exact equilibria to test convexity; attempt to transfer the LCP hardness to an actual impossibility claim. The first two are decidable checks; the third would require a proved complexity separation that is not supplied.
+
+\textbf{Tools and their roles.} Brouwer gives a finite-game Nash witness; affine dependence compresses support; rational-polytope vertices control output bits; total variation controls rounding error; linear-programming feasibility handles explicit tables; regret-feature polytopes expose nonconvexity; the expectation evaluator verifies proposed mixtures; reduction bookkeeping separates hardness from a runtime lower bound.
+
+\textbf{Tiny cases.} A one-player instance is solved exactly by a payoff-maximizing pure action, evaluated by the promised routine. A game with one action for each player has all regrets zero. The two-player coordination example in Section 4 shows that even averaging two exact Nash equilibria can violate the required lower regret bound.
+
+\section{WORK}
+\begin{lemma}[Product distributions have nonnegative regret]\label{lem:product}
+For $\mu=\bigotimes_i x_i$,
+\[
+ r_i(\mu)=\max_b v_{i,b}(x_{-i})-
+             \sum_bx_i(b)v_{i,b}(x_{-i})\ge0.
+\]
+At a Nash equilibrium this expression is zero for every player.
+\end{lemma}
+\begin{proof}
+A convex combination of finitely many real numbers is at most their maximum. The displayed formula follows by conditioning on player $i$'s independent action. At Nash equilibrium every action in the support is a best response, so the convex combination equals the maximum.
+\end{proof}
+
+\begin{lemma}[A real exact witness exists]\label{lem:nash}
+Every finite game in the stated domain has a real product distribution with all $r_i=0$.
+\end{lemma}
+\begin{proof}
+For $x$ in the product of mixed-strategy simplexes write
+$U_i(x)=\sum_bx_i(b)v_{i,b}(x_{-i})$ and
+$h_{i,b}(x)=\max(0,v_{i,b}(x_{-i})-U_i(x))$. Set
+\[
+ T_{i,b}(x)=\frac{x_i(b)+h_{i,b}(x)}{1+\sum_ch_{i,c}(x)}.
+\]
+This is a continuous self-map of a nonempty compact convex finite-dimensional set. Brouwer's fixed-point theorem, in its standard form that every such continuous self-map has a fixed point, applies. At a fixed point let $H_i=\sum_bh_{i,b}$. The fixed-point identity implies $h_{i,b}=x_i(b)H_i$. If $H_i>0$, every action of positive probability has strictly positive excess payoff, and therefore
+$\sum_bx_i(b)[v_{i,b}-U_i]>0$. Its left side equals zero by the definition of $U_i$, a contradiction. Hence $H_i=0$ for every $i$. No pure deviation improves payoff, so $x$ is a Nash equilibrium and Lemma~\ref{lem:product} completes the proof.
+\end{proof}
+
+\begin{theorem}[Polynomial-length rational \emph{exact} IVFCCE witnesses]\label{thm:witness}
+Let $A=\sum_i|S_i|$. There exists an exact IVFCCE supported on at most $A+1$ pure profiles, with rational weights whose encoding length is polynomial in $L$. It is a permitted mixture of product distributions, since a pure profile is a product of point masses.
+\end{theorem}
+\begin{proof}
+For each pure profile $a$ form the $A$-dimensional rational feature vector
+\[
+ f(a)=(u_i(b,a_{-i})-u_i(a))_{i,b}.
+\]
+Let $\mu^*$ be the product witness from Lemma~\ref{lem:nash}. Choose one maximizing action $b_i$ for every player; then
+$g_{i,b_i}(\mu^*)=0$ and all other feature expectations are nonpositive.
+
+A finite convex combination in $\R^A$ can be shortened to at most $A+1$ points while preserving its value. For completeness, if more points have positive weight, their augmented vectors $(1,f(a))\in\R^{A+1}$ are linearly dependent. Choose coefficients $\lambda_a$, not all zero, with $\sum\lambda_a=0$ and $\sum\lambda_af(a)=0$. Some $\lambda_a$ is positive. Subtract $t\lambda_a$ from each weight, where $t=\min_{\lambda_a>0}\mu(a)/\lambda_a$. The new weights remain nonnegative, still sum to one, preserve the feature vector, and have smaller positive support. Iteration terminates. This argument is existential and is not a polynomial-time procedure on a succinctly described exponential profile space.
+
+Let $B\subseteq S$ be the resulting support, $|B|\le A+1$. On these profiles consider the rational polytope
+\[
+ \lambda\ge0,\quad\sum_{a\in B}\lambda_a=1,\quad
+ \sum_{a\in B}\lambda_af_{i,b}(a)\le0\ (i,b),\quad
+ \sum_{a\in B}\lambda_af_{i,b_i}(a)=0\ (i).
+\]
+It is nonempty by the compressed real witness and bounded by the simplex. It has a vertex: successively minimizing coordinates on nonempty compact faces produces a zero-dimensional face, since otherwise a nonzero feasible direction would change a coordinate. At a vertex, a maximal linearly independent set of tight constraints has rank $|B|$; a nonzero null direction would otherwise allow two nearby feasible points whose midpoint is the vertex.
+
+Consequently the vertex coordinates solve a nonsingular rational system of order at most $A+1$. Multiply feature rows by $D$. Their integer entries have absolute value at most $D$, and the normalization row has entries one. The determinant expansion bounds the integer determinants by $|B|!\max(1,D)^{|B|}$. Cramer's rule therefore gives polynomial-bit rational weights because $A$ and $\log D$ are polynomially bounded in $L$. The resulting distribution has each regret both at most zero and at least its zero-valued selected feature, hence exactly zero.
+\end{proof}
+
+\begin{proposition}[Exact verification of the required output]\label{prop:verify}
+A rational polynomial-length mixture of rational products can be checked for $|r_i|\le\varepsilon$ in polynomial time under the specified expectation interface.
+\end{proposition}
+\begin{proof}
+For each mixture component and each pure deviation $b$, evaluate $v_{i,b}(x_{-i})$ exactly. Its realized payoff is $\sum_bx_i(b)v_{i,b}(x_{-i})$. Take the rational mixture-weighted averages of the deviations minus the realized payoffs and then their finite maxima. There are polynomially many components and explicitly listed actions; the evaluator and all rational additions, multiplications and comparisons have polynomial bit complexity. Probability nonnegativity and normalization can also be checked exactly.
+\end{proof}
+
+\begin{proposition}[A simple one-product approximate witness]
+For every $\varepsilon>0$, there exists a product witness with all strategy denominators at most $Q=\lceil2A/\varepsilon\rceil$ and $0\le r_i\le\varepsilon$.
+\end{proposition}
+\begin{proof}
+Round a real Nash strategy down to multiples of $1/Q$ in all but one coordinate and put the remaining probability in that coordinate. For player $i$ the total-variation distance is at most $(|S_i|-1)/Q$. By telescoping the factors in a product distribution, the total-variation distance between the products is at most the sum of the marginal distances. A function valued in $[0,1]$ changes its expectation by no more than total variation: this follows by separating the positive and negative parts of the signed difference measure. Every pure-deviation payoff and realized payoff therefore changes by at most $A/Q$. The maximum regret changes by at most $2A/Q\le\varepsilon$. At the rounded product, the lower bound zero follows from Lemma~\ref{lem:product}. The denominator has $O(\log A+\log(1/\varepsilon))$ bits; finding this rounding without the real Nash witness is a separate computational task.
+\end{proof}
+
+\begin{theorem}[Exact polynomial-time algorithm for explicit payoff tables]\label{thm:explicit}
+If all pure payoffs are explicitly listed, an exact IVFCCE can be found in time polynomial in that table's bit length.
+\end{theorem}
+\begin{proof}
+For every tuple $b=(b_1,\ldots,b_k)\in S$, solve the rational feasibility problem
+\[
+ \mu\in\Delta(S),\qquad
+ g_{i,c}(\mu)\le0\ \ (i,c),\qquad
+ g_{i,b_i}(\mu)=0\ \ (i).
+\]
+The standard polynomial-time rational linear-programming theorem decides feasibility and returns a rational feasible point with polynomial encoding length when one exists. Its hypotheses hold: each program has $|S|$ variables, polynomially many explicitly given rational constraints and polynomial-size coefficients. There are $|S|$ such programs, and $|S|$ is bounded by the explicit table size. At least one program is feasible by Lemma~\ref{lem:nash}. Every returned feasible point has all maximum regrets zero by the equality and inequality constraints. An explicit list of its pure-profile weights is already polynomial in the table size. The argument does not apply to succinct games, in which $|S|$ can be exponential in $L$.
+\end{proof}
+
+\subsection{Counterexample to convex averaging}
+Take two players with actions $0,1$ and identical payoffs $u_i(a)=1$ if the two actions coincide, and zero otherwise. Both point masses at $(0,0)$ and $(1,1)$ are exact Nash equilibria and hence exact IVFCCEs. Their equal mixture gives each player expected payoff 1. Committing to either fixed action gives payoff $1/2$. Consequently both regrets equal $-1/2$. The mixture is an exact CCE but is not an $\varepsilon$-IVFCCE for any $\varepsilon<1/2$.
+
+Thus the feasible set is not convex. In fact it is a union, over tuples $b$, of the rational polytopes used in Theorem~\ref{thm:explicit}; the tuple need not be known in advance. Convex-combining feasible solutions or solving only the ordinary CCE inequalities cannot bypass this selection issue.
+
+\section{VERIFICATION}
+\textbf{Exact tiny-instance check.}
+\begin{lstlisting}[language=Python]
+from fractions import Fraction as F
+from itertools import product
+S=list(product((0,1),repeat=2))
+def u(a): return F(int(a[0]==a[1]))
+def regrets(mu):
+    ans=[]
+    for i in range(2):
+        dev=[]
+        for b in (0,1):
+            total=F(0)
+            for a,p in mu.items():
+                ap=list(a);ap[i]=b
+                total+=p*(u(tuple(ap))-u(a))
+            dev.append(total)
+        ans.append(max(dev))
+    return ans
+assert regrets({(0,0):F(1)})==[0,0]
+assert regrets({(1,1):F(1)})==[0,0]
+assert regrets({(0,0):F(1,2),(1,1):F(1,2)})==[F(-1,2),F(-1,2)]
+print('exact regrets and nonconvexity verified')
+\end{lstlisting}
+
+\textbf{Adversarial review.} The witness theorem does not round an irrational exact Nash equilibrium and call the result exact; it moves to a rational feasible polytope on a compressed support. Compression alone preserves a potentially irrational feature vector, so the separate rational-vertex step is essential. The explicit-table algorithm enumerates an exponential object only when it is already part of the input. Binary precision is not replaced by unary precision. The CCE counterexample disproves an algorithmic shortcut, not the existence of a different polynomial-time algorithm. The evaluator is assumed uniform at the representation level.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED for the succinct high-precision algorithm and for CLS-completeness.}
+
+\textbf{Strongest checked partial result.} Every instance has a polynomial-length rational \emph{exact} IVFCCE supported on at most $\sum_i|S_i|+1$ pure profiles. Proposed mixtures are exactly verifiable, and explicit-table games admit the fully specified polynomial-time LP-enumeration algorithm. Convex averaging of exact equilibria demonstrably fails.
+
+\textbf{Exact first gap.} There is no proved polynomial-time method here for selecting the active zero-regret action tuple and its supporting profiles from only a succinct polynomial-expectation representation. For CLS-completeness, the separate missing step is a reduction from a CLS-complete search problem, not merely the cited P-LCP reduction.
+
+\textbf{Three next targets.} First, build a separation/optimization oracle for a fixed active tuple using the special regret-feature structure, or give a precise hardness reduction for that oracle. Second, seek a polynomial potential path through active-tuple changes whose bit complexity does not depend on $1/\varepsilon$. Third, test whether a known CLS-complete continuous optimization problem can be encoded while preserving the exact expectation property and the lower regret bound.
+
+\textbf{Minimal-obstruction information.} There is no instance-level nonexistence counterexample, by Theorem~\ref{thm:witness}. Any negative answer about polynomial time needs a computational lower-bound argument in the declared model, not an irrationality or output-size objection.
+
+\end{document}
