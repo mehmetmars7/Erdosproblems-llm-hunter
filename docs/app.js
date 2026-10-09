@@ -150,8 +150,9 @@ function getUniqueModels(attacks) {
     }))];
 }
 
-function getModelLabels(attacks) {
+function getModelLabels(attacks, { fullNames = false } = {}) {
     const shorten = name => {
+        if (fullNames) return name.replace(/_/g, ' ').trim().replace(/\s+/g, ' ').toLowerCase();
         if (/^openai$/i.test(name)) return 'openai';
         if (/gpt[ _]6[ _]astra[ _]ultra/i.test(name)) {
             return name.includes('(collection)') ? 'gpt 6 (collection)' : 'gpt 6';
