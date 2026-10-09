@@ -1,0 +1,188 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-17: Maxmin equality with the concavified nonrevealing value}
+\label{sec:C73-17}
+\noindent\textbf{Input:} \texttt{C73-17.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+Let $K,I,J$ be nonempty finite sets, let $\mathbb N=\{0,1,\ldots\}$, and put $\Omega=(I\times J)^{\mathbb N}$ with its product Borel sigma-algebra. A payoff is a bounded Borel map $f:K\times\Omega\to\mathbb R$. The informed maximizer knows $k\sim p\in\Delta(K)$; both players observe all past joint actions, but choose the next actions simultaneously and independently conditional on their information. Write
+\[
+ V(p)=\sup_\sigma\inf_\tau\mathbb E_{p,\sigma,\tau}f,
+ \qquad u(p)=\operatorname{val}\left(\sum_kp_kf(k,\cdot)\right).
+\]
+The second expression is the complete-information bounded-Borel Blackwell value. The external Blackwell determinacy theorem \cite{martin-blackwell} states that, for two players with finite action sets, simultaneous moves, public observation of past joint actions, and a bounded Borel payoff of the infinite play, behavioral maxmin and minimax are equal. Each payoff $\sum_k p_kf(k,\cdot)$ meets these hypotheses. The theorem yields a value and $\eta$-optimal strategies for every $\eta>0$, not necessarily optimal-strategy attainment. Define
+\[
+ (\operatorname{cav}u)(p)=\sup_{p=\sum_{r=1}^R\lambda_rq_r}
+       \sum_{r=1}^R\lambda_ru(q_r),
+\]
+where $R$ is a positive integer, $\lambda_r\geq0$, $\sum_r\lambda_r=1$, and $q_r\in\Delta(K)$.
+
+\textbf{Literal target.} Give a structural, noncircular characterization of
+\[
+ \mathcal C=\{f:\ \forall p\in\Delta(K),\ V(p)=(\operatorname{cav}u)(p)\}.
+\]
+This is not the assertion that every bounded Borel payoff belongs to $\mathcal C$. A payoff outside $\mathcal C$ therefore refutes that stronger assertion, not the characterization problem. No correction to the displayed target is needed. Priors on faces, singleton action sets, lack of optimal strategies, and distinctions between maxmin and minimax are stress points.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Castellon Koltun, Lehrer and Solan, Theorem 2.5 of \cite{tail}, prove equality for payoffs invariant under changes to finitely many action coordinates. Their Section 5 asks for a broader characterization. Their proof also records the universal lower bound proved below. This note does not claim novelty for that bound or reprove their tail-payoff theorem. All new calculations below concern finite-prefix examples and explicitly stated subclasses. The context check was performed on 9 October 2026 and is not an exhaustive exclusion of later work.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Classification and tools.} This is a repeated-game information problem. The useful tools are: finite convex decompositions (split a prior); behavioral realization (implement private mixtures without extra observable signals); equality of cylinder probabilities (identify infinite-play laws); concave envelopes (organize the lower bound); finite minimax (solve cylinder payoffs); posterior martingales (a possible route beyond cylinders); tail invariance (remove the cost of finite initial play).
+
+\textbf{Proof tracks.} First prove concavity of $V$ directly with behavioral strategies. Then identify structural subclasses where an uninformed upper bound matches it. \textbf{Disproof tracks.} Test a first-stage payoff, push the prior to the boundary, and make the informed best row depend on the type. The best tractable path is an exact two-type cylinder calculation plus the general lower bound.
+
+\subsection*{4) WORK}
+\begin{lemma}[Behavioral implementation of a finite private mixture]
+For every finite decomposition $p=\sum_r\lambda_rq_r$ and informed strategies $\sigma^r$, there is an informed behavioral strategy $\sigma$ such that, for every uninformed behavioral strategy $\tau$,
+\[
+ \mathbb P_{p,\sigma,\tau}=\sum_r\lambda_r\mathbb P_{q_r,\sigma^r,\tau}
+ \quad\text{on }K\times\Omega.
+\]
+\end{lemma}
+\begin{proof}
+For $p_k>0$ set $\pi_r(k)=\lambda_rq_r(k)/p_k$. These numbers sum to one. For a public history $h=((i_0,j_0),\ldots,(i_{t-1},j_{t-1}))$, let
+\[
+ L_r(k,h)=\prod_{s<t}\sigma^r(k,h_s)(i_s),
+ \qquad D(k,h)=\sum_r\pi_r(k)L_r(k,h),
+\]
+where $h_s$ is the prefix of length $s$. If $D(k,h)>0$, prescribe
+\[
+ \sigma(k,h)(i)=\frac{\sum_r\pi_r(k)L_r(k,h)\sigma^r(k,h)(i)}{D(k,h)}.
+\]
+If the denominator is zero, or $p_k=0$, choose any distribution. Multiplying these conditional probabilities along a history telescopes: the product of the maximizer's probabilities is $D(k,h)$. The product of the opponent's probabilities is $\prod_{s<t}\tau(h_s)(j_s)$, independent of $r$ and $k$. Consequently both sides in the lemma assign the same probability to every cylinder fixing $k$ and a finite history. Cylinders form a generating algebra, and two probability measures agreeing there agree on its generated sigma-algebra. This proves equality of laws, including all bounded Borel expectations. No infinite-play payoff continuity or optimal-strategy attainment has been assumed.
+\end{proof}
+
+\begin{proposition}[Universal checked lower bound]
+For every bounded Borel $f$, $V$ is concave and $V\geq\operatorname{cav}u$ on the entire simplex.
+\end{proposition}
+\begin{proof}
+Fix a finite prior decomposition and $\eta>0$. Choose $\sigma^r$ guaranteeing at least $V(q_r)-\eta$ against every $\tau$, using the definition of the supremum. The preceding lemma gives, for every $\tau$,
+\[
+ \mathbb E_{p,\sigma,\tau}f
+ =\sum_r\lambda_r\mathbb E_{q_r,\sigma^r,\tau}f
+ \geq\sum_r\lambda_rV(q_r)-\eta.
+\]
+Taking an infimum, a supremum, and then $\eta\downarrow0$ proves concavity. Ignoring the type permits the maximizer to guarantee $u(p)-\eta$, so $V(p)\geq u(p)$. Concavity then gives $V(p)\geq\sum_r\lambda_ru(q_r)$ for every finite decomposition. Taking their supremum proves the assertion. This establishes the direction any full characterization must complement.
+\end{proof}
+
+\begin{proposition}[A continuous first-stage counterexample to universal equality]
+Let $K=I=J=\{0,1\}$ and let $f$ depend only on the first actions, with type matrices
+\[
+ A^0=\begin{pmatrix}1&0\\0&0\end{pmatrix},\qquad
+ A^1=\begin{pmatrix}0&0\\0&1\end{pmatrix}.
+\]
+For $p=\Pr(k=0)$,
+\[
+ u(p)=(\operatorname{cav}u)(p)=p(1-p),\qquad
+ V(p)=\min\{p,1-p\}.
+\]
+In particular $V(1/2)=1/2>1/4=(\operatorname{cav}u)(1/2)$.
+\end{proposition}
+\begin{proof}
+The nonrevealing matrix is $\operatorname{diag}(p,1-p)$. If its maximizer assigns probability $x$ to row zero, the minimum over columns is $\min\{px,(1-p)(1-x)\}$. For $0<p<1$, this is maximized at $x=1-p$ and equals $p(1-p)$. At $p=0,1$, its value is zero. The function $p-p^2$ is concave, so its concave envelope is itself.
+
+In type zero row zero weakly dominates row one, and in type one row one weakly dominates row zero. If the informed player selects that type-dependent row, the payoffs against pure columns are $p$ and $1-p$, guaranteeing their minimum. Conversely, for an arbitrary informed strategy, column zero gives payoff at most $p$ and column one at most $1-p$. Selecting the better of these minimizing columns proves the matching upper bound. Later actions cannot affect a first-stage payoff. The functional is bounded and continuous on the product space; it is not tail invariant. All restrictions of the counterexample are thus verified.
+\end{proof}
+
+\begin{proposition}[A non-tail structural sufficient class]
+Suppose $f(k,\omega)=a_k+h(\omega)$, where $a_k$ are real constants and $h$ is any bounded Borel functional. Then
+\[
+ V(p)=u(p)=(\operatorname{cav}u)(p)=p\cdot a+\operatorname{val}(h).
+\]
+\end{proposition}
+\begin{proof}
+Let $v=\operatorname{val}(h)$. An $\eta$-optimal maximizing strategy in the complete-information game for $h$, used independently of $k$, guarantees $p\cdot a+v-\eta$. An $\eta$-optimal minimizing strategy for $h$ guarantees at most $v+\eta$ against every maximizing behavioral strategy. In particular it has this guarantee against each conditional strategy $\sigma(k,\cdot)$ separately. Averaging over $p$ gives the upper bound $p\cdot a+v+\eta$ in the informed game. Let $\eta\downarrow0$. The nonrevealing equality follows by adding the constant $p\cdot a$ to $h$, and the result is affine in $p$.
+\end{proof}
+
+\begin{proposition}[A finite-cylinder common-best-row test]
+For a first-stage payoff given by matrices $A^k$, suppose
+\[
+ \forall y\in\Delta(J),\qquad
+ \bigcap_{k\in K}\argmax_{i\in I}(A^ky)_i\ne\varnothing.
+\]
+Then $V(p)=u(p)=\operatorname{cav}u(p)$ for every prior.
+\end{proposition}
+\begin{proof}
+The finite Bayesian zero-sum game has pure informed plans $K\to I$. The finite minimax theorem, applied to this finite matrix game, gives
+\[
+ V(p)=\min_{y\in\Delta(J)}\sum_kp_k\max_i(A^ky)_i.
+\]
+The common-maximizer hypothesis makes the summand expression equal to $\max_i\sum_kp_k(A^ky)_i$ for every $y$. A second application of finite minimax identifies its minimum as $u(p)$. Finally the displayed expression for $V$ is an infimum of affine functions of $p$, hence concave. Therefore $u=V$ equals its own concave envelope. The hypothesis is structural but is not claimed necessary.
+\end{proof}
+
+\paragraph{Small-case computation.}
+A singleton type has no information advantage. For the two-type example, exact rational evaluation at $p=0,1/4,1/2,3/4,1$ gives gaps $0,1/16,1/4,1/16,0$. The accompanying script evaluates:
+\begin{lstlisting}
+for p in [0, 1/4, 1/2, 3/4, 1]:  # use exact fractions
+    nonrevealing = p*(1-p)
+    informed = min(p, 1-p)
+    assert informed >= nonrevealing
+\end{lstlisting}
+These five checks supplement, rather than replace, the all-prior formula above.
+
+\subsection*{5) VERIFICATION}
+The mixture lemma was checked at zero-prior types and zero-likelihood histories; arbitrary prescribed actions there do not alter the laws. The proof uses $\eta$-optimal strategies rather than nonexistent maximizers. The cylinder example has exactly the monitoring and independent first-stage actions required by the input. Concavity concerns the maxmin, not equality with the minimax. The separable-type subclass is allowed to depend on an initial block, so tail invariance is not necessary for membership in $\mathcal C$. Conversely the continuous cylinder example shows that mere continuity or finite memory of the payoff does not suffice.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for the structural characterization in the attached file.
+
+\textbf{Strongest checked partial results.} A full proof of the universal lower bound; an exact bounded continuous two-type example with strict inequality at every interior prior; and two proved structural sufficient subclasses, one including non-tail functionals. The cylinder construction is a \emph{full counterexample to universal equality}, not a solution of the actual classification target.
+
+\textbf{Exact first gap.} No necessary-and-sufficient structural condition on a general bounded Borel $f$ has been established that ensures the reverse inequality $V(p)\leq\operatorname{cav}u(p)$ for every $p$.
+
+\textbf{Top three next moves.} (1) Classify finite-prefix matrix trees by recursively tracking the posterior and nonrevealing continuation game. (2) Determine a quantitative condition under which altering an arbitrary finite prefix has uniformly negligible payoff effect. (3) Test mixtures of a tail-invariant functional and the displayed first-stage matrix for a sharp boundary between equality and a positive information gap.
+
+\textbf{Minimal counterexample perspective.} Two types, two actions each and one payoff-relevant stage already disprove the broadest candidate sufficient condition (bounded continuity). They do not falsify an as-yet-unspecified structural characterization.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{martin-blackwell}
+Donald A. Martin. The Determinacy of Blackwell Games.
+\emph{The Journal of Symbolic Logic} 63(4) (1998), 1565--1581.
+\url{https://www1.cmc.edu/pages/faculty/MONeill/math188/papers/martin2.pdf}.
+
+\bibitem{tail}
+Gil Bar Castellon Koltun, Ehud Lehrer, and Eilon Solan.
+\emph{The Maxmin Value of Repeated Games with Incomplete Information on One Side and Tail-Measurable Payoffs}.
+arXiv:2512.01581 (2025), Theorem 2.5 and Sections 3 and 5.
+\url{https://arxiv.org/html/2512.01581}.
+
+\end{thebibliography}
+
+\end{document}

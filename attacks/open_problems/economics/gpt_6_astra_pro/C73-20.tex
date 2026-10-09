@@ -1,0 +1,161 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-20: Exact polynomial-time solution of simple stochastic games}
+\label{sec:C73-20}
+\noindent\textbf{Input:} \texttt{C73-20.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+A simple stochastic game has a finite graph, two absorbing vertices $0,1$, and $n\geq0$ other vertices. Each nonterminal vertex has two listed successors, possibly equal. At a Max or Min vertex its owner chooses a successor; at a random vertex the two listed choices each have probability $1/2$. Max receives $\mathbf1_{\{\exists t\geq0:s_t=1\}}$; in particular every nonterminating path receives zero. Strategies may be arbitrary behavioral history strategies. Define
+\[
+ v(s)=\sup_\sigma\inf_\tau\Pr_{s,\sigma,\tau}(\exists t\geq0:s_t=1).
+\]
+The exact target is $\exists$ a deterministic algorithm and polynomial $p$ such that $\forall$ explicitly encoded games, initial vertices $s$, and binary rational $q\in[0,1]$, the algorithm decides $v(s)\geq q$ in at most $p(L)$ operations on bits, where $L$ includes the encoding of $q$.
+
+There is no assertion of a stopping promise. Removing unreachable vertices is harmless, but declaring arbitrary recurrent classes to have positive value is not. A purported polynomial running time in $1/\eta$ for approximation does not meet the exact target. The statement needs no mathematical correction.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Condon's primary paper \cite{condon} supplies the pure stationary optimal-strategy theorem for this reachability model. The recent discussion in Hansen and Nie \cite{hansen-nie} retains its polynomial-time complexity as unresolved and distinguishes it from general-sum discounted stationary-equilibrium complexity. The following finite denominator argument and enumeration algorithm are proved here for transparency, not presented as novel complexity results. Literature checked on 9 October 2026.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Type and tools.} This is an exact rational game-computation problem. Useful tools are: pure stationary determinacy (finite policy search); graph reachability (remove zero-value recurrent regions for fixed policies); absorbing Markov-chain equations (evaluate policies); Hadamard's determinant inequality (bound denominators); rational separation (convert sufficiently precise approximation to decision); backward induction (acyclic subclass); renewal and union bounds (test stopping-time shortcuts).
+
+\textbf{Proof tracks.} Find a polynomial policy-search rule or exploit finite denominator bounds to obtain exact decisions from bit-polynomial approximation. \textbf{Disproof tracks.} Test nonstopping self-loops, build stopping chains with exponentially delayed success, and enumerate all two-vertex graphs. The achieved path is a complete exact exponential algorithm, a polynomial acyclic subcase, and explicit failures of common shortcuts.
+
+\subsection*{4) WORK}
+\paragraph{Precisely identified external theorem.}
+For every finite simple stochastic reachability game, there are pure stationary policies $\sigma_*,\tau_*$ such that, simultaneously for all initial vertices and all behavioral $\sigma,\tau$,
+\[
+ \Pr_{s,\sigma,\tau_*}(\text{reach }1)
+ \leq\Pr_{s,\sigma_*,\tau_*}(\text{reach }1)
+ \leq\Pr_{s,\sigma_*,\tau}(\text{reach }1).
+\]
+This is the stationary optimality theorem used from \cite{condon}. Finiteness, turn-based control, fair random choices, terminal reachability payoff, and zero on nontermination all match its hypotheses. No analogous assertion is assumed for concurrent nonzero-sum games.
+
+\begin{lemma}[Exact policy evaluation and a denominator bound]
+Fix one pure stationary policy for each player. Every induced reachability probability is rational with reduced denominator at most $3^n$, and the entire vector can be computed in polynomial bit complexity.
+\end{lemma}
+\begin{proof}
+The pair induces a finite Markov chain. Let $R$ be the nonterminal vertices from which a directed path of positive-probability transitions reaches vertex one. Vertices outside $R\cup\{1\}$ have hitting probability zero: any finite successful realization would give such a path. Let $k=|R|\leq n$, $Q$ be the transition matrix restricted to $R$, and $b$ the vector of one-step probabilities of entering vertex one.
+
+From every state in $R$ there is a simple path to one with at most $k$ edges, each of probability at least $1/2$. Thus the chance of exiting $R$ within $k$ transitions is at least $2^{-k}$, regardless of the starting state in $R$. Repeated conditioning gives a geometric bound on remaining in $R$. Therefore $Q^t\to0$ and $(I-Q)^{-1}=\sum_{t\geq0}Q^t$ exists. The hitting probabilities solve $(I-Q)v=b$ uniquely. If $R$ is empty no linear system is needed.
+
+Set $B=2(I-Q)$ and $c=2b$. These have integer entries. A row of $B$ has a diagonal entry of magnitude at most two, and the sum of the magnitudes of its off-diagonal entries is at most two. Its Euclidean norm is consequently at most $\sqrt8$. Hadamard's inequality yields
+\[
+ 0<|\det B|\leq(\sqrt8)^k<3^k\quad(k>0).
+\]
+Cramer's rule says the reduced denominator of any coordinate of $v=B^{-1}c$ divides the nonzero integer $\det B$. Values zero and one have denominator one. This proves the bound for every vertex. Graph reachability is polynomial, and fraction-free elimination on this integer system is polynomial in dimension and entry bit length; alternatively determinant computation followed by Cramer's rule gives a polynomial number of integer determinant computations, whose intermediate minor sizes have $O(n)$ bits by the same norm bounds. Thus the bit-complexity assertion follows as well.
+\end{proof}
+
+\begin{proposition}[Finite rational separation, but not a polynomial solver]
+Every game value has denominator at most $3^n$. If $q=a/b$ is reduced with $b\geq1$, then either $v(s)=q$ or $|v(s)-q|\geq1/(b3^n)$. Exhaustive policy-pair enumeration gives an exact algorithm using at most $2^n$ policy-pair evaluations and polynomial work per pair.
+\end{proposition}
+\begin{proof}
+An optimal pure stationary pair exists by the stated external theorem, so its value is covered by the lemma. The difference between two unequal rationals of denominators $d\leq3^n$ and $b$ has a nonzero integer numerator over denominator $bd$, proving separation.
+
+There are at most two choices at each controlled vertex and only one prescribed transition at each random vertex. Hence the product of the counts of Max and Min policies is at most $2^n$. Evaluate every pair, take the minimum over Min policies for each Max policy, then the maximum. Stationary optimality proves that this computes $v(s)$ exactly, including in nonstopping graphs. The count $2^n$ is exponential, so this is not the requested algorithm.
+\end{proof}
+
+\paragraph{The exact precision issue.}
+Put $\Delta=1/(b3^n)$. Given an approximation $\widehat v$ with $|\widehat v-v|\leq\Delta/3$, decide ``below threshold'' exactly when $\widehat v<q-\Delta/2$. If $v<q$ then $\widehat v\leq q-2\Delta/3$; if $v\geq q$ then $\widehat v\geq q-\Delta/3$. This also handles equality. The number of precision bits is $O(n+\log b)$, but an algorithm polynomial in $1/\Delta$ would still be exponential. The missing theorem is an algorithm polynomial in the \emph{bit length of the desired precision}, not merely the existence of a denominator bound.
+
+\begin{proposition}[A polynomial solved subclass]
+If the graph induced by the nonterminal vertices is acyclic, exact values and optimal pure stationary policies can be computed in polynomial bit complexity.
+\end{proposition}
+\begin{proof}
+Choose a reverse topological order. Set $v(0)=0,v(1)=1$. At each remaining vertex, once its successors have been processed, take their maximum, minimum, or average according to its type. Induction on the maximum number of remaining nonterminal steps verifies each value against arbitrary history strategies, since every continuation has already been evaluated. There are at most $n$ steps on every path. All averages are dyadic with denominator at most $2^n$, and max/min do not enlarge denominators beyond the larger depth bound. Thus each exact arithmetic operation uses $O(n)$ bits and there are polynomially many such operations. Comparing to a binary threshold adds polynomial work in its length.
+\end{proof}
+
+\begin{proposition}[A stopping family with exponentially slow finite-horizon value iteration]
+For every $n\geq1$ there is a stopping simple stochastic game with $n$ nonterminal random vertices, value one from its initial vertex, but probability of reaching one by time $T$ at most $T2^{-n}$.
+\end{proposition}
+\begin{proof}
+Use states $0',1',\ldots,(n-1)'$ recording the number of consecutive heads in independent fair coin tosses. From $j'$ a head moves to $(j+1)'$, or to absorbing one if $j=n-1$; a tail moves to $0'$. Absorbing zero is present but unreachable. Every disjoint block of $n$ tosses consists entirely of heads with probability $2^{-n}$, independently across these blocks. The probability of never seeing such a block is zero, so absorption occurs almost surely. If absorption occurs by time $T$, some run of $n$ consecutive tosses ending by $T$ consists entirely of heads. There are at most $T$ possible ending positions. A union bound gives $T2^{-n}$. At horizons $T\leq2^{n-1}$ the finite-horizon value is at most $1/2$, although the infinite-horizon value is one. The graph size is $O(n\log n)$ bits, so this family rules out a polynomial horizon bound for naive iteration.
+\end{proof}
+
+\paragraph{Smallest false Bellman shortcut.}
+An uncontrolled self-loop disconnected from vertex one has value zero, but its formal Bellman equation is $x=x$, which every number in $[0,1]$ satisfies. Solving an arbitrary fixed-point system without least-reachability semantics or recurrent-class elimination is invalid.
+
+\paragraph{Exhaustive finite computation.}
+For two nonterminal vertices, the script enumerates all $3^2\cdot4^4=2304$ ordered-successor/type specifications, allowing repeated successors. It evaluates all pure policy pairs exactly and verifies equality of pure maxmin and minimax. Among the resulting $4608$ state values, the denominator counts are
+\[
+ \begin{array}{c|rrrr}
+ \text{denominator}&1&2&3&4\\\hline
+ \text{count}&4216&360&16&16
+ \end{array}
+\]
+No denominator exceeds the proved bound $3^2$. The code's essential loop is:
+\begin{lstlisting}
+for graph in all_two_nonterminal_graphs():
+    values = {pair: exact_chain_hitting_probabilities(graph, pair)
+              for pair in pure_policy_pairs(graph)}
+    assert pure_maxmin(values) == pure_minmax(values)
+\end{lstlisting}
+This is an exhaustive check only for the stated finite enumeration, not evidence establishing a general polynomial bound.
+
+\subsection*{5) VERIFICATION}
+The policy evaluator removes states without a positive path to the winning sink before inversion; hence it never inverts a singular recurrent block and assigns it a spurious value. Repeated successors simply give probability one and meet all matrix bounds. When $n=0$ the initial vertex is terminal. Thresholds zero and one, exact equality, unreachable zero, and almost-sure but slow stopping have all been included. The use of pure policies is explicitly justified by the external theorem, not inferred from a finite search. Exponential running time and exponential horizon are not concealed as polynomial in the binary input size.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for the full exact polynomial-time problem.
+
+\textbf{Strongest checked partial result.} Complete exact policy evaluation with $3^n$ denominator control; an exact exponential algorithm; a polynomial algorithm for acyclic games; and a stopping family disproving a uniform polynomial finite-horizon shortcut.
+
+\textbf{Exact first gap.} No method is proved to locate the optimal value to error $1/(3b3^n)$ with running time polynomial in $n$ and the entire threshold/input bit length.
+
+\textbf{Top three next moves.} (1) Seek a polynomial policy-pivot bound using the recurrent-component structure. (2) Derive a bit-polynomial approximation routine at the separation precision rather than a routine polynomial in inverse error. (3) Study whether exact rational certificates can be discovered by a restricted convex formulation whose optimization does not already encode the missing game solution.
+
+\textbf{Minimal counterexample perspective.} A finite graph cannot disprove existence of all polynomial algorithms. Two vertices already expose bad fixed-point semantics; the run-of-heads family exposes slow value iteration. Neither is a complexity lower bound for arbitrary algorithms.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{condon}
+Anne Condon. The Complexity of Stochastic Games.
+\emph{Information and Computation} 96(2) (1992), 203--224.
+DOI: 10.1016/0890-5401(92)90048-K. The checked primary technical-report version is TR 863 (1989).
+\url{https://research.cs.wisc.edu/techreports/1989/TR863.pdf}.
+
+\bibitem{hansen-nie}
+Kristoffer Arnsfelt Hansen and Xinhao Nie.
+\emph{On the Complexity of Stationary Nash Equilibria in Discounted Perfect Information Stochastic Games}.
+arXiv:2510.11550, version 1 (2025).
+\url{https://arxiv.org/html/2510.11550v1}.
+
+\end{thebibliography}
+
+\end{document}

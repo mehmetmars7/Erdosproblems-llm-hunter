@@ -1,0 +1,267 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C78-7: The extremal number of stable-marriage matchings}
+\label{sec:C78-7}
+\noindent\textbf{Input:} \texttt{C78-7.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+
+\subsection*{1) FORMAL RESTATEMENT}
+For every integer $n\geq1$, let $U=\{u_1,\ldots,u_n\}$ and
+$W=\{w_1,\ldots,w_n\}$ be disjoint. Each agent has a strict total order on the other side.
+A perfect matching is a bijection $M:U\to W$. It is stable when, for every
+$u\in U$ and $w\ne M(u)$, at least one of $u,w$ prefers its partner in $M$ to the other.
+Write $s(I)$ for the number of stable matchings of the preference profile $I$ and
+\[
+ x_n=\max_I s(I),\qquad \gamma=\limsup_{n\to\infty}x_n^{1/n}.
+\]
+The task is to determine $x_n$, or sharp asymptotics including $\gamma$ and, ideally,
+subexponential factors. It is an extremal determination problem, not the assertion
+that some given formula is true. Merely displaying an instance with few or many
+matchings does not disprove the question.
+
+We set $x_0=1$ for block arguments; this convention does not alter the input.
+Preferences are complete, ties are forbidden, and labeled matchings are counted
+without identifying isomorphic objects. Important stress points are cross-block
+matches, strictness of preferences, and the distinction between a limit and a limsup.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The survey \cite{matching-survey} explicitly asks the extremal counting question.
+Palmer and P\'alv\"olgyi prove the upper bound $x_n\leq 3.55^{n+O(1)}$
+in Theorem 1 of \cite{palmer}; that paper also records an exponential lower base
+approximately $2.28$. These are literature bounds, not new bounds established below.
+The targeted search did not yield a verified determination of the exact base.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof track.} First establish exact factorization for independent blocks.
+Next exploit the preference structure of the symmetric difference of two stable
+matchings. Finally test whether the small-instance structure can constrain the
+asymptotic base.
+
+\textbf{Construction track.} Search all profiles of sizes $1,2,3$; construct independent
+copies of an extremal small block; then examine why such products do not by themselves
+bound more strongly interacting instances.
+
+\textbf{Tools and purpose.} Deferred acceptance guarantees a nonempty stable set;
+alternating cycles compare stable matchings; permutation parity rules out an
+extremal three-agent chain; block products amplify constructions; logarithmic
+superadditivity identifies the growth limit; exhaustive permutation enumeration
+checks the small cases; rotation-poset/entropy methods are possible tools for a
+future upper bound, but are not silently invoked in the proofs below.
+
+\subsection*{4) WORK}
+\begin{lemma}[Existence and exact block factorization]
+Every complete strict instance has a stable matching. If two instances are placed
+in disjoint blocks and every agent ranks all members of its own block ahead of
+all outsiders, then the stable matchings of the combined instance are exactly the
+unions of one stable matching from each block. Consequently
+\[
+ x_{n+m}\geq x_nx_m\qquad(n,m\geq0).
+\]
+\end{lemma}
+\begin{proof}
+For existence, let unmatched men propose in preference order and let each woman
+retain her preferred proposal so far. There are at most $n^2$ proposals. An unmatched
+man cannot exhaust his list: otherwise every woman has received a proposal and
+retains a man, which would leave no man unmatched. Thus the procedure ends with a
+perfect matching. A man who prefers another woman to his final partner proposed
+to her earlier; she rejected him, or later replaced him, and her retained partner
+can only improve. Hence that pair cannot block.
+
+For factorization, suppose a perfect matching uses an external partner for some
+man in a block of size $n$. The number of internally matched men equals the number
+of internally matched women. Therefore a woman in the same block also has an
+external partner. These two agents prefer one another to their external partners,
+so they block. Thus any stable matching is internal to every block. Its restriction
+to a block must be stable, or an internal blocking pair would block the whole
+matching. Conversely, a union of stable block matchings has no internal blocking
+pair, and neither member of a cross-block pair prefers the outsider to its own
+internal partner. Multiplying the numbers of choices proves the assertion.
+\end{proof}
+This lemma supplies a lower-bound construction and the only supermultiplicativity
+used below; it does not assert that extremizers themselves decompose into blocks.
+
+\begin{theorem}[The growth limit exists]
+Using the exponential upper bound stated in the literature check above,
+\[
+ \lim_{n\to\infty}x_n^{1/n}=\sup_{k\geq1}x_k^{1/k}=\gamma<\infty,
+ \qquad x_n\leq\gamma^n\quad(n\geq1).
+\]
+\end{theorem}
+\begin{proof}
+Fix $k\geq1$ and write $n=qk+r$, where $0\leq r<k$. The previous lemma and
+$x_r\geq1$ give $x_n\geq x_k^q$. Since $q/n\to1/k$,
+$\liminf_n x_n^{1/n}\geq x_k^{1/k}$. Taking the supremum over $k$ proves that the
+liminf is at least the supremum of the entire sequence. The reverse inequality
+for the limsup follows from the definition of a supremum. The cited exponential
+upper bound makes this supremum finite. Each term is bounded by the supremum,
+which proves the last inequality.
+\end{proof}
+
+\begin{lemma}[Preference orientation on an alternating cycle]
+Let $M,N$ be two stable matchings. On any single alternating cycle in their
+symmetric difference, all men prefer $M$ to $N$, or all prefer $N$ to $M$.
+\end{lemma}
+\begin{proof}
+Index the cycle so that $M(u_i)=w_i$ and $N(u_i)=w_{i+1}$, cyclically. Suppose
+$u_i$ prefers $w_i$ to $w_{i+1}$. Stability of $N$ forces $w_i$ to prefer
+$u_{i-1}$ to $u_i$. Stability of $M$ then forces $u_{i-1}$ to prefer
+$w_{i-1}$ to $w_i$. Iterating this implication around the cycle makes every man
+prefer $M$. If the first man instead prefers $N$, interchange the two matchings.
+Strict preferences ensure that these are the only cases.
+\end{proof}
+
+\begin{theorem}[Exact small values, with a human-checkable upper bound]
+\[
+ x_1=1,\qquad x_2=2,\qquad x_3=3.
+\]
+\end{theorem}
+\begin{proof}
+The first equality follows from there being only one bijection. For $n=2$, the
+upper bound is $2!=2$. The instance
+\[
+ u_1:w_1\succ w_2,\quad u_2:w_2\succ w_1,\qquad
+ w_1:u_2\succ u_1,\quad w_2:u_1\succ u_2
+\]
+has both bijections stable: in the identity matching the men have their first
+choices, and in the other matching the women have their first choices.
+
+For $n=3$, any two different permutations differ on a single alternating cycle,
+of length two or three. The preceding lemma therefore makes any two stable
+matchings comparable in every man's preference order. These comparisons form a
+linear order: transitivity follows from the transitivity of each individual
+preference order.
+
+Suppose four stable matchings existed. Order four of them as
+$M^0\succ M^1\succ M^2\succ M^3$, from the men's perspective. Every consecutive
+change moves at least two men, so there are at least six partner changes. Each
+of the three men can change partners at most twice while strictly worsening
+among three women. There are consequently exactly six changes: each step moves
+exactly two men, and every man moves exactly twice. Each step is a transposition
+of partners, so the permutation taking $M^0$ to $M^3$ is odd. On the other hand,
+each man has visited three distinct partners, so this permutation has no fixed
+point. A fixed-point-free permutation of three objects is a three-cycle and is
+even. This contradiction proves $x_3\leq3$.
+
+For the matching lower bound, use the lists
+\[
+\begin{array}{c|c@{\qquad}c|c}
+ u_1&w_1\succ w_2\succ w_3&w_1&u_2\succ u_3\succ u_1\\
+ u_2&w_2\succ w_3\succ w_1&w_2&u_3\succ u_1\succ u_2\\
+ u_3&w_3\succ w_1\succ w_2&w_3&u_1\succ u_2\succ u_3
+\end{array}
+\]
+and the matchings $(w_1,w_2,w_3)$, $(w_2,w_3,w_1)$, and $(w_3,w_1,w_2)$,
+where coordinates list partners of $u_1,u_2,u_3$. The first gives all men their
+first choices and the last gives all women their first choices. In the middle
+matching, a man's only preferred woman is his first choice. That woman prefers
+her middle-matching partner to him, as is verified in each of the three displayed
+lists. Hence all three matchings are stable.
+\end{proof}
+In particular, independent three-agent blocks give
+$x_{3q+r}\geq3^q x_r$ for $r=0,1,2$. This elementary lower bound is weaker than
+the literature lower bound; it is included because its proof is complete here.
+
+\subsection*{5) VERIFICATION}
+The exhaustive check in \texttt{verify.py} considers exactly $(n!)^{2n}$ preference
+profiles and all $n!$ matchings for each profile. It constructs inverse rankings
+and rejects a matching precisely when both blocking inequalities hold. The
+reported histograms are
+\[
+\begin{array}{c|r|rrr}
+ n&\text{profiles}&s(I)=1&s(I)=2&s(I)=3\\\hline
+ 1&1&1&0&0\\
+ 2&16&14&2&0\\
+ 3&46656&34080&11484&1092
+\end{array}
+\]
+Thus the computations independently check, rather than replace, the analytical
+small-case proof. A minimal pseudocode description is
+\begin{lstlisting}
+for all 2*n lists, each a permutation of range(n):
+    count = 0
+    for every bijection M:
+        if no pair prefers one another to their partners:
+            count += 1
+    update histogram and maximum
+\end{lstlisting}
+The alternating-cycle upper bound is deliberately limited to $n=3$: for $n\geq4$
+the symmetric difference can have several cycles with different orientations.
+That is the exact point at which this proof stops extending. Complete lists are
+also essential to the cross-block counting argument as stated. No claim about
+random preference instances, counting complexity, or a sharp base follows from
+these finite checks.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest checked partial result.} Exact factorization under independent
+blocks; the limit formula for $\gamma$; and a complete proof of $x_1=1,x_2=2,x_3=3$.
+The record numerical bases in the literature check above are imported literature bounds.
+
+\textbf{Exact first gap.} There is no matching universal upper and constructive
+lower exponential bound determining $\gamma$ in this work.
+
+\textbf{Next three moves.}
+\begin{enumerate}[nosep]
+\item Derive a restriction on alternating-cycle orientations that survives when
+several cycles coexist, rather than assuming the three-agent linear order.
+\item Search for interacting blocks whose stable-count-per-agent exceeds that
+of their components, keeping complete preference-list certificates.
+\item Relate those restrictions to a sharper count of admissible rotation-poset
+downsets; an arbitrary-poset bound would need its representation hypotheses checked.
+\end{enumerate}
+\textbf{Counterexample perspective.} There is no specified numerical conjecture to
+falsify. A construction beating a proposed exponential upper bound would need
+an infinite amplified family, not just a mislabeled small-instance maximum.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{matching-survey}
+Katar\'ina Cechl\'arov\'a, \'Agnes Cseh, and David F. Manlove.
+\emph{Selected open problems in Matching Under Preferences}. 2019, Section 3.2.1.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+
+\bibitem{palmer}
+Cory Palmer and D\"om\"ot\"or P\'alv\"olgyi.
+\emph{At most $3.55^n$ stable matchings}. arXiv:2011.00915, version 2 (2021), Theorem 1.
+\url{https://arxiv.org/abs/2011.00915}.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,186 @@
+% ECONOMICS_PROBLEM: {"id": "D86-21", "title": "Strongly polynomial computation of an optimal finite contract", "jel_code": "D86", "source_id": "OP-0596"}
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Strongly polynomial optimal finite contracts}\par
+\medskip
+{\large D86-21: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+Fix integers $n,m\ge1$. The explicit rational input consists of $q_{aj}\ge0$ with $\sum_{j=1}^m q_{aj}=1$ for each action $a\in[n]$, costs $c_a\ge0$ with $\min_a c_a=0$, and rewards $r_j\ge0$. A contract is $t\in\R_+^m$. The agent maximizes $q_a\cdot t-c_a$; among maximizing actions, the agent chooses one maximizing the principal's payoff $q_a\cdot(r-t)$. Thus the target is
+\[
+ \max_{a\in[n],\ t\ge0}q_a\cdot(r-t)
+ \quad\text{subject to }(q_a-q_b)\cdot t\ge c_a-c_b\quad(b\in[n]).
+\]
+An exact algorithm must output a rational optimal contract and an action realizing this objective. The question is whether one algorithm uses at most $\operatorname{poly}(n,m)$ arithmetic operations and comparisons, independently of numerical bit lengths, while every intermediate rational encoding has length polynomial in the total input length $L$.
+
+\textbf{Conventions and stress points.} The action and outcome arrays are explicit. The $a=b$ incentive constraint is redundant. Empty feasibility for a particular action is allowed; that action is omitted. Strong polynomiality does not eliminate the cost of reading or writing binary numbers. Principal-favorable ties are essential for using weak inequalities and for attainment at incentive boundaries. Individual rationality follows from the zero-cost action and nonnegative payments. No strictly positive reservation utility or strict implementation requirement is added.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Paul D\"utting, Michal Feldman, and Inbal Talgam-Cohen, \emph{Algorithmic Contract Theory: A Survey}, arXiv:2412.16384v1 (20 December 2024), explicitly asks the strongly polynomial question in Section 3.1 after Observation 3.3. That section presents the linear-programming approach; Section 3.3 treats binary-action and binary-outcome cases. Checked primary survey: \url{https://arxiv.org/html/2412.16384v1}.
+
+The proofs below reproduce the LP reduction and establish restricted algorithms and a specified-action embedding. They do not claim that the survey proves an equivalence between unrestricted optimal-contract computation and general linear programming, nor that the present embedding establishes such an equivalence.
+
+\section{ATTACK PLAN}
+\textbf{Proof track.} Isolate minimum-payment implementation for each action, derive sparse optimal witnesses, and seek a dimension-independent basis-selection method. Check the two-action and fixed-dimension cases explicitly.
+
+\textbf{Disproof track.} Test whether optima can fail to exist under favorable ties; try to encode arbitrary rational inequalities inside a target action's incentive constraints; examine whether such an encoding actually forces a global optimal-contract algorithm to solve the target problem.
+
+\textbf{Tools and roles.} Rational LP gives ordinary polynomial-time computation; compact objective sublevels prove attainment; nonnegative orthants exclude lineality; active-constraint rank bounds payment support; determinant bounds control exact encodings; likelihood-ratio comparisons solve two actions; zero-sum row embeddings enforce probability normalization; explicit tie comparisons distinguish inducibility from principal-optimal behavior.
+
+\textbf{Tiny cases.} With one action, its cost is zero and $t=0$ is optimal. With one outcome all action distributions coincide, so $t=0$ and a zero-cost action are optimal. If every cost is zero, $t=0$ attains $\max_a q_a\cdot r$, an upper bound on every nonnegative-payment contract's profit.
+
+\section{WORK}
+\begin{theorem}[LP characterization and attainment]\label{thm:lp}
+For each action $a$, let
+\[
+ C_a=\min\{q_a\cdot t:t\ge0,\ (q_a-q_b)\cdot t\ge c_a-c_b\ (b\ne a)\},
+\]
+with $C_a=+\infty$ if the feasible set is empty. Every finite $C_a$ is attained. The optimal principal payoff is
+\[
+ \max_{a:C_a<\infty}(q_a\cdot r-C_a).
+\]
+It is attained by a rational contract and computable in polynomial bit time using rational linear programming.
+\end{theorem}
+\begin{proof}
+For a fixed feasible $a$, a payment on an outcome with $q_{aj}=0$ can be set to zero. Its contribution to every incentive row is $-q_{bj}t_j\le0$, so removing it weakly increases the row's left side; the objective is unchanged. Let $t^0$ be any feasible payment vector after these deletions and set $B=q_a\cdot t^0\ge0$. Among feasible vectors with the same zero coordinates and objective at most $B$, every remaining coordinate satisfies $0\le t_j\le B/q_{aj}$. This is a nonempty closed bounded set in a finite-dimensional space. The continuous objective therefore attains its minimum there, which is also its minimum over the original feasible set: any better original vector could be cleaned in the same way and would belong to this set.
+
+For any fixed $t$, precisely the actions satisfying the weak inequalities are agent best responses. Maximizing over those feasible actions yields exactly the principal-favorable tie rule. Hence maximizing over all feasible pairs $(a,t)$ is equivalent to the original behavioral problem. Optimizing first over $t$ for each $a$ yields the displayed finite maximum. A zero-cost action is feasible at $t=0$, so the set being maximized over is nonempty and the optimal profit is nonnegative.
+
+Use the rational LP theorem in the following form: a finite-dimensional linear program with rational coefficients can, in time polynomial in its binary encoding length, be classified as infeasible, unbounded, or finite-optimal; in the last case it returns a rational optimal solution of polynomial encoding length. Here each program has $m$ nonnegative variables and $n-1$ rational incentive rows, hence encoding length polynomial in $L$. Its objective is nonnegative on the feasible set, so it is never unbounded below. The attainment argument verifies that a finite infimum is an optimum. Solving the $n$ programs and comparing their rational objective values proves the ordinary bit-complexity assertion. This theorem does not bound the arithmetic count independently of coefficient lengths.
+\end{proof}
+
+\begin{theorem}[Sparse optimal payments and fixed dimensions]\label{thm:sparse}
+Whenever an action is inducible, one minimum-payment contract for it has at most $n-1$ positive coordinates. It can be chosen as a vertex of its feasible payment polyhedron. For each fixed $n$, and separately for each fixed $m$, optimal contracts have strongly polynomial arithmetic algorithms, with the exponent permitted to depend on that fixed parameter.
+\end{theorem}
+\begin{proof}
+Set coordinates with $q_{aj}=0$ to zero, as above. The minimum-payment face with these zero coordinates is compact: if $C_a$ is the minimum, all remaining coordinates are bounded by $C_a/q_{aj}$. A nonempty compact polytope has an extreme point. One elementary proof is to successively minimize each coordinate on the current compact minimizing face; after all coordinates have been fixed the remaining point is extreme. Let $t$ be such a point. It is also a vertex of the original feasible payment polyhedron: if it were a strict convex combination of two feasible points, both would have the same optimal objective, and both would have zero in every coordinate where $t$ is zero and nonnegativity applies. They would therefore belong to the compact optimal face, contradicting extremality.
+
+Let $J=\{j:t_j>0\}$ and $k=|J|$. On these coordinates the tight incentive rows must have rank $k$. Otherwise choose a nonzero direction supported on $J$ annihilating every tight row. Sufficiently small moves in both signs preserve positive coordinates and all strictly slack rows, producing two distinct feasible points with midpoint $t$. This contradicts the vertex property. There are at most $n-1$ incentive rows, so $k\le n-1$.
+
+For fixed $n$, enumerate supports $J$ with $|J|=k\le\min(m,n-1)$ and choices of $k$ incentive rows. Solve the square system making those rows tight, reject singular systems, set coordinates outside $J$ to zero, and check feasibility exactly. Include the all-zero candidate. At least one optimal vertex appears, by the rank argument. The number of candidates per target action is at most
+\[
+ \sum_{k=0}^{\min(m,n-1)}\binom{m}{k}\binom{n-1}{k},
+\]
+which is polynomial in $m$ when $n$ is fixed. The same expression is polynomial in $n$ when $m$ is fixed. Each candidate uses polynomially many arithmetic operations for elimination, verification, and objective comparison; the additional factor $n$ for target actions remains polynomial. Clearing denominators and applying the determinant expansion bounds every candidate numerator and denominator by a polynomial number of input bits. Exact elimination can be performed with these polynomial-size intermediate encodings. The enumeration is not polynomial with a parameter-independent exponent when both $n$ and $m$ vary.
+\end{proof}
+
+\begin{theorem}[Two-action formula]\label{thm:two}
+Suppose the actions are $0,1$, with $c_0=0<c_1=c$. Write $d_j=q_{1j}-q_{0j}$ and $J=\{j:d_j>0\}$. If $J=\varnothing$, action 1 is not inducible. Otherwise
+\[
+ C_1=c\min_{j\in J}\frac{q_{1j}}{d_j}.
+\]
+A minimizing index $j^*$ yields the contract $t_{j^*}=c/d_{j^*}$ and all other payments zero. The global optimum is the larger of $q_0\cdot r$ and $q_1\cdot r-C_1$. The arithmetic count is $O(m)$, and encodings have polynomial bit length.
+\end{theorem}
+\begin{proof}
+The sole constraint for action 1 is $\sum_jd_jt_j\ge c$. If no $d_j>0$, its left side is nonpositive. If there are positive coefficients, deleting payments with $d_j\le0$ weakly improves feasibility and weakly reduces expected payment. For a feasible vector supported on $J$,
+\[
+ q_1\cdot t
+ =\sum_{j\in J}\frac{q_{1j}}{d_j}d_jt_j
+ \ge\left(\min_{j\in J}\frac{q_{1j}}{d_j}\right)c.
+\]
+The stated single payment attains equality and binds the incentive constraint. Action 0 has minimum payment zero. Theorem~\ref{thm:lp} gives the comparison of profits, including the favorable tie rule. Computing the ratios and finding their minimum takes $O(m)$ arithmetic operations. The formula uses only a constant number of operations on each rational coefficient. If both costs are zero, the all-zero contract is optimal, as checked above.
+\end{proof}
+
+\subsection{An exact embedding into specified-action inducibility}
+The following reduction explains why the fixed-action LP need not be combinatorially simple. Its limited conclusion is important.
+
+\begin{proposition}[Embedding arbitrary nonnegative-variable feasibility]\label{prop:embed}
+Given $A\in\Q^{r\times d}$ and $b\in\Q^r$, $d\ge1$, one can construct a rational contract instance with strictly positive outcome probabilities and nonnegative costs, one of them zero, together with a distinguished action $*$, such that
+\[
+ \exists x\in\R_+^d:Ax\ge b
+ \quad\Longleftrightarrow\quad
+ \text{action $*$ is weakly inducible}.
+\]
+The construction uses polynomially many arithmetic operations and polynomial-size rational encodings. It concerns a specified action, not selection of a globally optimal action.
+\end{proposition}
+\begin{proof}
+Append the $d$ inequalities $x_j\ge0$ to the row list; denote the resulting pairs by $(a_\rho,b_\rho)$, where $a_\rho\in\Q^d$. For each row form
+\[
+ \widetilde a_\rho=(a_{\rho1},\ldots,a_{\rho d},-\sum_{j=1}^d a_{\rho j})\in\Q^{d+1},
+\]
+whose coordinates sum to zero. Put $m=d+1$, $q_*=(1/m,\ldots,1/m)$, and
+\[
+ \lambda_\rho=\frac{1}{2m(1+\max_j|\widetilde a_{\rho j}|)},\qquad
+ q_\rho=q_*-\lambda_\rho\widetilde a_\rho.
+\]
+Every $q_\rho$ has sum one and each coordinate is strictly larger than $1/(2m)$, so it is a probability vector with full support. Let
+\[
+ C=\max(0,\max_\rho\lambda_\rho b_\rho),\quad
+ c_*=C,\quad c_\rho=C-\lambda_\rho b_\rho\ge0.
+\]
+If $C=0$, the distinguished action has zero cost. If $C>0$, a maximizing row action has zero cost. Set rewards to zero, since they play no role in inducibility.
+
+The distinguished action's inequality against $\rho$ is exactly
+\[
+ \lambda_\rho\widetilde a_\rho\cdot t\ge\lambda_\rho b_\rho,
+ \quad\text{or}\quad
+ a_\rho\cdot x\ge b_\rho,
+ \qquad x_j=t_j-t_m.
+\]
+The appended rows imply $x_j\ge0$. Thus any implementing $t\ge0$ yields a solution of the original system. Conversely, a feasible nonnegative $x$ yields an implementing contract by $t_j=x_j$ for $j\le d$ and $t_m=0$. There are $r+d+1$ actions and $d+1$ outcomes. The displayed formulas use polynomially many rational sums, products, comparisons, and divisions, with denominator bit lengths bounded polynomially in the input length.
+
+In fact, for fixed $x$ every representing payment vector has $t_j=x_j+t_m$ and $t_m\ge0$, so
+$q_*\cdot t=(\sum_jx_j)/m+t_m$. Consequently minimum payment for $*$ corresponds to minimizing $\sum_jx_j$ over the original nonnegative feasible set, with $t_m=0$ at an optimum.
+\end{proof}
+
+\textbf{Why this is not a full hardness equivalence.} A globally optimal contract is allowed to induce another action. In the construction above, rewards are zero, so a zero-payment contract inducing a zero-cost action is always globally optimal, regardless of whether $*$ is inducible. Thus this particular construction cannot use a global optimal-contract oracle to decide the original feasibility question. A reward/implementation gadget forcing the required selection, without introducing an easier incentive instrument, has not been proved here. Treating Proposition~\ref{prop:embed} as an equivalence for the question in Section 1 would be an invalid quantifier substitution.
+
+\section{VERIFICATION}
+\textbf{Exact two-action test.} Let
+$q_0=(3/4,1/4)$, $q_1=(1/4,3/4)$, $c_1=1/4$, and $r=(0,2)$. The formula gives $t=(0,1/2)$, expected payment $C_1=3/8$, and agent utilities $1/8$ under both actions. Principal profits at this contract are $3/8$ for action 0 and $9/8$ for action 1, so favorable ties select action 1. The zero contract gives profit $1/2$. The optimal profit is therefore $9/8$.
+\begin{lstlisting}[language=Python]
+from fractions import Fraction as F
+q0=(F(3,4),F(1,4)); q1=(F(1,4),F(3,4))
+c=F(1,4); r=(F(0),F(2)); t=(F(0),F(1,2))
+dot=lambda x,y:sum(a*b for a,b in zip(x,y))
+assert dot(q0,t)==dot(q1,t)-c==F(1,8)
+assert dot(q1,t)==F(3,8)
+assert dot(q0,tuple(r[j]-t[j] for j in range(2)))==F(3,8)
+assert dot(q1,tuple(r[j]-t[j] for j in range(2)))==F(9,8)
+assert dot(q0,r)==F(1,2)
+print('two-action contract: exact utility, payment, and tie checks passed')
+\end{lstlisting}
+
+\textbf{Adversarial audit.} Zero-probability outcomes are removed only for the fixed target action, where their incentive coefficients are nonpositive. The optimum-face argument separately proves existence of a vertex before enumerating bases; sparsity alone would not justify enumeration of tight rows. The zero-cost action need not be unique. Rewards being nonnegative does not make every action inducible. The embedding explicitly preserves row sums, positivity, and the zero-cost convention, but does not preserve the identity of the globally optimal action. No iteration bound is inferred from output sparsity.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest fully proved partial result.} Optimal contracts are attained and rational, and ordinary polynomial bit-time computation reduces to $n$ explicit LPs. There are sparse optimal contracts with at most $n-1$ positive payments; fixed-action-count and fixed-outcome-count versions have strongly polynomial arithmetic algorithms. Two actions admit the displayed closed form. Arbitrary rational linear feasibility embeds into specified-action inducibility, with its scope limitation proved explicitly.
+
+\textbf{Exact first gap.} No parameter-independent polynomial arithmetic bound is established for selecting optimal payment bases across all actions when both $n$ and $m$ vary. Conversely, the specified-action embedding does not force a global contract optimizer to expose feasibility of that action and therefore does not prove an equivalence or an impossibility result for the literal question.
+
+\textbf{Three next targets.} First, exploit the probability-difference structure to build a polynomial arithmetic basis-selection algorithm that avoids the enumeration in Theorem~\ref{thm:sparse}. Second, test a reward gadget that makes a distinguished action globally optimal exactly when an encoded feasibility system has a solution, while preserving limited liability and zero-cost participation. Third, seek a strongly polynomial dual separation method for the family of implementation LPs using their common probability matrix rather than solving them independently.
+
+\textbf{Minimal obstruction.} A counterexample cannot simply be an instance without an optimum: attainment is proved. Any hard family escaping the restricted algorithms must allow both the number of actions and the number of outcomes to grow. Superpolynomial behavior of one LP method, or large magnitudes of optimal payments, is not by itself a disproof of a strongly polynomial arithmetic algorithm.
+
+\end{document}

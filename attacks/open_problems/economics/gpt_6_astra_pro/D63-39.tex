@@ -1,0 +1,212 @@
+% ECONOMICS_PROBLEM: {"id": "D63-39", "title": "EFX existence for three agents with additive chores", "jel_code": "D63", "source_id": "OP-0589"}
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Three-agent EFX for positive additive chores}\par
+\medskip
+{\large D63-39: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+There are exactly three agents $[3]=\{1,2,3\}$ and a finite set of chores $[m]$, where $m\ge0$. Costs are strictly positive real numbers $c_{ig}>0$ for each agent and chore, with additive extension $c_i(B)=\sum_{g\in B}c_{ig}$. A complete allocation is a partition $A=(A_1,A_2,A_3)$ of $[m]$ into disjoint, possibly empty bundles. It is EFX if
+\[
+ \forall i,j\in[3]\ \forall g\in A_i:\qquad
+ c_i(A_i\setminus\{g\})\le c_i(A_j).
+\]
+Thus removal is from the envious agent's \emph{own} bundle. The target is
+\[
+ \forall m\ge0\ \forall c\in\R_{>0}^{3\times m}\ \exists A\text{ complete}: A\text{ is EFX}.
+\]
+The $m=0$ case is the empty allocation and satisfies every condition vacuously. No Pareto-efficiency requirement is imposed. Rational or integer data will be used for computations, and Proposition~\ref{prop:integer} proves that searching positive integer costs does not exclude a possible real-valued nonexistence example.
+
+\textbf{Stress points.} Four-agent counterexamples do not disprove a three-agent statement. Additivity and strict positivity are retained. Empty own bundles impose no removal condition. Existence for a finite numerical grid is not existence for a continuous cost domain. A procedure that finds only EF1, approximate EFX, or a partial allocation does not solve the question.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The attachment cites He and Tao, \emph{EFX for Additive Chores: Nonexistence, Pareto Incompatibility, and Bi-Valued Existence}, arXiv:2606.08872v2. Section 6 leaves the unrestricted three-agent additive case open; its nonexistence construction concerns at least four agents. \url{https://arxiv.org/html/2606.08872v2}.
+
+A later relevant preprint is Xinkai Zhang, \emph{EFX Allocations for Three Agents and Seven or Eight Chores}, arXiv:2609.10585v2. Theorems 1.1--1.2 report existence for seven and eight chores with nonnegative additive costs, via hand reductions and SMT unsatisfiability checks. The paper also identifies earlier coverage up to six chores. \url{https://arxiv.org/html/2609.10585v2}. Its external solver runs are \emph{not independently reproduced here}. Accordingly, the elementary and algorithmic proofs below are distinguished from this cited computer-assisted coverage; the source does not settle arbitrary $m$.
+
+Common-order existence is already part of the literature discussed in these sources. The full constructive proof below is included for verification, not presented as a novelty claim.
+
+\section{ATTACK PLAN}
+\textbf{Proof track.} Compress EFX to its maximum residual cost; prove a sufficient insertion condition; show that rotations toward cheapest bundles preserve EFX; use these lemmas to obtain a complete, complexity-bounded construction in the common-order class. Test whether the insertion step extends to heterogeneous rankings.
+
+\textbf{Disproof track.} Enumerate all allocations of small positive instances; construct failures of naive insertion at nonenvying agents; encode nonexistence by strict linear inequalities for every allocation and reduce real candidates to positive integers.
+
+\textbf{Tools and roles.} Additive residual thresholds give exact verification; pigeonhole arguments restrict empty bundles; choosing cheapest chores solves very small instances; functional directed graphs locate envy cycles; bundle-rank potentials bound rotations; common item ordering supplies the insertion inequality; strict-inequality perturbation controls numeric domains; disjunctive linear arithmetic describes complete counterexample searches.
+
+\textbf{Tiny cases.} At most one chore per agent is always EFX. With four chores, giving one agent its two cheapest chores and one remaining chore to each other agent works, as proved next. These checks retain every removal and every comparison agent.
+
+\section{WORK}
+\begin{lemma}[Residual characterization and empty bundles]\label{lem:residual}
+For nonempty $A_i$ put
+\[
+ T_i(A)=c_i(A_i)-\min_{g\in A_i}c_{ig}.
+\]
+For empty $A_i$ put $T_i(A)=0$. Then EFX is equivalent to
+$T_i(A)\le c_i(A_j)$ for all $i,j$. If $m>3$ and all costs are positive, every bundle in an EFX allocation is nonempty.
+\end{lemma}
+\begin{proof}
+For nonempty $A_i$, the largest remaining cost after one deletion is obtained by removing a smallest-cost chore, giving exactly $T_i(A)$. Its inequality is equivalent to all the removal inequalities. For empty $A_i$, the original conditions are vacuous and the new ones read $0\le c_i(A_j)$, which hold.
+
+If some bundle is empty and $m>3$, distributing the chores among at most two nonempty bundles leaves some agent with at least two chores. Removing any one from that bundle leaves at least one positive-cost chore, so its residual cost is positive. Its EFX comparison with the empty bundle, of cost zero, fails. More generally the same argument applies whenever an empty bundle coexists with a bundle of size at least two.
+\end{proof}
+
+\begin{proposition}[Elementary existence through four chores]\label{prop:four}
+Every positive additive instance with three agents and $m\le4$ has a complete EFX allocation.
+\end{proposition}
+\begin{proof}
+For $m\le3$, use at most one chore per agent, so every own residual is zero. For $m=4$, give agent 1 two chores of smallest cost according to $c_1$, and give the remaining two chores singly to agents 2 and 3. Agent 1's residual is the larger cost of its two chores, which is at most the cost under $c_1$ of either remaining chore. Its comparisons with the other two bundles hold, and its comparison with itself follows because a positive cost was removed. Each other agent has own residual zero and hence satisfies every comparison. Ties among cheapest chores can be broken arbitrarily.
+\end{proof}
+
+\begin{lemma}[A sufficient insertion condition]\label{lem:insert}
+Let $A$ be an EFX allocation of an already assigned subset, let $g$ be unassigned, and suppose an agent $i$ does not envy any bundle in the cost sense:
+\[
+ c_i(A_i)\le c_i(A_j)\quad\text{for all }j.
+\]
+If $A_i=\varnothing$, or if $c_{ig}\le\min_{h\in A_i}c_{ih}$, then adding $g$ to $A_i$ preserves EFX for all agents.
+\end{lemma}
+\begin{proof}
+If $A_i$ is empty, its new residual is zero. Otherwise $g$ is a minimum-cost chore in the new bundle, and its new residual is
+$c_i(A_i)+c_{ig}-c_{ig}=c_i(A_i)$, which is at most every other bundle's cost by the hypothesis. Its comparison with its own new bundle also holds. Every other agent's own residual is unchanged. Its comparisons with bundles other than $i$ are unchanged, and its comparison with bundle $i$ weakly relaxes because $c_{jg}>0$. Thus all EFX inequalities hold.
+\end{proof}
+
+\begin{lemma}[Cheapest-bundle cycle rotations]\label{lem:cycles}
+For an EFX allocation with $n\ge1$ agents, draw one arrow $i\to j$ whenever agent $i$ envies some bundle, choosing $j$ to minimize $c_i(A_j)$; draw no arrow from a nonenvying agent. A directed cycle can be rotated by giving each agent on it the bundle of its outgoing neighbor. This preserves EFX and strictly reduces each rotating agent's own cost. For a fixed multiset of $n$ bundle contents, at most $n(n-1)$ such rotations are needed before the resulting graph has no directed cycle. At that point it has a vertex with no outgoing arrow, that is, a nonenvying agent.
+\end{lemma}
+\begin{proof}
+Every arrow leads to a strictly cheaper bundle than the sender's current bundle, and specifically to one cheapest among all the current bundles. In a cycle rotation each rotating agent therefore receives a cheapest old bundle. From that agent's perspective the new own residual is at most its new whole-bundle cost, which is at most the cost of every old bundle. The new list of bundles is a permutation of the old list, so every one of its EFX comparisons holds. An agent outside the cycle retains its own bundle and residual, while the comparison bundles are merely permuted; its inequalities remain true as well. Strict improvement of the rotating agents follows from the definition of an arrow.
+
+During a sequence of rotations with no insertion, the $n$ bundle contents are fixed. Each agent can move strictly downward in cost among these bundles at most $n-1$ times, including when several have equal cost. Across all agents there are at most $n(n-1)$ such strict improvements. Every rotation makes at least one strict improvement (in fact at least two), so the stated bound follows. Finally, a finite directed graph where every vertex has exactly one outgoing arrow contains a directed cycle: following arrows from any start eventually repeats a vertex. Thus a cycle-free graph with outdegree zero or one must have a vertex of outdegree zero.
+\end{proof}
+
+\begin{theorem}[Complete EFX under a common chore order]\label{thm:order}
+Suppose $n\ge1$ agents have positive additive costs and there is an order $g_1,\ldots,g_m$ such that
+\[
+ c_{i,g_1}\ge c_{i,g_2}\ge\cdots\ge c_{i,g_m}\quad\text{for every }i.
+\]
+Then a complete EFX allocation exists. For rational input, one can construct it with a strongly polynomial number of arithmetic operations and polynomial-size intermediate encodings. This includes proportional costs but permits agents to disagree arbitrarily about cost ratios while agreeing on the order.
+\end{theorem}
+\begin{proof}
+Start with all bundles empty. Before adding $g_t$, eliminate every directed cycle by Lemma~\ref{lem:cycles}. At most $n(n-1)$ rotations occur in this phase; EFX is preserved and a nonenvying agent $i$ is obtained. Every chore already assigned precedes $g_t$ in the common order, including after bundle rotations. Hence $c_{i,g_t}\le c_{ih}$ for every $h\in A_i$. If $A_i$ is empty, the alternate condition in Lemma~\ref{lem:insert} applies. Add $g_t$ to this agent. EFX is preserved. Induction proves that every prefix is completely allocated and EFX, and after $m$ steps the allocation is complete.
+
+The common order can be found or verified in polynomial arithmetic time. If such an order exists, every pair of chores has coordinatewise comparable cost vectors: all agents weakly rank them in the same direction. Sorting by the sums $s_g=\sum_i c_{ig}$ therefore gives a common order. Indeed, if $s_g>s_h$, comparability excludes $c_{ig}\le c_{ih}$ for all $i$, so $c_{ig}\ge c_{ih}$ for all $i$; if their sums tie, comparability forces coordinatewise equality. Verify the obtained ordering for every row. This step takes $O(nm+m\log(m+1))$ arithmetic operations and comparisons.
+
+Maintain the matrix $B_{ij}=c_i(A_j)$. Constructing all minimum-bundle arrows requires $O(n^2)$ comparisons; finding a cycle in the finite graph is polynomial in $n$. A rotation permutes columns of $B$, and an insertion adds the vector $(c_{1g},\ldots,c_{ng})$ to one column. With straightforward implementations, $O(mn^4+nm+m\log(m+1))$ arithmetic operations suffice, a deliberately loose bound. Entries are sums of at most $m$ input costs, so their rational encodings, and all comparisons, have polynomial bit length. The rotation bound depends on bundle ranks, not cost magnitudes.
+\end{proof}
+
+\subsection{The obstruction to extending this proof indiscriminately}
+A nonenvying agent need not satisfy the minimum-cost condition for the next chore. This is not a minor technicality. Take three identical rows
+\[
+ c_1=c_2=c_3=(1,1,1,100)
+\]
+and the partial allocation $A_1=\{1\}$, $A_2=\{2\}$, $A_3=\{3\}$. It is EFX, and every agent is nonenvying. Adding chore 4 to \emph{any} bundle gives its recipient residual cost 100 after the old unit-cost chore is removed, while another bundle has cost 1. Thus every direct insertion fails. A complete EFX allocation still exists: assign chore 4 alone, two unit chores to a second agent, and one unit chore to the third. This example disproves automatic extension by appending to a sink; it does not disprove existence. The common-order algorithm avoids it by processing the expensive chore first. Heterogeneous rankings provide no single order that automatically serves every row.
+
+\begin{proposition}[Positive integer counterexamples suffice]\label{prop:integer}
+For each fixed $m$, if a strictly positive real $3\times m$ cost matrix has no complete EFX allocation, then a strictly positive integer matrix of the same dimensions has none.
+\end{proposition}
+\begin{proof}
+For every complete allocation $A$, choose one failure witness $i,j,g\in A_i$ with
+\[
+ D_{A,i,j,g}(c):=c_i(A_i\setminus\{g\})-c_i(A_j)>0.
+\]
+There are finitely many allocations and chosen strict inequalities. Each is a continuous linear inequality. All cost entries are also strictly positive. Therefore a sufficiently small neighborhood of the given matrix preserves positivity and every chosen strict violation. A rational matrix exists in this neighborhood by density of the rationals. It retains a violation for every allocation. Multiplying by a common positive denominator preserves the inequalities and yields positive integers.
+\end{proof}
+
+\begin{corollary}[Finite counterexample specification]
+For fixed $m$, existence of a positive-cost counterexample is equivalent to feasibility of
+\[
+ c_{ig}\ge1\quad(i,g),\qquad
+ \bigwedge_{A\text{ complete}}
+ \bigvee_{\substack{i,j\in[3],\ g\in A_i}}
+ [D_{A,i,j,g}(c)\ge1].
+\]
+\end{corollary}
+\begin{proof}
+A feasible matrix gives a strict EFX violation for every allocation. Conversely, the positive integer matrix from Proposition~\ref{prop:integer} has every positive entry and every selected positive violation at least one. This proves feasibility of the displayed system. The formula must include all $3^m$ allocations, not merely balanced bundle sizes.
+\end{proof}
+Scaling each agent's whole cost row by any positive factor preserves every EFX inequality involving that agent. Thus row-sum normalization is another legitimate search convention, but it is a different normalization from the all-integer, unit-margin formula and should not be imposed simultaneously without justification.
+
+\section{VERIFICATION}
+\textbf{Executed exact enumeration.} Every positive $\{1,2\}$ cost matrix was tested for three agents and each $m=1,\ldots,5$. The respective matrix counts were $8,64,512,4,096,32,768$, and every one admitted an EFX allocation. A further 1,000 generated positive integer instances with three agents, nine chores, and costs in $\{1,\ldots,50\}$ also admitted EFX allocations. All allocation comparisons used integer sums, not floating point. This is a finite search, not an unsatisfiability proof over all real costs.
+
+The shared bundled program \texttt{checks/fairness\_check.cpp} includes both this enumeration and the goods tests. Its unsigned 32-bit generator is initialized to 20261009 and updated by $s\leftarrow1664525s+1013904223\pmod{2^{32}}$, with each entry $1+(s\bmod50)$. The nine-chore batch follows the 1,000 four-agent/six-good matrices; the exhaustive tests consume no generator states. The source and report specify that ordering.
+
+\textbf{Independent constructive checks.} The bundled Python program \path{checks/D63-39_common_order.py} constructed allocations for 650 common-order positive instances: $n=1,\ldots,5$, $m=0,\ldots,12$, ten generated matrices per pair. It checked EFX after \emph{every} rotation and insertion, and checked final completeness. Across these runs 151 cycle rotations occurred. It also verified failure of direct insertion in all three choices of recipient in the displayed four-chore example. These checks supplement, rather than replace, Theorem~\ref{thm:order}.
+
+The following standalone exact checker supplies the basic exhaustive-search method and the insertion test:
+\begin{lstlisting}[language=Python]
+from itertools import product
+
+def efx_chores(c,a):
+    n,m=len(c),len(a)
+    bundles=[[g for g in range(m) if a[g]==i] for i in range(n)]
+    for i in range(n):
+        if not bundles[i]: continue
+        residual=sum(c[i][g] for g in bundles[i])-min(c[i][g] for g in bundles[i])
+        if any(residual>sum(c[i][g] for g in bundles[j]) for j in range(n)):
+            return False
+    return True
+
+def find_allocation(c):
+    for a in product(range(len(c)),repeat=len(c[0])):
+        if efx_chores(c,a): return a
+    return None
+
+c=((1,1,1,100),)*3
+for recipient in range(3):
+    assert not efx_chores(c,(0,1,2,recipient))
+assert efx_chores(c,(1,1,2,0))
+for m in range(1,4):
+    checked=0
+    for flat in product((1,2),repeat=3*m):
+        c=tuple(flat[i*m:(i+1)*m] for i in range(3))
+        assert find_allocation(c) is not None
+        checked+=1
+    assert checked==2**(3*m)
+    print(m,checked,'exact EFX witnesses found')
+# The bundled C++ implementation runs the same exhaustive specification
+# through m=5 and the separate 1000-instance nine-chore sample.
+\end{lstlisting}
+
+\textbf{Adversarial audit.} Every removal is from the owner's bundle. The rotation proof uses \emph{cheapest} outgoing bundles, not arbitrary envy edges. Outsiders retain EFX because the whole list of comparison bundles is permuted. The polynomial rotation bound applies within a phase with fixed bundle contents and is restarted after each insertion. The common-order proof does not infer order agreement from additivity. A failed insertion can be repaired by reallocations in the explicit example, so it is not mislabeled a nonexistence counterexample. External computer-assisted results are not claimed as locally rerun certificates.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED for unrestricted three-agent positive additive costs.}
+
+\textbf{Strongest fully proved partial result.} A complete EFX allocation is constructed with a strongly polynomial arithmetic bound for any number of agents whose chore orders agree, with fully proved insertion and cycle-rotation lemmas. All three-agent instances through four chores have an elementary direct proof. Possible real counterexamples reduce to positive integers and a complete finite linear-arithmetic specification. No counterexample was found in the executed finite searches.
+
+\textbf{Exact first gap.} For three agents with heterogeneous chore rankings and arbitrary $m$, no procedure is proved to transform a partial EFX allocation into a complete one while preserving exact EFX. The specific missing step in the current strategy is an insertion or reassignment lemma that always produces an eligible recipient when no common order supplies the minimum-cost condition. The direct-insertion version of that step is explicitly false.
+
+\textbf{Three next targets.} First, strengthen insertion by allowing a controlled sequence of bundle reassignments and prove its residual inequalities for the receiving agent, not only for unaffected agents. Second, solve the full unit-margin counterexample system for a fixed next dimension, retaining every allocation pattern and obtaining checkable rational witnesses or unsatisfiability certificates. Third, isolate a finite set of cross-order configurations that obstruct the common-order argument and prove a repair lemma for each; neither exhaustiveness nor such repairs have been established.
+
+\textbf{Minimal-counterexample information.} The proofs here exclude $m\le4$ and every common-order instance. Taking the cited seven/eight-chore results together with their stated earlier coverage as external theorems excludes all $m\le8$, making $m\ge9$ the remaining range; this stronger bound is a literature dependency, not the outcome of our grid checks. A counterexample can be assumed to have positive integer costs. When $m>3$, any allocation that could be EFX must have all three bundles nonempty, but no particular nonempty bundle-size pattern may be assumed sufficient.
+
+\end{document}

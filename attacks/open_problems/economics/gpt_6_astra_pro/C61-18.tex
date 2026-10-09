@@ -1,0 +1,189 @@
+% ECONOMICS_PROBLEM: {"id": "C61-18", "title": "Polynomial-time solution of rational P-matrix linear complementarity", "jel_code": "C61", "source_id": "OP-0144"}
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Rational P-matrix linear complementarity}\par
+\medskip
+{\large C61-18: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+For each integer $n\ge1$, an input consists of binary-encoded $M\in\Q^{n\times n}$ and $q\in\Q^n$, of combined bit length $L$. The promise is
+\[
+ \det M[I,I]>0\quad(\varnothing\ne I\subseteq[n]),\qquad[n]=\{1,\ldots,n\}.
+\]
+Such a matrix is a $P$-matrix. The output must be rational vectors $z,w\in\Q^n$ satisfying
+\[
+ z\ge0,\quad w=Mz+q\ge0,\quad z_iw_i=0\quad(i\in[n]).
+\]
+The question is whether there exist a deterministic algorithm $\mathcal A$ and a polynomial $p$, independent of $n,M,q$, such that $\mathcal A$ returns such an output on every promised input using at most $p(L)$ bit operations. Promise recognition is not an input requirement. An optional zero-dimensional input has the empty solution.
+
+\textbf{Stress points.} A unique real solution is not automatically an efficiently computable solution. Polynomial output length does not bound search time. Degenerate solutions can have $z_i=w_i=0$, so uniqueness of the solution does not imply uniqueness of a complementary basis. A lower bound for one pivot rule does not disprove the existence of every polynomial-time algorithm.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Michaela Borzechowski, John Fearnley, Spencer Gordon, Rahul Savani, Patrick Schnider, and Simon Weber, \emph{Two Choices Are Enough for P-LCPs, USOs, and Colorful Tangents}, ICALP 2024, LIPIcs 297, article 32, describes the P-LCP search problem and reductions involving it. Official source: \url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ICALP.2024.32}.
+
+The later paper by Ioannis Anagnostides and Weiqiang Zheng, \emph{Algorithmic Collusion and the Complexity of Information-Value-Free Equilibria}, arXiv:2609.22757v1, Section 4.2.2, again uses rational P-LCP as a computational bottleneck: \url{https://arxiv.org/html/2609.22757v1}. These checked sources do not supply a general polynomial-time algorithm. No claim that a literature search rules out all other results is needed below.
+
+The existence and uniqueness facts used in the problem are proved here rather than treated as an unexplained black box. They resolve feasibility and encoding issues, not the algorithmic question.
+
+\section{ATTACK PLAN}
+\textbf{Proof track.} Derive a quantitative sign property from the principal minors, use it for existence and uniqueness, and examine whether it yields a polynomially bounded search. Separately solve the triangular subclass by elimination.
+
+\textbf{Disproof track.} Search tiny promised instances for output pathologies, test a natural projected iteration, and distinguish a failed method from a lower bound for all methods.
+
+\textbf{Landscape and tools.} Principal-minor expansion preserves positivity after diagonal perturbations; sign nonreversal proves uniqueness; compactness gives a coercivity constant; Brouwer supplies an existence witness; complementary supports reduce the problem to rational linear systems; Cramer's rule controls bit lengths; triangular elimination gives an algorithmic subclass; cube orientations and pivot rules suggest, but do not provide, a global search bound.
+
+\textbf{Tiny cases.} For $n=1$, $M=(m)$ with $m>0$ has $z=\max(0,-q/m)$ and $w=\max(q,0)$. If $q\ge0$ in any dimension, $z=0,w=q$ is a solution. The exact two-dimensional grid check in Section 5 tests 4,975 promised inputs.
+
+\section{WORK}
+\begin{lemma}[Diagonal perturbations]\label{lem:diag}
+If $A$ is a $P$-matrix of order $r$ and $D=\operatorname{diag}(d_1,\ldots,d_r)$ with $d_i\ge0$, then $\det(A+D)>0$.
+\end{lemma}
+\begin{proof}
+Multilinearity of the determinant in the columns gives
+\[
+ \det(A+D)=\sum_{I\subseteq[r]}\det A[I,I]\prod_{j\notin I}d_j,
+ \qquad\det A[\varnothing,\varnothing]=1.
+\]
+To verify the identity, select the column of $A$ at indices in $I$ and the column $d_je_j$ at all other indices. Expanding along the latter columns leaves the principal minor $A[I,I]$ with positive sign, since the deleted row indices equal the deleted column indices. Every summand is nonnegative, and the $I=[r]$ summand is strictly positive.
+\end{proof}
+
+\begin{lemma}[Sign nonreversal]\label{lem:sign}
+For every nonzero $h\in\R^n$, at least one index satisfies $h_i(Mh)_i>0$.
+\end{lemma}
+\begin{proof}
+Suppose all these products are nonpositive. Let $I=\{i:h_i\ne0\}$ and $d_i=-(Mh)_i/h_i\ge0$ for $i\in I$. Since $h$ vanishes outside $I$,
+\[
+ (M[I,I]+\operatorname{diag}(d_i:i\in I))h_I=0.
+\]
+The matrix is nonsingular by Lemma~\ref{lem:diag}, since every principal submatrix of a $P$-matrix is itself a $P$-matrix. This contradicts $h_I\ne0$.
+\end{proof}
+
+\begin{theorem}[Existence and uniqueness]\label{thm:exist}
+Every real $q$ and every real $P$-matrix $M$ have exactly one complementarity solution.
+\end{theorem}
+\begin{proof}
+First prove existence. The continuous function
+$h\mapsto\max_i h_i(Mh)_i$ is strictly positive on the compact set $\{h:\|h\|_\infty=1\}$ by Lemma~\ref{lem:sign}. Therefore its minimum $\beta$ exists and is positive. Choose $R>0$ so that $\beta R>\|q\|_\infty$. On the cube $[0,R]^n$ define, coordinatewise,
+\[
+ T(z)=\min(R,\max(0,z-Mz-q)).
+\]
+This is a continuous self-map of a nonempty compact convex finite-dimensional set. Brouwer's fixed-point theorem, stating that every such map has a fixed point, gives $z=T(z)$. Put $w=Mz+q$.
+At a fixed point, $z_i=0$ implies $w_i\ge0$; $0<z_i<R$ implies $w_i=0$; and $z_i=R$ implies $w_i\le0$. In particular, $z_iw_i\le0$ for all $i$.
+
+If some $z_i=R$, then $\|z\|_\infty=R$ and homogeneity gives
+\[
+ \beta R^2\le\max_i z_i(Mz)_i
+ \le R\|q\|_\infty,
+\]
+because $z_i(Mz)_i=z_iw_i-z_iq_i\le R\|q\|_\infty$. This contradicts the choice of $R$. Hence no coordinate equals $R$. The remaining fixed-point alternatives give $z,w\ge0$ and $z_iw_i=0$.
+
+For uniqueness, let $(z,w)$ and $(z',w')$ be two solutions and set $h=z-z'$. Then $Mh=w-w'$ and
+\[
+ h_i(Mh)_i=(z_i-z'_i)(w_i-w'_i)
+          =-z_iw'_i-z'_iw_i\le0.
+\]
+Lemma~\ref{lem:sign} forces $h=0$; then $w=w'$.
+\end{proof}
+
+\begin{theorem}[Rational witnesses and exhaustive exact algorithm]\label{thm:bits}
+For rational input, the unique solution has bit length polynomial in $L$. It can be found by testing at most $2^n$ rational linear systems, each solvable and checkable in polynomial bit time.
+\end{theorem}
+\begin{proof}
+Let $I=\{i:z_i>0\}$ for the solution in Theorem~\ref{thm:exist}. Complementarity gives $w_I=0$, so
+\[
+ z_I=-M[I,I]^{-1}q_I,\qquad z_{[n]\setminus I}=0.
+\]
+The inverse exists by the promise. For $I=\varnothing$, the formula means $z=0$.
+
+To bound the encoding, multiply all input entries by the product $D$ of their positive denominators. The bit length of $D$ is at most the sum of their denominator bit lengths, hence $O(L)$. Entries of the resulting integer systems have $O(L)$ bits. A determinant of order at most $n$ is a sum of at most $n!$ products of at most $n$ such entries, so its bit length is $O(nL+n\log(n+1))$. Cramer's rule bounds the numerators and denominators of $z_I$ by this polynomial. Computing $w=Mz+q$ also uses polynomial-size rational numbers. Fraction-free elimination, or ordinary exact Gaussian elimination with cancellation and determinant bounds, takes polynomial bit time on each such system.
+
+Enumerate every $I\subseteq[n]$, compute the displayed candidate, compute $w$, and verify all signs and products exactly. The true positive support is on the list. Any accepted candidate is a solution, and uniqueness prevents distinct accepted solution vectors. A degenerate solution can be accepted for more than one $I$; this does not affect correctness.
+\end{proof}
+
+\begin{theorem}[Triangular subclass]\label{thm:tri}
+For lower-triangular $M$ with positive diagonal, an exact solution is obtained with $O(n^2)$ arithmetic operations and polynomial-size intermediate encodings.
+\end{theorem}
+\begin{proof}
+Process $i=1,\ldots,n$. Having chosen the earlier coordinates, put
+\[
+ b_i=q_i+\sum_{j<i}M_{ij}z_j,\qquad
+ z_i=\max(0,-b_i/M_{ii}),\qquad w_i=M_{ii}z_i+b_i.
+\]
+Each coordinate satisfies the one-dimensional complementarity conditions. Later choices do not affect earlier $w_i$, by lower triangularity. Thus the final vectors solve the full system. Such $M$ is a $P$-matrix because every principal determinant is a product of positive diagonal entries, so uniqueness follows from Theorem~\ref{thm:exist}. Each initial segment is itself a rational triangular LCP; the bit bound in Theorem~\ref{thm:bits} applies to its computed solution. Products and sums forming $b_i$ therefore have polynomial bit length. The sum of row lengths is $O(n^2)$.
+\end{proof}
+
+\subsection{A checked failure of a candidate general method}
+The iteration $z^{t+1}=\max(0,z^t-(Mz^t+q))$ need not converge even in one dimension. For $M=(3)$, $q=-1$ and $z^0=0$, it gives $0,1,0,1,\ldots$, whereas the unique solution is $z=1/3,w=0$. Thus the $P$-property alone does not make this unit-step map a contraction. This is not a counterexample to the existence of a different polynomial-time algorithm.
+
+The existence proof also does not give such an algorithm. The compactness constant $\beta$ has no polynomial computational bound in the argument, and Brouwer's theorem is an existence theorem rather than a polynomial exact search routine. Replacing these two missing steps by the exhaustive support algorithm gives correctness but still has a $2^n$ factor.
+
+\section{VERIFICATION}
+\textbf{Boundary and quantifier audit.} The sign lemma never divides by a zero coordinate. The diagonal expansion includes the empty principal minor only with convention one. The cube proof excludes cap coordinates before asserting complementarity. The rationality argument uses the support of an existing solution, so it is not circularly used to prove existence. Nothing assumes nondegeneracy. The triangular result bounds arithmetic operations independently of numerical values, but the unrestricted question remains a bit-complexity question.
+
+\textbf{Exact computation.} For diagonal entries $a,d\in\{1,2,3\}$ and off-diagonal entries $b,c\in\{-2,-1,0,1,2\}$, exactly 199 matrices satisfy $ad-bc>0$. All 25 vectors $q\in\{-2,-1,0,1,2\}^2$ were tested for each, giving 4,975 inputs. Every input had exactly one accepted solution vector. Multiple complementary descriptions were deduplicated. The following complete checker uses exact fractions; the counts above are its executed output.
+\begin{lstlisting}[language=Python]
+from fractions import Fraction as F
+from itertools import product
+count = matrices = 0
+for a,d in product(range(1,4),repeat=2):
+    for b,c in product(range(-2,3),repeat=2):
+        det = a*d-b*c
+        if det <= 0: continue
+        matrices += 1
+        for q0,q1 in product(range(-2,3),repeat=2):
+            candidates = [(F(0),F(0)),(-F(q0,a),F(0)),
+                (F(0),-F(q1,d)),
+                (F(b*q1-d*q0,det),F(c*q0-a*q1,det))]
+            accepted = set()
+            for x,y in candidates:
+                u,v = a*x+b*y+q0,c*x+d*y+q1
+                if min(x,y,u,v)>=0 and x*u==0 and y*v==0:
+                    accepted.add((x,y,u,v))
+            assert len(accepted)==1
+            count += 1
+assert (matrices,count)==(199,4975)
+print(matrices,count)
+\end{lstlisting}
+A finite grid is not evidence sufficient to extrapolate a runtime theorem; here it checks the algebra and boundary conventions.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest fully proved partial result.} The solution exists uniquely, is rational with polynomial output length, and has a verified $2^n\operatorname{poly}(L)$ exact search algorithm. The triangular subclass has a strongly polynomial arithmetic algorithm. A natural projected iteration is explicitly disproved as a general convergent method.
+
+\textbf{Exact first gap.} No procedure has been proved to find a valid complementary support, or an equivalent exact solution representation, using $\operatorname{poly}(L)$ bit operations for every promised $P$-matrix. The existence/uniqueness proof supplies no such search bound.
+
+\textbf{Three next targets.} First, seek a pivot or support-update potential whose number of strict improvements has a polynomial bound valid for every $P$-matrix, including degenerate inputs. Second, test whether quantitative sign nonreversal can be converted into an algorithm without conditioning-dependent iteration counts. Third, identify a larger elimination-stable subclass than triangular matrices and prove both closure and a polynomial reduction from the unrestricted problem; the latter reduction is missing.
+
+\textbf{What a disproof would require.} There is no infeasible or irrational promised instance to serve as a counterexample. A disproof of the literal algorithmic statement must be a computational lower bound for the full promised search problem, not merely a family on which a chosen iterative or pivot rule is slow.
+
+\end{document}

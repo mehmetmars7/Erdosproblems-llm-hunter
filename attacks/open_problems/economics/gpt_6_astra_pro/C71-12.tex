@@ -1,0 +1,447 @@
+% ECONOMICS_PROBLEM: {"id": "C71-12", "title": "Grand-coalition arrival in the patient limit", "jel_code": "C71", "source_id": "OP-0222"}
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries Grand-coalition arrival in the patient limit}\par
+\medskip
+{\large C71-12: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+Work with one fixed finite set $N$, a fixed real payoff table, and fixed positive sharing weights. These primitives may not depend on the discount factor. The state space $\mathcal X$ consists of all laminar families of subsets of $N$ of size at least two; a family is laminar when two members are disjoint or one contains the other. Its top-level partition $P(x)$ consists of maximal agreements and uncovered singleton players. Write $\mathcal G=\{x:N\in x\}$.
+
+Require $V(x)=\sum_i\pi_i(x)$, $V(h)=V^*$ for $h\in\mathcal G$, and
+$\gamma=\min_{x\notin\mathcal G}(V^*-V(x))>0$. For each top-level agreement $K\in x\cap P(x)$ require
+\[
+ \pi_i(x)=\pi_i(x\setminus\{K\})+s_i(x,K)
+ \sum_{j\in K}[\pi_j(x)-\pi_j(x\setminus\{K\})],\quad i\in K,
+\]
+where every $s_i(x,K)>0$ and $\sum_{i\in K}s_i(x,K)=1$.
+
+A merge joins at least two blocks of $P(x)$, adds their union $K$, and needs the relevant player set $R=K$. Terminating $K\in x$ by $i\in K$ removes every agreement containing $K$ and has $R=\{i\}$. Player $i$ may also stay, with target $x$ and $R=\{i\}$. These are all moves. Let $M^+(x)$ include stays, and let $M(x)$ exclude them.
+
+For a stochastic matrix $p$ and $0<\delta<1$, set
+\[
+ \ell_i=(1-\delta)(I-\delta p)^{-1}\pi_i,
+ \qquad \ell_i^+(x)=\sum_y p_{xy}\ell_i(y).
+\]
+The inverse exists: $\sum_{t\ge0}\delta^tp^t$ converges entrywise and in the maximum-row-sum matrix norm. A player ranks targets by $\ell_i$, with the current state strictly preferred to every different target having equal value; all other value ties remain ties. A move $m$ is profitable when
+$\ell_i(\tau(m))\ge\ell_i^+(x)$ for every $i\in R(m)$. It is dominated when some $m'\in M^+(x)$ has nonempty $R(m')\subseteq R(m)$ and every member of $R(m')$ strictly prefers its target. Let $C(x)$ be the profitable undominated moves. Let $F(x)$ consist of moves in $C(x)$ whose target is weakly best in $C(x)$ for at least one player, whether or not that player is relevant to the move.
+
+An equilibrium satisfies precisely
+\begin{align*}
+ p_{xy}>0,
+ \ y\ne x&\ \Longrightarrow\ \exists m\in C(x):\tau(m)=y;\tag{E1}\\
+ C(x)\cap M(x)\ne\varnothing&\ \Longrightarrow\ p_{xx}<1;\tag{E2}\\
+ m\in F(x)&\ \Longrightarrow\ p_{x,\tau(m)}>0.\tag{E3}
+\end{align*}
+No positive lower bound on a nonzero transition probability is imposed. In particular, (E1) does not require a positive diagonal entry to be justified by a profitable stay.
+
+\textbf{Literal question.} Do there exist such fixed primitives, $\delta_k\uparrow1$, equilibrium matrices $p_k$, and initial states $x_k$ such that
+$\Pr_{x_k}^{p_k}(T_{\mathcal G}=\infty)>0$ for every $k$? Here the hitting time includes time zero. The answer below is affirmative, with $x_k=\varnothing$ for every $k$ and probability equal to one.
+
+\textbf{Logical correction.} The attachment's ``equivalently, is it true that every fixed model has a threshold'' is the \emph{negation} of the preceding existential assertion, not the same assertion. The two formulations describe opposite sides of the same decision problem. We prove the existential assertion and disprove the threshold assertion.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Heitzig's version 2 explicitly withdraws the equilibrium status of the old deterministic cycle under the revised rules: see Remark 6.7 and Proposition 6.8. Some later passages still refer to that superseded construction without the qualification. We use neither those claims nor any equilibrium-existence theorem from that source. We reuse its concrete block-value primitives, then give a different stochastic kernel and verify the stated axioms independently.
+
+\textbf{Checked primary source.} Jobst Heitzig, \emph{Does the grand coalition form? Persistence, arrival, and the role of the sharing rule in a dynamic process of nested binding agreements}, arXiv:2608.17766v2, especially Definitions 2.14--2.15 and Remark 6.7. \url{https://arxiv.org/html/2608.17766v2}. This is a preprint; no novelty or peer-review claim is made for the construction below.
+
+\section{ATTACK PLAN}
+\textbf{Proof track.} Try to turn the welfare gap into a drift or supermartingale argument and examine closed communicating classes. The obstruction is that (E2)--(E3) require positivity but do not bound transition rates away from zero.
+
+\textbf{Construction track, selected.} Introduce waiting while preserving discounted values by a time-change identity. Specify every off-cycle row, not merely a recurrent cycle. Enumerate all moves using exact fractions, then replace numerical evidence by a rational Bellman certificate and a uniform strict-margin bound.
+
+\textbf{Tools and their roles.} Finite Markov-chain closure proves nonarrival; Bellman equations certify discounted values; diagonal time change separates patience from effective transition frequency; laminar-family enumeration checks the entire domain; subset domination incorporates unilateral deviations and stays; rational gap bounds make the result uniform in $\delta$; independent exact arithmetic detects ties and excludes rounding errors.
+
+\textbf{Tiny cases.} With two players there are only $e=\varnothing$ and $h=\{N\}$. Sharing implies $\pi_i(h)>\pi_i(e)$ for both players. If $a=p_{eh}$ and $b=p_{he}$, subtraction of the two Bellman equations gives
+\[
+ \ell_i(h)-\ell_i(e)
+ =\frac{(1-\delta)[\pi_i(h)-\pi_i(e)]}
+ {1-\delta+\delta(a+b)}>0.
+\]
+At $h$, every termination is dominated by its player's stay, hence (E1) gives $b=0$. At $e$, merge-all is profitable and undominated; it is best for both players among the candidates. Thus (E3) gives $a>0$, and arrival occurs almost surely. The counterexample uses four players.
+
+\section{WORK}
+\subsection{A fixed payoff model}
+Let $N=\{A,B,C,D\}$. Concatenated letters denote sets, not new players. Define a block-value function $v(K;P)$ to be zero except for
+\[
+\begin{array}{c|r}
+(K;P)&v(K;P)\\\hline
+(N;\{N\})&256\\
+(AB;AB|C|D)&240\\
+(CD;AB|CD)&240\\
+(C;A|B|C|D)&112\\
+(D;A|B|C|D)&128.
+\end{array}
+\]
+Define $\pi(x)$ recursively on the number of agreements. For a singleton block $\{i\}\in P(x)$ set $\pi_i(x)=v(\{i\};P(x))$. For a nonsingleton block $K\in P(x)$ put $x^-=x\setminus\{K\}$ and set
+\begin{equation}\label{eq:recursive-payoff}
+ \pi_i(x)=\pi_i(x^-)+\frac{v(K;P(x))-\sum_{j\in K}\pi_j(x^-)}{|K|},\qquad i\in K.
+\end{equation}
+Every player belongs to exactly one top-level block, so this defines a single payoff for each player. The recursive calls have fewer agreements, so they terminate. Summing over $K$ shows that its players' total payoff equals $v(K;P(x))$. Therefore $V(x)=\sum_{K\in P(x)}v(K;P(x))$. For grand states this is 256; for nongrand states it is either 240 or 0. Hence $V^*=256$ and $\gamma=16$. Equation~\eqref{eq:recursive-payoff} is exactly the required sharing identity with $s_i(x,K)=1/|K|>0$. Negative individual payoffs are allowed by the problem.
+
+\subsection{An explicit auxiliary kernel on every state}
+Define
+\[
+ x_0=\varnothing,\quad x_1=\{AB\},\quad
+ x_2=\{AB,CD\},\quad x_3=\{CD\},\qquad
+ C_0=\{x_0,x_1,x_2,x_3\}.
+\]
+Let $Q$ be the following stochastic matrix. All unspecified entries are zero, and the cases are applied in the displayed order.
+\begin{enumerate}[label=(\roman*),leftmargin=*]
+\item For $x=x_j\in C_0$, set $Q_{xx}=2/3$ and $Q_{x,x_{j+1\bmod4}}=1/3$.
+\item For $x=\{AB,CD,N\}$, give probabilities $3/8,3/8,1/4$ to $x,x_3,x_2$, respectively.
+\item For $x=\{AC,BD\}$ or $x=\{BC,AD\}$, give probability $1/4$ to each of $x$, $x\cup\{N\}$, and the two states containing just one of the two agreements in $x$.
+\item For either grand state obtained in (iii), set $Q_{xx}=1$.
+\item In every other state give probability $1/2$ to $x$ and $1/2$ to $\{AB\}$ when $AB\in x$, or to $\varnothing$ when $AB\notin x$.
+\end{enumerate}
+These cases exhaust all states and do not assign the same destination twice within a row. All diagonal entries are positive. Every off-diagonal destination is a legal moving target. To check the last assertion in case (v), a laminar family on four players is a chain unless it has two disjoint pairs. The three possible two-pair families were already handled. Removing the innermost agreement empties a chain; if $AB$ is present, terminating the next larger agreement leaves exactly $\{AB\}$. The remaining special cases are direct merges or chain-rule terminations.
+
+Define the auxiliary value table
+\begin{equation}\label{eq:L}
+ L=\frac14(I-\tfrac34 Q)^{-1}\pi,
+ \qquad H=QL.
+\end{equation}
+$Q$ is auxiliary: it is \emph{not} asserted to be an equilibrium at discount $3/4$.
+
+\subsection{Time change and the role of undominated moves}
+For a state $x$, let $U(x)$ be all undominated moves, without imposing profitability, using the target values $L$ and the specified status-quo tie rule.
+
+\begin{lemma}[Strict improvement for relevant players]\label{lem:strict}
+If a moving move $m$ is undominated, then
+$L_i(\tau(m))>L_i(x)$ for every $i\in R(m)$.
+\end{lemma}
+\begin{proof}
+If $L_i(\tau(m))\le L_i(x)$, staying at $x$ by $i$ is strictly preferred to the different target $\tau(m)$, including when values tie. Its relevant set $\{i\}$ is contained in $R(m)$. This stay therefore dominates $m$. Domination is tested against all moves, not only profitable moves, so no profitability hypothesis on the stay is needed.
+\end{proof}
+
+\begin{lemma}[A sufficient exact certificate]\label{lem:certificate}
+Suppose a finite payoff model and a stochastic matrix $Q$ with positive diagonal have the values in~\eqref{eq:L}. Suppose, at every state,
+\begin{equation}\label{eq:support}
+ \{\tau(m):m\in U(x),\ \tau(m)\ne x\}
+ =\{y\ne x:Q_{xy}>0\}.
+\end{equation}
+Let $\eta>0$ be the minimum of $L_i(\tau(m))-L_i(x)$ over all moving $m\in U(x)$ and $i\in R(m)$, and let
+$B=\max_{x,i}|H_i(x)-L_i(x)|$. When the moving set is nonempty and $B>0$, put $\alpha_0=\min(1,\eta/(2B))$. For every $0<\alpha\le\alpha_0$, the matrix
+\[
+ p_\alpha=(1-\alpha)I+\alpha Q
+\]
+is an equilibrium at $\delta=3/(3+\alpha)$.
+\end{lemma}
+\begin{proof}
+Lemma~\ref{lem:strict} makes the finite minimum positive. The identity $L=\pi/4+3QL/4$ gives $\pi=4L-3QL$. Substitution shows
+\[
+ (1-\delta)\pi+\delta[(1-\alpha)L+\alpha QL]=L
+ \quad\text{when }\alpha=3(1-\delta)/\delta.
+\]
+The unique discounted Bellman solution for $p_\alpha$ is consequently $\ell=L$. Its continuation benchmark is
+$\ell^+(x)=L(x)+\alpha(H(x)-L(x))$. For every relevant player of an undominated moving move,
+\[
+ L_i(\tau(m))-\ell_i^+(x)
+ \ge\eta-\alpha B\ge\eta/2>0.
+\]
+Thus all undominated moving moves are profitable. Some undominated stays can be unprofitable; this causes no problem because all diagonal entries of $p_\alpha$ are positive.
+
+Every positive off-diagonal transition has an undominated moving witness by~\eqref{eq:support}; that witness is profitable, proving (E1). If $C(x)$ has a moving member,~\eqref{eq:support} provides a positive off-diagonal entry, proving (E2). Every profitable undominated move has either a supported moving target by~\eqref{eq:support} or the supported current state. In particular all moves in $F(x)$ have supported targets, proving (E3). This establishes the lemma without an appeal to equilibrium existence.
+\end{proof}
+
+\begin{proposition}[Finite rational certificate for the displayed model]\label{prop:finite}
+For the payoff model and $Q$ above,~\eqref{eq:support} holds at all 52 states. The minimum and maximum in Lemma~\ref{lem:certificate} are
+\[
+ \eta=\frac{24}{115},\qquad B=\frac{608}{25},\qquad
+ \alpha_0=\frac{15}{3496}.
+\]
+\end{proposition}
+\begin{proof}
+The complete rational table below specifies $L$ and the set of undominated moving targets at every state. The displayed values satisfy $L=\pi/4+3QL/4$ row by row. To test domination, enumerate the legal merges, every termination by every eligible player, and each stay, and compare their relevant sets and target values. This finite calculation checks 558 moves. The complete standard-library verifier in Section~5 independently regenerates the laminar families, payoffs and moves and checks every assertion using rational arithmetic. It does not invoke a linear-programming or equilibrium solver. It also checks the two extrema rather than merely testing a sample of discount factors. Together with the table, this is an explicit finite arithmetic certificate.
+\end{proof}
+
+\subsection*{Complete arithmetic certificate}
+State identifiers are local to this table. A coalition is encoded by the bit mask
+$A=1,B=2,C=4,D=8$; for example, $3=AB$ and $15=N$.
+The last column lists all undominated \emph{moving target states}, not relevant player sets.
+\begingroup\footnotesize\renewcommand{\arraystretch}{1.45}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}r l l l l@{}}
+\toprule ID & Agreements & $\pi_A,\pi_B,\pi_C,\pi_D$ & $L_A,L_B,L_C,L_D$ & Targets\\\midrule\endhead
+0 & $\varnothing$ & $(0,0,112,128)$ & $(32,32,\frac{376}{5},\frac{424}{5})$ & $\{1\}$\\
+1 & $\{3\}$ & $(120,120,0,0)$ & $(64,64,\frac{192}{5},\frac{208}{5})$ & $\{14\}$\\
+2 & $\{5\}$ & $(-56,0,56,0)$ & $(\frac{-16}{5},\frac{96}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+3 & $\{6\}$ & $(0,-56,56,0)$ & $(\frac{96}{5},\frac{-16}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+4 & $\{7\}$ & $(\frac{-112}{3},\frac{-112}{3},\frac{224}{3},0)$ & $(\frac{64}{15},\frac{64}{15},\frac{5624}{75},\frac{1272}{25})$ & $\{0\}$\\
+5 & $\{9\}$ & $(-64,0,0,64)$ & $(\frac{-32}{5},\frac{96}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+6 & $\{10\}$ & $(0,-64,0,64)$ & $(\frac{96}{5},\frac{-32}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+7 & $\{11\}$ & $(\frac{-128}{3},\frac{-128}{3},0,\frac{256}{3})$ & $(\frac{32}{15},\frac{32}{15},\frac{1128}{25},\frac{6376}{75})$ & $\{0\}$\\
+8 & $\{12\}$ & $(0,0,-8,8)$ & $(16,16,\frac{168}{5},\frac{232}{5})$ & $\{0\}$\\
+9 & $\{13\}$ & $(-80,0,32,48)$ & $(\frac{-64}{5},\frac{96}{5},\frac{1448}{25},\frac{1752}{25})$ & $\{0\}$\\
+10 & $\{14\}$ & $(0,-80,32,48)$ & $(\frac{96}{5},\frac{-64}{5},\frac{1448}{25},\frac{1752}{25})$ & $\{0\}$\\
+11 & $\{15\}$ & $(4,4,116,132)$ & $(\frac{104}{5},\frac{104}{5},\frac{2288}{25},\frac{2592}{25})$ & $\{0\}$\\
+12 & $\{3,7\}$ & $(40,40,-80,0)$ & $(\frac{272}{5},\frac{272}{5},\frac{-224}{25},\frac{624}{25})$ & $\{1\}$\\
+13 & $\{3,11\}$ & $(40,40,0,-80)$ & $(\frac{272}{5},\frac{272}{5},\frac{576}{25},\frac{-176}{25})$ & $\{1\}$\\
+14 & $\{3,12\}$ & $(0,0,120,120)$ & $(8,8,\frac{384}{5},\frac{416}{5})$ & $\{8\}$\\
+15 & $\{3,15\}$ & $(124,124,4,4)$ & $(88,88,\frac{616}{25},\frac{664}{25})$ & $\{1\}$\\
+16 & $\{5,7\}$ & $(-56,0,56,0)$ & $(\frac{-16}{5},\frac{96}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+17 & $\{5,10\}$ & $(0,0,0,0)$ & $(\frac{240}{13},\frac{1152}{65},\frac{13248}{325},\frac{1104}{25})$ & $\{2,6,41\}$\\
+18 & $\{5,13\}$ & $(-56,0,56,0)$ & $(\frac{-16}{5},\frac{96}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+19 & $\{5,15\}$ & $(8,64,120,64)$ & $(\frac{112}{5},\frac{224}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+20 & $\{6,7\}$ & $(0,-56,56,0)$ & $(\frac{96}{5},\frac{-16}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+21 & $\{6,9\}$ & $(0,0,0,0)$ & $(\frac{1152}{65},\frac{240}{13},\frac{13248}{325},\frac{1104}{25})$ & $\{3,5,44\}$\\
+22 & $\{6,14\}$ & $(0,-56,56,0)$ & $(\frac{96}{5},\frac{-16}{5},\frac{1688}{25},\frac{1272}{25})$ & $\{0\}$\\
+23 & $\{6,15\}$ & $(64,8,120,64)$ & $(\frac{224}{5},\frac{112}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+24 & $\{7,15\}$ & $(\frac{80}{3},\frac{80}{3},\frac{416}{3},64)$ & $(\frac{448}{15},\frac{448}{15},\frac{7544}{75},\frac{1912}{25})$ & $\{0\}$\\
+25 & $\{9,11\}$ & $(-64,0,0,64)$ & $(\frac{-32}{5},\frac{96}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+26 & $\{9,13\}$ & $(-64,0,0,64)$ & $(\frac{-32}{5},\frac{96}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+27 & $\{9,15\}$ & $(0,64,64,128)$ & $(\frac{96}{5},\frac{224}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+28 & $\{10,11\}$ & $(0,-64,0,64)$ & $(\frac{96}{5},\frac{-32}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+29 & $\{10,14\}$ & $(0,-64,0,64)$ & $(\frac{96}{5},\frac{-32}{5},\frac{1128}{25},\frac{1912}{25})$ & $\{0\}$\\
+30 & $\{10,15\}$ & $(64,0,64,128)$ & $(\frac{224}{5},\frac{96}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+31 & $\{11,15\}$ & $(\frac{64}{3},\frac{64}{3},64,\frac{448}{3})$ & $(\frac{416}{15},\frac{416}{15},\frac{1768}{25},\frac{8296}{75})$ & $\{0\}$\\
+32 & $\{12,13\}$ & $(0,0,-8,8)$ & $(\frac{96}{5},\frac{96}{5},\frac{1048}{25},\frac{1352}{25})$ & $\{0\}$\\
+33 & $\{12,14\}$ & $(0,0,-8,8)$ & $(\frac{96}{5},\frac{96}{5},\frac{1048}{25},\frac{1352}{25})$ & $\{0\}$\\
+34 & $\{12,15\}$ & $(64,64,56,72)$ & $(\frac{224}{5},\frac{224}{5},\frac{1688}{25},\frac{1992}{25})$ & $\{0\}$\\
+35 & $\{13,15\}$ & $(-16,64,96,112)$ & $(\frac{64}{5},\frac{224}{5},\frac{2088}{25},\frac{2392}{25})$ & $\{0\}$\\
+36 & $\{14,15\}$ & $(64,-16,96,112)$ & $(\frac{224}{5},\frac{64}{5},\frac{2088}{25},\frac{2392}{25})$ & $\{0\}$\\
+37 & $\{3,7,15\}$ & $(104,104,-16,64)$ & $(80,80,\frac{416}{25},\frac{1264}{25})$ & $\{1\}$\\
+38 & $\{3,11,15\}$ & $(104,104,64,-16)$ & $(80,80,\frac{1216}{25},\frac{464}{25})$ & $\{1\}$\\
+39 & $\{3,12,15\}$ & $(4,4,124,124)$ & $(\frac{224}{23},\frac{224}{23},\frac{8776}{115},\frac{9544}{115})$ & $\{8,14\}$\\
+40 & $\{5,7,15\}$ & $(8,64,120,64)$ & $(\frac{112}{5},\frac{224}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+41 & $\{5,10,15\}$ & $(64,64,64,64)$ & $(64,64,64,64)$ & $\varnothing$\\
+42 & $\{5,13,15\}$ & $(8,64,120,64)$ & $(\frac{112}{5},\frac{224}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+43 & $\{6,7,15\}$ & $(64,8,120,64)$ & $(\frac{224}{5},\frac{112}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+44 & $\{6,9,15\}$ & $(64,64,64,64)$ & $(64,64,64,64)$ & $\varnothing$\\
+45 & $\{6,14,15\}$ & $(64,8,120,64)$ & $(\frac{224}{5},\frac{112}{5},\frac{2328}{25},\frac{1912}{25})$ & $\{0\}$\\
+46 & $\{9,11,15\}$ & $(0,64,64,128)$ & $(\frac{96}{5},\frac{224}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+47 & $\{9,13,15\}$ & $(0,64,64,128)$ & $(\frac{96}{5},\frac{224}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+48 & $\{10,11,15\}$ & $(64,0,64,128)$ & $(\frac{224}{5},\frac{96}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+49 & $\{10,14,15\}$ & $(64,0,64,128)$ & $(\frac{224}{5},\frac{96}{5},\frac{1768}{25},\frac{2552}{25})$ & $\{0\}$\\
+50 & $\{12,13,15\}$ & $(64,64,56,72)$ & $(\frac{224}{5},\frac{224}{5},\frac{1688}{25},\frac{1992}{25})$ & $\{0\}$\\
+51 & $\{12,14,15\}$ & $(64,64,56,72)$ & $(\frac{224}{5},\frac{224}{5},\frac{1688}{25},\frac{1992}{25})$ & $\{0\}$\\
+\bottomrule\end{longtable}\endgroup
+
+
+\begin{theorem}[Fixed-model nonarrival arbitrarily close to patience]\label{thm:main}
+The fixed four-player payoff model above satisfies the hypotheses of the attachment. For every
+\[
+ \boxed{\quad\frac{3496}{3501}\le\delta<1,\qquad
+ p_\delta=(1-\alpha_\delta)I+\alpha_\delta Q,
+ \quad \alpha_\delta=\frac{3(1-\delta)}{\delta}\quad}
+\]
+$p_\delta$ is an equilibrium and
+$\Pr^{p_\delta}_{\varnothing}(T_{\mathcal G}=\infty)=1$.
+\end{theorem}
+\begin{proof}
+The discount interval is exactly $0<\alpha_\delta\le15/3496$. Proposition~\ref{prop:finite} and Lemma~\ref{lem:certificate} prove the equilibrium axioms. The set $C_0$ contains no grand state and is closed under $Q$, and therefore under $p_\delta$. Starting from $x_0=\varnothing$, every finite-time state is in $C_0$ with probability one. The countable union of the zero-probability events $\{X_t\notin C_0\}$ has probability zero. Hence the grand coalition is never hit almost surely. The same primitives and the same initial state work for all these discount factors. For example, $\delta_k=1-1/(1000k)$ for $k\ge1$ gives the requested sequence.
+\end{proof}
+
+\section{VERIFICATION}
+\textbf{Adversarial checks.} The first attempted time change of a different auxiliary kernel failed (E3) at off-cycle states: additional termination moves became profitable at high patience. That candidate was rejected. The kernel printed above fixes those rows and has been checked independently with both a matrix-based exact calculation and the self-contained verifier below.
+
+The proof uses no uniform mixing bound: positive move probabilities are allowed to converge to zero. The payoff table does not change with $\delta$. The result includes unilateral termination of an inner agreement together with every ancestor. Stays participate in domination even when they are not profitable. The computation retains exact equality in the status-quo tie rule. All off-cycle states are covered; no local-cycle calculation is promoted to a global equilibrium. The finite inverse in~\eqref{eq:L} is certified by the Bellman identities and stochasticity, not by floating-point inversion. Starting in a grand state gives $T_{\mathcal G}=0$ and is not the initial condition used in the theorem.
+
+\textbf{Reproducible verification.} Copy the following listing to a Python 3 file and run it. Only the standard library is required. It outputs the state and move counts and the exact patience threshold. The interval between discount factors is covered analytically by Lemma~\ref{lem:certificate}, not by numerical interpolation.
+
+\begin{lstlisting}[language=Python]
+"""Self-contained certificate for C71-12; Python 3 standard library only.
+No floating point, numerical search, or external solver is used.
+"""
+from fractions import Fraction as F
+from itertools import combinations
+from functools import lru_cache
+N = frozenset('ABCD')
+AB, CD = frozenset('AB'), frozenset('CD')
+def subsets(s, minimum=0):
+    s = sorted(s, key=lambda a: (len(a), tuple(sorted(a))))
+    return [frozenset(t) for r in range(minimum,len(s)+1)
+            for t in combinations(s,r)]
+coalitions = subsets(N,2)
+X = [frozenset(t) for r in range(len(coalitions)+1)
+     for t in combinations(coalitions,r)
+     if all(not(a & b) or a <= b or b <= a
+            for a,b in combinations(t,2))]
+assert len(X) == 52
+empty = frozenset()
+core = [empty, frozenset([AB]), frozenset([AB,CD]),
+        frozenset([CD])]
+cross = [frozenset([frozenset('AC'),frozenset('BD')]),
+         frozenset([frozenset('BC'),frozenset('AD')])]
+def top(x):
+    t = [a for a in x if not any(a < b for b in x)]
+    used = frozenset().union(*t)
+    return frozenset(t + [frozenset([i]) for i in N-used])
+def block_value(k,p):
+    if k == N: return F(256)
+    if k == AB and p == frozenset([AB,frozenset('C'),frozenset('D')]):
+        return F(240)
+    if k == CD and p == frozenset([AB,CD]): return F(240)
+    if all(len(a)==1 for a in p):
+        if k == frozenset('C'): return F(112)
+        if k == frozenset('D'): return F(128)
+    return F(0)
+@lru_cache(None)
+def payoff(x):
+    ans = {}; p = top(x)
+    for k in p:
+        if len(k)==1:
+            ans[next(iter(k))] = block_value(k,p)
+        else:
+            before = payoff(x-frozenset([k]))
+            gain = block_value(k,p)-sum(before[i] for i in k)
+            for i in k: ans[i] = before[i]+gain/len(k)
+    return ans
+
+def kernel(x):
+    if x in core:
+        return {x:F(2,3), core[(core.index(x)+1)%4]:F(1,3)}
+    if x == frozenset([AB,CD,N]):
+        return {x:F(3,8), core[3]:F(3,8), core[2]:F(1,4)}
+    if x in cross:
+        return {x:F(1,4), x|frozenset([N]):F(1,4),
+                **{frozenset([k]):F(1,4) for k in x}}
+    if any(x == y|frozenset([N]) for y in cross):
+        return {x:F(1)}
+    return {x:F(1,2), core[1] if AB in x else empty:F(1,2)}
+
+# A displayed rational Bellman certificate, not a computed approximation.
+# Each key lists agreements as strings, each value is in A,B,C,D order.
+DATA = [
+    ((), ('32', '32', '376/5', '424/5')),
+    (('AB',), ('64', '64', '192/5', '208/5')),
+    (('AC',), ('-16/5', '96/5', '1688/25', '1272/25')),
+    (('BC',), ('96/5', '-16/5', '1688/25', '1272/25')),
+    (('ABC',), ('64/15', '64/15', '5624/75', '1272/25')),
+    (('AD',), ('-32/5', '96/5', '1128/25', '1912/25')),
+    (('BD',), ('96/5', '-32/5', '1128/25', '1912/25')),
+    (('ABD',), ('32/15', '32/15', '1128/25', '6376/75')),
+    (('CD',), ('16', '16', '168/5', '232/5')),
+    (('ACD',), ('-64/5', '96/5', '1448/25', '1752/25')),
+    (('BCD',), ('96/5', '-64/5', '1448/25', '1752/25')),
+    (('ABCD',), ('104/5', '104/5', '2288/25', '2592/25')),
+    (('AB', 'ABC'), ('272/5', '272/5', '-224/25', '624/25')),
+    (('AB', 'ABD'), ('272/5', '272/5', '576/25', '-176/25')),
+    (('AB', 'CD'), ('8', '8', '384/5', '416/5')),
+    (('AB', 'ABCD'), ('88', '88', '616/25', '664/25')),
+    (('AC', 'ABC'), ('-16/5', '96/5', '1688/25', '1272/25')),
+    (('AC', 'BD'), ('240/13', '1152/65', '13248/325', '1104/25')),
+    (('AC', 'ACD'), ('-16/5', '96/5', '1688/25', '1272/25')),
+    (('AC', 'ABCD'), ('112/5', '224/5', '2328/25', '1912/25')),
+    (('BC', 'ABC'), ('96/5', '-16/5', '1688/25', '1272/25')),
+    (('BC', 'AD'), ('1152/65', '240/13', '13248/325', '1104/25')),
+    (('BC', 'BCD'), ('96/5', '-16/5', '1688/25', '1272/25')),
+    (('BC', 'ABCD'), ('224/5', '112/5', '2328/25', '1912/25')),
+    (('ABC', 'ABCD'), ('448/15', '448/15', '7544/75', '1912/25')),
+    (('AD', 'ABD'), ('-32/5', '96/5', '1128/25', '1912/25')),
+    (('AD', 'ACD'), ('-32/5', '96/5', '1128/25', '1912/25')),
+    (('AD', 'ABCD'), ('96/5', '224/5', '1768/25', '2552/25')),
+    (('BD', 'ABD'), ('96/5', '-32/5', '1128/25', '1912/25')),
+    (('BD', 'BCD'), ('96/5', '-32/5', '1128/25', '1912/25')),
+    (('BD', 'ABCD'), ('224/5', '96/5', '1768/25', '2552/25')),
+    (('ABD', 'ABCD'), ('416/15', '416/15', '1768/25', '8296/75')),
+    (('CD', 'ACD'), ('96/5', '96/5', '1048/25', '1352/25')),
+    (('CD', 'BCD'), ('96/5', '96/5', '1048/25', '1352/25')),
+    (('CD', 'ABCD'), ('224/5', '224/5', '1688/25', '1992/25')),
+    (('ACD', 'ABCD'), ('64/5', '224/5', '2088/25', '2392/25')),
+    (('BCD', 'ABCD'), ('224/5', '64/5', '2088/25', '2392/25')),
+    (('AB', 'ABC', 'ABCD'), ('80', '80', '416/25', '1264/25')),
+    (('AB', 'ABD', 'ABCD'), ('80', '80', '1216/25', '464/25')),
+    (('AB', 'CD', 'ABCD'), ('224/23', '224/23', '8776/115', '9544/115')),
+    (('AC', 'ABC', 'ABCD'), ('112/5', '224/5', '2328/25', '1912/25')),
+    (('AC', 'BD', 'ABCD'), ('64', '64', '64', '64')),
+    (('AC', 'ACD', 'ABCD'), ('112/5', '224/5', '2328/25', '1912/25')),
+    (('BC', 'ABC', 'ABCD'), ('224/5', '112/5', '2328/25', '1912/25')),
+    (('BC', 'AD', 'ABCD'), ('64', '64', '64', '64')),
+    (('BC', 'BCD', 'ABCD'), ('224/5', '112/5', '2328/25', '1912/25')),
+    (('AD', 'ABD', 'ABCD'), ('96/5', '224/5', '1768/25', '2552/25')),
+    (('AD', 'ACD', 'ABCD'), ('96/5', '224/5', '1768/25', '2552/25')),
+    (('BD', 'ABD', 'ABCD'), ('224/5', '96/5', '1768/25', '2552/25')),
+    (('BD', 'BCD', 'ABCD'), ('224/5', '96/5', '1768/25', '2552/25')),
+    (('CD', 'ACD', 'ABCD'), ('224/5', '224/5', '1688/25', '1992/25')),
+    (('CD', 'BCD', 'ABCD'), ('224/5', '224/5', '1688/25', '1992/25')),
+]
+L = {frozenset(frozenset(k) for k in fam):
+     dict(zip('ABCD',map(F,values))) for fam,values in DATA}
+assert set(L)==set(X)
+Q = {x:kernel(x) for x in X}
+Pi = {x:payoff(x) for x in X}
+assert all(sum(q.values())==1 and min(q.values())>0 for q in Q.values())
+assert all(sum(Pi[x].values())==256 for x in X if N in x)
+assert min(256-sum(Pi[x].values()) for x in X if N not in x)==16
+for x in X:
+    for k in top(x) & x:
+        b=Pi[x-frozenset([k])]
+        gain=sum(Pi[x][i]-b[i] for i in k)
+        assert all(Pi[x][i]==b[i]+gain/len(k) for i in k)
+Plus={x:{i:sum(p*L[y][i] for y,p in Q[x].items()) for i in N} for x in X}
+assert all(L[x][i]==Pi[x][i]/4+F(3,4)*Plus[x][i] for x in X for i in N)
+
+def moves(x):
+    result=[]
+    for a in subsets(top(x),2):
+        k=frozenset().union(*a)
+        result.append((x|frozenset([k]),k))
+    for k in x:
+        target=frozenset(a for a in x if not k<=a)
+        result.extend((target,frozenset([i])) for i in k)
+    result.extend((x,frozenset([i])) for i in N)
+    return result
+
+def strict(x,y,z,i):
+    return L[y][i]>L[z][i] or (L[y][i]==L[z][i] and y==x and z!=x)
+eta=None; B=F(0); count=0
+for x in X:
+    M=moves(x); count+=len(M)
+    U=[(y,k) for y,k in M if not any(
+        h<=k and all(strict(x,z,y,i) for i in h) for z,h in M)]
+    moving=[(y,k) for y,k in U if y!=x]
+    assert {y for y,k in moving} == set(Q[x])-{x}
+    for y,k in moving:
+        for i in k:
+            gap=L[y][i]-L[x][i]
+            assert gap>0
+            eta=gap if eta is None else min(eta,gap)
+    B=max(B,max(abs(Plus[x][i]-L[x][i]) for i in N))
+assert count==558 and eta==F(24,115) and B==F(608,25)
+alpha0=eta/(2*B)
+assert alpha0==F(15,3496)
+assert F(3)/(3+alpha0)==F(3496,3501)
+assert all(N not in x and set(Q[x])<=set(core) for x in core)
+print('PASS: 52 states; 558 moves; all sharing and Bellman identities;')
+print('all undominated target sets; eta=24/115; B=608/25;')
+print('equilibrium family certified for 3496/3501 <= delta < 1.')
+\end{lstlisting}
+
+\section{FINAL}
+\textbf{LABEL: FULL SOLUTION.}
+
+\textbf{SUBLABEL: FULL PROOF of the existential nonarrival assertion; COUNTEREXAMPLE/DISPROOF of the universal eventual-arrival threshold assertion.}
+
+Theorem~\ref{thm:main} supplies one fixed four-player model, explicit equilibrium matrices at every $\delta\in[3496/3501,1)$, and probability-one nonarrival from $\varnothing$. The decisive mechanism is endogenous waiting: the equilibrium axioms require positive support, not a lower bound on the frequency with which supported moves occur. This conclusion applies to the literal definitions in the attachment; adding a uniform positive lower bound on transition rates or requiring all positive self-loops to have profitable stay witnesses changes the problem.
+
+\end{document}

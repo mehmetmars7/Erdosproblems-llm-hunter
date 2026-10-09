@@ -1,0 +1,158 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-28: Exact Nash equilibrium in concurrent reachability games}
+\label{sec:C73-28}
+\noindent\textbf{Input:} \texttt{C73-28.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+Fix a finite nonempty state space $S$, initial state $s_0$, nonempty finite action sets $A_i(s)$, a transition kernel $P$, and targets $F_i\subseteq S$ for two players. At stage $t\geq0$, the players independently sample simultaneous actions conditional on the public state history. A strategy is a map from feasible nonempty state histories to the simplex over the current feasible actions. Its input does not include private past actions. Put
+\[
+ u_i(\sigma_1,\sigma_2)=\Pr_{s_0,\sigma_1,\sigma_2}(\exists t\geq0:s_t\in F_i).
+\]
+The exact target is
+\[
+ \forall G\ \forall s_0\ \exists\sigma_1,\sigma_2\ \forall i\in\{1,2\}
+ \ \forall\tau_i,\quad
+ u_i(\tau_i,\sigma_{-i})\leq u_i(\sigma_1,\sigma_2).
+\]
+No stationary or finite-memory restriction is imposed. An empty target gives constant payoff zero; a target containing $s_0$ gives constant payoff one. Later target visits need not be absorbing. This is an existence question, not a request to characterize the best response to every prescribed opponent strategy. No correction to the literal statement is needed.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Rajasekaran and Vardi \cite{reach-source} distinguish this infinite-horizon existence question from finite-horizon realizability and record that a previously proposed nonexistence example was flawed. Their state-history convention is retained here. The positive result below is for common targets, not arbitrary target pairs. The best-response example below is checked directly and is not represented as an equilibrium nonexistence result. The context check is dated 9 October 2026.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Type and tools.} This is infinite-horizon nonzero-sum equilibrium existence. Useful tools are: discounted dynamic programming (produce a finite policy selector); monotone convergence (recover reachability); finite-policy subsequences (retain exact attainment); cooperative joint control (a solved common-target subclass); behavioral deviation comparisons (respect the strategy domain); finite-horizon induction (tiny cases); optimal stopping (search for nonattainment).
+
+\textbf{Proof tracks.} First solve aligned targets through a team-control problem. Then test compactness of finite-horizon equilibria or best-response correspondences. \textbf{Disproof tracks.} Construct a prescribed opponent whose favorable response probability increases with time; test whether delaying indefinitely destroys attainment; distinguish this failure from a game with no equilibrium. The common-target theorem and explicit nonattainment obstruction are the achieved results.
+
+\subsection*{4) WORK}
+\begin{lemma}[An optimal pure stationary policy for finite reachability control]
+In a finite Markov decision process with finite nonempty action sets and target $F$, there is a pure stationary policy attaining the maximal probability of ever hitting $F$ simultaneously from every state, among all history-dependent randomized policies.
+\end{lemma}
+\begin{proof}
+Make $F$ absorbing; this does not change its first hitting time $\tau$. For $0<\beta<1$, maximize $\mathbb E[\beta^\tau\mathbf1_{\{\tau<\infty\}}]$, with value one for initial states in $F$. On the other states the Bellman equation is
+\[
+ v_\beta(s)=\beta\max_a\sum_{s'}P(s'\mid s,a)v_\beta(s').
+\]
+Its operator on the nonterminal coordinates, with terminal values fixed, is a contraction with constant $\beta$ in the supremum norm. The geometric iteration argument gives a unique fixed point. A maximizing pure selector attains it: iterate its Bellman equality along the chain, stopping at a hit or at time $N$, and let the bounded remainder $\beta^N$ tend to zero. For an arbitrary history policy, the corresponding Bellman inequalities give payoff at most the fixed point by the same stopped-iteration argument. Thus a pure stationary policy $\pi_\beta$ is optimal from all states.
+
+Let $V(s)=\sup_\pi\Pr_s^\pi(\tau<\infty)$. For each fixed policy $\pi$, monotone convergence gives
+\[
+ \sup_{0<\beta<1}\mathbb E_s^\pi[\beta^\tau\mathbf1_{\{\tau<\infty\}}]
+ =\Pr_s^\pi(\tau<\infty).
+\]
+Taking the supremum over $\pi$ commutes with the supremum over $\beta$, since both are suprema over the same Cartesian product of choices. Consequently $v_\beta(s)\uparrow V(s)$ as $\beta\uparrow1$.
+
+There are only finitely many pure stationary policies. Along some sequence $\beta_j\uparrow1$, the chosen $\pi_{\beta_j}$ is the same policy $\pi_*$. For each state, its discounted hitting payoffs converge by monotone convergence to its undiscounted hitting probability. But these payoffs are $v_{\beta_j}(s)$ and converge to $V(s)$. Hence $\pi_*$ attains $V$ from every state. This argument uses finiteness of pure stationary policies; compactness of unrestricted policies alone would not yield attainment.
+\end{proof}
+
+\begin{theorem}[Common targets admit exact subgame-perfect equilibrium]
+If $F_1=F_2=F$, the game in the input has an exact Nash equilibrium. In fact it has a pure stationary profile that is subgame perfect with prefixed target-achievement payoffs.
+\end{theorem}
+\begin{proof}
+Treat each joint action $(a_1,a_2)$ as a single action of a cooperative controller. This produces a finite Markov decision process. The preceding lemma supplies a pure stationary optimal joint selector $\pi_*(s)=(a_1^*(s),a_2^*(s))$. Its components are admissible independent pure actions in the original game.
+
+Fix a player and any behavioral state-history deviation while the other component remains prescribed. Their joint action distribution at each history is an allowed randomized action of the cooperative control problem. It therefore cannot produce a hitting probability exceeding the team optimum $V(s_0)$ already achieved by the selector. Since both players have exactly that hitting-probability payoff, neither has a profitable deviation.
+
+At a feasible history whose prefix has not hit $F$, the same argument applies from the last state, using simultaneous statewise optimality of $\pi_*$. If the prefix has hit $F$, both continuation payoffs are already one and cannot improve. Thus the profile satisfies the all-feasible-history subgame-perfect inequalities, even when targets are not originally absorbing. Collapsing the target was used only to compute the first-hit optimum; actions after the first hit have no payoff relevance.
+\end{proof}
+
+\begin{proposition}[A prescribed opponent can have no best response]
+There is a finite two-player concurrent reachability game and an admissible state-history strategy of player two against which player one has supremum payoff one but no strategy attaining it.
+\end{proposition}
+\begin{proof}
+Use states $s,w,\ell$, with $w,\ell$ absorbing. At $s$, player one chooses wait or stop, and player two chooses good or bad. Wait leads to $s$ regardless of the opponent's action; stop leads to $w$ after good and to $\ell$ after bad. Let $F_1=\{w\}$ and $F_2=\{\ell\}$. Prescribe for player two, after $t$ previous transitions still at $s$,
+\[
+ \Pr(\text{good at stage }t)=1-\frac1{t+2}.
+\]
+This is an allowed state-history strategy; the number of repeated states gives $t$, and neither player needs private action memory.
+
+Let $T_s$ be player one's first stopping stage under any behavioral strategy, with value $\infty$ when there is no stop. Conditional on $T_s=t<\infty$, simultaneous independent randomization gives success probability $1-1/(t+2)$. The opponent's earlier actions do not affect any state before stopping. Therefore
+\[
+ u_1=\sum_{t\geq0}\Pr(T_s=t)\left(1-\frac1{t+2}\right).
+\]
+If $\Pr(T_s<\infty)<1$, this is at most that probability and hence below one. If $\Pr(T_s<\infty)=1$, at least one integer $t$ has positive mass, and the strictly positive sum $\sum_t\Pr(T_s=t)/(t+2)$ again makes $u_1<1$. On the other hand, stopping at a deterministic stage $n$ yields $1-1/(n+2)\to1$. Thus the supremum is one and it is unattained.
+\end{proof}
+
+\paragraph{Why this is not a counterexample to the target.}
+In the very same game, let player one always wait and player two always choose bad. Neither can profitably deviate: player one can only reach $\ell$ by stopping and never reaches $w$; player two cannot make the waiting opponent stop and never reaches $\ell$. Both payoffs are zero. This profile is a Nash equilibrium and remains one after every feasible history with unachieved targets. The nonattainment proposition defeats a proof assuming that \emph{every prescribed opponent} has a best response; it does not defeat equilibrium existence.
+
+\paragraph{Finite-horizon check and its limitation.}
+For any fixed finite horizon, construct a finite normal-form game at each state-history node with payoffs equal to the already computed successor continuation payoffs. The finite mixed Nash theorem \cite{nash} gives a local equilibrium. Induction backwards verifies all multistage deviations by conditioning on the next state, so a finite-horizon SPE, and hence NE, exists. In the one-controller wait/stop game with common winning target, however, ``wait until stage $n$ then stop'' is an exact equilibrium for every $n$, and its coordinatewise limit always waits and is not an equilibrium. Thus taking an arbitrary limit of finite-horizon equilibria does not complete the infinite-horizon proof.
+
+\paragraph{Tiny computations.}
+For a one-state game with no other state reachable, each player's payoff is the constant indicator that the state is already in the target, so every profile is an equilibrium. The accompanying script also checks all 256 one-step $2\times2$ binary terminal-payoff tables with exact fractions, finding an equilibrium in each (254 have a pure one, two require mixing). For the fixed-opponent construction, stopping at stages $0,1,2,10,100$ gives the exact values $1/2,2/3,3/4,11/12,101/102$.
+\begin{lstlisting}
+for stop_time in [0, 1, 2, 10, 100]:
+    payoff = 1 - Fraction(1, stop_time + 2)
+    assert payoff < 1
+# The proof, not this finite loop, establishes supremum 1 and nonattainment.
+\end{lstlisting}
+
+\subsection*{5) VERIFICATION}
+The cooperative proof does not silently authorize correlated equilibrium: the optimal joint selector is pure and factors into the two actual choices. A unilateral behavioral deviation induces a permissible randomized team policy, so comparing against the larger cooperative control set is valid. The finite-policy subsequence is common to all states, making the prefixed SPE statement valid. In the nonattainment example, actions are not observed retrospectively except through the state; before stopping that state contains only time, exactly as required. The explicit equilibrium in the same example prevents mislabeling it as nonexistence. No compactness of payoffs has been assumed merely because the strategy-coordinate space is compact.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for arbitrary pairs of reachability targets.
+
+\textbf{Strongest checked partial result.} Every finite common-target game has an exact pure stationary SPE, proved by discounted reachability control and a finite-policy limit. A three-state game rigorously exhibits best-response nonattainment against a particular allowed opponent strategy, while still possessing an explicitly verified equilibrium.
+
+\textbf{Exact first gap.} For conflicting targets with potentially unbounded stopping times, no construction here produces a profile satisfying both players' infinite-horizon deviation inequalities simultaneously.
+
+\textbf{Top three next moves.} (1) Characterize jointly attainable continuation-payoff pairs inside nonstopping components. (2) Search for equilibrium selectors whose target-hitting tails are controlled even when arbitrary profiles have no such control. (3) Analyze three-state stop/wait variants with both players able to force transitions, explicitly checking history-dependent as well as stationary deviations.
+
+\textbf{Minimal counterexample perspective.} A genuine counterexample must use conflicting incentives and must rule out all state-history profiles. Failure of a best response to one opponent, failure of stationary equilibrium, or a bad limit of finite-horizon equilibria is insufficient.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{reach-source}
+Senthil Rajasekaran and Moshe Y. Vardi.
+\emph{Verifying Equilibria in Finite-Horizon Probabilistic Concurrent Game Systems}.
+arXiv:2503.14690, version 7 (2026), Sections 1--2.
+\url{https://arxiv.org/html/2503.14690v7}.
+
+\bibitem{nash}
+John F. Nash, Jr. Equilibrium points in $n$-person games.
+\emph{Proceedings of the National Academy of Sciences} 36(1) (1950), 48--49.
+DOI: 10.1073/pnas.36.1.48.
+\url{https://www.pnas.org/doi/10.1073/pnas.36.1.48}.
+
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,264 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-30: Nonpotential weak feedback selection for finite-state master equations}
+\label{sec:C73-30}
+\noindent\textbf{Input:} \texttt{C73-30.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+\subsection*{1) FORMAL RESTATEMENT}
+Let $d\geq3$, $T>0$, $\Delta_d=\{m\geq0:\sum_i m_i=1\}$, and let $f,g:\Delta_d\to\mathbb R^d$ be smooth on a neighborhood of the simplex. Define
+\[
+ H_i(u)=\tfrac12\sum_{j\ne i}(u_i-u_j)_+^2,
+ \qquad b_i(m,u)=\sum_{j\ne i}[m_j(u_j-u_i)_+-m_i(u_i-u_j)_+].
+\]
+The deterministic classical master equation is
+\[
+ -\partial_t U_i+H_i(U)-b(m,U)\cdot DU_i=f_i(m),
+ \qquad U_i(T,m)=g_i(m).
+\]
+For smooth nonnegative repulsion families $\phi_\varepsilon\to0$ locally uniformly on $(0,1]$, set
+\[
+ R_i^\phi=\sum_{j\ne i}[m_j\phi_\varepsilon(m_i)-m_i\phi_\varepsilon(m_j)],
+ \quad L_\varepsilon=\varepsilon\sum_{j,k}(m_j\delta_{jk}-m_jm_k)\partial_{jk}^2.
+\]
+The input's regularization is
+\begin{align*}
+0={}&\partial_tU_i+L_\varepsilon U_i+(b+R^\phi)\cdot DU_i
+ +2\varepsilon(e_i-m)\cdot DU_i-H_i(U)+f_i(m)\\
+&+\sum_{j\ne i}\phi_\varepsilon(m_j)(U_j-U_i),\qquad U_i(T,m)=g_i(m).
+\end{align*}
+Every derivative contraction is tangent to the simplex. Denote by $\mathcal A(f,g,T)$ the families for which this problem has a unique classical solution continuous on the closed domain, $C^1$ in time and $C^2$ in the interior, with bounded values and first derivatives and second derivatives bounded on interior compact subsets, separately for each $\varepsilon$. Unlike the companion population-selection input, this definition does not separately postulate an interior SDE solution.
+
+Set $Z^{\varepsilon,\phi}=(U_i^{\varepsilon,\phi}-U_d^{\varepsilon,\phi})_{i<d}$. A selected weak feedback field means an $L^1_{\rm loc}((0,T)\times\operatorname{int}\Delta_d)$ subsequential limit of these differences. Lebesgue measure is the $(d-1)$-dimensional simplex measure. The target is to find genuinely nonpotential assumptions and an intrinsic admissibility criterion giving compactness of these fields, uniqueness of every selected limit, and agreement with a classical master solution when one exists. A precise independence target is
+\[
+ \forall\phi,\psi\in\mathcal A(f,g,T)\ \forall K\Subset(0,T)\times\operatorname{int}\Delta_d,
+ \quad\|Z^{\varepsilon,\phi}-Z^{\varepsilon,\psi}\|_{L^1(K)}\longrightarrow0,
+\]
+together with existence of convergent subsequences. Empty regularization classes would make independence vacuous and would not supply selection. No correction to the explicit target is needed; however, merely writing $b(m,U)DU$ for a discontinuous field does not define a distribution.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Theorem 4.6 and Section 4.4 of Cardaliaguet--Delarue \cite{cardaliaguet-delarue}, printed p.~3693, separate potential weak selection from its nonpotential extension. Cecchin--Delarue \cite{cecchin-delarue} treats the potential construction. Nonpotential uniqueness is not wholly unexplored: Bertucci \cite{bertucci} develops continuous monotone solutions and stability in finite-state master equations. None of these observations alone identifies every limit of the exact repulsion class displayed above. The following characteristic argument is a direct monotonicity proof, not a claim of first establishing nonpotential master-equation uniqueness. Context checked on 9 October 2026.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Type and tools.} This is nonlinear PDE selection with a nonconservative transport product. Relevant tools are: forward--backward characteristics (an intrinsic continuous formulation); Schauder's fixed-point theorem (existence); component barriers (uniform characteristic bounds); monotonicity (uniqueness); convex Hamiltonian remainders (an energy identity); tangent-coordinate curl (certify genuine nonpotentiality); smooth jump profiles (test distributional meaning); local compactness estimates (the missing noisy-limit bridge).
+
+\textbf{Proof tracks.} Construct a unique intrinsic characteristic field under strict monotonicity, including an explicitly nonpotential example, and test classical consistency. Then try to identify vanishing-noise limits with it. \textbf{Disproof tracks.} Change the smoothing path across a feedback jump and compute the actual $b\,DZ$ product; vary boundary repulsion only where it is unconstrained; check whether uniqueness of characteristics really proves compactness of parabolic solutions. The characteristic construction succeeds; the last inference does not follow from it.
+
+\subsection*{4) WORK}
+\paragraph{A genuinely nonpotential structural assumption.}
+Assume, for some $\alpha>0$ and every $m,n\in\Delta_d$,
+\[
+ (f(m)-f(n))\cdot(m-n)\geq\alpha\|m-n\|_2^2,
+ \qquad (g(m)-g(n))\cdot(m-n)\geq0. \tag{MON}
+\]
+No symmetry of the derivative of $f$ is imposed. These assumptions are used only in the deterministic results below, unless a noisy-limit assertion is explicitly stated.
+
+\begin{lemma}[Existence of a deterministic forward--backward solution]
+For any smooth bounded $f,g$, every $t_0\in[0,T]$ and every interior initial law $m^0$, there is a bounded classical-in-time solution on $[t_0,T]$ to
+\[
+ \dot u_i=H_i(u)-f_i(m),\qquad
+ \dot m=b(m,u),\qquad m(t_0)=m^0,\quad u(T)=g(m(T)). \tag{FB}
+\]
+The population stays interior. Uniform bounds depend only on $d,T,\|f\|_\infty,\|g\|_\infty$.
+\end{lemma}
+\begin{proof}
+Given a continuous candidate path $z$ in the simplex, solve backward
+$\dot u_i=H_i(u)-f_i(z)$ with terminal $g_i(z(T))$.
+Local ODE existence and uniqueness follow from local Lipschitz continuity of $H$ in $u$ and continuity in time. In reversed time, the equation is $v_i'=f_i(z)-H_i(v)$. At a maximum component its derivative is at most $\|f\|_\infty$, and at a minimum component $H_i(v)=0$, so its derivative is at least $-\|f\|_\infty$. Scalar upper and lower barriers, or the corresponding one-sided derivatives at ties, give
+\[
+ \|u\|_\infty\leq M:=\|g\|_\infty+T\|f\|_\infty.
+\]
+The bound prevents escape from every bounded region in finite time, so the ODE extends to the whole interval. The rates $(u_i-u_j)_+$ are continuous and bounded by $2M$.
+
+With these rates solve the linear population equation from $m^0$. Its transition generator conserves total mass and has nonnegative off-diagonal entries. Positivity follows either by the integral equation with an integrating factor for each coordinate or by approximation with small time-step stochastic transition matrices. More explicitly, while coordinates are nonnegative each satisfies $\dot m_i\geq-2M(d-1)m_i$; comparison gives $m_i(t)\geq m_i^0e^{-2M(d-1)(t-t_0)}>0$, excluding a first loss of nonnegativity. The sum remains one. The coordinate drift is bounded in magnitude by $2Md$, so the resulting population path has a common Lipschitz bound.
+
+Let $\mathcal K$ be the set of continuous simplex paths starting at $m^0$ with Lipschitz constant at most $2Md$ in the supremum norm. It is nonempty, convex, closed, and compact in the Banach space of continuous paths: values are bounded and the common Lipschitz modulus gives Arzel\`a--Ascoli compactness. The construction just described maps $\mathcal K$ into itself. It is continuous: uniform convergence of $z$ gives uniform convergence of its running and terminal data by smoothness on the compact simplex; the bounded backward ODE solutions converge by Gronwall using the Lipschitz constant of $H$ on $[-M,M]^d$; the induced rates and the solutions of the linear forward ODE then converge by another Gronwall estimate.
+
+Schauder's fixed-point theorem states that a continuous self-map of a nonempty compact convex subset of a Banach space has a fixed point. All those hypotheses have just been checked. A fixed point of this map is precisely a solution of (FB). Its two paths are $C^1$ because their right sides are continuous. At $t_0=T$ simply prescribe $m(T)=m^0,u(T)=g(m^0)$. This covers the zero-length boundary case as well.
+\end{proof}
+
+\begin{theorem}[Uniqueness of characteristics under (MON)]
+Under (MON), solution (FB) is unique for every initial time and interior initial law.
+\end{theorem}
+\begin{proof}
+Each $H_i$ is convex and $C^1$, being a sum of positive-part squares of linear forms. Its convex remainder
+\[
+ D_{H_i}(v,u)=H_i(v)-H_i(u)-DH_i(u)\cdot(v-u)
+\]
+is nonnegative. Direct differentiation of the displayed Hamiltonian gives the vector identity
+\[
+ b(m,u)=-\sum_i m_i DH_i(u).
+\]
+For two solutions $(m,u),(n,v)$ with the same initial law, set $w=u-v$, $\delta m=m-n$. Differentiating their scalar product and using this vector identity gives, term by term,
+\begin{align*}
+ \frac d{dt}(w\cdot\delta m)
+ ={}&-(f(m)-f(n))\cdot(m-n)\\
+ &-\sum_i m_iD_{H_i}(v,u)-\sum_i n_iD_{H_i}(u,v)\\
+ \leq{}&-\alpha\|m-n\|_2^2.
+\end{align*}
+To check the signs, the coefficient of $m_i$ before introducing the remainder is
+$H_i(u)-H_i(v)-DH_i(u)\cdot(u-v)=-D_{H_i}(v,u)$;
+the coefficient of $n_i$ is $-D_{H_i}(u,v)$.
+
+At the initial time the scalar product is zero. At terminal time it is
+$(g(m(T))-g(n(T)))\cdot(m(T)-n(T))\geq0$.
+Integration therefore yields $0\leq-\alpha\int_{t_0}^T\|m-n\|_2^2dt\leq0$. Continuity forces $m=n$ at every time. With this fixed population path, the backward ODE and terminal condition have a unique solution by local Lipschitz uniqueness on the bounded range, so $u=v$.
+\end{proof}
+
+\begin{theorem}[An intrinsic continuous characteristic feedback field]
+Under (MON), define $\mathcal U(t_0,m^0)$ as the initial value $u(t_0)$ of the unique solution (FB). Then $\mathcal U$ is bounded and continuous on $[0,T]\times\operatorname{int}\Delta_d$ and has terminal value $g$. It is the unique bounded continuous field with the following intrinsic property: for every initial time and interior law there exists an absolutely continuous path $m$ with $\dot m=b(m,\mathcal U(t,m))$ such that $u(t)=\mathcal U(t,m(t))$ is absolutely continuous, satisfies $\dot u=H(u)-f(m)$, and has terminal value $g(m(T))$.
+\end{theorem}
+\begin{proof}
+Existence, uniqueness and the bound $M$ make the definition unambiguous. To prove continuity, take initial conditions $(t_n,m_n)\to(t,m)$ with $m$ interior. Extend their solution paths constantly to earlier times when necessary. The population paths have the uniform Lipschitz bound from the existence lemma. Their value derivatives are bounded by $2(d-1)M^2+\|f\|_\infty$, so the value paths also have a uniform Lipschitz bound. Arzel\`a--Ascoli gives a uniformly convergent subsequence of both extended paths. Passing to the integrated ODEs on $[t,T]$ and their terminal conditions shows that the limit solves (FB) from $(t,m)$. Uniqueness identifies it. Every convergent subsequence has the same limit; compactness then implies convergence of the whole sequence of initial values. This proves continuity, including at $t=T$.
+
+Take a solution from $(t_0,m^0)$. Its restriction from any later time $s$ solves (FB) with initial population $m(s)$. By uniqueness its value at that time is $\mathcal U(s,m(s))$. Hence the solution gives the required pathwise property. Conversely, a field possessing that property produces a solution of (FB) for every starting point. Uniqueness of (FB) forces its value at each starting point to equal $\mathcal U$. This is a deterministic characteristic admissibility principle. It is not yet a theorem identifying parabolic $L^1$ limits with that principle.
+\end{proof}
+
+\begin{corollary}[Classical consistency and uniqueness]
+Under (MON), any bounded $C^1$ classical solution of the deterministic master equation equals $\mathcal U$ throughout the interior. In particular there is at most one such classical solution, and its component differences equal those of $\mathcal U$.
+\end{corollary}
+\begin{proof}
+For a bounded classical field $U$, solve $\dot m=b(m,U(t,m))$ from an interior point. The drift is locally Lipschitz in $m$. Boundedness of $U$ gives a bound on all outgoing rates, and $\dot m_i\geq-Cm_i$ prevents approach to the boundary in finite time. Thus the characteristic extends to terminal time. The chain rule and master equation give
+\[
+ \frac d{dt}U_i(t,m(t))=\partial_tU_i+b\cdot DU_i=H_i(U)-f_i(m).
+\]
+The terminal condition supplies $g(m(T))$. This is the unique (FB) solution, so at the starting point $U=\mathcal U$. Since that point was arbitrary, the fields agree. This argument does not assert that a continuous characteristic field is differentiable.
+\end{proof}
+
+\begin{proposition}[An explicit genuinely nonpotential example satisfying (MON)]
+For $d=3$, let $f(m)=m+Km$, $g(m)=0$, where
+\[
+ K=\begin{pmatrix}0&-1&0\\1&0&0\\0&0&0\end{pmatrix}.
+\]
+Then (MON) holds with $\alpha=1$, but no smooth scalar potential has these tangent cost differences, even after adding a common state-dependent component to all the $f_i$.
+\end{proposition}
+\begin{proof}
+Skew symmetry gives $(m-n)\cdot K(m-n)=0$, hence
+$(f(m)-f(n))\cdot(m-n)=\|m-n\|_2^2$. The terminal condition is monotone with equality.
+
+Use simplex coordinates $x=m_1,y=m_2,m_3=1-x-y$. The tangent covector of a putative potential would have components
+\[
+ f_1-f_3=2x-1,\qquad f_2-f_3=2x+2y-1.
+\]
+Its cross derivatives are respectively zero and two. Equality of mixed partial derivatives for a smooth scalar function is necessary and fails on every interior open set. Adding the same scalar component to every $f_i$ leaves these differences unchanged. Thus the example is genuinely nonpotential in the feedback-relevant sense, not just an artifact of choosing an ambient extension or value gauge.
+\end{proof}
+
+\begin{proposition}[The actual feedback transport product is not determined by an $L^1$ jump limit]
+There are two sequences of smooth bounded fields $U^\varepsilon$ and $\widetilde U^\varepsilon$ on an interior three-state simplex rectangle, having the same $L^1$ limit and the same limiting component differences, for which
+$b(m,U^\varepsilon)\cdot D(U_1^\varepsilon-U_3^\varepsilon)$ and the analogous expression for $\widetilde U^\varepsilon$ have different distributional limits.
+\end{proposition}
+\begin{proof}
+Choose an interior rectangle in coordinates $(x,y)=(m_1,m_2)$ crossing $x=c>0$ and staying inside $x+y<1$. Set $U=(Z_1,Z_2,0)$. Let $\theta\in C^\infty(\mathbb R)$ be nondecreasing, zero for arguments at most $-1/4$ and one for arguments at least $1/4$. For sequence A, set
+\[
+ Z_1^\varepsilon=3+\theta((x-c)/\varepsilon+1),\qquad
+ Z_2^\varepsilon=1+\theta((x-c)/\varepsilon-1).
+\]
+For sequence B, exchange the $+1$ and $-1$ shifts in these two formulas. All fields are independent of $y$ and time. Both sequences converge in $L^1$ to $(3,1)$ for $x<c$ and $(4,2)$ for $x>c$. They always satisfy $Z_1>Z_2>0$. In this ordered region the model's drift is exactly
+\[
+ b_1(m,U)=-m_1[(Z_1-Z_2)+Z_1]=-x(2Z_1-Z_2).
+\]
+Since $U_3=0$ and the fields depend only on $x$, the transport expression in the proposition is $-x(2Z_1-Z_2)\partial_xZ_1$.
+
+In sequence A, $Z_2=1$ throughout the support of $\partial_xZ_1$, because its transition occurs later in a disjoint interval. Test against a smooth compactly supported function of $(x,y)$, change variables across the first transition, and use its shrinking support to replace $x$ and the test function by their values at $x=c$. The limiting coefficient of the delta measure on $x=c$ is
+\[
+ -c\int_3^4(2z-1)\,dz=-6c.
+\]
+In sequence B, $Z_2=2$ throughout the $Z_1$ transition, so the coefficient is instead
+\[
+ -c\int_3^4(2z-2)\,dz=-5c.
+\]
+The replacement in the test integral is justified by uniform continuity of its smooth coefficients on the shrinking support and the bounded total variation $\int\partial_xZ_1dx=1$. Thus the distributional limits are respectively $-6c\,\delta_{x=c}\otimes dy$ and $-5c\,\delta_{x=c}\otimes dy$ on the rectangle. They differ although their $L^1$ field limits agree.
+\end{proof}
+
+\paragraph{Scope of the obstruction.}
+These two smooth sequences are not claimed to solve the parabolic master equation or to have the input's terminal data. They disprove a putative definition of the unregularized nonlinear product based on $L^1$ convergence alone. They do \emph{not} disprove independence among genuine admissible noisy solutions, for which the PDE might enforce a particular transition path.
+
+\paragraph{A conditional, but not sufficient, passage to a classical limit.}
+If along a given admissible sequence $U^\varepsilon\to U$ in $C^1$ on every interior compact set, $\varepsilon D^2U^\varepsilon\to0$ there, and the terminal data are attained by the limiting field, direct substitution in the regularized equation gives the deterministic classical equation. Local vanishing of $\phi_\varepsilon$ eliminates its terms because values and first derivatives are then locally uniformly bounded. Under (MON), the corollary identifies this limit as $\mathcal U$. These are \emph{additional convergence hypotheses}, not estimates proved for the original admissible class. Treating them as an answer to the compactness question would be circular.
+
+\paragraph{Tiny checks and computation.}
+The explicit example has three states, the smallest dimension required in the input, and cross derivatives $0$ and $2$. The energy calculation reduces to the exact skew-symmetric identity $v\cdot Kv=0$. The jump-profile coefficients are the exact integrals $-6c$ and $-5c$. The accompanying script checks these coefficients algebraically and the displayed curl values. Minimal pseudocode is:
+\begin{lstlisting}
+left, right = 3, 4
+for fixed_Z2 in [1, 2]:
+    coefficient_over_c = -(right**2-left**2-fixed_Z2*(right-left))
+    assert coefficient_over_c in [-6, -5]
+assert cross_derivative_first == 0
+assert cross_derivative_second == 2
+\end{lstlisting}
+No discretized PDE calculation is used as proof of regularization-independent selection.
+
+\subsection*{5) VERIFICATION}
+The Schauder map has a compact convex domain and verified continuous dependence; uniqueness does not secretly assume a unique fixed point before applying monotonicity. The forward--backward energy signs were checked term by term, and the terminal monotonicity inequality has the correct direction. Interior positivity follows from bounded exit rates, not from an unjustified boundary condition. The nonpotential example is tested in tangent coordinates and is not made potential by a common value gauge. The two smoothing paths use the \emph{actual} three-state drift coefficient, not a generic unrelated conservation law. Most importantly, intrinsic characteristic uniqueness and classical consistency do not prove that the original parabolic family is compact or that its limits satisfy characteristic admissibility.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED} for the full selected-feedback compactness and regularization-independence target.
+
+\textbf{Strongest checked partial results.} Existence and uniqueness of deterministic forward--backward solutions under (MON); a unique bounded continuous intrinsic characteristic field and classical consistency; an explicit genuinely nonpotential strongly monotone example; and an explicit pair of smoothings proving that $L^1$ convergence alone does not determine the nonlinear feedback transport product.
+
+\textbf{Exact first gap.} No $L^1_{\rm loc}$ precompactness theorem has been proved here for all $Z^{\varepsilon,\phi}$ in the input's admissible class, even for the displayed strongly monotone nonpotential example. After compactness, identification with characteristic admissibility is a further unproved bridge.
+
+\textbf{Top three next moves.} (1) Derive uniform interior translation or variation estimates for the exact Kimura system, retaining all $\varepsilon$-gradient and repulsion terms. (2) Prove that every actual parabolic limit transports along the unique deterministic characteristics despite only weak feedback convergence. (3) Analyze admissible viscous transition profiles to determine which nonconservative paths the system selects, rather than allowing arbitrary smooth approximations.
+
+\textbf{Minimal counterexample perspective.} A genuine disproof of regularization independence would require the same smooth nonpotential $f,g$, two admissible repulsion families, and distinct verified limits of their actual PDE solutions. The two constructed smoothing paths show a definitional obstruction but do not meet those stronger requirements.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{cardaliaguet-delarue}
+Pierre Cardaliaguet and Fran\c{c}ois Delarue.
+\emph{Selected topics in mean field games}. Proceedings of the International Congress of Mathematicians 2022, volume 5.
+DOI: 10.4171/ICM2022/17. Sections 4.3--4.4; especially printed pp.~3691--3693.
+\url{https://ems.press/content/book-chapter-files/33265}.
+
+\bibitem{cecchin-delarue}
+Alekos Cecchin and Fran\c{c}ois Delarue.
+Selection by vanishing common noise for potential finite state mean field games.
+\emph{Communications in Partial Differential Equations} 47(1) (2022), 89--168.
+DOI: 10.1080/03605302.2021.1955256. Preprint: arXiv:2005.12153.
+\url{https://arxiv.org/abs/2005.12153}.
+
+\bibitem{bertucci}
+Charles Bertucci.
+Monotone solutions for mean field games master equations: finite state space and optimal stopping.
+\emph{Journal de l'\'Ecole polytechnique---Math\'ematiques} 8 (2021), 1099--1132.
+DOI: 10.5802/jep.167.
+\url{https://www.numdam.org/articles/10.5802/jep.167/}.
+
+\end{thebibliography}
+
+\end{document}

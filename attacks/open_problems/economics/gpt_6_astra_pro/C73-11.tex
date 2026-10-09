@@ -1,0 +1,314 @@
+% !TeX program = pdflatex
+% Self-contained source: pdflatex twice; no fontspec or external bibliography.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=24mm,headheight=14pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage{enumitem,booktabs,longtable,array,xurl,listings,needspace}
+\usepackage[hidelinks,unicode]{hyperref}
+\hypersetup{pdftitle={Economic Theory: Proof Attempts and Adversarial Checks},pdfauthor={Research notes},pdfsubject={Eleven user-supplied mathematical problems}}
+\newcommand{\NE}{\operatorname{NE}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\setcounter{tocdepth}{1}
+\setlist{leftmargin=*,itemsep=2pt,topsep=4pt}
+\lstset{basicstyle=\small\ttfamily,columns=fullflexible,keepspaces=true,
+ breaklines=true,breakatwhitespace=false,showstringspaces=false,
+ frame=single,framerule=0.25pt,aboveskip=8pt,belowskip=8pt,xleftmargin=3pt,xrightmargin=3pt}
+\allowdisplaybreaks[1]
+\raggedbottom
+
+\begin{document}
+{\large\bfseries Research attempt and adversarial verification}\par
+9 October 2026\hfill Original-target status: \textbf{UNRESOLVED}\par
+\section{C73-11: Universal convergence of simultaneous fictitious play}
+\label{sec:C73-11}
+\noindent\textbf{Input:} \texttt{C73-11.tex}. \quad\textbf{Tools:} web browsing [YES]; Python computation [YES].
+
+\subsection*{1) FORMAL RESTATEMENT}
+Let $N=\{1,\ldots,n\}$, with $n\geq1$, and let every finite action set $S_i$ be
+nonempty. Let $X=\prod_i\Delta(S_i)$, and extend each payoff array $u_i$
+multilinearly to independent mixed profiles. For every $x^1\in X$, and every
+sequence of legal simultaneous best replies, set
+\[
+ a_i^{t+1}\in\argmax_{a\in S_i}u_i(a,x_{-i}^t),\qquad
+ x_i^{t+1}=x_i^t+\frac{e_{a_i^{t+1}}-x_i^t}{t+1},\quad t\geq1.
+\]
+The class to characterize is
+\[
+ \mathcal C_{\rm FP}=\{G:\ \forall x^1\in X\ \forall\text{ legal reply sequences},
+ \ \operatorname{dist}(x^t,\NE(G))\longrightarrow0\}.
+\]
+Euclidean distance is used. Boundary initializations and arbitrary choices at ties
+are included. The output sought is a noncircular condition on payoff arrays,
+not another formula quantifying over the same trajectories. This is a classification
+agenda; a nonconvergent game excludes that game, not the classification question itself.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+The input survey \cite{li-survey} supplies the learning-classification context.
+Monderer and Shapley \cite{monderer-fp} prove a fictitious-play property for
+identical-interest games. The proof below independently treats positive weighted
+potential games under the precise simultaneous update and tie convention in the
+input. A specific nonconvergent $3\times3$ array is analyzed directly, rather than
+relying on an unspecified version of a cyclic-play example.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof track.} Use a continuous Nash residual; seek a payoff-derived
+Lyapunov function with a summable discretization error; turn weighted summability
+of residuals into pointwise residual convergence.
+
+\textbf{Construction track.} Test a cyclic $3\times3$ interaction, first with
+synchronized beliefs and then with distinct pure initializations. Track constant
+best-reply blocks exactly to distinguish an actual counterexample from a finite
+simulation that only appears to cycle.
+
+\textbf{Tools and purpose.} Multilinear extension identifies directional gains;
+compactness equates residual and Nash-set convergence; Taylor's theorem controls
+simultaneous-update errors; harmonic step sums prevent isolated residual spikes;
+strict payoff comparisons make block lengths exact; permutation support arguments
+identify the equilibrium set; integer count arithmetic eliminates floating-point
+tie errors in the search.
+
+\subsection*{4) WORK}
+For later use, define
+\[
+ r_i(x)=\max_{a_i}u_i(a_i,x_{-i})-u_i(x),\qquad R(x)=\sum_i r_i(x).
+\]
+Every $r_i$ is nonnegative and Lipschitz on $X$, because it is a finite maximum
+of polynomials minus a polynomial. Also $R(x)=0$ exactly on $\NE(G)$: no mixed
+deviation can outperform the best pure deviation. Since $X$ is compact and
+$\NE(G)$ is nonempty by finite-game Nash existence \cite{nash}, any sequence has
+$R(x^t)\to0$ if and only if its distance to $\NE(G)$ tends to zero. To verify the
+nontrivial direction, a sequence with distance bounded below has a convergent
+subsequence whose limit is outside $\NE(G)$ but has zero residual, a contradiction.
+
+\begin{theorem}[Positive weighted potential games belong to $\mathcal C_{\rm FP}$]
+Suppose there are $w_i>0$ and an array $\Phi$ such that, for every pure opponents'
+profile and every $a_i,b_i$,
+\[
+ u_i(a_i,s_{-i})-u_i(b_i,s_{-i})
+ =w_i\bigl(\Phi(a_i,s_{-i})-\Phi(b_i,s_{-i})\bigr).
+\]
+Then every process in the formal restatement converges in distance to $\NE(G)$.
+\end{theorem}
+\begin{proof}
+Extend $\Phi$ multilinearly and put $\alpha_t=1/(t+1)$ and
+$d^t=(e_{a_i^{t+1}}-x_i^t)_i$. The potential identity extends by multilinearity,
+so
+\[
+ \langle\nabla\Phi(x^t),d^t\rangle
+ =\sum_i\frac{r_i(x^t)}{w_i}=:Q(x^t)\geq0.
+\]
+The norm of $d^t$ is bounded by a constant $D$, and the Hessian of $\Phi$ is bounded
+on the compact convex set $X$. Taylor's theorem on the line segment of the update
+therefore gives a constant $C$ with
+\[
+ \Phi(x^{t+1})-\Phi(x^t)\geq\alpha_tQ(x^t)-C\alpha_t^2.
+\]
+Writing $e_t=C\alpha_t^2$, the bounded sequence
+$\Phi(x^t)-\sum_{s=t}^{\infty}e_s$ is nondecreasing. It converges, and summing the
+displayed inequality gives $\sum_t\alpha_tQ(x^t)<\infty$.
+
+Here is the required no-spike argument. Let $L$ be a Lipschitz constant for $Q$.
+If $LD=0$, then $Q(x^t)$ is constant along the process and the divergent sum
+$\sum_t\alpha_t$ forces that constant to be zero. Otherwise suppose infinitely
+many $t$ have $Q(x^t)\geq\delta>0$. Starting at any sufficiently large such time,
+let $k>t$ be the first index such that
+$\sum_{s=t}^{k-1}\alpha_s\geq\delta/(2LD)$. For $t\leq j<k$, the minimality of
+$k$ gives $Q(x^j)\geq\delta/2$. Thus this interval contributes at least
+$\delta^2/(4LD)$ to $\sum_s\alpha_sQ(x^s)$. If there are infinitely many spikes,
+choose these finite intervals successively with disjoint interiors. Their
+contributions contradict the finite sum. Hence $Q(x^t)\to0$. Positive weights
+make this equivalent to $R(x^t)\to0$, and the residual criterion finishes the proof.
+\end{proof}
+This is a sufficient array condition, not a necessary one. For example, strict
+dominance gives another class: if every player has a strictly dominant pure action,
+all selected replies are those actions, and
+$x_i^t=e_{a_i^*}+(x_i^1-e_{a_i^*})/t$. The arrays
+\[
+ A=\begin{pmatrix}3&2\\1&0\end{pmatrix},\qquad
+ B=\begin{pmatrix}3&0\\2&0\end{pmatrix}
+\]
+have strictly dominant first actions but cannot have a positive weighted potential:
+the row player's rectangular payoff difference is zero, while the column player's
+is one; multiplying either by a positive weight cannot reconcile them.
+
+\begin{theorem}[An explicit game outside $\mathcal C_{\rm FP}$]
+Let
+\[
+ A=\begin{pmatrix}0&0&1\\1&0&0\\0&1&0\end{pmatrix},\qquad
+ B=\begin{pmatrix}0&1&0\\0&0&1\\1&0&0\end{pmatrix}.
+\]
+Start from $x^1=e_1$, $y^1=e_2$ and choose the lowest numbered best action at every
+tie. This legal process does not approach the Nash set.
+\end{theorem}
+\begin{proof}
+Each player best responds by selecting the cyclic successor of a largest
+coordinate of the other's empirical counts. First, the only equilibrium is
+$x=y=(1/3,1/3,1/3)$. Indeed, a singleton support for one player forces a singleton
+support for the other; their cyclic-successor requirements would give a pure
+action equal to its successor twice, which is impossible. If a support has size
+two, the other player's largest-coordinate set must contain at least two actions.
+The other support cannot have size one; if it had size three, best-response
+indifference would force the first player to be uniform with full support.
+Consequently both supports have size two and both distributions put weight
+$1/2$ on their supports. Each support must be the cyclic successor of the other,
+so a two-element subset would be invariant under a three-cycle squared. No such
+subset exists. Full supports force both distributions to be uniform.
+
+Use integer counts $c=tx^t$ and $d=ty^t$. These are integers for the chosen initial
+condition. Consecutive constant reply blocks have the following forms; the final
+column is the condition at which the next block begins:
+\[
+\begin{array}{c|c|c}
+ k\bmod6&(\text{row action},\text{column action})&\text{switch condition}\\\hline
+ 0&(3,2)&c_3=c_1\\
+ 1&(3,1)&d_1=d_2\\
+ 2&(2,1)&c_2=c_3+1\\
+ 3&(2,3)&d_3=d_1\\
+ 4&(1,3)&c_1=c_2\\
+ 5&(1,2)&d_2=d_3+1
+\end{array}
+\]
+We verify this table and its repetition, including all tie offsets. At the start
+of a six-block cycle write $c=(a,b,c_0)$ and $d=(d_0,e,f)$, with
+$a>b\geq c_0$, $e=f+1$, and $f\geq d_0$. Initially these are $(1,0,0)$ and
+$(0,1,0)$. The six positive lengths are
+\begin{align*}
+ A_0&=a-c_0, &B_0&=e+A_0-d_0, &C_0&=a+B_0-b+1,\\
+ D_0&=C_0+A_0+1, &E_0&=D_0+B_0+1, &F_0&=E_0+C_0+1.
+\end{align*}
+In the first block, the third row count catches the first; at equality the column's
+first action takes precedence over its second. In the second, the first column
+count catches the second; the row's second action takes precedence over its third.
+In the third, the second row count must exceed the third, since equality still
+favors the column's first action. In the fourth and fifth, equality suffices by
+the same lowest-action rule; in the sixth the second column count must exceed
+the third. These are exactly the six conditions in the table. The untouched
+third competitor is never larger than the two being compared, by the displayed
+initial inequalities and the positive preceding increments.
+
+At the next cycle the counts are
+\[
+ c'=(a+E_0+F_0,\ b+C_0+D_0,\ a+B_0),\quad
+ d'=(e+A_0+C_0,\ e+A_0+F_0,\ e+A_0+C_0+E_0).
+\]
+They satisfy the same inequalities, now strictly where needed, and $d'_2=d'_3+1$.
+This proves repetition of the table. If $\ell_k$ is the length of block $k$, the
+formulas also give
+\[
+ \ell_0=1,\quad\ell_1=2,\quad\ell_2=4,\qquad
+ \ell_{k+3}=\ell_{k+2}+\ell_k+1\quad(k\geq0).
+\]
+For clarity, the cross-cycle identities follow by subtraction:
+$A'_0=D_0+F_0+1$, $B'_0=A'_0+E_0+1$, and
+$C'_0=B'_0+F_0+1$. Thus the recurrence covers every index, not just the
+three within-cycle transitions.
+
+The lengths increase and $\ell_{k+3}\geq2\ell_k$. Grouping the earlier lengths
+in triples consequently gives $\sum_{j=0}^k\ell_j\leq6\ell_k$.
+If block $k$ begins at time $t_k=1+\sum_{j<k}\ell_j$, its averaging weight is
+\[
+ \lambda_k=\frac{\ell_k}{t_k+\ell_k}\geq\frac17.
+\]
+During this block the row player repeats one action $a$, so
+$x^{t_k+\ell_k}=(1-\lambda_k)x^{t_k}+\lambda_ke_a$.
+If both endpoint profiles were within Euclidean distance $1/30$ of the uniform
+profile, their $a$ coordinates could differ by at most $1/15$. But the update
+would increase that coordinate by at least
+\[
+ \frac17\left(\frac23-\frac1{30}\right)=\frac{19}{210}>\frac1{15}.
+\]
+At least one endpoint is therefore a distance at least $1/30$ from the unique
+Nash equilibrium. The endpoint times tend to infinity. Set convergence fails.
+\end{proof}
+
+\subsection*{5) VERIFICATION}
+For a one-player game, every chosen action maximizes its fixed payoff and initial
+mass on suboptimal actions is divided by $t$. The same argument handles singleton
+action sets. In the two-player identical-payoff anti-coordination game with matrix
+$\left(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\right)$, synchronized pure-start
+fictitious play has total residual $(t+1)/t^2$ at odd $t$, consistent with the
+potential theorem. Actual actions need not converge in this example.
+
+The integer implementation of the cyclic counterexample records total residuals
+$0.3054$, $0.282011$, $0.27850335$, and $0.278920207$ at times
+$10^2,10^3,10^4,10^5$. The analytical block proof, not those four numbers,
+certifies nonconvergence. An initial attempted test with both initial beliefs
+$e_1$ instead produced residuals tending to zero; the universal quantifier requires
+only one legal bad initialization, not that every initialization fail.
+
+Minimal search pseudocode is
+\begin{lstlisting}
+c, d = (1,0,0), (0,1,0)
+for t = 1,2,...:
+    row = first_argmax(A*d)
+    col = first_argmax(transpose(B)*c)
+    record_switches_and_residual_before_update()
+    c[row] += 1; d[col] += 1
+\end{lstlisting}
+The potential proof uses $\sum\alpha_t^2<\infty$ and
+$\sum\alpha_t=\infty$ separately. It neither assumes strict potential improvement
+at a tie nor interchanges a maximum and an infinite-time limit.
+
+\Needspace{8\baselineskip}
+\subsection*{6) FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest checked partial result.} A complete convergence theorem for positive
+weighted potential games, a distinct dominance class, and a fully verified explicit
+$3\times3$ exclusion with an infinite subsequence bounded away from its unique equilibrium.
+
+\textbf{Exact first gap.} No noncircular necessary-and-sufficient payoff-array
+criterion for arbitrary finite games is established.
+
+\textbf{Next three moves.}
+\begin{enumerate}[nosep]
+\item Characterize which nonpotential perturbations preserve the Lyapunov inequality
+with an error that remains summable along every legal path.
+\item Search for cyclic-block certificates with rational inequalities and prove
+completeness or incompleteness of that certificate family in small dimensions.
+\item Test proposed criteria against both the strictly dominant nonpotential array
+and the synchronized versus asymmetric paths of the cyclic array.
+\end{enumerate}
+\textbf{Counterexample perspective.} The displayed game falsifies universal convergence
+across all games. It does not falsify a yet-unspecified characterization, and it
+does not show that all nonpotential games fail.
+
+\paragraph{Reproducibility and scope.} This is one of eleven companion reports. The bundle includes \texttt{verify.py} and its executed results. Finite experiments supplement the proofs; they are not proofs of asymptotic claims. Literature coverage is targeted, and no novelty or formal proof-assistant certification is claimed.
+
+\begin{thebibliography}{99}
+\small
+\bibitem{li-survey}
+Hanyu Li, Wenhan Huang, Zhijian Duan, David Henry Mguni, Kun Shao, Jun Wang, and Xiaotie Deng.
+\emph{A survey on algorithms for Nash equilibria in finite normal-form games}. arXiv:2312.11063 (2023).
+\url{https://arxiv.org/abs/2312.11063}.
+
+\bibitem{monderer-fp}
+Dov Monderer and Lloyd S. Shapley.
+Fictitious Play Property for Games with Identical Interests.
+\emph{Journal of Economic Theory} 68(1) (1996), 258--265.
+\url{https://www.sciencedirect.com/science/article/pii/S0022053196900149}.
+
+\bibitem{nash}
+John F. Nash, Jr. Equilibrium points in $n$-person games.
+\emph{Proceedings of the National Academy of Sciences} 36(1) (1950), 48--49.
+DOI: 10.1073/pnas.36.1.48.
+\url{https://www.pnas.org/doi/10.1073/pnas.36.1.48}.
+
+\end{thebibliography}
+
+\end{document}

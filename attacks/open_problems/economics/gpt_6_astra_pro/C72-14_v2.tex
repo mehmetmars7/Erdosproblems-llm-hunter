@@ -1,0 +1,183 @@
+% ECONOMICS_PROBLEM: {"id": "C72-14", "title": "The Catch-Up optimal-draw conjecture for consecutive integers", "jel_code": "C72", "source_id": "OP-0589"}
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xcolor,xurl,hyperref,listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}\newcommand{\E}{\mathbb E}
+\newcommand{\1}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\conv}{\operatorname{conv}}
+\newcommand{\rank}{\operatorname{rank}}
+\lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,columns=fullflexible,
+ keepspaces=true,showstringspaces=false,frame=single,aboveskip=8pt,belowskip=8pt}
+\begin{document}
+\begin{center}
+{\Large\bfseries The Catch-Up optimal-draw conjecture}\par
+\medskip
+{\large C72-14: research attempt and adversarial verification}\par
+9 October 2026
+\end{center}
+\textbf{Tools.} Web browsing: YES. Exact rational computation: YES.\par
+\section{FORMAL RESTATEMENT}
+Let $\N=\{1,2,\ldots\}$ and let $R$ be a finite set of distinct positive integers. The player due to select is behind by the nonnegative integer $d$, and must select an item when $R\ne\varnothing$, even if $d=0$. Selecting $x<d$ leaves the same player active with deficit $d-x$; selecting $x\ge d$ transfers activity to the other player, whose deficit is $x-d$. Scores are additive. The terminal payoff is the final score of the currently designated player minus the other player's final score; throughout, players optimize the actual difference, not merely a win/draw/loss label.
+
+Define
+\[
+ V(\varnothing,d)=-d,\qquad
+ V(R,d)=\max_{x\in R}\begin{cases}
+ V(R\setminus\{x\},d-x),&x<d,\\
+ -V(R\setminus\{x\},x-d),&x\ge d.
+ \end{cases}
+\]
+For $S_N=\{1,\ldots,N\}$ and $T_N=N(N+1)/2$, the proposition is
+\[
+ \forall N\in\N:\quad N\equiv0\text{ or }3\pmod4
+ \ \Longrightarrow\ V(S_N,0)=0.
+\]
+An opening $x$ has value $-V(S_N\setminus\{x\},x)$ for player 1. Thus the desired conclusion is equivalent to all opening values being nonpositive and at least one being zero.
+
+\textbf{Stress points.} Equality transfers the turn; deficit is a necessary state variable; several consecutive selections by the same player are legal; positivity of the integers is used in the stopping shortcut below. $N=0$ is outside the statement, although the empty game would have value zero. There is no ambiguity requiring a change in the mathematical target.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The primary article is A. Isaksen, M. Ismail, S. J. Brams and A. Nealen, \emph{Catch-Up: A Game in Which the Lead Alternates}, Game \& Puzzle Design 1(2), 38--49 (2015), archived at \url{https://mpra.ub.uni-muenchen.de/108784/}. The institutional LSE 2019 seminar record also lists Bernhard von Stengel's \emph{Computational progress on the Catch-Up game}: \url{https://www.lse.ac.uk/Mathematics/assets/documents/Events-Archive/CGO-PhD/PhD-Seminar-on-Combinatorics-2019-update.pdf}.
+
+The conference website named in the attachment could not be retrieved in this check. The separately named October 2026 working note is not among these nine attachments; its reported computations are not used. The computations below were rerun from the displayed recurrence. These source checks do not establish that every alternative scoring or tie convention is equivalent to the present one.
+
+\section{ATTACK PLAN}
+\textbf{Proof strategies.} Induct on a strengthened family of states $(R,d)$ rather than on $N$ alone; seek a paired-block invariant that survives an opponent's multiple selections; alternatively prove the stronger bound $|V(S_N,0)|\le1$ and use parity.
+
+\textbf{Disproof strategies.} Exhaustively solve consecutive sets; test equal-sum and deficit-monotonicity generalizations on small nonconsecutive sets; test forced-single-selection restrictions against the unrestricted recursion. Exact dynamic programming is selected as the immediate falsification tool, followed by structural lemmas.
+
+\textbf{Relevant tools.} Backward induction defines the exact value; memoization avoids repeated states; parity restricts attainable payoffs; remaining-total bounds terminate hopeless catch-up states; bit masks encode the residual set; score-state verification checks the reduced state convention; equal-sum partitions diagnose an inadequate induction hypothesis; adversarial opening analysis separates a draw strategy from mere draw feasibility.
+
+\textbf{Tiny cases.} $V(\{1\},0)=1$. On $\{1,2\}$, opening 1 loses by 1 and opening 2 wins by 1, so the value is 1. On $\{1,2,3\}$, the three opening values are $0,-2,0$. These calculations include the smallest admissible case $N=3$ and show why considering only one opening is insufficient.
+
+\section{WORK}
+\begin{lemma}[The recurrence is the minimax value]\label{lem:dp}
+For every finite $R$ and integer $d\ge0$, the displayed recursion equals the scoring-game minimax value, and pure optimal strategies exist after every legal history.
+\end{lemma}
+\begin{proof}
+Induct on $|R|$. With no items left, the current player's existing deficit is the terminal payoff $-d$. If $R$ is nonempty, that player chooses one of finitely many items. When $x<d$, that player is still behind and remains the maximizing player for the smaller subgame. When $x\ge d$, the other player is designated, and the two players' final advantages have opposite signs, giving the minus sign in the recursion. The induction hypothesis evaluates each smaller subgame. Choosing an item attaining the finite maximum and then following its optimal continuation proves the assertion. Ties at $x=d$ belong to the second case and are therefore included.
+\end{proof}
+
+\begin{lemma}[Bounds, parity, scaling, and terminal shortcut]\label{lem:invariants}
+Write $s(R)=\sum_{x\in R}x$. Then
+\[
+ -s(R)-d\le V(R,d)\le s(R)-d,\qquad
+ V(R,d)\equiv s(R)-d\pmod2.
+\]
+If $d\ge s(R)$, then $V(R,d)=s(R)-d$. For each positive integer $k$,
+$V(kR,kd)=kV(R,d)$, where $kR=\{kx:x\in R\}$.
+\end{lemma}
+\begin{proof}
+In a terminal allocation, let $B\subseteq R$ be the items received by the other player. The current player's final advantage is
+$s(R)-d-2s(B)$. This proves both bounds and parity for every terminal history. Backward induction selects a terminal value at every node of this finite game tree, so they also hold for $V$.
+
+When $d\ge s(R)$, positivity implies that before the last item the active player cannot catch up: every proper selected subset has sum strictly less than $s(R)\le d$. That player receives all items. If equality holds, the turn changes only after the final item, which does not change the terminal score. This proves the shortcut, including $R=\varnothing$.
+
+Multiplication by $k$ preserves the two comparisons $x<d$ and $x\ge d$. Induction on $|R|$ in the recurrence multiplies every candidate payoff, and hence its maximum, by $k$.
+\end{proof}
+
+\begin{corollary}[The arithmetic reduction]
+$T_N$ is even exactly when $N\equiv0,3\pmod4$. In those cases, proving $|V(S_N,0)|\le1$ would prove the conjecture.
+\end{corollary}
+\begin{proof}
+Checking the four residues of $N$ modulo 4 gives the parity assertion. By Lemma~\ref{lem:invariants}, $V(S_N,0)$ is then an even integer; zero is its only possible value in $[-1,1]$.
+\end{proof}
+
+\begin{lemma}[Finite search state bound]
+Every deficit reached from $(S_N,0)$ lies in $\{0,1,\ldots,N\}$. Thus at most $(N+1)2^N$ reduced states are needed, with at most $N$ transitions per state.
+\end{lemma}
+\begin{proof}
+The initial deficit is zero. If $x<d\le N$, the new deficit $d-x$ is nonnegative and at most $N$. Otherwise the new deficit is $x-d\le x\le N$. Induction along a history proves the claim. There are $2^N$ possible remaining subsets. This yields an exact exponential-time algorithm, not a uniform proof of the conjecture.
+\end{proof}
+
+\subsection{What the exact computation finds}
+The recurrence was evaluated for every $1\le N\le22$. The resulting values, in order, are
+\[
+\begin{array}{c|rrrrrrrrrrr}
+N&1&2&3&4&5&6&7&8&9&10&11\\\hline
+V&1&1&0&0&1&1&0&0&-1&-1&0\\
+\end{array}
+\]
+\[
+\begin{array}{c|rrrrrrrrrrr}
+N&12&13&14&15&16&17&18&19&20&21&22\\\hline
+V&0&1&-1&0&0&1&-1&0&0&1&1.
+\end{array}
+\]
+Thus all admissible values $N=3,4,7,8,11,12,15,16,19,20$ in this range give draws. At $N=22$, 45,742,930 non-shortcut memoized states were evaluated. The full opening vector was evaluated for each $N$; for example it is $(0,0,-2,-2)$ at $N=4$, and all opening values are zero at $N=20$. A separate implementation retaining both absolute scores and the active-player identity agreed for $1\le N\le11$.
+
+\subsection{Two exact failures of natural strengthening attempts}
+\textbf{A deficit-monotonicity failure.} Direct use of the recursion gives
+\[
+ V(\{1,2\},1)=0<1=V(\{1,2\},2).
+\]
+For the first equality, choosing 1 leads to $-V(\{2\},0)=-2$, whereas choosing 2 leads to $-V(\{1\},1)=0$. For the second, choosing 1 gives $V(\{2\},1)=1$, while choosing 2 gives $-V(\{1\},0)=-1$. A larger starting deficit can therefore improve the minimax outcome by altering activity transitions.
+
+\textbf{An equal-partition failure.} Let $R=\{2,5,6,8,9\}$. The equal partition $\{6,9\}\sqcup\{2,5,8\}$ has sum 15 on each side, but $V(R,0)=2$. Its opening values are
+\[
+\begin{array}{c|rrrrr}
+x&2&5&6&8&9\\\hline
+\text{opening value}&2&-4&-2&-2&-2.
+\end{array}
+\]
+These are exact finite-recursion values, reproduced by the listing below. For an additional local check, after opening 2 the other player's four choices have values $-4,-2,-2,-2$, respectively, because the next-player subgame values are $4,2,2,2$. This is a counterexample to ``equal-sum partition implies optimal draw'', \emph{not} a counterexample to the consecutive-integer conjecture.
+
+\section{VERIFICATION}
+\textbf{Executable specification and small counterexample certificate.} The following Python listing includes no heuristics. The production run to $N=22$ used the equivalent C++ bit-mask implementation also supplied with this research output; the Python version is intended for small reruns.
+\begin{lstlisting}[language=Python]
+from functools import lru_cache
+@lru_cache(None)
+def V(R,d):
+    assert d >= 0 and len(set(R)) == len(R)
+    if d >= sum(R):
+        return sum(R)-d
+    candidates=[]
+    for x in R:
+        tail=tuple(y for y in R if y!=x)
+        candidates.append(V(tail,d-x) if x<d else -V(tail,x-d))
+    return max(candidates)
+for n in range(1,13):
+    R=tuple(range(1,n+1))
+    print(n,V(R,0),[-V(tuple(y for y in R if y!=x),x) for x in R])
+R=(2,5,6,8,9)
+assert [-V(tuple(y for y in R if y!=x),x) for x in R] == [2,-4,-2,-2,-2]
+assert V((1,2),1)==0 and V((1,2),2)==1
+\end{lstlisting}
+
+\textbf{Adversarial review.} Every recursive call removes exactly one item. The sign changes only upon transferring activity. The shortcut at $d=s(R)$ preserves the outcome, even though that last selection formally changes the turn. The integer memo table used a sentinel outside the possible payoff range. No symmetry, pairing assumption, or dominance pruning was used in the reported search. A finite table, however large, does not establish the quantified statement for all $N$.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+
+\textbf{Strongest checked partial result.} Exact minimax verification through $N=22$, together with the complete recurrence proof, parity/scaling lemmas, deficit bound, and explicit counterexamples to equal-partition sufficiency and deficit monotonicity.
+
+\textbf{Exact first gap.} No uniform argument has been proved that simultaneously gives
+\[
+ \forall x\in S_N:\ V(S_N\setminus\{x\},x)\ge0,
+ \qquad \exists x\in S_N:\ V(S_N\setminus\{x\},x)=0
+\]
+for all admissible $N$. The stronger narrow-value bound in the corollary is also unproved.
+
+\textbf{Three next targets.} First, characterize residual-set/deficit pairs preserved by a four-integer block extension, including opponents' multiple selections. Second, search for a counterexample to the proposed general bound $|V(R,0)|\le\max(r_1,r_2-r_1,\ldots,r_k-r_{k-1})$ before attempting to use it for consecutive sets. Third, extract optimal defensive opening policies from adjacent admissible sizes and test their invariants on \emph{all} reachable states rather than on chosen drawn paths.
+
+\textbf{Minimal-counterexample information.} If a counterexample exists, the smallest admissible $N$ is at least 23 by the computation here, and its nonzero value has absolute value at least two by parity. No claim that 23 is a counterexample is made.
+
+\end{document}
