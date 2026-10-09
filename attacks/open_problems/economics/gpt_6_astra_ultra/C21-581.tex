@@ -1,0 +1,101 @@
+% ECONOMICS_PROBLEM: {"id": "C21-581", "title": "Calibrating sensitivity assumptions", "jel_code": "C21", "source_id": "OP-0422"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Calibrating sensitivity assumptions: what validation can and cannot calibrate}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+For the specified constant-effect linear causal model, the known omitted-variable identity is
+\[
+ |\beta_{\rm obs}-\beta|=s\sqrt{\frac{r_Yr_D}{1-r_D}},\qquad
+ s=\frac{\sigma_{Y\mid D,X}}{\sigma_{D\mid X}}.
+\]
+The variances are linear-projection residual variances. The problem is credible calibration of $r_D,r_Y$, not derivation of this identity. Cinelli and Hazlett \cite{sensitivity} provide the sensitivity framework and discuss formal benchmarking against observed covariates. Here a Gaussian construction shows why validation of a candidate covariate alone cannot calibrate an unrestricted omitted confounder. A separate finite-sample construction then propagates an explicitly declared comparative-strength assumption.
+
+\begin{proposition}[Unlimited bias with the same observed experiment]
+Fix $b\in\mathbb R$ and any $0<r<1$. There is a family of centered Gaussian structural models with the identical observable law
+$D\sim N(0,1)$ and $Y=bD+E$, $E\sim N(0,1)$ independent of $D$, but with causal coefficients unbounded in magnitude. Additional validated variables independent of $(D,E)$ can have the same joint observed law throughout this family.
+\end{proposition}
+\begin{proof}
+Let $V,D,E$ be independent standard Gaussians. For $-1<c<1$, set
+\[
+ U=cD+\sqrt{1-c^2}\{\sqrt r E+\sqrt{1-r}V\},\quad
+ \gamma=\frac{\sqrt r}{\sqrt{1-c^2}},\quad
+ \beta=b-\frac{c\sqrt r}{\sqrt{1-c^2}}.
+\]
+Then $Y=\beta D+\gamma U+\varepsilon$, where
+$\varepsilon=(1-r)E-\sqrt{r(1-r)}V$.
+Its covariance with $D$ is zero, and its covariance with $U$ is
+$\sqrt{1-c^2}\{(1-r)\sqrt r-r\sqrt{1-r}\sqrt{1-r}\}=0$.
+Joint Gaussianity therefore gives $E[\varepsilon\mid D,U]=0$, as required by the structural model. The observable equation remains exactly $Y=bD+E$. The two partial squared correlations are $r_D=c^2$ and $r_Y=r$, so the causal coefficient diverges as $c$ approaches either endpoint. Add any fixed independent validated vector to both the observed covariates and the validation records; its law and its associations with $D,Y$ remain unchanged. It places no restriction on this omitted $U$.
+\end{proof}
+Thus even a perfectly measured benchmark with zero observed associations does not bound an omitted confounder without a relationship between their strengths. Negative controls likewise need exclusion and relevance restrictions; their label alone supplies neither.
+
+\section*{A declared validation bridge}
+Now let a probability validation sample observe a candidate benchmark $V$ along with $(Y,D,X)$. The following assumptions are substantive inputs. Validation observations are iid from the study population; if they come from another population, an explicit moment-transport restriction replaces equality. Define $r_D^V,r_Y^V$ by the same population projections used for $U$. Assume
+\[
+ r_D\le\min\{d_*,\kappa_D r_D^V\},\qquad
+ r_Y\le\min\{1,\kappa_Y r_Y^V\},\qquad d_*<1,
+\]
+with prespecified $\kappa_D,\kappa_Y\ge0$. The benchmark is not asserted to be the actual omitted confounder; these inequalities are the scientific calibration bridge.
+
+\begin{proposition}[A simultaneous covariance confidence region]
+Let $Z=(Y,D,X',V)'\in\mathbb R^p$ have each coordinate bounded by $M\ge1$, where the nonconstant covariate basis is recorded separately from its intercept. For an iid validation sample of size $n$, let $\widehat\mu$ and $\widehat H$ be empirical first and raw second moments. Define
+\[
+ t_n=M^2\sqrt{\frac{2\log\{2(p+p^2)/\alpha\}}n}.
+\]
+With probability at least $1-\alpha$, all entries of the population moments satisfy
+$|\mu_j-\widehat\mu_j|\le t_n$ and $|H_{jk}-\widehat H_{jk}|\le t_n$ simultaneously. Intersect this box with realizable moment pairs and any maintained positive residual-variance restrictions, and map it by $C=H-\mu\mu'$ to a covariance region $\mathcal C_n$. The true covariance belongs to this region on the same event.
+\end{proposition}
+\begin{proof}
+Each first coordinate lies in an interval of length $2M$ and each raw product in an interval of length at most $2M^2$. Hoeffding's two-sided bound is therefore at most $2\exp\{-nt_n^2/(2M^4)\}$ for each entry. There are at most $p+p^2$ entries. A union bound proves simultaneous coverage. Intersecting with true maintained restrictions and applying the deterministic covariance map preserves membership.
+\end{proof}
+For a covariance $C$, all required projection variances and covariances are Schur complements. For example, after removing the recorded $X$ basis,
+\[
+ C_{DV\cdot X}=C_{DV}-C_{DX}C_{XX}^{-1}C_{XV},\qquad
+ r_D^V(C)=\frac{C_{DV\cdot X}^2}{C_{DD\cdot X}C_{VV\cdot X}}.
+\]
+For $r_Y^V$ residualize on $(D,X)$ instead. Constants in $X$ are handled by centering, rather than inverting an intercept's zero variance.
+
+\begin{theorem}[An honest calibrated causal interval]
+Suppose the preceding bridge holds, and every covariance admitted to $\mathcal C_n$ has the inverses and positive residual variances needed for these definitions. Let $b(C)$ and $s(C)$ be the omitted regression coefficient and residual standard-deviation ratio. Put
+\[
+ d(C)=\min\{d_*,\kappa_Dr_D^V(C)\},\quad
+ y(C)=\min\{1,\kappa_Yr_Y^V(C)\},\quad
+ B(C)=s(C)\sqrt{\frac{y(C)d(C)}{1-d(C)}}.
+\]
+Then the interval
+\[
+ \left[\inf_{C\in\mathcal C_n}\{b(C)-B(C)\},\
+       \sup_{C\in\mathcal C_n}\{b(C)+B(C)\}\right]
+\]
+has coverage at least $1-\alpha$ for $\beta$. An empty region is reported separately. Suprema and infima need not be replaced by attained extrema unless the region is compact and the maps are continuous there.
+\end{theorem}
+\begin{proof}
+On the covariance-coverage event the true $C$ is feasible. The bridge and monotonicity of $yd/(1-d)$ in both arguments bound the true omitted-variable bias by $B(C)$. Thus $\beta$ belongs to the interval associated with the true covariance, which is contained in the displayed outer interval. This argument requires no independence between estimated calibration parameters and the estimated omitted coefficient: they are covered jointly by one moment region.
+\end{proof}
+Uniform lower bounds on relevant covariance eigenvalues and residual variances make this procedure informative as moments concentrate. Indeed
+$A^{-1}-B^{-1}=A^{-1}(B-A)B^{-1}$ bounds inverse perturbations by $\lambda^{-2}\|A-B\|$ when eigenvalues exceed $\lambda$. Products, Schur complements and bounded-away-from-zero ratios are then continuous uniformly. The sensitivity width generally converges to a positive limit; more validation removes sampling error, not the maintained allowance for omitted confounding. Near-zero residual variances or $d_*=1$ can destroy this control.
+
+\section*{Remaining gap}
+The note supplies a reproducible uncertainty calculation and a precise impossibility without a calibration bridge. It does not justify the strength multipliers, identify every hidden confounder, or verify external moment transport. Its interval is a coverage guarantee, not an assertion that every covariance-box endpoint is a sharp causal model. Establishing credible bridges using institutional knowledge or specially designed negative controls remains unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{sensitivity} C. Cinelli and C. Hazlett (2020). Making sense of sensitivity: extending omitted variable bias. \emph{Journal of the Royal Statistical Society, Series B} 82, 39--67. Primary publisher summary and metadata. \url{https://rss.onlinelibrary.wiley.com/doi/10.1111/rssb.12348}.
+\end{thebibliography}
+\end{document}
