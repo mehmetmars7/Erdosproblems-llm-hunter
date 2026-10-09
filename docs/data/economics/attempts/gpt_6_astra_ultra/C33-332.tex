@@ -1,0 +1,78 @@
+% ECONOMICS_PROBLEM: {"id": "C33-332", "title": "Scalable inference for spatial and spatio-temporal interference", "jel_code": "C33", "source_id": "OP-0541"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\title{Scalable inference for spatial and spatio-temporal interference: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Status: unresolved.} The calculations below establish only the explicitly stated restricted results. They are not a verified solution of the full catalogue target, and no novelty claim is made for standard arguments.
+
+\section{Target, restrictions and policy functional}
+Write $A_t=\rho I+\delta B_t(\ell)$ and $D_t=\beta I+\gamma B_t(\ell)$ in the canonical model
+\[
+ Y_t=\alpha\mathbf1+A_tY_{t-1}+D_tW_t+U_t,
+ \quad U_t\sim N(0,\sigma^2I).
+\]
+Innovations are independent across dates and nodes and independent of randomized treatment conditional on the past. For the calculations below, fix deterministic location paths and a fixed common initial outcome vector. This strengthens the canonical predetermined-location condition: if locations depend on past outcomes, kernel matrices are random and the unconditional mean recursion below need not close. Assume $\|A_t\|_2\leq1-\eta$ uniformly for $\eta>0$. For clarity first use nonadaptive policy paths with known means $q_t^v=\mathbb E W_t^v$, independent of contemporaneous innovations, and the same initial condition. The policy means need not specify independent assignments for the expectation calculation because the outcome equation is linear.
+
+Let $d_t=\mathbb E Y_t^1-\mathbb E Y_t^0$ and $\Delta q_t=q_t^1-q_t^0$. Then
+\[
+ d_0=0,\quad d_t=A_td_{t-1}+D_t\Delta q_t,
+ \qquad \tau=\frac1{NT}\sum_{t=1}^T\mathbf1^{\mathsf T}d_t.
+\]
+This recursion is the exact policy target on this subclass. For adaptive policies, replacing $q_t$ by unconditional means specified independently of the outcome law is generally invalid; their feedback law must be solved jointly.
+
+\section{Identification of the range from distances}
+If treatment has a positive-definite conditional covariance and conditional exogeneity, then
+\[
+ \operatorname{Cov}(Y_t,W_t\mid\mathcal H_{t-1})
+   =D_t\operatorname{Var}(W_t\mid\mathcal H_{t-1}).
+\]
+Thus the observable conditional law identifies $D_t$. Its diagonal identifies $\beta$, since $B_{ii,t}=0$. For edges at distances $r_1\neq r_2$ with $h(r_1),h(r_2)>0$, and $\gamma\neq0$, put $v(r)=D_{ij,t}/h(r)$. Then
+\[
+ \log\left|\frac{v(r_1)}{v(r_2)}\right|
+       =-\frac{r_1-r_2}{\ell},\qquad
+ \gamma=a_Nv(r_1)e^{r_1/\ell}.
+\]
+This proves point identification of $(\ell,\gamma)$ under these conditions; it is not yet a stable estimator, since division becomes unreliable when $\gamma$ is near zero or distances nearly coincide. Once $D_t$ is known, conditional means identify $A_t$ if the distribution of $Y_{t-1}$ spans the necessary regressors. With Gaussian innovations and at least one prior innovation date, full support supplies this spanning property in the correctly specified model. The diagonal identifies $\rho$, and nonzero edges identify $\delta$ after $\ell$ is known.
+
+If all positive edges have the same distance $r$, their weights are one common factor $c(\ell)=a_N^{-1}h(r)e^{-r/\ell}$ times an adjacency matrix. Changing $\ell$ while preserving $\gamma c(\ell)$ and $\delta c(\ell)$ leaves $A_t,D_t$ unchanged. Thus individual parameters fail identification. Nevertheless the policy target above is unchanged for policies on these same locations: structural-parameter nonidentification need not imply policy-effect nonidentification. Predicting at new distances would break that equivalence.
+
+\section{An exact inference result in a restricted subexperiment}
+Take $T=1$, $Y_0=0$, known $\ell$, and a randomized design whose realized matrix
+$Z=[\mathbf1,W_1,B_1W_1]$ satisfies $cN I\preceq Z^{\mathsf T}Z\preceq CN I$ almost surely, for constants $0<c<C$. Such a condition requires purposeful design; independent assignment with overlap alone does not guarantee it on every realization. Let $\vartheta=(\alpha,\beta,\gamma)$. Conditional on assignment, ordinary least squares obeys exactly
+\[
+ \widehat\vartheta-\vartheta\sim
+ N\bigl(0,\sigma^2(Z^{\mathsf T}Z)^{-1}\bigr).
+\]
+For fixed policy contrast, write $\tau=l^{\mathsf T}\vartheta$, with
+$l=(0,N^{-1}\mathbf1^{\mathsf T}\Delta q,
+N^{-1}\mathbf1^{\mathsf T}B\Delta q)$. If $\sigma$ is known, the usual Gaussian interval has exact conditional and unconditional coverage, and
+\[
+ \mathbb E(\widehat\tau-\tau)^2
+   =\sigma^2\mathbb E[l^{\mathsf T}(Z^{\mathsf T}Z)^{-1}l]
+   \leq\sigma^2\|l\|^2/(cN).
+\]
+For nonzero $l$ bounded away from zero, this $N^{-1}$ squared-error rate is also necessary on any parameter class containing a fixed interior ball. Choose two parameters separated by $h/\sqrt N$ in a direction affecting $l$. Their Gaussian Kullback--Leibler divergence is bounded by $C\|h\|^2/(2\sigma^2)$, while their targets differ by a constant times $N^{-1/2}$. Taking $h$ sufficiently small keeps testing error bounded away from zero; the two-point testing inequality gives an $N^{-1}$ risk lower bound. This argument establishes a sharp rate for the restricted experiment, not the full unknown-range panel.
+
+With unknown $\sigma$, an independent Gaussian residual variance estimate gives the corresponding exact Student interval when $N>3$. For $T>1$, conditioning on the entire future regressor array generally destroys the simple fixed-design Gaussian argument, because future lagged outcomes contain current errors. A martingale analysis is required instead; it is not supplied here.
+
+\section{Sparsity and conditioning are separate issues}
+Minimum separation and fixed taper radius imply a bounded number of neighbors per node, hence $O(N)$ kernel entries at each date. Spatial binning with cells of fixed size can enumerate candidate pairs in $O(N)$ expected work under a standard hash implementation and bounded occupancy; deterministic sorting gives an additional $\log N$ factor. One evaluation of the likelihood, its fixed-dimensional gradient, or the policy recursion uses $O(NT)$ arithmetic. Streaming time slices uses $O(N)$ working memory if past observations are externally accessible.
+
+This is a cost per evaluation, not a near-linear guarantee for global unknown-$\ell$ optimization. A grid search or repeated nonlinear solve introduces an iteration factor, and weak range identification can make it large. Nor does sparse computation repair vanishing information at $\gamma=\delta=0$. Uniformly shrinking intervals for nonidentified structural parameters are impossible, though the same-location target may still be regular.
+
+\section{Remaining gap and checked source}
+The target recursion, two-distance identification, exact single-date inference and sparse evaluation costs are established. Sharp uniform risk for unknown range, weak spillovers, growing $T$, moving locations and adaptive policies remains unresolved. It needs explicit information lower bounds and a global estimation argument, not simply a statement that the model is finite dimensional.
+
+Subhankar Bhadra and Michael Schweinberger, \emph{Causal Inference Under Network Interference}, arXiv:2508.06808v1, Sections 8.5--8.6 inspected for temporal and spatial research directions:
+\url{https://arxiv.org/html/2508.06808v1#S8.SS6}.
+
+\end{document}
