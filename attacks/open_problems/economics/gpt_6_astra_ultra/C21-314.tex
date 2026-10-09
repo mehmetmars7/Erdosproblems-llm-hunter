@@ -1,0 +1,140 @@
+% ECONOMICS_PROBLEM: {"id": "C21-314", "title": "Estimating target heterogeneity from multiple studies", "jel_code": "C21", "source_id": "OP-0504"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\begin{document}
+\section*{Estimating target heterogeneity from multiple studies}
+\textbf{Research attempt by GPT-6 (Codex), 9 October 2026.}
+The procedure was to restate the canonical target, inspect its cited primary source,
+derive a tractable result, and test the assumptions and remaining gap.
+These calculations are not a claim of novelty or independent proof verification.
+
+\subsection*{Target and source check}
+There are independent samples of sizes $n_s$ from study laws and covariates from
+an outcome-free target population $P_0$. Write $N=\sum_s n_s$ and
+$P_* =\sum_s(n_s/N)P_s$. The target is the function
+$\tau_0=m_1-m_0$, with squared integrated risk under $P_0$.
+The canonical assumptions impose common conditional responses, fixed overlap
+$\epsilon\leq e_s\leq1-\epsilon$, H\"older smoothness, and
+$P_0\leq\kappa P_*$. They do not require identical study designs.
+The inspected source, Cinelli et al., Section 3.3.3, motivates heterogeneous
+causal effects with multiple studies; it does not supply the following
+transport minimax theorem. The sharp general theorem and bounded-deviation
+extension are the targets, not a claim that ordinary regression is unsolved.
+
+\subsection*{A pooled construction requiring no propensity estimation}
+First restrict to $0<\beta\leq1$ on $[0,1]^d$, with common H\"older constant
+$L$. Partition the cube into $K\leq C_dh^{-d}$ cells of diameter at most
+$\sqrt d h$. For each treatment $w$, average the observed $Y$'s in each
+cell across all studies, retaining only records with $W=w$. Use zero if
+the cell is empty and clip the average to $[-1,1]$. Denote this regression
+estimate by $\widehat m_w$.
+
+\begin{proposition}
+For constants depending only on $d,\beta,L$, the resulting effect estimator
+satisfies
+\[
+ \E\|\widehat m_1-\widehat m_0-\tau_0\|_{L^2(P_0)}^2
+ \leq C\left(h^{2\beta}+\frac{\kappa K}{N\epsilon}\right).
+\]
+The bound holds for unequal study sizes and nonidentical covariate laws,
+including disjoint study supports.
+\end{proposition}
+\begin{proof}
+Fix a cell $A$ and treatment $w$. Its count $M$ is a sum of independent,
+not necessarily identically distributed Bernoulli variables, with mean
+$\mu\geq N\epsilon P_*(A)$. Conditional on all covariates and assignments,
+the selected outcomes are independent, have variances at most one, and
+have means within $L(\sqrt d h)^\beta$ of $m_w(x)$ for every $x\in A$.
+For $M>0$, the conditional squared error is bounded by
+$2L^2d^\beta h^{2\beta}+2/M$. For $M=0$ it is at most one.
+If the Bernoulli success probabilities are $p_i$, then
+\[
+ \E\frac1{M+1}
+ =\int_0^1\prod_i(1-p_i+p_it)\,dt
+ \leq\int_0^1e^{-\mu(1-t)}dt\leq\frac1\mu.
+\]
+Since $1/M\leq2/(M+1)$ for $M\geq1$ and
+$\Pr(M=0)\leq e^{-\mu}\leq1/\mu$, the integrated stochastic
+contribution is at most $C P_0(A)/\mu\leq C\kappa/(N\epsilon)$.
+Cells with $P_*(A)=0$ have zero target mass and contribute nothing.
+Summing cells and using $(a-b)^2\leq2a^2+2b^2$ proves the claim.
+\end{proof}
+For fixed $\epsilon,\kappa$, taking $h\asymp N^{-1/(2\beta+d)}$
+gives risk $O(N^{-2\beta/(2\beta+d)})$. There is no target-sample term:
+the target covariates are unnecessary for this uniform guarantee.
+Nor is there a study-propensity smoothness penalty. Outcome-regression
+pooling avoids estimating those nuisance functions. This observation does
+not settle optimal dependence on growing $\kappa$, higher smoothness, or
+adaptation to favorable designs.
+
+\subsection*{Lower-bound mechanism and support stress test}
+To see the familiar rate obstruction, take all study designs and the target
+uniform on the cube, all propensities a fixed admissible constant
+$e_0\in[\epsilon,1-\epsilon]$, and $m_0=0$. Divide the cube
+into $K\asymp h^{-d}$ subcubes. In subcube $j$ put a smooth nonnegative
+bump of height $a h^\beta$, multiplied by a bit $v_j\in\{0,1\}$;
+choose $a$ small enough for the H\"older ball. Generate $Y\in\{-1,1\}$
+with mean $m_W(X)$. Neighboring bit configurations differ in integrated
+squared mean by order $h^{2\beta+d}$ and in sample KL divergence by at
+most $CNh^{2\beta+d}$, using that Bernoulli probabilities remain in
+$[1/4,3/4]$. Choose $Nh^{2\beta+d}$ a small constant. The total variation
+bound $\operatorname{TV}\leq\sqrt{\operatorname{KL}/2}$ then gives a
+positive error probability for each bit under any decoder. Decoding an
+estimated regression by its closest bump converts each incorrect bit into
+loss at least $ch^{2\beta+d}$. Summing $K$ bits yields the lower rate
+$ch^{2\beta}$. This checks the exponent in this restricted setting.
+A study with no observations near a target point cannot be made informative
+by its large sample elsewhere; the cell count proof makes this explicit.
+
+\subsection*{Bounded transport violations}
+With population study means known, define, on study-supported points,
+\[
+ l_w(x)=\max\{-1,\max_{s:x\in\operatorname{supp}P_s}
+ [m_{w,s}(x)-\delta_s]\},\quad
+ u_w(x)=\min\{1,\min_{s:x\in\operatorname{supp}P_s}
+ [m_{w,s}(x)+\delta_s]\}.
+\]
+Without smoothness restrictions on target responses, the sharp pointwise
+interval is $[l_1-u_0,u_1-l_0]$: every choice of means in the two
+intersected intervals is realized by bounded Bernoulli potential outcomes,
+independent of randomized assignment. With target H\"older restrictions,
+the exact functional set instead is
+\[
+ \{f_1-f_0:f_w\in\mathcal H_d^\beta(L),\quad
+ l_w\leq f_w\leq u_w\quad P_0\text{-a.e.}\}.
+\]
+The pointwise interval can then overstate what is jointly attainable.
+For example, constant observed means zero and common $\delta\leq\min(1,L)$
+permit target pairs $(m_1,m_0)=(\delta,-\delta)$ and
+$(-\delta,\delta)$ with exactly the same study data. Their effects differ
+by $4\delta$, so the worst squared $L^2$ risk is at least $4\delta^2$,
+even with infinite study and target samples. Randomization cannot remove
+this transport ambiguity.
+
+\subsection*{Verification and remaining problem}
+The result uses fixed positive overlap; replacing it with merely pointwise
+positivity invalidates the uniform rate. Constants and empty cells were
+accounted for, and study membership is not assumed random. The general
+sharp dependence on coverage, smoothness beyond one, and unequal
+$\delta_s$ with jointly smooth target functions is not proved here.
+The next concrete task is an optimal-recovery analysis of the intersected
+H\"older bands, combined with local effective sample counts.
+\textbf{Final status: UNRESOLVED.}
+
+\subsection*{Source}
+C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta,
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal
+Inference}, arXiv:2508.17099v1 (2025), Section 3.3.3.
+\url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}.
+
+\end{document}

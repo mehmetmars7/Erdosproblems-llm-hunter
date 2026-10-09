@@ -1,0 +1,132 @@
+% ECONOMICS_PROBLEM: {"id": "C72-285", "title": "Statistical confidence in game equilibria", "jel_code": "C72", "source_id": "OP-0288"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{Statistical confidence in game equilibria\\[4pt]\large Selection-safe certificates and sharp gap dependence for a fixed candidate}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Question and scope}
+The target is statistically valid equilibrium certification when queries, candidate strategies and stopping times are all chosen from simulation data. This attempt gives an explicit simultaneous certificate with coefficient cancellation, then proves upper and lower simulation-cost bounds for a fixed pure candidate with known incumbent payoffs. That subproblem exposes the role of deviation gaps and boundary nontermination. It does not provide instance-optimal costs for unrestricted equilibrium search.
+
+\section*{Anytime payoff intervals and exploitability}
+Assume $0<\varepsilon<1$; for $\varepsilon\ge1$, the universal exploitability bound one is already an immediate certificate. Let $K=\prod_i|A_i|$ be the number of pure profiles and $n$ the number of players. A query of profile $a$ costs $c(a)>0$ and returns a vector in $[0,1]^n$ from a fixed profile-specific distribution, independent of previous queries conditional on the queried profile. Within-query player components may be correlated. Equivalently, one may presample an independent infinite vector sequence for each profile and reveal the next entry whenever it is queried.
+
+After $s\ge1$ queries of a profile, let $\widehat u_{i,s}(a)$ be the sample mean and put
+\[
+ \rho(s)=\sqrt{\frac{\log(4nKs^2/\delta)}{2s}},\qquad
+ L_i(a)=(\widehat u_i(a)-\rho(s))\vee0,
+ \quad U_i(a)=(\widehat u_i(a)+\rho(s))\wedge1.
+\]
+Before any query, take $[L_i(a),U_i(a)]=[0,1]$. Here $0<\delta<1$. For a product mixed profile $\sigma$, define
+\[
+ d_{i,b,a}=\ind\{a_i=b\}\sigma_{-i}(a_{-i})-\sigma(a),
+\]
+and the upper certificate
+\[
+ E^+(\sigma)=\max\left\{0,\max_{i,b}
+ \sum_a\big[(d_{i,b,a})_+U_i(a)-(-d_{i,b,a})_+L_i(a)\big]\right\}.
+\]
+
+\begin{theorem}[Adaptive candidate and stopping validity]
+With probability at least $1-\delta$, simultaneously at every query count and for every product profile $\sigma$, its true exploitability satisfies $e_G(\sigma)\le E^+(\sigma)$. Consequently any data-selected candidate and any stopping time may issue a certificate whenever $E^+(\sigma)\le\varepsilon$; the probability of any incorrect issued certificate is at most $\delta$. A fixed computational budget may instead return FAIL with no claim of success.
+\end{theorem}
+\begin{proof}
+For a bounded variable with mean $u$, the exponential moment bound $\E e^{\lambda(Y-u)}\le e^{\lambda^2/8}$ follows by bounding the convex exponential by its chord on $[0,1]$ and maximizing over its mean; equivalently, the log moment's second derivative is the variance of a tilted variable in $[0,1]$, at most $1/4$, and its value and first derivative vanish at zero. Multiplying this bound over samples and optimizing Markov's inequality gives
+$\Prb(|\widehat u_s-u|>r)\le2e^{-2sr^2}$.
+The presampled-sequence construction permits this fixed-$s$ inequality despite adaptive query counts. A union bound over all $nK$ coordinates and all $s\ge1$ gives total failure at most
+$\sum_{s\ge1}\delta/(2s^2)=\delta\pi^2/12<\delta$.
+
+On the resulting simultaneous event every true payoff lies in its current interval. The gain from deviation $b$ is exactly $\sum_a d_{i,b,a}u_i(a)$. A linear function over a box is maximized by selecting the upper endpoint for positive coefficients and the lower endpoint for negative coefficients. This is precisely the inner expression of the certificate. The box event holds simultaneously for every coefficient vector, hence every candidate, without an additional union bound over mixed profiles or stopping rules.
+\end{proof}
+
+The cancellation is useful: when the candidate already plays $b$ with probability one, every coefficient for that player's deviation to $b$ vanishes. More generally, only profiles in the candidate's support or its pure-deviation neighborhoods enter its bound. This does not permit ignoring unseen deviations: their payoff intervals remain $[0,1]$ and can prevent certification.
+
+\begin{proposition}[A finite completion fallback]
+Assume access to a computational routine that returns a $\xi$-Nash profile of any given finite payoff table, for a chosen $0<\xi<\varepsilon$. Query every pure profile $s_0$ times, where $\rho(s_0)\le(\varepsilon-\xi)/4$, and run the routine on the sample means. Its returned profile satisfies $E^+(\sigma)\le\varepsilon$ on every data realization. Total simulation cost is $s_0\sum_a c(a)$, with
+$s_0=O((\varepsilon-\xi)^{-2}\log(nK/[\delta(\varepsilon-\xi)]))$ sufficient. No polynomial bound on the routine's computation time is asserted.
+\end{proposition}
+\begin{proof}
+For every deviation, the sum of absolute coefficients $\sum_a|d_{i,b,a}|$ is at most two, since it is the difference between two probability vectors. Each interval endpoint is within $\rho(s_0)$ of its sample mean. Thus the box maximum is at most the estimated deviation gain plus $2\rho(s_0)\le\xi+(\varepsilon-\xi)/2<\varepsilon$. The weaker displayed radius is chosen to leave slack. The anytime event from the theorem gives coverage; the numerical bound holds regardless of that event, so stopping is finite for all realizations, subject to the stated solver assumption. The radius tends to zero, and substitution of a sufficiently large constant times the displayed order verifies existence of $s_0$.
+\end{proof}
+
+\section*{A fixed pure-candidate audit}
+Consider a restricted simulator in which a pure candidate's incumbent payoffs are known. Enumerate its $J\ge1$ nontrivial deviations; if there are none, the candidate is an exact equilibrium without queries. For deviation $j$, an independent query returns a Bernoulli payoff of mean $\mu_j$, costs $c_j>0$, and its certification threshold is $t_j=u_j^{\mathrm{inc}}+\varepsilon\in(0,1)$. Known incumbent payoffs may come from a deterministic simulator; this assumption deliberately removes their estimation cost. The candidate is $\varepsilon$-Nash exactly when $\mu_j\le t_j$ for all $j$. Define the positive certification margins $d_j=t_j-\mu_j$.
+
+For each deviation sample until its upper bound, using
+$\rho_J(s)=\sqrt{\log(4Js^2/\delta)/(2s)}$, is at most $t_j$. Issue the candidate's certificate only after every deviation passes. The order of auditing deviations may be arbitrary; total cost is the sum of their sample costs.
+
+\begin{theorem}[Gap-dependent upper cost]
+Suppose $0<d_j\le1$ for all $j$. The audit terminates almost surely, has error probability at most $\delta$ uniformly over all payoff means, and satisfies
+\[
+ \E\operatorname{Cost}\le\sum_{j=1}^J c_j
+ \left[\left\lceil\frac{128}{d_j^2}
+ \log\frac{64J}{\delta d_j}\right\rceil+\frac3{d_j^2}\right].
+\]
+Here uniform error means that at any configuration with some $\mu_j>t_j$, issuing a certificate has probability at most $\delta$; termination is only claimed for the positive-margin class.
+\end{theorem}
+\begin{proof}
+The simultaneous interval argument above, with $J$ scalar sequences, proves error control. Let $L_j=\log(64J/(\delta d_j))$ and $s_j=\lceil128d_j^{-2}L_j\rceil$. Since $d_j\le1$ and $L_j\ge\log64>4$, we have $s_j\le129d_j^{-2}L_j$. Therefore
+\[
+ \log(4Js_j^2/\delta)
+ \le L_j+2\log129+4\log(1/d_j)+2\log L_j
+ \le10L_j.
+\]
+It follows that $\rho_J(s_j)^2\le10d_j^2/256<d_j^2/4$. The function $\log(4Js^2/\delta)/s$ is decreasing for $s\ge s_j$, since its logarithmic numerator exceeds two. Thus $\rho_J(s)\le d_j/2$ thereafter.
+
+If the audit has not stopped for deviation $j$ after $s\ge s_j$ samples, its sample mean must exceed $\mu_j+d_j/2$; otherwise its upper bound would be at most $t_j$. The probability is at most $e^{-sd_j^2/2}$. This exponential tail proves almost-sure termination and bounds its expected sample count by
+$s_j+\sum_{s\ge s_j}e^{-sd_j^2/2}\le s_j+1+2/d_j^2\le s_j+3/d_j^2$.
+Multiply by costs and sum. The expectation argument does not condition on the confidence event, so it also controls rare estimation failures.
+\end{proof}
+
+\begin{theorem}[Matching gap dependence and the boundary obstruction]
+Consider any audit that issues a certificate almost surely at every strictly feasible mean vector and issues one with probability at most $\delta$ whenever any mean exceeds its threshold. Fix a valid instance such that both $t_j-d_j$ and $t_j+d_j$ lie in $[1/4,3/4]$ for every $j$. Then
+\[
+ \E\operatorname{Cost}\ge
+ \sum_j\frac{c_j}{22d_j^2}\log\frac1\delta.
+\]
+Moreover, no such uniformly honest audit can issue a certificate almost surely at a boundary instance with one $\mu_j=t_j\in(0,1)$: its probability of ever certifying that boundary instance is at most $\delta$.
+\end{theorem}
+\begin{proof}
+For the cost bound, change only deviation $j$ from mean $t_j-d_j$ to $t_j+d_j$. The alternative invalidates the candidate. For the transcript stopped at a deterministic query cap, the log-likelihood chain rule gives relative entropy equal to the expected number of $j$ queries times the binary relative entropy between these two means. Assignment and stopping rules contribute zero to the likelihood ratio because their history-dependent kernels are the same under both laws. Mapping the transcript to the event of certificate issuance by that cap decreases relative entropy, by the log-sum inequality. As the cap grows, its probability tends to one under the valid instance and is at most $\delta$ under the alternative. Hence
+\[
+ \E N_j\,\mathrm{kl}(t_j-d_j,t_j+d_j)\ge\log(1/\delta).
+\]
+The inequality $\mathrm{kl}(p,q)\le(p-q)^2/[q(1-q)]$, obtained from $\log x\le x-1$, bounds this divergence by $(64/3)d_j^2<22d_j^2$. Sum the resulting inequalities with costs. Infinite expected sample counts already satisfy the claim.
+
+For the boundary, fix a finite query cap $M$. Change the boundary mean to $t_j+u$ and let $u\downarrow0$. Every finite transcript law converges in total variation to its boundary law: this follows either by summing finite Bernoulli histories and the common randomized action kernels, or by a likelihood bound uniform over at most $M$ observations. Since certificate issuance by the cap has probability at most $\delta$ under every alternative, the same holds at the boundary. Let $M\to\infty$ and use increasing-event continuity to bound the probability of ever certifying by $\delta$.
+\end{proof}
+
+\section*{Remaining gap and reference}
+The upper and lower bounds match the sum of inverse squared certification margins up to logarithmic factors in this fixed-candidate, Bernoulli, known-incumbent problem. They do not establish optimal costs for selecting a different equilibrium, using mixed deviations, exploiting payoff covariance or sharing observations through game structure. Boundary nontermination explains why a general guaranteed-completion procedure needs slack, a fallback candidate search, or explicit FAIL reporting.
+
+The EGTA survey's primary preprint and published metadata were checked. Its statistical reasoning and strategy-exploration sections motivate these issues; the present finite-sample calculations are proved directly and carry no claim of novelty or full instance optimality.
+\begin{thebibliography}{9}
+\bibitem{egta} M. P. Wellman, K. Tuyls and A. Greenwald (2025), Empirical Game-Theoretic Analysis: A Survey, \emph{Journal of Artificial Intelligence Research} 82, 1017--1076, Sections 6 and 7.3. \url{https://arxiv.org/abs/2403.04018v2}. DOI: \url{https://doi.org/10.1613/jair.1.16146}.
+\end{thebibliography}
+
+\end{document}

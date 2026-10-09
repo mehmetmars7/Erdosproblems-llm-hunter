@@ -1,0 +1,166 @@
+% ECONOMICS_PROBLEM: {"id": "D44-238", "title": "Optimal mechanisms for one unit-demand buyer", "jel_code": "D44", "source_id": "OP-0173"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Optimal mechanisms for one unit-demand buyer: Finite-menu approximation with exact incentive compatibility}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Revenue target and computational representation}
+For a unit-demand buyer with values in a compact box
+$V=\prod_{j=1}^m[a_j,b_j]\subseteq[0,H]^m$, $H>0$, the target is
+\[
+ R(F)=\sup_{(x,p)\ \mathrm{IC,IR},\ p\ge0,\ \sum_jx_j\le1}
+                      \mathbb E_F p(v).
+\]
+The general lottery-menu model and solved distribution families in
+\cite[Section 2 and Theorems 1--2]{unit} are literature inputs.
+We provide a finite linear-program approximation with a proved uniform
+error bound and exact, rather than approximate, IC and IR on the original
+continuous type space. The calculation permits any distribution on the
+box, so independence is not needed for its mathematical bound. Independence
+makes the grid-cell probabilities products of one-dimensional masses.
+
+The input for the algorithm below consists of $m,H,\varepsilon$ and
+the exact rational probabilities of specified grid cells. Without such
+a probability representation or integration oracle, it is not a
+bit-complexity algorithm for arbitrary real densities.
+
+\section*{A menu perturbation inequality}
+A menu entry is $(q,p)$ with $q\ge0$, $\sum_jq_j\le1$ and $p\ge0$,
+and the menu contains $(0,0)$. Every entry selected by an IR type in
+$[0,H]^m$ has $p\le v\cdot q\le H$. Delete entries never selected and
+take the closure of the remaining entries in the compact set
+$\Delta_{\le1}^m\times[0,H]$. Each original type's selected entry remains
+utility-maximizing in this closure, since the utility inequality extends
+by continuity. Compactness ensures that every type has a best entry.
+
+\begin{lemma}
+Let a compact menu have prices in $[0,H]$. Type $v$ selects $(q,p)$ from
+the original menu. Discount every price by the common factor $1-\eta$,
+where $0<\eta<1$, and let type $w$ select the discounted version of
+$(q',p')$, with any tie selection. If $\|v-w\|_\infty\le\delta$, then
+\[
+ (1-\eta)p'\ge(1-\eta)p-\frac{2\delta}{\eta}.          \tag{1}
+\]
+\end{lemma}
+\begin{proof}
+Optimality at $v$ gives $v\cdot q-p\ge v\cdot q'-p'$.
+Optimality at $w$ after the discount gives
+$w\cdot q'-(1-\eta)p'\ge w\cdot q-(1-\eta)p$.
+Adding yields
+\[
+ \eta(p'-p)\ge (w-v)\cdot(q-q')\ge-2\delta,
+\]
+because both allocation vectors have $\ell^1$ norm at most one.
+Multiplying the resulting price bound by $1-\eta$ proves (1), with
+the weaker displayed denominator bound. The argument uses only weak
+optimality inequalities, so ties do not affect it.
+\end{proof}
+
+\begin{corollary}
+If distributions $F,G$ on the box admit a coupling with
+$\|v-w\|_\infty\le\delta$ almost surely, then
+\[
+ |R(F)-R(G)|\le \eta H+\frac{2\delta}{\eta}
+                    \qquad(0<\eta<1).                  \tag{2}
+\]
+\end{corollary}
+\begin{proof}
+Take any feasible mechanism for $F$, replace its menu by the compact
+closure described above, and offer its discounted version to $G$.
+Measurable maximizers exist for this compact continuous menu problem;
+one may, for example, first maximize utility, then price, and then
+successively allocation coordinates. The selected entries define an IC
+and IR direct mechanism. Integrating (1) under the coupling gives revenue
+at least $(1-\eta)$ times the original revenue minus $2\delta/\eta$.
+Every feasible revenue is at most $H$. Taking suprema over the original
+mechanisms proves $R(G)\ge R(F)-\eta H-2\delta/\eta$.
+Interchange the distributions for the other direction. Attainment of
+either original supremum is unnecessary.
+\end{proof}
+
+\section*{An executable finite construction}
+Partition each coordinate interval into subintervals of length at most
+$\delta$ and map every type to the lower corner of its cell, remaining
+inside the original box. Let $G$ be the resulting finite distribution
+on grid types $v^1,\ldots,v^K$, of probabilities $\lambda_t$.
+Solve the linear program
+\[
+ \max\sum_{t=1}^K\lambda_t p_t
+\]
+subject to, for every $s,t$,
+\[
+ q_t\ge0,\quad\sum_jq_{tj}\le1,\quad0\le p_t\le H,
+ \quad v^t\cdot q_t-p_t\ge0,
+ \quad v^t\cdot q_t-p_t\ge v^t\cdot q_s-p_s.             \tag{3}
+\]
+Its feasible region is nonempty and compact. Every feasible solution is
+a grid mechanism; conversely every IC/IR grid mechanism can be recorded
+in (3), with payments at most $H$. Its optimal value is therefore $R(G)$.
+
+\begin{theorem}
+For $0<\varepsilon<H$, choose
+\[
+ \eta=\frac{\varepsilon}{4H},\qquad
+ \delta=\frac{\varepsilon^2}{32H}.
+\]
+Offer the finite menu $\{(q_t,(1-\eta)p_t):1\le t\le K\}$ from an
+optimal solution of (3), together with $(0,0)$. Let each continuous type
+choose a utility-maximizing entry, using any fixed measurable tie rule.
+This mechanism is exactly IC and IR, has nonnegative payments, and earns
+at least $R(F)-\varepsilon$.
+It uses at most $1+(2+H/\delta)^m$ entries.
+\end{theorem}
+\begin{proof}
+The grid coupling moves each coordinate by at most $\delta$, and
+$\eta H+2\delta/\eta=\varepsilon/2$. Equation (2) gives
+$R(G)\ge R(F)-\varepsilon/2$. Apply (1) once more, now to the optimal
+finite grid menu and its discounted version evaluated by the original
+types. Its revenue is at least
+$R(G)-\eta H-2\delta/\eta\ge R(F)-\varepsilon$.
+Choosing entries from a fixed menu is exactly incentive compatible:
+reporting truthfully selects a utility maximizer available under every
+report. The zero entry supplies IR, and the positive discount preserves
+nonnegative prices. A product grid with the stated mesh has no more than
+$(2+H/\delta)^m$ corners, proving the size bound.
+\end{proof}
+
+For fixed $m$, rational bounds and rational cell probabilities make (3)
+a finite rational linear program of size polynomial in the grid size
+and the probability bit lengths. The method is exponential in dimension;
+the continuity bound itself has no dimension factor because unit-demand
+allocations have $\ell^1$ norm at most one.
+
+\section*{Unresolved characterization}
+The result supplies certified approximation, not a closed-form optimal
+menu for general independent densities. It does not show that the exact
+supremum has a finite-menu optimizer, give a polynomial algorithm when
+$m$ varies, or eliminate the need to compute cell masses. The common
+price discount is essential to converting nearby-type comparisons into
+exact IC at the original types; merely evaluating a grid allocation rule
+on rounded reports would not establish those incentives. No optimality
+claim is made for deterministic item prices or for the source's already
+solved special families.
+
+\begin{thebibliography}{9}
+\bibitem{unit} K. Hashimoto, K. Kuwahara and R. Nonaka.
+\emph{Selling Multiple Items to a Unit-Demand Buyer via Automated
+Mechanism Design}, arXiv:2502.10086v2, Sections 1--2.
+\url{https://arxiv.org/html/2502.10086v2}.
+\end{thebibliography}
+
+\end{document}

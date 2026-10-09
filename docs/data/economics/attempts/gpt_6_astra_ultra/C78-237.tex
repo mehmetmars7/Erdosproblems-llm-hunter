@@ -1,0 +1,162 @@
+% ECONOMICS_PROBLEM: {"id": "C78-237", "title": "Stable-roommates robustness to preference perturbations", "jel_code": "C78", "source_id": "OP-0561"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Stable-roommates robustness to preference perturbations: An exact swap radius and its sharp universal bound}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Worst-case robustness}
+There are $N\ge4$ agents, with $N$ even, complete strict preference lists,
+and a fixed perfect matching $M$. The canonical robustness condition is
+\[
+ M\in\bigcap_{J:\,\text{at most }d\text{ adjacent swaps from }I}
+                          \mathcal S(J).                \tag{1}
+\]
+The perturbation agenda is distinguished from pair failures in
+\cite[Section 3.3.2]{survey}; quantitative swap robustness for marriage
+is studied in \cite{strength}. We analyze (1) directly for roommates.
+The resulting verification formula and sharp radius bound do not solve
+weighted search over all robust matchings or stability probabilities under
+arbitrary distributions of perturbations.
+
+Let $r_i(j)\in\{1,\ldots,N-1\}$ denote the original rank of $j$ in
+$i$'s list, with smaller ranks better. For an unmatched pair $\{i,j\}$,
+define
+\[
+ c_i(j;M)=\max\{0,r_i(j)-r_i(M(i))\},\qquad
+ s_I(M)=\min_{\{i,j\}\notin M}
+           \{c_i(j;M)+c_j(i;M)\}.                       \tag{2}
+\]
+
+\section*{A complete verification certificate}
+\begin{theorem}
+The minimum total number of adjacent swaps needed to make $M$ unstable
+is exactly $s_I(M)$. Consequently $M$ is $d$-robust if and only if
+$s_I(M)>d$. After rank preprocessing, verification and a shortest
+destabilizing swap sequence take $O(N^2)$ time plus the output length.
+The formula also detects original instability through $s_I(M)=0$.
+\end{theorem}
+\begin{proof}
+Consider one list and two distinct names $j$ and $M(i)$. If $j$ is already
+above $M(i)$, no change is necessary. Otherwise their rank distance is
+$r_i(j)-r_i(M(i))$. To reverse their relative order, they must cross by an
+adjacent interchange. Before that crossing, the names between them have
+to be moved past one of the two, requiring at least their distance minus
+one swaps; the crossing is one more. Equivalently, in the final order
+every intermediate name has changed its relative order with at least one
+of the endpoints, in addition to the endpoints' own inversion. Each
+adjacent swap changes exactly one pairwise order. The lower bound is
+attained by moving $j$ upward to just above $M(i)$. The required cost is
+therefore $c_i(j;M)$.
+
+A blocking pair requires the two corresponding strict comparisons, in
+two different agents' lists. Their swap costs add, and swaps in other
+lists cannot reduce either requirement. Thus any perturbation creating
+this blocker costs at least $c_i(j;M)+c_j(i;M)$, and the two upward moves
+attain that cost simultaneously. Every instability has some blocking
+pair; minimizing over those pairs proves (2). Scan all $O(N^2)$ pairs and
+retain a minimizer to obtain the algorithm and its explicit certificate.
+\end{proof}
+
+\section*{The largest possible radius}
+\begin{theorem}
+For every strict complete profile and every perfect matching,
+\[
+ s_I(M)\le N-1.                                         \tag{3}
+\]
+For each even $N\ge4$, there is a profile and a matching attaining
+$s_I(M)=N-1$. Hence the largest attainable integer robustness budget is
+$N-2$, and no matching can satisfy (1) when $d\ge N-1$.
+\end{theorem}
+\begin{proof}
+For fixed $i$, writing $r=r_i(M(i))$ gives
+\[
+ \sum_{j\ne i,M(i)}c_i(j;M)
+ =\frac{(N-1-r)(N-r)}2
+ \le\frac{(N-2)(N-1)}2.
+\]
+Summing over agents counts the total cost in (2) over the
+$N(N-2)/2$ unmatched unordered pairs. Their average is at most $N-1$,
+so their minimum is at most $N-1$.
+
+For sharpness, fix any perfect matching $M$ and let $G$ be the complete
+graph with its matching edges deleted. It is regular of even degree
+$N-2=2k$. Decompose its edges into $k$ disjoint spanning unions of cycles.
+Here is a proof that such a decomposition exists. Orient an Euler tour in
+each connected component of this even-degree graph, giving every vertex
+$k$ incoming and $k$ outgoing edges. Form a bipartite graph with a left
+and right copy of every vertex and an edge from the left tail to the right
+head of each oriented edge. It is $k$-regular. For every left subset $S$,
+its $k|S|$ incident edges enter at most $k$ times each right neighbor, so
+$|\Gamma(S)|\ge|S|$. Hall's theorem gives a perfect matching. Remove it
+and repeat to obtain $k$ perfect matchings. Each corresponds to directed
+cycles covering every vertex in the original graph, as required.
+
+Number these cycle factors $h=1,\ldots,k$. Rank $M(i)$ first for every
+agent. In factor $h$, give $i$'s outgoing neighbor cost $h$ and its incoming
+neighbor cost $N-1-h$, meaning rank one plus that cost. These $2k$ costs
+are precisely $1,\ldots,N-2$, so they define a strict complete list.
+Every unmatched edge is outgoing at one endpoint and incoming at the
+other within one factor; its two costs sum to $N-1$. Equation (2) gives
+$s_I(M)=N-1$. In particular $M$ is originally stable because everyone has
+its first choice.
+\end{proof}
+
+\section*{A finite search formulation, without a polynomial-time claim}
+The radius formula also gives a polynomial-size integer feasibility
+formulation. Introduce $x_{ij}=x_{ji}\in\{0,1\}$ for $i\ne j$ with
+$\sum_{j\ne i}x_{ij}=1$. For distinct prospective blockers $i,j$ and
+prospective partners $k\notin\{i,j\}$, $l\notin\{i,j\}$, define
+\[
+ c_i(j;k)=\max\{0,r_i(j)-r_i(k)\}.
+\]
+Whenever $c_i(j;k)+c_j(i;l)\le d$, impose
+\[
+ x_{ik}+x_{jl}\le1.                                    \tag{4}
+\]
+There are $O(N^4)$ such inequalities. Inconsistent partner choices, such
+as $k=l$, are already excluded by the matching equations.
+
+\begin{proposition}
+The integer solutions of these constraints are exactly the $d$-robust
+perfect matchings. Adding any rational linear edge-cost objective gives
+an exact formulation of the weighted robust search problem.
+\end{proposition}
+\begin{proof}
+If a matching violates robustness, its minimizing pair in (2), together
+with the two assigned partners, yields a violated inequality (4).
+Conversely, a violated inequality selects two partners whose corresponding
+non-matched pair has destabilization cost at most $d$, contradicting (1).
+The edge objective simply evaluates the selected matching.
+\end{proof}
+This is an integer formulation, not an integrality theorem or an efficient
+algorithm for solving it. Average-case stability depends on overlaps
+between blocking events and on the declared perturbation distribution;
+the minimum distance alone does not determine that probability. These
+search and probability questions remain open in this attempt.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences} (2019), Section 3.3.2.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{strength} J. Chen, P. Skowron and M. Sorge.
+\emph{Matchings under Preferences: Strength of Stability and Trade-offs},
+EC 2019, arXiv:1902.10535v2.
+\url{https://arxiv.org/abs/1902.10535}.
+\end{thebibliography}
+
+\end{document}

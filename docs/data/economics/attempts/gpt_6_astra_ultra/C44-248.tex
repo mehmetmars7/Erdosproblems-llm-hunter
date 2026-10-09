@@ -1,0 +1,94 @@
+% ECONOMICS_PROBLEM: {"id": "C44-248", "title": "Policy learning under covariate and response shifts", "jel_code": "C44", "source_id": "OP-0512"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+\title{Policy learning under covariate and response shifts: an irreducible shift floor and two sampling costs}
+\author{GPT 6 Astra Ultra}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section*{Scope}
+A source sample consists of iid observations containing outcomes; an iid target covariate sample is mutually independent of it. Throughout the statistical results, assume source consistency, no interference, and conditional treatment exchangeability, so that the conditional regressions $m_w^P(x)=E_P[Y\mid X=x,W=w]$ identify source causal means. Target responses may differ from source responses by at most $\delta$ in each treatment arm. For policy $\pi$, write
+\[
+ V_Q(\pi)=E_Q[m_0^Q(X)+\pi(X)\tau_Q(X)],\qquad
+ \mathcal R_Q(\widehat\pi)=\sup_{\pi\in\Pi}V_Q(\pi)-V_Q(\widehat\pi).
+\]
+The distribution-shift discussion in Section 3.3.3 of \cite{agenda} motivates this information pattern. The results below exhibit a nonvanishing response-shift floor, and separate source and target sampling errors under additional restrictions.
+
+\begin{proposition}[Unobserved response shift creates a fixed regret floor]
+There is a class with smooth means, identical source and target covariate distributions, overlap $e=1/2$, and two fixed policies such that every learner has worst-case expected target regret at least $2\delta/\pi$ for $0<\delta\le1/4$, regardless of source and target sample sizes.
+\end{proposition}
+\begin{proof}
+Let $X$ be uniform on $[0,1]$, $v(x)=\sin(2\pi x)$, and source means both equal $1/2$. Set $A=[0,1/2]$, $D=(1/2,1]$, and $\Pi=\{1_A,1_D\}$. In target world $+$ let $m_1^Q=1/2+\delta v$ and $m_0^Q=1/2-\delta v$; in target world $-$ reverse the signs. These means are smooth and within $\delta$ of the corresponding source means. Outcomes can be Bernoulli. All observed data have identical laws in the two worlds, because target outcomes are unobserved.
+
+The policy value difference $V_Q(1_A)-V_Q(1_D)$ equals $4\delta/\pi$ in world $+$ and its negative in world $-$. If the learner selects $1_A$ with probability $p$, its regrets are $(1-p)4\delta/\pi$ and $p4\delta/\pi$. Their maximum is at least $2\delta/\pi$. Randomizing continuously between these policies does not improve this lower bound, since values are linear in the mixing probability. The construction belongs to any fixed Holder class whose radius accommodates these displayed smooth functions.
+\end{proof}
+
+\begin{proposition}[An oracle density-ratio upper bound]
+Let $\Pi$ contain $M<\infty$ policies, $|Y|\le B$, and let the supplied source propensity satisfy $e\in[\epsilon,1-\epsilon]$. Suppose the supplied covariate density ratio $r=dQ_X/dP_X$ satisfies $r\le\kappa$. Maximize over $\Pi$ the empirical average of
+\[
+ r(X)\pi(X)\left\{\frac{WY}{e(X)}-
+ \frac{(1-W)Y}{1-e(X)}\right\}.
+\]
+With probability at least $1-\alpha$, the selected policy has target regret at most
+\[
+ C B\left\{\sqrt{\frac{\kappa\log(2M/\alpha)}{n\epsilon}}+
+ \frac{\kappa\log(2M/\alpha)}{n\epsilon}\right\}+2\delta.
+\]
+\end{proposition}
+\begin{proof}
+The score mean is the source-response benefit integrated under target covariates, $E_Q[\pi\tau_P]$. Its absolute value is bounded by $B\kappa/\epsilon$. Its second moment is at most
+\[
+ B^2E_P\left[r^2\left\{1/e+1/(1-e)\right\}\right]
+ \le 2B^2\kappa/\epsilon,
+\]
+since $E_Pr=1$ and $r^2\le\kappa r$. Bernstein's inequality and a union bound control the empirical error for all policies at the displayed stochastic order. Empirical maximization costs twice that uniform error.
+
+For any two policies, the difference between their true target value difference and the analogous source-response difference is
+$E_Q[(\pi-\pi')(\tau_Q-\tau_P)]$, whose absolute value is at most $2\delta$, since $|\pi-\pi'|\le1$. The target baseline mean cancels. Insert a target-optimal policy into this comparison and add the empirical error. The target covariate sample is unnecessary here because its full density ratio was supplied.
+\end{proof}
+
+\begin{proposition}[A plug-in route without density-ratio estimation]
+Let an estimator $\widehat\tau$ trained only on source data satisfy $|\widehat\tau|\le2B$. Using an independent target sample of size $N$, maximize $Q_N(\pi\widehat\tau)$ over $M$ policies. Conditional on the source data, with probability at least $1-\alpha$,
+\[
+ \mathcal R_Q(\widehat\pi)\le
+ \sqrt\kappa\|\widehat\tau-\tau_P\|_{L^2(P_X)}
+ +C B\sqrt{\frac{\log(2M/\alpha)}N}+2\delta.
+\]
+\end{proposition}
+\begin{proof}
+Let $\pi^*$ be target optimal. Add and subtract target and empirical averages using $\widehat\tau$ in
+$Q[(\pi^*-\widehat\pi)\tau_Q]$. Empirical optimality makes its empirical $\widehat\tau$ term nonpositive. The population response-estimation term is bounded by $Q|\widehat\tau-\tau_P|$, and the shift term by $2\delta$. The remaining two empirical-process terms are bounded by twice $\sup_\pi|(Q_N-Q)(\pi\widehat\tau)|$, to which conditional Hoeffding and a union bound apply. Finally
+$Q|f|=E_Pr|f|\le\sqrt{E_Pr^2}\|f\|_2\le\sqrt\kappa\|f\|_2$.
+\end{proof}
+This bound avoids fitting a density ratio, but it can be slower than policy-specific estimation if estimating the full effect function is difficult.
+
+\begin{proposition}[Both sample sizes can matter even in smooth submodels]
+For the same two policies, a model class with fixed $\kappa>1$ containing the following smooth submodels has minimax expected regret bounded below by
+$c(\delta+n^{-1/2}+N^{-1/2})$, with $c>0$ depending on its fixed bounds, for sufficiently large sample sizes.
+\end{proposition}
+\begin{proof}
+The first proposition gives the $\delta$ term. For source information set $Q_X=P_X$ uniform, $m_0=1/2$, and $m_1=1/2+\theta v$, with exact invariance and $\theta=\pm c_0/\sqrt n$. Source relative entropy is bounded by $C n\theta^2$; target covariate laws agree. The optimal policy switches between the two signs and its value advantage is $2|\theta|/\pi$. A learner with smaller expected regret would give a test with too-small error, contradicting the two-point testing bound.
+
+For target information, keep the source response contrast equal to a supplied constant $a>0$, and the source covariate law uniform. Set the target density to $1+\theta v$, with $\theta=\pm c_0/\sqrt N$, and impose exact response invariance. For large $N$ these densities satisfy the prescribed upper ratio bound $\kappa>1$. The source experiments coincide, target relative entropy is bounded, and the policy value gap is $2a|\theta|/\pi$. The same testing argument gives the $N^{-1/2}$ term. The supremum risk over the union of these submodels is at least the maximum of the three lower bounds, hence at least one third their sum after reducing the constant.
+\end{proof}
+
+\section*{Remaining gap}
+The lower bounds establish three unavoidable costs but not the full nonparametric minimax frontier. The density-ratio upper bound assumes an oracle ratio; the plug-in result leaves the source effect-estimation error explicit. Sharp dependence on smoothness, policy complexity, unknown ratios, and the interaction of the two sample sizes remains unresolved. The response-shift floor cannot be removed without target outcomes or stronger transport assumptions.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane, and J. Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025). \url{https://arxiv.org/html/2508.17099v1}.
+\end{thebibliography}
+\end{document}
