@@ -1,0 +1,127 @@
+% ECONOMICS_PROBLEM: {"id":"C73-24","title":"Subgame-perfect equilibrium in concurrent reachability games","jel_code":"C73","source_id":"OP-0159"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\title{Exact subgame perfection when reachability objectives resolve uniformly}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+The target asks whether every finite two-player concurrent reachability game has an exact subgame-perfect equilibrium, against all behavioral public-state-history deviations and after every feasible history. Earlier target visits must remain credited. This note proves existence under an additional, decidable uniform-resolution condition; it does not settle the unrestricted question.
+
+Rajasekaran and Vardi explicitly report the unrestricted Nash and subgame-perfect existence questions as open in the introduction of their April 2026 revision \cite{RV}. Their finite-horizon results do not supply the missing infinite-horizon limit. We give the limit argument with the precise hypothesis that makes it valid. The fixed-point construction below is the usual finite-game idea underlying Nash's theorem \cite{Nash}; no novelty claim is made.
+
+\section*{A finite augmentation and a graph condition}
+Let $S$ be the state set, $F_i$ the targets, and $P$ the transition kernel. Use augmented states $q=(s,b_1,b_2)$, where $b_i$ records whether $F_i$ has already been visited. On a transition to $s'$, set $b_i'=\max\{b_i,\mathbf1_{F_i}(s')\}$. Let $Q$ contain exactly the augmented states reached by some feasible prefix from the given initial state. It is finite and closed under feasible transitions. An augmented stationary strategy is an admissible original state-history strategy, since the flags are computable from that history.
+
+The feasible graph contains an edge whenever some joint action has a positive transition probability. Define $D\subseteq Q$ by requiring, for each $i$, either $b_i=1$ or no feasible path from $q$ can reach a state with flag $b_i=1$. Thus every player's eventual payoff has been determined at $D$, including irrevocable failures. The set $D$ is closed under every action, and its terminal payoff is $r_i(q)=b_i$. Put $\tau_D=\inf\{t\geq0:q_t\in D\}$.
+
+\begin{lemma}[A finite characterization of uniform resolution]\label{lem:graph}
+Set $C_0=Q\setminus D$ and recursively
+\[
+ C_{k+1}=\{q\in C_k:\text{some joint action }a
+                  \text{ has }P(C_k\mid q,a)=1\}.
+\]
+The following statements are equivalent:
+\begin{enumerate}
+\item $C_m=\varnothing$ for some integer $m$;
+\item no nonempty $C\subseteq Q\setminus D$ admits, at each $q\in C$, a joint action whose transition support is contained in $C$;
+\item there exist $L\geq1$ and $\delta>0$ such that, from every augmented state and under every history-dependent strategy profile,
+$\Prb(\tau_D>L)\leq1-\delta$.
+\end{enumerate}
+If $Q\setminus D\ne\varnothing$ and (1) holds, take $m\leq |Q\setminus D|$, $L=m$, and $\delta=p_*^m$, where $p_*$ is the least positive transition probability. From every continuation and under every profile, including every unilateral deviation,
+\[
+ \Prb(\tau_D>kL)\leq(1-\delta)^k,
+ \qquad \E\tau_D\leq L/\delta.
+\]
+If $Q=D$, the same conclusions hold with $L=1,\delta=1$.
+\end{lemma}
+\begin{proof}
+The decreasing finite sequence $C_k$ stabilizes. A nonempty stable set has the property in (2); conversely, any set with that property remains in every $C_k$, by induction. This proves (1)$\Leftrightarrow$(2). If the sequence empties, assign to $q\notin D$ the index $r(q)\geq1$ at which it is first removed. For every joint action at $q$, at least one successor lies outside $C_{r(q)-1}$ and consequently has smaller rank or belongs to $D$. The total probability of these successors is at least $p_*$. This bound remains true after any independent mixed-action choices, and even after correlated choices.
+
+At any history, the conditional probability of decreasing rank at each of the next at most $m$ transitions until reaching $D$ is at least $p_*^m$. Subsequent transitions stay in $D$. This proves (3), uniformly over histories and strategies. Applying the conditional bound successively in blocks proves the geometric tail. Summing $\Prb(\tau_D>t)$ over integer $t\geq0$ gives $\E\tau_D\leq L\sum_{k\geq0}(1-\delta)^k=L/\delta$.
+
+If (2) fails, select at each state in its nonempty set a support-preserving joint action and let both players follow their components. From that set $D$ is never reached. This contradicts (3), proving the converse.
+\end{proof}
+
+\section*{Discounting with a uniform error bound}
+For $0<\lambda<1$ consider the auxiliary terminal payoff
+\[
+ u_i^\lambda=\E[\lambda^{\tau_D}r_i(q_{\tau_D})\mathbf1_{\{\tau_D<\infty\}}].
+\]
+At states in $D$ the payoff is immediately $r_i$.
+
+\begin{lemma}[Stationary equilibrium in the discounted auxiliary game]\label{lem:discount}
+For every $0<\lambda<1$, the auxiliary game has a stationary profile $x^\lambda$ that is a Nash equilibrium from every augmented state against arbitrary history-dependent deviations.
+\end{lemma}
+\begin{proof}
+For a stationary profile $x$, its value $v_i^x$ equals $r_i$ on $D$ and is the unique solution, off $D$, of
+\[
+ v_i^x(q)=\lambda\sum_{q'}P_x(q'\mid q)v_i^x(q').
+\]
+The map on the coordinates outside $D$ is a contraction of modulus at most $\lambda$. Its convergent geometric expansion also shows that $v^x$ depends continuously on $x$.
+For $q\notin D$ define
+\[
+ Q_i^x(q,a_i)=\lambda\sum_{a_{-i},q'}x_{-i}(a_{-i}\mid q)
+                   P(q'\mid q,a_i,a_{-i})v_i^x(q'),
+ \quad g_i^x(q,a_i)=\max\{0,Q_i^x(q,a_i)-v_i^x(q)\}.
+\]
+On the finite product of action simplexes consider the continuous map
+\[
+ x_i(a_i\mid q)\longmapsto
+ \frac{x_i(a_i\mid q)+g_i^x(q,a_i)}{1+\sum_c g_i^x(q,c)}.
+\]
+On $D$ leave $x$ unchanged. Brouwer's fixed-point theorem applies to this compact convex finite-dimensional domain. At a fixed point, write $G=\sum_cg_i^x(q,c)$. The fixed-point equations give $g_i^x(q,a)=Gx_i(a\mid q)$. If $G>0$, every action used with positive probability has
+$Q_i^x(q,a)-v_i^x(q)=Gx_i(a\mid q)>0$. This contradicts
+$\sum_a x_i(a\mid q)[Q_i^x(q,a)-v_i^x(q)]=0$.
+Thus all gains vanish.
+
+Fix any history-dependent deviation. Iterating the inequalities $v_i^x(q)\geq Q_i^x(q,a_i)$ until $D$ or date $N$ bounds its expected discounted terminal payoff received by $N$ by $v_i^x(q_0)$. The omitted residual is bounded by $\lambda^N$, since $0\leq v_i^x\leq1$. Letting $N\to\infty$ proves the deviation inequality. Following $x_i$ gives equality by the defining value equation. This holds from every state.
+\end{proof}
+
+\begin{theorem}[Exact SPE under uniform resolution]\label{thm:main}
+Suppose the equivalent conditions of Lemma~\ref{lem:graph} hold. The original game has an exact subgame-perfect equilibrium stationary in $(s,b_1,b_2)$. Moreover every profile $x^\lambda$ in Lemma~\ref{lem:discount} is a subgame-perfect $\varepsilon_\lambda$-equilibrium for the original reachability payoffs, where
+\[
+ \varepsilon_\lambda=2(1-\lambda)L/\delta.
+\]
+Every convergent subsequence of these profiles as $\lambda\uparrow1$ has an exact subgame-perfect limit.
+\end{theorem}
+\begin{proof}
+Uniform resolution implies almost-sure finite $\tau_D$ under every continuation profile. Thus the original reachability payoff is $u_i=\E r_i(q_{\tau_D})$. The inequality $1-\lambda^t\leq(1-\lambda)t$ gives, uniformly over states, profiles, and deviations,
+\[
+ 0\leq u_i-u_i^\lambda\leq(1-\lambda)L/\delta.
+\]
+Combining this bound for a prescribed profile and a deviation with the auxiliary equilibrium inequalities proves the stated error bound (a one-sided argument would even remove one of the two terms).
+
+The product of stationary simplexes is compact, so take $x^{\lambda_k}\to x$. For any fixed history-dependent deviation, its probability of hitting $D$ by a fixed finite date is a finite sum of continuous expressions in the opponents' stationary probabilities. The remaining payoff is bounded uniformly by $(1-\delta)^{\lfloor N/L\rfloor}$. First letting $k\to\infty$ at fixed $N$, then $N\to\infty$, proves convergence of its undiscounted payoff. The same argument applies to the prescribed profiles. Pass to the limit in the approximate equilibrium inequalities for each fixed deviation and each augmented initial state. Their error tends to zero.
+
+At any feasible original history, including a history of probability zero under $x$, the continuation has the corresponding augmented state and the same stationary continuation profile. A player's credited previous success is its flag. The all-state deviation inequalities therefore prove precisely subgame perfection as defined in the target.
+\end{proof}
+
+\section*{Why the extra hypothesis is substantive}
+Consider one active player at state $s$, with actions ``wait'' (return to $s$) and ``go'' (reach absorbing target $g$); the second player has one action. A stationary go-probability $p>0$ reaches $g$ almost surely, while $p=0$ never reaches it. Hence reachability payoff is discontinuous at $p=0$. Here $C=\{s\}$ survives the graph deletion because waiting keeps play inside it. This is an obstruction to the limiting argument, not a counterexample to equilibrium existence: always going is an equilibrium.
+
+The result covers stochastic cycles whenever all action choices force a uniformly positive chance of resolving the objectives within a bounded number of transitions. It does not require every player to succeed. The stopping set includes irreversible failure, and the graph test quantifies over joint actions before equilibrium choices are made.
+
+\textbf{Unresolved boundary.} The first missing step for the unrestricted target is to handle nonempty controlled invariant sets outside $D$, without assuming uniform payoff continuity. Neither discounted equilibrium existence nor pointwise convergence of strategies removes that obstacle. No claim is made that all games have stationary augmented equilibria, or that failure of this sufficient condition disproves general SPE existence. The work is an analytic research attempt with full proofs of the stated restricted claims; no numerical experiment or formal proof-assistant verification is asserted.
+
+\begin{thebibliography}{9}
+\bibitem{RV} S. Rajasekaran and M. Y. Vardi, \emph{Verifying Equilibria in Finite-Horizon Probabilistic Concurrent Game Systems}, arXiv:2503.14690v7, 22 April 2026. Introduction and Section 2. \url{https://arxiv.org/html/2503.14690v7}.
+\bibitem{Nash} J. F. Nash, \emph{Equilibrium points in n-person games}, Proceedings of the National Academy of Sciences 36 (1950), 48--49. \url{https://doi.org/10.1073/pnas.36.1.48}.
+\end{thebibliography}
+
+\end{document}

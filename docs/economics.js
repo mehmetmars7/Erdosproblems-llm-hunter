@@ -105,7 +105,9 @@
             const selected = filter(records, { search: search.value, family: family.value, jel: jel.value })
                 .sort((a, b) => compare(a, b, sort.value, direction.value));
             body.innerHTML = rows(selected);
-            count.textContent = `${selected.length} of ${records.length} entries · Statements only`;
+            const attemptCount = selected.reduce((total, record) => total +
+                window.ProblemHunting.getMathematicalAttempts(record.attacks).length, 0);
+            count.textContent = `${selected.length} of ${records.length} entries · ${attemptCount} research attempt${attemptCount === 1 ? '' : 's'}`;
             headers.forEach(button => {
                 const active = button.dataset.sort === sort.value;
                 button.closest('th').setAttribute('aria-sort', active ?

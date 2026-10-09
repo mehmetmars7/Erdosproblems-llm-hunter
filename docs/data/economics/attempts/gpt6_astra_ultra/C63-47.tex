@@ -1,0 +1,248 @@
+% ECONOMICS_PROBLEM: {"id": "C63-47", "title": "The computational cost of minimax-optimal causal estimation", "jel_code": "C63", "source_id": "OP-0534"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{The computational cost of minimax-optimal causal estimation\\\large An explicit fast estimator and a data-access lower bound}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C63-47}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and model}
+The target is the runtime needed to attain the statistical minimax risk
+for a treated mean in a smooth binary causal model. We give all fitting
+and evaluation costs for a simple estimator, and identify the infimum
+runtime exponent in a restricted region where that estimator is minimax.
+No computational lower bound for rough regimes is claimed.
+
+Observe $n$ independent copies of $(X,W,Y)$, where
+$X\in[0,1]^d$, $W,Y\in\{0,1\}$,
+$\epsilon\leq e(x)=P(W=1\mid X=x)\leq1-\epsilon$,
+and $m(x)=\E[Y\mid X=x,W=1]$. Consistency and conditional causal
+exchangeability identify $\psi=\E m(X)$. The density $p$ is bounded
+above and below and the nuisance functions belong to the catalogue
+H\"older balls. For $s>0$ put $t(s)=\min\{s,1\}$. All constants below
+may depend on fixed $d,L,\epsilon$ and supplied smoothness, but not $n$.
+
+Cinelli et al. \cite{challenge} explicitly distinguish implementation
+from statistical optimality. Higher-order estimators already form an
+established literature \cite{robins}; the first-order construction here
+does not displace their sharper rough-regime results. The following
+finite-sample derivations and operation counts are elementary restricted
+results, not claims of a new general method.
+
+\section{Histogram fitting with random counts}
+Split the first $3N$ observations into three independent groups of size
+$N=\lfloor n/3\rfloor$, ignoring at most two remaining observations.
+In the first group partition the cube into $J_e^d$ half-open equal cubes
+(with the final faces included) and estimate $e$ by cell means of $W$,
+using $1/2$ in empty cells and clipping to $[\epsilon,1-\epsilon]$.
+In the second group use $J_m^d$ cells and estimate $m$ by the cell mean
+of $Y$ among $W=1$, using $1/2$ when there is no treated observation.
+Write the fitted functions as $\widehat e,\widehat m$.
+
+\begin{lemma}[Integrated histogram error]
+If $e\in\mathcal H_d^{s_e}(L)$ and
+$m\in\mathcal H_d^{s_m}(L)$, then, with $t_e=t(s_e),t_m=t(s_m)$,
+\[
+ \E\|\widehat e-e\|_{L^2(P_X)}^2
+ \leq C(J_e^{-2t_e}+J_e^d/N),\qquad
+ \E\|\widehat m-m\|_{L^2(P_X)}^2
+ \leq C(J_m^{-2t_m}+J_m^d/N).
+\]
+No smoothness of $p$ is needed for these inequalities.
+\end{lemma}
+\begin{proof}
+On a cell of side $J^{-1}$, either H\"older continuity ($s\leq1$)
+or the bound on first derivatives ($s>1$) bounds the oscillation of
+the relevant regression function by $C_{d,L}J^{-t(s)}$.
+Let the cell probability be $\pi$ and the probability of a qualifying
+observation be $\rho$. For fitting $e$, all observations qualify and
+$\rho=\pi$. For fitting $m$, qualification means $W=1$ and
+$\rho\geq\epsilon\pi$. The number $D$ of qualifying observations is
+binomial $(N,\rho)$. Conditional on $D=j>0$, their responses are
+independent draws from the conditional cell law; their mean has variance
+at most $1/(4j)$ and expectation equal to the corresponding cell mean.
+That mean differs from the regression function at every point of the
+cell by at most its oscillation, including the treatment-weighted cell
+mean used for $m$.
+For $0<\rho\leq1$,
+\[
+ \E\frac1{D+1}=\frac{1-(1-\rho)^{N+1}}{(N+1)\rho},\quad
+ \E\frac{\Ind\{D>0\}}D\leq\frac2{(N+1)\rho},\quad
+ P(D=0)\leq\frac1{(N+1)\rho}.
+\]
+The first identity follows by integrating
+$\E z^D=(1-\rho+\rho z)^N$ over $z\in[0,1]$;
+the second uses $1/j\leq2/(j+1)$, and the third follows from
+the first because its integrand expectation includes $P(D=0)$.
+The last justification can equivalently be checked directly from
+$(N+1)\rho(1-\rho)^N\leq1$.
+Squared bias and variance thus give integrated cell risk bounded by
+$C\pi J^{-2t}+C\pi/[(N+1)\rho]$; the empty-cell squared error is
+at most one. Sum over cells, using $\pi/\rho\leq1/\epsilon$.
+Zero-mass cells contribute zero. Clipping $\widehat e$ weakly reduces
+its pointwise distance from the true $e$, completing the proof.
+\end{proof}
+
+\begin{theorem}[A finite-sample doubly robust bound]
+Use the third group to compute
+\[
+ \widehat\psi=\frac1N\sum_{i\in I_3}
+ \left[\widehat m(X_i)+\frac{W_i}{\widehat e(X_i)}
+                 (Y_i-\widehat m(X_i))\right].
+\]
+Then
+\[
+ \E(\widehat\psi-\psi)^2\leq
+ \frac{(1+\epsilon^{-1})^2}{N}
+ +\epsilon^{-2}\E\|\widehat e-e\|_2^2
+                       \E\|\widehat m-m\|_2^2.
+\]
+Choose dyadic integers $J_j$ within a factor two of
+$N^{1/(2t_j+d)}$, for $j=e,m$. The resulting risk is at most
+\[
+ C\left[n^{-1}+
+ n^{-2t_e/(2t_e+d)-2t_m/(2t_m+d)}\right]
+\]
+for $n\geq6$, and the clipped estimator has no larger risk.
+\end{theorem}
+\begin{proof}
+Condition on both fitting groups. The score has absolute value at most
+$1+\epsilon^{-1}$, so its sample-mean conditional variance is bounded
+by the first displayed term. Direct conditional expectation gives the
+exact bias
+\[
+ B=\int\frac{(\widehat e-e)(\widehat m-m)}{\widehat e}\,dP_X.
+\]
+Cauchy--Schwarz yields
+$B^2\leq\epsilon^{-2}\|\widehat e-e\|_2^2\|\widehat m-m\|_2^2$.
+The two fitted functions are independent because they use separate
+groups, so the expectation of this product factors. Conditional variance
+plus squared conditional bias proves the first inequality. The lemma
+and the chosen grid sizes give each factor order
+$N^{-2t_j/(2t_j+d)}$. Since $N$ is comparable to $n$, the second
+inequality follows. Projection onto $[0,1]$ reduces error because
+$\psi\in[0,1]$.
+\end{proof}
+
+\section{What exponent is actually established}
+\begin{theorem}[Minimax risk and the infimum runtime exponent]
+Suppose
+\[
+ \frac{t_e}{2t_e+d}+\frac{t_m}{2t_m+d}\geq\frac12. \tag{*}
+\]
+For the full smoothness class in the statement, assume it contains the
+constant subfamily $p=1,e=1/2,m=\theta$, $\theta\in[1/4,3/4]$,
+with $Y\mid X,W$ Bernoulli $(\theta)$. Then
+$c/n\leq R_n^\star\leq C/n$.
+The estimator above takes at most $C_d n\log(n+1)$ arithmetic RAM
+operations, counting fitting, tuning, storage initialization and evaluation.
+If inspecting an input observation costs at least one operation, no
+algorithm with uniform expected runtime at most $n^a$, $a<1$, can attain
+a constant multiple of $R_n^\star$. For every $a>1$ such a constant-factor
+algorithm exists. Consequently the infimum possible exponent is $1$;
+this does not assert attainment under the exact bound $T\leq n$ at $a=1$.
+\end{theorem}
+\begin{proof}
+Condition (*) makes the preceding upper bound order $n^{-1}$.
+For the statistical lower bound take $\theta_0=1/2$ and
+$\theta_1=1/2+1/(4\sqrt n)$ in the constant subfamily. Only the $Y$
+coordinates depend on $\theta$. The single-observation chi-square
+divergence of $P_1$ from $P_0$ is $4(\theta_1-\theta_0)^2$; independence
+gives $1+\chi^2(P_1^n,P_0^n)=(1+1/(4n))^n\leq e^{1/4}$.
+Cauchy--Schwarz gives $\TV\leq\frac12\sqrt{\chi^2}<1/2$.
+Classify an estimate by the nearer target. A classification error entails
+squared loss at least one quarter of the squared target separation, and
+the sum of testing errors is at least $1-\TV$. Thus maximum risk is at
+least a positive constant times $n^{-1}$.
+
+Locate each coordinate in a dyadic grid by binary comparisons in
+$O(\log J_j)$ steps. Each observation requires $O(d\log(n+1))$
+comparisons and a constant number of additions per visited cell. Each
+array has $J_j^d\leq C_d N$ entries, so initialization and division of
+cell sums by counts take $O(n)$ operations for fixed $d$. For each fixed $t_j$, include $\lambda_j=2^{2t_j+d}$ among the fixed
+real RAM constants. Choose the largest integer $k$ with $\lambda_j^k\leq N$
+by repeated multiplication, and put $J_j=2^k$. This chooses the required
+resolution in $O(\log n)$ operations without a unit-cost exponentiation
+assumption. These are arithmetic-model constants, with no claim about
+their finite-precision bit representation. Evaluation on the
+third group has the same lookup cost. This proves the total count.
+
+For the runtime lower bound the standard RAM model must charge access
+to data: an operation can reveal only a bounded number of previously
+unread records. Absorb that bound into constants. Under the constant
+subfamily every new record is an independent Bernoulli outcome together
+with ancillary variables. Adaptively chosen unread indices retain that
+law. The chain rule for relative entropy of the algorithm's stopped
+transcript therefore gives
+\[
+ \KL(Q_0\|Q_1)\leq
+ \E_0 N_{\rm read}\,
+ \operatorname{kl}(\theta_0,\theta_1)
+ \leq C n^a(\theta_1-\theta_0)^2.
+\]
+To justify stopping, first truncate after $M$ operations, use the finite
+chain rule, then let $M\to\infty$; finite expected runtime implies almost
+sure stopping, and the entropy bound passes to the transcript by the
+increasing information partitions (or by its conditional log-likelihood
+sum). Choose target separation $c_0 n^{-a/2}$ with a fixed sufficiently
+small $c_0>0$. It stays inside $[1/4,3/4]$ and makes entropy at most
+$1/8$. Binary entropy satisfies
+$\operatorname{kl}(u,v)\geq2(u-v)^2$: its second derivative in $u$ is
+$1/[u(1-u)]\geq4$ and its value and first derivative vanish at $u=v$.
+Grouping likelihoods on an event by Jensen therefore proves
+$\TV(Q_0,Q_1)\leq\sqrt{\KL(Q_0\|Q_1)/2}\leq1/4$.
+The same testing argument gives risk $\geq c n^{-a}$, which is not
+$O(n^{-1})$ when $a<1$.
+Finally $C_dn\log(n+1)\leq n^a$ for all sufficiently large $n$ if
+$a>1$. On the finitely many smaller sample sizes output a constant in
+one operation; increasing the risk comparison constant covers them,
+since the statistical lower bound is positive. This respects the exact
+runtime constraint for every $n\geq1$.
+\end{proof}
+
+\section{Verification and first unresolved gap}
+The two nuisance fits were deliberately made independent; otherwise
+factoring their squared $L^2$ errors would be unjustified. The operation
+bound covers all observations actually used and all array entries. In
+the runtime lower bound data access, not a purported hardness conjecture,
+is the source of the obstruction. Condition (*) is a sufficient
+first-order region, not the sharp boundary of parametric minimax risk.
+The first unresolved gap is an explicit optimal runtime construction
+and matching lower bound in smoothness regimes requiring higher-order
+bias correction, including the adaptation penalty when indices are
+unknown. Arithmetic counts here imply no bit-complexity claim.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy,
+S. Magliacane and J. Zubizarreta (2025), Challenges in Statistics:
+A Dozen Challenges in Causality and Causal Inference,
+arXiv:2508.17099v1, Section 3.5.3, Implementation.
+\url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}.
+\bibitem{robins} J. Robins, L. Li, E. Tchetgen and A. van der Vaart (2008),
+Higher order influence functions and minimax estimation of nonlinear
+functionals, arXiv:0805.3040. \url{https://arxiv.org/abs/0805.3040}.
+\end{thebibliography}
+
+\end{document}

@@ -1,6 +1,6 @@
 # Problem Hunting with LLMs
 
-A collection of attempts by advanced Large Language Models (LLMs) to solve [Erdos Problems](https://www.erdosproblems.com/) and **Top Open Problems** across mathematics and theoretical computer science, alongside an **Economics** catalogue of open problem statements. MathOverflow is retained as a subset of the open-problems collection.
+A collection of attempts by advanced Large Language Models (LLMs) to solve [Erdos Problems](https://www.erdosproblems.com/) and **Top Open Problems** across mathematics and theoretical computer science, alongside an **Economics** catalogue of problem statements and model research attempts. MathOverflow is retained as a subset of the open-problems collection.
 
 
 **Live Site:** [mehmetmars7.github.io/Erdosproblems-llm-hunter](https://mehmetmars7.github.io/Erdosproblems-llm-hunter)

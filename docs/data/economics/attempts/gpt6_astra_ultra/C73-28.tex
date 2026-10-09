@@ -1,0 +1,112 @@
+% ECONOMICS_PROBLEM: {"id":"C73-28","title":"Nash equilibrium in two-player concurrent reachability games","jel_code":"C73","source_id":"OP-0158"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\title{Exact certificates for stationary concurrent reachability equilibria}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and scope}
+The target is exact Nash existence in every finite two-player concurrent reachability game with behavioral public-state-history strategies. We derive necessary and sufficient finite certificates for a restricted strategy class: profiles stationary in the current state and the two target-visit flags. Deviations remain completely unrestricted within the target's state-history convention. A certificate may be imposed only at the designated initial state; no off-path equilibrium requirement is silently added.
+
+Rajasekaran and Vardi's April 2026 revision explicitly describes unrestricted exact existence as open, and notes a flaw in a formerly proposed counterexample \cite{RV}. The reduction below is a verification and restricted-search result, not an existence proof. Its essential point is to reject spurious harmonic solutions supported on nonwinning recurrent classes.
+
+\section*{Model and finite Markov-chain values}
+Adjoin bits recording visits to $F_1,F_2$ to obtain a finite state set $Q$, closed under feasible transitions, with initial state $q_0$. Let $B_i$ be the states with bit $i$ equal to one. These sets are closed under all actions. Strategies $x_i(a_i\mid q)$ are independent mixed actions; their induced transition matrix is
+\[
+ K_x(q,q')=\sum_{a_1,a_2}x_1(a_1\mid q)x_2(a_2\mid q)P(q'\mid q,a_1,a_2).
+\]
+A vertex belongs to $Z_i(x)$ if the positive-edge graph of $K_x$ has no path from it to $B_i$; a length-zero path is allowed. Thus $Z_i(x)\cap B_i=\varnothing$.
+
+\begin{lemma}[The boundary conditions that select the actual value]\label{lem:value}
+For a fixed stationary profile $x$, its reachability probabilities $v_i(q)$ are the unique solution to
+\[
+ v_i=1\text{ on }B_i,\qquad v_i=0\text{ on }Z_i(x),\qquad
+ v_i(q)=\sum_{q'}K_x(q,q')v_i(q')\text{ otherwise}.                 \tag{1}
+\]
+They lie in $[0,1]$. Without the zero boundary on $Z_i(x)$, uniqueness can fail and a harmonic solution need not equal a reachability probability.
+\end{lemma}
+\begin{proof}
+Each state outside $B_i\cup Z_i(x)$ has a positive-probability path to $B_i$ of length at most $|Q|$. There are finitely many states and positive matrix entries, so some $\eta>0$ is a uniform lower bound on the probability of hitting $B_i\cup Z_i(x)$ in the next $|Q|$ steps from any such state. Repeating in blocks shows almost-sure absorption into this union, with geometric tail. The hitting probability of $B_i$ satisfies (1) by conditioning on the first transition.
+
+If $w$ solves the homogeneous version of (1), iterate its harmonic equations up to the hitting time or date $N$. The boundary values vanish, giving
+$|w(q)|\leq\|w\|_\infty\Prb_q(\tau_{B_i\cup Z_i}>N)$. The right side tends to zero, proving uniqueness. For the final assertion, a state that loops forever without reaching a target satisfies $w(q)=w(q)$ for every value assigned to it, although its true reachability probability is zero.
+\end{proof}
+
+\section*{Unrestricted deviations against a stationary opponent}
+For player $i$, with the opponent fixed at $x_{-i}$, write
+\[
+ K_{i,a}^x(q,q')=\sum_{a_{-i}}x_{-i}(a_{-i}\mid q)P(q'\mid q,a,a_{-i}).
+\]
+
+\begin{lemma}[Reachability as the least superharmonic majorant]\label{lem:mdp}
+Let $w_i(q)$ be the supremum probability of reaching $B_i$ from $q$ over all history-dependent behavioral deviations against $x_{-i}$. Then $w_i\in[0,1]^Q$, $w_i=1$ on $B_i$, and
+\[
+ w_i(q)=\max_{a\in A_i(q)}\sum_{q'}K_{i,a}^x(q,q')w_i(q')
+ \quad(q\notin B_i).                                             \tag{2}
+\]
+It is the coordinatewise least vector $z\in[0,1]^Q$ satisfying
+\[
+ z=1\text{ on }B_i,\qquad
+ z(q)\geq\sum_{q'}K_{i,a}^x(q,q')z(q')\quad(q\notin B_i,\ a\in A_i(q)). \tag{3}
+\]
+\end{lemma}
+\begin{proof}
+Let $w_i^N$ be the maximal probability of reaching $B_i$ within $N$ transitions. Start with $w_i^0=\mathbf1_{B_i}$; backward induction gives the recursion in (2) with $w_i^{N+1}$ on the left and $w_i^N$ on the right. Finite action sets ensure the finite-horizon maximum is attained. The sequence increases and is bounded by one, so it has a limit $w$. A maximum over finitely many linear expressions commutes with this limit, giving (2).
+
+For any infinite-horizon deviation, the probability of ever reaching $B_i$ is the increasing limit of its finite-horizon probabilities, each at most $w_i^N$. It is therefore at most $w$. Conversely, an optimal $N$-step strategy followed by arbitrary actions is an admissible infinite strategy, so the infinite supremum is at least $w_i^N$ for every $N$. This proves $w=w_i$ without requiring attainment of an infinite-horizon best response.
+
+If $z$ satisfies (3), induction gives $w_i^N\leq z$: the base case uses nonnegativity, and the induction uses the superharmonic inequalities. Taking limits proves $w_i\leq z$. Equation (2) shows that $w_i$ itself satisfies (3).
+\end{proof}
+
+\begin{theorem}[Initial-state and all-state equilibrium certificates]\label{thm:cert}
+Fix a stationary augmented profile $x$, and compute $v_i$ using (1). It is a Nash equilibrium from $q_0$, against every allowed history-dependent deviation, if and only if for each $i$ there exists $z_i\in[0,1]^Q$ satisfying (3) and
+\[
+ z_i(q_0)=v_i(q_0).                                               \tag{4}
+\]
+It is a Nash equilibrium from every augmented state if and only if $v_i$ itself satisfies (3) for each player. In that latter case its induced original state-history profile is subgame perfect, with previously visited targets credited.
+\end{theorem}
+\begin{proof}
+If the certificate holds, Lemma~\ref{lem:mdp} bounds every deviation payoff from $q_0$ by $z_i(q_0)=v_i(q_0)$, which is the prescribed payoff by Lemma~\ref{lem:value}. Conversely, equilibrium means $w_i(q_0)=v_i(q_0)$, since following $x_i$ is itself an admissible deviation. Choose $z_i=w_i$ and apply Lemma~\ref{lem:mdp}.
+
+The same argument at every state yields the all-state assertion: if all-state equilibrium holds, $w_i=v_i$, and conversely (3) bounds all deviations by $v_i$. An original history determines an augmented state and the continuation of an augmented stationary profile depends only on that state. Applying the all-state inequalities after every feasible prefix proves the final assertion, including off-path prefixes.
+\end{proof}
+
+\section*{A finite algebraic search, with its exact logical scope}
+\begin{corollary}[Finite polynomial systems for the restricted existence question]\label{cor:finite}
+For a game with rational transition probabilities, existence of a profile stationary in the augmented state and Nash from $q_0$ is equivalent to feasibility of at least one of finitely many explicitly constructible systems of polynomial equalities and weak or strict inequalities over the reals. Such existence is decidable by real quantifier elimination. This decides only the specified stationary augmented class, not unrestricted Nash existence.
+\end{corollary}
+\begin{proof}
+Enumerate a nonempty proposed support $A_i^+(q)\subseteq A_i(q)$ for each player and state. Introduce probability variables $x_i(a\mid q)>0$ on the proposed support, set other probabilities to zero, and impose unit sums. Nonnegativity of all summands shows that an edge $q\to q'$ has $K_x(q,q')>0$ exactly when some supported joint action has $P(q'\mid q,a_1,a_2)>0$. Thus its graph, and each $Z_i$, are determined by the support alone, without solving for the probabilities.
+
+Introduce variables $v_i,z_i\in[0,1]^Q$. Impose (1), (3), and (4), using the graph-derived $Z_i$. These are polynomial conditions with rational coefficients: the equations for $v_i$ have degree at most three and the deviation inequalities degree at most two in the displayed variables. By Theorem~\ref{thm:cert}, every solution is a valid equilibrium certificate. Conversely, any stationary augmented equilibrium has one of the enumerated supports and its actual $v_i$ and best-response values $w_i$ give a solution. The finite disjunction is therefore equivalent to restricted existence. The decision theorem for real polynomial formulas, in its effective rational-coefficient form, applies \cite{BPR}. No polynomial running-time claim follows.
+\end{proof}
+
+A proposed rational certificate can be checked using rational arithmetic and graph reachability. For algebraic probabilities one must also supply an exact real-algebraic representation and verify the inequalities in that representation. Numerical Bellman residuals alone are not certificates: at a nonwinning absorbing state the false assignment $v=1$ can have zero residual.
+
+\section*{Adversarial checks and the remaining gap}
+There is no requirement that $z_i=v_i$ at states outside $q_0$ in the initial-state certificate. For example, an off-path state may offer player $i$ an unused action going directly to its target. Then $v_i$ may fail (3) there, but $z_i$ can correctly equal one; this does not invalidate Nash equilibrium at an initial state from which no unilateral deviation can benefit from that state. Conversely, a player who has already reached its target has $v_i=z_i=1$, making all of its subsequent deviation inequalities automatic.
+
+The two-player independence requirement appears in the product defining $K_x$. Public correlation is not introduced. Flags use only the observed state prefix; no private-action observation is assumed. The best-response proof quantifies over all history-dependent behavior and takes the reachability limit directly, rather than replacing those deviations by stationary ones without proof.
+
+\textbf{Unresolved boundary.} The first missing assertion is that some feasible certificate exists for every game, or that a broader finite-memory family always contains an equilibrium. Neither assertion is proved here. Failure of every stationary support system in a particular game would exclude only augmented stationary equilibria, not the general strategies in the target. No exhaustive support calculation or counterexample is claimed. This is a self-contained exact reduction and proof, not a claimed resolution or novelty assertion.
+
+\begin{thebibliography}{9}
+\bibitem{RV} S. Rajasekaran and M. Y. Vardi, \emph{Verifying Equilibria in Finite-Horizon Probabilistic Concurrent Game Systems}, arXiv:2503.14690v7 (22 April 2026), introduction and Section 2. \url{https://arxiv.org/html/2503.14690v7}.
+\bibitem{BPR} S. Basu, R. Pollack, and M.-F. Roy, \emph{Algorithms in Real Algebraic Geometry}, second edition, Springer, 2006, chapter on quantifier elimination. \url{https://doi.org/10.1007/3-540-33099-2}.
+\end{thebibliography}
+
+\end{document}

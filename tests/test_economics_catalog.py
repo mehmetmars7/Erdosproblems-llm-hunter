@@ -15,6 +15,16 @@ from scripts.import_economics import import_economics, parse_source
 from scripts.update_economics_ranks import update_economics_ranks
 
 
+# Permanent identities of the research batch selected at ranks 11--50 on
+# 2026-10-09. Future reranking must not move these attempts to different problems.
+ULTRA_BATCH_IDS = set('''
+C73-11 C71-12 C79-13 C72-14 C73-15 D81-16 C73-17 C61-18 C73-19 C73-20
+D86-21 D63-22 O33-23 C73-24 C73-25 C65-26 C73-27 C73-28 C65-29 C73-30
+C72-31 C73-32 C65-33 D44-34 C63-35 C72-36 C65-37 C73-38 D63-39 C73-40
+C73-41 C90-42 C73-43 E52-44 C65-45 D82-46 C63-47 C62-48 C73-49 C14-50
+'''.split())
+
+
 def source_fixture():
     first = (r'\section*{Source mathematical conventions}' + '\nAtlas context.\n'
              + '% MERGED_PROBLEM: {"id":"OP-0010","source":"atlas","jel":"C73"}\n'
@@ -263,12 +273,15 @@ class CompleteEconomicsImportTests(unittest.TestCase):
             self.assertNotIn('difficulty-rank:', record['definition_tex'])
             self.assertNotIn('\\ProblemClassification', record['definition_tex'])
             self.assertNotIn('Primary JEL index', record['definition_tex'])
-            if record['id'] not in {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'}:
+            if record['id'] not in {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'} | ULTRA_BATCH_IDS:
                 self.assertEqual(record['attacks'], [])
 
     def test_six_public_attacks_cover_five_canonical_problems(self):
         data = build_economics_data()
-        attacked = {problem_id: record for problem_id, record in data.items() if record['attacks']}
+        attacked = {problem_id: dict(record, attacks=[attack for attack in record['attacks']
+                                                     if attack['model'] == 'GPT 6 Astra Pro'])
+                    for problem_id, record in data.items()
+                    if any(attack['model'] == 'GPT 6 Astra Pro' for attack in record['attacks'])}
         self.assertEqual(set(attacked), {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'})
         self.assertEqual(sum(len(record['attacks']) for record in attacked.values()), 6)
         self.assertEqual([attack['version'] for attack in attacked['C73-1']['attacks']], [1, 2])
@@ -287,6 +300,28 @@ class CompleteEconomicsImportTests(unittest.TestCase):
         self.assertNotIn('Exact Counting of Turn-Boundary Positions', catchup)
         self.assertIn(r'\bibitem{isaksen2015}', catchup)
         self.assertIn('small-deficit strategy fails', catchup)
+
+    def test_ultra_batch_preserves_problem_identity_and_public_downloads(self):
+        data = build_economics_data()
+        ultra = {problem_id: [attack for attack in record['attacks']
+                              if attack['model'] == 'GPT 6 Astra Ultra']
+                 for problem_id, record in data.items()}
+        self.assertEqual({problem_id for problem_id, attacks in ultra.items() if attacks}, ULTRA_BATCH_IDS)
+        for problem_id in ULTRA_BATCH_IDS:
+            with self.subTest(problem_id=problem_id):
+                self.assertEqual(len(ultra[problem_id]), 1)
+                attack = ultra[problem_id][0]
+                expected_claim = 'solved' if problem_id == 'C65-45' else 'unresolved'
+                self.assertEqual(attack['version'], 1)
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                self.assertEqual(attack['status'], expected_claim)
+                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(data[problem_id]['llm_status'], expected_claim)
+                self.assertTrue(attack['file_path'].startswith('attacks/open_problems/economics/gpt6_astra_ultra/'))
+                self.assertTrue(attack['download_url'].startswith('data/economics/attempts/gpt6_astra_ultra/'))
+                source = (BASE_DIR / attack['file_path']).read_bytes()
+                self.assertEqual((BASE_DIR / 'docs' / attack['download_url']).read_bytes(), source)
+                self.assertNotRegex(source.decode(), r'/Users/|/home/|/mnt/data|/workspace/|uploaded filename')
 
     def test_specialized_and_merged_source_conventions_are_present(self):
         data = build_economics_data()

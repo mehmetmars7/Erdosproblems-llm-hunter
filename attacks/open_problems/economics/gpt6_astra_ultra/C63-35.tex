@@ -1,0 +1,203 @@
+% ECONOMICS_PROBLEM: {"id": "C63-35", "title": "Scalable heterogeneous-agent macroeconomics", "jel_code": "C63", "source_id": "OP-0016"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Scalable heterogeneous-agent macroeconomics\\\large A coupled residual certificate and its conditioning limits}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C63-35}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and restricted result}
+The target asks for globally certified heterogeneous-agent computation,
+including binding constraints, and propagation of solver error into
+estimation. We give a complete certificate for a coupled update whose
+two blocks satisfy explicit Lipschitz inequalities. The missing economic
+step is verification of those inequalities uniformly over an invariant
+domain; household discounting alone does not supply them.
+
+The sequence-space method of Auclert et al. \cite{ssj} is an established
+efficient approach to solution and estimation. Krusell--Smith \cite{ks}
+provides a foundational aggregate-risk computation. Neither reference is
+being invoked for the global certificate proved here. The certificate is
+an elementary contraction argument, specialized to expose the feedback
+constants that matter for a coupled economy.
+
+\section{Coupled residuals}
+Let $X,Y$ be nonempty complete metric spaces with distances $d_X,d_Y$.
+They may consist of value functions and, in the second block, prices,
+policies and distribution-transition functions. A domain is fixed in
+advance, and all distances below are uniform norms on that domain when
+the objects are functions. Let $T=(T_1,T_2):X\times Y\to X\times Y$ map
+the domain into itself. Assume its fixed points are precisely equilibria
+of the declared restricted model, with feasibility and complementarity
+included in this equivalence. Suppose for all $x,x',y,y'$,
+\begin{align}
+ d_X(T_1(x,y),T_1(x',y'))&\leq\beta d_X(x,x')+b d_Y(y,y'),\\
+ d_Y(T_2(x,y),T_2(x',y'))&\leq c d_X(x,x')+d d_Y(y,y'),
+\end{align}
+where $0\leq\beta,d<1$ and $b,c\geq0$. Put
+$D=(1-\beta)(1-d)-bc$.
+
+\begin{theorem}[Global two-block error certificate]
+If $D>0$, $T$ has exactly one fixed point $(x^*,y^*)$. For any candidate
+$(x,y)$ define the exact residual magnitudes
+$r_1=d_X(x,T_1(x,y))$ and $r_2=d_Y(y,T_2(x,y))$. Then
+\[
+ \begin{pmatrix}d_X(x,x^*)\\d_Y(y,y^*)\end{pmatrix}
+ \leq\frac1D
+ \begin{pmatrix}1-d&b\\c&1-\beta\end{pmatrix}
+ \begin{pmatrix}r_1\\r_2\end{pmatrix}
+\]
+coordinatewise. There is $t>0$ such that
+$q=\max\{\beta+bt,d+c/t\}<1$. In the distance
+$d_t((x,y),(x',y'))=\max\{d_X(x,x'),d_Y(y,y')/t\}$,
+iteration satisfies
+\[
+ d_t(T^k(x,y),(x^*,y^*))\leq
+ \frac{q^k}{1-q}d_t((x,y),T(x,y)).
+\]
+\end{theorem}
+\begin{proof}
+When $b,c>0$, choose $c/(1-d)<t<(1-\beta)/b$; the interval is
+nonempty exactly because $D>0$. If $b=0$, choose $t$ large enough that
+$d+c/t<1$. If $c=0,b>0$, choose $t<(1-\beta)/b$. These choices also
+cover $b=c=0$. The two Lipschitz inequalities prove $T$ is a
+$q$-contraction in $d_t$. Consecutive iterates have distances at most
+$q^k d_t(u,Tu)$; summing this geometric series makes them Cauchy in the
+complete product space. Their limit is fixed by continuity of $T$.
+Two fixed points have distance at most $q$ times their distance, so coincide.
+The tail sum gives the iteration estimate.
+For the coordinate estimate write $a=d_X(x,x^*)$, $e=d_Y(y,y^*)$.
+The triangle inequality gives $(1-\beta)a-be\leq r_1$ and
+$(1-d)e-ca\leq r_2$. Multiply the first by $1-d$ and add $b$ times
+the second to get $Da\leq(1-d)r_1+br_2$. Multiply the second by
+$1-\beta$ and add $c$ times the first to obtain the other bound.
+\end{proof}
+
+\begin{proposition}[Approximate evaluation and global validation]
+Suppose only $\widetilde T(u)$ is evaluated, with verified block errors
+$d_X(T_1(u),\widetilde T_1(u))\leq\delta_1$ and
+$d_Y(T_2(u),\widetilde T_2(u))\leq\delta_2$. The preceding coordinate
+bound remains valid after replacing $r_i$ by
+$d_i(u_i,\widetilde T_i(u))+\delta_i$.
+If a scalar residual function $r(s)$ is $L$-Lipschitz on a metric domain
+$\mathcal D$ and $G$ is an $h$-net, then
+\[
+ \sup_{s\in\mathcal D}|r(s)|\leq\max_{g\in G}|r(g)|+Lh.
+\]
+The same statement holds for norm-valued residuals using their norm
+Lipschitz bound. Truncation, quadrature and distribution-compression errors
+must be included in the $\delta_i$ or in the grid bound.
+\end{proposition}
+\begin{proof}
+The first claim is the triangle inequality for each block. For every $s$
+choose $g\in G$ with distance at most $h$; then
+$|r(s)|\leq |r(g)|+Lh$. Take the supremum. For vectors apply the reverse
+triangle inequality to their norms.
+\end{proof}
+
+This validates all states only when the asserted net and Lipschitz bound
+are themselves established. Finite simulation paths need not form a net
+of a distribution space.
+
+\section{Explicit failures of unjustified certificates}
+\begin{proposition}[Conditioning cannot be omitted]
+For each $\gamma\in(0,1)$ the scalar fixed-point equation
+$x=(1-\gamma)x$ has unique equilibrium zero and residual
+$r(x)=\gamma|x|$. Every error bound $|x|\leq C r(x)$ valid for nonzero
+$x$ requires $C\geq\gamma^{-1}$. For the equation $F(x)=x^2=0$ on
+$[0,1]$, no finite constant $C$ satisfies $|x|\leq C|F(x)|$ throughout
+any neighborhood of zero. Finally fixed-price contraction of a household
+block does not imply contraction of the coupled update.
+\end{proposition}
+\begin{proof}
+The first ratio is identically $\gamma^{-1}$. The second ratio is $1/x$
+for $x>0$, unbounded near zero. For the last assertion take
+$T(v,p)=(\tfrac12v+p,v)$ on $\R^2$. For fixed $p$ the first component
+contracts in $v$ with coefficient $1/2$. Its update matrix has positive
+eigenvalue $(1+\sqrt{17})/4>1$, so iteration expands along its eigenvector
+in every norm. Here the feedback product $bc=1$ violates $D>0$.
+\end{proof}
+
+Binding constraints do not invalidate the theorem when the update is
+Lipschitz but nondifferentiable. They do invalidate applications that
+silently replace a complementarity residual with an equality residual
+on slack inequalities. No differentiability of $T$ was used.
+
+\section{Propagation into estimation}
+Let $\Theta$ be a parameter set with metric $d_\Theta$, true parameter
+$\theta_0$, and model moments $M(\theta)\in\R^k$. Numerical moments
+$\widetilde M$ and empirical moments $\widehat m$ satisfy
+\[
+ \sup_{\theta\in\Theta}\|\widetilde M(\theta)-M(\theta)\|\leq\eta,
+ \quad \|\widehat m-M(\theta_0)\|\leq\zeta.
+\]
+Assume quantitative identification
+$\|M(\theta)-M(\theta_0)\|\geq\kappa d_\Theta(\theta,\theta_0)$
+for all $\theta$, with $\kappa>0$.
+
+\begin{theorem}[Solver and sampling errors remain separately visible]
+If $\widehat\theta$ is a $\xi$-approximate minimum-distance fit, meaning
+\[
+ \|\widetilde M(\widehat\theta)-\widehat m\|
+ \leq\inf_\theta\|\widetilde M(\theta)-\widehat m\|+\xi,
+\]
+then
+$d_\Theta(\widehat\theta,\theta_0)\leq
+ [2\eta+2\zeta+\xi]/\kappa$.
+If moments are $L_M$-Lipschitz in the equilibrium object and that object
+has a uniform numerical error bound $\Delta$, with direct integration
+error at most $\eta_0$, one may take $\eta=L_M\Delta+\eta_0$.
+\end{theorem}
+\begin{proof}
+Use $\theta_0$ as a feasible comparison to bound the fitted discrepancy
+by $\eta+\zeta+\xi$. A second triangle inequality bounds
+$\|M(\widehat\theta)-M(\theta_0)\|$ by
+$\eta+(\eta+\zeta+\xi)+\zeta$. Divide by $\kappa$.
+The last assertion follows by adding the Lipschitz change in the moment
+to its direct numerical integration error.
+\end{proof}
+
+\section{Verification and unresolved step}
+All displayed bounds are deterministic and require no empirical
+benchmark claims. In particular the exact inverse contains the feedback
+denominator $D$, which can be small even when $\beta<1$ is well below one.
+The first unresolved economic step is construction of an equilibrium-
+equivalent invariant update with certified $b,c,d$ satisfying $D>0$ for a
+nontrivial globally nonlinear aggregate-risk model across binding
+constraints. The theorem supplies no general complexity guarantee for
+covering its infinite-dimensional distribution domain. Thus the complete
+catalogue computation and benchmarking programme remains unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{ssj} A. Auclert, B. Bard\'oczy, M. Rognlie and L. Straub (2021),
+Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent
+Models, \emph{Econometrica} 89(5), 2375--2408.
+\url{https://doi.org/10.3982/ECTA17434}.
+\bibitem{ks} P. Krusell and A. A. Smith, Jr. (1998), Income and Wealth
+Heterogeneity in the Macroeconomy, \emph{Journal of Political Economy}
+106(5), 867--896. \url{https://doi.org/10.1086/250034}.
+\end{thebibliography}
+
+\end{document}

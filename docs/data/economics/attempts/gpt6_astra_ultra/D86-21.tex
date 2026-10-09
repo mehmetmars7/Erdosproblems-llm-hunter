@@ -1,0 +1,195 @@
+% ECONOMICS_PROBLEM: {"id": "D86-21", "title": "Strongly polynomial computation of an optimal finite contract", "jel_code": "D86", "source_id": "OP-0596"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,geometry,hyperref}
+\geometry{margin=1in}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Q}{\mathbb Q}
+\title{Exact contracts on an affine line of outcome distributions}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem D86-21. Status: unresolved.} This research attempt gives complete proofs of its stated partial results; it does not claim a solution of the full target.
+
+\section{Recap and what is already known}
+Action $a$ has rational cost $c_a\geq0$ and outcome distribution $q_a$;
+one action has zero cost. The principal's rational outcome rewards $r_j$
+are nonnegative. A contract $t\geq0$ pays $t_j$ at outcome $j$.
+The agent maximizes $q_a\cdot t-c_a$, with ties favoring the principal.
+The target asks for an optimal contract with a number of arithmetic operations
+polynomial in the numbers $n,m$ of actions and outcomes, independent of numeric
+bit lengths, and polynomial-size intermediate encodings.
+
+The survey~\cite{survey}, Section 3.1, gives the minimum-payment LP approach,
+ordinary polynomial-time solvability, and the at-most-$n-1$-nonzero-payments
+observation. Those facts are not novel contributions of this attempt. We
+rederive the support fact and develop an explicit strongly polynomial algorithm
+when the distributions lie on an affine line. This restriction allows arbitrarily
+many actions and outcomes but does not cover general technologies.
+
+\section{Why sparse payments alone do not settle the target}
+For a candidate action $a$, put $B_{bj}=q_{aj}-q_{bj}$ and
+$d_b=c_a-c_b$ for $b\ne a$. Its minimum-payment problem is
+\[
+ \min q_a\cdot t\quad\text{subject to }Bt\geq d,\quad t\geq0.
+\]
+\begin{lemma}[The known support bound, with degeneracy allowed]
+If action $a$ is weakly inducible, its minimum-payment problem has an optimal
+solution with at most $\operatorname{rank}(B)\leq n-1$ positive coordinates.
+\end{lemma}
+\begin{proof}
+The objective is nonnegative on the feasible set. A bounded-below linear
+objective on a nonempty polyhedron attains its infimum; apply the standard
+finite-dimensional LP attainment theorem. Among optima choose one, $t$, with
+minimum support. If its supported columns of $B$ are dependent, choose a
+nonzero vector $z$ supported there with $Bz=0$. For sufficiently small positive
+and negative $\epsilon$, $t+\epsilon z$ remains nonnegative and feasible.
+Optimality forces $q_a\cdot z=0$, since otherwise one sign improves the objective.
+Choose a sign and increase its magnitude until the first positive coordinate
+becomes zero. Such a finite endpoint exists in at least one direction because
+$z\ne0$. This gives another optimum with strictly smaller support, a
+contradiction. Thus the supported columns are independent.
+\end{proof}
+
+\begin{proposition}[Fixed number of actions]
+For every fixed $n$, an optimal finite contract can be found by a strongly
+polynomial algorithm whose arithmetic-operation count is
+$m^{O(n)}\operatorname{poly}(n)$ and whose intermediate encodings are polynomial
+in input length. This is not a uniform strongly polynomial bound when $n$ varies.
+\end{proposition}
+\begin{proof}
+For each $a$, the feasible polyhedron lies in the nonnegative orthant and
+therefore has no lines. A nonempty optimal face has a vertex. At a vertex
+with $k$ positive coordinates, the active incentive inequalities restricted
+to these coordinates must have rank $k$; otherwise a small two-sided feasible
+perturbation contradicts being a vertex. In particular $k\leq n-1$.
+Enumerate each support of size $k\leq n-1$ and each choice of $k$ incentive
+rows; solve the resulting square system when nonsingular and check all original
+inequalities and nonnegativity. Include $t=0$ separately. At least one optimal
+vertex is encountered for every inducible action. Gaussian elimination on
+matrices of size at most $n-1$ and all comparisons use a number of operations
+bounded as stated. Cramer's-rule determinant bounds give polynomial input-bit
+length for all candidates. Select the action/payment candidate maximizing
+$q_a\cdot(r-t)$.
+
+To justify the tie rule, every candidate action is a utility maximizer for its
+contract. If another tied action would give the principal more, principal-favorable
+tie breaking realizes at least the candidate payoff. Conversely every actual
+contract/action outcome is feasible in the corresponding LP. Thus maximizing
+candidate payoffs attains exactly the optimal realizable payoff.
+\end{proof}
+
+\section{An unrestricted-outcome but one-dimensional technology}
+\begin{theorem}[Affine-line contract algorithm]
+Suppose the distributions have a rational representation
+\[
+ q_a=q^0+\theta_a d,\qquad \sum_jd_j=0,
+\]
+where all $q_a$ are probability vectors. If $d\ne0$, an optimal contract can
+be computed using $O(n^2+nm)$ arithmetic operations, with polynomial-size
+intermediate rational encodings. At most one outcome receives a positive
+payment. If all $q_a$ coincide, the zero contract is optimal.
+The affine-line hypothesis itself can be tested, and such a representation
+found if it exists, with $O(nm)$ arithmetic operations.
+\end{theorem}
+\begin{proof}
+First take $d\ne0$ and set $x=d\cdot t$. The incentive inequalities for $a$
+reduce exactly to
+\[
+ (\theta_a-\theta_b)x\geq c_a-c_b\quad\text{for every }b.
+\]
+Intersect these half-lines to obtain a closed interval $I_a$, possibly empty
+or unbounded. A zero coefficient with a positive right side makes it empty.
+This takes $O(n)$ operations for each $a$.
+Since $d$ is nonzero and sums to zero, both $\{j:d_j>0\}$ and
+$\{j:d_j<0\}$ are nonempty. Define
+\[
+ \alpha_a^+=\min_{d_j>0}\frac{q_{aj}}{d_j},\qquad
+ \alpha_a^-=\min_{d_j<0}\frac{q_{aj}}{-d_j}.
+\]
+Both numbers are nonnegative. For $x\geq0$, every $t\geq0$ with $d\cdot t=x$
+satisfies $q_a\cdot t\geq\alpha_a^+x$: for $d_j>0$ this holds termwise;
+for $d_j\leq0$, $q_{aj}\geq0\geq\alpha_a^+d_j$.
+Equality is achieved by selecting a minimizing outcome $j$ and setting
+$t_j=x/d_j$, all other payments zero. For $x\leq0$ the analogous bound and
+one-outcome construction give minimum payment $\alpha_a^-(-x)$.
+In particular at $x=0$ the zero contract achieves minimum payment zero.
+Thus the exact minimum-payment cost as a function of $x$ is
+\[
+ C_a(x)=\begin{cases}\alpha_a^+x,&x\geq0,\\
+ \alpha_a^-(-x),&x\leq0.\end{cases}
+\]
+It is nondecreasing away from zero on either half-line. Consequently choose
+$x_a=0$ if $0\in I_a$, the left endpoint if $I_a\subset(0,\infty)$, or the
+right endpoint if $I_a\subset(-\infty,0)$. The endpoint is finite whenever
+needed. This remains optimal if a slope vanishes. Realize $x_a$ by the
+one-outcome payment described above, calculate
+$q_a\cdot r-C_a(x_a)$, and maximize over nonempty $I_a$.
+The preceding proposition's tie argument applies unchanged and proves global
+optimality. There is at least one nonempty interval because zero payment
+induces a minimum-cost action.
+
+All intervals require $O(n^2)$ comparisons and divisions; all slope minima,
+rewards, and output comparisons require $O(nm)$ more. Endpoints are ratios of
+input costs and $\theta$ differences, and payments are products and ratios of
+a bounded number of these rational quantities. Sums in rewards have at most
+$m$ terms. Their encodings are polynomial in total input length.
+
+For recognition, choose $q^0$ as one input row. If every row is equal, there
+is no variation in expected payment or reward across actions. A minimum-cost
+action is always chosen, and zero payment maximizes principal payoff.
+Otherwise choose a nonzero row difference $d=q_b-q^0$, and one coordinate
+$j_0$ with $d_{j_0}\ne0$. Set
+$\theta_a=(q_{aj_0}-q^0_{j_0})/d_{j_0}$ and check every coordinate of
+$q_a=q^0+\theta_a d$. This proves and tests the hypothesis using $O(nm)$
+operations, and the same encoding bounds apply.
+\end{proof}
+
+\begin{example}[A checked instance with interior action]
+Let the two outcome rewards be $(0,10)$ and let success probabilities and costs
+of the three actions be $(0,0),(1/2,1),(1,3)$.
+The minimum payments for the three actions are respectively $0,1,4$ in
+expectation: inducing the middle action requires success-minus-failure payment
+in $[2,4]$, and inducing the high action requires it at least $4$.
+The corresponding maximum principal payoffs are $0,4,6$. A payment of $4$
+on success and zero on failure is optimal; the high and middle actions give
+the agent equal utility $1$, and principal-favorable tie breaking selects
+the high action with principal payoff $6$.
+\end{example}
+
+\section{Status and first remaining gap}
+The line hypothesis turns all incentives into constraints on one scalar and
+makes minimum payments explicit. General rows have several independent
+directions; neither the support bound nor fixed-$n$ enumeration yields an
+operation count polynomial jointly in $n,m$. No reduction proving equivalence
+to general strongly polynomial linear programming is asserted. The first gap
+is a uniform method for those multidimensional incentive systems.
+
+\paragraph{Finite implementation checks.}
+As a finite algebraic check, the affine-line algorithm was compared with
+complete vertex enumeration of every action's payment LP on 100 rational
+four-action, three-outcome instances, using exact fraction arithmetic and
+random seed $20261009$. Costs included a zero-cost action and rewards were
+nonnegative integers. Every optimum and incentive-feasibility check agreed.
+This test supports the implementation but does not replace the proof.
+
+\begin{thebibliography}{9}
+\bibitem{survey} P.~D\"utting, M.~Feldman, and I.~Talgam-Cohen,
+\emph{Algorithmic Contract Theory: A Survey}, arXiv:2412.16384v1 (2024),
+Section 3.1, Observations 3.3--3.4 and the intervening computational discussion;
+Section 3.3 discusses simpler action and outcome domains.
+\url{https://arxiv.org/html/2412.16384v1}.
+\end{thebibliography}
+
+\end{document}

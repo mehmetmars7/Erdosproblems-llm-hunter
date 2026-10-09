@@ -1,0 +1,171 @@
+% ECONOMICS_PROBLEM: {"id": "C73-20", "title": "Polynomial-time solution of simple stochastic games", "jel_code": "C73", "source_id": "OP-0163"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,geometry,hyperref}
+\geometry{margin=1in}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Q}{\mathbb Q}
+\title{Exact certificates and a parameterized algorithm for simple stochastic games}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem C73-20. Status: unresolved.} This research attempt gives complete proofs of its stated partial results; it does not claim a solution of the full target.
+
+\section{Recap and attribution}
+A simple stochastic game has Max, Min, and fair-coin vertices, two successors
+per nonterminal vertex, and absorbing terminals $0,1$. Nontermination loses
+for Max. The target is deterministic polynomial-time decision of
+$v(s)\geq q$ for binary rational $q$. Hansen and Nie~\cite{hn} retain this
+zero-sum computational question; their general-sum results do not resolve it.
+
+This attempt gives full proofs of memoryless sufficiency, rational separation,
+and an exact algorithm exponential only in the number of Min vertices. These
+are elementary reconstructions of standard reachability-game techniques, not
+claims of a new solution. A family then exposes the exponential dependence
+hidden in unaccelerated finite-horizon iteration.
+
+\section{Memoryless reduction, including nonstopping games}
+\begin{lemma}[Pure stationary saddle strategies]
+Every finite simple stochastic game admits pure stationary strategies
+$\sigma^*,\tau^*$ such that, simultaneously for every initial vertex and
+all behavioral $\sigma,\tau$,
+\[
+ \Pr_{\sigma,\tau^*}(\text{reach }1)
+ \leq \Pr_{\sigma^*,\tau^*}(\text{reach }1)
+ \leq \Pr_{\sigma^*,\tau}(\text{reach }1).
+\]
+\end{lemma}
+\begin{proof}
+For $0<\beta<1$ replace the payoff by
+$\beta^{T_1}\mathbf1\{T_1<\infty\}$, where $T_1$ is the hitting time of $1$.
+On nonterminal coordinates the Bellman operator chooses the maximum, minimum,
+or average of successor values, multiplied by $\beta$, with boundary values
+$0,1$. It is a sup-norm contraction of factor $\beta$; successive iteration
+therefore converges to its unique fixed point $u^\beta$.
+Choose attaining successor actions for both players.
+For these choices, Bellman inequalities iterate for any history-dependent
+opponent to give the finite-horizon payoff inequality with a residual term
+of absolute value at most $\beta^T$. Letting $T$ increase proves the saddle
+inequalities for the discounted payoff, from every state.
+
+There are finitely many pure stationary policy pairs. Along a sequence
+$\beta\uparrow1$, some pair recurs infinitely often. Fix it as
+$(\sigma^*,\tau^*)$. For any fixed behavioral opponent, the discounted
+payoff converges pointwise to the reachability indicator, including value zero
+on nonterminating paths; it is bounded by one. Dominated convergence in the
+saddle inequalities along that subsequence gives the displayed inequalities.
+Because the discounted pair was optimal at all states and the state set is
+finite, the same selected pair works at every initial state.
+\end{proof}
+
+\begin{lemma}[Evaluation and a denominator bound]
+Let $N\geq1$ be the number of nonterminal vertices. For any fixed pure
+stationary pair its reachability probabilities can be computed in polynomial
+bit time and have reduced denominators at most $B=N!2^N$. The same denominator
+bound holds for the game values.
+\end{lemma}
+\begin{proof}
+In the induced Markov chain, find the nonterminal states $R$ having a directed
+positive-probability path to terminal $1$. States outside $R$ have value zero.
+For $s\in R$, some simple path to $1$ has length at most $N$, with probability
+at least $2^{-N}$. Therefore the substochastic transition matrix $Q$ restricted
+to $R$ satisfies $\|Q^N\|_\infty\leq1-2^{-N}$, so $I-Q$ is invertible.
+The values on $R$ solve $(I-Q)x=p$, where $p_s$ is the one-step probability
+of reaching $1$. Multiplying by two gives an integer square system with
+coefficients of absolute value at most two. If $d=|R|$, its nonzero determinant
+has absolute value at most $d!2^d\leq B$. Cramer's rule proves the denominator
+bound; exact elimination is polynomial in the graph size. The preceding lemma
+provides a stationary optimal pair, so its values are the game values.
+If $N=0$, only the terminal values need be tested.
+\end{proof}
+
+\begin{theorem}[Enumeration of one side]
+If $k$ is the number of Min vertices, exact values and threshold decisions can
+be computed in $2^k\operatorname{poly}(L)$ bit operations, where $L$ includes
+the graph and threshold encodings. In particular the target is polynomial-time
+solvable on classes with $k=O(\log L)$ with a fixed implied constant.
+\end{theorem}
+\begin{proof}
+Enumerate the at most $2^k$ stationary Min policies $\tau$. Fixing one gives
+a Max reachability Markov decision process. Its values are the unique minimizer
+of $\sum_s x_s$ subject to $0\leq x_s\leq1$, $x_0=0$, $x_1=1$, and
+\[
+ x_s\geq x_t\quad\text{for every allowed successor $t$ at a Max state},
+ \qquad x_s\geq\tfrac12(x_t+x_u)\quad\text{at a coin state};
+\]
+fixed Min states have the single corresponding successor inequality.
+To verify this LP characterization, finite-horizon reachability values start
+at zero on nonterminals and monotonically increase under the Bellman operator.
+Every feasible $x$ bounds them above by induction. Their limit equals the
+infinite-horizon MDP value: for any strategy, finite-horizon hitting probabilities
+increase to its eventual hitting probability, and suprema over horizons and
+strategies commute. The limit satisfies the Bellman equations by continuity
+of finite maxima, hence is itself LP feasible and is coordinatewise no greater
+than any feasible point. This proves the objective assertion.
+
+The LP has polynomially many rational constraints, so a polynomial bit LP
+algorithm computes its exact optimum $v^\tau$. By the stationary-saddle lemma
+$v(s)=\min_\tau v^\tau(s)$ for each state, and an optimal Min policy attains all
+these minima simultaneously. Computing these coordinatewise minima and
+comparing to the rational threshold gives the algorithm. Standard exact rational
+LP algorithms and the preceding denominator bound control encoding length.
+This uses ordinary bit-polynomial LP, with no strong-polynomial claim.
+\end{proof}
+
+\begin{corollary}[How much approximation would suffice]
+If $q$ has reduced denominator $b$, then $v(s)\ne q$ implies
+$|v(s)-q|\geq1/(Bb)$. A certified interval of width strictly less than
+$1/(Bb)$ therefore decides the threshold, including equality if the interval
+contains $q$.
+\end{corollary}
+\begin{proof}
+Write $v(s)=a/d$ with $d\leq B$. A nonzero difference from $q=c/b$ has
+absolute numerator at least one over denominator $db$. If an interval of the
+stated width contains both $v(s)$ and $q$, they must coincide.
+\end{proof}
+
+\section{An obstruction to finite-horizon acceleration by hope alone}
+\begin{proposition}[A fair-coin family with slow convergence]
+For every $N\geq1$ there is an $N$-nonterminal-state simple stochastic game,
+with no strategic choices, whose infinite-horizon value is one but whose
+$T$-horizon value from its first state is at most $T2^{-N}$.
+\end{proposition}
+\begin{proof}
+States $0',1',\ldots,(N-1)'$ record the current number of consecutive heads.
+A head at $j'<(N-1)'$ advances to $(j+1)'$, a head at $(N-1)'$ reaches terminal
+$1$, and every tail resets to $0'$. Thus success requires $N$ consecutive
+heads. Among the first $T$ tosses there are at most $T$ possible ending
+positions for such a run; a union bound gives probability at most $T2^{-N}$.
+On the other hand, disjoint blocks of $N$ tosses are independent, and a block
+is all heads with probability $2^{-N}$. The probability of no all-head block
+among $j$ such blocks is $(1-2^{-N})^j\to0$. Eventual success has probability
+one. An unused terminal $0$ completes the stipulated format.
+\end{proof}
+
+\section{Verification and unresolved step}
+Every linear-system denominator bound includes transient and nonstopping
+regions. The example uses only fair coins and an explicit graph, rather than
+an exponentially tiny transition encoded as a different game model.
+The first unresolved step is replacing the $2^k$ policy enumeration by uniformly
+polynomial work. Polynomial output length, finite-horizon convergence, and
+polynomial-time verification do not perform that replacement.
+
+\begin{thebibliography}{9}
+\bibitem{hn} K.~Arnsfelt Hansen and X.~Nie,
+\emph{On the Complexity of Stationary Nash Equilibria in Discounted Perfect
+Information Stochastic Games}, arXiv:2510.11550v1 (2025), Section 1.
+\url{https://arxiv.org/html/2510.11550v1}.
+\end{thebibliography}
+
+\end{document}

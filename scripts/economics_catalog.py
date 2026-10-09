@@ -24,6 +24,10 @@ PUBLIC_ATTEMPTS_PATH = Path('docs/data/economics/attempts')
 STATEMENT_START = '% BEGIN ECONOMICS STATEMENT\n'
 STATEMENT_END = '% END ECONOMICS STATEMENT'
 ID_RE = re.compile(r'[A-Z][0-9]{2}-[1-9][0-9]*')
+MODEL_LABELS = {
+    'gpt_6_astra_pro': 'GPT 6 Astra Pro',
+    'gpt6_astra_ultra': 'GPT 6 Astra Ultra',
+}
 
 
 def load_registry(base_dir=BASE_DIR):
@@ -213,8 +217,8 @@ def load_economics_attempts(base_dir, records):
             body = replace_tex_command(body, 'addcontentsline', 3, lambda *args: '')
             body = expand_tex_notation(body, tex_notation_macros(preamble, {}))
             attack = parse_attack('% ATTEMPT_STATUS: ' + statuses[0] + '\n' + body.strip(),
-                                  'GPT 6 Astra Pro' if directory.name == 'gpt_6_astra_pro'
-                                  else directory.name.replace('_', ' '), posted[0],
+                                  MODEL_LABELS.get(directory.name, directory.name.replace('_', ' ')),
+                                  posted[0],
                                   metadata_content=content)
             attack.update(version=version, entry_kind='research_attempt',
                           file_path=path.relative_to(base_dir).as_posix(),

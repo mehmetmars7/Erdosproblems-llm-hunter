@@ -1,0 +1,136 @@
+% ECONOMICS_PROBLEM: {"id":"C72-31","title":"High-precision information-value-free coarse correlated equilibrium","jel_code":"C72","source_id":"OP-0145"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb,amsthm,geometry,hyperref}
+\geometry{margin=1in}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\DeclareMathOperator{\NE}{NE}
+\DeclareMathOperator{\cav}{cav}
+\DeclareMathOperator{\supp}{supp}
+\title{High-precision information-value-free coarse correlated equilibrium\\ GPT 6 Astra Ultra}
+\author{Research attempt}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and literature boundary}
+The target asks for a polynomial-time algorithm in the succinct input length and the binary accuracy length for information-value-free coarse correlated equilibrium, or a sharper CLS-completeness classification. Write
+\[
+ g_{i,b}(a)=u_i(b,a_{-i})-u_i(a),\qquad
+ r_i(\mu)=\max_{b\in S_i}\sum_a\mu(a)g_{i,b}(a).
+\]
+An $\epsilon$-IVFCCE requires $-\epsilon\le r_i(\mu)\le\epsilon$ for every player. The lower inequalities are essential.
+
+The source proves CLS membership and P-matrix-LCP hardness and leaves CLS-completeness conjectural \cite{az}. It also explicitly notes the polynomial LP-enumeration algorithm for an explicit normal-form table. The compression and explicit-table arguments below are independent reconstructions of these known ideas, not new complexity breakthroughs. The additional restricted analysis identifies when the lower inequalities follow automatically from coarse obedience and gives an exact polynomial LP for constant-sum polymatrix inputs.
+
+\section*{A finite union of rational polytopes}
+Put $m=\sum_i|S_i|$. For a joint witness profile $b=(b_i)_i$, define
+\[
+ P_b(\epsilon)=\left\{\mu\in\Delta(S):
+ \begin{array}{ll}
+ \sum_a\mu(a)g_{i,c}(a)\le\epsilon&\text{for all }i,c\in S_i,\\
+ \sum_a\mu(a)g_{i,b_i}(a)\ge-\epsilon&\text{for all }i
+ \end{array}\right\}.
+\]
+\begin{proposition}[Exact disjunctive formulation]
+For every finite game and every $\epsilon\ge0$, the set of $\epsilon$-IVFCCEs is exactly $\bigcup_{b\in S}P_b(\epsilon)$. In particular, an exact IVFCCE is a CCE with at least one zero-regret fixed action for each player.
+\end{proposition}
+\begin{proof}
+The upper inequalities impose $r_i\le\epsilon$. The condition $r_i\ge-\epsilon$ says exactly that at least one of the finitely many numbers $\sum_a\mu(a)g_{i,c}(a)$ is at least $-\epsilon$. Choose one such action as $b_i$ for each player. This gives membership in one $P_b(\epsilon)$. Conversely membership in one of these polytopes provides the required witness actions, so both sides of every regret bound hold. At $\epsilon=0$, the witness action's upper and lower inequalities make its regret exactly zero.
+\end{proof}
+
+\begin{theorem}[Polynomial-size exact rational certificate]
+Suppose every pure payoff lies in $D^{-1}\mathbb Z\cap[0,1]$. Every such finite game has an exact IVFCCE supported on at most $m+1$ pure profiles, whose positive probabilities have numerators and denominators bounded by
+\[
+ (m+1)!D^{m+1}.
+\]
+Hence under the target's polynomial encoding assumptions there exists an exact polynomial-length rational mixture of product distributions, and a proposed such certificate can be checked in polynomial time using the polynomial-expectation interface.
+\end{theorem}
+\begin{proof}
+We use the classical finite-game existence theorem: every finite game has a mixed Nash equilibrium \cite{nash}. Its product distribution is an exact IVFCCE, since each best fixed action gives the same payoff as the equilibrium mixture and no fixed action gives more. By the proposition, at least one $P_b(0)$ is nonempty. This is a compact rational polytope and has an extreme point $\mu$.
+
+For completeness, the elementary extreme-point facts used here can be obtained as follows. Maximize the first coordinate over the compact polytope, then the second over the resulting maximizing face, and continue through all coordinates. The final face is one point, an extreme point. At an extreme point, active equality and inequality normals span the affine degrees of freedom: otherwise a nonzero vector orthogonal to every active normal permits sufficiently small perturbations in both directions without violating an inactive inequality, contradicting extremality.
+
+If $\mu$ has $s>m+1$ positive coordinates, the corresponding vectors
+\[
+ \bigl(1,(g_{i,c}(a))_{i,c}\bigr)\in\R^{m+1}
+\]
+are linearly dependent. A nonzero dependence gives a perturbation of the positive probabilities preserving normalization and every regret coordinate. Taking a sufficiently small positive multiple in either direction preserves nonnegativity and all constraints in $P_b(0)$, contradicting extremality. Thus $s\le m+1$.
+
+Restrict the active constraint system to these $s$ support coordinates. Select $s$ independent rows, which exist by the preceding active-normal fact. Besides normalization, all rows are regret rows or their negatives. Multiply every row by $D$. The resulting nonsingular integer matrix and its right-hand side have entries of absolute value at most $D$. Cramer's rule represents each weight as a ratio of determinants. Expanding a determinant as a signed sum over permutations bounds its absolute value by $s!D^s\le(m+1)!D^{m+1}$. The same bound applies to numerator determinants. Reducing a fraction cannot increase the bound.
+
+A pure profile specifies one listed action per player; it is also a product of point masses. Thus the support and rational weights have polynomial encoding length when $m$ and $\log D$ do. For each support profile and each unilateral deviation, the payoff can be evaluated via degenerate rational mixed strategies in the promised interface. Summing weighted differences and comparing their maxima with zero verifies the certificate in polynomial time.
+\end{proof}
+
+The certificate theorem does not identify the support or the witness profile efficiently. This is the computational obstruction left by the otherwise useful finite-dimensional reformulation. With a fully explicit payoff table, enumerating all $b\in S$ and solving the corresponding rational LPs is polynomial in that table's size; this is the known explicit-table algorithm, not a polynomial algorithm in a succinct description.
+
+\section*{When coarse obedience already controls information value}
+A polymatrix representation means
+\[
+ u_i(a)=c_i(a_i)+\sum_{j\ne i}A^{ij}_{a_i,a_j},
+\]
+with explicitly given rational one-player vectors and pair matrices; missing edges contribute zero. Assume the game is constant sum:
+$\sum_i u_i(a)=C$ for every pure profile. This includes the usual zero-sum representation after adding playerwise constants, and accommodates the target's normalization to $[0,1]$.
+
+\begin{theorem}[Regret-sum bound and exact polynomial algorithm]
+In every $n$-player constant-sum polymatrix game, for every correlated distribution $\mu$,
+\[
+ \sum_{i=1}^n r_i(\mu)\ge0.
+\]
+Consequently every exact CCE is an exact IVFCCE. For $n\ge2$, every $\epsilon$-CCE satisfies
+\[
+ -(n-1)\epsilon\le r_i(\mu)\le\epsilon\quad\text{for all }i.
+\]
+Moreover an exact rational product IVFCCE can be found in time polynomial in the rational polymatrix input length by solving one linear program.
+\end{theorem}
+\begin{proof}
+Let $x_i$ be the $i$th marginal of $\mu$ and $x=\bigotimes_i x_i$. Pairwise separability gives
+\[
+ \mathbb E_\mu u_i(b,a_{-i})
+ =c_i(b)+\sum_{j\ne i}\sum_{a_j}A^{ij}_{b,a_j}x_{j,a_j}
+ =v_{i,b}(x_{-i}).
+\]
+Since a maximum is at least its average under $x_i$,
+\[
+ \sum_i r_i(\mu)
+ =\sum_i\max_b v_{i,b}(x_{-i})-\mathbb E_\mu\sum_i u_i(a)
+ \ge\sum_i u_i(x)-C=0.
+\]
+If every regret is nonpositive, their sum can be nonnegative only when all are zero. If every regret is at most $\epsilon$, then
+$r_i\ge-\sum_{j\ne i}r_j\ge-(n-1)\epsilon$, proving the quantitative claim.
+
+For the algorithm, use variables $x_i\in\Delta(S_i)$ and real $z_i$, and solve
+\[
+ \min\ \sum_i z_i\qquad
+ \text{subject to}\quad z_i\ge v_{i,b}(x_{-i})\quad\text{for all }i,b.
+\]
+The right-hand sides are linear in the marginal variables. At any feasible point,
+$z_i\ge u_i(x)$, so the objective is at least $C$. Finite Nash existence supplies a mixed equilibrium $x^*$, at which taking $z_i=u_i(x^*)$ is feasible and gives objective $C$. Thus the optimum is $C$.
+
+At any optimum, the nonnegative numbers $z_i-u_i(x)$ sum to zero, so each is zero. Therefore $u_i(x)=z_i\ge v_{i,b}(x_{-i})$ for all actions: $x$ is Nash. Its product distribution is an exact IVFCCE. The LP has polynomially many variables and constraints and rational coefficients of polynomial encoding length. Standard exact rational linear programming returns a rational optimum of polynomial length in polynomial time. If boundedness of auxiliary variables is desired, add $0\le z_i\le1$, which does not exclude the equilibrium witness for payoffs in $[0,1]$. This yields a one-component mixture in the output format.
+\end{proof}
+
+The LP is the familiar constant-sum polymatrix generalization of the zero-sum minmax program, as established in \cite{polymatrix}; its derivation is included to show exactly which structural property makes the succinct restriction tractable.
+
+\section*{Adversarial check and unresolved gap}
+In the binary coordination game paying both players one on matching actions and zero otherwise, let $\mu$ give probability one half to each of $(0,0)$ and $(1,1)$. The realized payoff is one, while every fixed action earns one half. Thus both regrets equal $-1/2$: this is an exact CCE but fails the IVF lower bound for every $\epsilon<1/2$. The constant-sum hypothesis in the preceding proof cannot simply be dropped.
+
+Exact IVFCCEs therefore have rational certificates of polynomial length. The constant-sum polymatrix theorem solves a succinct subclass at arbitrary precision. Neither result finds the witness actions and support in arbitrary succinct games, strengthens the verified hardness for the P-matrix LCP to CLS-hardness, or proves a polynomial algorithm for the full target. Its status remains unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{az} I. Anagnostides and W. Zheng, \emph{Algorithmic Collusion and the Complexity of Information-Value-Free Equilibria}, arXiv:2609.22757v1 (2026), Sections 1.1.2 and 2.1, Lemma 4.3, and Theorems 4.1--4.2. \url{https://arxiv.org/html/2609.22757v1}. Checked the primary source on 9 October 2026, including its explicit-table enumeration observation and compressed trajectory result. CLS-completeness is not reported as proved.
+\bibitem{polymatrix} Y. Cai, O. Candogan, C. Daskalakis, and C. Papadimitriou, \emph{Zero-Sum Polymatrix Games: A Generalization of Minmax}, Mathematics of Operations Research 41(2) (2016), 648--655. \url{https://www.cs.yale.edu/homes/cai/publication/cai-zero-sum-2016/cai-zero-sum-2016.pdf}. Primary author-hosted paper and publication record checked.
+\bibitem{nash} J. Nash, \emph{Non-Cooperative Games}, Annals of Mathematics 54(2) (1951), 286--295. \url{https://irving.vassar.edu/faculty/gj/FTU/io/literature/Nash51.pdf}. Primary paper checked. Used only for existence of a mixed equilibrium in every finite game; the certificate and LP deductions from existence are proved above.
+\end{thebibliography}
+
+\end{document}

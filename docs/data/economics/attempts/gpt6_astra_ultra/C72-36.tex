@@ -1,0 +1,203 @@
+% ECONOMICS_PROBLEM: {"id": "C72-36", "title": "Exact normal-form correlated equilibrium from an extensive-form tree", "jel_code": "C72", "source_id": "OP-0143"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,geometry,hyperref}
+\geometry{margin=1in}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Q}{\mathbb Q}
+\title{Polynomial support for zero-sum trees and a correlation obstruction}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem C72-36. Status: unresolved.} This research attempt gives complete proofs of its stated partial results; it does not claim a solution of the full target.
+
+\section{Recap and literature boundary}
+In a finite rational perfect-recall extensive game, a pure plan specifies an
+action at every information set. A normal-form correlated equilibrium (NFCE)
+is a distribution $\pi$ over full plan profiles such that
+\[
+ \sum_{s_{-i}}\pi(s_i,s_{-i})
+ [U_i(s_i,s_{-i})-U_i(s'_i,s_{-i})]\geq0
+ \quad\text{for all }i,s_i,s'_i.
+\]
+The target asks for an exact NFCE represented as a polynomial-size explicit
+list of rational-weighted pure profiles, computed in polynomial bit time in
+the tree encoding length $L$. A player's recommendation is her entire plan
+before play. Cheval et al.~\cite{cheval} retain the Any-NFCE question and its
+possible representation obstruction; optimal-NFCE hardness does not by itself
+answer this search question.
+
+We give a complete construction in the two-player zero-sum subcase. Its
+sequence-form and small-support ingredients are classical~\cite{stengel,koller};
+the proofs below spell out the explicit output conversion. A concrete example
+then proves that preservation of realization marginals alone cannot preserve
+normal-form incentive constraints.
+
+\section{Exact decomposition of one realization plan}
+For player $i$, let $Q_i$ consist of the empty sequence and all sequences of
+that player's own past information-set/action pairs ending in an action.
+Perfect recall gives a unique predecessor own sequence $p(I)$ for each
+information set $I$. Write $p(I)a$ for its extension by action $a$ at $I$.
+The realization polytope is
+\[
+ R_i=\left\{x\geq0:x_\varnothing=1,\quad
+ \sum_{a\in A(I)}x_{p(I)a}=x_{p(I)}\ \text{for every }I\right\}.
+\]
+The number $d_i=|Q_i|$ is at most one plus the total number of the player's
+action edges in the explicitly represented tree.
+
+\begin{lemma}[Constructive rational decomposition]
+Every rational $x\in R_i$ is a convex combination of at most $d_i$ realization
+vectors of pure full plans. The plans and rational weights can be found in
+polynomial bit time and have polynomial total encoding length in that of $x$
+and the tree.
+\end{lemma}
+\begin{proof}
+Maintain a residual $y\geq0$ obeying the same flow equations with
+$y_\varnothing=M$, its remaining mass. Initially $y=x$, $M=1$.
+If $M>0$, build a pure plan recursively in the player's own sequence order.
+Whenever the predecessor sequence is selected by the plan, it has positive
+$y$-mass, and the flow equation ensures at least one extension of positive
+mass; select such an action. At information sets whose predecessors are not
+selected, choose any action. The resulting pure realization vector $e$ is
+$0$--$1$, has $e_\varnothing=1$, satisfies the flow equations, and has
+$e_q=1$ only where $y_q>0$.
+Set $\lambda=\min_{q:e_q=1}y_q>0$ and subtract $\lambda e$ from $y$.
+The residual remains nonnegative and satisfies the flow equations with mass
+$M-\lambda$. At least one positive coordinate disappears, and no zero
+coordinate becomes positive. Repeat. There are at most $d_i$ iterations.
+At termination mass is zero, since otherwise another plan could be extracted;
+all other coordinates are then zero by the flow equations and the acyclic
+own-sequence order. Hence the extracted weights sum to one and reconstruct $x$.
+
+Choose initially a common denominator $D$ for the rational coordinates of $x$.
+Every subtraction preserves the property that all coordinates and extracted
+weights are multiples of $1/D$ in $[0,1]$. The bit length of $D$ is at most the
+sum of input denominator lengths. Plan extraction and updates scan polynomially
+many coordinates for at most $d_i$ iterations, proving the stated bit bounds.
+\end{proof}
+
+\begin{lemma}[Realization payoff formula]
+For two players, there is a rational matrix $A$ of dimensions $d_1$ by $d_2$
+and polynomial encoding length such that expected player-1 payoff under
+independent realization plans $x,y$ equals $x^{\mathsf T}Ay$.
+Every realization plan is equivalent, against every opponent, to the mixed
+full-plan strategy furnished by the preceding lemma.
+\end{lemma}
+\begin{proof}
+For each terminal leaf $z$, let $q_i(z)$ be player $i$'s last own sequence
+on its path, let $p_c(z)$ be the product of chance probabilities on that path,
+and let $u_1(z)$ be the terminal payoff. Add $p_c(z)u_1(z)$ to
+$A_{q_1(z),q_2(z)}$. Each leaf contributes once, and products have at most tree
+size many rational factors, so all encodings remain polynomial.
+For independent pure plans the reachability indicator of a leaf is exactly
+the product of the corresponding two $0$--$1$ realization coordinates.
+Linearity in mixtures proves the formula for the decompositions. A behavioral
+strategy yields the same own-sequence products and thus the same realization
+vector. Conversely any $x\in R_i$ defines action probabilities
+$x_{p(I)a}/x_{p(I)}$ when the denominator is positive, and arbitrary probabilities
+otherwise. Multiplication along own sequences recovers $x$, since unreachable
+own sequences have zero flow. Perfect recall is precisely what makes these
+predecessors well defined. Thus realization equivalence holds against every
+opponent, including its pure deviations.
+\end{proof}
+
+\begin{theorem}[Polynomial explicit NFCE for two-player zero-sum games]
+Every finite rational two-player zero-sum perfect-recall tree has an exact
+NFCE on at most $d_1d_2$ pure profiles. It can be computed in polynomial bit
+time, and its explicit full-plan list and all probabilities have polynomial
+total encoding length in the tree input.
+\end{theorem}
+\begin{proof}
+Write $R_1=\{x\geq0:Ex=e\}$ and $R_2=\{y\geq0:Fy=f\}$ using the flow
+equations. Both are nonempty compact polytopes: recursively every coordinate
+is in $[0,1]$. For fixed $x$, linear programming duality gives
+\[
+ \min_{y\geq0,Fy=f}x^{\mathsf T}Ay
+ =\max_{v:F^{\mathsf T}v\leq A^{\mathsf T}x}f^{\mathsf T}v.
+\]
+Therefore Max's security strategy is the solution of the polynomial-size LP
+\[
+ \max f^{\mathsf T}v\quad\text{subject to }Ex=e,\ x\geq0,
+ \ F^{\mathsf T}v\leq A^{\mathsf T}x.
+\]
+The dual LP is
+\[
+ \min e^{\mathsf T}u\quad\text{subject to }Fy=f,\ y\geq0,
+ \ E^{\mathsf T}u\geq Ay.
+\]
+Finite-dimensional LP duality supplies equal attained optimal objectives;
+ordinary exact rational LP algorithms compute rational optimal $x,y$ of
+polynomial bit length in polynomial time. The displayed inequalities show
+that $x$ guarantees at least this value against every $y'$ and $y$ holds every
+$x'$ to at most this value. They are consequently a zero-sum saddle pair.
+
+Decompose $x$ and $y$ by the first lemma into mixtures $\mu_1,\mu_2$ on at
+most $d_1,d_2$ pure full plans, and output their independent product. Against
+$\mu_2$, every player-1 pure plan has payoff at most the saddle value. Their
+$\mu_1$-weighted average equals that value, so every plan of positive $\mu_1$
+weight must itself attain the value. Thus conditional on any positive-probability
+recommendation to player 1, no full-plan deviation improves payoff: the
+opponent's conditional law is still $\mu_2$. For player 2 the same argument
+uses minimizing payoffs. Recommendations with zero probability impose the
+zero inequality. These are exactly all NFCE constraints. Products of the
+rational weights retain polynomial encodings, and the number and length of
+full plans have the asserted polynomial bounds.
+\end{proof}
+
+\section{Why a naive extension loses incentives}
+\begin{proposition}[Identical marginals can conceal an NFCE violation]
+Two joint distributions over complete plans can have the same realization
+marginal for each player, while only one is an NFCE.
+\end{proposition}
+\begin{proof}
+Use matching pennies: each player chooses $H$ or $T$ without observing the
+other, player 1 gets $+1$ for matching and $-1$ otherwise, and player 2 gets
+the negative payoff. Represent it as a two-step extensive tree whose second
+player's nodes are in one information set; it has perfect recall.
+The independent uniform distribution is a Nash equilibrium and an NFCE:
+conditional on either recommendation the opponent remains uniform and both
+actions give expected payoff zero. Instead put mass $1/2$ on each of
+$(H,H)$ and $(T,T)$. Each player's marginal is still uniform, hence has the
+same realization coordinates. But player 2, upon receiving either recommendation,
+knows that following loses one and switching wins one. Its NFCE inequality
+for that recommendation is $(1/2)(-1-1)=-1<0$.
+\end{proof}
+
+\section{Verification and first gap}
+The decomposition keeps recommendations as complete plans, including actions
+off the realized path. It does not replace NFCE with a sequential recommendation
+concept. The positive theorem uses two-player zero-sum LP duality; general-sum
+security strategies need not be equilibria, and for a variable number of
+players the product of individual support bounds is not uniformly polynomial.
+More fundamentally, correlated recommendations require conditional information
+not preserved by individual realization marginals, as the example proves.
+A polynomial representation preserving those conditional incentive inequalities
+for general perfect-recall trees is the first missing step.
+
+\begin{thebibliography}{9}
+\bibitem{cheval} V.~Cheval, F.~Horn, S.~Paul, and M.~Shirmohammadi,
+\emph{On the Complexity of the Optimal Correlated Equilibria in Extensive-Form
+Games}, arXiv:2507.11509v2 (2026), Sections 2 and 7.
+\url{https://arxiv.org/html/2507.11509v2}.
+\bibitem{stengel} B.~von Stengel, \emph{Efficient Computation of Behavior
+Strategies}, Games and Economic Behavior 14(2), 220--246 (1996).
+\url{https://doi.org/10.1006/game.1996.0050}.
+\bibitem{koller} D.~Koller and N.~Megiddo, \emph{Finding Mixed Strategies
+with Small Supports in Extensive Form Games}, International Journal of Game
+Theory 25, 73--92 (1996).
+\url{https://theory.stanford.edu/~megiddo/pdf/smallsupport.pdf}.
+\end{thebibliography}
+
+\end{document}
