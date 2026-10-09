@@ -1,0 +1,95 @@
+% ECONOMICS_PROBLEM: {"id": "C72-366", "title": "Reduced-game validity", "jel_code": "C72", "source_id": "OP-0289"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Reduced-game validity: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The target is a computation policy that minimizes a valid upper bound on full-game exploitability, including strategy discovery, simulation, equilibrium computation and validation. This attempt proves a finite-budget certificate under known metric coverage, derives its approximation--sampling tradeoff, and gives an explicit example where expansion worsens the selected equilibrium's full regret. It also gives a budget allocation rule conditional on known oracle error curves. It does not establish an optimal exploration policy for unrestricted simulator games or carry out the requested held-out evaluation.
+
+The survey \cite{egta} motivates restricted-game analysis and simulation uncertainty. The rates, example and budget program below are additional derivations, not results attributed to that survey. Its accessible HTML renders some mathematics incompletely, so no claim of having verified its complete final-section theorem content is made.
+
+\section*{A simultaneous full-game certificate}
+Normalize payoffs to $[0,1]$. There are $n$ players. For player $i$, choose a finite $h_i$-net $X_i$ of its compact metric strategy space, and assume the known, opponent-uniform Lipschitz property
+\[
+ |u_i(s_i,s_{-i})-u_i(t_i,s_{-i})|\leq L_i d_i(s_i,t_i).
+\]
+Write $m=\prod_i|X_i|$. At each restricted pure profile simulate $r$ independent payoff vectors, obtaining empirical mean payoffs $\widehat u_i$. Independence is needed across repetitions at a profile; correlation of players' payoffs within a simulated vector is harmless. Hoeffding's inequality and a union bound give, with probability at least $1-\delta$,
+\[
+ \max_{i,x\in X}|\widehat u_i(x)-u_i(x)|\leq
+ a_r:=\sqrt{\frac{\log(2nm/\delta)}{2r}}.
+\]
+The event is uniform over all restricted mixed profiles, including a profile selected after seeing the same observations: integration cannot increase the sup norm.
+
+\begin{proposition}[Certificate for an adaptively selected restricted profile]
+If a solver returns a product mixed profile $\sigma$ with empirical restricted exploitability at most $\varepsilon$, then, on that event,
+\[
+ e_S(\sigma)\leq\varepsilon+2a_r+\max_i L_i h_i.
+\]
+\end{proposition}
+\begin{proof}
+For every pure restricted deviation, changing its payoff and the incumbent payoff from empirical to true values changes the difference by at most $2a_r$. For any full-space deviation select a net point at distance at most $h_i$. Its expected payoff differs by at most $L_i h_i$, after integrating over opponents. Taking suprema and then the maximum over players proves the assertion. No optimization guarantee is being inferred from an unsuccessful best-response search.
+\end{proof}
+
+Known uniform regularity matters. Given finitely many queried points on $[0,1]$, a continuous nonnegative bump of height one can be placed in an unqueried interval and set to zero at all observations. A one-player game with that bump and a queried incumbent gives restricted regret zero and full regret one. Its Lipschitz constant can be arbitrarily large. Mere continuity with no known modulus therefore does not yield a computable finite-query coverage certificate.
+
+\section*{Budget rates and their limitations}
+Suppose covering numbers satisfy $|X_i|\leq C_i h^{-d_i}$ for a common radius $h$, and let $D=\sum_i d_i$. A full empirical payoff table then has $m\leq C h^{-D}$ profiles. With simulation budget $B$ and $r=\lfloor B/m\rfloor\geq1$, the stochastic part of the certificate is of order
+\[
+ \sqrt{\frac{h^{-D}\log(B/\delta)}B}.
+\]
+Balancing it against $Lh$ gives
+\[
+ h\asymp\left(\frac{\log(B/\delta)}B\right)^{1/(D+2)},\qquad
+ e_S\lesssim\varepsilon+
+ \left(\frac{\log(B/\delta)}B\right)^{1/(D+2)}.
+\]
+Constants depend on the known covering geometry, Lipschitz bound and player count. This is an upper bound for the specified full-table procedure, not a minimax theorem. It exposes a genuine curse of dimension because $D$ sums the players' dimensions. A structured payoff model, direct deviation oracle, or role symmetry can change the cost model.
+
+Solving a finite general-sum game is not free. If a certified solver requires $T(m,\varepsilon)$ operations, the actual feasible choices obey
+\[
+ mr+T(m,\varepsilon)+C_{\rm net}(h)\leq B_{\rm total}.
+\]
+Enumerating feasible integer $(m,r)$ and solver tolerances on a prescribed finite menu minimizes the displayed certificate over that menu. It does not justify claiming the rate with all computation included unless $T$ and net construction costs are explicitly bounded.
+
+For an alternative certified oracle suppose its optimization error after $b$ units of training is $A b^{-p}$, and independent validation has error $C n_v^{-1/2}$. For a fixed candidate and $b+n_v=K$, minimizing the error surrogate is a strictly convex one-dimensional problem. Its interior solution satisfies
+\[
+ pA b^{-p-1}=\frac C2(K-b)^{-3/2}.
+\]
+Both boundary divergences imply a unique solution when $A,C,p>0$. A binary search solves this equation. Unknown learning curves cannot simply be substituted as guaranteed bounds; fitting the curves requires separate uncertainty accounting.
+
+\section*{Expansion can make the chosen answer worse}
+Consider a symmetric two-player game with row payoff matrix
+\[
+ U=\begin{pmatrix}0&-1&-1\\-1&1&0\\-1&2&0\end{pmatrix},
+\]
+with strategies $A,B,C$, and column payoff matrix $U^\top$. In the restriction $X_i=\{A\}$, the sole equilibrium $(A,A)$ has full regret zero. Enlarge both restrictions to $\{A,B\}$. The profile $(B,B)$ is a restricted equilibrium, but deviating to $C$ raises payoff from one to two, so its full regret is one. Thus nested strategy sets and exact restricted equilibrium computation do not imply monotonic improvement of the selected answer. This example uses raw payoff units: rescaling every payoff as $(u+1)/3$ puts it in $[0,1]$ and changes the nonzero regret to $1/3$, preserving the counterexample.
+
+A valid monotonic statement is available for certificates. Keep every candidate, validate all candidates with simultaneous failure probability at most $\delta$, and report the one with the smallest previously certified upper bound. The best retained numerical bound is nonincreasing as the archive expands. For infinitely many stages, allocate $\delta_t=6\delta/(\pi^2t^2)$ and use fresh conditional validation or a genuinely time-uniform method. A lower certified bound is not proof that the selected candidate's actual regret decreases: two overlapping confidence bounds can reverse the true ordering. Full-regret minimization with an exact oracle would yield the stronger monotonic value statement on a nested candidate archive.
+
+\section*{What remains}
+A practically optimal policy must learn which additional strategies matter, quantify oracle incompleteness, charge solver costs, and compare held-out full-game regret at equal budgets. None of those empirical quantities is supplied in the problem. The certificate and counterexample specify conditions any proposed solution must satisfy; they do not remove the research question concerning adaptive exploration and transfer across games.
+\begin{thebibliography}{9}
+\bibitem{egta} M. P. Wellman, K. Tuyls and A. Greenwald (2025), Empirical Game-Theoretic Analysis: A Survey. Primary arXiv v2 HTML inspected, especially Sections 2.1--2.2:
+\url{https://arxiv.org/html/2403.04018v2}.
+\end{thebibliography}
+\end{document}

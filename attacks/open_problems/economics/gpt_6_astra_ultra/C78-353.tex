@@ -1,0 +1,95 @@
+% ECONOMICS_PROBLEM: {"id": "C78-353", "title": "A matching with highest stability probability in the lottery model", "jel_code": "C78", "source_id": "OP-0545"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newcommand{\Cov}{\operatorname{Cov}}
+\title{A matching with highest stability probability in the lottery model: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The independent-lottery optimization problem is not settled here. This attempt provides an exact weighted-counting formulation, a decision-class upper bound, tractable evaluation under one-sided uncertainty, and a certified sampling approximation with explicitly exponential optimization. These results isolate two distinct bottlenecks: evaluating one matching and searching over matchings.
+
+The 2020 primary paper \cite{aziz} reports the lottery-model optimization gap and a polynomial result when only constantly many agents on one side are uncertain. Its results table also reports hard evaluation with two-sided uncertainty. Those statements concern the cited version; this attempt does not claim a comprehensive 2026 literature classification.
+
+\section*{Integer counting with binary rational probabilities}
+For each agent $a$, write all its probabilities over a common denominator $d_a$, so $q_{aj}=w_{aj}/d_a$ with nonnegative integers $w_{aj}$ summing to $d_a$. Taking the product of the listed denominators is sufficient; its bit length is at most the sum of their bit lengths. Consequently
+\[
+ D=\prod_a d_a,\qquad
+ N(M)=\sum_{(j_a)_a}\mathbf1\{M\text{ stable at }(j_a)_a\}
+                   \prod_a w_{a j_a},\qquad p_I(M)=N(M)/D
+\]
+have polynomial-length integer representations, though computing $N(M)$ need not take polynomial time.
+
+For a fixed matching, $N(M)$ is a counting-function value. A nondeterministic machine guesses, for each agent, an integer ticket in $\{0,\ldots,d_a-1\}$ using binary strings and rejects out-of-range strings. Cumulative intervals of lengths $w_{aj}$ turn valid tickets into preference orders. It accepts precisely when the chosen profile has no blocking pair. There are $N(M)$ accepting branches. Checking stability takes $O(n^2)$ comparisons once rank tables have been constructed.
+
+For a threshold $\tau=u/v$, the predicate is $vN(M)-uD\geq0$. Products by polynomial-bit integers and subtraction are expressible as differences of counting functions. To handle equality, the integer sign test $2(vN(M)-uD)+1>0$ is equivalent. Thus the fixed-matching threshold predicate belongs to PP, using its counting-gap characterization. Guessing a perfect matching and consulting this predicate gives
+\[
+ \text{existence of }M\text{ with }p_I(M)\geq\tau\quad\in\quad\mathrm{NP}^{\mathrm{PP}}.
+\]
+This is an upper bound, not completeness. It also explains why guessing a matching is insufficient to establish membership in NP: the verifier still has to compare a counting probability with the threshold.
+
+One exact optimizer enumerates the $n!$ perfect matchings and all $\prod_a k_a$ profiles, taking $O(n!\,n^2\prod_a k_a)$ arithmetic operations plus bit costs. Alternatively, binary search on the integer interval $[0,D]$ with the existence oracle finds the optimal numerator. A matching witness can be recovered by successively fixing partners and making the corresponding constrained existential queries. This is an oracle description, not an efficient implementation of the unrestricted problem.
+
+\section*{A factorization when one side is certain}
+Suppose every proposer $u$ has a deterministic ranking. For a fixed $M$ and receiver $w$, define
+\[
+ A_w(M)=\{u\ne M^{-1}(w):u\text{ ranks }w\text{ above }M(u)\}.
+\]
+Let
+\[
+ r_w(M)=\sum_j q_{wj}\mathbf1\{P_w^j\text{ ranks }M^{-1}(w)
+                                   \text{ above every }u\in A_w(M)\}.
+\]
+Then
+\[
+                         p_I(M)=\prod_w r_w(M).
+\]
+Indeed, a blocking pair involving $w$ exists exactly when its realized order ranks some member of $A_w(M)$ above its assigned partner. Once $M$ is fixed, these are events concerning different receivers' independent lotteries. The formula is therefore computable in time polynomial in the explicitly listed input.
+
+This formula is useful but does not turn maximization into a standard weighted assignment problem: changing the partner of one proposer can change $A_w(M)$ for many receivers. Treating $\log r_w(M)$ as a fixed edge weight would be incorrect. In the fully deterministic restriction, ordinary deferred acceptance returns an optimizer with probability one. The broader constant-uncertainty result belongs to the cited paper, rather than being inferred from this product formula.
+
+\section*{A small example and a check on tempting objectives}
+Let $n=2$. Both proposers independently choose either order with equal probability. Receiver $w_1$ always prefers $u_1$ and receiver $w_2$ always prefers $u_2$. The identity matching is stable with probability one: neither receiver ever wants to leave its partner. The crossed matching is stable only if both proposers prefer their crossed partners, an event of probability $1/4$. This example can be verified by listing four profiles and checking both matchings.
+
+In general maximizing the expected number of satisfied agents, or minimizing the expected number of blocking pairs, is a different objective from maximizing the probability of zero blocking pairs. If one allocation has one blocking pair with probability $0.4$ and another has ten with probability $0.1$, their expected blocking counts and zero-block probabilities rank them oppositely. This probability calculation is an illustration of the objective distinction, not a claim that the displayed pair of distributions has been realized by a particular lottery instance.
+
+\section*{Uniform sampling and its computational limitation}
+Draw $T$ independent profiles from the stated input lotteries. Let $\widehat p_T(M)$ be the fraction for which $M$ is stable. For any $\delta>0$, the bounded-variable exponential inequality and a union bound give
+\[
+ \Prb\left\{\max_M|\widehat p_T(M)-p_I(M)|>\delta\right\}
+ \leq2n!\exp(-2T\delta^2).
+\]
+Hence taking
+\[
+ T\geq \frac{2}{\varepsilon^2}\log\frac{2n!}{\alpha}
+\]
+and choosing an exact empirical maximizer yields $p_I(\widehat M)\geq\max_Mp_I(M)-\varepsilon$ with probability at least $1-\alpha$. The proof adds two uniform errors of size $\varepsilon/2$. The sample count is polynomial in $n,1/\varepsilon,\log(1/\alpha)$, but enumerating all empirical candidates remains factorial. No polynomial-time approximation scheme is claimed.
+
+There is also a universal existence floor. For each realized strict complete profile, at least one of the $n!$ matchings is stable. Taking expectations gives $\sum_Mp_I(M)\geq1$, so the optimum is at least $1/n!$. This floor is too small for an additive approximation to guarantee a useful multiplicative approximation.
+
+\section*{Remaining obstacle}
+The counting upper bound does not supply a matching hardness reduction for optimization. Conversely, exact one-sided evaluation and polynomial sample complexity do not supply a polynomial search method. Settling the source gap requires a reduction that preserves independent per-agent lotteries, or an optimization algorithm exploiting stable-matching structure across exponentially many realized profiles. Neither is established here.
+\begin{thebibliography}{9}
+\bibitem{aziz} H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei and B. Rastegari (2020), Stable Matching with Uncertain Linear Preferences, \emph{Algorithmica} 82, 1410--1433. Primary article indexed full-text results and Theorem 3 inspected; direct PMC reload returned a browser challenge. \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC7066306/}. DOI: \url{https://doi.org/10.1007/s00453-019-00650-0}.
+\end{thebibliography}
+
+\end{document}

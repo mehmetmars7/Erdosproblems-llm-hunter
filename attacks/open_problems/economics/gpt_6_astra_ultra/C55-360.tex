@@ -1,0 +1,122 @@
+% ECONOMICS_PROBLEM: {"id": "C55-360", "title": "Practical adaptive penalties for debiased regularized GMM", "jel_code": "C55", "source_id": "OP-0577"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\newcommand{\Cov}{\operatorname{Cov}}
+\title{Practical adaptive penalties for debiased regularized GMM: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and outcome}
+\textbf{Status: unresolved.} The full problem requires adaptive parameter and nuisance penalties in growing-dimensional nonlinear GMM. This attempt solves a diagonal Gaussian random-design submodel with an unknown noise scale: all penalties and confidence widths are computable, simultaneous coverage is finite-sample uniform, and debiasing is exact. A remainder decomposition then identifies why the same calibration does not solve the source's general problem.
+
+Belloni et al. \cite{bcchk}, the paragraph after Theorem 3.4 and Remark 3.3, explicitly discuss unknown constants and initial adaptive nuisance programs. Those primary PDF passages were inspected. The exact pivot construction below is a restrictive benchmark, not a replacement proof of their theorem.
+
+\section*{A model with a genuinely feasible calibration}
+For $i=1,\ldots,n$ and $j=1,\ldots,p$, observe
+\[
+ Y_{ij}=D_{ij}\theta_{0j}+\epsilon_{ij},\qquad 1\leq D_{ij}\leq2.
+\]
+Rows are independent and identically distributed. Conditional on the entire design array, each coordinate error vector consists of independent $N(0,\sigma_j^2)$ entries, independent of the design, with $\sigma_j>0$. Cross-coordinate errors within a row may be correlated. Sparsity or approximate sparsity of $\theta_0$ is allowed but will not be needed for coverage. Assume $n\geq2$.
+
+Use diagonal moments
+\[
+ g_j(Z_i,\theta)=D_{ij}(D_{ij}\theta_j-Y_{ij}).
+\]
+Their sample derivative is $\widehat G=\operatorname{diag}(S_j/n)$, where $S_j=\sum_iD_{ij}^2\geq n$. Define the coordinate least-squares pilot and residual scale
+\[
+ \widetilde\theta_j=\frac{\sum_iD_{ij}Y_{ij}}{S_j},\qquad
+ \widehat\sigma_j^2=\frac{1}{n-1}
+                    \sum_i(Y_{ij}-D_{ij}\widetilde\theta_j)^2.
+\]
+Let $t_*=t_{n-1,\,1-\alpha/(2p)}$, a computable Student quantile, and set
+\[
+             \lambda_{\theta,j}=t_*\widehat\sigma_j\sqrt{S_j}/n.
+\]
+No unknown sparsity, noise bound or matrix norm enters this penalty.
+
+The regularized program minimizes $\|\theta\|_1$ subject to
+$|\widehat g_j(\theta)|\leq\lambda_{\theta,j}$ for all $j$.
+Since $\widehat g_j(\theta)=(S_j/n)(\theta_j-\widetilde\theta_j)$, it separates coordinatewise and its solution is
+\[
+ \widehat\theta_j=\operatorname{sign}(\widetilde\theta_j)
+        (|\widetilde\theta_j|-t_*\widehat\sigma_j/\sqrt{S_j})_+.
+\]
+This is a data-dependent weighted feasibility region, as permitted by the requested vector of penalties; it is not an unweighted common penalty with hidden unknown scale constants.
+
+\section*{Nuisance estimation and exact debiasing}
+The sample inverse is observed exactly:
+\[
+                      \widehat A=\operatorname{diag}(n/S_j).
+\]
+It solves the diagonal inverse-moment program
+$\min\|A\|_1$ subject to $\|A\widehat G-I\|_\infty\leq\lambda_A$
+with the computable choice $\lambda_A=0$, restricting $A$ to diagonal matrices. There are no other nuisance inverse operations in this just-identified diagonal model. This zero penalty is justified by the known diagonal structure and $S_j\geq n$; using zero in a general singular high-dimensional sample Jacobian would be invalid.
+
+The debiased estimator satisfies the identity
+\[
+ \check\theta=\widehat\theta-\widehat A\widehat g(\widehat\theta)
+              =\widetilde\theta.
+\]
+Thus the regularization bias cancels exactly, regardless of unknown sparsity. The nonlinear remainder is zero. Estimating the population inverse separately is unnecessary for the finite-sample pivot, although $\widehat A$ also consistently estimates it under the displayed design assumptions.
+
+\begin{proposition}[Uniform finite-sample rectangles]
+The rectangle
+\[
+ C_n=\prod_{j=1}^p\left[
+ \check\theta_j-t_*\widehat\sigma_j/\sqrt{S_j},\quad
+ \check\theta_j+t_*\widehat\sigma_j/\sqrt{S_j}\right]
+\]
+has coverage at least $1-\alpha$ for every parameter, every permitted design law and every permitted cross-coordinate covariance.
+\end{proposition}
+\begin{proof}
+Conditional on the design, normal projection theory gives
+$(\widetilde\theta_j-\theta_{0j})\sqrt{S_j}/\widehat\sigma_j
+\sim t_{n-1}$.
+The numerator projection is independent of its residual sum of squares, and the residual projection has rank $n-1$. Each coordinate interval therefore misses with probability $\alpha/p$. A union bound over coordinates gives the result without requiring coordinate independence. Integrating over the design preserves coverage. The same event shows feasibility of $\theta_0$ in the regularized program.
+\end{proof}
+The simultaneous event also yields
+$|\widehat\theta_j-\theta_{0j}|\leq2t_*\widehat\sigma_j/\sqrt{S_j}$
+by the triangle inequality. If $\theta_{0j}=0$, feasibility implies the minimizing coordinate is exactly zero. Consequently under exact $s$-sparsity its $\ell_1$ error is at most $2s$ times the largest coordinate radius on this event. Under approximate sparsity, coordinatewise soft-thresholding instead gives the usual split between large coordinates and the tail, but no exact support assertion is made.
+
+\section*{Widths without inputting the scale bound}
+For a uniform sequence of classes assume $\sup_j\sigma_j\leq C$ for some fixed finite constant, unknown to the procedure, and $\log(p/\alpha)=o(n)$ with fixed or suitably controlled $\alpha$. Chi-square concentration and a union bound show
+$\max_j\widehat\sigma_j=O_P(C)$ uniformly. The Student quantile obeys $t_*=O(\sqrt{\log(p/\alpha)})$ in this range: write a Student variable as a standard normal divided by the square root of an independent chi-square ratio, bound the ratio away from zero, and use normal tail bounds. Since $S_j\geq n$, the largest coordinate width is
+\[
+                         O_P\!\left(\sqrt{\log(p/\alpha)/n}\right).
+\]
+The variance bound defines the class but is never a tuning input. Without a class restriction of this kind, a common rate constant cannot hold over arbitrarily large scales.
+
+\section*{Why this does not finish general adaptive GMM}
+For a general differentiable moment map, Taylor expansion gives
+\[
+ \check\theta-\theta_0=-\widehat A\widehat g(\theta_0)
+ +(I-\widehat A\widehat G)(\widehat\theta-\theta_0)
+ -\widehat A R,
+\]
+where $R$ is the sample nonlinear remainder and $\widehat G$ is the chosen expansion derivative. A feasible Gaussian or multiplier calibration for the first term does not control the last two. Uniform inference needs their maximum norm to be small relative to the simultaneous approximation scale, along with a valid covariance approximation. Nuisance penalties must deliver inverse errors multiplied by parameter errors, not merely small standalone fitting residuals.
+
+The diagonal benchmark sets both algebraic remainders to zero and uses exact Gaussian pivots. Unknown sparse inverse matrices, heavy tails, nonlinear Jacobians and weak identification destroy these shortcuts. Completing computable adaptation for all such nuisance programs while retaining the source's oracle rates remains unresolved here; the benchmark provides a stringent special-case test that any general method should pass.
+\begin{thebibliography}{9}
+\bibitem{bcchk} A. Belloni, V. Chernozhukov, D. Chetverikov, C. Hansen and K. Kato (2018), High-Dimensional Econometrics and Regularized GMM, arXiv:1806.01888v2. Theorem 3.4, following paragraph and Remark 3.3, printed pp.56--57, inspected. \url{https://arxiv.org/pdf/1806.01888v2}.
+\end{thebibliography}
+
+\end{document}
