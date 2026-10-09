@@ -1,0 +1,238 @@
+% ECONOMICS_PROBLEM: {"id": "C83-200", "title": "Generalizing from a vanishing fraction of a dependent network population", "jel_code": "C83", "source_id": "OP-0536"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Generalization from sparsely sampled networks\\\large A risk bound and a sharp clique replication law}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C83-200}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and contribution}
+The catalogue fixes independent Bernoulli outcome sampling, observed population
+assignments, and interference through independent local shocks. The question is
+how sampling, neighborhood overlap, and policy likelihood ratios jointly limit
+squared-error risk. We give a finite-sample upper bound for the full stated
+class and matching upper and lower orders for disjoint equal cliques under a
+specific policy contrast. In that family the effective number of replications
+is the smaller of the expected outcome sample size and the number of cliques.
+Neither this family nor a maximum-degree bound characterizes arbitrary graphs.
+
+Bhadra and Schweinberger \cite{network}, Section 8.2 of the first version,
+motivate generalization when observed outcomes are dependent and the sample
+is small relative to the population. The independent local-shock experiment
+below is the catalogue's explicit restriction of that broader agenda.
+The weighting identity is standard change of measure; all risk bounds and
+lower-bound constructions used here are proved directly.
+
+\section{An overlap-sensitive upper bound}
+Let $S_i$ be independent Bernoulli $(\pi)$ sampling indicators, independent
+of all $W_j,U_j$, with $\pi=n/N\in(0,1]$. Write $B_i=B_r(i)$.
+The $W_j$ are independent Bernoulli $(p_j)$, $0<p_j<1$, and the $U_j$
+are mutually independent and independent of $W$. Under both policies the
+law of $U$ stays fixed. Outcomes satisfy $Y_i=f_i(W_{B_i},U_{B_i})$
+and $|Y_i|\leq M$. For $a=0,1$, define
+\[
+ L_i^a(w)=\prod_{j\in B_i}
+ \left(\frac{q_j^a}{p_j}\right)^{w_j}
+ \left(\frac{1-q_j^a}{1-p_j}\right)^{1-w_j},\qquad
+ R_i=L_i^1-L_i^0,\qquad v_i=\E_p R_i^2.
+\]
+Endpoint policy probabilities are allowed: factors are evaluated according
+to the observed binary value, so no $0^0$ convention is needed. Let
+$\mathcal E=\{\{i,j\}:i<j,\ B_i\cap B_j\ne\varnothing\}$.
+
+\begin{theorem}[Finite-sample risk]
+The observable estimator
+\[
+ \widehat\psi=\frac1{N\pi}\sum_{i=1}^N S_iR_iY_i
+\]
+is unbiased for the catalogue's $\psi_N$. Uniformly over all admissible
+$f_i$ and shock distributions,
+\[
+ \E(\widehat\psi-\psi_N)^2\leq
+ U_N:=\frac{M^2}{N^2\pi}\sum_i v_i+
+       \frac{2M^2}{N^2}\sum_{\{i,j\}\in\mathcal E}\sqrt{v_iv_j}. \tag{1}
+\]
+In particular minimax risk is at most $\min\{U_N,4M^2\}$. If $v_i\leq v$
+and each ball intersects at most $D$ other balls, (1) is at most
+$M^2v(1/n+D/N)$.
+\end{theorem}
+\begin{proof}
+For every fixed $u_{B_i}$, summing over the finite assignment space
+shows $\E_p[L_i^aY_i\mid U_{B_i}=u]=\E_{q^a}[Y_i\mid U_{B_i}=u]$.
+Integration over $U$ and independence of $S_i$ prove unbiasedness.
+Put $T_i=R_iY_i$. Since $\E T_i^2\leq M^2v_i$,
+\[
+ \Var(S_iT_i/\pi)
+ =\pi^{-1}\E T_i^2-(\E T_i)^2\leq M^2v_i/\pi.
+\]
+For $i\ne j$, independence of the sampling indicators gives
+$\Cov(S_iT_i/\pi,S_jT_j/\pi)=\Cov(T_i,T_j)$.
+If the balls are disjoint, the primitive variables determining $T_i,T_j$
+are independent, so this covariance is zero. Otherwise Cauchy--Schwarz
+bounds its absolute value by $M^2\sqrt{v_iv_j}$. Expanding the variance
+of the sum gives (1). There are at most $ND/2$ unordered intersecting
+pairs, giving the last bound. Finally $|\psi_N|\leq2M$, so the zero
+estimator has risk at most $4M^2$. Choose between these two estimators
+using their known bounds; this proves the minimax assertion.
+\end{proof}
+
+The likelihood factors are computable without estimating outcome regressions.
+In particular, for $a,b\in\{0,1\}$ set
+\[
+ K_i(a,b)=\prod_{j\in B_i}\left\{
+ \frac{q_j^aq_j^b}{p_j}+
+ \frac{(1-q_j^a)(1-q_j^b)}{1-p_j}\right\}.
+ \quad v_i=K_i(1,1)+K_i(0,0)-2K_i(1,0). \tag{2}
+\]
+Independence factors the second moment $\E L_i^aL_i^b$ into the
+one-coordinate terms displayed, proving (2). Thus identical policies give
+$v_i=0$, exactly as they must. A bound based only on the separate policy
+second moments would miss this cancellation. Equation (1) proves consistency
+whenever its two nonnegative terms vanish, even if $n/N\to0$.
+
+\section{A sharp family: equal cliques}
+Take $N=Km$ with $K,m\geq1$, let the graph be $K$ disjoint cliques of
+size $m$, and use $r=1$. All assignment probabilities are $1/2$. In each
+clique choose a known representative $c$. The policies differ only at the
+representatives: $q_c^1=1$, $q_c^0=0$; at other vertices both policy
+probabilities equal $1/2$. Thus for every node of this clique
+$R_i=2(2W_c-1)$ and $v_i=4$. The class of outcome functions remains the
+full bounded local-shock class, with arbitrary node heterogeneity.
+
+\begin{theorem}[Replication law]
+For this graph-policy family there are universal constants $c,C>0$ such
+that, for $n=N\pi\geq1$,
+\[
+ \frac{cM^2}{\min(n,K)}\leq
+ \inf_{\widetilde\psi}\sup_{(f,U)}
+       \E(\widetilde\psi-\psi_N)^2
+ \leq\frac{CM^2}{\min(n,K)}. \tag{3}
+\]
+The lower bound permits every estimator based on the full observed graph,
+all assignments, sampling indicators, and all sampled outcomes.
+\end{theorem}
+\begin{proof}
+Each ball is exactly one clique and intersects $m-1$ other balls.
+The preceding theorem gives risk at most
+$4M^2(1/n+(m-1)/N)\leq8M^2/\min(n,K)$.
+
+For a lower bound fix a scalar $\theta\in[-1/2,1/2]$. In clique $c$
+let $V_c$ be a random sign with $\Pr(V_c=1)=(1+\theta)/2$, generated
+using only its representative's independent shock $U_c$; all other shocks
+can be constant. Set, for every node in that clique,
+\[
+ Y_i(w)=M w_c V_c.
+\]
+This obeys the local representation, with independent shocks across all
+vertices. The shocks do not become globally shared: only nodes in the
+same clique use the same representative shock. Under the policy contrast,
+$\psi_N=M\theta$. A clique reveals its sign precisely when $W_c=1$
+and at least one of its outcomes is sampled. The probability of this event
+is $h/2$, where $h=1-(1-\pi)^m$. On its complement all observed outcomes
+are zero or absent and carry no information about $\theta$. The assignments
+and sampling patterns themselves have a law independent of $\theta$.
+
+Compare $\theta=t$ and $\theta=-t$, where
+$t=1/[4\sqrt{1+Kh}]$. The sign-law divergence is
+\[
+ d(t)=t\log\frac{1+t}{1-t}\leq4t^2\qquad(0\leq t\leq1/2).
+\]
+Indeed $\log((1+t)/(1-t))=\int_{-t}^t(1+x)^{-1}dx
+\leq2t/(1-t)\leq4t$. Conditioning on the parameter-free sampling and
+assignment patterns gives divergence $Kh\,d(t)/2\leq1/8$ between
+the two entire observed experiments. Pinsker's inequality then gives
+$\TV\leq1/4$. For completeness, that inequality follows by reducing KL
+to a binary event attaining total variation and using
+$\operatorname{kl}(x,y)\geq2(x-y)^2$; the latter follows by integrating
+the second derivative $1/[x(1-x)]\geq4$ about $x=y$.
+
+The two targets differ by $2Mt$. Selecting the nearer target from any
+estimate gives a test whose wrong selections imply squared loss at least
+$M^2t^2$. The sum of its two error probabilities is at least $1-\TV$:
+for a rejection event $A$, the sum is $P_-(A)+P_+(A^c)
+=1-[P_+(A)-P_-(A)]$. Consequently maximum risk is at least
+$M^2t^2(1-\TV)/2\geq3M^2/[128(1+Kh)]$.
+Finally, by the union bound $h\leq\min(m\pi,1)$, so
+$Kh\leq\min(n,K)$ and $1+Kh\leq2\min(n,K)$ when $n,K\geq1$.
+This proves (3), for example with $c=3/256$ and $C=8$.
+\end{proof}
+
+The informative-clique count also has the right order directly:
+\[
+ (1-e^{-1})\min(n,K)\leq K[1-(1-\pi)^m]\leq\min(n,K).
+\]
+For the lower bound use $(1-\pi)^m\leq e^{-m\pi}$ and
+$1-e^{-x}\geq(1-e^{-1})\min(x,1)$, the latter following from concavity
+on $[0,1]$ and monotonicity afterward. Hence many observations inside
+one clique cannot replace independent replication across cliques.
+When $m=1$, (3) reduces to $M^2/n$ even for a vanishing sampling fraction.
+When $K$ stays bounded, the risk does not vanish, however large $n$ becomes.
+
+\section{A separate obstruction from policy likelihood ratios}
+\begin{proposition}[Rare assignment obstruction]
+For a complete graph on $N$ vertices, $r=1$, $p_j=1/2$,
+$q^1_j=1$, and $q^0_j=0$, minimax risk is at least
+$\tfrac12M^2(1-2^{-N})$, for every outcome-sampling probability.
+\end{proposition}
+\begin{proof}
+Use two deterministic outcome systems
+$Y_i(w)=sM\Ind\{w_1=\cdots=w_N=1\}$ with $s\in\{-1,1\}$,
+and constant shocks. Their targets are $-M$ and $M$. Couple their
+assignments and sampling indicators identically. The observed records
+coincide unless every assignment equals one and at least one outcome is
+sampled; this has probability at most $2^{-N}$. Thus total variation is
+at most $2^{-N}$. The nearer-target testing argument in the preceding
+proof gives maximum risk at least $(2M)^2(1-\TV)/8$, as claimed.
+\end{proof}
+
+This last proposition concerns a much harder policy contrast than (3).
+It shows why graph overlap and a nominal sampling count cannot alone
+characterize the problem. Local assignment positivity holds at every
+vertex, but the intervention puts its mass on an exponentially rare
+joint exposure.
+
+\section{Remaining gap and verification}
+The results solve the risk order of the declared equal-clique family and
+supply a general sufficient condition. They do not give matching lower
+bounds for arbitrary weighted overlap graphs or for policies whose
+likelihood differences cancel unevenly across vertices. The covariance
+bound in (1) can be loose: a graph intersection permits dependence but
+does not require the hardest covariance pattern to be simultaneously
+attainable. A complete solution needs a lower-bound construction respecting
+both overlapping local shock sets and the exact policy contrast.
+All quantitative claims here are analytic; no simulations are used as
+proof. The source check used the first-version Section 8.2, not an assumed
+conclusion from an uninspected later revision.
+
+\begin{thebibliography}{9}
+\bibitem{network} S. Bhadra and M. Schweinberger (2025),
+\emph{Causal Inference Under Network Interference}, arXiv:2508.06808v1,
+Section 8.2, Internal versus external validity.
+\url{https://arxiv.org/html/2508.06808v1#S8.SS2}.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,159 @@
+% ECONOMICS_PROBLEM: {"id": "C21-173", "title": "Identification and inference after learning a mediator representation", "jel_code": "C21", "source_id": "OP-0517"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Learned mediator representations\\\large Exact lift ranges, conditional inference, and target stability}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C21-173}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{What is being identified}
+The target distinguishes an intervention on a mediator representation from the many full-mediator interventions that implement it. We derive an exact finite-support range under a bounded intervention-density ratio, give a finite-sample interval conditional on representation training, and prove a stability bound for a fixed scientific target when a smooth response truly factors through a reference representation. General minimax rates with estimated reduced densities remain unresolved.
+
+The representation-learning agenda is discussed in \cite[Section 3.4.3]{challenge}. We retain its causal assumptions: jointly measurable potential outcomes $Y(w,m)$, consistency, no interference, conditional independence of the outcome-generating error from $(W,M)$ given $X$, and support positivity. These identify $\mu_w(x,m)=\E[Y(w,m)\mid X=x]$ on the supported intervention region. All results below distinguish this identification from statistical estimation.
+
+\section{An exact range with feasibility constraints}
+First let $X$ have finite support with probabilities $p_x>0$, and let the mediator have finite support $\mathcal M_x\subset[0,1]^p$. This is an explicit discrete submodel; it does not satisfy a requirement of Lebesgue mediator densities. Fix $w$ and write
+$q_{xm}=\Pr(M=m\mid W=w,X=x)>0$. Throughout this finite-support section, $z$ ranges only over nonempty fibers. Let a supplied representation $\phi$ divide $\mathcal M_x$ into fibers $F_{xz}=\{m:\phi(m)=z\}$. Supply representation masses $g_{xz}\geq0$ summing to one for each $x$.
+
+A lift gives induced mediator masses $h_{xm}=g_{xz}K(m\mid z,x)$ for $m\in F_{xz}$. Impose the declared ratio constraint
+\[
+ 0\leq h_{xm}\leq Rq_{xm},\qquad
+ \sum_{m\in F_{xz}}h_{xm}=g_{xz},\qquad R\geq1.\tag{1}
+\]
+The causal value is $\sum_xp_x\sum_m\mu_w(x,m)h_{xm}$. Lifts with $g_{xz}=0$ are irrelevant.
+
+\begin{theorem}[Sharp finite-support lift range]\label{range}
+Feasible lifts exist if and only if $g_{xz}\leq R\sum_{m\in F_{xz}}q_{xm}$ for every $x,z$. If they exist, the set of causal values is the closed interval $[V_-,V_+]$ obtained as follows. In each fiber, sort its response values increasingly and allocate total mass $g_{xz}$ successively to the lowest values up to their capacities $Rq_{xm}$; summing these fiber minima with weights $p_x$ gives $V_-$. Allocate in decreasing order to obtain $V_+$.
+
+The value is invariant to every feasible lift if and only if $V_-=V_+$. In particular, on a fiber with
+\[
+ 0<g_{xz}<R\sum_{m\in F_{xz}}q_{xm},\tag{2}
+\]
+invariance of that fiber's contribution is equivalent to constancy of $\mu_w(x,\cdot)$ on the fiber. If every fiber has oscillation at most $\delta_{xz}$, then
+\[
+            V_+-V_-\leq\sum_xp_x\sum_zg_{xz}\delta_{xz}.
+\]
+\end{theorem}
+\begin{proof}
+Summing the upper bounds in (1) proves necessity of the feasibility inequalities. For sufficiency, filling capacities in any fixed order reaches exactly $g_{xz}$ because their sum is at least that mass. Fibers impose independent constraints, so these allocations combine to a lift; when $g_{xz}>0$, take $K=h/g$, and choose arbitrary fiber-supported probabilities on zero-mass fibers.
+
+To prove minimization, suppose a feasible vector allocates positive mass to a larger-response point while some smaller-response point is below capacity. Move the smaller of that allocated mass and available capacity to the smaller-response point. The objective decreases or remains equal. More formally, choose a threshold response at which the cumulative sorted capacity first reaches $g_{xz}$. In the greedy allocation every point below that threshold is full and every point above it is empty. For any competitor, subtraction from this allocation and the common mass constraint give
+\[
+ \sum_m\mu_m(h_m-h_m^{\rm greedy})
+ =\sum_m(\mu_m-\lambda)(h_m-h_m^{\rm greedy})\geq0:
+\]
+each summand is nonnegative by fullness below and emptiness above the threshold $\lambda$. This proves the minimum, including ties. Reverse the order for the maximum. The feasible set is a nonempty compact convex polytope, and its linear image is the whole interval between its attained extrema.
+
+Under (2), the vector
+$h_m=g_{xz}Rq_{xm}/\sum_{j\in F_{xz}}Rq_{xj}$ lies strictly between zero and every capacity. Small transfers of either sign between any pair of points remain feasible. Constancy of the objective forces equal response values for that pair. Conversely equal values plainly imply invariance. Contributions of distinct fibers cannot cancel an ambiguity range because each range length is nonnegative and $p_x>0$. Finally a mass-$g_{xz}$ average of responses ranges over an interval of length at most $g_{xz}\delta_{xz}$, proving the last bound after summation.
+\end{proof}
+
+The strict inequality in (2) is essential. If $g_{xz}=R\sum_{m\in F_{xz}}q_{xm}$, every capacity must be filled. There is only one induced allocation even if the responses differ. Thus ``constant on every fiber'' is sufficient but is not always necessary once the admissible lift set includes an active global density-ratio restriction. A fiber with two mediator states, capacities $1/2,1/2$, mass one, and response values zero and one is the simplest example.
+
+\section{Inference conditional on independent representation training}
+Return to standard Borel covariate and mediator spaces. Let $|Y|\leq B$, treatment propensity $e_w(x)\geq\varepsilon>0$, and let $q_w(dm\mid x)$ be the observed mediator kernel conditional on $W=w,X=x$. An independent training sample selects $\widehat\phi$ and a feasible lift, inducing a kernel $H(dm\mid x)$ with
+\[
+ H(\cdot\mid x)\ll q_w(\cdot\mid x),\qquad
+ r(x,m)=\frac{dH(\cdot\mid x)}{dq_w(\cdot\mid x)}(m)\leq R.
+\]
+In the next theorem $e_w$ and this derivative are supplied. They are a deliberate restriction, not estimates assumed exact. The target conditional on training is
+$\Psi_H=\E_X\int\mu_w(X,m)H(dm\mid X)$.
+
+\begin{theorem}[Conditional finite-sample interval]\label{inference}
+For $n$ independent inference observations, set
+\[
+ \widehat\Psi_H=\frac1n\sum_{i=1}^n
+       \frac{\Ind\{W_i=w\}}{e_w(X_i)}r(X_i,M_i)Y_i.
+\]
+Conditional on every training realization for which the displayed assumptions hold, the interval
+\[
+ \widehat\Psi_H\ \pm\ \frac{BR}{\varepsilon}
+                  \sqrt{\frac{2\log(2/\eta)}{n}}
+\]
+covers $\Psi_H$ with probability at least $1-\eta$, for $0<\eta<1$.
+\end{theorem}
+\begin{proof}
+Conditional on training the summands are independent, lie in
+$[-BR/\varepsilon,BR/\varepsilon]$, and have expectation
+\[
+ \E_X\int\frac{e_w(x)}{e_w(x)}r(x,m)\mu_w(x,m)q_w(dm\mid x)
+       =\Psi_H.
+\]
+Hoeffding's inequality for this interval of length $2BR/\varepsilon$ gives the stated probability. Conditioning is legitimate because no inference observations selected the representation or the lift.
+\end{proof}
+
+An augmentation gives a useful exact remainder for learned weights. To state it without density notation ambiguities, fix a dominating mediator measure $\lambda$, write $a(x,m)=e_w(x)q_w(m\mid x)$, and suppose $H$ has density $h$. Let $\widehat\mu$ and $\widehat r$ be fitted independently of inference data and bounded so that the following score has a known envelope. Define
+\[
+ Z=\int\widehat\mu(X,m)h(m\mid X)\,d\lambda(m)
+      +\Ind\{W=w\}\widehat r(X,M)\{Y-\widehat\mu(X,M)\}.
+\]
+\begin{proposition}[A conditional product-error certificate]
+With all fitted functions and $h$ fixed by training,
+\[
+ \E Z-\Psi_H
+  =\E_X\int(a\widehat r-h)(\mu_w-\widehat\mu)\,d\lambda.
+\]
+Consequently the absolute bias is at most
+$\|a\widehat r-h\|_2\|\mu_w-\widehat\mu\|_2$, where the norms use $P_X\otimes\lambda$. If $|Z|\leq A$ and training supplies a valid upper bound $b_n$ for that product, the interval
+$\overline Z\pm\{A\sqrt{2\log(2/\eta)/n}+b_n\}$ has conditional coverage at least $1-\eta$.
+\end{proposition}
+\begin{proof}
+Take conditional expectations given $X$ in the second term. Subtract $\int h\mu_w$, combine the two integrals, and factor their difference to obtain the identity. Cauchy--Schwarz gives the product bound. Hoeffding bounds $|\overline Z-\E Z|$ with failure probability $\eta$, and the triangle inequality gives coverage. A certificate holding only on a training event of probability $1-\delta_n$ yields unconditional coverage at least $1-\eta-\delta_n$; it is not conditional coverage for the failed training realizations.
+\end{proof}
+
+For example, on a genuinely reduced model, prediction bounds $O(n^{-u})$ and $O(n^{-v})$ for these two specific norms make the remainder $O(n^{-u-v})$. A root-$n$-order interval follows if $u+v\geq1/2$ with a supplied constant bound; a negligible remainder requires $u+v>1/2$. No smoothness-to-rate claim is made without a construction establishing the appropriate reduced density, overlap, and norm bounds. In particular, separate smoothness of $e_w$ and the mediator density cannot simply be replaced by a freely chosen rate for their product error.
+
+\section{A learned target versus a fixed scientific target}
+Let $\phi_*:\mathcal M\to\R^r$ be a reference representation, and suppose the response has an exact factorization
+\[
+ \mu_w(x,m)=\nu_w(x,\phi_*(m)),\qquad
+ |\nu_w(x,z)-\nu_w(x,z')|\leq L\|z-z'\|^t,
+ \quad0<t\leq1,
+\]
+on all relevant supports. A H\"older response of order $\beta$ gives such a modulus with $t=\min\{\beta,1\}$ and an appropriate constant on a bounded domain. Fix the same representation intervention $g(dz\mid x)$ for the learned and reference targets. Assume feasible lifts exist for both representations and that their induced full-mediator kernels meet the needed support conditions.
+
+\begin{theorem}[Target stability from a response factorization]\label{stability}
+If $\|\widehat\phi-\phi_*\|_\infty\leq a$, then for every feasible learned lift,
+\[
+ |\Psi_{\widehat\phi,K}-\Psi_{\phi_*,K_*}|\leq La^t.
+\]
+The reference value is independent of $K_*$. Moreover, responses on every fiber of $\widehat\phi$ differ by at most $L(2a)^t$; hence the range over any collection of feasible learned lifts has diameter at most $L(2a)^t$.
+\end{theorem}
+\begin{proof}
+On a reference fiber $\phi_*(m)=z$, the response equals $\nu_w(x,z)$, so any reference lift integrates to that value. On a learned fiber $\widehat\phi(m)=z$, one has $\|\phi_*(m)-z\|\leq a$, whence
+$|\mu_w(x,m)-\nu_w(x,z)|\leq La^t$. Integrate this inequality under the learned lift, then under $g$ and $P_X$, whose total mass is one. This proves the first assertion uniformly over lifts. If $m,m'$ belong to the same learned fiber, the triangle inequality gives $\|\phi_*(m)-\phi_*(m')\|\leq2a$, proving the oscillation bound. Integrating fiberwise upper and lower bounds yields the range diameter bound.
+\end{proof}
+
+If independent training has error probability at most $\delta_n$ for the event $\|\widehat\phi-\phi_*\|_\infty\leq a_n$, enlarging the conditional interval of Theorem~\ref{inference} by $La_n^t$ gives a fixed-reference-target interval with unconditional coverage at least $1-\eta-\delta_n$. Its width has order $n^{-1/2}+a_n^t$ in the supplied-weight experiment. The proof is the union bound on the training and inference events and Theorem~\ref{stability}. The representation covering numbers alone were not used: once a training guarantee is supplied, conditional inference does not pay a second automatic search penalty. Deriving that guarantee from a specified learner and the entropy bound is a separate problem.
+
+\section{Limits of the result}
+The sharp range theorem includes finite-support positivity and ratio constraints explicitly; the continuous version can require essential ranges and measurable selection. The inference theorem supplies a transparent root-$n$ benchmark when the intervention weights are known, and its augmentation identifies exactly the nuisance product that must be controlled when they are learned. It does not establish the optimal rates as functions of all the catalogue's smoothness indices. The fixed-target conclusion requires the response factorization and a common intervention $g$, not merely a predictive embedding or a small numerical distance between arbitrary encoders.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1. Sections 3.4.2--3.4.3, particularly ``Representing complex mediators,'' inspected 9 October 2026. The finite lift program and stability arguments above are direct derivations, not attributed source theorems. \url{https://arxiv.org/html/2508.17099v1#S3.SS4.SSS3}.
+\end{thebibliography}
+
+\end{document}

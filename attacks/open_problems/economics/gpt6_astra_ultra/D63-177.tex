@@ -1,0 +1,205 @@
+% ECONOMICS_PROBLEM: {"id": "D63-177", "title": "Polynomial-time computation of simultaneous EEFX and EFL allocations", "jel_code": "D63", "source_id": "OP-0192"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\Ind}{\mathbf 1}
+\DeclareMathOperator{\SC}{SC}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\supp}{supp}
+\title{Constructive EEFX and EFL on two tractable domains}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{D63-177}. \textbf{Status: unresolved.}
+
+\section{Target and exact convention}
+The general target asks for a deterministic polynomial-time complete
+allocation that is both epistemic EFX (EEFX) and EFL for rational
+nonnegative additive values. Akrami et al. \cite[Sections 4--6]{Shares}
+prove existence and leave efficient simultaneous computation open.
+We prove polynomial algorithms for proportional valuations and for two
+arbitrary agents, and an exact finite recognition reduction for EEFX.
+The latter has a pseudopolynomial dynamic program at fixed population.
+These claims do not settle general allocation search.
+
+Throughout, EFX and EEFX test removal of \emph{every} good, including a
+good of zero value to the evaluating agent. This convention is essential
+in both the algorithm and the recognition result. Actual EFX is a
+sufficient condition for EEFX, since the actual bundles of all other
+agents then provide the required epistemic partition.
+
+\section{A partition lemma with zero goods}
+For weights $b_g\ge0$ and a positive integer $k$, start with $k$ empty
+bundles. Process every good, including zeros, in nonincreasing weight
+order, assigning it to a bundle of minimum current total weight.
+Resolve all ties by fixed indices of goods and bundles.
+\begin{lemma}[A complete balanced partition]\label{lpt}
+The resulting partition $B$ satisfies, for every pair of bundles $B_i,B_j$,
+\[
+ b(B_i)\ge b(B_j\setminus\{g\})\quad(g\in B_j).
+\]
+It also satisfies EFL with respect to the common weight function: if
+$B_j$ contains at least two positive-weight goods, there is $g\in B_j$
+with $b(B_j\setminus\{g\})\le b(B_i)$ and $b_g\le b(B_i)$.
+\end{lemma}
+\begin{proof}
+For nonempty $B_j$, let $g_*$ be its last assigned good. Its load immediately
+before that assignment was at most every other current load and hence at
+most every other final load. The ordering ensures $b_g\ge b_{g_*}$ for
+all $g\in B_j$. Thus deleting any $g$ leaves weight at most
+$b(B_j)-b_{g_*}\le b(B_i)$, proving the first assertion even when
+$b_{g_*}=0$.
+
+If $B_j$ contains at least two positive goods, choose one of minimum
+positive weight, denoted $g$. The first assertion gives
+$b(B_j\setminus\{g\})\le b(B_i)$. Another positive good in the residual
+has weight at least $b_g$, so $b_g\le b(B_j\setminus\{g\})\le b(B_i)$.
+This is exactly the second EFL alternative. Bundles with at most one
+positive good satisfy the first EFL alternative by definition.
+\end{proof}
+The proof shows why appending zeros to an arbitrary bundle is invalid:
+a zero deletion leaves that bundle's entire value. Processing zeros
+through the minimum-load rule keeps this comparison valid.
+
+\begin{theorem}[Proportional valuations]\label{proportional}
+Suppose $a_{ig}=c_i b_g$ for rational $b_g\ge0$ and $c_i>0$.
+The partition algorithm with $k=n$, assigned to the agents in its fixed
+order, returns an all-good EFX and EFL allocation and hence an EEFX and
+EFL allocation. It runs in polynomial bit complexity.
+\end{theorem}
+\begin{proof}
+Apply Lemma~\ref{lpt} and multiply each evaluating agent's inequalities
+by $c_i$. This gives actual EFX and EFL. The actual other bundles are an
+EEFX certificate for every agent. Sorting and at most $nm$ exact rational
+load comparisons and additions suffice, where $m=|M|$. A sum of $m$
+input rationals has polynomial bit length (use the product of denominators
+as a common denominator), giving the bit-complexity assertion.
+\end{proof}
+Zero-valuation agents can be included by allowing $c_i=0$ in this theorem:
+all their comparisons are automatic. Positive scales were stated only to
+make the proportional structure transparent.
+
+\begin{theorem}[Two arbitrary additive agents]\label{two}
+For $n=2$ and arbitrary rational nonnegative additive valuations, a
+complete all-good EFX and EFL allocation can be computed in polynomial
+time. Thus the full simultaneous EEFX--EFL target holds for two agents.
+\end{theorem}
+\begin{proof}
+Agent 1's values are used to construct the two bundles in
+Lemma~\ref{lpt}. Agent 2 receives a bundle she weakly prefers according
+to her own total value, using a fixed tie rule; agent 1 receives the other.
+Agent 1's comparisons, whichever bundle she receives, satisfy the lemma.
+Agent 2 is envy-free, so for every good $g$ in the other bundle,
+\[
+ v_2(A_2)\ge v_2(A_1)\ge v_2(A_1\setminus\{g\}),\qquad
+ v_2(A_2)\ge v_2(A_1)\ge a_{2g}.
+\]
+If that other bundle has at least two positively valued goods these two
+inequalities give EFL with any chosen good; otherwise its first
+alternative holds. She also satisfies all-good EFX. The preceding
+polynomial bound and two bundle-value calculations finish the proof.
+\end{proof}
+This is a direct cut-and-choose argument. Its conclusion is restricted to
+two agents, where each epistemic partition has a single part; it does not
+extend by recursively cutting without an additional proof.
+
+\section{Exact recognition of an epistemic certificate}
+For an agent $i$ with a fixed proposed own bundle, write
+$u=v_i(A_i)$ and let $w_g=a_{ig}$ for remaining goods. There are $k=n-1$
+parts in an epistemic partition. For a nonempty part $P$, define
+$L(P)=\sum_{g\in P}w_g$ and $z(P)=\min_{g\in P}w_g$.
+\begin{proposition}[A bin condition equivalent to EEFX]\label{bin}
+The proposed bundle is EEFX-feasible for agent $i$ if and only if the
+remaining goods can be partitioned into $k$ parts such that each nonempty
+part satisfies
+\[
+ L(P)-z(P)\le u.
+\]
+Empty parts impose no constraint. In particular, a part containing a
+zero-weight good must have total load at most $u$.
+\end{proposition}
+\begin{proof}
+For a nonempty part, the maximum over all deletions of the residual value
+is $\max_{g\in P}(L(P)-w_g)=L(P)-\min_{g\in P}w_g$.
+The all-good inequalities hold precisely when this maximum is at most
+$u$. Taking the conjunction over parts gives the equivalence. The
+zero-good assertion follows by substituting $z(P)=0$.
+\end{proof}
+\begin{theorem}[A fixed-population pseudopolynomial recognizer]\label{dp}
+Suppose the remaining $w_g$ and $u$ are nonnegative integers, put
+$W=\sum_g w_g$ and $V=\max_g w_g$ (set $V=0$ if there are no goods).
+There is a deterministic algorithm deciding and constructing an EEFX
+certificate in
+\[
+ O\!\left(mk\bigl((W+1)(V+2)\bigr)^k\right)
+\]
+arithmetic operations on integers of polynomial bit length. Thus for
+fixed $n$ the running time is pseudopolynomial. For rational values one
+may clear denominators, but this need not give a polynomial bit-time
+bound in the original input.
+\end{theorem}
+\begin{proof}
+Process the remaining goods in any fixed order. A state records, for each
+labeled part $j$, its current load $L_j\in\{0,\ldots,W\}$ and its minimum
+$z_j\in\{0,\ldots,V\}\cup\{\infty\}$. The symbol $\infty$ is used
+only for empty parts. Begin with all loads zero and minima infinity.
+For the next weight $w$, branch over its $k$ possible parts, replacing
+$(L_j,z_j)$ by $(L_j+w,\min\{z_j,w\})$. Record a predecessor for every
+reachable state and discard a transition whenever a nonempty part has
+$L_j-z_j>u$.
+
+Discarding is safe. Adding a good to a nonempty part weakly increases
+$L-z$: if $w\ge z$, it increases by $w$; if $w<z$, the new expression
+is $L$, at least the old $L-z$. When a first good is added to an empty
+part the expression is zero. Thus an infeasible part can never become
+feasible by later additions. Inductively, reachable retained states are
+exactly the partial assignments with valid current parts. After all
+goods, any retained state gives a certificate by Proposition~\ref{bin},
+and every valid certificate follows a retained path. Predecessors recover
+it. There are at most $((W+1)(V+2))^k$ states per layer and $k$ transitions
+per state. This proves the bound and correctness.
+\end{proof}
+A polynomial-size certificate for a proposed allocation consists of its
+own assignment and, for each agent, the ordered assignment of every other
+good to one of $n-1$ parts. Proposition~\ref{bin} checks it in polynomial
+time for rational input. This verification fact does not supply a
+polynomial algorithm that finds the allocation.
+
+\section{Remaining gap and source check}
+The unrestricted problem still requires simultaneously choosing all own
+bundles. The recognition dynamic program operates after those choices,
+and its numerical parameters can be exponentially large in binary input
+length. The positive allocation results cover proportional values and
+arbitrary two-agent instances only. The source's revised HTML was checked
+on 9 October 2026, particularly Sections 4--5 and the future-directions
+item distinguishing existence from polynomial computation. Its different
+restricted-additive algorithm is not used as a black box here.
+\begin{thebibliography}{9}
+\bibitem{Shares} H. Akrami, U. Feige, R. Mahara, K. Mehlhorn, and N. Rathi,
+\emph{The Power of Share-Based Notions in Proving Envy-Based Fairness
+Guarantees}, arXiv:2602.11732v2, 2026, Sections 4--6.
+\url{https://arxiv.org/html/2602.11732v2}.
+\end{thebibliography}
+
+\end{document}

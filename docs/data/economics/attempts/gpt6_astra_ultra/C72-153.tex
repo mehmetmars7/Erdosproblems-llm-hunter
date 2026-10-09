@@ -1,0 +1,214 @@
+% ECONOMICS_PROBLEM: {"id": "C72-153", "title": "Exact Nash complexity in concisely represented potential games", "jel_code": "C72", "source_id": "OP-0139"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\Ind}{\mathbf 1}
+\DeclareMathOperator{\SC}{SC}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\supp}{supp}
+\title{Exact potential equilibria: constructive membership and a structural algorithm}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C72-153}. \textbf{Status: unresolved.}
+
+\section{Target and contribution}
+The canonical target asks whether exact Nash search for a succinct
+multilinear potential is complete for $\mathsf{FIXP}\cap\mathsf{PLS}$.
+The source explicitly uses a convention allowing a reduction to local
+search without efficient verification of every purported real solution
+\cite[Question 6.1 and footnote 5]{Potential}. We preserve that convention.
+We reconstruct membership and then isolate a tractable structural class:
+a supplied bounded-width decomposition of an explicitly factored potential
+permits an exact pure equilibrium in polynomial time. The latter restriction
+is not imposed by the original circuit representation.
+
+Let $S_i$ be explicitly listed action sets, $X=\prod_i\Delta(S_i)$,
+and $\Phi$ the input multilinear potential. All rational calculations
+below use the source's disjoint-player-block and disjoint-subcircuit
+multiplication convention. A pure profile occupies polynomial space even
+when the number of pure profiles is exponential.
+
+\section{Two explicit membership constructions}
+\begin{proposition}[Local search has valid target outputs]\label{pls}
+Under the stated circuit convention, exact Nash search reduces to a finite
+local-search problem with polynomial-bit objective values and polynomial-time
+neighbor inspection. A local optimum of that problem is a pure Nash equilibrium.
+\end{proposition}
+\begin{proof}
+Use pure profiles as local-search states and all unilateral changes as
+neighbors. There are at most $\sum_i(|S_i|-1)$ neighbors, and their
+potentials can be evaluated exactly in polynomial time by the maintained
+circuit convention. Start at the profile consisting of the first listed
+action of every player.
+
+For an integer objective, let $D$ be the product of the positive denominators
+of all rational constant gates. On a pure input, every monomial obtained by
+formally expanding the circuit uses a given constant gate at most once:
+a multiplication gate combines disjoint subcircuits, and an addition chooses
+a summand in each expanded monomial. Consequently the denominator of every
+pure-profile potential divides $D$. Its binary length is polynomial.
+The objective $D\Phi(a)$ is therefore an exactly computable integer of
+polynomial bit length. If the local-search convention requires nonnegative
+values, shift all objectives by a common power of two dominating their
+absolute values; a polynomial-bit bound follows from the circuit evaluation
+bound and the input size. The shift does not change improving neighbors.
+
+If no neighbor increases potential, then for each player $i$ and pure
+deviation $b_i$, $\Phi(a)\ge\Phi(b_i,a_{-i})$. By multilinearity the
+same inequality holds for every mixed deviation, which is a convex
+combination of these values. Thus $a$ is an exact Nash equilibrium.
+Termination follows from strict improvement on a finite state space; no
+polynomial bound on the number of improvement steps is asserted.
+\end{proof}
+\begin{proposition}[An explicit fixed-point map]\label{fixp}
+Exact equilibria are precisely the fixed points of the following continuous
+rational algebraic circuit map from $X$ to itself:
+\begin{align*}
+ g_{ia}(x)&=\max\{0,\Phi(a,x_{-i})-\Phi(x)\},\\
+ G_i(x)&=\sum_{a\in S_i}g_{ia}(x),\\
+ F_{ia}(x)&=\frac{x_{ia}+g_{ia}(x)}{1+G_i(x)}.
+\end{align*}
+The map has size polynomial in the input circuit and listed action sets.
+\end{proposition}
+\begin{proof}
+Every denominator is at least one, every coordinate is nonnegative, and
+the coordinates for each player sum to one. Thus the map is continuous
+and maps $X$ into itself. Copying the potential circuit once per listed
+action evaluates all displayed differences in polynomial circuit size.
+At an equilibrium all gains vanish, so $F(x)=x$.
+
+Conversely, if $F(x)=x$, then $g_{ia}(x)=x_{ia}G_i(x)$ for every $a$.
+Suppose $G_i(x)>0$. Every supported action has strictly positive gain and
+therefore $\Phi(a,x_{-i})>\Phi(x)$. Taking the $x_i$-weighted average
+contradicts $\sum_a x_{ia}\Phi(a,x_{-i})=\Phi(x)$. Hence every $G_i=0$,
+all pure deviation gains are nonpositive, and all mixed gains are too.
+\end{proof}
+These are constructive explanations of the source's stated memberships,
+not hardness results. In particular, Proposition~\ref{pls} does not require
+representing or verifying every irrational mixed equilibrium.
+
+\section{A polynomial algorithm with bounded interaction width}
+Assume additional input of the form
+\[
+ \Phi(a)=\sum_{\ell=1}^{L}\phi_\ell(a_{U_\ell}),
+\]
+where each $U_\ell$ is a subset of players and $\phi_\ell$ is an explicitly
+listed rational table. The interaction graph joins two players when they
+occur in a common $U_\ell$. A tree decomposition consists of bags $B_t$
+on the vertices of a tree, containing every player, such that every
+interaction edge has both endpoints in a bag and the bags containing a
+fixed player form a connected subtree. Suppose the decomposition is
+supplied and every factor scope is contained in a supplied bag; its width
+is $w=\max_t|B_t|-1$. This last containment can also be checked directly.
+
+\begin{theorem}[Factored-potential exact equilibrium]\label{tree}
+Let $q=\max_i|S_i|$. Given the above factors and decomposition, one can
+compute a globally potential-maximizing pure profile, and hence an exact
+Nash equilibrium, using a number of rational operations bounded by
+\[
+ O\!\left((L+|\mathcal T|)q^{w+1}
+          +\text{total factor-table size}\right),
+\]
+up to the cost of looking up and adding input table entries. Bit complexity
+is polynomial in this quantity and the input bit length. In particular,
+for every fixed $w$ this is a polynomial-time exact algorithm.
+\end{theorem}
+\begin{proof}
+Root the bag tree and assign each factor to one containing bag. Let
+$f_t(b)$ be the sum of the factors assigned to bag $t$, evaluated at its
+bag assignment $b$. For a nonroot bag with parent $p(t)$, set
+$D_t=B_t\cap B_{p(t)}$. Define a message indexed by separator assignments:
+\[
+ M_t(s)=\max_{b:\,b|_{D_t}=s}
+ \left[f_t(b)+\sum_{c:\,p(c)=t}M_c(b|_{D_c})\right].
+\]
+Compute these messages from leaves upward, storing a maximizing bag
+assignment for every separator assignment. At the root maximize the same
+bracket over its full bag assignment.
+
+We prove the recursion by induction on the subtree. The induction claim
+is that $M_t(s)$ equals the maximum total of factors assigned in the
+subtree rooted at $t$, among assignments of all its players agreeing with
+$s$. For a leaf this is the formula. For an internal node, running
+intersection implies that a player shared by two child subtrees belongs
+to $B_t$, and any player shared with the parent side belongs to $D_t$.
+After the bag assignment $b$ is fixed, the remaining child choices have
+no conflicting unfixed player. Their maxima therefore add, and all of
+them can be realized simultaneously. This proves the recursion and the
+root global optimum. Follow stored choices downward to reconstruct a
+consistent maximizing pure profile. Any unilateral change is among the
+profiles over which global maximization was performed, so it cannot
+increase the potential.
+
+Each bag has at most $q^{w+1}$ assignments. Evaluate every bracket once,
+placing its value in the corresponding separator entry and retaining the
+maximum. The sum of numbers of child terms is the number of tree edges;
+factor evaluations contribute at most $Lq^{w+1}$ table accesses. Every
+stored value is a sum of at most $L$ rational input entries, so numerators
+and denominators have polynomial bit length, even without common input
+denominators. Exact comparisons and reconstruction have the asserted cost.
+\end{proof}
+
+\section{Why finding a mixed equilibrium is not a rounding argument}
+\begin{proposition}\label{rounding}
+The support of an exact mixed equilibrium need not consist of pure Nash
+profiles. In contrast, every pure profile in the product support of a
+mixed global maximizer of a multilinear potential is a global maximizer.
+\end{proposition}
+\begin{proof}
+For the first assertion, take two players with actions $0,1$ and common
+payoff $\Phi(a)=\Ind\{a_1=a_2\}$. Independent uniform mixing is an exact
+equilibrium: either pure action yields expected payoff $1/2$. The supported
+profile $(0,1)$ is not a pure equilibrium because either player can switch
+and increase payoff from zero to one.
+
+For the second assertion let $V$ be the largest potential at any pure
+profile. A mixed potential is the average of pure potential values under
+the product distribution, hence is at most $V$; a pure maximizer attains
+$V$, so the mixed and pure global maxima agree. If a mixed global maximizer
+put positive mass on a pure profile with value strictly below $V$, its
+finite weighted average would be strictly below $V$, a contradiction.
+\end{proof}
+The distinction matters for attempts to turn the fixed-point construction
+into a discrete algorithm. Theorem~\ref{tree} computes a global maximizer
+using additional structure; the fixed-point map only ensures equilibrium.
+
+\section{Remaining gap and checked source}
+The full circuit need not expose low-width factors, and even an equivalent
+expanded representation can have exponential size. Thus the structural
+algorithm gives no algorithm for arbitrary succinct inputs. No hardness
+reduction for $\mathsf{FIXP}\cap\mathsf{PLS}$ is supplied. The source HTML
+was consulted on 9 October 2026; Question 6.1 and its footnote state the
+completeness question and the solution-verification convention used here.
+No computational experiments are used.
+\begin{thebibliography}{9}
+\bibitem{Potential} I. Anagnostides, M.-F. Balcan, K. Fragkia,
+T. Sandholm, E. Tewolde, and B. H. Zhang,
+\emph{The Complexity of Equilibrium Refinements in Potential Games},
+arXiv:2511.03968, 2026 version. Section 3 and Question 6.1.
+\url{https://arxiv.org/html/2511.03968}.
+\end{thebibliography}
+
+\end{document}

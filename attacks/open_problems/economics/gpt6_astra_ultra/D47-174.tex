@@ -1,0 +1,213 @@
+% ECONOMICS_PROBLEM: {"id": "D47-174", "title": "Scaling kidney exchange", "jel_code": "D47", "source_id": "OP-0298"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Scaling kidney exchange\\\large Participation guarantees, equity loss, and composition accounting}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{D47-174}. \textbf{Status:} Unresolved; restricted results and reductions.
+
+\section{Research target and the declared one-batch model}
+The full target combines institutional withholding incentives, equity,
+exchange failures, international constraints, and dynamic participation.
+Roth's white paper \cite[p.~4]{roth} identifies full center submission as
+an institutional problem; Ashlagi and Roth \cite[Section 6, item 2,
+p.~5467]{ar} explicitly separate scale from biological heterogeneity.
+Neither source is a theorem asserting the mechanism studied below.
+
+We analyze a restricted, completely specified model. All pairs arrive
+in one batch, the realized compatibility graph is known to the planner,
+only cycles of length at most $K\geq2$ are permitted, and there are no
+chains. Resources allow any collection of vertex-disjoint cycles;
+there is no shared capacity constraint beyond vertex disjointness.
+Each selected cycle succeeds in its entirety with the same probability
+$s\in(0,1]$, and otherwise makes no transplant. Cycle failures may be
+correlated, but their marginal probability is $s$ under both internal
+and pooled operation. A plan is selected before failures and no repair
+is attempted. These assumptions make expected transplant counts equal
+to $s$ times planned counts. There are no monetary transfers.
+
+Center $h$ owns $V_h$. Let $O_h$ be a maximum-cardinality internal cycle
+packing and $b_h=|V(O_h)|$. Its outside option is $s b_h$. The union
+$O=\bigcup_hO_h$ is feasible, and write $b=\sum_hb_h$. Computing these
+packings may itself be hard for $K\geq3$; the guarantees below are
+structural and do not assert a polynomial clearing algorithm.
+
+\section{A guaranteed-participation benchmark}
+Reserve the cycles $O$, delete their vertices, and choose a
+maximum-cardinality packing $Q$ in the residual graph. Output $O\cup Q$.
+
+\begin{theorem}[A cycle-cap bound on the cost of reservations]
+For every realized graph in the stated model, the reservation plan gives
+every center at least its internal expected outside option. If $T^*$ is
+the maximum number of vertices covered by any pooled packing, then
+\[
+ |V(O\cup Q)|\geq\max\{b,T^*-(K-1)b\}\geq T^*/K.
+\]
+The same $1/K$ comparison holds for expected total transplants. If
+patient weights satisfy $0<w_{\min}\leq w_i\leq w_{\max}$, the plan's
+expected weighted value is at least
+$w_{\min}/(K w_{\max})$ times the maximum expected weighted value.
+\end{theorem}
+\begin{proof}
+Every reserved internal cycle is still performed with the same marginal
+success probability, so center $h$ receives at least $s b_h$ expected
+transplants. Take an optimum pooled packing $P^*$ with $T^*$ covered
+vertices. At most $b$ of its cycles intersect the reserved vertices,
+because the cycles are disjoint and each intersecting cycle contains
+at least one distinct reserved vertex. Deleting these cycles discards
+at most $K b$ vertices. The remaining cycles are a feasible residual
+packing, so $|V(Q)|\geq T^*-K b$ and
+$|V(O\cup Q)|\geq T^*-(K-1)b$. The trivial bound $|V(O\cup Q)|\geq b$
+gives the maximum. If $b\geq T^*/K$ the first term suffices; otherwise
+the second is greater than $T^*/K$.
+
+Linearity of expectation multiplies all counts by $s$; independence
+of failures is unnecessary. The algorithm's weighted value is at least
+$s w_{\min}T^*/K$, while any packing's expected weighted value is at
+most $s w_{\max}T^*$, proving the final assertion.
+\end{proof}
+
+This benchmark enforces participation conditional on full submission.
+It is not a dominant-strategy withholding mechanism: changing the
+submitted set can change the reserved internal optimum and the residual
+exchange opportunities. The theorem deliberately makes no such
+incentive claim.
+
+\begin{proposition}[A truthful baseline and its efficiency limit]
+The mechanism that independently performs a maximum-cardinality internal
+packing for each submitting center is dominant for full submission
+against subset withholding and subsequent internal exchange on withheld
+vertices, with the same cycle cap, failure law, and resource rules.
+Nevertheless its ratio to pooled expected total transplants can be zero.
+\end{proposition}
+\begin{proof}
+Fix a center's full set $V_h$ and a submitted subset $S_h$. A maximum
+internal packing on $S_h$ together with any packing on
+$V_h\setminus S_h$ is a feasible internal packing on $V_h$. Their total
+planned count cannot exceed $b_h$. Multiplication by $s$ proves the
+required expected-utility dominance, for every submission of the
+other centers; those submissions do not enter this mechanism.
+For the efficiency assertion give each of two centers one vertex and
+put a directed two-cycle between the vertices, with no internal cycles.
+The mechanism makes zero transplants, whereas pooling gives $2s>0$.
+\end{proof}
+
+Thus a participation-safe allocation and a dominant-submission rule
+are mathematically distinct. Combining their benefits, rather than
+confusing the two inequalities, is part of the remaining target.
+
+\section{An exact equity obstruction, including lotteries and failures}
+\begin{proposition}[No uniform weighted efficiency under unrestricted weights]
+Even with $K=2$ and the common success probability $s$, individually
+rational randomized mechanisms can have an arbitrarily small ratio to
+unconstrained weighted efficiency, irrespective of their computational
+power or withholding incentives.
+\end{proposition}
+\begin{proof}
+Center $A$ owns $a_1,a_2$ and center $B$ owns $b_1$. The only cycles are
+$(a_1,a_2)$ and $(a_1,b_1)$. Set $w_{a_1}=w_{a_2}=1$ and $w_{b_1}=W>1$.
+Center $A$ has outside option $2s$. A lottery putting probability $x$
+on its internal cycle and $y$ on the cross-center cycle, with
+$x+y\leq1$, gives $A$ expected utility $s(2x+y)$. The requirement
+$2x+y\geq2$ forces $x=1,y=0$: indeed $2x+y\leq2-y$.
+Thus every individually rational lottery has weighted value $2s$.
+The unconstrained optimum uses the cross-center cycle and has value
+$s(W+1)$. Their ratio $2/(W+1)$ tends to zero. All plans obey the same
+failure and medical constraints, and no payment can compensate $A$.
+\end{proof}
+
+The loss is caused by the difference between center transplant-count
+objectives and patient equity weights. Randomizing plans does not
+remove the binding participation constraint. This is a restricted
+impossibility result, not a prediction about actual patient weights.
+
+\section{Separating composition and scale in a two-type pool}
+To make the counterfactuals explicit, assume pairs have type $X$ or $Y$,
+any opposite-type pair can form a two-cycle, and no same-type cycle is
+feasible. Let a pool contain $x$ and $y$ vertices of the two types.
+Failure probability remains $1-s$ per cycle.
+
+\begin{theorem}[Exact composition accounting and a finite-pool bound]
+The maximum planned transplant count is $f(x,y)=2\min(x,y)$.
+For two pools with imbalances $d_j=x_j-y_j$, the exact gain from
+pooling their fixed compositions is
+\[
+ f(x_1+x_2,y_1+y_2)-f(x_1,y_1)-f(x_2,y_2)
+ =|d_1|+|d_2|-|d_1+d_2|.
+\]
+For an iid pool of size $N$ with type-$X$ probability $p$, let
+$F(N,p)$ be its expected optimum planned count. Then
+\[
+ F(N,p)=N-\E|2X-N|,\qquad X\sim\operatorname{Bin}(N,p),
+\]
+\[
+ \max\{0,N-N|2p-1|-2\sqrt{Np(1-p)}\}
+ \leq F(N,p)\leq N-N|2p-1|.
+\]
+Multiply all formulas by $s$ for expected completed transplants.
+\end{theorem}
+\begin{proof}
+Each cycle uses one vertex of each type, so at most $\min(x,y)$ cycles
+are possible; completeness across types attains this bound. The identity
+$2\min(x,y)=x+y-|x-y|$ proves the fixed-composition formula by subtraction.
+For the random pool substitute $x=X,y=N-X$. Convexity of absolute value
+gives $\E|2X-N|\geq|2Np-N|$. The triangle inequality and
+Cauchy--Schwarz give
+\[
+ \E|2X-N|\leq |2Np-N|+2\E|X-Np|
+ \leq N|2p-1|+2\sqrt{Np(1-p)}.
+\]
+Subtract from $N$ and use nonnegativity. Linearity of expectation again
+supplies the common factor $s$.
+\end{proof}
+
+For a declared common composition $p_0$, a scale-only counterfactual is
+$F(N_1+N_2,p_0)-F(N_1,p_0)-F(N_2,p_0)$. At the same pooled size, a
+composition comparison is $F(N_1+N_2,p)-F(N_1+N_2,p_0)$.
+A mixture of two countries with fixed counts and different probabilities
+need not have binomial type counts; its corresponding expression uses
+the sum of their two independent binomials. Choosing $p_0$ is a
+substantive counterfactual, not an empirically identified decomposition.
+
+\section{What remains}
+These proofs handle batch arrivals, a transparent failure law, outside
+options, and one explicit biological simplification. They neither
+calibrate realistic blood/HLA composition nor solve dynamic exit,
+heterogeneous failures, shared capacity, chains, or strategic pooling.
+The unrestricted-weight obstruction persists even before those harder
+features are added. Sustainable mechanisms with quantified withholding
+incentives remain the principal missing step.
+\begin{thebibliography}{9}
+\bibitem{roth} A. E. Roth (2010). \emph{Market Design: Understanding
+markets well enough to fix them when they're broken}, Section 1, p.~4.
+\url{https://web.stanford.edu/~alroth/papers/NSF%20Grand%20Challenge.SBE%202020.%20Market%20Design.pdf}.
+\bibitem{ar} I. Ashlagi and A. E. Roth (2021). \emph{Kidney Exchange:
+An Operations Perspective}. Management Science 67(9), 5455--5478.
+Sections 4.2 and 6, particularly item 2 on p.~5467.
+\url{https://pubsonline.informs.org/doi/pdf/10.1287/mnsc.2020.3954}.
+\end{thebibliography}
+
+\end{document}
