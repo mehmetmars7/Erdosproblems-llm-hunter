@@ -1,0 +1,198 @@
+% ECONOMICS_PROBLEM: {"id": "C21-194", "title": "High-dimensional causal inference", "jel_code": "C21", "source_id": "OP-0104"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Orthogonal inference with independent blocks\\\large Weighted information, environment drift, and a weak-signal lower bound}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C21-194}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Scope and statistical model}
+The target concerns high-dimensional nuisance learning with dependence and changing environments. We give a uniform inference theorem for independent blocks with arbitrary dependence inside each block, explicit deterministic weighting, and environment-specific nuisance functions. The theorem specifies prediction conditions rather than asserting they hold for every high-dimensional learner. We also give drift and weak-information counterexamples. It leaves the optimal learnability and lower-bound frontier unresolved.
+
+For each $m$, blocks $B_b=(O_{bi}:1\leq i\leq N_b)$, $1\leq b\leq m$, are independent. Their sizes may grow without restriction. Use deterministic within-block weights $a_{bi}\geq0$, $\sum_i a_{bi}=1$, and outer weights $w_b>0$, $\sum_b w_b=1$. Each marginal observation satisfies
+\[
+ Y_{bi}=\theta D_{bi}+g_b(X_{bi})+\epsilon_{bi},\qquad
+ \E[\epsilon_{bi}\mid D_{bi},X_{bi}]=0.
+\]
+Within each block the nuisance functions $q_b(x)=\E[D_{bi}\mid X_{bi}=x]$ and $l_b(x)=\E[Y_{bi}\mid X_{bi}=x]$ are common across its coordinates; the marginal covariate distributions may differ. The coefficient $\theta$ is common across blocks. Assume $|Y|,|D|,|\theta|,|q_b|,|l_b|\leq K$ for a fixed $K$. A causal interpretation additionally requires the structural invariance in the catalogue.
+
+Write $v_{bi}=D_{bi}-q_b(X_{bi})$, and define the ideal block quantities
+\[
+ S_b=\sum_i a_{bi}v_{bi}\epsilon_{bi},\qquad
+ T_b=\sum_i a_{bi}v_{bi}^2,\quad
+ J_m=\sum_b w_b\E T_b,\quad
+ \sigma_m^2=\sum_b w_b^2\E S_b^2.
+\]
+Because $\E S_b=0$, $\sigma_m^2$ is the variance of the weighted ideal score. It incorporates all within-block dependence.
+
+Independent-data orthogonality is developed in \cite[Section 4.1]{dml}; dependence-aware cross-fitting has established extensions, including \cite[Theorems 1--2]{multiway}. Our proof addresses the simpler independent-block sampling geometry directly.
+
+\section{Prediction conditions that preserve block independence}
+Partition the block indices into a fixed number $F$ of folds. For $b$ in fold $f$, fit bounded functions $\widehat q_b,\widehat l_b$ using only blocks outside $f$. An environment label may index these predictions; the assumption does not make unobserved environments automatically learnable. Let $\mathcal A_f$ denote the training data for fold $f$. Define conditional prediction errors
+\[
+ e_{qb}^2=\sum_i a_{bi}\E[(\widehat q_b-q_b)^2(X_{bi})\mid\mathcal A_f],
+ \qquad
+ e_{lb}^2=\sum_i a_{bi}\E[(\widehat l_b-l_b)^2(X_{bi})\mid\mathcal A_f].
+\]
+The expectations integrate a fresh marginal from block $b$. In a sequence of law classes assume, uniformly in the law,
+\begin{align}
+ &J_m\geq j_*>0,\qquad
+ c_*\sum_b w_b^2\leq\sigma_m^2\leq C_*\sum_b w_b^2,
+ \qquad \frac{\max_b w_b}{(\sum_b w_b^2)^{1/2}}\longrightarrow0,
+                                                        \label{info}\\
+ &\max_b(e_{qb}+e_{lb})=o_P(1),\qquad
+ \sum_b w_b e_{qb}(e_{lb}+e_{qb})=o_P(\sigma_m).
+                                                        \label{rates}
+\end{align}
+Constants do not depend on $m$ or the law. Uniform $o_P$ means the supremum of the associated failure probabilities tends to zero. The variance lower bound is substantive: the theorem does not pretend that every choice of block averaging has this amount of information.
+
+Put $\widehat v_{bi}=D_{bi}-\widehat q_b(X_{bi})$ and
+\[
+ \widehat J=\sum_b w_b\sum_i a_{bi}\widehat v_{bi}^2,
+ \qquad
+ \widehat\theta=\widehat J^{-1}
+   \sum_b w_b\sum_i a_{bi}\widehat v_{bi}(Y_{bi}-\widehat l_b(X_{bi})).
+\]
+Use an arbitrary bounded value if $\widehat J<j_*/2$; that event will have probability tending uniformly to zero. Define
+\[
+ \widehat S_b=\sum_i a_{bi}\widehat v_{bi}
+       \{Y_{bi}-\widehat l_b(X_{bi})-\widehat\theta\widehat v_{bi}\},
+ \qquad \widehat\sigma_m^2=\sum_b w_b^2\widehat S_b^2.
+\]
+
+\begin{theorem}[Uniform block inference]\label{blockthm}
+Under \eqref{info}--\eqref{rates} and the boundedness assumptions,
+\[
+ \frac{J_m(\widehat\theta-\theta)}{\sigma_m}
+  =\frac{\sum_b w_bS_b}{\sigma_m}+o_P(1)
+  \ \Longrightarrow\ N(0,1)
+\]
+uniformly over the declared law classes. Moreover,
+$\widehat J-J_m=o_P(1)$ and
+$\widehat\sigma_m^2/\sigma_m^2\to_P1$, uniformly.
+Consequently
+\[
+ \left[\widehat\theta\ \pm\ z_{1-\alpha/2}
+                     \frac{\widehat\sigma_m}{\widehat J}\right]
+\]
+has asymptotic uniform coverage $1-\alpha$ for every fixed $0<\alpha<1$.
+\end{theorem}
+\begin{proof}
+All constants below depend only on the displayed fixed bounds. Set
+$\delta_{qb}=\widehat q_b-q_b$ and $\delta_{lb}=\widehat l_b-l_b$.
+Since $Y-l_b=\theta v+\epsilon$, the fitted score at the true coefficient expands, observation by observation, as
+\begin{align}
+ &(v-\delta_q)\{Y-l_b-\delta_l-\theta(v-\delta_q)\}-v\epsilon\nonumber\\
+ &\hspace{10mm}=-\delta_q\epsilon-v\delta_l+\theta v\delta_q
+                   +\delta_q\delta_l-\theta\delta_q^2.\label{expansion}
+\end{align}
+Conditional on a fold's training data, its evaluation blocks are independent. The first three terms have conditional marginal expectation zero, using $\E[v\mid X]=0$ and $\E[\epsilon\mid D,X]=0$. Thus the absolute conditional mean of the block score error is at most
+$e_{qb}e_{lb}+K e_{qb}^2$. Its conditional second moment is at most
+$C(e_{qb}^2+e_{lb}^2)$: boundedness first gives this bound for each summand, and Jensen's inequality for the $a_{bi}$ gives it for the block average. No independence inside the block is used.
+
+For a given fold, the variance of its centered weighted score error is therefore at most
+\[
+ C\sum_{b\text{ in fold}}w_b^2(e_{qb}^2+e_{lb}^2)
+       =o_P(\sigma_m^2).
+\]
+Conditional Chebyshev, first on training events where the errors are small and then off those events, makes the centered error $o_P(\sigma_m)$. The number of folds is fixed, so the sum over folds remains $o_P(\sigma_m)$ even though the fitted scores across folds are dependent. The total conditional-mean bounds are $o_P(\sigma_m)$ by \eqref{rates}. We have proved
+\[
+ \sum_b w_b\widehat S_b(\theta)=\sum_b w_bS_b+o_P(\sigma_m).
+                                                        \tag{4}
+\]
+
+For the denominator, the ideal weighted average $\sum_b w_bT_b$ has variance at most $C\sum_b w_b^2=o(1)$. The last convergence follows from \eqref{info}: writing $s=(\sum w_b^2)^{1/2}$, one has $s^2\leq\max w_b=o(s)$ and hence $s\to0$. Also
+$|(v-\delta_q)^2-v^2|\leq C|\delta_q|$ by boundedness. Its weighted expected magnitude, conditional fold by fold, is at most $C\max_b e_{qb}=o_P(1)$. Conditional Markov gives $\widehat J-J_m=o_P(1)$. In particular the denominator exception is negligible. Since the score is affine in $\theta$, (4) gives
+\[
+ \widehat\theta-\theta=\widehat J^{-1}
+       \{\sum_b w_bS_b+o_P(\sigma_m)\}=O_P(\sigma_m).
+\]
+The bounded independent variables $w_bS_b$ satisfy the Berry--Esseen bound
+\[
+ C\frac{\sum_b w_b^3}{\sigma_m^3}
+ \leq C'\frac{\max_b w_b}{(\sum_b w_b^2)^{1/2}}\longrightarrow0.
+\]
+This proves the uniform normal approximation and the linear representation.
+
+It remains to verify variance estimation. Independence and boundedness give
+\[
+ \Var\left(\sum_b w_b^2S_b^2\right)\leq C\sum_b w_b^4
+       =o(\sigma_m^4),
+\]
+since $\sum w_b^4\leq(\max w_b)^2\sum w_b^2$ and \eqref{info} holds. Its expectation is $\sigma_m^2$. The conditional second-moment bound already proved, now weighted by $w_b^2$, yields
+\[
+ \sum_b w_b^2\{\widehat S_b(\theta)-S_b\}^2=o_P(\sigma_m^2)
+\]
+by conditional Markov and a finite fold sum. Finally
+$|\widehat S_b-\widehat S_b(\theta)|\leq C|\widehat\theta-\theta|$, so its weighted square sum is
+$O_P(\sigma_m^2)\sum_b w_b^2=o_P(\sigma_m^2)$.
+Cauchy--Schwarz applied to the difference of the two sums of squares proves $\widehat\sigma_m^2/\sigma_m^2\to_P1$. Combining these uniform probability bounds with the uniform normal approximation proves coverage.
+\end{proof}
+
+For equal block weights, the theorem requires
+$\sum_bm^{-1}e_{qb}(e_{lb}+e_{qb})=o_P(m^{-1/2})$ and yields width of order $m^{-1/2}$ when $J_m$ is fixed away from zero. More generally the effective number for this variance-comparable weighting scheme is $(\sum w_b^2)^{-1}$. This is a property of the chosen scores and weights, not a universal formula based solely on the total number of rows. If a prediction theorem supplies errors
+$e_q\lesssim\sqrt{s_q\log p/m}+a_q$ and
+$e_l\lesssim\sqrt{s_l\log p/m}+a_l$, the exact sufficient restriction is obtained by inserting those expressions into \eqref{rates}; the approximation errors $a_q,a_l$ cannot be omitted.
+
+\section{Drift and weak variation cannot be hidden in prediction notation}
+\begin{proposition}[Pooling distinct environments can create a false slope]
+There is a bounded independent-observation two-environment model with true structural slope zero such that using the pooled nuisance functions in the orthogonal score converges to a nonzero coefficient.
+\end{proposition}
+\begin{proof}
+Take an even number of observations, half in each supplied environment $s_b\in\{-1,1\}$. Let $v_b,\epsilon_b$ be independent centered bounded random variables, independent across $b$, with $\E v_b^2=t^2>0$. Set
+\[
+ D_b=s_ba+v_b,\qquad Y_b=s_ba+\epsilon_b,
+\]
+where $a>0$. With the environment included among the controls, $\theta=0$, $q_b=l_b=s_ba$, and the conditional mean restriction holds. Omitting the environment gives pooled functions $q=l=0$. The resulting sample slope has numerator tending to $a^2$ and denominator tending to $a^2+t^2$, by bounded independent-variable variance bounds. Its limit is $a^2/(a^2+t^2)>0$. Equivalently, the last two terms of \eqref{expansion} have nonvanishing mean. Orthogonality is local to the correct nuisance functions and does not excuse this drift misspecification.
+\end{proof}
+
+\begin{proposition}[Perfect replication and weak residual variation]
+Consider $m$ independent blocks, each containing any number of exact copies of one pair
+\[
+ D_b\in\{-\sqrt\kappa,\sqrt\kappa\}\text{ equiprobably},\qquad
+ Y_b=\theta D_b+\epsilon_b,\quad\epsilon_b\sim N(0,1),
+\]
+with $0<\kappa\leq1$ and $|\theta|\leq T$ for fixed $T>0$. All signs and errors are independent. For a universal $c>0$,
+\[
+ \inf_{\widehat\theta}\sup_{|\theta|\leq T}
+  \E(\widehat\theta-\theta)^2
+       \geq c\min\{T^2,(m\kappa)^{-1}\}.
+\]
+Thus unbounded replication inside a block does not create more information, and a vanishing $\kappa$ can defeat consistency.
+\end{proposition}
+\begin{proof}
+The copies generate the same sigma field as the $m$ distinct pairs. For two coefficients differing by $\Delta$, the Gaussian conditional likelihood gives $\KL(P_0,P_1)=m\kappa\Delta^2/2$. Choose two coefficients in $[-T,T]$ at separation $\Delta=c_0\min\{T,(m\kappa)^{-1/2}\}$ with a sufficiently small fixed $c_0$. Pinsker's inequality makes their total variation at most $1/2$. Classify any estimator by the nearer coefficient. On a classification error its squared loss is at least $\Delta^2/4$, and the sum of the two testing error probabilities is at least $1-\TV\geq1/2$. The larger risk is therefore at least $\Delta^2/16$, proving the result. This lower-bound submodel uses Gaussian, rather than bounded, outcomes; it belongs to the catalogue's moment-based model, not the bounded sufficient class of Theorem~\ref{blockthm}.
+\end{proof}
+
+\section{Remaining frontier}
+The proof isolates the correct objects: block score variance, residual treatment information, environment-specific prediction errors, and intact evaluation blocks. It does not determine how many distinct drifting nuisance functions can be learned, optimal weighting for arbitrary internal covariance, or the minimax nuisance threshold near weak information. Those tasks require a declared complexity and drift class. In particular, counting predictors or quoting independent-row rates cannot establish \eqref{rates} in a dependent experiment.
+
+\begin{thebibliography}{9}
+\bibitem{dml} V. Chernozhukov et al. (2018), \emph{Double/debiased machine learning for treatment and structural parameters}, Econometrics Journal 21, C1--C68. Author-posted version arXiv:1608.00060v7, Section 4.1, Assumption 4.1 and Theorem 4.1 inspected 9 October 2026. \url{https://arxiv.org/pdf/1608.00060}.
+\bibitem{multiway} H. D. Chiang, K. Kato, Y. Ma and Y. Sasaki, \emph{Multiway Cluster Robust Double/Debiased Machine Learning}, arXiv:1909.03489. Theorems 1--2 and the abstract inspected 9 October 2026. Its multiway array design is different from the independent-block theorem proved here. \url{https://arxiv.org/pdf/1909.03489}.
+\end{thebibliography}
+
+\end{document}

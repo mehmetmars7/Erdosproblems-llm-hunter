@@ -1,0 +1,196 @@
+% ECONOMICS_PROBLEM: {"id": "C73-159", "title": "Strategic queue stability", "jel_code": "C73", "source_id": "OP-0286"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\Ind}{\mathbf 1}
+\DeclareMathOperator{\SC}{SC}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\supp}{supp}
+\title{Strategic queue stability: exact star components and a global-regret obstruction}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C73-159}. \textbf{Status: unresolved.}
+
+\section{Target and declared timing}
+The catalogue deliberately makes the load-slack factor depend on routing,
+buffers, feedback, and a learner class. Tardos \cite[Theorem 8]{Tardos}
+gives a factor-three benchmark for its tiny-buffer learning model, with
+additional individual arrival restrictions. We do not transfer that factor
+to a different architecture. Instead we completely analyze one graph class
+under explicit timing and give a counterexample to replacing window regret
+by global regret.
+
+Time is discrete. At the beginning of a round each nonempty source offers
+one packet to a compatible server. A server already holding a packet
+rejects offers; an empty server accepts one offer according to any
+work-conserving priority rule. A server then independently succeeds with
+its Bernoulli service coin, serving its held packet if any, including a
+packet admitted in that round. Finally independent Bernoulli arrivals
+join the source queues. Each server has a one-packet buffer. A packet
+transferred to a buffer immediately leaves its source, and is counted in
+exactly one place. Initial total backlog is finite.
+
+\section{An exact factor for disjoint star components}
+Partition sources into groups $I_1,\ldots,I_m$, with every source in $I_j$
+compatible only with server $j$. Let server $j$ have success probability
+$\mu_j\in(0,1]$, and write $a_j=\sum_{i\in I_j}\lambda_i$.
+A learner has only one admissible action at a nonempty source, so every
+external-regret bound holds with regret zero. The admission priority may
+be arbitrary and history-dependent subject to accepting an offer whenever
+the buffer is empty and offers exist.
+
+\begin{theorem}[Exponential backlog bound and $c^*=1$]\label{stars}
+Under this timing and graph, if $a_j<\mu_j$ for every $j$, then there are
+constants $\theta_j>0$, $q_j<1$, and $B_j<\infty$ such that, for all $t$,
+\[
+ \E e^{\theta_j W_j(t)}\le
+ q_j^t e^{\theta_j W_j(0)}+\frac{B_j}{1-q_j},
+ \qquad W_j(t)=\sum_{i\in I_j}Q_i(t)+H_j(t).
+\]
+In particular strong stability holds for every allowed admission policy.
+The open centralized stability region is exactly
+$\{\lambda:a_j<\mu_j\text{ for every }j\}$, and the catalogue's load-slack
+factor equals one for this model and learner class.
+\end{theorem}
+\begin{proof}
+At the service step a server has a packet if and only if the pre-round
+total $W_j(t)$ is positive. If its buffer is empty but the total is positive,
+a source must have offered a packet and work conservation admits one.
+Let $D_j(t)$ be its independent Bernoulli service coin and let
+$A_j(t)$ be the sum of that round's arrivals in its group. Thus exactly
+\[
+ W_j(t+1)=\bigl(W_j(t)-D_j(t)\bigr)^++A_j(t).
+\]
+No routing choice or priority appears in this identity. For $w\ge1$,
+conditional on the past and $W_j(t)=w$,
+\[
+ \E[e^{\theta W_j(t+1)}\mid\mathcal F_t]
+ =e^{\theta w}q_j(\theta),\qquad
+ q_j(\theta)=(1-\mu_j+\mu_j e^{-\theta})
+ \prod_{i\in I_j}(1-\lambda_i+\lambda_i e^\theta).
+\]
+This smooth function has $q_j(0)=1$ and derivative
+$q_j'(0)=a_j-\mu_j<0$. Choose sufficiently small $\theta_j>0$ with
+$q_j=q_j(\theta_j)<1$. At $w=0$, the conditional exponential moment is
+$B_j=\prod_{i\in I_j}(1-\lambda_i+\lambda_i e^{\theta_j})$.
+For every state, therefore,
+\[
+ \E[e^{\theta_j W_j(t+1)}\mid\mathcal F_t]
+ \le q_j e^{\theta_j W_j(t)}+B_j.
+\]
+Iterating yields the displayed bound. Since
+$w\le e^{\theta_j w}/\theta_j$, each first moment is uniformly bounded;
+there are finitely many groups, proving strong stability.
+
+Under any centralized policy, at most one Bernoulli-$\mu_j$ potential
+service can be used per round in group $j$. Conservation of packets gives
+$\E W_j(t)\ge W_j(0)+t(a_j-\mu_j)$, so rates with $a_j>\mu_j$ cannot
+be strongly stable. No point with $a_j=\mu_j$ can be interior to the
+stabilizable region: arbitrarily close rate vectors on its overloaded
+side violate that necessary bound. The previous argument stabilizes every
+strictly feasible point, proving the assertion about the open region.
+For every centrally feasible $\lambda^0$, the same rates already stabilize
+all learners and priorities in this class. The infimum over allowed
+$c\ge1$ is consequently one.
+\end{proof}
+This result allows many competing sources per server, and priorities may
+starve individual sources over particular finite intervals. The aggregate
+bound nevertheless bounds every individual queue. It does not address
+strategic server selection, because each source has one neighbor.
+
+\section{Why global no-regret is insufficient}
+The next construction keeps the same packet accounting and timing but has
+one source and two compatible servers. The good server has $\mu_g=1$;
+the bad server has $\mu_b=\varepsilon$, where
+$0<\varepsilon<\lambda<1$. Start empty. At round $t$ define the learner's
+counterfactual one-step payoff for an action to be the indicator that its
+newly offered packet would be admitted and complete in that round,
+holding current buffers and service coins fixed. Set both payoffs to zero
+when the source is empty. This is an external-regret comparison on observed
+states, not a counterfactual rerun of the whole queueing process.
+
+The rule chooses the bad server in the deterministic windows
+\[
+ I_k=\{4^k,4^k+1,\ldots,4^k+2^k-1\},\quad k=1,2,\ldots,
+\]
+and the good server in every other round. Old buffered packets continue
+to receive service attempts even if no new offer is sent to their server.
+
+\begin{theorem}[Sublinear cumulative regret with unbounded expected backlog]
+For every realized sequence of arrivals and service coins, the rule has
+external regret through time $T$ at most $4\sqrt T$ relative to either
+fixed server. Nevertheless
+\[
+ \sup_t\E[Q(t)+H_g(t)+H_b(t)]=\infty.
+\]
+The arrival rate $\lambda$ is centrally strictly feasible.
+\end{theorem}
+\begin{proof}
+The good server is empty at the beginning of every round: any packet it
+accepts completes immediately. When the source is nonempty, choosing it
+therefore yields payoff one, which no action can exceed. When the source
+is empty all compared payoffs are zero. Consequently there is no positive
+regret contribution in any good-server round. Every bad-server round
+contributes at most one relative to either fixed action. If $4^k\le T$,
+then $2^k\le\sqrt T$, and the sum of lengths of all windows started by
+$T$ is less than $2^{k+1}\le2\sqrt T$ for the largest such $k$.
+The announced more conservative bound follows, including times before
+the first window. It is pathwise, hence holds in expectation and with
+probability one.
+
+During a window $I_k$, no new packet is sent to the good server, and it
+starts and remains empty. The only departures are bad-server successes,
+whose expected number is at most $\varepsilon 2^k$. Expected arrivals
+in that window equal $\lambda 2^k$. Nonnegativity of its starting backlog
+and packet conservation imply that total expected backlog just after the
+window is at least $(\lambda-\varepsilon)2^k$. This tends to infinity.
+Finally routing exclusively to the good server is a single-server system
+with load $\lambda<1$, and Theorem~\ref{stars} proves its strong stability.
+\end{proof}
+Thus even a deterministic $O(\sqrt T)$ bound from the initial date gives
+no time-uniform expected-backlog guarantee. Long bad windows can occur
+arbitrarily late while occupying a vanishing fraction of elapsed time.
+This example does not satisfy the catalogue's maintained uniform window
+regret requirement; its purpose is to show why that requirement cannot
+be silently dropped. It also makes the choice of counterfactual routing
+payoff explicit, as required by the target.
+
+\section{What remains}
+The factor-one theorem solves only the specified disjoint-star architecture.
+For graphs allowing strategic choice, determining $c^*$ still requires a
+fixed learner class, a quantitative window event, and a stability argument
+that uses that event under the chosen admission rules. Neither theorem
+improves the published tiny-buffer factor-three bound. The cited Theorem 8
+was checked in the full text on 9 October 2026: both total-load slack and
+$\lambda_i<1/2$ are stated there. The proofs above are analytic; no
+simulation is used.
+\begin{thebibliography}{9}
+\bibitem{Tardos} E. Tardos, \emph{Learning and the Price of Anarchy in Games},
+Proceedings of the International Congress of Mathematicians 2026,
+Volume 2, Theorem 8 and the packet-routing discussion.
+\url{https://epubs.siam.org/doi/full/10.1137/25M1808064}.
+\end{thebibliography}
+
+\end{document}

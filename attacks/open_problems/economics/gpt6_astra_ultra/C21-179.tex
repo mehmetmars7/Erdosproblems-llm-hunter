@@ -1,0 +1,167 @@
+% ECONOMICS_PROBLEM: {"id": "C21-179", "title": "Minimax heterogeneous-effect estimation outside Hölder classes", "jel_code": "C21", "source_id": "OP-0527"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Sparse additive BV treatment effects\\\large An explicit selection bound and two causal lower bounds}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C21-179}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Aim and declared experiment}
+The target combines unknown active coordinates, nonsmooth univariate components and causal nuisance estimation. We give a finite, computationally expensive estimator with a dimension-explicit upper bound under supplied propensity, a transfer bound for learned propensity, and lower bounds that distinguish component estimation from coordinate selection. These establish useful restricted benchmarks, but do not close every logarithmic or sparsity gap and do not determine the optimal nuisance frontier.
+
+Assume the binary causal baseline, $X\sim\operatorname{Unif}([0,1]^d)$, $|Y|\leq B$, fixed overlap, and
+\[
+\begin{gathered}
+ \tau(x)=b+\sum_{j\in S}h_j(x_j),\qquad |S|\leq k\leq d,\qquad
+ \int_0^1h_j=0,\\
+ |b|\leq L,\qquad \|h_j\|_\infty,\ |Dh_j|((0,1))\leq L,
+ \qquad\|\tau\|_\infty\leq M.
+\end{gathered}
+\]
+Take $M\leq2B$ without loss by replacing it with the smaller effective bound. Smoothness restrictions on $m_0$ and $e$ are retained for lower-bound compatibility; the supplied-propensity upper bound does not need to estimate $m_0$. The motivation is the non-H\"older minimax direction of \cite[Section 3.5.3]{challenge}.
+
+\section{A finite sparse dictionary}
+\begin{lemma}[Centered component approximation]\label{component}
+For fixed $L$ and $0<\epsilon<1/2$, there is a finite collection $\mathcal G_\epsilon$ of mean-zero step functions such that each admissible $h_j$ has an approximation $g_j$ with
+\[
+ \|h_j-g_j\|_2^2\leq C\epsilon^2,
+ \quad \|g_j\|_\infty\leq2L,
+ \quad \log|\mathcal G_\epsilon|
+                 \leq C\epsilon^{-1}\log(C/\epsilon).
+\]
+\end{lemma}
+\begin{proof}
+Write a BV representative as $h=c+u-v$, where $u,v$ are cumulative positive and negative derivative measures and their total increases sum to at most $L$. Round $c,u,v$ to value mesh $\epsilon$. Each rounded monotone part has at most $\lceil L/\epsilon\rceil$ jumps of height $\epsilon$. Round jump locations to a grid of mesh $1/Q$, with $Q$ of order $\epsilon^{-3}$. Outside a set of measure at most $2\lceil L/\epsilon\rceil/Q$, the error is at most $3\epsilon$; on that set all functions are uniformly bounded by constants depending on $L$. Squared integrated error is therefore at most $C\epsilon^2$. Clip to $[-L,L]$, which reduces the error. The possible rounded constants and jump lists number at most $(C/\epsilon)(Q+1)^{2\lceil L/\epsilon\rceil}$, giving the entropy bound.
+
+Subtract the integral from every resulting step function. The supremum is then at most $2L$. Since $h$ has mean zero, Cauchy--Schwarz bounds the removed integral by the previous $L^2$ error; subtracting it in fact projects the error onto the mean-zero subspace and cannot increase its $L^2$ norm. This proves the centered dictionary claim.
+\end{proof}
+
+Form a dictionary by selecting at most $k$ coordinates, assigning a member of $\mathcal G_\epsilon$ to each, and adding a constant from an $\epsilon$ grid of $[-L,L]$. Clip each total function to $[-M,M]$; call the dictionary $\mathcal F_{d,k,\epsilon}$.
+
+\begin{lemma}[Selection and approximation costs]\label{addnet}
+With constants depending only on $L,M$,
+\begin{align*}
+ \inf_{f\in\mathcal F_{d,k,\epsilon}}\|f-\tau\|_2^2
+                           &\leq C(k+1)\epsilon^2,\\
+ \log|\mathcal F_{d,k,\epsilon}|
+ &\leq k\log(ed/k)+C(k+1)\epsilon^{-1}\log(C/\epsilon).
+\end{align*}
+\end{lemma}
+\begin{proof}
+Before clipping, the approximation error is a constant plus a sum of centered functions on distinct independent uniform coordinates. The cross inner products are zero. Its squared norm is therefore the squared constant error plus the sum of component squared errors, at most $C(k+1)\epsilon^2$. Clipping cannot increase distance to the bounded target.
+
+The number of supports is at most $(ed/k)^k$: with $t=k/d\leq1$,
+$t^k\sum_{j=0}^k\binom dj\leq(1+t)^d\leq e^k$. Each support contributes at most $|\mathcal G_\epsilon|^k$ functions, and there are at most $C/\epsilon$ constants. Lemma~\ref{component} and taking logarithms prove the result. Clipping may identify functions, which only reduces their number.
+\end{proof}
+
+\section{Risk bounds with and without a supplied propensity}
+For supplied $e$, define $Z=WY/e(X)-(1-W)Y/(1-e(X))$, whose regression is $\tau$ and whose magnitude is at most $B/\varepsilon$. Let $\widehat\tau$ minimize empirical squared error of $Z$ over $\mathcal F_{d,k,\epsilon}$, with a fixed tie rule.
+
+\begin{theorem}[Dimension-explicit constructive upper bound]\label{upper}
+For all $1\leq k\leq d$ and $n\geq3$, a choice $\epsilon$ of order $(\log n/n)^{1/3}$ gives
+\[
+ \sup_P\E\|\widehat\tau-\tau\|_2^2
+ \leq C\left\{(k+1)(\log n/n)^{2/3}
+                    +\frac{k\log(ed/k)}n\right\}\wedge4M^2.\tag{1}
+\]
+Here $C$ depends only on fixed $L,M,B,\varepsilon$, not on $d,k,n$. If an independent sample instead supplies
+$\widehat e\in[\varepsilon/2,1-\varepsilon/2]$, replace $e$ in $Z$ by $\widehat e$. The same bound holds with an additional term $C\E\|\widehat e-e\|_2^2$ inside the braces.
+\end{theorem}
+\begin{proof}
+We record the finite-regression argument to make the bound self-contained. For responses and dictionary functions bounded by a fixed $K$, let $h=\E[Z\mid X]$, $r_f=\|f-h\|_2^2$, and take a best dictionary member $g$. The loss difference
+$D_f=(Z-f)^2-(Z-g)^2$ has mean $r_f-r_g$, magnitude at most $8K^2$, and variance at most $32K^2(r_f+r_g)$. Bernstein and a union bound give, with probability $1-e^{-u}$,
+\[
+ (P-P_n)D_f\leq
+ C K\sqrt{(r_f+r_g)(u+\log|\mathcal F|)/n}
+     +C K^2(u+\log|\mathcal F|)/n
+\]
+for every member. For the empirical minimizer $P_nD_f\leq0$. Absorbing the square-root term into $(r_f+r_g)/2$ gives
+$r_{\widehat f}\leq3r_g+C K^2(u+\log|\mathcal F|)/n$.
+Integrate over $u$ to obtain expected risk at most
+$3r_g+C K^2\log(e|\mathcal F|)/n$. Lemma~\ref{addnet} and the chosen $\epsilon$ prove (1). The cap follows because target and estimator are both in $[-M,M]$.
+
+For fitted propensity, conditional on training the regression is $h=\tau+b_e$, where
+\[
+ b_e=(e-\widehat e)\left\{\frac{m_1}{\widehat e}
+                         +\frac{m_0}{1-\widehat e}\right\},
+ \qquad\|b_e\|_2^2\leq C\|\widehat e-e\|_2^2.
+\]
+Approximate $\tau$ by the dictionary, then use
+$\|g-h\|_2^2\leq2\|g-\tau\|_2^2+2\|b_e\|_2^2$ in the finite-regression bound and the analogous inequality for $\widehat f-\tau$. Average over training. This proves the additional error term without imposing smoothness on the jumping treated mean.
+\end{proof}
+
+Thus randomized assignment permits consistency along every sequence with
+\[(k_n+1)(\log n/n)^{2/3}+k_n\log(ed_n/k_n)/n\to0.\]
+This is a sufficient, not necessary, sequence condition. Under unknown propensity one must also establish a vanishing prediction term at the appropriate scale. A fixed-dimensional H\"older regression estimate can supply such a term, but in growing dimension its constants and radius must be tracked; a dimension-free rate is not assumed here.
+
+\section{Two lower bounds within compatible causal models}
+In both lower bounds use $e=1/2$, $m_0=0$, and $Y\in\{-B,B\}$ with treated mean $\tau$. Assume the fixed variance upper bound permits $B^2$ and any prescribed variance lower bound is strictly smaller than $B^2$. Choose the effect amplitudes small enough to meet that lower bound as well as $B/2$. If necessary, replace $B$ in this lower-bound construction by a smaller positive symmetric outcome scale compatible with the variance bounds; all lower-bound constants then depend on that scale and its positive variance slack. The catalogue only requires that a nondegenerate subclass be present, not a lower variance bound for every law. These laws are generated by conditional independent potential outcomes and randomized treatment. Constant nuisance functions satisfy the smoothness restrictions whenever the stated radii include them.
+
+\begin{theorem}[Cost of many BV components]\label{nonparam}
+For some fixed constants $c_0,c_1>0$ depending only on the fixed class constants, whenever $d\geq k\geq1$ and $k\leq c_0n^{1/3}$,
+\[
+                        R_{n,d,k}^\star\geq c_1 k n^{-2/3}.
+\]
+\end{theorem}
+\begin{proof}
+Take the first $k$ coordinates as active. Partition each univariate domain into $J$ intervals and let $\psi_\ell$ equal $+1$ on the first half of interval $\ell$, $-1$ on its second half, and zero elsewhere. These functions have mean zero, squared norm $1/J$, disjoint supports up to endpoints, and variation at most four. For independent signs $\omega_{j\ell}$ set
+\[
+ h_j(u)=a\sum_{\ell=1}^J\omega_{j\ell}\psi_\ell(u),
+ \qquad a=\kappa/J.
+\]
+Each component has variation at most $4aJ=4\kappa$, magnitude $a$, and mean zero. Choose fixed $\kappa$ small relative to $L$. The total effect has magnitude at most $ka$, so the condition $k\leq c_0n^{1/3}$ with sufficiently small $c_0$ ensures the bounds $M$, $B/2$, and the specified variance slack when $J$ is of order $n^{1/3}$.
+
+Changing one sign changes the treated mean by $2a\psi_\ell(x_j)$. The Bernoulli divergence inequality gives $n$-sample neighbor KL at most $Cna^2/J$. Choose $J$ of order $n^{1/3}$ and $\kappa$ small so every neighbor total variation is at most $1/2$. The functions $\psi_\ell(x_j)$ are mutually orthogonal across all pairs $(j,\ell)$: within a coordinate this follows from disjoint supports, across coordinates from centering and the product design.
+
+Project any estimator onto these $kJ$ orthogonal functions and decode each coefficient by its sign. Bessel's inequality makes its total squared error at least $a^2/J$ times the number of sign errors. For each bit the average error over a uniform sign prior is at least $(1-\TV)/2\geq1/4$, by pairing alternatives differing only in that bit. Average risk is at least $kJa^2/(4J)=ka^2/4$, proving the claim.
+\end{proof}
+
+\begin{theorem}[Coordinate selection is a separate cost]\label{selection}
+For $d\geq16$ and any $k\geq1$,
+\[
+               R_{n,d,k}^\star\geq c\min\{1,\log(d)/n\},
+\]
+with a positive constant depending only on the fixed class constants.
+\end{theorem}
+\begin{proof}
+Let $\psi$ be $+1$ on $[0,1/2)$ and $-1$ on $[1/2,1]$.
+Use alternatives $\tau_j(x)=a\psi(x_j)$, $1\leq j\leq d$, and the zero reference law. Choose
+$a^2=c_2\min\{1,\log(d)/n\}$ with sufficiently small $c_2$ to satisfy all amplitude and variation bounds. Distinct alternatives have squared distance $2a^2$ by centering and independence. Their KL divergence to the zero law is at most $Cna^2\leq(\log d)/8$ after reducing $c_2$.
+
+For a uniformly distributed alternative index $J_0$, mutual information between $J_0$ and the data is at most the average KL to any reference law, hence at most $(\log d)/8$. For any decoded index with error probability $p$, the entropy chain rule gives
+$H(J_0\mid\text{data})\leq\log2+p\log d$: reveal whether an error occurred, then at most $d$ possibilities remain on error. Since $H(J_0)=\log d$, it follows that
+$p\geq1-1/8-\log2/\log d\geq1/2$.
+Decode an arbitrary function estimator by the nearest $\tau_j$ in $L^2$. On a decoding error its squared distance from the true alternative is at least $(\sqrt{2}a/2)^2=a^2/2$, by the triangle inequality. Its average risk is at least $a^2/4$, proving the bound.
+\end{proof}
+
+\section{The gap is explicit}
+For fixed $d,k\geq1$, the nonparametric exponent $2/3$ is matched up to logarithms. For growing $k$, the upper bound records both component and support costs; the lower bounds prove a $kn^{-2/3}$ term in an amplitude-compatible regime and a separate $\log d/n$ obstruction. They do not establish the full $k\log(ed/k)/n$ lower term or remove logarithms. The fixed uniform bound on the sum of components matters: it restricts how many independently large components a lower-bound construction may contain. Finally the additive propensity prediction term is a property of inverse weighting and not a minimax necessity. Establishing matching unknown-propensity rates that exploit smooth $m_0$ while permitting jumps in $m_1$ remains the main causal gap.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1, Section 3.5.3, ``New parameters'' and ``New models,'' inspected 9 October 2026. \url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}.
+\end{thebibliography}
+
+\end{document}

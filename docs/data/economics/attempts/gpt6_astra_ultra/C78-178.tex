@@ -1,0 +1,212 @@
+% ECONOMICS_PROBLEM: {"id": "C78-178", "title": "Approximating the least unpopularity factor in house allocation", "jel_code": "C78", "source_id": "OP-0542"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Least unpopularity factor\\\large Rational certificates, component structure, and exact common orders}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C78-178}. \textbf{Status:} Unresolved; restricted results and reductions.
+
+\section{Target and source boundary}
+For a matching $M$, put $r_Q=\phi(Q,M)$ and $s_Q=\phi(M,Q)$.
+The target is $u(M)=\max_Qd(r_Q,s_Q)$, where $d(0,0)=1$ and
+$d(r,0)=+\infty$ for $r>0$. Thus $u(M)\geq1$.
+The full approximation threshold is unresolved here.
+The verified survey \cite[Section 3.1.1, Theorems 2--3]{survey} records
+polynomial evaluation and the historical $(3/2-\epsilon)$ hardness
+bound; the primary reduction and its approximation consequence appear
+in \cite[Theorem 5.2 and concluding paragraph]{mcc}.
+We give full elementary proofs of the structural facts used
+below and solve the identical-order family exactly. These are
+restricted derivations, without a novelty assertion.
+
+\section{Pareto completion and an exact threshold oracle}
+\begin{lemma}[Finite factor and completion]\label{pareto}
+A matching has finite factor if and only if it is Pareto optimal.
+If every applicant weakly prefers $M'$ to $M$, then
+$u(M')\leq u(M)$. A Pareto-optimal such $M'$ can be found in polynomial
+time. For $n\geq2$, every Pareto-optimal matching satisfies
+$u(M')\leq\max\{1,n-1\}$; for $n\leq1$ it has factor one.
+\end{lemma}
+\begin{proof}
+Infinite factor means exactly that some challenger has $r_Q>0,s_Q=0$,
+which is a Pareto improvement. If assignments weakly improve from $M$
+to $M'$, then for every fixed challenger $Q$ its winning count weakly
+decreases and its losing count weakly increases. Therefore any ratio
+strictly above one cannot increase; taking the maximum together with
+the ever-present value one proves the monotonicity assertion, including
+zero denominators.
+
+Give each applicant strictly decreasing positive integer scores for
+her acceptable houses and score zero for unmatched. Restrict her
+allowed assignments to those weakly preferred to $M(a)$, with a private
+dummy allowed precisely when unmatched remains permissible. Maximize
+the sum of scores by a weighted bipartite assignment. The result weakly
+improves $M$. Any Pareto improvement of this result would be feasible
+in the restricted graph and strictly increase the score, a
+contradiction. The scores have polynomial encoding length.
+
+For finite factor, a positive winning count requires at least one loser.
+The winning and losing sets are disjoint, so $r_Q+s_Q\leq n$ and
+$r_Q/s_Q\leq n-1$. Comparisons with zero wins cannot raise the maximum
+above one. For a single applicant a Pareto optimum gives her top house
+if any, and no challenger wins.
+\end{proof}
+
+For a rational $\lambda\geq1$, give assignment edge $(a,h)$ weight $1$
+if $h\succ_a M(a)$, weight $-\lambda$ if $M(a)\succ_a h$, and weight
+zero for equality. Include private dummy houses for unmatched.
+
+\begin{proposition}[Exact rational verification]\label{oracle}
+Let $F_M(\lambda)$ be the maximum weight of an applicant-saturating
+assignment in this graph. Then
+\[
+ F_M(\lambda)=\max_Q(r_Q-\lambda s_Q),\qquad
+ u(M)\leq\lambda\quad\Longleftrightarrow\quad F_M(\lambda)=0.
+\]
+An exact finite factor can be computed by searching the sorted set
+\[
+ \{1\}\cup\{r/s:1\leq r\leq n,\ 1\leq s\leq r,\ r+s\leq n\}
+\]
+and making polynomially many weighted-assignment calls. If the factor
+is infinite, that fact is also decidable in polynomial time.
+\end{proposition}
+\begin{proof}
+Assignment weights sum to $r_Q-\lambda s_Q$, establishing the first
+identity by the dummy correspondence. The challenger $Q=M$ gives zero,
+so $F_M\geq0$. If $F_M=0$, no positive-numerator zero-denominator
+comparison exists and all positive-denominator ratios are at most
+$\lambda$. Conversely those two properties bound every assignment
+weight by zero. Finite maxima above one are attained by one of the
+listed rational numbers; there are at most $n^2+1$ candidates, each of
+polynomial bit length. Testing $\max\{1,n-1\}$ first distinguishes
+infinity by Lemma~\ref{pareto}; then threshold monotonicity permits
+binary search. The $n\leq1$ case can be evaluated directly.
+\end{proof}
+
+This is a verification oracle for a \emph{given} matching. Searching
+for a matching whose threshold test succeeds is a different task, and
+no polynomial algorithm for that search follows.
+
+\section{Why additive amplification does not transfer}
+\begin{proposition}[Component maxima]\label{product}
+For disjoint house-allocation instances $I_1,\ldots,I_t$,
+\[
+ u_I\left(\bigcup_jM_j\right)=\max_j u_{I_j}(M_j),\qquad
+ u_I^*=\max_j u_{I_j}^*.
+\]
+\end{proposition}
+\begin{proof}
+A challenger confined to component $j$, and identical to $M$ elsewhere,
+achieves every component ratio, giving the lower bound. If one component
+has infinite factor this already proves equality. Otherwise set
+$U=\max_j u_{I_j}(M_j)<\infty$. Every component comparison satisfies
+$r_j\leq U s_j$, including $s_j=0$, where finiteness forces $r_j=0$.
+Summing gives the global ratio at most $U$ when the total denominator
+is positive, and gives $d(0,0)=1\leq U$ otherwise. This proves the first
+identity. All component minima are attained since their matching sets
+are finite, and Lemma~\ref{pareto} supplies a finite feasible factor.
+Choosing component minimizers proves the second identity.
+\end{proof}
+
+In particular arbitrarily many disjoint copies preserve the optimum
+factor. The sum-based integrality amplification for the unpopularity
+margin cannot be reused for this objective.
+
+\begin{proposition}[Exact comparison with the margin]
+If $M$ is Pareto optimal, has $n$ applicants, margin $\mu(M)$ and factor
+$u(M)=U$, then
+\[
+ U\leq\mu(M)+1,\qquad
+ \mu(M)\leq\left\lfloor\frac{n(U-1)}{U+1}\right\rfloor.
+\]
+\end{proposition}
+\begin{proof}
+For every comparison with $s_Q>0$, $r_Q/s_Q=1+(r_Q-s_Q)/s_Q
+\leq1+\mu(M)$; a zero denominator has zero numerator. Maximizing over challengers
+proves the first inequality. For the second, $r_Q\leq U s_Q$ implies
+$(r_Q-s_Q)/(r_Q+s_Q)\leq(U-1)/(U+1)$ whenever the numerator is positive.
+Since $r_Q+s_Q\leq n$, all positive margins have the stated upper
+bound; nonpositive margins and $Q=M$ cause no problem. Use integrality.
+\end{proof}
+
+\section{A complete solution for common strict rankings}
+Assume every applicant accepts every one of $h$ houses and has the same
+ranking $h_1\succ\cdots\succ h_h$. Empty sets are allowed.
+
+\begin{theorem}[Common-order formula]\label{common}
+If $n\leq1$ or $h=0$, then $u^*=1$. Otherwise
+\[
+ u^*=\max\{1,\min(h,n-1)\}.
+\]
+Every Pareto-optimal matching is optimal for this family and can be
+obtained by serial dictatorship.
+\end{theorem}
+\begin{proof}
+A Pareto optimum matches exactly $r=\min(n,h)$ applicants to precisely
+the first $r$ houses. Indeed an unmatched applicant and unused house
+permit a Pareto improvement, as does an unused house ranked above an
+occupied house. Conversely any matching with this described form is
+Pareto optimal: if some applicant strictly improves, following the
+occupants of the successively better houses cannot improve everyone
+without eventually worsening the current holder of a better house.
+More explicitly, among changed occupied houses, the best-ranked one
+has an original owner who cannot move to a strictly better changed or
+unused house, so a purported weak improvement is impossible.
+
+When $h<n$, choose one unmatched applicant, give her $h_r$, give the
+previous owner of $h_j$ house $h_{j-1}$ for $2\leq j\leq r$, and leave
+the original owner of $h_1$ unmatched. There are $r=h$ winners and one
+loser. No challenger can have more than $h$ winners, since each winner
+must receive a distinct house, and finiteness requires a loser whenever
+there are winners. Thus the maximum factor is $\max\{1,h\}$.
+
+When $h\geq n\geq2$, cyclically give each original holder of $h_j$,
+$j\geq2$, house $h_{j-1}$, and give the holder of $h_1$ house $h_n$.
+There are $n-1$ winners and one loser. Lemma~\ref{pareto} is a matching
+upper bound. Non-Pareto matchings have infinite factor, so the formula
+is also the global optimum. The elementary boundary cases follow by
+giving a sole applicant her best available house. Serial dictatorship
+has exactly the described form.
+\end{proof}
+
+This family attains the absolute $n-1$ bound with $h\geq n$, but has
+approximation ratio one. Therefore a large achieved factor by itself
+is not an approximation lower bound. The common-order formula and the
+verification oracle leave general profiles, the historical hardness
+gap, and the optimal polynomial-time factor approximation unresolved.
+No current best-bound claim beyond the source-dated survey is made.
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh, and D. F. Manlove (2019).
+\emph{Selected open problems in Matching Under Preferences}.
+Bulletin of EATCS 128, Sections 3.1.1 and 3.2.4.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{mcc} R. M. McCutchen (2008).
+\emph{The least-unpopularity-factor and least-unpopularity-margin
+criteria for matching problems with one-sided preferences}.
+LATIN 2008, LNCS 4957, 593--604. Theorem 5.2 and final paragraph.
+\url{https://mattmccutchen.net/research/publications/least-unpopularity.pdf}.
+\end{thebibliography}
+\end{document}

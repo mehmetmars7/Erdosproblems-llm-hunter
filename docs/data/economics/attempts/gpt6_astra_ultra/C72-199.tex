@@ -1,0 +1,257 @@
+% ECONOMICS_PROBLEM: {"id": "C72-199", "title": "Improving search-and-mix approximation guarantees", "jel_code": "C72", "source_id": "OP-0132"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\Ind}{\mathbf 1}
+\DeclareMathOperator{\SC}{SC}
+\DeclareMathOperator{\OPT}{OPT}
+\DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\supp}{supp}
+\title{Strategically centered zero-sum certificates for search-and-mix}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C72-199}. \textbf{Status: unresolved.}
+
+\section{Target and outcome}
+The target is a fully specified polynomial-time search-and-mix algorithm
+with a fixed worst-case additive regret below one third for all rational
+bimatrix games in $[0,1]$. The survey \cite[Section 3.4 and open-problem
+item 1]{Survey} records the $1/3+\delta$ benchmark and the improvement
+question. We give a complete algorithm with a computable structural
+certificate that beats one third on a declared class, and a polynomial
+mixing optimization for fixed candidate-list sizes. Neither result yields
+a uniform sub-third guarantee over all games.
+
+For $x\in\Delta_m$, $y\in\Delta_n$, define
+\[
+ r(x,y)=\max\left\{\max_i e_i^TAy-x^TAy,
+                    \max_j x^TBe_j-x^TBy\right\}.
+\]
+The two terms are nonnegative because a best response is at least the
+current mixed payoff. All algorithms below operate on exactly encoded
+rational input.
+
+\section{Centering out strategically irrelevant terms}
+Let $M=A+B$. Solve the linear program
+\begin{equation}\label{centering}
+ \epsilon_* =\min_{c\in\R^m,d\in\R^n,\epsilon\ge0}\epsilon
+ \quad\text{subject to}\quad
+ |M_{ij}-c_i-d_j|\le\epsilon\quad\text{for all }i,j.
+\end{equation}
+An arbitrary constant can be transferred between $c$ and $d$, so impose
+$c_1=0$ as a gauge. Write $C_{ij}=M_{ij}-c_i-d_j$ for an optimal residual,
+and form
+\[
+ A'_{ij}=A_{ij}-d_j,\quad B'_{ij}=B_{ij}-c_i,
+ \quad H=(A'-B')/2.
+\]
+Then $A'=H+C/2$ and $B'=-H+C/2$. Subtracting $d_j$ from the row player's
+payoff does not change a unilateral row deviation at a fixed opponent
+strategy. Subtracting $c_i$ from the column player's payoff likewise
+preserves all column deviations.
+
+\begin{theorem}[An exact structural regret certificate]\label{certificate}
+The centering program and a Nash equilibrium $(x^H,y^H)$ of the zero-sum
+game $(H,-H)$ can be computed in polynomial bit complexity. Their output
+satisfies
+\[
+ r(x^H,y^H)\le\epsilon_*.
+\]
+More precisely its two regrets are bounded respectively by
+\[
+ \frac12\left(\max_i e_i^TCy^H-(x^H)^TCy^H\right),\qquad
+ \frac12\left(\max_j(x^H)^TCe_j-(x^H)^TCy^H\right).
+\]
+In particular, for any fixed $\eta\in(0,1/3)$, all inputs with
+$\epsilon_*\le1/3-\eta$ admit the requested sub-third output by this
+algorithm. When $M_{ij}=c_i+d_j$ exactly, the output is an exact Nash
+equilibrium of the original game.
+\end{theorem}
+\begin{proof}
+The centering program has a feasible point with $\epsilon=1$: choose
+$c_i=0$ and $d_j=1$, since $0\le M_{ij}\le2$. Under the gauge and
+$\epsilon\le1$, the row $i=1$ constraints imply $d_j\in[-1,3]$.
+Then column $j=1$ implies $c_i\in[-4,4]$. Thus imposing these compact
+rational bounds loses no optimal solution. A rational optimum of polynomial
+bit length can be computed by a polynomial-time rational linear-programming
+algorithm. The zero-sum equilibrium is obtained from the primal and dual
+minimax linear programs for $H$, also rational and of polynomial size.
+Finite zero-sum minimax, equivalently linear-program duality, ensures their
+solutions satisfy
+\[
+ (e_i-x^H)^THy^H\le0,\qquad
+ (x^H)^T(-H)(e_j-y^H)\le0
+\]
+for every pure deviation. This is the standard LP algorithm for finite
+zero-sum games; no real-algebraic output is required.
+
+Strategic invariance and the decomposition give
+\[
+ (e_i-x^H)^TAy^H
+ =(e_i-x^H)^THy^H+\tfrac12(e_i-x^H)^TCy^H
+ \le\tfrac12(e_i-x^H)^TCy^H.
+\]
+Take the maximum over $i$ for the first detailed certificate. The second
+follows identically from $B'=-H+C/2$. Every entry of $C$ is between
+$-\epsilon_*$ and $\epsilon_*$, so every displayed difference of its
+averages is at most $2\epsilon_*$. Dividing by two proves the uniform
+certificate. The exact and sub-third specializations follow immediately.
+\end{proof}
+The use of the symmetric surrogate $H$ matters: approximating only one
+player's matrix by a zero-sum game loses the factor one half in the
+residual oscillation. Removing row and column shifts further avoids
+charging for payoff terms that never affect that player's deviations.
+
+\section{A fully specified general search-and-mix template}
+The structural subroutine can be incorporated in a template that is
+defined on every input, not merely on the favorable class. Choose the
+first row $i_0$. Let $j_0$ be a pure best response of the column player
+to it, and let $i_1$ be a pure best response of the row player to $j_0$.
+Break ties by smallest index. Put
+\[
+ x^0=\tfrac12(e_{i_0}+e_{i_1}),\qquad y^0=e_{j_0}.
+\]
+Compute $(x^H,y^H)$ as above. The candidate lists are
+\[
+ X=(e_{i_0},e_{i_1},x^H),\qquad Y=(e_{j_0},y^H).
+\]
+Evaluate regrets exactly at $(x^0,y^0)$ and $(x^H,y^H)$ and return the
+better of the two, with a fixed tie rule. Each is a specified convex
+combination from these lists.
+\begin{proposition}[A global guarantee with a structural improvement]\label{template}
+This deterministic template has polynomial bit complexity and, for every
+input, returns a profile with
+\[
+ r(x,y)\le\min\{1/2,\epsilon_*\}.
+\]
+\end{proposition}
+\begin{proof}
+At $y^0$, row $i_1$ is a best response, so the row regret of $x^0$ is
+$\tfrac12(A_{i_1j_0}-A_{i_0j_0})\le1/2$. For any column deviation $j$,
+\[
+ (x^0)^TB(e_j-e_{j_0})
+ =\tfrac12(B_{i_0j}-B_{i_0j_0})
+  +\tfrac12(B_{i_1j}-B_{i_1j_0})\le1/2,
+\]
+since the first parenthesis is nonpositive by the choice of $j_0$ and
+the second is at most one. Thus the fallback has regret at most $1/2$.
+Theorem~\ref{certificate} bounds the other profile. Exact comparison of
+the two computed regrets proves the bound. Best-response scans and
+rational linear programs have the claimed polynomial complexity.
+\end{proof}
+The fallback proof is the elementary best-response mixing construction,
+not an improvement on the survey's general $1/3+\delta$ algorithm.
+Its role here is to make the new certificate part of a complete,
+independently specified template without invoking an unexpanded subroutine.
+
+\section{Optimizing mixing for constant-size candidate lists}
+The next result applies to arbitrary rational candidate lists, including
+the three-by-two lists above. Candidate generation and mixing optimization
+are separate issues in the target.
+\begin{lemma}[Regret continuity]\label{lip}
+For all probability vectors $x,x',y,y'$,
+\[
+ |r(x,y)-r(x',y')|\le2\bigl(\|x-x'\|_1+\|y-y'\|_1\bigr).
+\]
+\end{lemma}
+\begin{proof}
+For entries of $A$ in $[0,1]$, changing $y$ changes each pure-row payoff
+by at most $\|y-y'\|_1$, and hence changes their maximum by at most that
+amount. The current payoff changes by at most
+$\|x-x'\|_1+\|y-y'\|_1$, by adding and subtracting $(x')^TAy$.
+The row regret therefore changes by at most
+$\|x-x'\|_1+2\|y-y'\|_1$. The column argument interchanges the two
+coefficients. The absolute difference of maxima of two numbers is at
+most the larger absolute difference of the two entries, yielding the
+stated convenient bound.
+\end{proof}
+\begin{theorem}[Polynomial approximate mixing at fixed list size]\label{grid}
+Fix positive constants $s,t$. Given lists $X=(x^1,\ldots,x^s)$ and
+$Y=(y^1,\ldots,y^t)$ of rational strategies and rational $\tau>0$, one
+can compute mixtures with regret at most
+\[
+ \min_{\lambda\in\Delta_s,\mu\in\Delta_t}
+ r\left(\sum_a\lambda_ax^a,\sum_b\mu_by^b\right)+\tau
+\]
+in time polynomial in input bit length and $1/\tau$. If specified
+additional mixture pairs are also evaluated, the output is no worse than
+any of them.
+\end{theorem}
+\begin{proof}
+If $s=t=1$, there is only one mixture. Otherwise choose an integer
+$K\ge4(s+t-2)/\tau$ and enumerate probability vectors whose coordinates
+are integer multiples of $1/K$. For any $\lambda\in\Delta_s$, round its
+first $s-1$ coordinates downward and put the remaining probability in
+the last coordinate. The resulting $\widehat\lambda$ obeys
+$\|\lambda-\widehat\lambda\|_1\le2(s-1)/K$. The same procedure gives
+$\|\mu-\widehat\mu\|_1\le2(t-1)/K$. Taking convex combinations of
+probability vectors contracts this bound: for example
+\[
+ \left\|\sum_a(\lambda_a-\widehat\lambda_a)x^a\right\|_1
+ \le\sum_a|\lambda_a-\widehat\lambda_a|\|x^a\|_1
+ =\|\lambda-\widehat\lambda\|_1.
+\]
+A minimizing pair exists by continuity on compact simplices.
+Lemma~\ref{lip} shows that a grid pair within the above rounding distances
+has regret at most its optimum plus $4(s+t-2)/K\le\tau$.
+
+There are $\binom{K+s-1}{s-1}\binom{K+t-1}{t-1}$ grid pairs.
+For fixed $s,t$ this is polynomial in $K$, hence in $1/\tau$. Their
+regrets are exactly evaluated by scanning the original pure actions and
+performing rational arithmetic of polynomial bit length. Return a minimum,
+including any extra specified pairs in the same comparison. This proves
+both assertions.
+\end{proof}
+Applied to Proposition~\ref{template}, including its two output candidates
+among the evaluated pairs retains the bound $\min\{1/2,\epsilon_*\}$
+while approaching the best possible mixture from the chosen lists.
+The exponent in the grid size depends on $s+t$, so this is not a polynomial
+algorithm for lists of unrestricted length.
+
+\section{Remaining universal gap}
+The centering residual is not uniformly below one third. For example,
+$A=B=\left(\begin{smallmatrix}1&0\\0&1\end{smallmatrix}\right)$ has
+$\epsilon_*=1$: its alternating sum
+$M_{11}+M_{22}-M_{12}-M_{21}=4$ is unchanged by row/column shifts, while
+four residual entries of magnitude at most $\epsilon$ have alternating
+sum at most $4\epsilon$; $\epsilon=1$ is attainable. This game itself
+is easy, but it proves that the certificate alone cannot imply the
+desired universal constant.
+
+The unresolved task is a candidate-generation argument guaranteeing a
+sub-third mixture for every game, together with polynomial complexity.
+Theorem~\ref{grid} addresses only fixed-list mixing once such candidates
+are given. The survey HTML was checked on 9 October 2026, including the
+$1/3+\delta$ running-time statement and the explicit improvement question.
+No numerical experiment or claim about the current best universal bound
+is needed for these restricted results.
+\begin{thebibliography}{9}
+\bibitem{Survey} H. Li, W. Huang, Z. Duan, D. H. Mguni, K. Shao,
+J. Wang, and X. Deng, \emph{A survey on algorithms for Nash equilibria
+in finite normal-form games}, arXiv:2312.11063, 2023.
+Section 3.4 and ``Open problems and future directions,'' item 1.
+\url{https://arxiv.org/html/2312.11063}.
+\end{thebibliography}
+
+\end{document}

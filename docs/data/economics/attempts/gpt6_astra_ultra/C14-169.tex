@@ -1,0 +1,155 @@
+% ECONOMICS_PROBLEM: {"id": "C14-169", "title": "Valid causal inference with machine learning", "jel_code": "C14", "source_id": "OP-0105"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\allowdisplaybreaks
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\title{Policy inference under transport ambiguity\\\large Simultaneous finite-class guarantees and budget obstructions}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C14-169}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{A declared tractable policy experiment}
+The target combines adaptive policy choice, covariate shift, uncertain transport, and a population budget. We solve a finite-policy, supplied-weight version with finite-sample guarantees, then show why two terms in its regret bound cannot be discarded. The full machine-learning nuisance frontier remains unresolved.
+
+Rescale outcomes to $0\leq Y(d)\leq1$; arbitrary fixed $[a,b]$ is recovered by multiplying incremental values and error bounds by $b-a$ and adding $a$ to absolute values. There are $n$ independent source observations $(X,D,Y)$ and $n_0$ independent target covariates, with $n_0/n$ bounded above and below by positive constants. Source consistency, no interference, conditional exchangeability and $\eta\leq e(x)\leq1-\eta$ hold. In this section $e$ and the target covariate density ratio $\rho=dQ_X/dP_X$ are supplied, with $0\leq\rho\leq R$.
+
+Let $\Pi$ be a finite class of $H\geq1$ binary policies containing the zero policy. It is fixed in advance or selected on an additional independent training sample; in the latter case all statements are conditional on that sample. Let $0\leq c\leq C$ and $B\geq0$ be supplied. Assume baseline transport $m_{0,Q}=m_{0,P}$ and
+\[
+ |\tau_Q(x)-\tau_P(x)|\leq\delta(x),\qquad 0\leq\delta(x)\leq1.
+\]
+Only compatible target potential-outcome laws are considered. Define
+\[
+ v(\pi)=\E_Q[m_{0,P}+\pi\tau_P],\quad
+ d(\pi)=\E_Q[\pi\delta],\quad b(\pi)=\E_Q[c\pi].
+\]
+Then $|V_Q(\pi)-v(\pi)|\leq d(\pi)$. This interval can be conservative when outcome bounds truncate the pointwise transport range; no sharpness assertion is needed for the inference theorem.
+
+Orthogonal-score and policy-learning work \cite{dml,policy} motivates the problem. Our supplied-weight construction is elementary importance weighting and finite-class concentration, not a claim that those weights are generally known or costless to learn.
+
+\section{Simultaneous inference and safe optimization}
+Set
+\begin{align*}
+ Z_i(\pi)&=\rho(X_i)\left\{
+ \frac{\pi(X_i)D_iY_i}{e(X_i)}+
+ \frac{(1-\pi(X_i))(1-D_i)Y_i}{1-e(X_i)}\right\},\\
+ \widehat v(\pi)&=n^{-1}\sum_i Z_i(\pi),\qquad
+ \widehat d(\pi)=n_0^{-1}\sum_j\pi(X_j^Q)\delta(X_j^Q),\\
+ \widehat b(\pi)&=n_0^{-1}\sum_jc(X_j^Q)\pi(X_j^Q).
+\end{align*}
+For a desired failure probability $0<\zeta<1$, put
+\[
+ t=\log(6H/\zeta),\quad
+ u_v=\frac R\eta\sqrt{\frac{t}{2n}},\quad
+ u_d=\sqrt{\frac{t}{2n_0}},\quad
+ u_b=C\sqrt{\frac{t}{2n_0}},\quad e_n=u_v+u_d.
+\]
+Define $L(\pi)=\widehat v(\pi)-\widehat d(\pi)-e_n$ and
+\[
+ \widehat\Pi^B=\{0\}\cup
+ \{\pi\in\Pi:\widehat b(\pi)+u_b\leq B\}.
+\]
+Choose $\widehat\pi$ to maximize $L$ over this nonempty finite set, resolving ties in a fixed order.
+
+\begin{theorem}[Honesty, feasibility and regret]\label{policythm}
+With probability at least $1-\zeta$, simultaneously:
+\begin{enumerate}
+\item $L(\pi)\leq V_Q(\pi)$ for every $\pi\in\Pi$;
+\item $b(\widehat\pi)\leq B$;
+\item every policy $\pi\in\Pi$ with $b(\pi)\leq B-2u_b$, as well as the zero policy, satisfies
+\[
+ V_Q(\pi)-V_Q(\widehat\pi)\leq2d(\pi)+2e_n.
+\]
+\end{enumerate}
+Let $\Pi^- =\{0\}\cup\{\pi:b(\pi)\leq B-2u_b\}$ and define
+\[
+ \Gamma_Q(2u_b)=\max_{b(\pi)\leq B}V_Q(\pi)
+                         -\max_{\pi\in\Pi^-}V_Q(\pi).
+\]
+On the same event the full feasible-policy regret is at most
+$\Gamma_Q(2u_b)+2\sup_{\pi\in\Pi^-}d(\pi)+2e_n$.
+The budget-violation probability is at most $\zeta$, and the expected positive regret is at most this deterministic bound plus $\zeta$.
+\end{theorem}
+\begin{proof}
+Conditional expectation given $X$ and source identification show $\E_P Z_i(\pi)=v(\pi)$. Moreover $0\leq Z_i(\pi)\leq R/\eta$. Hoeffding's inequality and a union bound over the $H$ policies give
+$\max_\pi|\widehat v-v|\leq u_v$ except with probability $\zeta/3$. Applying the same inequality to the target variables in $[0,1]$ and $[0,C]$ bounds the deviations of $\widehat d$ and $\widehat b$ by $u_d,u_b$, each with failure at most $\zeta/3$. No independence between different policies or between these target averages is required. Work on the intersection event.
+
+For every $\pi$,
+\[
+ L(\pi)\leq v(\pi)-d(\pi)\leq V_Q(\pi),\qquad
+ V_Q(\pi)-L(\pi)\leq2d(\pi)+2e_n.
+\]
+Every nonzero policy in $\widehat\Pi^B$ has true cost at most $B$; the zero policy has cost zero exactly. A policy with $b(\pi)\leq B-2u_b$ satisfies $\widehat b(\pi)+u_b\leq B$ and is included. Thus, for every stated comparator,
+\[
+ V_Q(\pi)-V_Q(\widehat\pi)
+ \leq V_Q(\pi)-L(\widehat\pi)
+ \leq V_Q(\pi)-L(\pi)\leq2d(\pi)+2e_n.
+\]
+Maximizing over $\Pi^-$ and adding $\Gamma_Q$ gives the claim. Regret is at most one in absolute value for outcomes in $[0,1]$, so its positive part contributes at most $\zeta$ off the event.
+\end{proof}
+
+The theorem separates $\sqrt{\log H/n}$ sampling/selection cost, transport ambiguity, and the loss from tightening an unknown population budget. It covers a data-selected optimizer because its value bound was simultaneous before optimization. If no baseline transport is available, replace $Z_i(\pi)$ by
+\[
+ \rho(X_i)\pi(X_i)\left\{\frac{D_iY_i}{e(X_i)}
+                   -\frac{(1-D_i)Y_i}{1-e(X_i)}\right\}.
+\]
+Its expectation is $\E_Q[\pi\tau_P]$ and its range has length $2R/\eta$. Repeating the proof with $u_v=2(R/\eta)\sqrt{t/(2n)}$ yields simultaneous lower bounds and the same regret statement for incremental values. Absolute value identification does not follow from this replacement.
+
+\section{Two unavoidable obstructions}
+\begin{proposition}[A transport lower bound with identical observations]
+Fix $0<\Delta\leq1/2$ and allow the two constant policies. Even with infinite source data and the exact target covariate distribution, there exist two compatible target laws with $\delta=\Delta$, baseline transport, and identical available observations such that every policy learner has worst-case expected regret at least $\Delta/2$.
+\end{proposition}
+\begin{proof}
+Use no covariate variation. Under the source let $m_{0,P}=m_{1,P}=1/2$, with randomized treatment and bounded Bernoulli potential outcomes. In both target worlds take $m_{0,Q}=1/2$, and take $m_{1,Q}=1/2+\Delta$ or $1/2-\Delta$. These are realizable by Bernoulli potential outcomes and satisfy all the stated transport inequalities. Target outcomes are not observed, so the learner treats with the same probability $p$ in both worlds. Its expected regret is $\Delta(1-p)$ in the first and $\Delta p$ in the second. Their maximum is at least $\Delta/2$.
+\end{proof}
+
+\begin{proposition}[A hard population-budget boundary]\label{budgetlower}
+In the original experiment where $Q_X$ is learned from $n_0$ target covariates and its density ratio is not supplied, uniform high-probability budget feasibility need not permit vanishing regret without slack. For every $0<\zeta<1/2$, there is a two-policy bounded-outcome model such that any learner with budget-violation probability at most $\zeta$ in every model has, along some sequence of feasible models, expected regret bounded away from zero.
+\end{proposition}
+\begin{proof}
+Let $X\in\{0,1\}$, $c=1$, $B=1/2$, and policies $0$ and $\pi_1(x)=x$. Fix the same source law in every model, with $P_X(X=1)=1/2$, randomized treatment, $Y(0)=0$, and $Y(1)=1$. Impose exact transport of both potential outcomes. The target covariate mass is either
+$p_+=1/2+\varepsilon$ or $p_-=1/2-\varepsilon$.
+The ratios relative to the source are bounded, but their values are not revealed. Under $p_+$ selecting $\pi_1$ violates the budget, so its selection probability is at most $\zeta$.
+
+The source observations have identical laws under the two alternatives. Couple each target Bernoulli observation using a common uniform random variable. The probability that any of their $n_0$ coordinates differ is at most $2n_0\varepsilon$. Hence the total variation distance of the available-data laws is at most $2n_0\varepsilon$. Selection of $\pi_1$ under $p_-$ therefore has probability at most $\zeta+2n_0\varepsilon$. But $\pi_1$ is feasible and improves value by $p_-$ there. Taking $\varepsilon=n_0^{-2}$ gives expected regret at least
+\[
+ (1/2-n_0^{-2})(1-\zeta-2/n_0),
+\]
+which tends to $(1-\zeta)/2>0$. Learner randomization can be coupled identically and does not change the argument.
+\end{proof}
+
+This lower bound deliberately does not give the learner the unknown density ratio: supplying it in this example would reveal $p_+$ or $p_-$. It addresses the target-sampling part of the catalogue problem, while Theorem~\ref{policythm} supplies an explicit achievable benchmark in a more informative experiment.
+
+\section{Extension to learned weights and remaining gap}
+There is a direct deterministic robustness statement. If, conditional on independent training, an estimated score $\widetilde Z(\pi)$ is uniformly bounded by a known envelope and satisfies
+\[
+ \sup_{\pi\in\Pi}|\E_P\widetilde Z(\pi)-v(\pi)|\leq b_n,
+\]
+then adding $b_n$ to $e_n$ makes the proof of Theorem~\ref{policythm} unchanged. To check this, center the empirical mean at its actual expectation and use the displayed bound before the two value inequalities. This is a certificate requirement, not an assertion that small prediction error automatically supplies it. A substantive next step is to derive such a certificate for estimated transport and treatment weights with outcome augmentation, uniformly over a growing policy class. Sharp dependence on infinite-class complexity, optimal nuisance thresholds, and feasible budget relaxation are not established here.
+
+\begin{thebibliography}{9}
+\bibitem{dml} V. Chernozhukov, D. Chetverikov, M. Demirer, E. Duflo, C. Hansen, W. Newey and J. Robins (2018), \emph{Double/debiased machine learning for treatment and structural parameters}, Econometrics Journal 21, C1--C68. Section 1 and the partially linear example in the author-posted version were checked; this paper is background, not a transport theorem used above. \url{https://arxiv.org/pdf/1608.00060}. \url{https://doi.org/10.1111/ectj.12097}.
+\bibitem{policy} S. Athey and S. Wager (2021), \emph{Policy Learning with Observational Data}, Econometrica 89, 133--161. Author-posted abstract and bibliographic record inspected 9 October 2026; no specific theorem is invoked. \url{https://arxiv.org/abs/1702.02896}.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,339 @@
+% ECONOMICS_PROBLEM: {"id": "C44-186", "title": "Policy learning for quantile and inequality objectives", "jel_code": "C44", "source_id": "OP-0496"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Policy learning for quantile and inequality objectives\\\large Finite-menu regret, honest value bounds, and a nonregular obstruction}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C44-186}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and scope}
+The catalogue considers a finite, predeclared feasible policy menu and
+$J(F)=Q_u(F)-\lambda G(F)$. We prove a finite-sample simultaneous
+value bound and an expected-regret upper rate for a known-propensity
+subclass, with no extraneous logarithm in sample size. We also give a
+matching $n^{-1/2}$ lower order for a fixed two-policy pure-quantile
+subproblem, and show why removing quantile regularity can destroy uniform
+consistency. We do not obtain matching dependence on arbitrary menu
+geometry, unknown nuisance smoothness, or every $\lambda>0$.
+
+Cinelli et al. \cite{challenge}, Section 3.3.3, Beyond expectations,
+motivate distributional policy objectives including inequality. The
+particular quantile--Gini objective and finite-menu model are the
+catalogue's explicit refinement. The proofs use standard weighting and
+empirical-process tools with the needed arguments supplied below.
+
+\section{Model and a distribution estimator}
+Observe $n$ independent copies of $(X,W,Y)$, with $X$ uniform on $[0,1]^d$,
+$W\in\{0,1\}$, and $Y\in[a,b]$, where $0<a<b<\infty$. Assume
+consistency, no interference, conditional exchangeability of potential
+outcomes given $X$, and known propensity $e(X)\in[\epsilon,1-\epsilon]$.
+Let $\Pi=\{\pi_1,\ldots,\pi_M\}$ be a nonempty finite menu fixed before
+sampling, with every policy satisfying the catalogue's supplied budget.
+Let $F_\pi$ be its identified policy-outcome CDF. Fix $u\in(0,1)$,
+$\lambda\geq0$, and use the lower quantile
+$Q_u(F)=\inf\{y:F(y)\geq u\}$.
+
+Assume for each admissible law and policy that $q_\pi=Q_u(F_\pi)$ lies
+in $[a+r,b-r]$ for known $r>0$, and $F_\pi$ has a density at least
+$c_0>0$ throughout $[q_\pi-r,q_\pi+r]$. This local lower bound, shared
+across the class, is the regularity used below. Smoothness restrictions
+on the nuisance functions may additionally hold but are not needed when
+the treatment propensity is known.
+
+Define nonnegative weights and the normalized empirical CDF
+\[
+ A_i^\pi=\frac{\Ind\{W_i=\pi(X_i)\}}{p_\pi(X_i)},\qquad
+ p_\pi(x)=\pi(x)e(x)+(1-\pi(x))(1-e(x)),
+\]
+\[
+ H_\pi(y)=\frac1n\sum_i A_i^\pi\Ind\{Y_i\leq y\},\qquad
+ T_\pi=H_\pi(b),\qquad \widehat F_\pi(y)=H_\pi(y)/T_\pi. \tag{1}
+\]
+If $T_\pi=0$, define $\widehat F_\pi$ as the CDF of a point mass at $a$.
+Thus every estimate is an actual distribution, and its quantile and Gini
+coefficient are well-defined. Select $\widehat\pi$ maximizing
+$J(\widehat F_\pi)$, using the least menu index to break ties. Sorting
+finitely many observations computes all these quantities measurably.
+
+\section{Uniform distribution control without a threshold grid}
+\begin{lemma}[Weighted CDF concentration]
+Let
+$Z_\pi=\sup_y|H_\pi(y)-F_\pi(y)|$ and $Z=\max_\pi Z_\pi$.
+For $\eta\in(0,1)$,
+\[
+ \Pr\left\{Z>\frac4{\epsilon\sqrt n}
+           +\sqrt{\frac{\log(M/\eta)}{2n\epsilon^2}}\right\}\leq\eta.
+ \tag{2}
+\]
+Moreover $\E Z\leq C\epsilon^{-1}\sqrt{\log(2M)/n}$ for a universal
+constant $C$, and deterministically
+\[
+ \max_\pi\|\widehat F_\pi-F_\pi\|_\infty\leq\min(1,4Z). \tag{3}
+\]
+\end{lemma}
+\begin{proof}
+Conditional exchangeability and the known propensity give
+$\E[A^\pi\Ind(Y\leq y)]=F_\pi(y)$ and $\E A^\pi=1$.
+Symmetrization yields
+\[
+ \E Z_\pi\leq\frac2n\E\sup_y
+       \left|\sum_i\sigma_i A_i^\pi\Ind(Y_i\leq y)\right|,
+\]
+where the $\sigma_i$ are independent fair signs independent of the data.
+To verify this inequality, introduce an independent copy of the sample,
+use conditional Jensen to replace each expectation by that copy, and
+exchange each original-copy pair according to an independent fair sign.
+The triangle inequality splits the two resulting sign sums into equal
+expected suprema, giving the factor two.
+
+Condition on the data and order the observations by $Y$. The sums indexed
+by $y$ are among the partial sums of the independent mean-zero variables
+$\sigma_i A_i^\pi$ in that order, including the empty sum. If ties occur,
+only fewer partial sums are attained. For these partial sums $S_k$,
+$\E_\sigma\max_{k\leq n}|S_k|^2\leq4\E_\sigma S_n^2
+=4\sum_i(A_i^\pi)^2$. Here is the maximal-inequality argument: writing
+$M_n=\max_k|S_k|$, stopping on first crossing of a level $t$ and using
+conditional Jensen gives
+$t\Pr(M_n\geq t)\leq\E[|S_n|\Ind(M_n\geq t)]$.
+Integrating $2t\Pr(M_n\geq t)$ over $t\geq0$ gives
+$\E M_n^2\leq2\E[|S_n|M_n]$; Cauchy--Schwarz proves the assertion.
+Since $A_i^\pi\leq1/\epsilon$, the conditional expected maximum is at
+most $2\sqrt n/\epsilon$. Symmetrization proves
+$\E Z_\pi\leq4/(\epsilon\sqrt n)$.
+
+Replacing one observation changes $Z_\pi$ by at most $1/(n\epsilon)$,
+because each weighted indicator belongs to $[0,1/\epsilon]$.
+The bounded-difference inequality therefore gives
+$\Pr(Z_\pi-\E Z_\pi>t)\leq e^{-2n\epsilon^2t^2}$.
+For clarity, this inequality follows by exposing the independent
+observations successively: each conditional expectation increment has
+conditional range at most the corresponding replacement bound. The
+centered exponential bound $\E e^{sV}\leq e^{s^2c^2/8}$ for a range-$c$
+variable follows by bounding the tilted variance by $c^2/4$ and integrating
+the log moment generating function twice. Iteration and Markov's inequality
+give the displayed bounded-difference tail. A union bound proves (2).
+
+For the expectation let $a_M=\sqrt{\log M/(2n\epsilon^2)}$.
+The same union bound implies
+$\Pr(Z>4/(\epsilon\sqrt n)+a_M+t)\leq e^{-2n\epsilon^2t^2}$
+for $t\geq0$. Integrating this tail gives an extra term
+$\sqrt\pi/(2\sqrt{2n}\epsilon)$, proving the asserted expectation order.
+Finally $|T_\pi-1|\leq Z_\pi$ by taking $y=b$. If $Z<1/2$, then
+$T_\pi\geq1-Z$ and
+$|H_\pi/T_\pi-F_\pi|\leq2Z/(1-Z)\leq4Z$.
+If $Z\geq1/2$, the trivial CDF distance bound one is already at most
+$4Z$, including the zero-weight convention. This proves (3).
+\end{proof}
+
+\section{Lipschitz control of the nonadditive objective}
+For a distribution supported on $[a,b]$, write $\mu_F=\E_FY$.
+Integration of indicators gives
+\[
+ \mu_F=b-\int_a^bF(y)\,dy,\qquad
+ G(F)=\frac{\int_a^b F(y)(1-F(y))\,dy}{\mu_F}. \tag{4}
+\]
+Indeed $|Y-Y'|$ is the integral of the indicator that a threshold lies
+between $Y$ and $Y'$, whose expectation is $2F(y)(1-F(y))$ almost
+everywhere. Tonelli applies because the integrand is nonnegative and
+bounded, proving the second identity. No joint counterfactual outcome
+for the same individual is used.
+
+\begin{lemma}[Value stability]
+For every true policy CDF $F$ satisfying the stated local quantile condition
+and every CDF $H$ on $[a,b]$,
+\[
+ |J(H)-J(F)|\leq L\|H-F\|_\infty, \tag{5}
+\]
+where one valid known constant is
+\[
+ L=\max\{c_0^{-1},(b-a)/(c_0r)\}
+       +\lambda\left\{\frac{b-a}{a}+\frac{(b-a)^2}{4a^2}\right\}.
+\]
+Also the objective range over all such distributions has length at most
+$D=b-a+\lambda$.
+\end{lemma}
+\begin{proof}
+Put $z=\|H-F\|_\infty$. On the quantile neighborhood, continuity gives
+$F(q)=u$ and integration of its density gives
+$F(q+t)\geq u+c_0t$ and $F(q-t)\leq u-c_0t$ for $0\leq t\leq r$.
+If $z<c_0r$, take any $t>z/c_0$ within this neighborhood. Then
+$H(q-t)<u<H(q+t)$, forcing $Q_u(H)\in[q-t,q+t]$.
+Let $t\downarrow z/c_0$. If $z\geq c_0r$, use the full support bound
+$|Q_u(H)-q|\leq b-a\leq(b-a)z/(c_0r)$.
+
+For Gini, (4) yields $|\mu_H-\mu_F|\leq(b-a)z$.
+The function $x(1-x)$ is one-Lipschitz on $[0,1]$, so its integrals
+differ by at most $(b-a)z$, and each such integral is at most $(b-a)/4$.
+Both means are at least $a$. Subtracting the two ratios in (4) bounds
+the Gini difference by
+$[(b-a)/a+(b-a)^2/(4a^2)]z$.
+Add the quantile and weighted Gini bounds to obtain (5).
+Finally $Q_u\in[a,b]$ and $0\leq G\leq1$: the last upper bound follows
+from $|Y-Y'|\leq Y+Y'$ for positive outcomes. Hence $J\in[a-\lambda,b]$.
+\end{proof}
+
+\begin{theorem}[Regret and honest simultaneous values]
+Let
+\[
+ z_\eta=\min\left\{1,4\left[
+  \frac4{\epsilon\sqrt n}
+  +\sqrt{\frac{\log(M/\eta)}{2n\epsilon^2}}\right]\right\},
+ \qquad v_\eta=\min(D,Lz_\eta).
+\]
+With probability at least $1-\eta$, simultaneously for every policy,
+$|J(\widehat F_\pi)-J(F_\pi)|\leq v_\eta$, and
+\[
+ 0\leq\max_{\pi\in\Pi}J(F_\pi)-J(F_{\widehat\pi})
+       \leq\min(D,2v_\eta). \tag{6}
+\]
+The intervals $J(\widehat F_\pi)\pm v_\eta$ are honest simultaneous value
+intervals, including for the selected policy. Uniformly over the model,
+\[
+ \E\left[\max_\pi J(F_\pi)-J(F_{\widehat\pi})\right]
+ \leq\min\left\{D,\frac{C'L}{\epsilon}
+                        \sqrt{\frac{\log(2M)}n}\right\}. \tag{7}
+\]
+\end{theorem}
+\begin{proof}
+Equations (2), (3), and (5) imply the simultaneous value assertion; the
+objective range supplies the alternative bound $D$. If $\pi^*$ is a
+true maximizer, empirical maximization implies
+\[
+ J(F_{\pi^*})-J(F_{\widehat\pi})
+ \leq |J(F_{\pi^*})-J(\widehat F_{\pi^*})|
+       +|J(\widehat F_{\widehat\pi})-J(F_{\widehat\pi})|.
+\]
+This proves (6). The deterministic version bounds regret by
+$2L\min(1,4Z)\leq8LZ$. Take expectations and use the lemma; also
+use the deterministic range bound $D$ to get (7).
+\end{proof}
+
+The menu size is only an upper complexity proxy. Duplicate policies,
+or policies differing on null covariate sets, do not increase intrinsic
+minimax difficulty, so no lower rate depending solely on $M$ can hold
+without a separation condition on the menu.
+
+\section{A two-policy lower bound and the quantile discontinuity}
+\begin{proposition}[Matching fixed-menu quantile order]
+For $\lambda=0$, budget $c=1$, the two constant policies, and known
+randomization $e=1/2$, there is a subclass satisfying the local density
+condition and arbitrarily high covariate smoothness on which minimax
+expected regret is at least $c_u(b-a)n^{-1/2}$, with $c_u>0$ depending
+only on $u$. Together with (7), the fixed-menu order is $n^{-1/2}$.
+\end{proposition}
+\begin{proof}
+On the rescaled outcome interval $[0,1]$ let
+$f_t(x)=1+t(2x-1)$ with $|t|\leq1/4$. It is a positive density with
+CDF $F_t(x)=x+t(x^2-x)$ and density between $3/4$ and $5/4$.
+Take treatment-arm distributions $(f_{-t},f_t)$ under law $P_+$ and
+$(f_t,f_{-t})$ under $P_-$. Covariates are uniform and independent,
+so all conditional CDFs are constant in $X$ and satisfy any supplied
+covariate H\"older order with an adequate fixed radius. Generate potential
+outcomes independently of randomized treatment to satisfy the causal
+assumptions.
+
+Write $q_t=Q_u(F_t)$. For $t>0$, $q_t\geq u$ and
+$1-u=(1-q_t)(1+tq_t)\leq(1-q_t)(1+t)$.
+Furthermore $F_{-t}(q_t)-u=2tq_t(1-q_t)$.
+Since $f_{-t}\leq1+t$, integration between $q_{-t}$ and $q_t$ gives
+\[
+ q_t-q_{-t}\geq\frac{2tq_t(1-q_t)}{1+t}
+ \geq\frac{2tu(1-u)}{(1+t)^2}\geq t u(1-u).
+\]
+A common positive neighborhood around these quantiles lies in $(0,1)$
+for all $|t|\leq1/4$, with the fixed density bounds just given.
+
+The one-draw divergence between $f_t$ and $f_{-t}$ is at most
+$\int (f_t-f_{-t})^2/f_{-t}\leq4t^2/[3(1-t)]\leq2t^2$;
+the reverse direction has the same bound. This uses $\KL\leq\chi^2$
+and $\int_0^1(2x-1)^2dx=1/3$. Randomized treatment averages these
+two bounds, so $\KL(P_+^n,P_-^n)\leq2nt^2$. Set $t=1/(8\sqrt n)$.
+Pinsker gives total variation at most $1/8$.
+Any policy learner is a test for which law holds: the optimal constant
+policy switches between the laws. The sum of its error probabilities
+is at least $1-\TV\geq7/8$. Each wrong policy loses at least
+$(b-a)t u(1-u)$ after rescaling outcomes to $[a,b]$.
+Thus maximum regret is at least
+$7(b-a)u(1-u)/(128\sqrt n)$. All constants are uniform in the subclass.
+\end{proof}
+
+\begin{proposition}[No uniform consistency without quantile regularity]
+For the same two policies and $\lambda=0$, if arbitrary distributions on
+$\{a,b\}$ are allowed, minimax expected regret is bounded below by a
+positive constant independent of $n$.
+\end{proposition}
+\begin{proof}
+Let $s=\min(u,1-u)>0$ and $t=s/(16\sqrt n)$. Under $P_+$, the
+probabilities of outcome $a$ in arms zero and one are $u+t$ and $u-t$;
+under $P_-$ they are swapped. The corresponding quantiles are $a$ and
+$b$, so the best arm switches and every wrong selection loses $b-a$.
+For Bernoulli probabilities $u+t,u-t$, $\KL\leq\chi^2$ bounds either
+directional divergence by $4t^2/[(u\mp t)(1-u\pm t)]$.
+Both denominator factors are at least $s/2$, so the bound is at most
+$16t^2/s^2$. For $n$ observations, including fair treatment labels,
+KL is at most $1/16$ and total variation is below $1/4$.
+The two testing error probabilities sum to at least $3/4$; maximum
+regret is therefore at least $3(b-a)/8$. These alternatives approach
+the quantile discontinuity as $n$ grows and violate the local-density
+assumption, which is exactly why the earlier theorem does not apply.
+\end{proof}
+
+\section{Unknown propensity and the remaining frontier}
+A limited extension states precisely what an estimated propensity would
+need to provide. Suppose an independent training sample supplies
+$\widehat e\in[\epsilon/2,1-\epsilon/2]$ and a certified event
+$\|\widehat e-e\|_\infty\leq d$ of probability at least $1-\zeta$.
+Use (1) with this propensity. Conditional on training, its numerator
+expectation differs from $F_\pi$ at every threshold by at most
+$2d/\epsilon$, because $|p_\pi/\widehat p_\pi-1|\leq2d/\epsilon$.
+The same assertion holds for the normalizer's expectation relative to one.
+The concentration proof applies around those conditional expectations
+with weight bound $2/\epsilon$. Therefore, with probability at least
+$1-\eta-\zeta$, replace the unnormalized error in (2) by
+\[
+ \frac8{\epsilon\sqrt n}
+ +\sqrt{\frac{2\log(M/\eta)}{n\epsilon^2}}
+ +\frac{2d}{\epsilon}.
+\]
+Normalization and the value argument then apply unchanged. This conclusion
+follows by conditioning on the certified training event and union bounding
+its failure; it is not a claim that such a certificate is available for
+free. Deriving sharp certificates and using outcome-CDF augmentation to
+obtain product remainders are the first unresolved nuisance-rate steps.
+Matching policy-complexity lower bounds also need a nondegenerate menu,
+and the pure-quantile lower bound above does not settle all values of
+$\lambda$. These gaps keep the full target unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy,
+S. Magliacane and J. Zubizarreta (2025), \emph{Challenges in Statistics:
+A Dozen Challenges in Causality and Causal Inference}, arXiv:2508.17099v1,
+Section 3.3.3, Beyond expectations.
+\url{https://arxiv.org/html/2508.17099v1#S3.SS3.SSS3}.
+\end{thebibliography}
+
+\end{document}

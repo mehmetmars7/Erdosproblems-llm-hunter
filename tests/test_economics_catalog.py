@@ -379,7 +379,7 @@ class CompleteEconomicsImportTests(unittest.TestCase):
         data = build_economics_data()
         ultra = {problem_id: [attack for attack in record['attacks']
                               if attack['file_path'].startswith('attacks/open_problems/economics/gpt6_astra_ultra/')]
-                 for problem_id, record in data.items()}
+                 for problem_id, record in data.items() if problem_id in ULTRA_BATCH_IDS}
         self.assertEqual({problem_id for problem_id, attacks in ultra.items() if attacks}, ULTRA_BATCH_IDS)
         for problem_id in ULTRA_BATCH_IDS:
             with self.subTest(problem_id=problem_id):
@@ -396,6 +396,38 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 source = (BASE_DIR / attack['file_path']).read_bytes()
                 self.assertEqual((BASE_DIR / 'docs' / attack['download_url']).read_bytes(), source)
                 self.assertNotRegex(source.decode(), r'/Users/|/home/|/mnt/data|/workspace/|uploaded filename')
+
+    def test_astra_ultra_rank_151_to_200_batch_keeps_fixed_ids_and_exact_downloads(self):
+        # Freeze the selected identities, so later reranking cannot move manuscripts.
+        expected = '''D82-151 E58-152 C72-153 C21-154 O31-155 C12-156 E52-157 D63-158
+            C73-159 C21-160 F12-161 D31-162 Q54-163 I18-164 C78-165 L94-166
+            E62-167 C31-168 C14-169 D73-170 D44-171 D82-172 C21-173 D47-174
+            C78-175 Q54-176 D63-177 C78-178 C21-179 D71-180 C26-181 C62-182
+            H24-183 C21-184 J42-185 C44-186 H11-187 C23-188 D82-189 D71-190
+            C21-191 Q51-192 G28-193 C21-194 L42-195 D44-196 D72-197 G21-198
+            C72-199 C83-200'''.split()
+        self.assertEqual(len(set(expected)), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attempts = [attack for attack in data[problem_id]['attacks']
+                            if attack['model'] == 'GPT 6 Astra Ultra' and attack['version'] == 1]
+                self.assertEqual(len(attempts), 1)
+                attack = attempts[0]
+                self.assertEqual(attack['status'], 'unresolved')
+                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                self.assertEqual(attack['date_posted'], '2026-10-09')
+                self.assertEqual(attack['file_path'],
+                                 f'attacks/open_problems/economics/gpt6_astra_ultra/{problem_id}.tex')
+                self.assertEqual(attack['download_url'],
+                                 f'data/economics/attempts/gpt6_astra_ultra/{problem_id}.tex')
+                source = (BASE_DIR / attack['file_path']).read_bytes()
+                self.assertEqual(source, (BASE_DIR / 'docs' / attack['download_url']).read_bytes())
+                text = source.decode()
+                self.assertIn(r'\begin{proof}', text)
+                self.assertIn(r'\begin{thebibliography}', text)
+                self.assertNotRegex(text, r'/Users/|/home/|/mnt/data|/workspace/|TODO|proof omitted')
 
     def test_specialized_and_merged_source_conventions_are_present(self):
         data = build_economics_data()
