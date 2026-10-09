@@ -208,6 +208,27 @@ assert.match(render(multilineDelimiter), /\\Biggl\(/);
 assert.match(render(multilineDelimiter), /\\Biggr\)/);
 assert.doesNotMatch(render(multilineDelimiter), /\\left|\\right/);
 
+// Equation tags belong to the display, outside AMS inner environments.
+for (const environment of ['aligned', 'alignedat', 'gathered', 'split']) {
+    const columns = environment === 'alignedat' ? '{2}' : '';
+    const source = tex`\[\begin{` + environment + '}' + columns
+        + tex`a&=b\\&=c\tag{4}\end{` + environment + tex`}\]`;
+    const result = render(source);
+    assert.ok(result.includes(tex`\end{` + environment + tex`}\tag{4}\]`), result);
+    assert.equal((result.match(/\\tag\{4\}/g) || []).length, 1);
+}
+const nestedTag = render(tex`\[\begin{aligned}a&=\begin{gathered}b\tag*{\text{A{B}}}\end{gathered}\end{aligned}\]`);
+assert.match(nestedTag, /\\end\{gathered\}\\end\{aligned\}\\tag\*\{\\text\{A\{B\}\}\}/);
+const validTags = tex`\begin{align}a&=b\tag{1}\\c&=d\tag{2}\end{align}`;
+assert.equal(render(validTags), '<p>' + validTags.replace(/&/g, '&amp;') + '</p>');
+assert.match(render(tex`\begin{verbatim}\begin{aligned}a=b\tag{4}\end{aligned}\end{verbatim}`),
+    /<pre>\\begin\{aligned\}a=b\\tag\{4\}\\end\{aligned\}<\/pre>/);
+const economics655 = fs.readFileSync(path.join(root,
+    'attacks/open_problems/economics/gpt_6_astra_ultra/C72-655.tex'), 'utf8');
+const economics655Result = render(economics655);
+assert.match(economics655Result, /\\end\{aligned\}\\tag\{4\}/);
+assert.doesNotMatch(economics655Result, /\\begin\{aligned\}[\s\S]*?\\tag\{4\}[\s\S]*?\\end\{aligned\}/);
+
 // A missing source delimiter must not pull later list items/sections into math.
 const malformed = render(tex`\begin{enumerate}
 \item For some $c>0.
