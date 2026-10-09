@@ -63,6 +63,8 @@ assert.match(html, /data-sort="rank">Rank /);
 assert.doesNotMatch(html, /Difficulty rank|<option value="id">|UnsolvedMath #|data-sort="source"/);
 records[0].attacks = [{ model: 'GPT 6 Astra Ultra', status: 'unresolved' }, { entry_kind: 'statement_only' }];
 records[1].attacks = [{ model: 'GPT 6 Astra Pro', status: 'unresolved' }];
+assert.match(api.rows([records[0]]), />gpt 6 astra ultra<\/td>/);
+assert.match(api.rows([records[1]]), />gpt 6 astra pro<\/td>/);
 window.ECONOMICS_DATA = Object.fromEntries(records.map(record => [record.id, record]));
 api.init();
 assert.equal(elements['results-count'].textContent, '1 of 3 entries · 1 research attempt');

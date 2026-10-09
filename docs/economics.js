@@ -24,7 +24,7 @@
             case 'review': return shared.getReviewLabel(record.review);
             case 'claim': return shared.getOpenProblemClaimLabel(record);
             case 'completion': return shared.getMathematicalAttempts(record.attacks).length ? record.completion : null;
-            case 'models': return shared.getModelLabels(record.attacks).join(', ');
+            case 'models': return shared.getModelLabels(record.attacks, { fullNames: true }).join(', ');
             default: return record[key];
         }
     }
@@ -56,7 +56,7 @@
         const shared = window.ProblemHunting;
         return records.map(record => {
             const attempts = shared.getMathematicalAttempts(record.attacks);
-            const models = shared.getModelLabels(record.attacks);
+            const models = shared.getModelLabels(record.attacks, { fullNames: true });
             return `<tr>
             <td>${escape(record.rank)}</td>
             <td class="catalogue-problem"><a href="${href(record)}">${escape(record.title)}</a></td>
