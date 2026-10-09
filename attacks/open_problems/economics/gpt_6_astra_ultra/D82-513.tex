@@ -1,0 +1,131 @@
+% ECONOMICS_PROBLEM: {"id": "D82-513", "title": "Dimension dependence in learning a game by payments", "jel_code": "D82", "source_id": "OP-0155"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\title{An explicit dimension-dependent payment protocol with contextual resets}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{D82-513}. \textbf{Status:} Partial. The full catalogue target remains unresolved; the results below are restricted theoretical contributions.
+
+\section{Target and strategically relevant dimension}
+The catalogue fixes bounded payoffs, transfers in $[0,2]$, observation of mixed actions and a per-context prefix regret budget $C\sqrt T$. It asks for matching dependence of the minimax horizon on action counts. We derive an explicit, self-contained upper bound based on pairwise threshold tests and fresh contexts. It leaves a polynomial dimension gap relative to known lower bounds and therefore does not solve the minimax question. In particular observing exact mixed probabilities does not justify a naive finite-bit information bound.
+
+Fix a reference action $a_i^0$ for each player and define payoff differences
+\[
+ \Delta_{i,a,b}=U_i(a,b)-U_i(a_i^0,b),\qquad b\in A_{-i}.
+\]
+There are
+\[
+ D=\sum_{i=1}^n(m_i-1)\prod_{j\ne i}m_j
+   =M\sum_i(1-1/m_i)                                   \tag{1}
+\]
+such coordinates. They determine the strategic equivalence class exactly. Since $m_i\ge2$, $nM/2\le D<nM$. Thus $M$ alone describes dimension only after the family of player counts is specified.
+
+\begin{lemma}[Quotient norm]
+For any two payoff arrays, put $e_i(a,b)=\widetilde U_i(a,b)-U_i(a,b)$. Then
+\[
+ d(U,\widetilde U)
+ =\frac12\max_{i,b}\{\max_a e_i(a,b)-\min_a e_i(a,b)\}.   \tag{2}
+\]
+\end{lemma}
+\begin{proof}
+For fixed $(i,b)$ the free additive term selects a constant $w$ minimizing $\max_a|e_i(a,b)-w|$. Any covering interval needs radius at least half the range; the midpoint of the smallest and largest entries attains it. The constants are independent across $(i,b)$, proving (2).
+\end{proof}
+
+Equation (2) is also a useful estimation check: recovering absolute levels is unnecessary, while errors in different opponent profiles cannot be removed by one global constant.
+
+\section{One noisy threshold comparison}
+Consider a block of $L$ consecutive rounds and give every player a context label never used in any previous block. During the block, player $i$ is tested between action $a\ne a_i^0$ and reference action $a_i^0$ at fixed opponent profile $b$. Pay each opponent $j$ two for action $b_j$ and zero for all others. To compare $\Delta=\Delta_{i,a,b}$ with threshold $z\in[-1,1]$, pay player $i$
+\[
+ P_i(a)=1+\max\{-z,0\},\qquad
+ P_i(a_i^0)=1+\max\{z,0\},
+\]
+and zero for its other actions. All transfers lie in $[0,2]$. Their table is not supplied to the agent as an additional decision signal. The proof relies solely on the declared contextual regret guarantee; the context serves to isolate this block's accounting, not to assume an instantaneous best response.
+
+Write $R=C\sqrt T$. Opponent $j$'s payoff advantage from obeying $b_j$ over any other pure action is at least one, regardless of everyone else's play. Its regret inequality therefore implies
+\[
+ \sum_{t\text{ in block}}(1-x_j^t(b_j))\le R.             \tag{3}
+\]
+Set $e_t=1-\prod_{j\ne i}x_j^t(b_j)$. By the union bound and (3),
+$\sum_te_t\le(n-1)R$. For every action of player $i$, its underlying expected payoff against the actual mixed opponents differs from its payoff against $b$ by at most $e_t$, since underlying payoffs are in $[0,1]$.
+
+\begin{proposition}[A valid comparison with an explicit tolerance]
+Let $\bar x_a=L^{-1}\sum_t x_i^t(a)$ and
+\[
+ h=2(2n-1)R/L.                                          \tag{4}
+\]
+If $\bar x_a\ge1/2$, then $\Delta\ge z-h$. If $\bar x_a<1/2$, then $\Delta\le z+h$.
+\end{proposition}
+\begin{proof}
+Against pure opponents $b$, the augmented payoff difference between the two tested actions is $\Delta-z$. Each tested action has augmented payoff at least one, while every untested action has payoff at most one. If $\Delta-z=\gamma>0$, action $a$ beats \emph{every} other action by at least $\gamma$. Its cumulative regret comparator is therefore at least
+$\gamma L(1-\bar x_a)-2\sum_te_t$ after accounting for opponent deviations. The contextual guarantee bounds that expression above by $R$. If $\bar x_a<1/2$, this yields $\gamma\le2(2n-1)R/L$.
+
+If $z-\Delta=\gamma>0$, the reference action beats $a$ by $\gamma$ and weakly beats every other action. Its regret comparator is at least
+$\gamma L\bar x_a-2\sum_te_t$. When $\bar x_a\ge1/2$, the same calculation gives $\gamma\le h$. The assertions are automatic when the corresponding sign of $\Delta-z$ is reversed.
+\end{proof}
+
+The use of fresh contexts is essential to this proof. Subtracting two prefix regret bounds for a repeatedly used context would not upper-bound the regret incurred in between, since earlier comparator regret can be negative. Here the block begins with zero accumulated regret for its label, so the end-of-block inequality directly supplies the required bound.
+
+\section{Binary search and its self-consistent horizon}
+For every one of the $D$ differences, start with the known interval $[-1,1]$. Test its midpoint $z$. If $\bar x_a\ge1/2$, intersect the current interval with $[z-h,1]$; otherwise intersect it with $[-1,z+h]$. The proposition retains the true difference and reduces width from $w$ to at most $w/2+h$. After $K$ tests the width is at most
+\[
+ 2^{1-K}+2h.                                             \tag{5}
+\]
+All player/context labels are fresh in each of the $B=DK$ blocks, including the opponent labels.
+
+For $0<\varepsilon<1/4$, choose
+\[
+ K=\lceil\log_2(4/\varepsilon)\rceil,\quad B=DK,\quad
+ L=\left\lceil\max\left\{1,
+ \frac{64(2n-1)^2C^2B}{\varepsilon^2}\right\}\right\rceil,
+ \quad T=BL.                                            \tag{6}
+\]
+Because $R=C\sqrt{BL}$, these choices give $h\le\varepsilon/4$. The final width in (5) is at most $\varepsilon$, so its midpoint estimates the difference within $\varepsilon/2$.
+
+\begin{theorem}[An explicit upper bound]
+Under the catalogue's regret guarantee, the protocol (6) outputs an estimate with $d(U,\widetilde U)\le\varepsilon$, using
+\[
+ T=O\left(D\log(1/\varepsilon)+
+ \frac{n^2C^2D^2\log^2(1/\varepsilon)}{\varepsilon^2}\right).
+                                                               \tag{7}
+\]
+\end{theorem}
+\begin{proof}
+The comparison and interval proofs apply to every block independently of previous labels and of the principal's adaptive midpoint choices. Equations (5)--(6) give simultaneous deterministic error at most $\varepsilon/2$ on all differences, without a probabilistic union bound. Set each estimated reference payoff to zero and other estimated payoffs equal to their estimated differences. Choosing the allowable gauge $W_i(b)=-U_i(a_i^0,b)$ makes every entry error at most $\varepsilon/2$, hence certainly at most $\varepsilon$. Counting blocks in (6) proves (7).
+\end{proof}
+
+This explicitly solves the circular dependence of each block's regret on the \emph{total} horizon $T$. Replacing $C\sqrt T$ by $C\sqrt L$ would yield an unjustifiably smaller dimension factor for the guarantee in the question. The protocol uses polynomially many labels, but no bound on context count was imposed. If context count were restricted, (7) would not automatically apply. Its transfer expenditure is at most $2nT$; that is an upper accounting bound, not an optimal-payment claim.
+
+\section{Checks, lower bounds and the remaining gap}
+For one two-action player, opponents disappear and (3) has no terms. The tolerance becomes $2C\sqrt T/L$, directly matching the simple regret comparison. If a tested difference is exactly at the midpoint, either branch keeps it; no tie-breaking assumption is needed. If the agent puts mass on untested actions, the proof still works because their augmented utility is no larger than either tested action. These checks explain why the extra unit payments are needed.
+
+The source proves a lower bound of the form
+$\max\{\widetilde\Omega(nM)\log(1/\varepsilon),
+ C^2/(4\varepsilon^2)\}$ and leaves polynomial game-size factors open \cite{source}. Those are source results, not new lower bounds claimed here. Exact mixed-strategy observations can carry arbitrary real information, so a finite-transcript counting proof would need an admissible pure-action adversarial learner or another justified restriction; one cannot merely count action labels and ignore the observation model.
+
+Our bound displays the dimensions and contextual-reset cost explicitly, but it is quadratic in $D$ and includes additional factors in $n$ and accuracy logarithms. It does not match the cited lower bound. A sharper method may aggregate information across action coordinates, share context regret without negative-regret contamination, or improve the game-size lower bound. No such matching argument is supplied. The full catalogue task therefore remains partial, with a complete valid protocol and a precise unresolved polynomial gap.
+
+\begin{thebibliography}{9}
+\bibitem{source} B. H. Zhang, T. Lin, Y. Chen and T. Sandholm, \emph{Learning a Game by Paying the Agents}, arXiv:2503.01976v3, Sections 3--4, Theorems 4.2--4.4 and Section 6. \url{https://arxiv.org/html/2503.01976v3}. The source provides the model and existing bounds. The fresh-context pair-comparison proof above is an explicit specialization, with no claim to optimize its polynomial factors.
+\end{thebibliography}
+
+\end{document}

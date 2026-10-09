@@ -1,0 +1,112 @@
+% ECONOMICS_PROBLEM: {"id": "I32-523", "title": "Reliable poverty estimates without fresh surveys", "jel_code": "I32", "source_id": "OP-0379"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\title{Poverty without fresh surveys: honest interval limits and sample allocation}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{I32-523}. \textbf{Status:} Unresolved. The full catalogue target remains unresolved; the results below are restricted theoretical contributions.
+
+\section{The information gap}
+At date zero the catalogue observes consumption $C_0$ and predictors $X_0$; at date one it observes $X_1$ but not consumption. The target is $H_1=\Prob(C_1<z)$ in harmonized real units. Write $h_t(x)=\Prob(C_t<z\mid X_t=x)$. On a declared transportable region $S$, assume absolute continuity $F_{X_1}|_S\ll F_{X_0}$ and a bound $|h_1-h_0|\le\epsilon$. Outside $S$, poverty probabilities remain unrestricted. The catalogue already states the corresponding sharp population bounds. This attempt develops their statistical implications, an honest finite-cell interval and a small-sample acquisition calculation rather than merely restating the endpoints.
+
+The World Bank research call motivates robustness under structural shifts. It does not provide a verified numerical value of $\epsilon$ for any country. No imputed current headcount is claimed here. All survey arguments below use explicitly independent stratified samples; complex survey clustering and unequal inclusion weights would require their actual design variance or concentration bounds.
+
+\section{Irreducible uncertainty and an interval lower bound}
+Denote the population bounds by
+\[
+ L=\int_S(h_0-\epsilon)_+\,dF_1,\qquad
+ U=\int_S\min(1,h_0+\epsilon)\,dF_1+F_1(S^c),
+\]
+where $F_1=F_{X_1}$. Every value in $[L,U]$ is attainable: interpolate the lower and upper conditional poverty-probability functions, assign consumption $z/2$ to poor households and $2z$ to others, and leave the observed date-zero and date-one predictor laws unchanged. This construction uses no restrictions on consumption beyond those in the stated bounded-shift class.
+\begin{proposition}
+Let $I$ be any random interval computed only from the observed surveys, with coverage at least $1-\alpha$ for every compatible model. Its expected length under their common observed law satisfies
+\[
+ E|I|\ge(1-2\alpha)_+(U-L).
+\tag{1}
+\]
+Moreover every estimator based on that law has worst-case mean squared error at least $(U-L)^2/4$ over the two endpoint models.
+\end{proposition}
+\begin{proof}
+Endpoint models have identical observed-data distributions. Under that common law the events $L\in I$ and $U\in I$ each have probability at least $1-\alpha$, so their intersection has probability at least $1-2\alpha$. An interval containing both has length at least $U-L$, proving (1). For any estimator $\widehat H$, let $m=(L+U)/2$. The average of its squared risks at the two endpoints is
+\[
+ \tfrac12 E[(\widehat H-L)^2+(\widehat H-U)^2]
+ =E[(\widehat H-m)^2]+(U-L)^2/4.
+\]
+The larger risk is at least that average, proving the lower bound.
+\end{proof}
+If the population observable laws were known, the fixed midpoint attains the minimax squared risk over the full interval. Larger historical samples remove estimation error but cannot remove the bound's width. In particular, a predictor can fit the old survey perfectly and still fail this current-consumption target whenever future conditional shifts are unrestricted.
+
+\section{A finite-sample interval with declared sampling law}
+Partition the transportable region into $J$ cells. Assume $h_0$ is constant within each cell, with value $p_{0j}$, and let $w_j$ be its known date-one mass. Let $w_o=1-\sum_jw_j$ be the unrestricted mass outside this region. In each source cell observe $n_j>0$ independent Bernoulli poverty indicators with average $\widehat p_{0j}$. Samples are independent across cells. This is a deliberately finite model in which conditioning and overlap are explicit.
+
+Set
+\[
+ r_j=\sqrt{\frac{\log(2J/\alpha)}{2n_j}},\qquad
+ \widehat L=\sum_jw_j\max(0,\widehat p_{0j}-r_j-\epsilon),
+\]
+\[
+ \widehat U=\sum_jw_j\min(1,\widehat p_{0j}+r_j+\epsilon)+w_o.
+\tag{2}
+\]
+Hoeffding's inequality gives $\Prob(|\widehat p_{0j}-p_{0j}|>r_j)\le\alpha/J$. A union bound implies all cell inequalities simultaneously with probability at least $1-\alpha$. On that event the interval $[\widehat L,\widehat U]$ contains the full population identified interval, hence every admissible current headcount. This is uniform finite-sample coverage over the stated independent Bernoulli class.
+
+The clipped endpoint maps are one-Lipschitz. Relative to population endpoints, the sampling expansion on the same event is at most $2\sum_jw_jr_j$ at each end: the center can miss by $r_j$ and the confidence expansion adds another $r_j$. If one compares the plug-in endpoints without confidence expansion, the error is at most $\sum_jw_jr_j$. These separate bounds avoid confusing estimation error with the deliberate confidence enlargement.
+
+Known $w_j$ is an additional simplification. If target-cell masses are estimated, construct a simultaneous confidence region for their simplex vector and minimize or maximize the endpoint linear functions over that region jointly with the source bounds. Treating estimated weights as fixed would generally understate uncertainty. Refining cells also trades approximation restrictions against sparse-sample widths; arbitrary fine prediction bins do not guarantee conditional invariance.
+
+\section{How to allocate a small current-consumption sample}
+Suppose the target population has strata $j=1,\ldots,K$, including new-support strata, with known masses $w_j>0$ and independent current Bernoulli samples of sizes $n_j$. The unbiased stratified estimator is $\widehat H=\sum_jw_j\widehat p_{1j}$ and
+\[
+ \Var(\widehat H)=\sum_j\frac{w_j^2p_{1j}(1-p_{1j})}{n_j}.
+\]
+Let per-observation costs be $c_j>0$ and the total budget $B$. In the continuous allocation relaxation, if variances $\sigma_j^2=p_{1j}(1-p_{1j})$ are positive and known, the optimum is
+\[
+ n_j=\frac{B w_j\sigma_j/\sqrt{c_j}}
+            {\sum_k w_k\sigma_k\sqrt{c_k}},\qquad
+ \min\Var(\widehat H)=\frac{(\sum_jw_j\sigma_j\sqrt{c_j})^2}{B}.
+\tag{3}
+\]
+\begin{proof}
+Cauchy--Schwarz gives
+$(\sum_jw_j\sigma_j\sqrt{c_j})^2
+\le(\sum_jw_j^2\sigma_j^2/n_j)(\sum_jc_jn_j)$.
+Equality holds when $n_j$ is proportional to $w_j\sigma_j/\sqrt{c_j}$, and the budget determines the constant. This proves both formulas.
+\end{proof}
+If nothing is known about current probabilities, replace each variance by its maximum $1/4$. This yields a minimax variance allocation $n_j\propto w_j/\sqrt{c_j}$ and value $(\sum_jw_j\sqrt{c_j})^2/(4B)$. If a credible band $p_{1j}\in[l_j,u_j]$ is available, use the maximum of $p(1-p)$ on that band; its maximizing point is the band point nearest $1/2$. Integer rounding, minimum stratum samples and fixed travel costs require a modified allocation problem and can invalidate the exact relaxed value.
+
+Current-sample confidence bands and historical shift bands can be intersected on a joint coverage event, with error probabilities allocated between them. This can sharply reduce out-of-support uncertainty because new consumption is observed directly. An empty intersection is evidence against the restrictions or the sampling event and must be reported; it should not silently be replaced by a favorable headcount. The allocation formula minimizes a variance criterion, not every possible expected interval length under bounded shift, so it is a benchmark for the catalogue's broader acquisition problem.
+
+\section{Household decisions and evaluation}
+For a household probability known only to lie in $[l,u]$, declaring the household poor incurs expected false-positive loss $c_{FP}(1-p)$; declaring it nonpoor incurs false-negative loss $c_{FN}p$. Among deterministic decisions, the minimax rule declares poor exactly when
+\[
+ c_{FP}(1-l)\le c_{FN}u.
+\]
+The two sides are the respective worst-case losses. This rule need not minimize risk at every probability in the band. Randomized decisions form a larger action class and can improve worst-case loss; for $[0,1]$ and equal costs, a fair random classification has worst-case loss $1/2$ whereas either deterministic choice has worst-case loss one. Reporting an uncertainty flag can be more appropriate when the application permits abstention with a stated cost.
+
+Held-out historical surveys can compare aggregate errors and classification losses under actual earlier shifts, while deliberately shifted simulations test specified failures. Neither certifies future invariance or an untested numerical $\epsilon$. The unresolved task is to justify a realistic shift class, incorporate the actual survey design, select useful new measurements and evaluate those methods on current data. The derivations above provide honest limits and restricted procedures, rather than a data-free solution to current poverty measurement.
+
+\begin{thebibliography}{9}
+\bibitem{poverty} P. Corral, H. Stemmler, A. Ham, J. Fernandez, L. Lucchetti and P. Lanjouw (2025), \emph{Bridging the survey gap: a call for innovative methods to predict poverty}, World Bank, 4 December, competition discussion and final research questions. Primary author post: \url{https://blogs.worldbank.org/en/opendata/bridging-the-survey-gap--a-call-for-innovative-methods-to-predic}. The concentration, indistinguishability and allocation arguments here are self-contained standard statistical calculations.
+\end{thebibliography}
+
+\end{document}
