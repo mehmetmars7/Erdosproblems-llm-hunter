@@ -1,0 +1,918 @@
+% ECONOMICS_PROBLEM: {"id": "C73-10", "title": "Ordinary uniform approximate equilibria in quitting games", "jel_code": "C73", "source_id": "OP-0591"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TEX program = pdflatex
+% Self-contained source; no external BibTeX file or image assets required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,array,microtype,enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!55!black,citecolor=blue!55!black,urlcolor=blue!55!black]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\allowdisplaybreaks[2]
+\setlength{\parskip}{0.3em}
+\setlength{\parindent}{1.35em}
+\setlist{nosep}
+\numberwithin{equation}{section}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\NN}{\mathbb N_0}
+\newcommand{\EE}{\mathbb E}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\one}{\mathbf 1}
+\newcommand{\Reg}{\operatorname{Reg}}
+\newcommand{\NE}{\operatorname{NE}}
+\newcommand{\Delt}{\Delta}
+\newcommand{\cC}{\vec C}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\given}{\,|\,}
+\newcommand{\R}{\mathbb R}
+\title{Quitting Games and Uniform Equilibria:\\
+\large A Consolidated Mathematical Audit of Truncation, Cyclic Equilibria, and Finite Certificates}
+\author{GPT 6 Astra Pro}
+\date{8 October 2026}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C73-10}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 1\par
+\noindent\textbf{Status:} Unresolved for the complete catalogue problem; this manuscript records partial results and research attempts.\par
+\maketitle
+\begin{abstract}
+We investigate the open question whether every quitting game with finitely many
+players admits an ordinary uniform $\eps$-equilibrium for every $\eps>0$.
+We collect and carefully distinguish three kinds of conclusions. First, the
+stopping-time representation yields an exact identity for the only discontinuity
+created when quitting times escape to infinity, and an error bound for Nash
+equilibria of finite terminal truncations. Second, in an explicit classical
+three-player cyclic quitting game, we prove that the infinite game has a
+subgame-perfect exact equilibrium although \emph{every} exact Nash equilibrium
+of \emph{every} finite terminal truncation has unrestricted deviation gain
+strictly exceeding $1/4$; consequently, a tempting universal truncation
+criterion fails. Third, a quantile-rounding and date-compression argument
+gives a quantitative finite-grid approximation to the infimum of unrestricted
+regret, with error at most $(2n-1)D/k$. In particular, a game without
+arbitrarily accurate undiscounted equilibria would admit a rigorous finite
+nonexistence certificate. We supply explicit conversions to long-run-average
+and discounted equilibrium inequalities and illustrate the certificates by
+exact rational grid calculations. These statements do \emph{not} decide
+whether every finite-player quitting game has uniform $\eps$-equilibria.
+\end{abstract}
+
+\tableofcontents
+
+\section{The problem, literature, and scope}\label{sec:intro}
+A \emph{quitting game} is a stochastic game with one nonabsorbing state.
+At each stage all players simultaneously choose to continue or to quit.
+The first stage at which somebody quits determines the absorbing payoff;
+if everybody always continues, a specified continuation payoff applies.
+Despite this spare description, the existence of ordinary approximate
+equilibria for an arbitrary number of players has proved difficult.
+
+The classical treatments of Solan and Vieille \cite{SolanVieille2001} and
+Flesch, Thuijsman, and Vrieze \cite{Flesch1997} exhibit some of the
+underlying phenomena. Two- and three-player quitting games admit the
+relevant approximate equilibrium payoffs, while the unrestricted existence
+question for four or more players is identified as open in the 2026 treatment
+of Ashkenazi-Golan, Krasikov, Rainer, and Solan \cite{AKRS2026}.
+Solan and Solan \cite{SolanSolan2020} prove sunspot $\eps$-equilibrium
+existence for every finite-player quitting game, but public randomization
+is additional structure, not an ordinary equilibrium of the game as given.
+The same paper obtains a positive ordinary uniform-equilibrium conclusion
+under a non-$Q$-matrix condition; other positive classes follow from
+absorption-path arguments \cite{AKRS2024,AKRS2026}.
+
+There is a distinction between exact $0$-equilibria and approximate
+equilibria for every $\eps>0$. Exact $0$-equilibria need not exist
+\cite{Flesch1996,AKRS2026}. Throughout, our \emph{open question} concerns
+existence \emph{for each positive tolerance}, with strategies permitted to
+depend on that tolerance. We do not assert that exact uniform equilibria
+always exist.
+
+Our analysis of this question developed in stages. An initial approach
+tried to take exact equilibria of finite terminal games and send the
+terminal date to infinity. The approach admits a clean error lemma, but
+Section~\ref{sec:counterexample} disproves its universal convergence
+requirement. A replacement takes \emph{arbitrary} finite-support strategies,
+optimizes their regret in the \emph{infinite} game, and proves a quantitative
+approximation theorem (Section~\ref{sec:finite-grid}). The final implication
+is conditional and gives no positive or negative resolution of the open
+question.
+
+\section{Model, evaluations, and strategic regret}\label{sec:model}
+Let $I=\{1,\ldots,n\}$ with $n\ge2$. For each subset $S\subseteq I$ let
+$r^S\in\R^n$. If exactly the players in a nonempty set $S$ quit at the
+first terminating stage, payoffs equal $r^S$ thereafter. Write
+$c=r^\varnothing$ for the payoff vector if nobody ever quits.
+We often use the convenient normalization
+\begin{equation}\label{eq:normalization}
+   r_i^{\{i\}}=0,\qquad c_i<0,\qquad i\in I,
+\end{equation}
+which is the convention in the motivating problem. Except where explicitly
+indicated, the quantitative finite-grid theorem does not require
+\eqref{eq:normalization}.
+
+At stage $t\in\NN$, each player independently chooses $C_i$ or $Q_i$;
+let $\theta\in\NN\cup\{\infty\}$ be the first stage with at least one
+quitter, with $\theta=\infty$ if there is none. A behavior strategy for
+player $i$ is the sequence $x_i=(x_i^t)_{t\ge0}$, where $x_i^t$ is the
+conditional probability of quitting at $t$, provided the game has not
+ended. The undiscounted (terminal) payoff is
+\begin{equation}\label{eq:gamma}
+ \gamma_i(x)=\EE_x\!\left[
+ \one_{\{\theta<\infty\}}r_i^{S_\theta}
+ +\one_{\{\theta=\infty\}}c_i\right].
+\end{equation}
+A profile is an undiscounted $\eps$-Nash equilibrium if for every player
+$i$ and every behavior deviation $\widetilde x_i$,
+\begin{equation}\label{eq:undisc-eq}
+ \gamma_i(\widetilde x_i,x_{-i})-\gamma_i(x)\le\eps.
+\end{equation}
+The equilibrium is $\eps$-subgame-perfect if the analogous inequality
+holds in the continuation game starting at every stage $t$.
+
+For stochastic-game uniformity, give the nonabsorbing state the stage
+payoff $c$, and from the first quitting stage onward give the constant
+absorbing payoff $r^{S_\theta}$. If $g_i^t$ is the resulting stage-payoff
+process, define
+\begin{equation}\label{eq:evaluations}
+ \gamma_i^T(x)=\EE_x\left[\frac1T\sum_{t=0}^{T-1}g_i^t\right],\qquad
+ \gamma_i^\lambda(x)=\EE_x\left[\sum_{t\ge0}\lambda(1-\lambda)^t g_i^t\right].
+\end{equation}
+A \emph{uniform $\eps$-equilibrium} is one profile $x$ for which,
+for all sufficiently large $T$ and all sufficiently small $\lambda>0$,
+no unilateral behavior deviation improves either payoff in
+\eqref{eq:evaluations} by more than $\eps$.
+
+We use the payoff coordinate range
+\begin{equation}\label{eq:D}
+ D(r):=\max_{i\in I}\bigl(\max_{S\subseteq I}r_i^S-\min_{S\subseteq I}r_i^S\bigr).
+\end{equation}
+All payoff comparisons below are bounded by $D(r)$, regardless of the
+absolute size of the payoffs.
+
+\section{Stopping-time normal form and the tail discontinuity}\label{sec:stopping}
+Set $K=\NN\cup\{\infty\}$ with the order topology of the one-point
+compactification of $\NN$. A player's behavior strategy is equivalent to
+a distribution $\mu_i$ of a \emph{planned quitting time} $T_i\in K$:
+\begin{equation}\label{eq:hazards}
+ \mu_i(t)=x_i^t\prod_{s<t}(1-x_i^s),\qquad
+ \mu_i(\infty)=\prod_{s\ge0}(1-x_i^s).
+\end{equation}
+Conversely, as long as the denominator is positive,
+\begin{equation}\label{eq:reverse-hazard}
+ x_i^t=\frac{\mu_i(t)}{\mu_i(\{t,t+1,\ldots\}\cup\{\infty\})};
+\end{equation}
+subsequent hazards may be assigned arbitrarily when the denominator is
+zero. Planned times $T_1,\ldots,T_n$ are mutually independent. Their
+minimum identifies the absorption time, and the set of minimizers
+identifies the quitting coalition. This construction is equivalent to
+behavior strategies, including for unilateral deviations.
+
+Let $U_i(t;\mu_{-i})$ be the expected payoff to player $i$ from the pure
+planned quitting time $t\in K$, with opponents following $\mu_{-i}$.
+Expected payoff is affine in a player's own distribution, so
+\begin{equation}\label{eq:regret}
+ \Reg_r(\mu):=\max_{i\in I}\left\{
+ \sup_{t\in K}U_i(t;\mu_{-i})-\gamma_i(\mu)\right\}
+\end{equation}
+is precisely the maximum possible gain from \emph{any} unilateral
+behavior deviation. In particular,
+\begin{equation}\label{eq:g}
+ g(r):=\inf_{\mu\in\prod_i\Delta(K)}\Reg_r(\mu)
+\end{equation}
+vanishes exactly when the game has undiscounted $\eps$-equilibria for
+all $\eps>0$.
+
+\begin{proposition}[Exact tail discontinuity]\label{prop:tail}
+For arbitrary independent opponents' quitting times, let
+$q_j=\mu_j(\infty)$. Under \eqref{eq:normalization},
+\begin{equation}\label{eq:tail}
+ \lim_{t\to\infty}\bigl(U_i(t;\mu_{-i})-U_i(\infty;\mu_{-i})\bigr)
+ =(-c_i)\prod_{j\ne i}q_j.
+\end{equation}
+Without the normalization, the right-hand side is
+$(r_i^{\{i\}}-c_i)\prod_{j\ne i}q_j$.
+\end{proposition}
+\begin{proof}
+Fix a realization of the opponents' planned times. If at least one
+opponent quits at a finite time, sufficiently late finite $t$ and
+$t=\infty$ give the same payoff. If every opponent chooses $\infty$,
+a finite $t$ gives the sole-quitter payoff $r_i^{\{i\}}$, whereas
+$\infty$ gives $c_i$. Take expectations and apply bounded convergence;
+the probability of the latter event is $\prod_{j\ne i}q_j$.
+\end{proof}
+
+The payoff kernel is continuous at pure time profiles with at least one
+finite coordinate, but may be discontinuous at
+$(\infty,\ldots,\infty)$. Formula \eqref{eq:tail} identifies the lost
+payoff when finite quitting dates move arbitrarily far into the future.
+Ordinary weak compactness of quitting-time distributions consequently
+does not preserve best-response inequalities automatically.
+
+\section{The exact-terminal-truncation attempt}\label{sec:trunc}
+For $h\ge1$, let $H_h$ be the finite normal-form timing game in which
+all players choose a planned time from
+\begin{equation}\label{eq:Kh}
+ K_h:=\{0,1,\ldots,h-1,\infty\},
+\end{equation}
+using the original payoff rule (in particular, the all-$\infty$ outcome
+pays $c$). Such a game has a mixed Nash equilibrium by the finite-game
+existence theorem. Every such mixed profile can also be embedded as a
+behavior profile of the infinite quitting game.
+
+\begin{lemma}[Boundary estimate for an exact truncation equilibrium]\label{lem:boundary}
+Assume \eqref{eq:normalization}. If $\mu\in\NE(H_h)$ and
+$q_i=\mu_i(\infty)$, then in the original infinite quitting game
+\begin{equation}\label{eq:eta}
+ \Reg_r(\mu)\le\eta(\mu),\qquad
+ \eta(\mu):=\max_i(-c_i)\prod_{j\ne i}q_j.
+\end{equation}
+If $\infty$ is in the support of player $i$'s equilibrium distribution,
+then the maximal deviation gain \emph{for that player} is exactly
+$(-c_i)\prod_{j\ne i}q_j$.
+\end{lemma}
+\begin{proof}
+Every pure deviation from $K_h$ is available in $H_h$ and hence
+cannot improve player $i$'s payoff. For any finite $t\ge h$, since
+all opponents' finite planned dates are less than $h$,
+\begin{equation}\label{eq:tailfinite}
+ U_i(t;\mu_{-i})-U_i(\infty;\mu_{-i})
+ =(-c_i)\prod_{j\ne i}q_j.
+\end{equation}
+Since $\infty$ is an available deviation in $H_h$, the equilibrium
+payoff is at least $U_i(\infty;\mu_{-i})$, which proves the upper
+bound. When $\infty$ has positive equilibrium probability for player $i$,
+that action is a best response in $H_h$ and has payoff exactly equal
+to her equilibrium payoff; the late deviation realizes the bound.
+\end{proof}
+
+The lemma suggests choosing terminal-game equilibria whose residual
+never-quit probabilities satisfy
+\begin{equation}\label{eq:badcriterion}
+ \inf_{h\ge1}\min_{\mu\in\NE(H_h)}
+ \max_i(-c_i)\prod_{j\ne i}\mu_j(\infty)=0.
+\end{equation}
+If this condition held, the lemma would yield arbitrarily accurate
+undiscounted equilibria. It is a \emph{sufficient} criterion, but it is
+\emph{not necessary}. Section~\ref{sec:counterexample} gives a complete
+three-player refutation of its universal validity.
+
+\section{A cyclic game defeating exact terminal truncation}\label{sec:counterexample}
+Consider the three-player game $\Gamma_*$ with quitting-coalition
+payoffs in Table~\ref{tab:cyclic}. This is the normalized classical
+cyclic-game example associated with Flesch, Thuijsman, and Vrieze
+\cite{Flesch1997,AKRS2026}; its use here is as a counterexample to a
+\emph{proof method}, not as a counterexample to equilibrium existence.
+\begin{table}[htbp]
+\centering
+\caption{The cyclic three-player quitting game $\Gamma_*$.}
+\label{tab:cyclic}
+\begin{tabular}{@{}cl@{}}\toprule
+Quitting set $S$ & Payoff vector $r^S$\\\midrule
+$\varnothing$ & $(-1,-1,-1)$\\
+$\{1\}$ & $(0,2,-1)$\\
+$\{2\}$ & $(-1,0,2)$\\
+$\{3\}$ & $(2,-1,0)$\\
+$\{1,2\}$ & $(0,-1,0)$\\
+$\{1,3\}$ & $(-1,0,0)$\\
+$\{2,3\}$ & $(0,0,-1)$\\
+$\{1,2,3\}$ & $(-1,-1,-1)$\\\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{An exact cyclic subgame-perfect equilibrium}
+Consider the infinite three-stage periodic behavior profile
+\begin{equation}\label{eq:cycle}
+ (1/2,0,0),\qquad(0,1/2,0),\qquad(0,0,1/2),
+ \quad\text{repeated forever.}
+\end{equation}
+Here the triple at each stage lists quitting probabilities for
+players $1,2,3$. The associated continuation payoffs at the beginning
+of the three phases are
+\begin{equation}\label{eq:cyclevalues}
+ v^{(1)}=(0,1,0),\quad v^{(2)}=(0,0,1),\quad v^{(3)}=(1,0,0).
+\end{equation}
+Indeed,
+\[
+ v^{(1)}=\tfrac12 r^{\{1\}}+\tfrac12 v^{(2)}=(0,1,0),
+\]
+with the other two recursions following cyclically. At phase $1$,
+player $1$ is indifferent between quitting and continuing (each yields
+$0$); player $2$ earns $1$ by continuing and $-1/2$ by quitting;
+player $3$ earns $0$ by either action. The other phases follow by
+rotation of player indices.
+
+These one-stage incentive checks are sufficient for arbitrary
+deviations: under \emph{any} deviation by one player, the other two
+players independently quit with probability $1/2$ at their respective
+positions once per block. Their joint probability of not absorbing
+the game for $k$ full blocks is $4^{-k}$. Thus any player's payoff under
+any deviation differs negligibly, as $k\to\infty$, from one determined
+by the first $k$ blocks. Finite-horizon backward optimality and the
+one-stage checks establish all best-response inequalities.
+We have proved:
+\begin{proposition}\label{prop:cycle}
+The infinite game $\Gamma_*$ possesses a subgame-perfect
+undiscounted exact $0$-equilibrium, given by \eqref{eq:cycle}.
+\end{proposition}
+
+\subsection{A one-stage uniqueness calculation}
+We now calculate \emph{all} Nash equilibria of the terminal games
+$H_h$ in this example. Consider a one-stage game whose payoff, if all
+continue, is the common number $v\in[-1,0)$ for each player. Write
+$x_i$ for player $i$'s probability of quitting. The advantage of
+quitting instead of continuing for player $1$ is
+\begin{equation}\label{eq:D1}
+ D_1=x_2-3x_3+x_2x_3-v(1-x_2)(1-x_3),
+\end{equation}
+with the analogous cyclic expressions for the other players.
+
+\begin{lemma}[Unique one-stage equilibrium]\label{lem:onestage}
+For $-1\le v<0$, the one-stage game has a unique Nash equilibrium,
+which is symmetric and completely mixed, with
+\begin{equation}\label{eq:onestageprob}
+ x_1=x_2=x_3=p(v):=1-\frac1{\sqrt{1-v}}.
+\end{equation}
+Its equilibrium payoff vector is $(-p(v),-p(v),-p(v))$.
+Furthermore, for \emph{any} continuation payoff vector $v\in\R^3$
+(not necessarily symmetric), no Nash equilibrium of the one-stage
+game has any player quit with probability $1$.
+\end{lemma}
+\begin{proof}
+First prove the final assertion. If $x_1=1$, then player $2$'s
+advantage from quitting is $D_2=2x_3-3<0$, so $x_2=0$.
+Given $x_1=1,x_2=0$, player $3$'s quitting advantage is $1>0$, so
+$x_3=1$. But then player $1$'s quitting advantage is $-3<0$,
+a contradiction. Cyclic relabeling excludes $x_2=1$ and $x_3=1$.
+
+Now assume $v_1=v_2=v_3=v\in[-1,0)$. If $x_1=0$, player $2$'s
+quitting advantage is $x_3-v(1-x_3)>0$, forcing $x_2=1$, which is
+impossible. By symmetry every $x_i$ belongs to $(0,1)$.
+Set the quitting odds $z_i=x_i/(1-x_i)>0$. Dividing the
+indifference equations $D_i=0$ by the positive products of the other
+players' continuation probabilities yields
+\begin{align}\label{eq:odds}
+ v&=z_2-3z_3-z_2z_3,\\
+ v&=z_3-3z_1-z_3z_1,\nonumber\\
+ v&=z_1-3z_2-z_1z_2.\nonumber
+\end{align}
+In particular, if some $z_1\ge1$ then the second equation gives
+$v=z_3(1-z_1)-3z_1\le-3$, contradicting $v\ge-1$.
+Thus $0<z_i<1$ for all $i$. Put
+\[
+ f_v(z)=\frac{v+3z}{1-z},\qquad f_v'(z)=\frac{3+v}{(1-z)^2}>0.
+\]
+Equations \eqref{eq:odds} assert that
+$z_2=f_v(z_3)$, $z_3=f_v(z_1)$, and $z_1=f_v(z_2)$.
+A strictly increasing real map has no nontrivial finite cycle, so
+$z_1=z_2=z_3$, hence $x_1=x_2=x_3=x$.
+Equation \eqref{eq:D1} now reduces to
+\[
+ v=-\frac{x(2-x)}{(1-x)^2}=1-\frac1{(1-x)^2},
+\]
+which uniquely yields \eqref{eq:onestageprob}. Direct evaluation of
+the pure-quitting payoff gives $-x$; by indifference, this is the
+one-stage equilibrium payoff. The fully mixed profile satisfying these
+equalities is indeed a Nash equilibrium.
+\end{proof}
+
+\subsection{All exact terminal equilibria and a positive regret gap}
+Define recursively
+\begin{equation}\label{eq:p-rec}
+ p_0=1,\qquad
+ p_{k+1}=1-\frac1{\sqrt{1+p_k}},\qquad k\ge0,
+\end{equation}
+and put
+\begin{equation}\label{eq:qrec}
+ q_h:=\prod_{k=1}^{h}(1-p_k).
+\end{equation}
+
+\begin{theorem}[Failure of the universal truncation criterion]\label{thm:terminal-obstruction}
+For every integer $h\ge1$, the finite terminal timing game $H_h$
+associated with $\Gamma_*$ has \emph{exactly one} Nash equilibrium
+$\mu^{(h)}$. It has all three players quit independently with
+probabilities $p_h,p_{h-1},\ldots,p_1$ at the successive stages and
+has per-player payoff $-p_h$. When interpreted in the infinite quitting
+game,
+\begin{equation}\label{eq:qgap}
+ \Reg_{\Gamma_*}(\mu^{(h)})=q_h^2>\frac14.
+\end{equation}
+In particular, criterion \eqref{eq:badcriterion} is false even for a
+game possessing an exact subgame-perfect equilibrium.
+\end{theorem}
+\begin{proof}
+The continuation payoffs after the last available finite date are
+$(-1,-1,-1)$. By Lemma~\ref{lem:onestage}, the one-stage game at
+the last date has the unique symmetric mixed equilibrium with quitting
+probability $p_1$ and continuation payoff $-p_1$.
+
+We must justify applying backward induction to \emph{all} Nash
+equilibria of $H_h$, rather than just subgame-perfect equilibria.
+At any continuation history reached with positive probability, a Nash
+equilibrium induces a one-stage Nash equilibrium when its actual
+continuation payoffs are inserted at the all-continue action profile.
+By the final assertion of Lemma~\ref{lem:onestage}, no player quits
+with probability $1$ at such a history. Hence the next all-continue
+history also has positive probability. Induction from the initial stage
+shows that \emph{every} continuation history is reached with positive
+probability. Consequently, Nash equilibrium behavior is optimal at
+every stage, and the one-stage uniqueness lemma can be applied
+backwards. Its recursive formula is exactly \eqref{eq:p-rec}; this
+proves existence and uniqueness of the specified finite equilibrium.
+
+Each player's probability of choosing $\infty$ is $q_h>0$.
+Therefore the terminal action $\infty$ lies in every player's
+equilibrium support. Lemma~\ref{lem:boundary}, including its equality
+case, now gives
+$\Reg_{\Gamma_*}(\mu^{(h)})=q_h^2$.
+
+It remains to prove the uniform lower bound. From \eqref{eq:p-rec},
+\[
+ 1+p_{k-1}=\frac1{(1-p_k)^2},\qquad
+ (1-p_k)(1+p_{k-1})=\frac1{1-p_k}\ge1+p_k.
+\]
+Multiplying and telescoping gives
+\[
+ q_h\ge\prod_{k=1}^h\frac{1+p_k}{1+p_{k-1}}
+ =\frac{1+p_h}{2}>\frac12,
+\]
+because $p_h>0$. Squaring proves \eqref{eq:qgap}.
+\end{proof}
+
+\begin{remark}[What was actually disproved]
+The theorem is \emph{not} a counterexample to approximate-equilibrium
+existence; Proposition~\ref{prop:cycle} gives an exact equilibrium for
+the same game. Nor does it show failure of arbitrary finite-prefix
+approximations. It disproves the particular program of taking
+\emph{exact Nash equilibria} of terminal games with an artificial
+all-continue terminal payoff and expecting their infinite-game regret
+to tend to zero.
+\end{remark}
+
+\subsection{Finite cyclic prefixes do approximate equilibria}
+Repeat the three-stage block \eqref{eq:cycle} exactly $k$ times,
+then instruct every player to continue forever. Call this profile
+$x^{[k]}$. One block survives with probability $1/8$ and has
+unconditional absorbing-payoff contribution $(0,7/8,0)$. Thus
+\begin{equation}\label{eq:prefix-payoff}
+ \gamma(x^{[k]})=
+ \bigl(-8^{-k},\,1-2\cdot8^{-k},\,-8^{-k}\bigr).
+\end{equation}
+For an unrestricted deviator after the finite prefix, the appropriate
+terminal best-response value is
+$\max\{r_i^{\{i\}},c_i\}=0$, \emph{not} $-1$: such a deviator may
+quit alone after everyone else has been instructed to continue.
+For clarity, start the best-response backward induction at
+$W=(0,0,0)$ after the last prescribed block. At a stage where only
+player $j$ may quit, with probability $1/2$, the deviator $i=j$
+chooses between $0$ and $W_j$; a deviator $i\ne j$ chooses between
+$\tfrac12 r_i^{\{i,j\}}$ and
+$\tfrac12 r_i^{\{j\}}+\tfrac12 W_i$.
+Applying these recursions backwards through the stages with active
+players $3,2,1$ gives
+\[
+ (0,0,0)\xrightarrow{j=3}(1,0,0)
+ \xrightarrow{j=2}(0,0,1)
+ \xrightarrow{j=1}(0,1,0).
+\]
+Starting instead from $(0,1,0)$ gives exactly the same three
+intermediate vectors and ends again at $(0,1,0)$; thus appending
+whole blocks does not change the best-response payoff vector.
+Consequently,
+\begin{equation}\label{eq:prefix-reg}
+ \Reg_{\Gamma_*}(x^{[k]})=2\cdot8^{-k}\longrightarrow0.
+\end{equation}
+This demonstrates the exact distinction: arbitrary finite-support
+profiles can approximate an infinite equilibrium even when exact
+terminal Nash equilibria cannot.
+
+\section{The finite-grid replacement}\label{sec:finite-grid}
+The obstruction motivates optimizing regret directly over arbitrary
+finite-support profiles, rather than first imposing the Nash equations
+of a truncated terminal game. The next result is a quantitative
+approximation of the \emph{global} infimum $g(r)$.
+
+Fix $k\ge1$ and set $H=nk$. Let $\mathcal G_{n,k}$ denote the set of
+all product distributions $\mu=\bigotimes_i\mu_i$ in which each marginal
+$\mu_i$ is the empirical distribution of $k$ (not necessarily distinct)
+points in
+\begin{equation}\label{eq:grid-space}
+ K_H=\{0,1,\ldots,H-1,\infty\}.
+\end{equation}
+These are exactly the marginals whose probability masses are integer
+multiples of $1/k$. There are
+\begin{equation}\label{eq:gridcount}
+ |\mathcal G_{n,k}|=\binom{(n+1)k}{k}^{n}
+\end{equation}
+independent profiles. Define
+\begin{equation}\label{eq:mk}
+ m_k(r)=\min_{\mu\in\mathcal G_{n,k}}\Reg_r(\mu).
+\end{equation}
+We stress that \eqref{eq:mk} uses unrestricted infinite-game regret.
+
+\begin{theorem}[Quantitative finite-grid approximation]\label{thm:grid}
+For every $n\ge2$, every finite-player quitting-game payoff table
+$r$, and every positive integer $k$,
+\begin{equation}\label{eq:grid-main}
+ 0\le m_k(r)-g(r)\le\frac{(2n-1)D(r)}k.
+\end{equation}
+Equivalently,
+\begin{equation}\label{eq:grid-interval}
+ \max\!\left\{0,m_k(r)-\frac{(2n-1)D(r)}k\right\}
+ \le g(r)\le m_k(r).
+\end{equation}
+No assumption such as \eqref{eq:normalization} is needed.
+\end{theorem}
+\begin{proof}
+\emph{Step 1: midpoint-quantile rounding.}
+Fix any profile $\mu=\bigotimes_i\mu_i$. For each $i$ and
+$\ell\in\{1,\ldots,k\}$, choose the leftmost $t_{i,\ell}\in K$
+whose cumulative distribution function reaches
+$u_\ell=(2\ell-1)/(2k)$, and define
+\[
+ \nu_i=\frac1k\sum_{\ell=1}^k\delta_{t_{i,\ell}}.
+\]
+A quantile may equal $\infty$. Standard midpoint rounding gives,
+for every finite $t$, as well as for every left limit,
+\begin{equation}\label{eq:cdf-control}
+ \bigl|F_{\nu_i}(t)-F_{\mu_i}(t)\bigr|\le\frac1{2k}.
+\end{equation}
+The inequality also applies to the total finite mass, by taking
+$t\to\infty$.
+
+\emph{Step 2: the payoff is a three-level function of one stopping
+time.} Fix every stopping time except that of player $j$ and inspect
+any coordinate $i$. If the earliest among the fixed times is a finite
+$a$, and $J$ is the set of fixed players quitting at $a$, then as a
+function of $s=T_j$ the payoff is
+\[
+ f(s)=\begin{cases}
+ A=r_i^{\{j\}},&s<a,\\
+ B=r_i^{J\cup\{j\}},&s=a,\\
+ C=r_i^J,&s>a.
+ \end{cases}
+\]
+Let $\Delta F=F_{\nu_j}-F_{\mu_j}$. The change in the expectation
+of $f$ is exactly
+\[
+ (A-B)\Delta F(a-)+(B-C)\Delta F(a).
+\]
+By \eqref{eq:D} and \eqref{eq:cdf-control}, its absolute value is
+at most $D(r)/k$. If all fixed times equal $\infty$, there are only
+two payoff levels, and the same bound holds. Averaging over the fixed
+stopping times preserves the bound.
+
+\emph{Step 3: all unilateral deviations are controlled.}
+Replace the $n$ marginals successively. The bound just established
+gives, simultaneously for all players,
+\begin{equation}\label{eq:gamma-round}
+ |\gamma_i(\nu)-\gamma_i(\mu)|\le\frac{nD(r)}k.
+\end{equation}
+For any fixed pure deviation $t\in K$, only the other $n-1$
+marginals change, and the same estimate is uniform in $t$:
+\begin{equation}\label{eq:U-round}
+ \sup_{t\in K}\bigl|U_i(t;\nu_{-i})-U_i(t;\mu_{-i})\bigr|
+ \le\frac{(n-1)D(r)}k.
+\end{equation}
+Combining \eqref{eq:gamma-round} and \eqref{eq:U-round} yields
+\begin{equation}\label{eq:reg-round}
+ \Reg_r(\nu)\le\Reg_r(\mu)+\frac{(2n-1)D(r)}k.
+\end{equation}
+
+\emph{Step 4: date compression.}
+The union of the finite supports of the $\nu_i$ has at most $nk$
+points. Let the distinct finite support dates be
+$s_0<\cdots<s_{L-1}$, with $L\le nk$. Replace the date $s_a$ by $a$
+for every player, leaving $\infty$ unchanged, and call the product
+profile $\widehat\nu$. Every realized order and every tie of planned
+times is preserved, so
+\begin{equation}\label{eq:compress-gamma}
+ \gamma_i(\widehat\nu)=\gamma_i(\nu).
+\end{equation}
+For deviations, each new finite quitting time $a<L$ has the same
+payoff as the original deviation $s_a$; every new finite time
+$t\ge L$ has the same payoff as the original deviation
+$s_{L-1}+1$; and the deviation $\infty$ is unchanged. If $L=0$,
+the same conclusion follows by comparing immediate finite quitting
+with never quitting. Thus compression may delete old deviation
+opportunities but cannot create a new payoff level, and
+\begin{equation}\label{eq:compress-reg}
+ \Reg_r(\widehat\nu)\le\Reg_r(\nu).
+\end{equation}
+The profile $\widehat\nu$ belongs to $\mathcal G_{n,k}$.
+Consequently, for arbitrary $\mu$,
+\[
+ m_k(r)\le\Reg_r(\widehat\nu)
+ \le\Reg_r(\mu)+\frac{(2n-1)D(r)}k.
+\]
+Take the infimum over $\mu$ to obtain the upper bound in
+\eqref{eq:grid-main}. The lower bound follows from
+$\mathcal G_{n,k}\subseteq\prod_i\Delta(K)$.
+\end{proof}
+
+\begin{remark}[Neither correlation nor a compactness shortcut]
+Each rounded marginal remains independent of the others. Date
+compression is the same deterministic relabeling for every player;
+it preserves independence. No public signal is introduced. The
+argument avoids a hidden appeal to continuity at the all-$\infty$
+profile by bounding payoff errors before compressing dates.
+\end{remark}
+
+\section{Exact grid regret and finite nonexistence certificates}\label{sec:certificates}
+For a profile supported on $K_H$, the deviation payoff is constant
+for finite quitting times $t\ge H$. In full generality, the set of
+candidate deviations reduces to
+\begin{equation}\label{eq:finite-deviation-list}
+ \{0,1,\ldots,H,\infty\}.
+\end{equation}
+Under \eqref{eq:normalization}, set $q_j=\mu_j(\infty)$.
+The exact late-deviation identity is
+\begin{equation}\label{eq:late-general}
+ U_i(H;\mu_{-i})=U_i(\infty;\mu_{-i})
+ -c_i\prod_{j\ne i}q_j.
+\end{equation}
+Since $-c_i>0$, the late finite deviation weakly dominates never
+quitting, and therefore
+\begin{equation}\label{eq:finite-regret-formula}
+ \Reg_r(\mu)=\max_i\Bigg[
+ \max\left\{U_i(0;\mu_{-i}),\ldots,
+ U_i(H-1;\mu_{-i}),
+ U_i(\infty;\mu_{-i})-c_i\prod_{j\ne i}q_j\right\}
+ -\gamma_i(\mu)\Bigg].
+\end{equation}
+Importantly, the deviation immediately \emph{after} the last
+date cannot be omitted.
+
+\begin{corollary}[Finite certificate of failure of approximate equilibrium]\label{cor:certificate}
+Set $C(r)=(2n-1)D(r)$. The following are equivalent:
+\begin{align}\label{eq:finite-iff}
+ &g(r)>0;\\
+ &\exists\,k\ge1\text{ such that }m_k(r)>\frac{C(r)}k.\notag
+\end{align}
+If an exact calculation establishes $m_k(r)\ge L>C(r)/k$, then
+\begin{equation}\label{eq:cert-low}
+ \Reg_r(\mu)\ge L-\frac{C(r)}k>0
+ \quad\text{for \emph{every} infinite strategy profile }\mu.
+\end{equation}
+\end{corollary}
+\begin{proof}
+Theorem~\ref{thm:grid} proves the implication from the second
+statement to the first and \eqref{eq:cert-low}. Conversely, if
+$g(r)>0$, choose $k$ with $C(r)/k<g(r)$; since
+$m_k(r)\ge g(r)$, the second statement follows.
+\end{proof}
+
+\begin{proposition}[Rational counterexamples would suffice]\label{prop:lipschitz}
+For two games $r,\widetilde r$ with the same player set,
+\begin{equation}\label{eq:Lipschitz}
+ |g(r)-g(\widetilde r)|\le2\|r-\widetilde r\|_\infty.
+\end{equation}
+Thus if a counterexample exists with real payoffs, there is also a
+counterexample with rational payoffs. Rational approximation may be
+chosen to preserve the exact singleton-payoff normalization and the
+strict signs $c_i<0$.
+\end{proposition}
+\begin{proof}
+For fixed $\mu$, replacing $r$ by $\widetilde r$ changes every
+actual payoff and every pure-deviation payoff by at most
+$\|r-\widetilde r\|_\infty$. Therefore it changes
+$\Reg_r(\mu)$ by at most twice this amount. Infima over $\mu$
+preserve the same Lipschitz bound. Choose a rational table sufficiently
+close to a hypothetical $r$ with $g(r)>0$.
+\end{proof}
+
+\begin{corollary}[Equivalent universal finite inequalities]\label{cor:positive}
+Every $n$-player quitting game has undiscounted $\eps$-equilibria
+for every $\eps>0$ if and only if
+\begin{equation}\label{eq:unproved}
+ m_k(r)\le\frac{(2n-1)D(r)}k
+ \qquad\text{for every payoff table $r$ and every }k\ge1.
+\end{equation}
+\end{corollary}
+\begin{proof}
+If all such games have $g(r)=0$, Theorem~\ref{thm:grid} gives
+\eqref{eq:unproved}. Conversely, \eqref{eq:unproved} and
+$0\le g(r)\le m_k(r)$ imply $g(r)=0$ upon letting $k\to\infty$.
+\end{proof}
+
+The inequalities \eqref{eq:unproved} are \emph{not} proved here.
+Theorem~\ref{thm:grid} gives only
+$m_k(r)\le g(r)+C(r)/k$. Replacing the right-hand side with
+$C(r)/k$ without another argument would assume the conclusion of
+the open conjecture. At fixed $n,k$, each grid profile's regret is the
+maximum of finitely many linear expressions in the payoff table,
+with rational coefficients. A complete lower-bound certificate for a
+fixed rational game is therefore finite and exactly checkable. It
+may, however, require an astronomically large enumeration.
+
+\section{From finite undiscounted profiles to uniform approximations}\label{sec:uniform}
+The reduction has a direct uniform-equilibrium interpretation.
+Let $\Reg_T(\mu)$ and $\Reg_\lambda(\mu)$ be the maximum unilateral
+gains under the $T$-stage average and $\lambda$-discounted evaluations
+in \eqref{eq:evaluations}, respectively.
+
+\begin{theorem}[Uniform error bounds for finite-support profiles]\label{thm:uniform}
+If each player's stopping-time distribution is supported on
+$K_H=\{0,\ldots,H-1,\infty\}$, then
+\begin{equation}\label{eq:uniform-bound}
+ \Reg_T(\mu)\le\Reg_r(\mu)+\frac{2D(r)H}{T},
+ \qquad
+ \Reg_\lambda(\mu)\le\Reg_r(\mu)+2D(r)H\lambda.
+\end{equation}
+\end{theorem}
+\begin{proof}
+Under the prescribed profile, either absorption occurs at a stage
+less than $H$, or nobody ever quits. Therefore its $T$-average payoff
+differs from the terminal payoff by at most $D(r)H/T$, and the
+discounted payoff differs by at most
+$D(r)[1-(1-\lambda)^H]\le D(r)H\lambda$.
+
+The same bounds apply to any pure deviation to a quitting time
+$t\le H$ or $t=\infty$: absorption then either occurs before $H$
+or never occurs. If a deviator instead chooses finite $t>H$, all
+opponents who quit do so before $H$ and thereby make the late
+deviation irrelevant. Conditional on all opponents choosing $\infty$,
+the evaluated payoff is a convex combination of $c_i$ and
+$r_i^{\{i\}}$, with the weight on $r_i^{\{i\}}$ no larger than it is
+at time $H$. For either evaluation, such a late deviation has a
+payoff no greater than the maximum of quitting at $H$ and never
+quitting. Hence the evaluated best-response payoff exceeds the
+undiscounted best-response payoff by at most the respective one-sided
+bound. Subtract the lower bound for the prescribed profile's own
+evaluated payoff. Mixed deviations are convex combinations of pure
+deviations, completing the proof.
+\end{proof}
+
+\begin{corollary}[Ordinary and uniform approximate existence are equivalent]\label{cor:equivalence}
+For any finite-player quitting game in the sense of
+Section~\ref{sec:model}, the following are equivalent:
+\begin{enumerate}[label=(\roman*)]
+\item for every $\eps>0$ there is an undiscounted $\eps$-equilibrium;
+\item for every $\eps>0$ there is a uniform $\eps$-equilibrium.
+\end{enumerate}
+\end{corollary}
+\begin{proof}
+(i)$\Rightarrow$(ii): fix $\eps>0$ and an undiscounted profile of
+regret below $\eps/3$. By Theorem~\ref{thm:grid}, or directly by
+quantile rounding and date compression, it can be approximated by
+a finite-support profile whose regret is less than $2\eps/3$.
+Theorem~\ref{thm:uniform} makes this profile a uniform $\eps$-
+equilibrium for sufficiently large $T$ and small $\lambda$.
+
+(ii)$\Rightarrow$(i): for any fixed behavior profile and any fixed
+unilateral deviation, bounded convergence gives convergence of the
+long-run averages to the undiscounted payoff. A uniform $\eps/2$-
+equilibrium satisfies the average-payoff deviation inequality for all
+large $T$. Passing to the limit separately for each deviation yields
+an undiscounted $\eps/2$-equilibrium, hence an $\eps$-equilibrium.
+\end{proof}
+
+No corresponding assertion about subgame perfection follows just
+from the quantile approximation: rounding and compression do not
+preserve incentive constraints at every continuation history.
+
+\section{Exact finite-grid calculations for the cyclic example}\label{sec:computation}
+The finite-grid theorem is constructive in a theoretical sense.
+For a rational payoff table, \eqref{eq:finite-regret-formula} is a
+rational expression on every grid profile, so $m_k(r)$ is an exactly
+computable rational minimum by exhaustive enumeration. A sampled or
+local numerical minimum is \emph{not} a certificate of nonexistence.
+
+For the payoff table in Table~\ref{tab:cyclic}, exact rational
+enumeration gives the following small-grid results:
+\begin{center}
+\begin{tabular}{@{}cccc@{}}\toprule
+$k$ & $H=nk$ & Number of grid profiles & Exact $m_k(\Gamma_*)$\\\midrule
+$1$ & $3$ & $64$ & $1$\\
+$2$ & $6$ & $21{,}952$ & $1/8$\\\bottomrule
+\end{tabular}
+\end{center}
+One minimizing profile for $k=2$ is the independent product of
+\begin{equation}\label{eq:grid-min-example}
+ T_1\sim\tfrac12\delta_0+\tfrac12\delta_3,\quad
+ T_2\sim\tfrac12\delta_1+\tfrac12\delta_4,\quad
+ T_3\sim\tfrac12\delta_2+\tfrac12\delta_4.
+\end{equation}
+Direct enumeration of the $2^3$ joint planned-time outcomes and of all
+best-response date classes yields
+\begin{equation}\label{eq:grid-min-payoff}
+ \gamma(\mu)=(0,9/8,-1/8),\qquad
+ \bigl(\sup_t U_i(t;\mu_{-i})\bigr)_{i=1}^3=(0,5/4,0),
+\end{equation}
+so the unrestricted regret is $1/8$. Since
+$D(\Gamma_*)=3$ and $(2n-1)D=15$, the theorem's bound
+$m_2-15/2$ gives no positive lower bound on $g(\Gamma_*)$.
+In fact Proposition~\ref{prop:cycle} shows that
+$g(\Gamma_*)=0$. The computations are a check of the explicit
+finite formulation, not evidence of nonexistence.
+
+The exhaustive enumeration has a simple implementation-independent
+specification. Enumerate, for every player, the
+$\binom{H+k}{k}$ multisets of $k$ dates from $K_H$. For each product
+profile and every $i$, compute
+\begin{align*}
+ \gamma_i(\mu)
+ &=\sum_{(t_1,\ldots,t_n)\in K_H^n}
+   \left(\prod_j\mu_j(t_j)\right) r_i^{S(t_1,\ldots,t_n)},\\
+ U_i(t;\mu_{-i})
+ &=\sum_{t_{-i}\in K_H^{n-1}}
+   \left(\prod_{j\ne i}\mu_j(t_j)\right)r_i^{S(t,t_{-i})},
+\end{align*}
+where $S(\cdot)$ is the set of indices attaining the least finite
+date, and $r^\varnothing=c$ when every date is infinite. Evaluate
+the $H+2$ candidate deviations in \eqref{eq:finite-deviation-list}
+and minimize \eqref{eq:regret}. This is a finite exact certificate
+procedure involving no numerical tolerances.
+
+\section{Absorption paths, the residual obstacle, and conclusions}\label{sec:discussion}
+The absorption-path approach of Ashkenazi-Golan, Krasikov, Rainer,
+and Solan \cite{AKRS2024} compactifies absorbing behavior profiles
+using accumulated absorption probability in place of physical time.
+Its sequential-perfectness conditions retain both jump behavior
+(positive simultaneous quitting probabilities at discrete events)
+and continuous components (vanishing quitting rates). The connection
+between such paths and limits of approximate equilibria depends on
+the exclusions of the elementary immediate-absorption and
+never-absorption cases, as specified precisely in
+\cite{AKRS2024,AKRS2026}. The 2026 APS treatment develops an operator
+for a restricted class of paths in which one player is active at a
+time \cite{AKRS2026}; it is not a proof of universal ordinary
+equilibrium existence.
+
+The main lessons of the consolidated attempt can be stated without
+ambiguity:
+\begin{enumerate}[label=\arabic*.]
+\item Proposition~\ref{prop:tail} pinpoints the discontinuity that
+makes a naive limit of finite terminal-game equilibria unsafe.
+\item Lemma~\ref{lem:boundary} is a correct and useful sufficient
+error estimate, but Theorem~\ref{thm:terminal-obstruction} proves that
+forcing this estimate to vanish along \emph{exact} terminal-game
+Nash equilibria is not a viable general argument.
+\item Arbitrary finite-support profiles avoid that obstruction.
+Theorem~\ref{thm:grid} approximates the globally minimal regret
+with a computable, explicit $O(1/k)$ error bar; the finite certificate
+Corollary~\ref{cor:certificate} is the corresponding negative-
+resolution criterion.
+\item Corollary~\ref{cor:positive} isolates the unproved universal
+inequality \eqref{eq:unproved}. Establishing it for every payoff table,
+or finding one finite verified violation, would respectively give
+a positive solution or a genuine counterexample.
+\end{enumerate}
+
+\noindent\textbf{Status.} No proof of \eqref{eq:unproved}, and no
+counterexample meeting Corollary~\ref{cor:certificate}, is given here.
+Thus the general existence problem remains unresolved by the
+arguments in this manuscript. The finite reductions are presented as
+transparent mathematical research attempts; no claim is made that
+they were previously unknown or that they constitute a solution.
+
+\begin{thebibliography}{99}
+\bibitem{Flesch1996}
+J.~Flesch, F.~Thuijsman, and O.~J.~Vrieze (1996).
+Recursive repeated games with absorbing states.
+\emph{Mathematics of Operations Research} \textbf{21}, 1016--1022.
+
+\bibitem{Flesch1997}
+J.~Flesch, F.~Thuijsman, and K.~Vrieze (1997).
+Cyclic Markov equilibria in stochastic games.
+\emph{International Journal of Game Theory} \textbf{26}, 303--314.
+
+\bibitem{SolanVieille2001}
+E.~Solan and N.~Vieille (2001).
+Quitting games.
+\emph{Mathematics of Operations Research} \textbf{26}(2), 265--285.
+\url{https://doi.org/10.1287/moor.26.2.265.10549}.
+
+\bibitem{SolanSolan2020}
+E.~Solan and O.~N.~Solan (2020).
+Quitting games and linear complementarity problems.
+\emph{Mathematics of Operations Research} \textbf{45}(2), 434--454.
+\url{https://doi.org/10.1287/moor.2019.0996}.
+
+\bibitem{AKRS2024}
+G.~Ashkenazi-Golan, I.~Krasikov, C.~Rainer, and E.~Solan (2024).
+Absorption paths and equilibria in quitting games.
+\emph{Mathematical Programming} \textbf{203}, 735--762
+(first published online 22 April 2022).
+\url{https://doi.org/10.1007/s10107-022-01807-6}.
+
+\bibitem{AKRS2026}
+G.~Ashkenazi-Golan, I.~Krasikov, C.~Rainer, and E.~Solan (2026).
+The APS approach for undiscounted quitting games.
+\emph{International Journal of Game Theory} \textbf{55}, Article 19
+(published online 2 April 2026).
+\url{https://doi.org/10.1007/s00182-026-00982-6}.
+\end{thebibliography}
+
+\end{document}

@@ -2,13 +2,15 @@
 """Build the Economics catalogue without deriving permanent IDs from current ranks.
 
 The registry owns identity and statements; rankings.csv owns the mutable order.
-This module deliberately does not depend on the full-site builder.
+The standalone catalogue command also builds model/version research attempts.
 """
 
 import csv
+from datetime import date
 import json
 from pathlib import Path
 import re
+import sys
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -17,6 +19,8 @@ RANKINGS_PATH = Path('lists/economics/rankings.csv')
 JEL_CODES_PATH = Path('lists/economics/jel_codes.json')
 STATEMENTS_PATH = Path('attacks/open_problems/economics/statements')
 PUBLIC_STATEMENTS_PATH = Path('docs/data/economics/statements')
+ATTEMPTS_PATH = Path('attacks/open_problems/economics')
+PUBLIC_ATTEMPTS_PATH = Path('docs/data/economics/attempts')
 STATEMENT_START = '% BEGIN ECONOMICS STATEMENT\n'
 STATEMENT_END = '% END ECONOMICS STATEMENT'
 ID_RE = re.compile(r'[A-Z][0-9]{2}-[1-9][0-9]*')
@@ -156,12 +160,79 @@ def extract_statement(content):
     return body
 
 
+def load_economics_attempts(base_dir, records):
+    """Join model/version writeups by permanent ID, never legacy OP ID or rank."""
+    base_dir = Path(base_dir)
+    by_id = {record['id']: record for record in records}
+    attempts = {problem_id: [] for problem_id in by_id}
+    filename = re.compile(r'([A-Z][0-9]{2}-[1-9][0-9]*)(?:_v([1-9][0-9]*))?\.tex')
+    for directory in sorted((base_dir / ATTEMPTS_PATH).glob('*')):
+        if not directory.is_dir() or directory.name in {'statements', 'definitions'}:
+            continue
+        for path in sorted(directory.glob('*.tex')):
+            match = filename.fullmatch(path.name)
+            if not match or (match[2] is not None and int(match[2]) < 2):
+                raise ValueError(f'Invalid Economics attempt filename: {path.name}')
+            problem_id, version = match[1], int(match[2] or 1)
+            if problem_id not in by_id:
+                raise ValueError(f'Unknown Economics attempt ID: {problem_id}')
+            content = path.read_text(encoding='utf-8')
+            header = re.findall(r'^% ECONOMICS_PROBLEM: (.+)$', content, re.M)
+            if len(header) != 1:
+                raise ValueError(f'Missing or repeated Economics attempt identity: {path.name}')
+            metadata = json.loads(header[0])
+            for field in ('id', 'title', 'jel_code', 'source_id'):
+                if metadata.get(field) != by_id[problem_id][field]:
+                    raise ValueError(f'Economics attempt {field} mismatch: {path.name}')
+            statuses = re.findall(r'^% ATTEMPT_STATUS: (.+)$', content, re.M)
+            if len(statuses) != 1 or statuses[0] not in {'unresolved', 'partial', 'solved'}:
+                raise ValueError(f'Missing or invalid Economics ATTEMPT_STATUS: {path.name}')
+            posted = re.findall(r'^% FIRST_POSTED: (.+)$', content, re.M)
+            if len(posted) != 1 or date.fromisoformat(posted[0]).isoformat() != posted[0]:
+                raise ValueError(f'Missing or invalid Economics FIRST_POSTED: {path.name}')
+            if content.count(r'\begin{document}') != 1 or content.count(r'\end{document}') != 1:
+                raise ValueError(f'Expected one complete Economics attempt: {path.name}')
+            preamble, body = content.split(r'\begin{document}', 1)
+            body, trailing = body.split(r'\end{document}', 1)
+            if trailing.strip() or not body.strip():
+                raise ValueError(f'Invalid Economics attempt document: {path.name}')
+            # Reuse the site's existing read-only parser and document-local notation
+            # expansion. The late import avoids the builder's catalogue import cycle.
+            if str(BASE_DIR) not in sys.path:
+                sys.path.insert(0, str(BASE_DIR))
+            from build_site import (expand_tex_notation, parse_attack,
+                                    replace_tex_command, tex_notation_macros)
+            titles = []
+            replace_tex_command(preamble, 'title', 1, lambda title: titles.append(title) or '')
+            body = body.replace(r'\maketitle', r'\section*{' + titles[0] + '}' if titles else '')
+            body = re.sub(r'\\(?:tableofcontents|appendix|clearpage)\b', '', body)
+            body = body.replace(r'\begin{abstract}', r'\subsection*{Abstract}').replace(r'\end{abstract}', '')
+            body = re.sub(r'\\(?:begingroup|endgroup)\b', '', body)
+            body = replace_tex_command(body, 'vspace', 1, lambda *args: '')
+            body = replace_tex_command(body, 'setlength', 2, lambda *args: '')
+            body = replace_tex_command(body, 'addcontentsline', 3, lambda *args: '')
+            body = expand_tex_notation(body, tex_notation_macros(preamble, {}))
+            attack = parse_attack('% ATTEMPT_STATUS: ' + statuses[0] + '\n' + body.strip(),
+                                  'GPT 6 Astra Pro' if directory.name == 'gpt_6_astra_pro'
+                                  else directory.name.replace('_', ' '), posted[0],
+                                  metadata_content=content)
+            attack.update(version=version, entry_kind='research_attempt',
+                          file_path=path.relative_to(base_dir).as_posix(),
+                          download_url=(PUBLIC_ATTEMPTS_PATH / directory.name / path.name)
+                          .relative_to('docs').as_posix())
+            attempts[problem_id].append(attack)
+    for records in attempts.values():
+        records.sort(key=lambda attack: (attack['model'], attack['version']))
+    return attempts
+
+
 def build_economics_data(base_dir=BASE_DIR):
     """Return window.ECONOMICS_DATA records (read-only; works offline)."""
     base_dir = Path(base_dir)
     registry = load_registry(base_dir)
     records = registry['problems']
     rankings = read_ranking_csv(base_dir / RANKINGS_PATH, records)
+    attempts = load_economics_attempts(base_dir, records)
     data = {}
     for record in sorted(records, key=lambda record: rankings[record['id']]):
         problem_id = record['id']
@@ -174,7 +245,8 @@ def build_economics_data(base_dir=BASE_DIR):
             'jel_code': record['jel_code'],
             'domain_label': 'Game theory' if record.get('source_catalog') == 'Game theory' else 'Economics',
             'status': 'open',
-            'llm_status': 'none',
+            'llm_status': ('solved' if any(attack['status'] == 'solved' for attack in attempts[problem_id])
+                           else 'unresolved' if attempts[problem_id] else 'none'),
             'rank': rankings[problem_id],
             'source_id': record['source_id'],
             'source_catalog': record.get('source_catalog'),
@@ -187,7 +259,7 @@ def build_economics_data(base_dir=BASE_DIR):
             'definition_file': record['statement_file'],
             'statement_url': f'data/economics/statements/{problem_id}.tex',
             'entry_kind': 'statement_only',
-            'attacks': [],
+            'attacks': attempts[problem_id],
         }
     return data
 
@@ -223,6 +295,11 @@ def generate_economics_data(base_dir=BASE_DIR, data_dir=None):
     for problem_id, record in data.items():
         (download_dir / f'{problem_id}.tex').write_bytes(
             (base_dir / record['definitionFile']).read_bytes())
+    for record in data.values():
+        for attack in record['attacks']:
+            destination = data_dir.parent / attack['download_url']
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes((base_dir / attack['file_path']).read_bytes())
     return data
 
 

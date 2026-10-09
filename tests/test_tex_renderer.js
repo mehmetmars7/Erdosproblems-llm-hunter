@@ -13,6 +13,14 @@ vm.runInContext(scripts.find(script => script.includes('function formatTeX')), c
 const render = context.formatTeX;
 const tex = String.raw;
 
+for (const [environment, caption] of [['question', 'Question'], ['conjecture', 'Conjecture'],
+    ['warning', 'Warning'], ['example', 'Example']]) {
+    const result = render('\\begin{' + environment + '}[Named result]Relevant text.\\end{' + environment + '}');
+    assert.match(result, new RegExp('<strong>' + caption));
+    assert.match(result, /Named result/);
+    assert.doesNotMatch(result, /\\(?:begin|end)\{/);
+}
+
 // Source comments must stay hidden anywhere in an article or fragment, while
 // escaped percentages and literal code remain visible.
 const commented = tex`% Hidden header.
