@@ -228,6 +228,10 @@ def load_economics_attempts(base_dir, records):
                                   MODEL_LABELS.get(directory.name, directory.name.replace('_', ' ')),
                                   posted[0],
                                   metadata_content=content)
+            # A full solution claim implies full completion even when the
+            # manuscript has no numeric estimate or states a lower one.
+            if attack['status'] == 'solved':
+                attack['completion'] = 100
             attack.update(version=version, entry_kind='research_attempt',
                           file_path=path.relative_to(base_dir).as_posix(),
                           download_url=(PUBLIC_ATTEMPTS_PATH / directory.name / path.name)
@@ -273,9 +277,16 @@ def build_economics_data(base_dir=BASE_DIR):
             'entry_kind': 'statement_only',
             'attacks': attempts[problem_id],
         }
-        # parse_attack extracts the same TeX Completion Estimate sections used
-        # by Erdos. Match its per-problem rule: the highest stated estimate
-        # across models and versions, leaving absent estimates unset.
+        # As with resolved Erdos records, full resolution takes precedence
+        # over numeric estimates. Here it is explicitly an LLM claim; retain
+        # the source-catalogue status separately from the displayed status.
+        if data[problem_id]['llm_status'] == 'solved':
+            data[problem_id].update(source_status='open', status='solved',
+                                    status_source='llm_claim', completion=100,
+                                    completion_source='llm_claim')
+            continue
+        # Unresolved attempts use the highest stated estimate across models
+        # and versions, leaving absent estimates unset.
         completions = [attack['completion'] for attack in attempts[problem_id]
                        if type(attack.get('completion')) in (int, float)]
         if completions:

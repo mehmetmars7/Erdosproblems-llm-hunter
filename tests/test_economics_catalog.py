@@ -286,9 +286,43 @@ class EconomicsCatalogueTests(unittest.TestCase):
         data = build_economics_data(self.root)
         self.assertEqual(data[records[0]['id']]['completion'], 0)
         self.assertEqual(data[records[0]['id']]['attacks'][0]['completion'], 0)
-        for record in records[1:]:
-            self.assertNotIn('completion', data[record['id']])
-            self.assertNotIn('completion_source', data[record['id']])
+        solved = data[records[1]['id']]
+        self.assertEqual(solved['completion'], 100)
+        self.assertEqual(solved['attacks'][0]['completion'], 100)
+        self.assertEqual(solved['completion_source'], 'llm_claim')
+        self.assertEqual(solved['status'], 'solved')
+        self.assertEqual(solved['source_status'], 'open')
+        self.assertNotIn('completion', data[records[2]['id']])
+        self.assertNotIn('completion_source', data[records[2]['id']])
+
+    def test_solved_claim_overrides_lower_estimates_across_models_and_versions(self):
+        target = self.imported()['problems'][0]
+        solved = self.write_attempt(target)
+        solved.write_text(solved.read_text().replace(
+            '% ATTEMPT_STATUS: unresolved', '% ATTEMPT_STATUS: solved').replace(
+            r'\end{document}', r'\section{Completion Estimate}' + '\n15\\%\n'
+            + r'\end{document}'))
+        newer = self.write_attempt(target, 2)
+        newer.write_text(newer.read_text().replace(
+            r'\end{document}', r'\section{Completion Estimate}' + '\n45\\%\n'
+            + r'\end{document}'))
+        other_model = solved.parent.parent / 'gpt_6_astra_ultra' / solved.name
+        other_model.parent.mkdir()
+        other_model.write_bytes(newer.read_bytes())
+        data = generate_economics_data(self.root)
+        problem = data[target['id']]
+        self.assertEqual(problem['llm_status'], 'solved')
+        self.assertEqual(problem['status'], 'solved')
+        self.assertEqual(problem['status_source'], 'llm_claim')
+        self.assertEqual(problem['source_status'], 'open')
+        self.assertEqual(problem['completion'], 100)
+        self.assertEqual(problem['completion_source'], 'llm_claim')
+        self.assertEqual([a['status'] for a in problem['attacks']],
+                         ['solved', 'unresolved', 'unresolved'])
+        self.assertEqual([a['completion'] for a in problem['attacks']], [100, 45, 45])
+        for attack in problem['attacks']:
+            self.assertEqual((self.root / 'docs' / attack['download_url']).read_bytes(),
+                             (self.root / attack['file_path']).read_bytes())
 
     def test_attempt_identity_and_explicit_status_are_required(self):
         target = self.imported()['problems'][0]
@@ -409,7 +443,7 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 claim = 'solved' if problem_id in {'C72-131', 'C78-134'} else 'unresolved'
                 self.assertEqual(attack['status'], claim)
                 self.assertEqual(data[problem_id]['llm_status'], claim)
-                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(data[problem_id]['status'], 'solved' if claim == 'solved' else 'open')
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['date_posted'], '2026-10-09')
                 source = BASE_DIR / attack['file_path']
@@ -465,13 +499,19 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['version'], 1)
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['status'], expected_claim)
-                self.assertEqual(data[problem_id]['status'], 'open')
                 # The Pro manuscript for C71-12 separately claims a full solution.
                 aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12'} else 'unresolved'
                 self.assertEqual(data[problem_id]['llm_status'], aggregate_claim)
+                self.assertEqual(data[problem_id]['status'],
+                                 'solved' if aggregate_claim == 'solved' else 'open')
                 if problem_id == 'C71-12':
                     pro = [a for a in data[problem_id]['attacks'] if a['model'] == 'GPT 6 Astra Pro']
                     self.assertEqual([a['status'] for a in pro], ['solved'])
+                    self.assertEqual(data[problem_id]['completion'], 100)
+                    self.assertEqual(data[problem_id]['completion_source'], 'llm_claim')
+                    self.assertEqual(data[problem_id]['source_status'], 'open')
+                    self.assertEqual(pro[0]['completion'], 100)
+                    self.assertEqual(attack['completion'], 15)
                 self.assertTrue(attack['file_path'].startswith('attacks/open_problems/economics/gpt6_astra_ultra/'))
                 self.assertTrue(attack['download_url'].startswith('data/economics/attempts/gpt6_astra_ultra/'))
                 source = (BASE_DIR / attack['file_path']).read_bytes()
@@ -530,7 +570,7 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 claim = 'solved' if problem_id in {'C73-487', 'C73-496'} else 'unresolved'
                 self.assertEqual(attack['status'], claim)
                 self.assertEqual(data[problem_id]['llm_status'], claim)
-                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(data[problem_id]['status'], 'solved' if claim == 'solved' else 'open')
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['date_posted'], '2026-10-09')
                 self.assertEqual(attack['file_path'],
@@ -585,8 +625,9 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attempt['date_posted'], '2026-10-09')
                 claim = 'solved' if problem_id == 'C78-554' else 'unresolved'
                 self.assertEqual(attempt['status'], claim)
-                # A model proof claim does not change the external problem status.
-                self.assertEqual(data[problem_id]['status'], 'open')
+                # Keep source status distinct from the displayed LLM claim.
+                self.assertEqual(data[problem_id].get('source_status', data[problem_id]['status']), 'open')
+                self.assertEqual(data[problem_id]['status'], 'solved' if claim == 'solved' else 'open')
                 source = BASE_DIR / source_path
                 self.assertEqual(source.read_bytes(),
                                  (BASE_DIR / 'docs' / attempt['download_url']).read_bytes())

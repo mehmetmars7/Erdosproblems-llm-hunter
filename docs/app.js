@@ -319,7 +319,9 @@ function isOpenAIProblemStatus(problem) {
 function getOpenProblemStatusLabel(problem) {
     const status = getOpenProblemStatus(problem);
     const label = status === 'partial' ? 'partially solved' : String(status).replace(/_/g, ' ');
-    return label + (isOpenAIProblemStatus(problem) ? ' (OpenAI claim)' : '');
+    const source = isOpenAIProblemStatus(problem) ? ' (OpenAI claim)'
+        : status === 'solved' && problem.status_source === 'llm_claim' ? ' (LLM claim)' : '';
+    return label + source;
 }
 
 function getOpenProblemSourceStatusLabel(problem) {
@@ -797,6 +799,7 @@ function getProblemStatusClass(problem) {
 function getCompletionSourceLabel(problem) {
     if (!formatCompletion(problem.completion)) return '';
     if (problem.completion_source === 'database') return 'Resolved in Tao\'s database';
+    if (problem.completion_source === 'llm_claim') return 'LLM claim';
     if (!getMathematicalAttempts(problem.attacks).length &&
         (problem.attacks || []).some(a => a.entry_kind === 'statement_only')) {
         return 'Statement only; awaiting a mathematical attempt';

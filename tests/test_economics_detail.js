@@ -193,6 +193,19 @@ async function main() {
     assert.match(page.element('problem-meta').innerHTML, /Completion:<\/strong> —<\/p>/,
         'Statement-only entries cannot display a completion estimate');
 
+    const mixedClaims = { ...withAttacks, 'C73-1': { ...withAttacks['C73-1'],
+        status: 'solved', source_status: 'open', status_source: 'llm_claim',
+        llm_status: 'solved', completion: 100, completion_source: 'llm_claim',
+        attacks: withAttacks['C73-1'].attacks.map((attack, index) => ({ ...attack,
+            status: index === 0 ? 'solved' : 'unresolved', completion: index === 0 ? 100 : 15 }))
+    } };
+    page = await render('?type=economics&id=C73-1', mixedClaims);
+    assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> solved \(LLM claim\)/);
+    assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> solved/);
+    assert.match(page.element('problem-meta').innerHTML, /Completion:<\/strong> 100% \(LLM claim\)/);
+    assert.match(page.element('attempts-container').innerHTML, /class="status-text">solved<\/span>/);
+    assert.match(page.element('attempts-container').innerHTML, /class="status-text">unresolved<\/span>/);
+
     // A new ordering changes navigation and displayed rank while retaining every fixed route.
     const reordered = Object.fromEntries(Object.entries(sample).map(([id, record]) =>
         [id, { ...record, rank: 4 - record.rank }]));

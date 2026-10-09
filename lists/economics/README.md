@@ -37,6 +37,12 @@ results remain unresolved for the full problem. Keep local paths, upload chatter
 unrelated problems, and unpublished companion-file references out of public TeX.
 The website displays each version with its model, status, date, source link,
 and downloadable TeX. Statement files, IDs and difficulty ranks are unchanged.
+If any attempt claims a full solution, the displayed problem status is
+`solved (LLM claim)` and completion is 100%, regardless of unresolved attempts
+or lower estimates in other models or versions. The original catalogue status
+is retained in `source_status`; individual attempt verdicts and source files
+are preserved. Otherwise, completion is the highest stated numeric estimate,
+or absent when no estimate is supplied.
 
 `jel_codes.json` stores the JEL descriptions from the supplied classification
 text, with its source hash. The build includes one shared lookup containing the
