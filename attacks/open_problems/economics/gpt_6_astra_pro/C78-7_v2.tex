@@ -1,0 +1,176 @@
+% ECONOMICS_PROBLEM: {"id": "C78-7", "title": "The extremal number of stable-marriage matchings", "jel_code": "C78", "source_id": "OP-0553"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,xurl,hyperref,listings,microtype}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue,pdftitle={Research proof audit}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\setlength{\emergencystretch}{3em}
+\setlist{nosep,leftmargin=2em}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\EF}{\mathrm{EF}}
+\newcommand{\EFM}{\mathrm{EFM}}
+\newcommand{\PO}{\mathrm{PO}}
+\newcommand{\MMS}{\mathrm{MMS}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\lstset{basicstyle=\ttfamily\footnotesize,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries Extremal numbers of stable matchings}\par\medskip
+{\large C78-7(1).tex}\par
+Research attempt and adversarial audit --- 9 October 2026
+\end{center}
+\label{problem:OP-0553}
+\label{beyond:MM-12}
+\textbf{Tools.} Web browsing: YES. Computation: YES (Python, exact integer/rational checks, and explicitly identified numerical diagnostics).
+\textbf{Status convention.} A full proof of a restricted theorem does not resolve the full input. Literature results are marked as imported; no novelty or exhaustive current-literature certification is claimed. Computational searches certify only their stated finite domains.
+
+\section{FORMAL RESTATEMENT}
+For each integer $n\ge1$, take labeled disjoint sets $U=W=[n]$ (understood as different copies). Each agent has a strict total order of all agents on the opposite side. A matching is a bijection $\sigma:U\to W$. A blocking pair is $(i,j)$ with $j\ne\sigma(i)$ such that $i$ prefers $j$ to $\sigma(i)$ and $j$ prefers $i$ to $\sigma^{-1}(j)$. Let $\mathcal S(I)$ contain the matchings without blocking pairs, and
+\[
+x_n=\max_I|\mathcal S(I)|,\qquad \gamma=\limsup_{n\to\infty}x_n^{1/n}.
+\]
+The quantifiers in the extremal problem are $\forall n$, maximize over every complete strict profile $I$ of that size. The requested outputs are exact $x_n$, or matching asymptotic bounds, in particular the value of $\gamma$ and finer multiplicative growth. These are related targets, not a stated conjectural formula that can be disproved by one instance.
+
+Set $x_0=1$ for the empty matching; logarithms are natural. Labels are not quotiented out. Incomplete lists, ties, unequal side sizes and random-preference expectations are different models. Stress points are the maximum over profiles, the passage from a limsup to a limit, and the distinction between an exponential base and a prefactor.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Palmer and P\'alv\"olgyi prove an exponential upper bound $x_n\le 3.55^n+O(1)$, with a universal additive constant, in their paper \emph{At most $3.55^n$ stable matchings} \cite{pp}. The survey named in the input is a source for the counting question, not a claim that its 2019 bounds are current. The proofs below do not identify the optimal base, and their elementary lower bound is not advertised as the best published bound. Exact counts and product arguments below are proved independently rather than inferred from a literature-status statement.
+
+\section{ATTACK PLAN}
+This is an extremal enumeration problem. The proof track uses stable-matching existence, independent-block multiplication, a superadditive-limit argument, and alternating cycles. The construction track enumerates the smallest profiles and embeds favorable small blocks; a separate stress test asks whether product inequalities alone determine a prefactor.
+
+\begin{center}\begin{tabular}{p{.24\linewidth}p{.67\linewidth}}\toprule
+Tool & Role \\\midrule
+Deferred acceptance & Ensures $x_n\ge1$ and supplies boundary cases.\\
+Alternating cycles & Controls how two stable matchings can disagree.\\
+Independent blocks & Multiplies counts without introducing cross-block stability.\\
+Superadditivity & Converts fixed-size constructions into a genuine limiting base.\\
+Exact enumeration & Finds and checks minimal witnesses.\\
+Published exponential upper bound & Makes the limiting base finite.\\
+Comparison sequences & Tests whether a proposed prefactor conclusion follows from the available inequalities.\\\bottomrule
+\end{tabular}\end{center}
+The best fully executable path here is exact small cases plus the block/limit theorem. A rotation-poset extremal argument capable of matching the exponential bounds is not obtained.
+
+\section{WORK}
+\begin{lemma}[Existence and elementary bounds]
+For every $n\ge0$, $1\le x_n\le n!$.
+\end{lemma}
+\begin{proof}
+For $n=0$ use the declared convention. For $n\ge1$, repeatedly let an unmatched man propose to his most-preferred woman not yet proposed to. A woman keeps her preferred proposal, rejecting any other. There are at most $n^2$ proposals. A man cannot be rejected by all women while some woman has never received a proposal: every rejection leaves that woman holding another man, which would require $n$ other held men. Thus the process ends with a perfect matching. If a man prefers a woman to his terminal partner, he proposed to her earlier; she rejected him or subsequently traded up, and therefore prefers her terminal partner to him. No such pair blocks. Finally there are only $n!$ bijections.
+\end{proof}
+
+\begin{lemma}[Exact block multiplication]\label{lem:block}
+If $I$ and $J$ have sizes $n$ and $m$, form a combined instance in which every agent ranks all members of the opposite side of its own block before all outsiders, retaining the original within-block rankings. Then
+\[
+|\mathcal S(I\oplus J)|=|\mathcal S(I)|\,|\mathcal S(J)|.
+\]
+Consequently $x_{n+m}\ge x_nx_m$.
+\end{lemma}
+\begin{proof}
+If a man in a balanced block is matched outside it, counting internal matching edges shows that a woman of that block is also matched outside it. That man and woman prefer one another to their outside partners, and block. Hence every stable matching stays inside each block. Its restrictions must be stable, because an internal blocking pair would remain blocking. Conversely the union of two internal stable matchings has no internal blocking pair, and an agent never prefers an outsider to an internal partner. This proves a bijection between stable matchings and pairs of internal stable matchings. Maximizing gives the inequality.
+\end{proof}
+
+\begin{theorem}[The limiting base exists]
+The limsup in the input is a limit and
+\[
+\gamma=\sup_{k\ge1}x_k^{1/k},\qquad x_n\le\gamma^n\quad(n\ge1).
+\]
+Using the imported exponential upper bound, $\gamma\le3.55$ and even $x_n\le3.55^n$ for every $n$.
+\end{theorem}
+\begin{proof}
+Put $a_n=\log x_n$, $a_0=0$. Fix $k$ and write $n=qk+r$, $0\le r<k$. Lemma~\ref{lem:block} gives $a_n\ge q a_k+a_r\ge q a_k$. Therefore $\liminf a_n/n\ge a_k/k$. Taking the supremum over $k$, while $a_n/n\le\sup_k a_k/k$ for each $n$, proves equality and existence of the limit, possibly infinite before using an upper bound. The imported bound makes the limit at most $\log3.55$. For an alternative direct removal of its additive constant, fix $n$ and apply $x_n^r\le x_{rn}\le3.55^{rn}+C$. Taking $r$th roots and letting $r\to\infty$ proves $x_n\le3.55^n$.
+\end{proof}
+
+\begin{lemma}[Orientation on one alternating cycle]\label{lem:cycle}
+On every nontrivial alternating cycle of two stable matchings, all men on that cycle prefer the same one of the two matchings.
+\end{lemma}
+\begin{proof}
+Let the two matchings be $A,B$, and suppose man $i$ prefers $A(i)$ to $B(i)$. In $B$, woman $A(i)$ is matched to another man $j$. Stability of $B$ forces that woman to prefer $j$ to $i$. Stability of $A$ then forces $j$ to prefer $A(j)$ to $B(j)=A(i)$; otherwise $(j,A(i))$ blocks $A$. Repeat this implication around the alternating cycle. If the initial preference is for $B$, interchange the names of the matchings.
+\end{proof}
+
+\begin{theorem}[Exact first three values]
+$x_1=1$, $x_2=2$, and $x_3=3$.
+\end{theorem}
+\begin{proof}
+The first equality follows by inspection. For $n=2$, let the men rank $1\succ2$ and $2\succ1$, and the women rank $2\succ1$ and $1\succ2$. Both bijections are stable: in the men's favorite matching no man wants to deviate, and in the other matching no woman wants to deviate. The upper bound $2!$ is exact.
+
+For $n=3$, any two distinct matchings have just one nontrivial alternating cycle. Lemma~\ref{lem:cycle} therefore makes the stable matchings totally ordered by every man's weak preference. Suppose four stable matchings occurred in this order. At least two men change partners between successive matchings. No man can change more than twice along this order, since each change is a strict deterioration among three distinct partners. There are at least six and at most six changes in total. Each step is therefore a transposition, and each man participates exactly twice. The three transpositions must be the three edges of a triangle. Relabeling the men, their order can be written $AB,BC,AC$; the man $A$ returns to his original partner after these swaps. This contradicts strict deterioration. Thus there are at most three stable matchings.
+
+Here is a witness attaining three, with ranks listed from best to worst:
+\[
+\begin{array}{c|c@{\qquad}c|c}
+\text{man}&\text{women}&\text{woman}&\text{men}\\\hline
+1&1,2,3&1&3,1,2\\
+2&1,2,3&2&1,3,2\\
+3&3,2,1&3&1,2,3
+\end{array}
+\]
+The partner vectors are $(1,2,3)$, $(1,3,2)$, and $(2,3,1)$. In the first, the only woman a man prefers to his partner is woman 1 for man 2, and she prefers her current man 1. In the second, the potential blocking pairs from men's preferences are $(2,1),(2,2),(3,3)$; those women respectively prefer their current men $1,3,2$. In the third they are $(1,1),(2,1),(2,2),(3,2),(3,3)$; the women respectively prefer their current men $3,3,1,1,2$. Hence all three are stable.
+\end{proof}
+
+\begin{corollary}
+For $n=3q+r$, $0\le r<3$, $x_n\ge3^q x_r$. In particular $\gamma\ge3^{1/3}$.
+\end{corollary}
+\begin{proof}
+Use $q$ copies of the three-agent witness and the size-$r$ witness in Lemma~\ref{lem:block}, and then take roots.
+\end{proof}
+
+\begin{proposition}[A prefactor does not follow from supermultiplicativity]
+Positive integer supermultiplicative sequences can share an exponential base and have different polynomial prefactors.
+\end{proposition}
+\begin{proof}
+Take $a_n=4^n$ and $b_n=\lfloor4^n/(n+1)\rfloor$, with both zeroth terms equal to one. Because $(n+1)(m+1)\ge n+m+1$, the integer $b_nb_m$ is at most $4^{n+m}/(n+m+1)$, hence at most $b_{n+m}$. Both root limits are 4, whereas $b_n/a_n\sim1/(n+1)$. This is not a pair of stable-marriage constructions; it proves only that the abstract inequalities obtained above do not force a particular prefactor.
+\end{proof}
+
+\section{VERIFICATION}
+The supplied Python code enumerated all $1$, $16$, and $46{,}656$ preference profiles for $n=1,2,3$. For $n=3$ the distribution of stable counts was: $34{,}080$ profiles with one, $11{,}484$ with two, and $1{,}092$ with three. All arithmetic and blocking tests were exact. The independent analytic proof above does not depend on treating this run as a proof oracle.
+\begin{lstlisting}
+for each strict preference profile I:
+    count = 0
+    for each bijection sigma:
+        if no unmatched pair blocks sigma: count += 1
+    update maximum and retain a witness
+\end{lstlisting}
+Adversarial checks: the block argument uses balance within each block; dropping it invalidates the counting step. The limiting argument needs a uniform exponential upper bound to prove finiteness. The three-agent argument does not extend to four agents, because two disjoint alternating cycles can have different orientations. The lower bound proved here is intentionally not labeled state of the art. Empty blocks and $n=0$ satisfy every product identity.
+
+\section{FINAL}
+\textbf{LABEL: UNRESOLVED.}
+The full extremal sequence, optimal base, and finer asymptotics are not determined. The strongest self-contained conclusions here are exact $x_1,x_2,x_3$, the exact product construction, and the limit/supremum identity. The imported upper bound supplies $\gamma\le3.55$.
+
+\textbf{Exact first gap.} No argument matches an asymptotic lower construction with an upper bound for $x_n^{1/n}$.
+
+\textbf{Three next moves.} (1) Prove a new counting inequality for realizable rotation posets that is sharper than an arbitrary-poset bound. (2) Search structured four- and larger-block profiles for a genuinely improved root count, retaining complete preference witnesses. (3) Characterize when a stable-marriage instance factors into count-multiplying blocks, to determine whether near-extremal profiles must be indecomposable.
+
+\textbf{Minimal obstruction to this approach.} A large balanced, indecomposable profile with many interacting rotations could outperform every fixed block family. This is a structural search hypothesis, not a counterexample to an unstated numerical conjecture.
+
+\section{Completion Estimate}
+12\%
+
+Small cases and the limiting formulation are settled in this report; the central extremal base and prefactor remain undetermined.
+
+This is a subjective estimate of the fraction of the \emph{whole requested mathematical scope} addressed by this report, including the named variants. It is not a probability of correctness, an objectively measured fraction of a proof, or an estimate that the remaining work takes the complementary fraction of the time. Only the eleven supplied files are assessed; no missing rank-1--200 statements are inferred.
+
+\begin{thebibliography}{99}
+\bibitem{pp} C. Palmer and D. P\'alv\"olgyi. \emph{At most $3.55^n$ stable matchings}. FOCS 2021; arXiv:2011.00915, Theorem 1. \url{https://arxiv.org/html/2011.00915}.
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove. \emph{Selected open problems in Matching Under Preferences}. 2019, Section 3.2.1; reference supplied in the input. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\end{thebibliography}
+\end{document}
