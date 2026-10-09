@@ -1,0 +1,262 @@
+% ECONOMICS_PROBLEM: {"id": "C79-657", "title": "Encoding and complexity of token-rich Battle Sheep", "jel_code": "C79", "source_id": "OP-0221"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+% REVISION_VERSION: 2
+% REVISION_BASIS: supplied independent audit; attribution and scope clarification
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Encoding and complexity of token-rich Battle Sheep}
+\author{GPT 6 Astra Pro}
+\date{9 October 2026}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\maketitle
+\textbf{Problem ID:} \texttt{C79-657}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 2\par
+\section*{Result and scope}
+For the explicit-board, binary-stack, normal-play model in the statement,
+this attempt gives a complete polynomial-space upper bound and an exact
+stack-capping lemma. Combined with the cited same-rule hardness theorem,
+these establish the stated model's PSPACE-completeness. This is a submitted
+proof audit, not a claim of an independently refereed new resolution.
+The solved label records the submitted classification proof; it does not
+assert an unconditional negative answer to EXPTIME-hardness.
+The source already supplies the hardness; the upper-bound argument and
+capping proof are written out here.
+
+\textbf{Version 2 status and provenance.} The supplied audit recommends
+keeping the explicit-board classification separate from the source's
+historical EXPTIME-hardness question. This revision retains both complete
+proofs and states that separation formally below. The submitted solved
+status applies to the normal-play, binary-stack language
+$\mathcal W_{\mathrm{BS}}$ defined here. It leaves the unconditional
+EXPTIME-hardness question unresolved, since for this language that
+hardness is equivalent to $\mathsf{PSPACE}=\mathsf{EXPTIME}$.
+The supplied coalition and matching programs do not computationally
+validate Battle Sheep, and no fresh external source check is claimed.
+
+Write $B$ for the explicitly listed hexagonal-grid cells, $b=|B|$, and $e$
+for the number currently empty. Each occupied cell has an owner and a
+positive binary integer size. A move splits a size $s\geq2$ into $q$ and
+$s-q$, both positive. The $q$ tokens travel to the last empty cell along a
+chosen unobstructed straight direction, and $s-q$ remain at the source.
+The player with no legal move loses. This rule is essential throughout.
+
+\section*{Polynomial depth is independent of token count}
+\begin{lemma}
+Every legal move decreases the number of empty cells by exactly one.
+Thus every play from a position with $e_0$ empty cells has length at most
+$e_0\leq b$.
+\end{lemma}
+\begin{proof}
+The destination was empty and becomes occupied because $q\geq1$.
+The source remains occupied because $s-q\geq1$. Intermediate cells are
+crossed and left empty, and every other cell is unchanged. These are the
+only changes to occupancy. The nonnegative integer count of empty cells
+therefore decreases by one at each move.
+\end{proof}
+
+There can nevertheless be exponentially many choices of $q$ at one node.
+Polynomial depth does not imply polynomial game-tree size. It does suffice
+for a depth-first winner algorithm using polynomial space. At a node,
+enumerate every owned source, each of its six directions with an adjacent
+empty board cell, and each integer $1\leq q<s$. Recursively test the
+successor with the opposite player to move. The current node is winning
+if some successor is losing; it is losing if no legal move exists or all
+successors are winning.
+
+Positions with no occupied cells are immediately losing and can be
+handled before the following size bounds. Let $L$ be the maximum input
+bit length of a stack size and let $K$ be the
+maximum bit length of a coordinate. The conserved total is at most
+$b2^L$, so every stack uses at most $L+\lceil\log_2 b\rceil+1$ bits.
+A split counter requires the same order of space, even though incrementing
+through its full range may take exponential time. A board state, a source
+index, a direction, and a counter occupy polynomial space in $b,L,K$.
+Storing one such frame at each of at most $b+1$ recursion levels is still
+polynomial. A ray endpoint can be found by repeated coordinate addition
+and membership/occupancy checks; at most $b$ consecutive listed cells can
+be traversed. No assumption that the coordinate bounding rectangle has
+polynomial area is needed.
+
+\section*{An exact bound on strategically relevant stack sizes}
+The space argument already proves membership. The following stronger
+lemma shows that most of an enormous stack's binary representation is
+strategically irrelevant on a fixed explicit board.
+
+For a position with $e$ empty cells define its capped size vector by
+\[
+                         \widehat s_v=\min\{s_v,2^e\}
+                    \quad(v\text{ occupied}).                   \tag{1}
+\]
+\begin{theorem}
+Suppose two positions have the same board, occupied cells, owners, and
+player to move, and the same vector (1). They have the same winner.
+In particular, replacing every initial size $s_v$ by
+$\min\{s_v,2^{e_0}\}$ preserves winner determination exactly.
+\end{theorem}
+\begin{proof}
+Induct on $e$. If $e=0$, neither position admits a move because there is
+no adjacent empty destination. Both are losing for the player to move.
+
+For $e\geq1$, put $h=2^{e-1}$, so the current cap is $2h$. The two
+positions have the same geometrically available source--direction pairs.
+They also agree on whether each source has size at least two, since
+capping at $2h\geq2$ preserves that predicate. Every legal destination is
+determined entirely by occupancy and the selected direction.
+
+Fix a legal move in the first position, splitting source $s$ into the
+ordered child sizes $(q,s-q)$ at the destination and source. If $s<2h$,
+the corresponding source in the second position has exactly the same
+size, so choose exactly the same split. The new child caps at level $h$
+then agree.
+
+If $s\geq2h$, its counterpart $s'$ also satisfies $s'\geq2h$. The possible
+ordered pairs of child sizes after capping at $h$ are exactly
+\[
+ (a,h),\quad(h,a)\quad(1\leq a<h),\qquad(h,h).                    \tag{2}
+\]
+Two children below $h$ would have sum at most $2h-2$, impossible for such
+a source. Conversely, $(a,h)$ is realized by choosing $q=a$;
+$(h,a)$ by choosing $q=s-a$; and $(h,h)$ by choosing $q=h$.
+Each construction works for every source of size at least $2h$, including
+$s'$. Thus match the first move by any split of $s'$ giving the same pair
+in (2). When $h=1$, the two families involving $a$ are empty and $(1,1)$
+is the sole pair, as required.
+
+Both successors have $e-1$ empty cells and identical occupancy, ownership,
+and player to move. Every unchanged stack also has the same cap at $h$:
+equality of caps at $2h$ implies equality after applying the smaller cap.
+By induction the matched successors have the same winner. The argument
+is symmetric, so every move on either side has a counterpart with the
+same winning or losing successor status. A position has a winning move
+exactly when its counterpart does. This completes the induction.
+\end{proof}
+
+Capping uses a threshold whose binary representation has just $e_0+1$
+bits. Comparing a long input integer with that threshold and replacing it
+is polynomial in its input length. This produces an equivalent position
+with at most $b+1$ bits per stack. The result is a compression of large
+numbers, not a polynomial-time winner algorithm: the capped number itself
+can still be exponential in $b$, and the game tree can remain exponential.
+No claim that a cap of $b$ or $e_0+1$ tokens suffices follows from the proof.
+
+\section*{Classification and the source's question}
+Burke and Ono's Theorem 1 proves PSPACE-hardness for a restricted family
+of explicitly represented Battle Sheep positions under the same
+normal-play convention. Their rules retain the bottom token and require
+movement to empty cells. Such instances are a subclass of the binary-stack
+model here, so the identity encoding is a polynomial-time reduction.
+Together with the depth-first upper bound, this gives
+\[
+                         \mathcal W_{\mathrm{BS}}
+                         \text{ is PSPACE-complete}.             \tag{3}
+\]
+The hardness theorem is an external input to (3); the reduction gadgets
+are not claimed as this attempt's work.
+
+\begin{theorem}[Explicit-board classification]
+For finite explicitly listed hexagonal-grid boards with binary-encoded
+positive stack sizes, normal-play winner determination is
+$\mathsf{PSPACE}$-complete under polynomial-time many-one reductions,
+provided the legal split leaves at least one token at the source and
+places the moved tokens at the last consecutive empty cell in a chosen
+direction. The hardness part uses Burke and Ono's cited same-rule theorem.
+No succinct-board or alternative winner convention is included.
+\end{theorem}
+\begin{proof}
+The empty-cell lemma bounds play length by the explicit number of cells,
+and the depth-first recursion stores only polynomially many bits even
+when it enumerates exponentially many binary split choices. This proves
+membership. The cited restricted same-rule family embeds identically
+into the language defined here and gives the polynomial-time hardness
+reduction. The stack-capping theorem is an additional winner-preserving
+compression result; it is not needed to justify the space bound.
+\end{proof}
+
+The source's Open Problem 1 asks whether exponentially large stacks yield
+EXPTIME-hardness. Under the exact explicit-board rules above, that
+hardness would imply $\mathsf{EXPTIME}\subseteq\mathsf{PSPACE}$, by
+composing the polynomial reduction with the proved polynomial-space
+algorithm. Since the reverse containment is standard, it would imply
+$\mathsf{PSPACE}=\mathsf{EXPTIME}$. Conversely, if those classes coincide,
+PSPACE-completeness already gives EXPTIME-hardness. Thus this formulation
+cannot establish a larger complexity class merely by increasing token
+magnitudes. It would be incorrect to assert an unconditional separation
+between PSPACE and EXPTIME.
+
+\begin{corollary}[Exact status of the historical hardness question]
+For this explicit-board, binary-stack, normal-play language,
+\[
+ \mathcal W_{\mathrm{BS}}\text{ is }\mathsf{EXPTIME}\text{-hard}
+ \quad\Longleftrightarrow\quad
+ \mathsf{PSPACE}=\mathsf{EXPTIME},
+\]
+where hardness uses polynomial-time many-one reductions. Consequently
+the explicit-board classification gives no unconditional negative answer
+to the historical EXPTIME-hardness question.
+\end{corollary}
+\begin{proof}
+If the language is $\mathsf{EXPTIME}$-hard, its polynomial-space algorithm
+and the reductions decide every $\mathsf{EXPTIME}$ language in polynomial
+space. Combine this with the standard containment
+$\mathsf{PSPACE}\subseteq\mathsf{EXPTIME}$. Conversely, equality of the
+classes turns the proved $\mathsf{PSPACE}$-hardness into
+$\mathsf{EXPTIME}$-hardness under the same reductions.
+\end{proof}
+
+\section*{Rule checks and limitations}
+If a move were allowed to empty the source, the occupancy potential would
+no longer decrease strictly. If moves could land on occupied cells, the
+split-pair and geometry argument would need revision. If the board were
+succinctly described and could contain exponentially many cells, its
+number of empty cells would no longer be bounded by the input length.
+Scoring by occupied area at the end instead of normal play would also
+change the terminal condition. None of these variants is included in (3).
+The capping proof uses the stated winner convention and explicitly listed
+finite board, and preserves ownership rather than identifying the players.
+
+\textbf{Verification and final scope.} The submitted reasoning checks the
+strict occupancy potential, polynomial storage of binary splits, and
+the exact attainable child-cap pairs (2). Burke and Ono retain credit
+for the imported hardness theorem; this revision does not present their
+gadgets as newly verified. The precise classification and conditional
+complexity-class equivalence are the conclusions. Neither an
+unconditional failure of EXPTIME-hardness nor a separation of PSPACE from
+EXPTIME has been proved, and the supplied finite audit results do not
+settle either claim.
+
+\section{Completion Estimate}
+100\%
+
+This is a post hoc, heuristic estimate for the full catalogue target.
+The estimate covers the audited canonical explicit-board classification:
+the polynomial-space algorithm, exact cap equivalence, and cited same-rule
+hardness account for it. It does not assign completion to an unconditional
+answer to the source's separate EXPTIME-hardness question. For this
+language that question is exactly equivalent to
+$\mathsf{PSPACE}=\mathsf{EXPTIME}$, which remains undecided here.
+
+\section*{References}
+The reference is Kyle Burke and Hirotaka Ono,
+\emph{Battle Sheep is PSPACE-complete}, arXiv:2505.06414v1 (2025),
+Section 1.1, Theorem 1, and Section 3.
+\url{https://arxiv.org/html/2505.06414v1}.
+The contribution of this submitted attempt is the complete encoding audit
+and proved cap equivalence, with the source's hardness clearly attributed.
+\end{document}
