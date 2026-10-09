@@ -1,0 +1,147 @@
+% ECONOMICS_PROBLEM: {"id": "C78-203", "title": "Approximating MAX-SMTI under master-list restrictions", "jel_code": "C78", "source_id": "OP-0557"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Approximating MAX-SMTI under master-list restrictions: Exact optimization with a bounded acceptability frontier}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and restriction}
+For a marriage instance with ties and incomplete lists, the target is a
+weakly stable matching of maximum cardinality:
+\[
+ \operatorname{OPT}(I)=\max\{|M|:M\text{ has no mutually strict blocking pair}\}.
+\]
+The master-list approximation question is posed in
+\cite[Section 3.2.3]{survey}; the model and severe hardness restrictions
+are developed in \cite{master}. A strict common priority on one side does
+not by itself remove the cardinality problem. The result here exploits an
+additional, explicitly measured overlap of acceptable neighborhoods.
+Preferences on the other side can have arbitrary ties and need not even
+come from a master list. Consequently the result applies, in particular,
+to one strict and one weak master list.
+
+Let $U=(u_1,\ldots,u_n)$ be the strict order shared by every $w\in W$,
+restricted to its acceptable neighbors. Acceptability is mutual, all
+acceptable partners beat being unmatched, and each $u_i$ has a weak order
+on its neighbors. Write $\Gamma_i$ for that neighborhood.
+
+\section*{A complete serial description}
+\begin{lemma}
+A matching is weakly stable if and only if it can be obtained by processing
+$u_1,\ldots,u_n$ in order, assigning $u_i$ an arbitrary member of its best
+tie among still available acceptable partners, or leaving it unmatched
+when no such partner exists.
+\end{lemma}
+\begin{proof}
+Consider a stable matching after removing the partners of
+$u_1,\ldots,u_{i-1}$. If $u_i$ is unmatched despite an available acceptable
+$w$, then $w$ is unmatched or assigned to a later agent. Both strictly
+prefer matching together. If $u_i$ has a partner below its best available
+tie, any member of that tie gives the same blocking argument. Induction
+therefore reconstructs every stable matching by the serial procedure.
+Conversely, consider an acceptable unmatched pair $(u_i,w)$ in an output.
+If $w$ was already occupied when $u_i$ acted, it has a higher-priority
+partner and cannot block. Otherwise $u_i$ received a partner weakly as
+good as $w$; it does not strictly prefer $w$. These cases exhaust all pairs.
+\end{proof}
+This is a structural reduction, not a claim that arbitrary greedy tie
+breaking maximizes size. For example, let $u_1$ accept $a,b$ indifferently
+and let $u_2$ accept only $a$. Both partners prefer $u_1$ to $u_2$.
+Choosing $a$ first gives size one; choosing $b$ gives size two. Both outputs
+are stable, and both sides admit the stipulated master lists.
+
+\section*{An exact frontier algorithm}
+For each $w$ having at least one neighbor define
+\[
+ f(w)=\min\{i:w\in\Gamma_i\},\qquad
+ l(w)=\max\{i:w\in\Gamma_i\},
+\]
+\[
+ A_i=\{w:f(w)\le i\le l(w)\},\quad
+ k=\max_i|A_i|.
+\]
+Isolated partners can be discarded. The sets $A_i$ are intervals of
+\emph{potential relevance}, not an assertion that each neighborhood is
+consecutive in a preference ranking. Set
+$F_i=\{w:f(w)\le i<l(w)\}$ and $F_0=F_n=\varnothing$.
+
+\begin{theorem}
+Maximum-cardinality weak stability in this class can be solved exactly in
+$O(2^k(n+|E|))$ elementary operations after preprocessing preference ranks
+and frontier changes. A matching can be recovered by predecessor pointers.
+In particular, the problem is polynomial on instances with
+$k=O(\log(n+|W|))$, without bounding tie sizes separately.
+\end{theorem}
+\begin{proof}
+After processing $i$ agents, store a state $S\subseteq F_i$: precisely the
+partners in $F_i$ already used. Its label $D_i(S)$ is the greatest number
+of matches in a serial prefix having this state. An absent state has label
+$-\infty$, and $D_0(\varnothing)=0$.
+
+At step $i$, regard $S\subseteq F_{i-1}$ as a subset of $A_i$; all newly
+appearing partners are free. Every partner in $\Gamma_i$ belongs to $A_i$.
+The set of available acceptable partners is therefore exactly
+$\Gamma_i\setminus S$. If it is empty, the sole transition is to
+$S\cap F_i$ with no increment. Otherwise find its best tie $T$ in $u_i$'s
+weak order. For each $w\in T$, transition to
+$(S\cup\{w\})\cap F_i$ with increment one, retaining the greatest label
+when transitions merge.
+
+A forgotten partner has $l(w)<i+1$ and can never affect any future choice.
+The frontier state thus preserves every fact about the past relevant to a
+continuation. Induction on $i$ proves both that every stored label is
+realized by a legal serial prefix and that every such prefix is represented
+with at least its cardinality. The lemma then identifies
+$D_n(\varnothing)$ with $\operatorname{OPT}(I)$.
+
+There are at most $2^k$ states at every stage. Scanning the ordered
+neighborhood costs $O(1+|\Gamma_i|)$ per state, including all transitions.
+Bit masks and precomputed frontier projection maps implement updates;
+alternatively their polynomial overhead can be retained explicitly.
+Summing the scans gives the displayed operation count in a word model
+with $k$-bit masks. Standard bit operations give an additional polynomial
+factor in $k$ if masks do not fit a machine word.
+\end{proof}
+
+The same recurrence can maximize a rational sum of edge rewards by
+replacing the unit increment with the reward. The serial stability
+restriction, rather than the reward, determines which transitions exist.
+This also permits exact secondary optimization among maximum-size
+solutions by using lexicographic labels.
+
+\section*{What remains unresolved}
+The approximation factor is one only under the additional frontier bound.
+The width may be $|W|$ even when there is a single tie in the weak master
+list, so this does not improve a polynomial-time ratio for the unrestricted
+master-list classes. When both priorities are weak, earlier matched agents
+need not be protected by strict priority; the serial characterization
+itself fails. A general approximation result must address that obstacle
+or control the exponential frontier without assuming it small. The proof
+above is an exact restricted algorithm, with no assertion of priority over
+the broader parameterized matching literature.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences} (2019), Section 3.2.3.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{master} R. W. Irving, D. F. Manlove and S. Scott.
+\emph{The stable marriage problem with master preference lists}.
+Discrete Applied Mathematics 156 (2008), 2959--2977.
+\url{https://eprints.gla.ac.uk/25737/1/25737.pdf}.
+\end{thebibliography}
+
+\end{document}

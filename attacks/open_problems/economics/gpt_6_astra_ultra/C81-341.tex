@@ -1,0 +1,101 @@
+% ECONOMICS_PROBLEM: {"id": "C81-341", "title": "Measurement error in digital and administrative data", "jel_code": "C81", "source_id": "OP-0108"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\Var}{\operatorname{Var}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Measurement error in digital and administrative data: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Target and outcome}
+\textbf{Status: unresolved.} Version changes, erroneous linkage and selective validation can make a large administrative dataset less informative than its record count suggests. This attempt solves a finite-state bounding problem with a validated reporting kernel, bounded subsequent drift and a known randomized assignment rule. It also gives a finite-sample outer confidence construction and a validation-rate obstruction. Unrestricted observational treatment assignment and arbitrary record linkage remain outside this result.
+
+Hausman's review \cite{hausman}, whose primary abstract was checked, provides background on why different measurement-error structures require different identifying assumptions. No empirical error rates are taken from it. All kernel restrictions below are declared rather than inferred from the label ``administrative data.''
+
+\section*{A finite reporting model}
+Let the latent record be $l=(y,d,x)$, with finitely many values, $y\in[0,1]$, $d\in\{0,1\}$. Let $W$ be a finite reported record. A baseline validation exercise identifies a stochastic kernel $K_0(w\mid l)$ for every relevant latent state. In the new version, the unknown kernel satisfies the row-wise restriction
+\[
+ \frac12\sum_w|K(w\mid l)-K_0(w\mid l)|\leq\delta,
+ \qquad 0\leq\delta\leq1.
+\]
+This bounds arbitrary nonclassical misclassification, including dependence on outcome and treatment, within the finite representation. It does not model unmatched people absent from the sampling frame unless an explicit missing-record category and population denominator are included.
+
+Assume treatment in the latent population was randomized conditional on $X$ with a known probability $e_x\in(0,1)$. Assume consistency and conditional independence of treatment and the two potential outcomes. The observed new-version distribution is $q_w=\Prb(W=w)$. The desired average treatment effect is
+\[
+ \tau=\sum_x\Prb(X=x)\{E[Y\mid D=1,x]-\E[Y\mid D=0,x]\}.
+\]
+This identification statement requires the randomization assumptions; arbitrary association of $D$ and $Y$ would not suffice.
+
+\section*{An exact linear-program representation}
+Introduce variables $z_{lw}=\Prb(L=l,W=w)$, $\pi_l=\sum_wz_{lw}$ and nonnegative auxiliaries $u_{lw}$. Impose
+\begin{align*}
+ z_{lw}&\geq0,&\sum_lz_{lw}&=q_w,&\pi_l&=\sum_wz_{lw},\\
+ u_{lw}&\geq z_{lw}-K_0(w\mid l)\pi_l,&
+ u_{lw}&\geq -z_{lw}+K_0(w\mid l)\pi_l,\\
+ \sum_wu_{lw}&\leq2\delta\pi_l,&&&\\
+ \sum_y\pi_{(y,1,x)}&=e_x\sum_{y,d}\pi_{(y,d,x)}&&&\text{for every }x.
+\end{align*}
+Minimize and maximize the linear functional
+\[
+ T(\pi)=\sum_{x,y}y\left\{\frac{\pi_{(y,1,x)}}{e_x}
+                   -\frac{\pi_{(y,0,x)}}{1-e_x}\right\}.
+\]
+An empty feasible set means that the data and restrictions are incompatible, not that the effect equals zero.
+
+\begin{proposition}[Sharpness and attainment]
+If the feasible set is nonempty, the minimum and maximum of these programs are attained and their interval is exactly the identified set for $\tau$ in the specified finite-state model.
+\end{proposition}
+\begin{proof}
+Any admissible model produces $z=\pi K$. Multiplying each total-variation row bound by $\pi_l$ gives the displayed inequalities, and treatment balance follows from the known assignment probability. Substitution in the treatment-effect formula gives $T(\pi)$.
+
+Conversely, take feasible $(z,\pi,u)$. If $\pi_l>0$, define $K(w\mid l)=z_{lw}/\pi_l$. The inequalities imply the required row bound. If $\pi_l=0$, set that unobserved row to $K_0$; it affects neither the observed law nor the target. Generate $X$ with mass $\sum_{y,d}\pi_{(y,d,x)}$. In a positive-mass stratum choose $Y(0)$ and $Y(1)$ with the conditional distributions encoded by the corresponding $\pi$ rows, coupling them independently if desired. Generate $D$ independently with probability $e_x$, set $Y=Y(D)$, and then generate $W$ using $K$. This constructs a valid causal model with exactly the requested joint distribution and observed law.
+
+The feasible set of $z,\pi$ is closed and bounded; auxiliaries can also be bounded by their finite row totals. Thus extrema exist. Convex combinations of feasible points remain feasible and the objective is linear. The construction therefore realizes all intermediate target values as well as the endpoints.
+\end{proof}
+
+Known propensities are essential to linearity. If they depend on unknown latent frequencies under observational assignment, the displayed denominators cannot simply be inserted as constants. Likewise, estimating $K_0$ from cells absent in validation is an unsupported extrapolation, not a consequence of the program.
+
+\section*{Finite validation and outer confidence sets}
+Suppose an independently selected validation sample contains paired true and reported records from the baseline version. Conditional on each latent cell's count, the reported counts are multinomial. If simultaneous confidence statements establish
+\[
+ \operatorname{TV}(K_0(\cdot\mid l),\widehat K_0(\cdot\mid l))
+ \leq\eta_l\quad\text{for all }l,
+\]
+then the triangle inequality puts the new kernel within radius
+$\min(1,\delta+\eta_l)$ of $\widehat K_0$ in every row. A zero-count cell must receive an uninformative radius, rather than an estimated zero error rate. Finite-state coordinate Hoeffding bounds and a union bound provide one conservative way of constructing the $\eta_l$.
+
+Construct simultaneous multinomial confidence intervals for the observed $q_w$ as well. Replace exact column sums by membership in those intervals and the probability simplex, and replace the row centers and radii as just described. The optimization remains linear. On the joint confidence event the true model is feasible, so its effect belongs to the projected interval. Allocating failure probabilities across the validation and main-sample statements yields uniform coverage of at least $1-\alpha$ under their sampling assumptions. This is a conservative outer confidence interval; it is not asserted to be the sharp confidence procedure or the exact population identified set.
+
+There is a basic limit to what shrinking validation can accomplish. With constant independent validation probability $v_n$, $N_V\sim\operatorname{Binomial}(n,v_n)$. In an unrestricted submodel where all ordinary reports equal the same symbol, only validation distinguishes different latent outcome laws. If $nv_n$ stays bounded along a subsequence, then $\Prb(N_V=0)$ stays bounded away from zero (unless the trivial finite-sample design is changed). On that event two separated latent-effect models have identical observed records. A two-point argument therefore rules out uniformly consistent estimation over that submodel. The condition $nv_n\to\infty$ is necessary there; positive information per ordinary report can change the conclusion in more restricted models.
+
+\section*{A scalar check and the remaining gap}
+For a simpler model, suppose treatment is recorded without error and outcome misclassification in each arm is at most $\delta$ in probability. Then true and reported outcome means differ by at most $\delta$. If reported means are $q_1,q_0$, the sharp effect bounds under otherwise unrestricted binary misclassification are
+\[
+ [\max(0,q_1-\delta)-\min(1,q_0+\delta),\quad
+   \min(1,q_1+\delta)-\max(0,q_0-\delta)].
+\]
+They are attained by moving outcome mass in opposite directions in the two arms. At $q_1=0.6,q_0=0.4,\delta=0.05$, the interval is $[0.10,0.30]$. This scalar model is a separate simplified error restriction, not an automatic reduction for every multidimensional kernel.
+
+The main result provides an implementable benchmark for known randomization and explicitly bounded version drift. The full catalogue target still needs defensible validation sampling, changing linkage populations, sparse latent cells, dependence across records and causal assumptions for observational exposures. The magnitude of $\delta$ must be supported externally or reported as a sensitivity parameter. More records do not identify it by themselves.
+
+\begin{thebibliography}{9}
+\bibitem{hausman} J. Hausman (2001), Mismeasured Variables in Econometric Analysis: Problems from the Right and Problems from the Left, \emph{Journal of Economic Perspectives} 15(4), 57--67. Primary abstract:
+\url{https://pubs.aeaweb.org/doi/10.1257/jep.15.4.57}.
+\end{thebibliography}
+\end{document}

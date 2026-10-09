@@ -1,0 +1,107 @@
+% ECONOMICS_PROBLEM: {"id": "G14-279", "title": "AI trading and market efficiency", "jel_code": "G14", "source_id": "OP-0319"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{AI trading and market efficiency\\[4pt]\large Correlated information technologies and a collusion benchmark}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Question and scope}
+The target is the effect of AI trading on price accuracy, market quality and strategic conduct under a specified adoption intervention. This attempt separates two tractable mechanisms: replacing independent information with a correlated technology, and sustaining dealer markups by a repeated-game rule. It does not predict that actual learning algorithms collude or identify the causal effect of observed AI adoption.
+
+\section*{A competitive information benchmark}
+A one-period asset pays $V\sim N(0,v)$ at maturity, where $v>0$. There is no further payoff innovation between the trading date and maturity, so $V$ is also the latent contemporaneous full-information fundamental. It is not observed by market makers. Discounting and risk premia are zero; the error studied below is the gap from this full-information benchmark, not from the market makers' own conditional expectation. A share $s\in[0,1]$ of fixed information-processing capacity uses AI; this intervention replaces, rather than adds to, human capacity.
+
+For $0<s<1$, the public order-processing summaries are
+\[
+ H_s=V+\xi_H,\qquad A_s=V+Z+\xi_A,
+\]
+where $\xi_H,Z,\xi_A,V$ are independent centered Gaussians, with variances $1/[h(1-s)]$, $\rho$, $1/(as)$ and $v$, respectively. Here $a,h>0$ and $\rho\ge0$. The common component $Z$ represents correlated model error shared by the AI technology. At $s=0$ omit $A_s$; at $s=1$ omit $H_s$. Market makers observe both summaries and know their true law. Their zero-expected-profit quote is $P_s=\E[V\mid H_s,A_s]$. This is an explicit nonstrategic benchmark; signals are observations, not equilibrium truthful reports by strategic traders.
+
+\begin{theorem}[Exact pricing error and optimal capacity share]
+The price mean squared error is
+\[
+ M(s)=\E(P_s-V)^2=
+ \left[v^{-1}+h(1-s)+\frac{as}{1+\rho as}\right]^{-1}.
+\]
+For $\rho>0$, the minimizing share is
+\[
+ s^*=\clip_{[0,1]}\left(\frac{\sqrt{a/h}-1}{\rho a}\right).
+\]
+For $\rho=0$, it is $s^*=1$ when $a>h$, $s^*=0$ when $a<h$, and every share when $a=h$. If $a>h$ but $a/(1+\rho a)^2<h$, the unique optimum is interior: increasing AI capacity improves price accuracy below $s^*$ and worsens it above $s^*$.
+\end{theorem}
+\begin{proof}
+Conditional on $V$, the two summaries have independent errors with variances $[h(1-s)]^{-1}$ and $\rho+(as)^{-1}$. Multiplying their Gaussian densities by the prior density and completing the square in $V$ gives posterior precision
+$v^{-1}+h(1-s)+[\rho+(as)^{-1}]^{-1}$. The posterior mean is $P_s$ and the posterior variance is the reciprocal of this precision; it does not depend on the realized signals. Taking expectations gives the MSE formula. Its continuous extension gives the endpoints.
+
+Minimizing $M$ is equivalent to maximizing $I(s)=h(1-s)+as/(1+\rho as)$. For $\rho>0$,
+$I'(s)=-h+a/(1+\rho as)^2$ and
+$I''(s)=-2\rho a^2/(1+\rho as)^3<0$.
+Solving $I'=0$ and clipping proves the optimum and the strict comparative statics. For $\rho=0$, $I$ is affine and the remaining assertions follow.
+\end{proof}
+
+The deterioration at high AI shares does not contradict the value of information: increasing $s$ removes a source of independent human information. If human capacity were instead held fixed, precision would be $v^{-1}+h+as/(1+\rho as)$, which is nondecreasing in $s$. This distinction is part of the adoption intervention and cannot be settled by a regression coefficient labeled ``AI share.''
+
+\begin{proposition}[Misspecifying the common error]
+Suppose market makers incorrectly set $\rho=0$ when forming their quote. Let
+$D_0=v^{-1}+h(1-s)+as$ and
+$\widetilde P_s=[h(1-s)H_s+as A_s]/D_0$. Then
+\[
+ \E(\widetilde P_s-V)^2=D_0^{-1}+\rho\left(\frac{as}{D_0}\right)^2.
+\]
+In particular, as nominal AI precision $a\to\infty$ at a fixed $s>0$, this error tends to $\rho$, whereas the correctly specified posterior error tends to
+$[v^{-1}+h(1-s)+\rho^{-1}]^{-1}$ for $\rho>0$.
+\end{proposition}
+\begin{proof}
+Expand $\widetilde P_s-V$ as a linear combination of the independent variables $V,\xi_H,\xi_A,Z$. With $\rho=0$ the sum of its variance terms is $D_0^{-1}$, either by direct multiplication or the posterior calculation above. The additional independent $Z$ term has coefficient $as/D_0$, giving the formula. Taking limits proves the last claim. No excess trading profit or collusive behavior is required for this error.
+\end{proof}
+
+\section*{A fully specified repeated dealer benchmark}
+Consider a different market with a public asset value and identical risk-neutral dealers. One unit of a trading service is demanded each period. Its marginal resource cost is $c\ge0$ and customers will pay up to $\bar p>c$. There are $n\ge2$ dealers. Simultaneous quotes lie in $[c,\bar p]$; the lowest quote wins, and ties divide demand equally. Quotes and allocations are publicly observed, payoffs are price less cost times allocated demand, and dealers discount future periods by $\delta\in[0,1)$. Fundamentals and inventory risk are constant. The one-period competitive benchmark has every dealer quote $c$, earning zero.
+
+Fix $p^H\in(c,\bar p]$. The following deterministic automaton is completely specified: start in state C; in C quote $p^H$; remain in C only if every observed quote equals $p^H$; after any other quote enter state P forever; in P quote $c$. It has no training stage or exploration. It is a candidate algorithmic policy whose incentives can be checked, not a claim about reinforcement-learning convergence.
+
+\begin{theorem}[An exact excess-markup equilibrium]
+The stated automaton profile is a subgame-perfect equilibrium if and only if $\delta\ge1-1/n$. On its cooperative path the spread over resource cost is $p^H-c$ and joint per-period profit is $p^H-c$, strictly above the competitive benchmark despite identical information, costs and risk.
+\end{theorem}
+\begin{proof}
+In punishment state P, quoting above $c$ yields no sales while quoting $c$ yields zero profit, so no deviation is profitable. In state C, the continuation value from cooperation is $(p^H-c)/[n(1-\delta)]$. A first deviation above $p^H$ earns zero now and thereafter. A first deviation below $p^H$ earns at most $p^H-c$ now and zero thereafter. Thus $1/[n(1-\delta)]\ge1$ makes every first deviation weakly unprofitable. Any deviating strategy either never first deviates, giving the same payoff, or has such a first date, so this check proves sequential optimality after every public history.
+
+Conversely if $1/[n(1-\delta)]<1$, choose a sufficiently small $\eta>0$ with $p^H-\eta\ge c$ and $(p^H-c-\eta)>(p^H-c)/[n(1-\delta)]$. Undercutting by $\eta$ gives a profitable deviation. The profit and spread expressions on the cooperative path follow from equal division of the unit demand.
+\end{proof}
+
+This theorem makes the benchmark behind ``collusion'' explicit. It provides no inference that high observed profits imply this automaton: unobserved costs, differentiated services or risk-bearing could alter the competitive counterfactual. Nor does a low pricing MSE rule out the markup equilibrium, since the asset fundamental in this example is public and correctly known.
+
+\section*{Identification and the unresolved adoption problem}
+With observed fundamental realizations, the first model's MSE is estimable at a given share, but the causal curve additionally requires the specified replacement intervention and stable $a,h,\rho,v$. Correlation may change with training-data overlap or vendor concentration. Strategic orders would require a new signal-extraction equilibrium. Private adoption incentives, capital allocation, learning stability and out-of-sample adaptation have not been derived here.
+
+The Bank of England's official research agenda was checked, especially its financial-system discussion of algorithmic trading, market dynamics and technological innovation. It motivates the subject; it does not supply the Gaussian model, the automaton or an empirical collusion conclusion. All mathematical claims used here are proved above.
+\begin{thebibliography}{9}
+\bibitem{boe} Bank of England (2026), \emph{Bank of England Agenda for Research, 2025--2028}, sections The Financial System and The Prudential Architecture. \url{https://www.bankofengland.co.uk/research/bank-of-england-agenda-for-research}.
+\end{thebibliography}
+
+\end{document}

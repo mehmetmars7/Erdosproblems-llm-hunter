@@ -429,6 +429,30 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertIn(r'\begin{thebibliography}', text)
                 self.assertNotRegex(text, r'/Users/|/home/|/mnt/data|/workspace/|TODO|proof omitted')
 
+    def test_astra_ultra_rank_201_to_250_attempts_preserve_problem_identity(self):
+        # Fixed IDs of the batch selected on 2026-10-09, independent of reranking.
+        expected = set('L52-201 C21-202 C78-203 O34-204 D82-205 C21-206 O31-207 Q54-208 C63-209 C21-210 R42-211 O34-212 C78-213 C31-214 C18-215 D72-216 C78-217 D83-218 C31-219 J12-220 G12-221 F18-222 Q54-223 E42-224 C78-225 C23-226 C78-227 F13-228 D15-229 F13-230 E32-231 C21-232 C83-233 C21-234 G28-235 I18-236 C78-237 D44-238 C44-239 Q41-240 I32-241 D63-242 D83-243 C21-244 H22-245 C61-246 F32-247 C44-248 G12-249 F16-250'.split())
+        self.assertEqual(len(expected), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attempts = [a for a in data[problem_id]['attacks']
+                            if a['file_path'] ==
+                            f'attacks/open_problems/economics/gpt_6_astra_ultra/{problem_id}.tex']
+                self.assertEqual(len(attempts), 1)
+                attempt = attempts[0]
+                self.assertEqual(attempt['model'], 'GPT 6 Astra Ultra')
+                self.assertEqual(attempt['entry_kind'], 'research_attempt')
+                self.assertEqual(attempt['date_posted'], '2026-10-09')
+                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(attempt['status'], 'unresolved')
+                source = BASE_DIR / attempt['file_path']
+                self.assertEqual(source.read_bytes(),
+                                 (BASE_DIR / 'docs' / attempt['download_url']).read_bytes())
+                self.assertIn(r'\begin{proof}', source.read_text())
+                self.assertIn(r'\begin{thebibliography}', source.read_text())
+                self.assertNotRegex(source.read_text(), r'/Users/|/private/tmp/|/mnt/data/|TODO')
+
     def test_specialized_and_merged_source_conventions_are_present(self):
         data = build_economics_data()
         self.assertIn('BSDE conventions for SC-01--SC-06', data['C65-6']['definition_tex'])
