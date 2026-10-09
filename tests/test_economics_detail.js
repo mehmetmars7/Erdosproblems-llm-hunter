@@ -74,12 +74,12 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
 async function main() {
     let page = await render('?type=economics&id=C73-1');
     assert.equal(page.element('page-title').textContent, 'Game <one>');
-    assert.match(page.element('problem-meta').innerHTML, /Field:<\/strong> Economics/);
+    assert.doesNotMatch(page.element('problem-meta').innerHTML, /Field:/);
     assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
     assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> no attempt/);
     assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
     assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:|Source catalogue ID:|Original catalogue:|Difficulty ranks can change/);
-    assert.match(page.element('problem-meta').innerHTML, /Difficulty rank:<\/strong> 3 of 3/);
+    assert.match(page.element('problem-meta').innerHTML, /Rank:<\/strong> 3<\/p>/);
     assert.match(page.element('problem-meta').innerHTML, /economics\.html\?jel=C73/);
     assert.match(page.element('problem-meta').innerHTML, /C73<\/a> \(Stochastic and Dynamic Games - Evolutionary Games - Repeated Games\)/);
     assert.match(page.element('problem-links').innerHTML, /<h3>Definitions and assumptions<\/h3>/);
@@ -138,7 +138,7 @@ async function main() {
         [id, { ...record, rank: 4 - record.rank }]));
     page = await render('?type=economics&id=C73-1', reordered);
     assert.doesNotMatch(page.element('problem-meta').innerHTML, /Problem ID:/);
-    assert.match(page.element('problem-meta').innerHTML, /Difficulty rank:<\/strong> 1 of 3/);
+    assert.match(page.element('problem-meta').innerHTML, /Rank:<\/strong> 1<\/p>/);
     assert.equal(page.element('prev-problem').style.visibility, 'hidden');
     assert.equal(page.element('next-problem').href, 'problem.html?type=economics&id=H41-4');
 

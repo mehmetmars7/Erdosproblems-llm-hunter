@@ -231,10 +231,9 @@
         title.textContent = problem.title;
         document.title = problem.title + ' (' + problem.id + ') - Economics';
         metadata.innerHTML = '<p><a href="economics.html">&larr; Economics</a></p>' +
-            '<p><strong>Field:</strong> ' + escapeHtml(problem.domain_label || 'Economics') + '</p>' +
             '<p><strong>JEL code:</strong> <a href="economics.html?jel=' + encodeURIComponent(problem.jel_code) + '">' + escapeHtml(problem.jel_code) + '</a>' +
                 (jelDescription ? ' (' + escapeHtml(jelDescription) + ')' : '') + '</p>' +
-            '<p><strong>Difficulty rank:</strong> ' + escapeHtml(problem.rank) + ' of ' + ordered.length + '</p>' +
+            '<p><strong>Rank:</strong> ' + escapeHtml(problem.rank) + '</p>' +
             '<p><strong>Problem Status:</strong> ' + escapeHtml(shared.getOpenProblemStatusLabel({ ...problem, status: problem.status || 'open' })) + '</p>' +
             '<p><strong>LLM Claim:</strong> ' + escapeHtml(shared.getOpenProblemClaimLabel(problem)) + '</p>' +
             '<p><strong>Community Review:</strong> ' + escapeHtml(shared.getReviewLabel(problem.review)) + '</p>';
