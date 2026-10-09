@@ -1,4 +1,4 @@
-// Economics statements share the site's TeX renderer and status labels.
+// Economics statements and attempts share the site's TeX renderer and status labels.
 (function () {
     'use strict';
 
@@ -74,10 +74,10 @@
             .map(([key, records]) => [key, records.values().next().value]));
     }
 
-    function initReferences(container, data, problem) {
+    function initReferences(container, data, problem, prefix = 'economics-tex-label-') {
         const localTargets = new Map();
         container.querySelectorAll('.tex-label').forEach((label, index) => {
-            label.id = 'economics-tex-label-' + (index + 1);
+            label.id = prefix + (index + 1);
             label.tabIndex = -1;
             localTargets.set(referenceKey(label), label);
         });
@@ -253,12 +253,41 @@
             next.style.visibility = 'visible';
         }
         initReferences(statement, data, problem);
+        const attempts = shared.sortAttemptsNewestFirst(problem.attacks || []);
+        const attemptsSection = document.getElementById('llm-attempts-section');
+        const attemptsContainer = document.getElementById('attempts-container');
+        if (attempts.length) {
+            attemptsSection.hidden = false;
+            attemptsSection.style.display = '';
+            attemptsContainer.innerHTML = attempts.map((attack, index) => {
+                const version = Number.isSafeInteger(attack.version) ? attack.version : 1;
+                const filename = problem.id + (version > 1 ? '_v' + version : '') + '.tex';
+                const download = attack.download_url || '';
+                const safeDownload = /^data\/economics\/attempts\/[a-zA-Z0-9_-]+\/[A-Z]\d{2}-[1-9]\d*(?:_v[1-9]\d*)?\.tex$/.test(download);
+                const source = attack.file_path && /^attacks\/open_problems\/economics\/[a-zA-Z0-9_-]+\/[A-Z]\d{2}-[1-9]\d*(?:_v[1-9]\d*)?\.tex$/.test(attack.file_path)
+                    ? 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/' + attack.file_path : '';
+                // Repeated equation and source labels belong to their own version.
+                const content = formatTeX(normalizedStatement(attack.raw), false, false)
+                    .replace(/data-tex-scope="0"/g, 'data-tex-scope="attempt-' + (index + 1) + '"');
+                return '<div class="attempt"><div class="attempt-header"><h3>' +
+                    escapeHtml((attack.model || '').replace(/_/g, ' ')) + ' (v' + version + ')</h3>' +
+                    '<span class="status-text">' + escapeHtml(shared.getAttemptClaim(attack)) + '</span>' +
+                    (source ? ' <a href="' + escapeHtml(source) + '" target="_blank" rel="noopener">source</a>' : '') +
+                    (safeDownload ? ' <a href="' + escapeHtml(download) + '" download="' + escapeHtml(filename) + '">Download attack TeX</a>' : '') +
+                    '</div>' + (attack.date_posted ? '<div class="attack-date">Posted: ' + escapeHtml(attack.date_posted) + '</div>' : '') +
+                    '<div class="attempt-content tex-content">' + content + '</div></div>';
+            }).join('');
+            initReferences(attemptsContainer, data, problem, 'economics-attempt-tex-label-');
+        } else {
+            attemptsContainer.innerHTML = '';
+        }
         const math = window.MathJax;
         if (math && typeof math.typesetPromise === 'function') {
             try {
                 if (math.startup && math.startup.promise) await math.startup.promise;
-                await math.typesetPromise([statement]);
+                await math.typesetPromise(attempts.length ? [statement, attemptsContainer] : [statement]);
                 initReferences(statement, data, problem);
+                if (attempts.length) initReferences(attemptsContainer, data, problem, 'economics-attempt-tex-label-');
             } catch (error) {
                 console.warn('Economics statement typesetting failed:', error);
             }

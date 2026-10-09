@@ -1,0 +1,275 @@
+% ECONOMICS_PROBLEM: {"id": "C72-4", "title": "Computational complexity of optimin in finite games", "jel_code": "C72", "source_id": "OP-0589"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{xcolor,enumitem,booktabs,longtable,array,microtype,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\providecommand{\ER}{\exists\mathbb R}
+\providecommand{\coER}{\mathrm{co}\text{-}\exists\mathbb R}
+\providecommand{\D}{\Delta}
+\providecommand{\Opt}{\mathcal O}
+\providecommand{\Q}{\mathbb Q}
+\providecommand{\RR}{\mathbb R}
+\providecommand{\NP}{\mathsf{NP}}
+\providecommand{\FP}{\mathsf{FP}}
+\providecommand{\Ptime}{\mathsf{P}}
+\providecommand{\PPAD}{\mathsf{PPAD}}
+\providecommand{\FIXP}{\mathsf{FIXP}}
+\providecommand{\PSPACE}{\mathsf{PSPACE}}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C72-4}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 1\par
+\noindent\textbf{Status:} Unresolved for the complete catalogue problem; this manuscript records partial results and research attempts.\par
+\section{Computational complexity of optimin in finite games}
+\label{problem:OP-0589}
+\noindent\textbf{Addendum ID:} OPT-COMP-1. \textbf{JEL:} C72. \textbf{Formulation:} formal computational research questions, with an explicitly distinguished status audit.
+\noindent\textbf{Status convention.} \textsc{Published}: established in the cited literature. \textsc{Derived}: an internally checked deduction constructed for this addendum, not independently peer-reviewed. \textsc{Unresolved here}: no classification follows from the reviewed sources and arguments; not a claim of exhaustive literature coverage.
+\subsection*{Definitions and assumptions}\label{optimin:sec:def}
+Let
+\[
+ G=(N,(A_i)_{i\in N},(v_i)_{i\in N}),\quad
+ N=\{1,\ldots,n\},\quad n\ge2,\quad A=\prod_i A_i,
+\]
+be a finite strategic-form game with $m_i=|A_i|\ge2$ and rational pure payoffs
+$v_i:A\to[-1,1]\cap\Q$. Its mixed extension has $\D_i=\D(A_i)$,
+$\D=\prod_i\D_i$, and multilinear expected payoffs $u_i:\D\to\RR$.
+Unless specified otherwise, the input is the \emph{entire explicit payoff table},
+whose binary bit length is $L$; write $M=\prod_i m_i$ and $d=\sum_i m_i$.
+``Polynomial time'' always means polynomial in $L$ and any additional input bit lengths, not necessarily polynomial in $n$.
+
+For $p\in\D$, let the strictly profitable \emph{unilateral} responses of player $j$, including non-deviation, be
+\[
+ B_j(p)=\{p_j\}\cup
+ \bigl\{q_j\in\D_j:u_j(q_j,p_{-j})>u_j(p)\bigr\},
+ \qquad B_{-i}(p)=\prod_{j\ne i}B_j(p).
+\tag{OPT.1}\label{optimin:eq:B}
+\]
+Each individual profitability comparison is against the \emph{original baseline profile} $p$. The product permits combinations of independently profitable unilateral deviations; such a combination need not itself be profitable for all deviators. The baseline is always available. The benchmark optimin performance and mixed optimin set of Ismail (2025, Definitions 1--3) are
+\[
+ \pi_i(p)=\inf_{q_{-i}\in B_{-i}(p)}u_i(p_i,q_{-i}),\qquad
+ \Opt^{\rm mix}(G)=\bigl\{p\in\D:\ \nexists q\in\D:
+  \pi(q)\ge\pi(p),\ \pi(q)\ne\pi(p)\bigr\}.
+\tag{OPT.2}\label{optimin:eq:pi}
+\]
+Vector inequalities are componentwise. Pareto nondominance in (2) concerns the \emph{performance} vector, not necessarily actual payoffs. In finite mixed games, $\Opt^{\rm mix}(G)$ is nonempty [S1]; it may contain irrational probability vectors (see Section~\ref{optimin:sec:checks}).
+
+For the \emph{pure-restricted} concept, replace the candidate set $\D$ by $A$ and each $\D_j$ in (1) by $A_j$. Denote these objects by $\pi^{\rm pure}$ and $\Opt^{\rm pure}(G)$. In general
+\(\Opt^{\rm pure}(G)\not\subseteq\Opt^{\rm mix}(G)\); a pure-restricted optimin is not necessarily mixed-optimin.
+
+For exact mixed computation, specify how algebraic probabilities are encoded (e.g. isolating intervals and defining polynomials, or an equivalent real-algebraic representation). Rational candidate profiles and rational approximation outputs have binary-encoded fractions. For rational $\varepsilon\in(0,1)$ the strategy metric is $\|p-q\|_\infty$ on $\RR^d$. The type of reduction (many-one, Turing, or solution-preserving search reduction) must be identified before using a complexity-completeness label.
+
+\subsection*{Formal research question: principal open complexity problems}\label{optimin:sec:open}
+The overarching \textbf{open target} is a sharp worst-case classification of the \emph{total search} problem
+\[
+ \mathsf{MIXED\text{-}OPTIMIN}:\quad
+ G\longmapsto p\in\Opt^{\rm mix}(G).
+\tag{OPT.3}\label{optimin:eq:search}
+\]
+An arbitrary acceptable optimin is sufficient: neither maximizing welfare nor meeting a specified threshold is required. The decision/selection hardness results recorded later do \emph{not} classify this task. The following precise variants organize the remaining work. Where a component is already resolved, it is marked accordingly and the further question is stated explicitly.
+
+\begin{enumerate}[label=\textbf{(\Alph*)},leftmargin=2.8em,itemsep=11pt]
+\item \textbf{Two-player general-sum exact search (central unresolved case).}
+For rational bimatrix inputs with arbitrary action counts $m_1,m_2$, determine the exact complexity of (3) for $n=2$. Is there a polynomial-time algorithm under a specified exact algebraic-output model? If not, establish a correct search reduction and tight hardness/completeness bound (for example relative to $\PPAD$, $\FIXP$ or another justified total-search class). Separately classify bounded-support, bounded-action, or special-rank subfamilies. \emph{Do not infer PPAD-hardness merely from NP-hardness of choosing a performance-threshold-satisfying optimin.}
+
+\item \textbf{Three-player and general $n$-player exact search.}
+For each fixed $n\ge3$ and separately for variable $n$, determine the sharp search complexity of (3), distinguishing (i) general-sum, (ii) constant-sum, and (iii) zero-sum classes and fixed versus unbounded action counts. Determine whether a suitably formulated $\FIXP$-complete or other real search characterization applies, and whether a lower player count supports genuinely easier arbitrary-point search. A Nash oracle \emph{suffices} to find an optimin in constant-sum games; the reverse reduction is not established by that observation.
+
+\item \textbf{Exact-to-near approximation and a repair of performance efficiency.}
+Classify the rational-output total search problem
+\[
+ \mathsf{NEAR\text{-}OPTIMIN}(G,\varepsilon):\quad
+ \widehat p\in\D\cap\Q^d,\qquad
+ \inf_{p^*\in\Opt^{\rm mix}(G)}\|\widehat p-p^*\|_\infty\le\varepsilon.
+\tag{OPT.4}
+\]
+Can the real-algebraic upper bounds be improved to polynomial time or to a sharp standard approximation/search class, with explicit dependence on $L$, $\log(1/\varepsilon)$, and $1/\varepsilon$?
+The \emph{different} condition
+\[
+ \nexists q\in\D:\quad\pi(q)\ge\pi(\widehat p),\qquad
+ \max_i\bigl(\pi_i(q)-\pi_i(\widehat p)\bigr)>\varepsilon
+\tag{OPT.5}
+\]
+\emph{is not always satisfiable by rational $\widehat p$}, even for positive $\varepsilon$ (Section~\ref{optimin:sec:checks}). Accordingly, classify this second task only on a declared promise class guaranteeing a rational witness, or with algebraic outputs, or after specifying a different robust performance metric. Do not conflate (4) and (5).
+
+\item \textbf{Sharper threshold/value complexity where still open.}
+For rational $r=(r_1,\ldots,r_n)$, positive rational weights $\lambda_i$ summing to one, and rational $t$, define
+\[
+ \mathsf{GUARANTEE}(G,r):\ \exists p\in\D\ \forall i:\pi_i(p)\ge r_i\,?,\qquad
+ V_\lambda(G)=\max_{p\in\D}\sum_i\lambda_i\pi_i(p).
+\tag{OPT.6}
+\]
+The associated threshold $V_\lambda(G)\ge t$ and (6)'s guarantee problem are already NP-hard for bimatrix games and $\ER$-complete for three-player zero-sum games by reductions detailed below (\textsc{Derived}). The remaining sharper targets include: does unrestricted bimatrix feasibility belong to $\NP$, or is it $\ER$-complete? Determine the exact output complexity of $V_\lambda$ and a maximizing profile; classify rational additive-value approximation versus rational approximate maximizers, and pursue finer hardness/approximation bounds. For a specified threshold, distinguish merely \emph{some} feasible profile from an \emph{arbitrary} optimin.
+
+\item \textbf{Sharper certification and verification boundaries.}
+For a \emph{rational} proposed mixed profile $p$, define
+\[
+ \mathsf{IS\text{-}OPTIMIN}(G,p):\quad p\in\Opt^{\rm mix}(G)\,?
+\tag{OPT.7}
+\]
+The general problem is in $\coER$, and a four-player hardness construction gives $\coER$-completeness (\textsc{Derived}). Classify its exact complexity with two and three players, under restrictions such as symmetric, potential or polymatrix games, and for algebraically encoded candidate profiles. Investigate certification under explicitly declared promise gaps. \emph{Do not confuse} checking (7), which compares $p$ with all profiles, with polynomial-time computation of the numbers $\pi_i(p)$.
+
+\item \textbf{Succinct pure games: resolve the remaining search/representation gap.}
+On an explicit table, finding one or all pure-restricted optimins is polynomial-time (a settled fact). For a \emph{succinct} Boolean/rational-payoff circuit $C$, require payoff computation to take polynomial bit time and produce polynomial-bit rationals. Threshold feasibility of a pure optimin is $\Sigma_2^P$-complete even when every player has two actions (\textsc{Derived}). Determine tight total-search classifications under (i) all-binary-player representations, (ii) general polynomial-bit encodings of action strings, and (iii) restricted graphical or anonymous representations. Establish applicable search-reduction notions and identify precisely which structural restrictions restore polynomial time.
+
+\item \textbf{Structural and parameterized mixed-strategy search.}
+Determine sharp search and selection complexity beyond the already-solved full-table common-interest and two-person zero-sum cases, including (i) potential games, (ii) $n$-person constant-sum games for $n\ge3$, (iii) symmetric games, (iv) polymatrix/graphical games, (v) anonymous and low-rank games, and (vi) bounded-interaction graphs. Investigate parameterization by $n$, $d=\sum_i m_i$, support size, local width, payoff rank, and approximation tolerance. Fixed $d$ yields polynomial-time algebraic computation for each fixed dimension, but \emph{this alone is not a uniform fixed-parameter-tractability (FPT) theorem}; give parameter-explicit $f(d)L^{O(1)}$ bounds before asserting FPT. Pure-restricted and two-person zero-sum tractability are baseline cases, not unresolved problems.
+
+\item \textbf{Alternate permissible-deviation rules and totality.}
+Replace (1), separately, by
+\[
+ \widehat B_j^{\rm weak}(p)=\{q_j:u_j(q_j,p_{-j})\ge u_j(p)\},\qquad
+ \widehat B_j^{\rm best}(p)=\{p_j\}\cup\argmax_{q_j\in\D_j}u_j(q_j,p_{-j}).
+\tag{OPT.8}
+\]
+A $2\times2$ counterexample shows that their corresponding mixed Pareto-optimin sets \emph{may be empty} (\textsc{Derived}). Therefore first classify assumptions guaranteeing existence, or formally require an output of ``empty''. On classes with totality, determine search/threshold/approximation complexity; specify whether the scalar value is a \emph{maximum} or only a \emph{supremum}. The pure-restricted modifications remain total by finiteness and are polynomial for explicit tables.
+\end{enumerate}
+
+\subsection*{Source audit and current complexity status}\label{optimin:sec:results}
+\small
+\begin{longtable}{p{0.49\textwidth}p{0.45\textwidth}}
+\toprule
+\textbf{Precisely specified task} & \textbf{Status and provenance}\\\midrule
+\endfirsthead
+\toprule\textbf{Task} & \textbf{Status and provenance}\\\midrule\endhead
+Strict-deviation $\pi(p)$, rational $p$, explicit table & $\FP$ for all player counts (\textsc{Derived} vertex enumeration).\\
+Pure-restricted optimin: find one, enumerate all, verify, or decide performance thresholds; explicit table & $\Ptime$, all $n$ (elementary enumeration; \textsc{Published} pure existence in Ismail).\\
+Pure Nash existence/search conditional on existence; explicit normal form & $\Ptime$, all $n$ (\textsc{Published} [S2]); correction of an earlier erroneous claim.\\
+Exact arbitrary mixed optimin, general-sum bimatrix & \textbf{Unresolved here.} Algebraic computation possible; no NP-/PPAD-/FIXP-hardness of arbitrary search established.\\
+Exact arbitrary mixed optimin, general $n$ & Exact real-algebraic algorithm (\textsc{Derived}); no sharp general search classification.\\
+Distance-$\varepsilon$ rational output to an exact mixed optimin & $\FP^{\Sigma_2\mathbb R}\subseteq\mathsf{FPSPACE}$ (\textsc{Derived}; real-hierarchy upper bound [S9]).\\
+Rational performance-efficient output according to (5) & \textbf{Not always total}; four-player counterexample for each $0<\varepsilon<1$ (\textsc{Derived}).\\
+Two-player general-sum guarantee/value thresholds & $\NP$-hard and in $\ER$; cap-saturating subproblems $\NP$-complete (\textsc{Derived} from [S4]).\\
+Three-player zero-sum guarantee thresholds $\pi\ge0$ & $\ER$-complete (\textsc{Derived} from published bilinear hardness [S5]).\\
+Three-player zero-sum single-player performance threshold & $\ER$-complete (\textsc{Derived} from [S5]).\\
+Three-player zero-sum positive-weight value threshold & $\ER$-complete, with fixed weights $(1/5,2/5,2/5)$ (\textsc{Derived}).\\
+Numerical approximation of scalar optimum $V_\lambda$ & $\FP^{\ER}$ upper bound for additive value approximation; does not imply a rational near-maximizing profile (\textsc{Derived}).\\
+Check a rational mixed profile for global optimin status & $\coER$-complete for four players; in $\coER$ for any $n$ (\textsc{Derived}).\\
+Check performance efficiency at fixed $\varepsilon=1/2$ & $\coER$-complete for four players (\textsc{Derived}).\\
+Succinct pure-restricted guarantee thresholds, variable binary-action players & $\Sigma_2^P$-complete (\textsc{Derived}).\\
+Succinct pure-restricted arbitrary search, general action encodings & $\FP^{\Sigma_2^P}$ upper bound; Turing hardness under general succinct action encodings (\textsc{Derived}); binary-player search tighter bound unresolved.\\
+Two-player zero-sum and constant-sum mixed optimin search & $\Ptime$ via minimax linear programming (\textsc{Published} equivalence [S1]).\\
+Explicit tabular common-interest mixed optimin search & $\Ptime$ via a global pure payoff maximum (\textsc{Derived}).\\
+Weak-deviation/best-response modified mixed optimin & May be empty even in a rational $2\times2$ game (\textsc{Derived}).\\
+\bottomrule
+\end{longtable}
+\normalsize
+
+\textbf{Reading the table.} $\ER$-completeness is a \emph{decision} statement, with $\NP\subseteq\ER\subseteq\PSPACE$. $\coER$ is the complement decision class. An $\ER$-hard performance threshold is not a valid reduction to the total problem (3): an arbitrary optimin may fail the threshold even when another optimin satisfies it. Search problems requiring exact irrational outputs need a real/algebraic model rather than informal ordinary NP-completeness terminology. The results marked \textsc{Derived} are internal research findings with the caveats described at the start; the Nash-computation complexity classes in [S6, S7] are \emph{comparison results}, not classifications of optimin.
+
+\subsubsection*{Important correction: pure Nash equilibrium is also polynomial on a full table}
+An earlier discussion asserted that pure Nash search was generally non-polynomial on explicitly represented games. That was \emph{incorrect}. If the input lists all $nM$ entries, test the $m_i$ unilateral alternatives for each player at every one of $M$ pure profiles. This is polynomial in the explicit input length and either finds a pure Nash equilibrium or determines that none exists. The same elementary distinction is stated in [S2]. Hardness theorems for \emph{succinctly represented} pure Nash games, or Nash equilibria with specified properties, do not contradict it [S3, S2, S4].
+
+\subsubsection*{What remains different between pure Nash and pure optimin}
+Pure Nash equilibrium may fail to exist, whereas a pure-restricted optimin always exists because a finite set of performance vectors has a Pareto-maximal element [S1]. Enumeration returns all pure optima with at most $O(nM^2)$ payoff evaluations/comparisons up to bit costs; the same order gives an explicit-table algorithm for pure Nash existence (though not the same test). This does \emph{not} prove efficient pure optimin computation in the number of players: $M$ is exponential in $n$ when there are two actions per player.
+
+\subsection*{Mathematical verification notes}\label{optimin:sec:checks}
+These are brief verification arguments, placed \emph{after} the open statements. The arguments below record the reductions and constructions used in this attack; these results are not attributed to the paper introducing optimin.
+
+\subsubsection*{Exact performance evaluation and its symbolic hypograph}
+For rational $p$, set $g_{ja}=u_j(e_a,p_{-j})-u_j(p)$, so $\sum_a p_{ja}g_{ja}=0$. Then
+\[
+ \overline{B_j(p)}=
+ \begin{cases}
+ \{p_j\},&\max_a g_{ja}=0,\\
+ \{q_j\in\D_j:\sum_a q_{ja}g_{ja}\ge0\},&\max_a g_{ja}>0.
+ \end{cases}
+\tag{OPT.9}
+\]
+In the second branch this is a simplex cut by a halfspace. Besides permitted pure vertices, its vertices occur where an edge from $g_{ja}>0$ to $g_{jb}<0$ meets the hyperplane; the positive and negative coordinates are
+\[
+ q_{ja}=\frac{-g_{jb}}{g_{ja}-g_{jb}},\quad
+ q_{jb}=\frac{g_{ja}}{g_{ja}-g_{jb}}.
+\tag{OPT.10}
+\]
+At most $m_j^2$ candidates per opponent suffice. Multi-affinity implies that minimizing $u_i(p_i,q_{-i})$ over the independent product is attained at a product of vertices, with at most $\prod_{j\ne i}m_j^2\le M^2$ combinations. Thus rational-profile evaluation is polynomial in the \emph{full table}. Crucially, if no strict improvement exists, replacing $\{p_j\}$ by the entire weak-response polytope would be wrong.
+
+Conditioning on which gains are positive, zero or negative gives a polynomial-size semialgebraic description of $z_i\le\pi_i(p)$: for every valid candidate deviation tuple $q_{-i}$ require $z_i\le u_i(p_i,q_{-i})$. Multiplying only denominators known positive under their guards produces polynomial inequalities. Algebraic gate variables prevent exponential symbolic expansion. This yields $\ER$ upper bounds for threshold existence and $\coER$ for rational-profile nondominance.
+
+\subsubsection*{The two-player single-component linear-programming identity}
+For bimatrix payoff matrices $(A,B)$, with row mixture $x$ and column mixture $y$,
+\[
+ \max_{x,y}\pi_1(x,y)=
+ \max_b\ \max_{\substack{x\in\D(A_1)\\x^\mathsf T B e_b\ge x^\mathsf T B e_c\ (\forall c)}}
+ x^\mathsf T A e_b.
+\tag{OPT.11}
+\]
+To bound an arbitrary profile, observe that an opponent pure best reply is either already on the opponent's equilibrium support or is a strictly profitable deviation. Conversely, choosing the opponent's pure best reply $e_b$ makes that opponent unable to deviate profitably, attaining the displayed objective. There are polynomially many linear programs. \emph{This optimizes just one $\pi_i$; selecting a globally undominated vector remains a separate task.}
+
+\subsubsection*{Cap saturation and three-player hardness}
+If $\sum_i u_i(p)\le C$ at every profile, and $\sum_i r_i=C$, then
+\[
+ \pi(p)\ge r\quad\Longleftrightarrow\quad
+ p\text{ is a Nash equilibrium with }u(p)=r.
+\tag{OPT.12}
+\]
+Indeed $\pi\le u$ forces equality in the total-payoff cap; any strictly profitable deviation for one player would lower some other player's payoff below its threshold. Conversely a Nash equilibrium has no strict profitable deviations. For bimatrix NP-hardness, use the \emph{specific cap-saturating SAT construction} in Conitzer--Sandholm [S4], not an arbitrary Nash hardness statement.
+
+For three-player hardness start with the $\ER$-complete bilinear system
+$\sum_{a,b}c^{(k)}_{ab}x_ay_b=0$ for all $k$, with $x,y$ in simplexes [S5, Proposition 2 in the arXiv version]. A signed-equation selector $S$ chooses $(s,k)$ with $s\in\{\pm1\}$; set
+\[
+ (u_S,u_X,u_Y)=(2s q_k,-s q_k,-s q_k).
+\tag{OPT.13}
+\]
+This defines rational \emph{pure-table} payoffs by evaluating $q_k$ on pure actions, then using their multilinear extensions. It is constant-sum zero (rescale if necessary). By (12), performance thresholds $(0,0,0)$ are met exactly by a zero-payoff Nash equilibrium, which the selector's best-response condition makes equivalent to the bilinear equations being zero. For the fixed unequal weights $(1/5,2/5,2/5)$, the weighted value is $0$ exactly in the feasible case, and is negative otherwise. This is an \emph{optimin-specific reduction derived from} [S5], not a published optimin-complexity theorem in that paper.
+
+\subsubsection*{Four-player verification hardness and irrational rational-output obstruction}
+Introduce a fourth binary \emph{gate} player to the previous game: if the gate is open ($e=1$), the first three players receive their original payoffs; if it is closed ($e=0$), they receive zero; the gate obtains $u_4=e$. A rational baseline with a closed gate and signs balanced has $\pi=(0,0,0,0)$. It has a performance dominator exactly if the original bilinear system is feasible, with a gain of one for the gate in yes-instances. Thus verification is $\coER$-complete already with four players. This must not be rephrased as proving that \emph{finding any} optimin is hard.
+
+For the distinct issue of rational approximate performance, put
+\[
+ q_1(x,y)=x-y,\qquad q_2(x,y)=xy+x+y-1,
+\quad\text{with }x,y\in[0,1].
+\tag{OPT.14}
+\]
+In the signed-selector game with payoffs $(s q_k/2,-s q_k/4,-s q_k/4)$, all players' performances are nonpositive, and the only possible nondominated vector has $x=y=\sqrt2-1$. Add an extra selector action $D$ with original-player payoffs zero and a binary player $T$ with payoff $1$ on $D$, $0$ otherwise. The exact profile $D$ and $x=y=\sqrt2-1$ has performance $(0,0,0,1)$. At every rational profile, some $q_k\ne0$; the selector can profitably move to a signed action whenever $D$ has positive mass, reducing $T$'s performance to zero. Thus every rational profile is dominated by an improvement of one in $T$'s performance. This gives the non-totality of the \emph{specified rational-output performance approximation} for every $0<\varepsilon<1$, without affecting existence of rational strategy-distance approximations.
+
+\subsubsection*{Succinct binary-player pure thresholds and modified-rule nonexistence}
+In a succinct game where all pure actions are binary, reduce a quantified Boolean instance $\exists x\,\forall y\,\varphi(x,y)$ by encoding each universal bit using a directed triple of guard players with payoffs $u_h=b_h(1-2b_{h+1})$, indices modulo three. Requiring nonnegative performance forces the guards' baseline triple to $000$, yet allows each first guard bit to independently switch to $1$ profitably. An extra monitor player receives $\varphi$ and must guarantee payoff one, forcing $\forall y\,\varphi(x,y)$. This explains the $\Sigma_2^P$-hardness; membership follows from the existential baseline and universal deviation tuple. The reduction is for a \emph{circuit input}, not a full payoff table.
+
+For the two modified rules (8), the rational payoff table
+\[
+ \begin{array}{c|cc}
+ &L&R\\\hline
+ T&(1,0)&(0,0)\\
+ B&(0,1)&(0,0)
+ \end{array}
+\tag{OPT.15}
+\]
+with $x=\Pr(B)$, $y=\Pr(L)$, gives for both modifications
+\[
+ \widetilde\pi_1(x,y)=\begin{cases}(1-x)y,&x>0,\\0,&x=0,\end{cases}
+ \qquad\widetilde\pi_2(x,y)=0.
+\tag{OPT.16}
+\]
+Every attained first component is strictly below one, and can be improved with $y'=1$ and sufficiently small $x'>0$, leaving the second component at zero. Therefore neither modified mixed optima set has any element. The strict benchmark \emph{does} have $(T,L)$ as an optimin.
+
+\subsection*{Interpretation and scope}\label{optimin:sec:audit}
+\begin{enumerate}[label=\arabic*.,leftmargin=2em,itemsep=4pt]
+\item \textbf{Publisher-backed versus research-derived.} Ismail (2025) supplies the benchmark, upper semicontinuity/existence, the pure-restricted existence observation, and the two-person zero-sum equivalence. It \emph{does not} establish the NP-hardness, $\ER$-completeness, $\coER$-completeness, or $\Sigma_2^P$-completeness claims developed here. The exact bilinear source is Berthelsen--Hansen (2022); Conitzer--Sandholm (2008) supplies the SAT game with a social-welfare cap. These references have been checked against their text and bibliographic records.
+\item \textbf{Open versus solved.} The central arbitrary mixed search classifications remain unanswered by the deductions above. Thresholds, scalarized value, and global verification can be hard for a \emph{selected} optimin without proving that obtaining \emph{any} one is hard. In particular no general-sum bimatrix $\PPAD$-completeness or $\FIXP$-completeness theorem is claimed here.
+\item \textbf{Exact, rational and approximate.} Exact strategies may be irrational; numerical approximation of the \emph{value} $V_\lambda$ is easier to define than a rational approximate maximizing \emph{profile}. The former has a real-feasibility-oracle bound; the latter may be impossible at a fixed positive tolerance under the specified performance-efficiency notion.
+\item \textbf{Unattained scalar suprema for modified rules.} Upper semicontinuity of Ismail's \emph{strict} performance function is used for the maximum and existence statements. It does not automatically transfer to rules (8). For those variants, ``maximum'' must not be asserted absent attainment.
+\item \textbf{No unqualified FPT claim.} The fixed-dimensional real-algebraic algorithms imply polynomial running time when total dimension $d$ is a \emph{fixed constant}. One must exhibit an explicit uniform bound $f(d)L^{O(1)}$ to claim fixed-parameter tractability; no such tight parameter result is established as a separate theorem in this entry.
+\item \textbf{Status of originality.} These are mathematical reductions and examples prepared for this project, not peer-reviewed research results. Their validity was rechecked against definitions, elementary algebra, and source lemmas; exhaustive priority or novelty relative to the full 2026 literature has not been certified.
+\end{enumerate}
+
+\subsection*{References}\label{optimin:sec:refs}
+\begin{enumerate}[leftmargin=2.75em,itemsep=4pt]
+\item[S1] Mehmet S. Ismail (2025), \emph{Super-Nash Performance}, International Economic Review \textbf{66}(4), 1487--1503. \url{https://doi.org/10.1111/iere.12764}. Definitions 1--3; Theorem 1, Remarks 1 and 5; Proposition 2/Corollary 1; Appendix Lemma A.1. \textit{Source for optimin, not for our complexity classifications.}
+\item[S2] Carme \`Alvarez, Joaquim Gabarro, Maria Serna (2011), \emph{Equilibria Problems on Games: Complexity versus Succinctness}, Journal of Computer and System Sciences \textbf{77}(6), 1172--1197. \url{https://doi.org/10.1016/j.jcss.2011.01.001}. Abstract and representation analysis: pure Nash existence in explicit strategic games is polynomial-time; NP- and $\Sigma_2^P$-hardness in more succinct encodings.
+\item[S3] Georg Gottlob, Gianluigi Greco, Francesco Scarcello (2005), \emph{Pure Nash Equilibria: Hard and Easy Games}, Journal of Artificial Intelligence Research \textbf{24}, 357--406. \url{https://www.cs.cmu.edu/afs/cs/project/jair/pub/volume24/gottlob05a.pdf}. Relevant graphical/compact input restrictions; not a hardness claim for explicit full tables.
+\item[S4] Vincent Conitzer, Tuomas Sandholm (2008), \emph{New Complexity Results about Nash Equilibria}, Games and Economic Behavior \textbf{63}(2), 621--641. \url{https://doi.org/10.1016/j.geb.2008.02.015}; author PDF \url{https://www.cs.cmu.edu/~conitzer/nashGEB08.pdf}. Section 3, Definition 4 and Theorem 1: symmetric SAT game, cap $2(n-1)$, Nash payoffs $n-1$ iff satisfiable. The optimin cap reduction is a distinct deduction here.
+\item[S5] Marie Louisa T\o lb\o ll Berthelsen, Kristoffer Arnsfelt Hansen (2022), \emph{On the Computational Complexity of Decision Problems About Multi-player Nash Equilibria}, Theory of Computing Systems \textbf{66}(3), 519--545. \url{https://doi.org/10.1007/s00224-022-10080-1}; preprint \url{https://arxiv.org/abs/2001.05196}. Proposition 2 and Definition 1 of arXiv v1: $\ER$-complete homogeneous bilinear feasibility and the three-player signed-equation zero-sum game. The associated optimin results here are deductions, not their theorems.
+\item[S6] Xi Chen, Xiaotie Deng, Shang-Hua Teng (2009), \emph{Settling the Complexity of Computing Two-Player Nash Equilibria}, Journal of the ACM \textbf{56}(3), Article 14. \url{https://doi.org/10.1145/1516512.1516516}. Bimatrix Nash search is PPAD-complete, not automatically mixed-optimin search.
+\item[S7] Kousha Etessami, Mihalis Yannakakis (2010), \emph{On the Complexity of Nash Equilibria and Other Fixed Points}, SIAM Journal on Computing \textbf{39}(6), 2531--2597. \url{https://doi.org/10.1137/080720826}. FIXP and exact-versus-near real algebraic search for Nash.
+\item[S8] James Renegar (1992), \emph{On the Computational Complexity and Geometry of the First-Order Theory of the Reals}, Parts I--III, Journal of Symbolic Computation \textbf{13}(3), 255--352. \url{https://doi.org/10.1016/S0747-7171(10)80003-3} (Part I); \url{https://doi.org/10.1016/S0747-7171(10)80005-7} (Part III). Quantifier elimination, fixed-dimensional polynomiality and algebraic sampling.
+\item[S9] Thekla Hamm, Lucas Meijer, Tillmann Miltzow, Subhasree Patro (2025), \emph{Oracle Separations for $\mathbb R\mathrm{PH}$}. \url{https://arxiv.org/abs/2502.09279}. Theorem 14, real polynomial-hierarchy PSPACE bound; used only for the stated polynomial-space upper bound.
+\item[S10] Larry J. Stockmeyer (1976), \emph{The Polynomial-Time Hierarchy}, Theoretical Computer Science \textbf{3}(1), 1--22. \url{https://doi.org/10.1016/0304-3975(76)90061-X}. Standard second-level quantified-Boolean source problem; the pure-optimin guards are constructed here.
+\end{enumerate}
+\end{document}

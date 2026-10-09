@@ -17,8 +17,26 @@ Statements are stored in
 TeX file retains definitions, assumptions, questions, scope/status notes,
 references, merged formulations, and applicable shared source conventions. Old
 difficulty labels and the superseded top-level classification command are
-removed. There are no research attempts. Run the ordinary site build to emit
-embedded browser data and identical local downloadable statement copies.
+removed. Research attempts live in sibling model folders, separately from the
+canonical statements. Run the ordinary site build to emit embedded browser data
+and identical local downloadable copies of the statements and attempts.
+
+## Research attempts
+
+Use `attacks/open_problems/economics/{model}/{permanent-id}.tex`. Further
+versions use `{permanent-id}_v2.tex`, `_v3.tex`, and so on. For example,
+`gpt_6_astra_pro/C73-1.tex` and `C73-1_v2.tex` are separate attacks on the
+same stochastic-games problem. The build joins by permanent ID, never current
+rank or the potentially reused source OP ID.
+
+Each attempt is a complete standalone TeX document with one
+`ECONOMICS_PROBLEM` JSON comment matching the statement's `id`, `title`,
+`jel_code`, and `source_id`; one `FIRST_POSTED: YYYY-MM-DD` comment; and one
+explicit `ATTEMPT_STATUS: unresolved`, `partial`, or `solved` comment. Partial
+results remain unresolved for the full problem. Keep local paths, upload chatter,
+unrelated problems, and unpublished companion-file references out of public TeX.
+The website displays each version with its model, status, date, source link,
+and downloadable TeX. Statement files, IDs and difficulty ranks are unchanged.
 
 `jel_codes.json` stores the JEL descriptions from the supplied classification
 text, with its source hash. The build includes one shared lookup containing the

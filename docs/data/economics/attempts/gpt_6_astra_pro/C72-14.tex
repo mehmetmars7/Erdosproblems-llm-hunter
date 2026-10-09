@@ -1,0 +1,904 @@
+% ECONOMICS_PROBLEM: {"id": "C72-14", "title": "The Catch-Up optimal-draw conjecture for consecutive integers", "jel_code": "C72", "source_id": "OP-0589"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{geometry}
+\geometry{margin=27mm}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black,citecolor=blue!45!black}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{warning}[theorem]{Warning}
+
+\newcommand{\SN}{S_N}
+\newcommand{\TN}{T_N}
+\newcommand{\sm}{\operatorname{sum}}
+\newcommand{\RR}{\mathcal{R}}
+\DeclareMathOperator{\val}{val}
+
+\newcommand{\notesep}{\par\smallskip\noindent}
+
+\title{\textbf{Catch-Up on Consecutive Integers}\\[3pt]
+\large Precise formulation, rigorous partial results,\\
+proof attempts, and a counterexample to a proposed strategy}
+\author{GPT 6 Astra Pro}
+\date{8 October 2026}
+
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C72-14}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 1\par
+\noindent\textbf{Status:} Unresolved for the complete catalogue problem; this manuscript records partial results and research attempts.\par
+\maketitle
+
+\begin{abstract}
+For Catch-Up played on $\{1,2,\dots,N\}$, the conjecture is that
+optimal play produces a draw whenever $N(N+1)/2$ is even.  These notes
+collect the proof attempts made toward that statement.  We give a
+precise sequential model, an exact minimax recurrence, an opening
+antisymmetry (an observation attributed to Bernhard von Stengel), a
+sufficient two-opening criterion, and a proof that every even-total
+consecutive instance admits \emph{some} legal drawn play.  We then
+formulate half-score completion and exchange conditions, prove a
+one-deletion repair property of the canonical four-number blocks,
+and isolate the defect in a proposed small-deficit invariant.  An
+explicit adversarial analysis for $N=8$ proves that a strategy forced
+to maintain this small-deficit invariant loses, although an excluded
+move is drawing.  We distinguish valid lemmas, equivalent
+reformulations, sufficient conditions, and failed strategies.
+No uniform winning-or-drawing strategy for all $N$ is obtained.
+\end{abstract}
+
+\tableofcontents
+
+
+\section*{Formal problem statement: Catch-Up on consecutive integers}
+\addcontentsline{toc}{section}{Formal problem statement: Catch-Up on consecutive integers}
+\noindent
+\textbf{Instance.} Fix an integer $N\ge 1$ and the finite set
+$S_N=\{1,2,\ldots,N\}$. Two players, $P_1$ and $P_2$, start with
+scores $s_1=s_2=0$. Player $P_1$ makes the first move by taking exactly
+one integer. Thereafter the designated player takes unused integers one
+at a time, and is required to keep taking integers while their score is
+strictly below the other player's score; the turn ends immediately upon
+equality or overtaking. If the player cannot catch up even by taking all
+remaining integers, that player takes every remaining integer and the
+game terminates. Play also terminates when all integers have been taken.
+The terminal payoff to $P_1$ is the final score difference $s_1-s_2$.
+Both players have perfect information and choose optimally, with $P_1$
+maximising this payoff and $P_2$ minimising it.
+
+\medskip\noindent
+\textbf{Conjectured answer.} Put $T_N=N(N+1)/2$. For every $N$ for
+which $T_N$ is even (equivalently, $N\equiv0,3\pmod4$), prove or
+disprove that the optimal terminal score difference is exactly zero:
+\[
+\boxed{\operatorname{Val}(\operatorname{Catch\mbox{-}Up}(S_N))=0.}
+\]
+Equivalently, under optimal play both players finish with score
+$T_N/2=N(N+1)/4$. The existence of a legal drawn sequence of moves
+is weaker than the claim that the minimax outcome is a draw.
+
+
+\section{Rules and the question}
+
+\begin{definition}[Catch-Up]
+Let $S$ be a finite set of \emph{distinct positive integers}.  Players
+$P_1$ and $P_2$ begin with respective scores $(s_1,s_2)=(0,0)$.
+The following rules apply.
+\begin{enumerate}[label=(\roman*)]
+\item $P_1$ starts by choosing \emph{exactly one} element of $S$,
+      removing it, and adding it to her score.
+\item Thereafter, the player designated to act selects remaining
+      elements \emph{one at a time}, adding each to that player's score.
+      The acting player must continue selecting while strictly behind,
+      and must stop as soon as their score \emph{equals or exceeds} the
+      opponent's current score.  The turn then passes to the opponent,
+      who must make at least one selection if the remaining set is
+      nonempty, including if the scores are tied.
+\item If the acting player is behind and cannot catch up even by taking
+      every remaining number, that player receives all remaining
+      numbers and the game ends.  This convention agrees with
+      continuing to select the numbers one by one until none remain.
+\item When no numbers remain, the player with the larger score wins;
+      equality means a draw.
+\end{enumerate}
+Every selected number is allocated to exactly one player; thus the
+sum of the final scores equals $\sm(S):=\sum_{x\in S}x$.
+\end{definition}
+
+\begin{example}[A drawn play for $N=4$]
+From $\{1,2,3,4\}$, let $P_1$ choose $2$.  Player $P_2$ chooses $1$
+(still behind) and then $4$ (now ahead), and $P_1$ takes $3$.
+The final scores are $(5,5)$.  The existence of this play does not
+by itself prove a draw under optimal play.
+\end{example}
+
+Write
+\[
+\SN=\{1,2,\ldots,N\},\qquad
+\TN=\sm(\SN)=\frac{N(N+1)}2.
+\]
+When $\TN$ is even, put $H=\TN/2$.  The problem is the following.
+
+\begin{conjecture}[Optimal-draw conjecture for consecutive integers]
+\label{conj:main}
+For every positive integer $N$ with
+\[
+N\equiv 0\text{ or }3\pmod 4,
+\]
+optimal play in $\operatorname{Catch\mbox{-}Up}(\SN)$ ends in a draw;
+that is, both final scores are $H=N(N+1)/4$.
+\end{conjecture}
+
+\begin{remark}[Meaning of optimal play]
+The game is finite, has perfect information and no chance moves.
+We use the final difference $s_1-s_2$ as a zero-sum payoff: $P_1$
+maximises it and $P_2$ minimises it.  This is a convenient refinement
+of preferences among wins or losses.  In particular, the sign of the
+minimax payoff gives the same win--draw--loss outcome as the ordinary
+preferences win $>$ draw $>$ loss.  The conjecture asserts that the
+minimax payoff is zero; it is not an assertion that every legal play
+is drawn.
+\end{remark}
+
+\section{Exact game-value recurrence}
+
+\begin{definition}[The continuation value]
+Let $V(R,d)$ be the minimax \emph{final score advantage of the player
+about to select a number}, when the remaining set is $R$ and that
+player is currently behind by $d\ge0$.  When $d=0$ and $R\ne\varnothing$,
+the designated player is nevertheless required to select a number.
+Write $\sm(R)=\sum_{x\in R}x$, with $\sm(\varnothing)=0$.
+\end{definition}
+
+\begin{proposition}[Exact one-selection recurrence]
+\label{prop:recurrence}
+For every $d\ge0$,
+\begin{equation}\label{eq:terminal}
+V(\varnothing,d)=-d.
+\end{equation}
+For nonempty $R$,
+\begin{equation}\label{eq:recursion}
+\boxed{
+V(R,d)=\max_{x\in R}
+\begin{cases}
+V(R\setminus\{x\},d-x),&x<d,\\[2pt]
+-\,V(R\setminus\{x\},x-d),&x\ge d.
+\end{cases}}
+\end{equation}
+If $\sm(R)<d$, then $V(R,d)=\sm(R)-d$.
+\end{proposition}
+\begin{proof}
+If $x<d$, the acting player is still behind after taking $x$,
+so that same player must select again; the residual deficit is $d-x$.
+If $x\ge d$, the player has caught up or overtaken, and the next
+selection belongs to the opponent, now behind by $x-d$.  This
+interchanges the player whose advantage is measured, producing the
+minus sign.  In particular, \emph{equality $x=d$ belongs in the
+second branch}: a tied position passes the turn.  Maximisation over
+$x$ expresses the acting player's choice.  If $R=\varnothing$, no
+more points can be scored and the designated player's margin is $-d$.
+Finally, if $\sm(R)<d$, the acting player cannot catch up and receives
+every remaining number, giving margin $\sm(R)-d$.
+\end{proof}
+
+Applying the recurrence to the initial tied position gives
+\begin{equation}\label{eq:openingvalue}
+V(\SN,0)=-\min_{x\in\SN}V(\SN\setminus\{x\},x).
+\end{equation}
+Consequently, Conjecture~\ref{conj:main} is equivalent to
+\begin{align}
+V(\SN\setminus\{x\},x)&\ge0
+          &&\text{for \emph{every} }x\in\SN,\label{eq:all-opening}\\
+V(\SN\setminus\{x\},x)&\le0
+          &&\text{for \emph{at least one} }x\in\SN.\label{eq:one-opening}
+\end{align}
+The first line is the assertion that $P_2$ can avoid losing against
+any first move; the second that $P_1$ has at least one non-losing
+opening.  Both directions are needed.
+
+\section{Opening reversal and the two-opening criterion}
+
+\noindent
+The opening-reversal observation and its use are attributed here to
+Bernhard von Stengel, as indicated by the problem proposer; they are
+not asserted to be new results of these notes.
+
+For distinct $a,b\in S$, define $M_S(a,b)$ as the optimal final
+margin $s_1-s_2$ conditional on $P_1$ first taking $a$ and $P_2$
+first taking $b$, with optimal continuation thereafter.  This is a
+conditional value after the \emph{first selections} of the players;
+if $b<a$, $P_2$ has not yet completed his turn.
+
+\begin{lemma}[Opening reversal]
+\label{lem:reverse}
+For any finite $S$ of distinct positive numbers and $a\ne b$ in $S$,
+\begin{equation}\label{eq:antisym}
+\boxed{M_S(a,b)=-M_S(b,a).}
+\end{equation}
+More precisely, for $a<b$,
+\[
+M_S(a,b)=V(S\setminus\{a,b\},b-a),
+\qquad
+M_S(b,a)=-V(S\setminus\{a,b\},b-a).
+\]
+\end{lemma}
+\begin{proof}
+Assume $a<b$.  After $P_1$ takes $a$ and $P_2$ takes $b$,
+$P_2$ has overtaken and $P_1$ is about to select from
+$S\setminus\{a,b\}$, behind by $b-a$.  Its value, measured for $P_1$,
+is $V(S\setminus\{a,b\},b-a)$.  In the reversed opening, $P_1$
+takes $b$ and $P_2$ takes $a$.  Player $P_2$ is still behind and must
+continue the \emph{same} turn; the remaining set and deficit are
+identical, but the acting player's identity is reversed.  Therefore
+the values have opposite signs.
+\end{proof}
+
+\begin{proposition}[Opening form of the minimax value]
+\label{prop:matrix}
+For a set $S$ with at least two elements,
+\begin{equation}\label{eq:matrix}
+\boxed{V(S,0)=\max_{a\in S}\ \min_{b\in S\setminus\{a\}}M_S(a,b).}
+\end{equation}
+\end{proposition}
+\begin{proof}
+Player $P_1$ chooses an opening $a$, and $P_2$ then chooses a first
+number $b\ne a$.  Further selections by $P_2$, if necessary, and
+all later turns are optimised in $M_S(a,b)$.  Thus $P_2$ minimises
+over $b$ and $P_1$ maximises over $a$.
+\end{proof}
+
+An opening $a$ is called \emph{non-losing for $P_1$} when
+$\min_{b\ne a}M_S(a,b)\ge0$.
+
+\begin{corollary}[At most one strictly winning opening]
+\label{cor:unique}
+There cannot be two distinct openings from which $P_1$ can force a
+strictly positive final margin.
+\end{corollary}
+\begin{proof}
+If $a$ is a strictly winning opening, then $M_S(a,b)>0$ for
+all $b\ne a$.  By Lemma~\ref{lem:reverse}, $M_S(b,a)<0$ for every
+$b\ne a$, and therefore every other opening has a losing reply.
+\end{proof}
+
+\begin{theorem}[Two non-losing openings suffice for a draw]
+\label{thm:twoopen}
+If there exist two distinct non-losing openings $a,b\in S$, then
+$V(S,0)=0$.
+\end{theorem}
+\begin{proof}
+The existence of $a$ already gives $V(S,0)\ge0$.  Moreover,
+$M_S(a,b)\ge0$ and $M_S(b,a)\ge0$, so antisymmetry forces
+$M_S(a,b)=M_S(b,a)=0$.  Player $P_2$ can avoid losing as follows:
+against any opening $x\ne a$, select $a$ first, obtaining
+\[
+M_S(x,a)=-M_S(a,x)\le0.
+\]
+Against opening $a$, select $b$ first, yielding $M_S(a,b)=0$.
+Hence $P_2$ can hold the value to at most zero.  Together with
+$V(S,0)\ge0$, this gives $V(S,0)=0$.
+\end{proof}
+
+\begin{remark}[The remaining gap]
+To turn Theorem~\ref{thm:twoopen} into a proof of
+Conjecture~\ref{conj:main}, one still needs a \emph{uniform
+construction of two non-losing openings} for every $N\equiv0,3
+\pmod4$.  Neither the opening symmetry nor equal-sum arithmetic
+supplies that construction.  Antisymmetry by itself does not imply
+that any row of the matrix $M_S$ is nonnegative.
+\end{remark}
+
+\section{Equal-sum partitions: what they actually prove}
+
+\begin{proposition}[Parity]
+\label{prop:parity}
+For $N\ge1$,
+\[
+\TN\text{ is even}\quad\Longleftrightarrow\quad
+N\equiv0\text{ or }3\pmod4.
+\]
+\end{proposition}
+\begin{proof}
+The product $N(N+1)$ is divisible by $4$ exactly when one of the
+consecutive integers $N,N+1$ is divisible by $4$.
+\end{proof}
+
+\begin{lemma}[Explicit equal-sum partition]
+\label{lem:partition}
+Whenever $\TN$ is even, $\SN$ admits a disjoint partition
+$\SN=A\sqcup B$ with
+\[
+\sm(A)=\sm(B)=H=\frac{\TN}{2}.
+\]
+\end{lemma}
+\begin{proof}
+If $N=4m$, split each block
+$\{4j-3,4j-2,4j-1,4j\}$, $1\le j\le m$, as
+\[
+\{4j-3,4j\}\quad\text{and}\quad\{4j-2,4j-1\}.
+\]
+Both pairs have sum $8j-3$.  Assign one pair from each block to
+$A$, the other to $B$.
+
+If $N=4m+3$, first split $\{1,2,3\}$ into $\{3\}$ and
+$\{1,2\}$, each summing to $3$.  Then for $1\le j\le m$ split
+$\{4j,4j+1,4j+2,4j+3\}$ into
+\[
+\{4j,4j+3\}\quad\text{and}\quad\{4j+1,4j+2\},
+\]
+whose sums are both $8j+3$.  Combining the assigned halves produces
+the claimed partition.
+\end{proof}
+
+\begin{theorem}[A legal drawn play exists]
+\label{thm:exists}
+Let $S$ be any finite set of distinct positive integers that has an
+equal-sum partition $S=A\sqcup B$, with
+$\sm(A)=\sm(B)=H$.  Then \emph{there exists a legal play} of
+Catch-Up$(S)$ that ends in a draw, with final scores $(H,H)$.
+In particular, this is true for $S=\SN$ whenever $\TN$ is even.
+\end{theorem}
+\begin{proof}
+Give $A$ to $P_1$ and $B$ to $P_2$ as \emph{voluntary selection
+sets}.  Each player selects only numbers from their own assigned
+set, one by one, stopping at the first selection on a turn that
+catches or overtakes the opponent.
+
+Suppose the acting player has score $u$ and the opponent has score
+$v$, where $u\le v\le H$.  The acting player still has assigned
+numbers with total sum $H-u$.  Since
+\[
+H-u\ge v-u,
+\]
+there is enough assigned weight to catch up; selecting assigned
+numbers in any order and stopping at the first catch-up is legal.
+When the scores are tied below $H$, the same player has an assigned
+number left and can start the next turn.  Every score remains at
+most $H$, because nobody selects outside their own assigned set.
+If a player reaches $H$, the other player receives any remaining
+numbers and reaches $H$ as well.  Otherwise play continues until both
+assigned sets are exhausted, again giving $(H,H)$.
+\end{proof}
+
+\begin{warning}[Arithmetic feasibility is not strategic force]
+Theorem~\ref{thm:exists} assumes both players \emph{cooperate} with
+the assignment.  An opponent is free to take numbers from the other
+player's intended half.  Therefore this theorem does \emph{not}
+imply that either player can force a draw under optimal play.
+\end{warning}
+
+\begin{example}[Naive complementary pairing fails]
+For $S=\{1,2,3,4\}$, the partition
+$\{1,4\}\sqcup\{2,3\}$ has equal sums.  A proposed response
+``answer an opening $1$ with its partner $4$'' loses: the legal
+sequence $P_1:1$, $P_2:4$, $P_1:2,3$ ends at $(6,4)$.
+Thus a fixed-pair reply is not itself a non-losing strategy.
+\end{example}
+
+\section{Half-score completion sets and the failed induction shortcut}
+
+\begin{lemma}[Reaching the half-total]
+\label{lem:half}
+Suppose the sum of all initial numbers is $2H$.
+If either player's score first reaches \emph{exactly} $H$, the final
+outcome is forced to be a draw.  If either player's score ever exceeds
+$H$, that player has already secured a win.
+\end{lemma}
+\begin{proof}
+When a player first reaches $H$, that player's turn has ended,
+because the opponent cannot have more than $H$ (the total is $2H$).
+If the opponent's current score is $t\le H$, the remaining numbers
+have sum $H-t$.  The opponent, now acting, must receive all of them
+in order to catch up, so the final scores are $(H,H)$.
+If a player instead exceeds $H$, the sum of every number allocated
+to the opponent is strictly less than $H$.  The player who exceeded
+$H$ therefore necessarily wins.
+\end{proof}
+
+\begin{definition}[Half-score completion set]
+At a position with total initial sum $2H$, a \emph{completion set}
+for a player with score $s\le H$ is a subset $A$ of the currently
+remaining numbers such that $\sm(A)=H-s$.
+\end{definition}
+
+\begin{remark}[Why completion sets alone do not solve the game]
+Having a completion set gives a player enough designated numbers to
+reach $H$ while the opponent's score is at most $H$.  But the
+opponent may take elements of that set on intervening turns.
+Preservation against an adversary, not initial existence, is the
+missing ingredient.
+\end{remark}
+
+\begin{example}[A residual tied game need not retain its value]
+\label{ex:residual}
+The set $R=\{3,4,7\}$ has total $14$, and the fresh game on $R$
+is drawn under optimal play: the first player can take $7$, forcing
+the second player to take $3$ and $4$; conversely, a second player
+can reply to an opening $3$ or $4$ by taking $7$, resulting in a draw.
+Thus
+\[
+V(\{3,4,7\},0)=0.
+\]
+But for an acting player \emph{already behind by $2$},
+\begin{equation}\label{eq:offsetexample}
+V(\{3,4,7\},2)=-2.
+\end{equation}
+Indeed, taking $3$ leaves $\{4,7\}$; the opponent chooses $7$ and
+the acting player eventually receives $4$.  Taking $4$ is symmetric:
+the opponent takes $7$ and the player eventually receives $3$.
+Taking $7$ makes the opponent take both $3$ and $4$ to catch up.
+In every case the original acting player loses by $2$.
+
+This offset position is reachable within a \emph{legal} play on
+$\{1,\ldots,7\}$:
+\[
+P_1:1,\qquad P_2:2,\qquad P_1:5,\qquad P_2:6,
+\]
+which leaves scores $(6,8)$ and $R=\{3,4,7\}$ with $P_1$ to act.
+This is not a counterexample to Conjecture~\ref{conj:main}; the
+prefix is not claimed to be optimal.
+\end{example}
+
+\begin{warning}[Invalid induction shortcut]
+An induction on $N$ cannot replace the remaining game by a \emph{fresh}
+Catch-Up game merely because its remaining numbers admit an equal-sum
+partition.  The score deficit $d$ is part of the position, and
+Example~\ref{ex:residual} shows that changing $d$ changes the
+optimal value.  Any induction must track both the remaining set
+and the current deficit.
+\end{warning}
+
+\section{Balanced completions and signed exchanges}
+
+Assume a position has current scores $a$ and $a+d$, with $d\ge0$,
+and the player at $a$ about to select.  Set
+\[
+r=\sm(R),\qquad 2a+d+r=2H,\qquad
+q=H-a=\frac{r+d}{2}.
+\]
+The acting player needs $q$ points to reach $H$; the opponent
+needs $q-d$.
+
+\begin{definition}[Balanced completion partition]
+A partition $R=A\sqcup B$ is \emph{balanced} for this position when
+\begin{equation}\label{eq:balanced}
+\boxed{\sm(A)=q,\qquad\sm(B)=q-d.}
+\end{equation}
+The sets $A$ and $B$ complete the acting and nonacting players,
+respectively, to $H$.
+\end{definition}
+
+\begin{lemma}[Completion-partition equivalence]
+\label{lem:equiv}
+A balanced completion partition exists if and only if the acting
+player has a half-score completion subset $A\subseteq R$.
+\end{lemma}
+\begin{proof}
+One implication is immediate.  Conversely, if $\sm(A)=H-a=q$,
+then its complement has sum
+\[
+\sm(R\setminus A)=r-q
+=(2H-2a-d)-(H-a)=H-a-d=q-d.
+\]
+Thus $B=R\setminus A$ gives the balanced partition.
+\end{proof}
+
+\begin{remark}[Correction to an earlier proposed strengthening]
+Using two labelled halves is useful for describing exchanges, but
+Lemma~\ref{lem:equiv} shows that \emph{balanced completion} is not
+logically stronger than the original single completion-set condition.
+\end{remark}
+
+\begin{lemma}[Propagation under cooperation]
+\label{lem:propagate}
+Assume $R=A\sqcup B$ satisfies \eqref{eq:balanced}.  If the acting
+player legally completes a turn using only a subset $C\subseteq A$
+with $\sm(C)=d+e$, where $e\ge0$ is the new lead, then the new
+remaining set $(A\setminus C)\sqcup B$ is balanced for the other
+player's next turn, with the halves exchanged.
+\end{lemma}
+\begin{proof}
+After the turn, the other player is behind by $e$ and still needs
+$q-d$ to reach $H$.  Its designated completion set is $B$, of sum
+$q-d$.  The former acting player's remaining half has sum
+\[
+\sm(A\setminus C)=q-(d+e)=q-d-e,
+\]
+which is precisely the former acting player's remaining distance
+from $H$.  The asserted balanced partition follows.
+\end{proof}
+
+The essential issue is that an opponent may select numbers from
+\emph{both} halves.  The next identity records the exact repair
+requirement without asserting that it can always be met.
+
+\begin{lemma}[Exact signed-exchange equation]
+\label{lem:exchange}
+Suppose $R=A\sqcup B$ satisfies \eqref{eq:balanced}, and the acting
+player makes selections comprising a set $C\subseteq R$.  Write
+\[
+C_A=C\cap A,\qquad C_B=C\cap B,\qquad w=\sm(C_B).
+\]
+The other player, whose score was $a+d$ and is unchanged during this
+turn, still needs $q-d$ points to reach $H$.  Choose subsets
+\[
+D\subseteq A\setminus C_A,\qquad
+E\subseteq B\setminus C_B
+\]
+and let
+\[
+B'=\bigl((B\setminus C_B)\setminus E\bigr)\cup D.
+\]
+Then $B'$ is a completion set for the other player \emph{if and only if}
+\begin{equation}\label{eq:exchange}
+\boxed{\sm(D)-\sm(E)=w.}
+\end{equation}
+\end{lemma}
+\begin{proof}
+Since $\sm(B)=q-d$,
+\[
+\sm(B')=(q-d)-w-\sm(E)+\sm(D).
+\]
+This equals the required $q-d$ precisely when
+$\sm(D)-\sm(E)=w$.
+\end{proof}
+
+\begin{remark}[A necessary equation, not an existence theorem]
+The signed exchange \eqref{eq:exchange} is less restrictive than
+requiring a subset of $A\setminus C_A$ to sum exactly to $w$:
+we may also give up some elements of $B\setminus C_B$.
+Nevertheless, writing down the equation does not prove that a
+solution $(D,E)$ exists.  In particular, a hypothetical move that
+makes the acting player's score exceed $H$ leaves the opponent
+unable to complete to $H$ at all.
+\end{remark}
+
+\section{Four-number block repairs and a proposed invariant}
+
+\begin{lemma}[Repair after one deletion in an intact block]
+\label{lem:block}
+Let $u$ be a positive integer and
+\[
+Q=\{u,u+1,u+2,u+3\},\qquad
+O=\{u,u+3\},\qquad I=\{u+1,u+2\}.
+\]
+Then $\sm(O)=\sm(I)=2u+3$.  After deleting \emph{any one}
+number $x\in Q$, the remaining three numbers contain a subset of
+sum $2u+3$.
+\end{lemma}
+\begin{proof}
+If $x\in O$, the set $I$ survives and has sum $2u+3$.
+If $x\in I$, the set $O$ survives and has the same sum.
+\end{proof}
+
+This lemma motivates reorienting a block after the opponent
+``steals'' a number.  For example, if $O$ was the selected completion
+half and $u$ was removed, replacing the surviving $\{u+3\}$ by
+$I$ increases the completion-side sum by exactly $u$:
+\[
+\sm(I)-(u+3)=(2u+3)-(u+3)=u.
+\]
+This is genuine local flexibility, but applies to an \emph{intact}
+block before a \emph{single} deletion.  It says nothing by itself
+about repeated hits to a partially consumed block, let alone the
+legality of a complete catch-up move.
+
+\begin{lemma}[Small deficit: one selection and no crossing of $H$]
+\label{lem:small}
+Suppose a position has a balanced completion partition
+$R=A\sqcup B$, with the acting player behind by $d\ge0$, and assume
+\begin{equation}\label{eq:small}
+\boxed{d\le\min R.}
+\end{equation}
+Then the acting player must complete the turn in \emph{exactly one}
+selection and cannot finish that turn with score greater than $H$.
+If the player reaches $H$, the game is drawn.
+\end{lemma}
+\begin{proof}
+Every $x\in R$ satisfies $x\ge d$, so the first selection catches
+up or overtakes and the turn immediately ends.  By
+\eqref{eq:balanced}, any $x\in R$ lies in a subset whose sum is at
+most $q$: indeed $x\le\sm(A)=q$ if $x\in A$, and
+$x\le\sm(B)=q-d\le q$ if $x\in B$.  The acting player's score
+becomes $a+x\le a+q=H$.  Equality invokes Lemma~\ref{lem:half}.
+\end{proof}
+
+The attempted induction aimed to maintain \emph{both} a balanced
+completion partition and \eqref{eq:small} immediately after every
+turn of one favoured player.  The opposing player would then get
+only one choice before the next repair.  The local repair lemma makes
+this tempting.  To complete such a programme one would also need
+the following \emph{sufficient move criterion}.
+
+\begin{lemma}[A sufficient small-overshoot move criterion]
+\label{lem:overshoot}
+Suppose a player is about to select from $R$ and is behind by
+$e>0$.  Suppose $C\subseteq R$ is nonempty, has sum
+$\sm(C)=e+e'$ for some $e'\ge0$, and contains a number $y>e'$.
+Then the player may select all elements of $C\setminus\{y\}$ in
+any order and $y$ last, thereby ending the turn \emph{legally}
+with lead exactly $e'$.  If moreover $R\setminus C\ne\varnothing$ and
+\[
+e'\le\min(R\setminus C),
+\]
+then the resulting handoff satisfies the small-deficit bound.
+
+When the players are initially tied ($e=0$), a legal turn consists
+of \emph{exactly one} selection $y$; it leaves lead $e'=y$ and
+satisfies the small-deficit bound only if
+$R\setminus\{y\}\ne\varnothing$ and
+$y\le\min(R\setminus\{y\})$.
+\end{lemma}
+\begin{proof}
+For $e>0$, just before the last selection the acting player has
+added
+\[
+\sm(C)-y=e+e'-y<e.
+\]
+Because every number is positive, each earlier partial sum is also
+strictly below $e$.  Hence no earlier selection would have ended
+the turn.  The final choice $y$ takes the cumulative addition to
+$e+e'\ge e$, which ends the turn with lead $e'$.  The additional
+inequality is exactly the desired small-deficit condition for the
+next player.  At a tie, every positive first selection immediately
+creates a lead and ends the turn, so a multiple-selection turn is
+impossible; the separate statement follows.
+\end{proof}
+
+\begin{remark}[Corrections and limitations]
+An earlier formulation of the sufficient criterion implicitly
+required a final element $y>e'$ even when $e=0$.  That would be
+impossible because $\sm(C)=e'$ at a tie.  The tied case must be
+treated separately as in Lemma~\ref{lem:overshoot}.  More importantly,
+this lemma does \emph{not} assert that the needed subset $C$ exists.
+Even if suitable blocks admit exchanges, imposing the small-deficit
+condition turns out to exclude essential drawing moves.
+\end{remark}
+
+\section{Rigorous obstruction at $N=8$}
+
+In this section, the \emph{small-deficit restriction} means that a
+specified player must, after each of their completed turns and
+before a terminal outcome, leave a remaining set $R$ and score lead
+$\ell\ge0$ satisfying
+\begin{equation}\label{eq:A}
+\tag{A}\boxed{\ell\le\min R.}
+\end{equation}
+No completion-partition condition is imposed: the restriction is
+tested \emph{in isolation}, making the negative result stronger.
+
+\begin{proposition}[Small-deficit strategies lose for $N=8$]
+\label{prop:N8}
+In Catch-Up$(\{1,\ldots,8\})$, $P_2$ has a strategy defeating
+\emph{every} $P_1$ strategy constrained to satisfy (A) after each of
+her turns until the game finishes.  In particular, (A) is not a
+valid invariant for a uniform drawing strategy.
+\end{proposition}
+\begin{proof}
+The total is $36$, so $H=18$.  At her first selection, (A) forces
+$P_1$ to take $1$: if she took any $x>1$, her lead $x$ would exceed
+the still-available minimum $1$.  Player $P_2$ responds with $2$,
+leaving
+\[
+(s_1,s_2)=(1,2),\qquad R=\{3,4,5,6,7,8\}.
+\]
+Player $P_1$ is behind by $1$ and therefore obtains exactly one
+selection $x$.  Its resulting lead is $x-1$.  Condition (A) allows
+only $x=3$ or $x=4$: all $x\ge5$ leave $3$ available and give
+$x-1>3$.
+
+\smallskip\noindent\textbf{Case I: $P_1$ takes $3$.}
+Player $P_2$ answers with $4$, giving
+\[
+(s_1,s_2)=(4,6),\qquad R=\{5,6,7,8\}.
+\]
+Now $P_1$ is behind by $2$, so she must again take one number.
+Taking $8$ would create lead $4+8-6=6$ while leaving $5$
+available, violating (A).  Thus $P_1$ must take
+$x\in\{5,6,7\}$.  Player $P_2$ responds with $8$, leaving
+\[
+(s_1,s_2)=(4+x,14),\qquad
+R=\{5,6,7\}\setminus\{x\}.
+\]
+Each remaining number is at least the new deficit $10-x$ of $P_1$.
+So she takes one of the two remaining numbers, say $z$, and $P_2$
+takes the final number $w$.  Consequently,
+\[
+s_1=4+x+z\le17,
+\qquad
+s_2=14+w\ge19.
+\]
+Thus $P_1$ loses in every permitted continuation.
+
+\smallskip\noindent\textbf{Case II: $P_1$ takes $4$.}
+Player $P_2$ responds with $5$, obtaining
+\[
+(s_1,s_2)=(5,7),\qquad R=\{3,6,7,8\}.
+\]
+Player $P_1$, behind by $2$, must take one number.  Taking
+$x\in\{6,7,8\}$ would give lead $x-2>3$ while leaving $3$,
+violating (A).  Hence she must choose $3$, reaching $(8,7)$.
+Player $P_2$ takes $7$, reaching
+\[
+(s_1,s_2)=(8,14),\qquad R=\{6,8\}.
+\]
+There are two legal endings:
+\begin{center}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$P_1$ takes & $P_2$ takes & Final $(s_1,s_2)$\\
+\midrule
+$6$ & $8$ & $(14,22)$\\
+$8$ & $6$ & $(16,20)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Both are losses for $P_1$.  This completes the proof.
+\end{proof}
+
+The next proposition confirms that the restriction excludes a
+\emph{genuinely drawing} continuation rather than merely some
+unneeded, aesthetically unpleasant choice.
+
+\begin{proposition}[An excluded move is the only non-losing move]
+\label{prop:drawing8}
+At the legal position
+\begin{equation}\label{eq:critical}
+\boxed{(s_1,s_2)=(4,6),\qquad R=\{5,6,7,8\},
+\qquad P_1\text{ to move},}
+\end{equation}
+$P_1$ can avoid losing by taking $8$, whereas each of the choices
+$5,6,7$ is losing against the response $8$ by $P_2$.
+The drawing move $8$ violates (A), although it leaves a balanced
+completion partition.
+\end{proposition}
+\begin{proof}
+The losses after selecting $5,6,$ or $7$ are established in
+Case I of Proposition~\ref{prop:N8}.
+
+If instead $P_1$ takes $8$, the scores become $(12,6)$ and
+$R=\{5,6,7\}$.  Player $P_2$ is behind by $6$.
+His \emph{complete legal turns} are precisely
+\[
+\langle6\rangle,\quad\langle7\rangle,\quad
+\langle5,6\rangle,\quad\langle5,7\rangle.
+\]
+For each, $P_1$ can respond as follows:
+\begin{center}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$P_2$'s turn & $P_1$ next takes & Final $(s_1,s_2)$\\
+\midrule
+$\langle6\rangle$ & $7$ & $(19,17)$\\
+$\langle7\rangle$ & $6$ & $(18,18)$\\
+$\langle5,6\rangle$ & $7$ & $(19,17)$\\
+$\langle5,7\rangle$ & $6$ & $(18,18)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Thus $P_1$ can force at least a draw; the second or fourth reply
+shows that $P_2$ can force a draw against this choice, so the move's
+minimax outcome is exactly a draw.
+
+Finally, after taking $8$, $P_1$ leads by $6$, whereas the
+smallest remaining number is $5$.  Hence (A) fails.  Nevertheless,
+$P_1$ needs $18-12=6$ to reach $H$, and $P_2$ needs $18-6=12$;
+the remaining set has balanced completion partition
+\[
+\underbrace{\{6\}}_{\sm=6}
+\qquad\sqcup\qquad
+\underbrace{\{5,7\}}_{\sm=12}.
+\]
+So balanced completion survives even though small deficit does not.
+\end{proof}
+
+\begin{corollary}[Failure of the proposed proof scheme]
+\label{cor:failure}
+There is no proof of Conjecture~\ref{conj:main} based on the claim
+that $P_1$ can always play non-losing while maintaining (A) after
+every turn: that claim is false already for $N=8$.
+\end{corollary}
+\begin{proof}
+Proposition~\ref{prop:N8} directly contradicts the claimed
+strategy.  Adding a completion-partition requirement or further
+blockwise rules cannot restore a strategy while retaining the
+restriction (A).
+\end{proof}
+
+\section{What has and has not been established}
+
+\subsection*{Proved results}
+\begin{enumerate}[label=\arabic*.]
+\item The minimax recurrence \eqref{eq:recursion} exactly encodes the
+one-by-one selection rule, including turn changes upon equality.
+\item Opening reversal, the criterion of two non-losing openings,
+and uniqueness of a strictly winning opening are valid; the opening
+symmetry is attributed to Bernhard von Stengel.
+\item For $N\equiv0,3\pmod4$, an explicit equal-sum partition exists
+and yields at least one legal drawn play.
+\item Reaching the half-total exactly forces a draw; exceeding it
+forces a win.
+\item The single completion-subset condition is equivalent to the
+balanced completion-partition condition; repair by a signed exchange
+is governed exactly by \eqref{eq:exchange}.
+\item An intact four-number block can retain its half-block target
+sum after one arbitrary deletion, but this does not establish a
+repeated repair strategy.
+\item The combined small-deficit strategy fails, even without its
+partition component, by an explicit $N=8$ adversarial analysis.
+\end{enumerate}
+
+\subsection*{Claims \emph{not} established}
+\begin{enumerate}[label=\arabic*.]
+\item A uniform construction of two non-losing openings for
+$\SN$ whenever $\TN$ is even.
+\item Preservation of half-score completion sets under all legal
+adversarial turns.
+\item A repair-and-catch-up exchange strategy across repeatedly used
+four-number blocks.
+\item An induction step from $N$ to $N+4$ preserving the full game
+value when the residual deficit is included.
+\item Conjecture~\ref{conj:main}, i.e. the uniform assertion
+$V(\SN,0)=0$ for every $N\equiv0,3\pmod4$.
+\end{enumerate}
+
+\begin{remark}[A more appropriate future direction]
+The example in Proposition~\ref{prop:drawing8} shows that a drawing
+strategy must sometimes \emph{permit} an opponent to make multiple
+selections on the next turn.  A plausible invariant would need to
+track the full residual game state, or classify safe multi-selection
+responses while permitting completion-set repairs.  This is only a
+research direction; no such invariant or induction is proved here.
+\end{remark}
+
+\section*{Notes on attribution and computational evidence}
+\addcontentsline{toc}{section}{Notes on attribution and computational evidence}
+The original Catch-Up article is due to Isaksen, Ismail, Brams and
+Nealen (2015)~\cite{isaksen2015}.  The author of the present problem
+attributes the opening-reversal result to Bernhard von Stengel; its
+inclusion above is expository rather than a priority claim.
+Von Stengel's conference abstract reports computational results
+through $N=28$ and discusses the desirability of an induction
+proof~\cite{vstengel2019}.  The problem poser reports additional
+brute-force checks of the consecutive even-total case through
+$N=34$; those checks are \emph{not} reproduced or independently
+verified in these notes.  Finite computational verification,
+regardless of its range, does not substitute for a general proof.
+
+\begin{thebibliography}{9}
+\bibitem{isaksen2015}
+A.~Isaksen, M.~Ismail, S.~J.~Brams, and A.~Nealen,
+\emph{Catch-Up: A Game in Which the Lead Alternates},
+Game \& Puzzle Design, vol.~1, no.~2 (2015), pp.~38--49.
+\url{https://mpra.ub.uni-muenchen.de/108784/}.
+
+\bibitem{vstengel2019}
+B.~von Stengel, \emph{Computational progress on the Catch-Up game},
+conference abstract in CGTC III, Associa\c{c}\~ao Ludus.
+\url{https://ludicum.org/en/cgtc-iii/}.
+
+\bibitem{formalconjectures}
+\emph{The Catch-Up Game Conjecture}, formal-conjectures project,
+issue \#1324.
+\url{https://github.com/google-deepmind/formal-conjectures/issues/1324}.
+\end{thebibliography}
+\end{document}

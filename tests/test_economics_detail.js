@@ -58,8 +58,8 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
     vm.runInContext(economicsScript, context);
     vm.runInContext(detailScript, context);
     if (assetUrl) element('economics-detail-script').dataset = { economicsSrc: assetUrl };
-    const reference = (key, kind = 'ref') => ({
-        dataset: { texReference: key, texReferenceKind: kind, texScope: '0' },
+    const reference = (key, kind = 'ref', scope = '0') => ({
+        dataset: { texReference: key, texReferenceKind: kind, texScope: scope },
         removeAttribute(name) { delete this[name]; }
     });
     element('problem-links').labels = [{ dataset: { texLabel: 'local:eq', texScope: '0' } }];
@@ -67,6 +67,10 @@ async function render(query, data = sample, lazy = false, loadError = false, ass
         reference('local:eq', 'eqref'), reference('game:GT-050'), reference('problem:OP-0042'),
         reference('app:audited-crosswalk')
     ];
+    element('attempts-container').labels = ['attempt-1', 'attempt-2'].map(scope =>
+        ({ dataset: { texLabel: 'eq:shared', texScope: scope } }));
+    element('attempts-container').references = ['attempt-1', 'attempt-2'].map(scope =>
+        reference('eq:shared', 'eqref', scope));
     await callbacks[callbacks.length - 1]();
     return { element, context, createdScripts };
 }
@@ -132,6 +136,30 @@ async function main() {
         reference_aliases: { 'problem:OP-0042': 'C73-2' } } };
     page = await render('?type=economics&id=C73-1', explicitReference);
     assert.equal(page.element('problem-links').references[2].href, 'problem.html?type=economics&id=C73-2');
+
+    const withAttacks = { ...sample, 'C73-1': { ...sample['C73-1'], llm_status: 'unresolved',
+        attacks: [1, 2].map(version => ({
+            model: 'GPT 6 Astra Pro', version, status: 'unresolved', date_posted: '2026-10-09',
+            file_path: 'attacks/open_problems/economics/gpt_6_astra_pro/C73-1' + (version === 2 ? '_v2' : '') + '.tex',
+            download_url: 'data/economics/attempts/gpt_6_astra_pro/C73-1' + (version === 2 ? '_v2' : '') + '.tex',
+            raw: String.raw`\section{Version-specific result}\label{eq:shared}See \eqref{eq:shared}. $x<1$.`
+        })) } };
+    page = await render('?type=economics&id=C73-1', withAttacks);
+    assert.equal(page.element('llm-attempts-section').hidden, false);
+    assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> unresolved/);
+    const attackHtml = page.element('attempts-container').innerHTML;
+    assert.match(attackHtml, /GPT 6 Astra Pro \(v2\)/);
+    assert.match(attackHtml, /GPT 6 Astra Pro \(v1\)/);
+    assert.ok(attackHtml.indexOf('(v2)') < attackHtml.indexOf('(v1)'));
+    assert.match(attackHtml, /download="C73-1_v2\.tex"/);
+    assert.match(attackHtml, /download="C73-1\.tex"/);
+    assert.match(attackHtml, /data-tex-scope="attempt-1"/);
+    assert.match(attackHtml, /data-tex-scope="attempt-2"/);
+    const attackReferences = page.element('attempts-container').references;
+    assert.equal(attackReferences[0].href, '#economics-attempt-tex-label-1');
+    assert.equal(attackReferences[1].href, '#economics-attempt-tex-label-2');
+    assert.equal(page.element('problem-links').references[0].href, '#economics-tex-label-1');
+    assert.equal(page.element('comments').hidden, true);
 
     // A new ordering changes navigation and displayed rank while retaining every fixed route.
     const reordered = Object.fromEntries(Object.entries(sample).map(([id, record]) =>

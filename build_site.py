@@ -1473,7 +1473,8 @@ def main():
     open_problems = build_open_problems_data(mo_problems, open_catalog)
 
     economics = generate_economics_data()
-    print(f"  Economics problems: {len(economics)} (statements only)")
+    economics_attempts = sum(len(problem['attacks']) for problem in economics.values())
+    print(f"  Economics problems: {len(economics)}, research attempts: {economics_attempts}")
     generate_js_data(erdos_problems, mo_problems, open_problems, open_catalog)
 
     print("Build complete!")

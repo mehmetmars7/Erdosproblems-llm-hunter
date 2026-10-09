@@ -1,0 +1,551 @@
+% ECONOMICS_PROBLEM: {"id": "C73-1", "title": "Equilibrium payoffs in finite multiplayer stochastic games", "jel_code": "C73", "source_id": "OP-0590"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,array,longtable}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Uniform Equilibrium in Finite Stochastic Games: Verified Partial Results and Obstacles},pdfauthor={GPT 6 Astra Pro},pdfsubject={Research audit of the open uniform equilibrium problem}}
+\setlist{itemsep=2pt,topsep=4pt}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Uniform equilibrium: research audit}
+\fancyhead[R]{\small 8 October 2026}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prb}{\mathbb{P}}
+\newcommand{\ind}{\operatorname{ind}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\SOL}{\operatorname{SOL}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\wh}{\widehat}
+\title{\textbf{Uniform Equilibrium in Finite Stochastic Games}\\[5pt]
+\large Partial Results, a Four-Player Quitting-Game Audit,\\ and Obstructions to General Proof Strategies}
+\author{GPT 6 Astra Pro}
+\date{8 October 2026}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C73-1}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 2\par
+\noindent\textbf{Status:} Unresolved for the complete catalogue problem; this manuscript records partial results and research attempts.\par
+\maketitle
+\begin{abstract}
+Does every stochastic game with finitely many players, states, and actions admit a uniform Nash equilibrium payoff? This note consolidates a sequence of proof and counterexample attempts, but \emph{does not settle that open question}. It records two sufficient verification devices: a survival-weighted Bellman-defect criterion for quitting games and a continuation-potential certificate for general finite stochastic games. It proves a local-degree sufficient condition yielding stationary uniform approximate equilibria for a class of quitting games, and applies it to disqualify a previously proposed four-player counterexample matrix \emph{for every completion of its simultaneous-quitting payoffs}. The matrix audit includes exact complementary-support calculations and an explicit rational stationary equilibrium for one completion. Two unsuccessful general approaches are explained rigorously: predetermined schedules of stationary discounted equilibria fail even in the Big Match, and minmax-acceptable profiles cannot in general be enforced merely by post-deviation punishments. Continuous absorption-path screening and the remaining index-one regime are clearly identified as \emph{unresolved}, not as proofs of nonexistence. The arguments collected here have not undergone independent peer review; no originality or priority claim is asserted for them.
+\end{abstract}
+\vspace{2mm}
+\noindent\textbf{Status and scope.} As of the date above, neither a proof of universal uniform-equilibrium existence nor a finite counterexample is presented here. Statements explicitly marked as a theorem, proposition or lemma are proved in this note; externally established results are cited; computational and heuristic observations are labelled separately.
+\tableofcontents
+\clearpage
+
+\section{The open problem and precise definitions}\label{sec:model}
+A \emph{finite stochastic game} consists of a finite player set $I=\{1,\dots,n\}$, a finite state set $S$, finite nonempty action sets $A_i(s)$, bounded stage payoff functions $g_i(s,a)$, and a transition kernel $P(\cdot\mid s,a)\in\Delta(S)$. Stages are simultaneous move; states and past action profiles are publicly observed (perfect monitoring). A behavioral strategy $\sigma_i$ maps every finite public history ending in state $s$ to $\Delta(A_i(s))$. Under initial state $s$ and profile $\sigma$, let
+\[
+\gamma_i^N(s,\sigma)=\E_{s,\sigma}\left[\frac1N\sum_{t=1}^{N}g_i(s_t,a_t)\right].
+\]
+
+\begin{definition}[Uniform equilibrium payoff]\label{def:uniform}
+A family $v=(v_i(s))_{i\in I,s\in S}\in\R^{I\times S}$ is a \emph{uniform equilibrium payoff} if for every $\varepsilon>0$ there exist a strategy profile $\sigma^\varepsilon$ and an integer $N_\varepsilon$ such that for each initial state $s$, each player $i$, each behavioral deviation $\tau_i$, and every integer $N\ge N_\varepsilon$,
+\begin{align}
+\left|\gamma_i^N(s,\sigma^\varepsilon)-v_i(s)\right|&\le\varepsilon,\label{eq:uniform-payoff}\\
+\gamma_i^N(s,\tau_i,\sigma^\varepsilon_{-i})-\gamma_i^N(s,\sigma^\varepsilon)&\le\varepsilon.\label{eq:uniform-incentive}
+\end{align}
+The same profile works for all sufficiently long horizons $N$; it may depend on $\varepsilon$, but not on $N$.
+\end{definition}
+
+The main question is whether every game of this kind has such a vector $v$. It is important not to conflate this statement with existence of Nash equilibria for each \emph{fixed} discount factor, a single limiting-average Nash equilibrium, exact ($\varepsilon=0$) equilibrium, subgame-perfect equilibrium, or a correlated/sunspot equilibrium. Two-player finite stochastic games and a range of structured multiplayer cases have positive results; the unrestricted multiplayer question remains unresolved in the sources consulted \cite{sv2001,akrs2024,aps2026,sv2025}. Two- and three-player quitting games have positive results, whereas the corresponding general existence question for four or more players is expressly discussed as unresolved in \cite{aps2026}.
+
+\subsection{Quitting games and the payoff convention}\label{sec:quitting}
+A standard $n$-player quitting game has a single nonabsorbing state, with actions $C_i$ (continue) and $Q_i$ (quit) for every player. If the first nonempty set of quitters is $T\subseteq I$, the state becomes absorbing with perpetual stage payoff $r(T)\in\R^n$; prior to absorption the common stage-payoff vector is $b\in\R^n$. If nobody ever quits, the stage payoff remains $b$. All $2^n-1$ nonempty quitting sets have separate terminal payoff vectors. Write $\theta$ for the absorption stage, with $\theta=\infty$ if no quit ever occurs.
+
+The \emph{terminal-payoff functional} is
+\begin{equation}\label{eq:terminal-functional}
+\Gamma_i^\infty(\sigma)=\E_\sigma\left[r_i(T_\theta)\one_{\{\theta<\infty\}}+b_i\one_{\{\theta=\infty\}}\right].
+\end{equation}
+An approximate equilibrium for \eqref{eq:terminal-functional} is not, \emph{without additional tail control}, automatically a uniform equilibrium for the $N$-stage averages. Sections \ref{sec:weighted} and \ref{sec:index} establish the required tail estimates explicitly. Whenever singleton quits are under discussion, subtracting the constant $r_i(\{i\})$ from \emph{every} payoff of player $i$ permits the normalization
+\begin{equation}\label{eq:normalize}
+r_i(\{i\})=0,\qquad M_{ij}:=r_i(\{j\}).
+\end{equation}
+Here the $j$th \emph{column} of $M$ is the payoff vector when player $j$ quits alone. If these four vectors are displayed as rows of a matrix $R$, then $M=R^{\mathsf T}$.
+
+\section{Established approaches and the small unresolved core}\label{sec:literature}
+The equilibrium-existence theory for two-player stochastic games, zero-sum stochastic games, and many special classes is extensive; see the bibliography of \cite{akrs2024,sv2025}. We rely here on the following narrower assertions, with references tied to each statement.
+
+\begin{itemize}[leftmargin=*]
+\item Solan and Vieille \cite{sv2001} obtain uniform approximate equilibria for quitting games satisfying additional assumptions, and \cite{sv2002example} exhibits a four-player game whose simplest equilibrium uses a two-stage cycle.
+\item Solan and Solan \cite{solansolan2020} prove that every quitting game has sunspot approximate equilibria; they also establish uniform ordinary approximate equilibria under a non-$Q$-matrix condition on the relevant complementarity matrix.
+\item Ashkenazi-Golan, Krasikov, Rainer, and Solan \cite{akrs2024} compactify quitting strategies by \emph{absorption paths}, which allow both continuous small-hazard segments and discrete jumps. Sequentially perfect absorption paths characterize approximate terminal equilibria in the precise formulation of their article.
+\item The APS paper \cite{aps2026} studies a restricted family of paths (SFAPs) and its associated successor graph and operators; emptiness of that subclass does \emph{not} establish absence of all equilibria.
+\item Solan and Vieille \cite{sv2025} prove an existence theorem for positive recursive absorbing games subject to an explicitly nonrectangular absorption structure, rather than for all finite stochastic games.
+\item Solan and Vieille \cite{solanvieille2002corr} establish uniform correlated equilibrium payoffs with an autonomous correlating device. Correlation and public sunspots are stronger information resources than the independent randomization permitted in the original Nash problem.
+\end{itemize}
+
+A negative example among four-player quitting games would settle the original problem negatively, but a proof for quitting games alone would not settle arbitrary finite stochastic games positively. This distinction guides both the matrix and the general-game approaches below.
+
+\section{A survival-weighted Bellman-defect criterion}\label{sec:weighted}
+The first attempt replaced a global fixed point by small one-stage incentive defects accumulated along surviving paths. This section states a precise sufficient criterion; it is \emph{not} an unconditional construction.
+
+For this section only, assume the nonabsorbing payoff is $b=0$ and $|r_i(T)|\le L$ for every $i$ and nonempty $T$. A strategy in a standard quitting game, conditional on survival to stage $t$, is a vector $p_t=(p_{1,t},\dots,p_{n,t})\in[0,1]^n$. For any player $i$ put
+\[
+\mu_{-i,t}(T)=\prod_{j\in T}p_{j,t}
+\prod_{\substack{j\notin T\\j\ne i}}(1-p_{j,t}),\quad T\subseteq I\setminus\{i\}.
+\]
+Assume the eventual absorbing payoff is well defined under the prescribed profile, and let $u_{i,t}$ be its conditional expectation given survival to $t$. Define the values of quitting now and of continuing for exactly one stage followed by the prescribed strategy:
+\begin{align}
+Q_{i,t}&=\sum_{T\subseteq I\setminus\{i\}}\mu_{-i,t}(T)r_i(T\cup\{i\}),\label{eq:q-stage}\\
+C_{i,t}&=\sum_{\varnothing\ne T\subseteq I\setminus\{i\}}\mu_{-i,t}(T)r_i(T)
++\mu_{-i,t}(\varnothing)u_{i,t+1}.\label{eq:c-stage}
+\end{align}
+By the prescribed mixing rule,
+\[
+u_{i,t}=p_{i,t}Q_{i,t}+(1-p_{i,t})C_{i,t}.
+\]
+Set
+\begin{equation}\label{eq:defect}
+d_{i,t}=\max\{Q_{i,t},C_{i,t}\}-u_{i,t}\ge0,\quad
+\rho_{i,1}=1,\quad
+\rho_{i,t}=\prod_{k<t}\mu_{-i,k}(\varnothing).
+\end{equation}
+The number $\rho_{i,t}$ is the chance that all \emph{opponents} of $i$ have continued through stage $t-1$, independent of what $i$ does.
+
+\begin{proposition}[Weighted-defect verification]\label{prop:weighted}
+Suppose $\rho_{i,t}\to0$ for every $i$ and
+\[
+D_i:=\sum_{t=1}^\infty\rho_{i,t}d_{i,t}<\infty.
+\]
+Then every unilateral behavioral deviation $\tau_i$ satisfies
+\begin{equation}\label{eq:weighted-terminal}
+\Gamma_i^\infty(\tau_i,p_{-i})\le u_{i,1}+D_i.
+\end{equation}
+For every $N$ its $N$-stage average-payoff gain is at most
+\begin{equation}\label{eq:weighted-finite}
+D_i+2\kappa_{i,N},\qquad
+\kappa_{i,N}:=L\left(\rho_{i,N+1}+\frac1N\sum_{t=1}^N\rho_{i,t}\right)\xrightarrow[N\to\infty]{}0.
+\end{equation}
+Consequently a profile with sufficiently small $D_i$ for every $i$ is a uniform approximate equilibrium, with equilibrium payoff $u_{\cdot,1}$ (or with a convergent sequence of such initial payoff vectors).
+\end{proposition}
+\begin{proof}
+At a reached stage $t$, under either action of player $i$, the one-step payoff plus the continuation potential $u_{i,t+1}$ is at most $u_{i,t}+d_{i,t}$. Summing through stage $T$ telescopes the continuation-potential terms and yields
+\[
+\E_{\tau_i,p_{-i}}\left[r_i(T_\theta)\one_{\{\theta\le T\}}+u_{i,T+1}\one_{\{\theta>T\}}\right]-u_{i,1}
+\le\sum_{t=1}^T\rho_{i,t}d_{i,t}.
+\]
+The probability of reaching stage $T+1$ is bounded by $\rho_{i,T+1}\to0$, uniformly over $i$'s deviation, so bounded convergence gives \eqref{eq:weighted-terminal}. In the game with $b=0$, replacing the finite average on any path by the terminal payoff costs at most $L$ times the probability of absorption after $N$, plus $L(\theta-1)/N$ when absorption occurs by $N$. As $\Prb(\theta\ge t)\le\rho_{i,t}$,
+\[
+\left|\gamma_i^N(\tau_i,p_{-i})-\Gamma_i^\infty(\tau_i,p_{-i})\right|\le\kappa_{i,N}.
+\]
+The same holds under compliance. Applying the estimate twice proves \eqref{eq:weighted-finite}. Ces\`aro convergence gives $\kappa_{i,N}\to0$.
+\end{proof}
+
+If $d_{i,t}=0$, the stagewise complementary-slackness conditions are
+\[
+\begin{array}{ccl}
+p_{i,t}=0&\Longrightarrow&C_{i,t}\ge Q_{i,t},\\
+0<p_{i,t}<1&\Longrightarrow&C_{i,t}=Q_{i,t},\\
+p_{i,t}=1&\Longrightarrow&Q_{i,t}\ge C_{i,t}.
+\end{array}
+\]
+The missing implication is universal \emph{existence} of sequences satisfying arbitrarily small $D_i$ and the tail condition. The criterion should be treated as a verification tool, not as a solution of the open problem.
+
+\section{Four-player counterexample search: unsuccessful candidates}\label{sec:search}
+\subsection{Empty restricted path classes do not show nonexistence}
+A four-player singleton-payoff matrix occurring in the precursor discussion of the APS method \cite[Example~3.5]{apslecture} is
+\begin{equation}\label{eq:Rzero}
+R_0=\begin{pmatrix}
+0&4&-\frac12&-1\\
+-1&0&3&1\\
+-\frac18&-1&0&4\\
+4&\frac12&-1&0
+\end{pmatrix}.
+\end{equation}
+That source establishes emptiness of a \emph{restricted} path-payoff class, not nonexistence of ordinary uniform equilibrium. The initial search overlooked this logical distinction. As a further finite calculation, for $M_0=R_0^{\mathsf T}$, the LCP with
+\[
+q=(-4,-4,-4,-1)^{\mathsf T}
+\]
+has no solution: on each of its sixteen possible positive supports, the complementary equations are either inconsistent or fail nonnegativity. Therefore $M_0$ is not a $Q$-matrix. The non-$Q$ theorem of \cite{solansolan2020}, with its associated normal-player reduction, supplies a positive existence result in this setting. In particular, a restricted-path obstruction cannot be presented as a four-player counterexample.
+
+\subsection{A stronger proposed matrix and its heuristic continuous-path test}
+The subsequent search proposed
+\begin{equation}\label{eq:Rdag}
+R^\dagger=\begin{pmatrix}
+0&6&-3&-5\\
+6&0&3&-4\\
+-2&4&0&3\\
+4&-2&3&0
+\end{pmatrix},\qquad M^\dagger=(R^\dagger)^{\mathsf T}.
+\end{equation}
+Its singleton sign graph frustrates various one-quitter-at-a-time constructions. There was also a tentative continuous-path calculation: for a nonnegative absolutely continuous curve
+\[
+X(u)=\int_0^u\alpha(t)R^\dagger\,dt,
+\quad \alpha(t)\in\Delta(I),
+\quad \alpha_i(t)>0\ \Longrightarrow\ X_i(t)=0\ \text{a.e.},
+\]
+absolute continuity implies $X_i'(t)=0$ for almost every $t$ at which $X_i(t)=0$. Writing $A(t)=\supp\alpha(t)$ then forces
+\[
+\alpha_{A(t)}(t)^{\mathsf T}R^\dagger_{A(t),A(t)}=0\quad\text{a.e.}
+\]
+Since all principal submatrices of order at least two are nonsingular, $\alpha(t)$ must be concentrated on at most one player almost everywhere.
+
+\textbf{Scope warning:} these hypotheses describe a simplified absolutely continuous part of an absorption-path model, \emph{not} the full definition of a sequentially perfect absorption path. Switching on accumulation sets and especially \emph{discrete absorption jumps} are not excluded by this calculation. The earlier claim of an almost-complete counterexample proof was unjustified. In fact, the next section gives a stronger, decisive positive result: the entire $R^\dagger$ family has uniform equilibrium payoffs, regardless of its completion.
+
+\section{A local-degree theorem ruling out the proposed matrix}\label{sec:index}
+This is the principal positive contribution of the audit. The argument is elementary apart from standard properties of Brouwer degree \cite{gowda2016}. The theorem concerns all numbers of players; the worked certificate concerns four players.
+
+\subsection{The complementarity map and global projected degree}
+For a normalized singleton matrix $M\in\R^{n\times n}$ let
+\[
+\phi_M(z):=\min\{z,Mz\}
+\]
+coordinatewise. We call $M$ an $R_0$-matrix when $\phi_M^{-1}(0)=\{0\}$. By positive homogeneity, the local degree
+\[
+d(M):=\deg(\phi_M,B_\rho(0),0)
+\]
+is defined and independent of $\rho>0$.
+
+\begin{theorem}[Degree-based sufficient condition]\label{thm:degree}
+Suppose a normalized quitting game satisfies
+\begin{enumerate}[label=(\roman*)]
+\item $M$ is $R_0$;
+\item $d(M)\ne1$;
+\item for each player $i$, an opponent $j\ne i$ has $M_{ij}<0$.
+\end{enumerate}
+Then \emph{every} assignment of payoffs to simultaneous quit sets, and \emph{every} nonabsorbing payoff vector $b$, has a uniform equilibrium payoff. Stationary strategy profiles supply the uniform approximate equilibria.
+\end{theorem}
+
+\begin{proof}
+For $x\in[0,1]^n$, denote the distribution of opponents' quit sets by
+\[
+\mu_{-i,x}(T)=\prod_{j\in T}x_j\prod_{\substack{j\notin T\\j\ne i}}(1-x_j).
+\]
+Put
+\begin{align}
+a_i(x)&=1-\prod_{j\ne i}(1-x_j),\label{eq:ai}\\
+B_i(x)&=\sum_{\varnothing\ne T\subseteq I\setminus\{i\}}\mu_{-i,x}(T)r_i(T),\label{eq:Bi}\\
+Q_i(x)&=\sum_{T\subseteq I\setminus\{i\}}\mu_{-i,x}(T)r_i(T\cup\{i\}),\label{eq:Qi}\\
+F_i(x)&=B_i(x)-a_i(x)Q_i(x).\label{eq:Fi}
+\end{align}
+Whenever $a_i(x)>0$, the terminal payoff obtained by continuing forever is $C_i(x)=B_i(x)/a_i(x)$, while quitting immediately gives $Q_i(x)$. Therefore $F_i(x)=a_i(x)(C_i(x)-Q_i(x))$. All $F_i$ are polynomial and independent of $x_i$. Since singleton-quitter self-payoffs are normalized to zero,
+\begin{equation}\label{eq:jac}
+F(x)=Mx+O(\|x\|^2)\qquad (x\to0).
+\end{equation}
+The box complementarity conditions for stationary best responses are
+\begin{equation}\label{eq:box}
+F_i(x)\ \begin{cases}\ge0,&x_i=0,\\=0,&0<x_i<1,\\\le0,&x_i=1.\end{cases}
+\end{equation}
+With $K=[0,1]^n$ and Euclidean coordinatewise projection $P_K$, define $H(x)=x-P_K(x-F(x))$, extending $F$ polynomially beyond $K$. Its zeros are exactly the solutions of \eqref{eq:box}, all lying in $K$. On $\Omega=(-1,2)^n$, the homotopy
+\[
+H_t(x)=x-\big((1-t)P_K(x-F(x))+t(1/2,\dots,1/2)\big)
+\]
+never vanishes on the boundary, so
+\begin{equation}\label{eq:globald}
+\deg(H,\Omega,0)=1.
+\end{equation}
+Near the origin, upper projection is inactive, and $H(x)=\min\{x,F(x)\}=\phi_M(x)+O(\|x\|^2)$. The $R_0$ property yields $\min_{\|u\|=1}\|\phi_M(u)\|>0$, so zero is isolated and has local index $\ind(H,0)=d(M)$. Additivity of degree and $d(M)\ne1$ force a \emph{nonzero} root $x^*$ of \eqref{eq:box}.
+
+Suppose first that two or more coordinates of $x^*$ are positive. Every player then faces strictly positive opponent hazard $a_i(x^*)$. A player deviating from stationarity while opponents remain stationary can select any stopping time (including infinity); quitting at the first opportunity gives $Q_i$, continuing indefinitely gives $C_i$, and delaying $t-1$ rounds gives
+\[
+\big[1-(1-a_i)^{t-1}\big]C_i+(1-a_i)^{t-1}Q_i.
+\]
+Thus no behavioral deviation exceeds $\max\{C_i,Q_i\}$. Conditions \eqref{eq:box} make the prescribed action optimal, so $x^*$ is an exact equilibrium for the terminal-payoff functional. Its payoff is
+\begin{equation}\label{eq:stationaryV}
+V_i(x)=\frac{x_iQ_i(x)+(1-x_i)B_i(x)}{x_i+(1-x_i)a_i(x)}.
+\end{equation}
+
+It remains possible that only one coordinate of $x^*$ is positive, say $x_i^*=p>0$. For $k\ne i$, \eqref{eq:box} yields $r_k(\{i\})\ge p\,r_k(\{i,k\})$, so every other player is best responding at $x^*$. The sole quitter's response to never quitting may involve $b_i$, and must \emph{not} be ignored. Pick $j\ne i$ with $r_i(\{j\})<0$ and, for $\delta>0$, set
+\[
+x_i^\delta=p,\quad x_j^\delta=\delta,\quad x_k^\delta=0\ (k\notin\{i,j\}).
+\]
+For $i$, $Q_i(x^\delta)=\delta r_i(\{i,j\})\to0$ and $C_i(x^\delta)=r_i(\{j\})<0$, while $V_i(x^\delta)\to0$. For each $k\ne i$ the opponent hazard remains at least $p$, so the prescribed terminal payoff and best-response payoff depend continuously on $\delta$ and their difference tends to zero. Therefore $x^\delta$ gives terminal regret $o(1)$ and $V(x^\delta)\to r(\{i\})$.
+
+To convert these terminal equilibria into \emph{uniform} equilibria, let $x$ have at least two positive quitting coordinates, let $a_*:=\min_i a_i(x)>0$, and take $L\ge\max\{|b_i|,|r_i(T)|\}$. Under any unilateral deviation, the probability of survival through $t$ is at most $(1-a_*)^t$. Hence
+\begin{equation}\label{eq:terminalN}
+\sup_{\tau_i}\left|\gamma_i^N(\tau_i,x_{-i})-\Gamma_i^\infty(\tau_i,x_{-i})\right|\le\frac{2L}{Na_*}.
+\end{equation}
+The prescribed profile has the same bound. If its terminal regret is $\eta$, then
+\begin{equation}\label{eq:uniformbound}
+\sup_{\tau_i}\left[\gamma_i^N(\tau_i,x_{-i})-\gamma_i^N(x)\right]
+\le\eta+\frac{4L}{Na_*}.
+\end{equation}
+For a root with at least two positive coordinates, use $x^*$ and $v=V(x^*)$; for a singleton root, use sufficiently small $\delta$ and $v=r(\{i\})$. Equations \eqref{eq:terminalN}--\eqref{eq:uniformbound} give both requirements of Definition \ref{def:uniform} for all sufficiently large $N$, and absorption makes $b$ immaterial in the limit.\qedhere
+\end{proof}
+
+\begin{remark}
+The theorem's strict negative-entry assumption is stronger than needed for the perturbation step: a nonpositive entry also suffices in many cases. No claim of novelty or priority is made for this index argument; it is recorded as a self-contained sufficient condition and warrants independent review before being cited as a published result.
+\end{remark}
+
+\subsection{Exact four-player index certificate}
+For $M^\dagger=(R^\dagger)^{\mathsf T}$, all principal determinants of orders two, three, and four are nonzero:
+\begin{center}
+\begin{tabular}{cl}\toprule
+Order & Principal determinants (lexicographic support order)\\\midrule
+$2$ & $-36,\;-6,\;20,\;-12,\;-8,\;-9$\\
+$3$ & $-108,\;-36,\;-6,\;-66$\\
+$4$ & $-108$\\\bottomrule
+\end{tabular}
+\end{center}
+An $R_0$-violating homogeneous LCP solution supported on $S$ with $|S|\ge2$ would give $M^\dagger_{SS}z_S=0$, contradicting nonsingularity. A singleton support is impossible because every column of $M^\dagger$ has a negative entry. Thus $M^\dagger$ is $R_0$.
+
+For $q=(1,1,1,1)^{\mathsf T}$, exact enumeration of all sixteen complementary supports yields precisely the following strictly complementary solutions of $z\ge0$, $w=M^\dagger z+q\ge0$, $z_iw_i=0$:
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{cllc}\toprule
+$\supp(z)$ & $z^{\mathsf T}$ & $w^{\mathsf T}$ & Local index\\\midrule
+$\varnothing$ & $(0,0,0,0)$ & $(1,1,1,1)$ & $+1$\\
+$\{1,3\}$ & $(1/3,0,1/2,0)$ & $(0,5,0,5/6)$ & $-1$\\
+$\{2,4\}$ & $(0,1/4,0,1/2)$ & $(9/2,0,13/4,0)$ & $-1$\\\bottomrule
+\end{tabular}
+\end{center}
+The signs are those of $\det M^\dagger_{SS}$. Homotopy from $q$ to $0$ has bounded zeros by the $R_0$ property, hence
+\begin{equation}\label{eq:negdegree}
+d(M^\dagger)=1-1-1=-1.
+\end{equation}
+Players $1,2,3,4$ receive negative singleton payoffs, respectively, from opponents $3,4,1,1$, with values $-2,-2,-3,-5$. We conclude:
+\begin{corollary}\label{cor:all}
+Every four-player quitting game with singleton-payoff matrix \eqref{eq:Rdag} has a uniform equilibrium payoff, for all eleven choices of simultaneous-quitting payoff vectors and every continuing payoff vector $b$.
+\end{corollary}
+
+In particular the earlier conjectured counterexample was \emph{not} a counterexample. A simpler special-case oversight is worth recording: if $b=0$ and $r_i(\{i\})=0$, always continuing is an exact equilibrium at every finite horizon, since any sole quitter receives zero.
+
+\subsection{A complete rational equilibrium for one completion}\label{sec:example}
+One proposed join-incentive matrix was
+\[
+A=\begin{pmatrix}
+0&-3&-2&1\\3&0&3&-3\\-2&-2&0&-3\\-2&3&2&0
+\end{pmatrix}.
+\]
+It does \emph{not}, without an additional rule, define the eleven simultaneous-quit payoffs. A concrete completion is
+\begin{equation}\label{eq:completion}
+r_i(T)=\sum_{j\in T\setminus\{i\}}
+\left(R^\dagger_{ji}+\one_{\{i\in T\}}A_{ij}\right),\qquad \varnothing\ne T\subseteq I,
+\qquad b=(-1,-1,-1,-1).
+\end{equation}
+For this game,
+\[
+x=\left(\frac57,0,0,\frac45\right)
+\]
+is an exact stationary Nash equilibrium of the terminal-payoff game. Conditional on absorption, the quit sets $\{1\}$, $\{4\}$, $\{1,4\}$ have probabilities $5/33$, $8/33$, $20/33$. Their payoff vectors are $(0,6,-3,-5)$, $(4,-2,3,0)$, $(5,4,0,-7)$, giving
+\begin{equation}\label{eq:explicitpayoff}
+V(x)=\left(4,\frac{94}{33},\frac3{11},-5\right).
+\end{equation}
+All unilateral stopping incentives can be checked exactly:
+\begin{center}
+\begin{tabular}{ccccc}\toprule
+Player & $x_i$ & Quit now $Q_i$ & Continue forever $C_i$ & Prescribed $V_i$\\\midrule
+$1$ & $5/7$ & $4$ & $4$ & $4$\\
+$2$ & $0$ & $17/7$ & $94/33$ & $94/33$\\
+$3$ & $0$ & $-25/7$ & $3/11$ & $3/11$\\
+$4$ & $4/5$ & $-5$ & $-5$ & $-5$\\\bottomrule
+\end{tabular}
+\end{center}
+The minimum opponent hazard is $a_*=5/7$, and one may take $L=16$. Equation \eqref{eq:uniformbound} therefore gives the explicit bound
+\[
+\sup_{\tau_i}\left[\gamma_i^N(\tau_i,x_{-i})-\gamma_i^N(x)\right]\le\frac{448}{5N}.
+\]
+Thus the \emph{same} stationary profile is a uniform $\varepsilon$-equilibrium whenever $N\ge\lceil448/(5\varepsilon)\rceil$. The finite-horizon inequalities are approximate, not a claim of exact Nash equilibrium for every finite horizon.
+
+\subsection{Where the degree argument stops}
+Within the $R_0$ and negative-incoming class of Theorem \ref{thm:degree}, a counterexample must satisfy
+\[
+\boxed{d(M)=1.}
+\]
+This condition is necessary \emph{only within that class}, not for all quitting games. A concrete degree-one example is
+\begin{equation}\label{eq:Mone}
+M_1=\begin{pmatrix}
+0&3&-1&-1\\3&0&-1&-1\\-1&-1&0&3\\-1&-1&3&0
+\end{pmatrix}.
+\end{equation}
+It is $R_0$; at $q=(1,1,1,1)$ its exact LCP index sum is $1-4+4=1$. This is the singleton matrix associated with the Solan--Vieille four-player period-two example \cite{sv2002example}. Its existence of a nonstationary equilibrium makes the central point: failure of stationary methods is not failure of uniform equilibrium. Degree one offers no nonzero-root conclusion by the present global-local index comparison.
+
+\section{A general-game verification theorem using continuation potentials}\label{sec:potential}
+We next abandon quitting-game structure. A public history $h_t$ includes its stage and current state. For a prescribed profile $\sigma$, let $r_i(h,a_i,\sigma_{-i}(h))$ denote the expected current stage payoff if player $i$ uses pure action $a_i$ while opponents follow $\sigma$, and let $h^+$ be the random next public history. (Expectations below include transition and opponents' randomization.)
+
+\begin{theorem}[Potential--correction verification]\label{thm:potential}
+Suppose for each $i$ there are a bounded function $G_i$ and a function $B_i$ on finite public histories such that, for every history $h$ and unilateral pure action $a_i$,
+\begin{align}
+\E_{a_i,\sigma_{-i}(h)}G_i(h^+)&\le G_i(h),\label{eq:Gsuper}\\
+r_i(h,a_i,\sigma_{-i}(h))+
+\E_{a_i,\sigma_{-i}(h)}B_i(h^+)&\le G_i(h)+B_i(h)+\eta.\label{eq:Bupper}
+\end{align}
+Under compliance, suppose also
+\begin{align}
+\E_{\sigma(h)}G_i(h^+)&=G_i(h),\label{eq:Gmart}\\
+\left|r_i(h,\sigma(h))+\E_{\sigma(h)}B_i(h^+)-G_i(h)-B_i(h)\right|&\le\eta.\label{eq:Blower}
+\end{align}
+Assume, uniformly over histories $h$ at stage $N+1$ reachable from a given initial history $h_1$,
+\[
+\kappa_i(N):=\frac{|B_i(h_1)|+\sup_{h:\,|h|=N+1}|B_i(h)|}{N}\longrightarrow0.
+\]
+Then, for every unilateral deviation $\tau_i$,
+\begin{align}
+\gamma_i^N(\tau_i,\sigma_{-i})-\gamma_i^N(\sigma)&\le2\eta+2\kappa_i(N),\label{eq:pot-regret}\\
+\left|\gamma_i^N(\sigma)-G_i(h_1)\right|&\le\eta+\kappa_i(N).\label{eq:pot-payoff}
+\end{align}
+\end{theorem}
+\begin{proof}
+For all deviations, \eqref{eq:Gsuper} implies $\E G_i(h_t)\le G_i(h_1)$ by iteration. Telescoping \eqref{eq:Bupper} and using this bound gives
+\[
+\E_{\tau_i,\sigma_{-i}}\sum_{t=1}^N r_i(s_t,a_t)
+\le \sum_{t=1}^N\E G_i(h_t)+B_i(h_1)-\E B_i(h_{N+1})+N\eta
+\le NG_i(h_1)+N\eta+N\kappa_i(N).
+\]
+Under compliance, \eqref{eq:Gmart} keeps $\E G_i(h_t)=G_i(h_1)$, while summing \eqref{eq:Blower} gives \eqref{eq:pot-payoff}. Subtracting the prescribed-payoff lower bound from the deviating-payoff upper bound proves \eqref{eq:pot-regret}.
+\end{proof}
+
+This supplies a \emph{sufficient certificate} for a uniform equilibrium when $\eta\downarrow0$, with initial targets $G_i(h_1)$ converging to one payoff vector for all states. The hard unsolved step is jointly constructing the \emph{same independent strategy profile} and the supermartingale/sublinear-correction functions for every player. The existence of such objects is not a consequence of discounted Nash equilibrium alone.
+
+\section{An exact Big Match obstruction to discount scheduling}\label{sec:bigmatch}
+For each discount parameter $\lambda\in(0,1]$, consider the zero-sum Big Match with Player 1's payoff table
+\[
+\begin{array}{c|cc}
+ &L&R\\\hline
+T&1^*&0^*\\
+B&0&1
+\end{array}
+\]
+where $*$ denotes immediate absorption at the indicated payoff. Player 1 maximizes; Player 2 minimizes. The discounted stationary value is $1/2$, and the effective current-stage discounted game at that value is
+\[
+\begin{pmatrix}1&0\\(1-\lambda)/2&(1+\lambda)/2\end{pmatrix}.
+\]
+Its unique stationary equilibrium is
+\begin{equation}\label{eq:discount-actions}
+\Pr_\lambda(T)=p_\lambda=\frac{\lambda}{1+\lambda},
+\qquad\Pr_\lambda(L)=q_\lambda=\frac12.
+\end{equation}
+These probabilities are smooth rational functions of $\lambda$, and the value is constant. Nevertheless their predetermined scheduling fails.
+
+\begin{proposition}[Failure of every predetermined discount schedule]\label{prop:bigmatch}
+For \emph{any} deterministic sequence $\lambda_t\in(0,1]$, let the players use \eqref{eq:discount-actions} at stage $t$ conditional on survival. The resulting profile is not a uniform $\varepsilon$-equilibrium for any $\varepsilon<1/2$.
+\end{proposition}
+\begin{proof}
+Under the prescribed strategy of Player 2, $L$ and $R$ are each played with probability $1/2$. Every stage, including the conditional absorbing payoff, has expected payoff $1/2$ for Player 1; hence
+\begin{equation}\label{eq:half}
+\gamma_1^N(\sigma)=\frac12\qquad\text{for every }N.
+\end{equation}
+Let $\theta$ be Player 1's first stage choosing $T$, and set
+\[
+w_t=p_t\prod_{k<t}(1-p_k),\qquad
+\beta_T=\Prb(T<\theta<\infty)=\sum_{t>T}w_t\xrightarrow[T\to\infty]{}0.
+\]
+The distribution of $\theta$ is independent of Player 2's deviation, because Player 1's quit probabilities depend only on the calendar date. Player 2 chooses $R$ through stage $T$ and $L$ afterward. Absorption at or before $T$ produces payoff zero for Player 1; later absorption produces payoff one, while all nonabsorbing payoffs after $T$ are zero. The first $T$ stages can contribute at most $T/N$ to the $N$-stage average, so for $N>T$,
+\[
+\gamma_1^N(\sigma_1,\tau_2^T)\le\frac{T}{N}+\beta_T.
+\]
+In the zero-sum game Player 2's gain is Player 1's loss, thus by \eqref{eq:half}
+\[
+\gamma_2^N(\sigma_1,\tau_2^T)-\gamma_2^N(\sigma)
+\ge\frac12-\beta_T-\frac{T}{N}.
+\]
+For any $\varepsilon<1/2$, first choose $T$ so that $\beta_T<(1/2-\varepsilon)/2$, then choose an arbitrarily large $N$ so that $T/N<(1/2-\varepsilon)/2$. Such a profitable deviation violates the uniform-equilibrium inequality.
+\end{proof}
+
+In the language of Theorem \ref{thm:potential}, Player 2's discounted continuation targets are $G_2(s)=-1/2$, $G_2(1^*)=-1$, and $G_2(0^*)=0$. If Player 2 chooses $R$ in the live state, then
+\[
+\E[G_2(h^+)]-G_2(h)=\frac{p_t}{2}>0.
+\]
+Thus the crucial supermartingale condition \eqref{eq:Gsuper} is not inherited from the discounted Bellman inequalities. These positive drifts can accumulate. \emph{This example is not a counterexample to uniform-equilibrium existence}: the Big Match has uniform value, but successful strategies depend on the history and cannot be obtained by a fixed, calendar-only schedule of the stationary discounted equilibria.
+
+\section{Why minmax acceptability alone cannot enforce incentives}\label{sec:minmax}
+Flesch and Solan \cite{fleschsolan2023} establish several positive results for stochastic games with general bounded Borel payoff functionals, including approximately minmax-acceptable strategy profiles in every subgame and extensive-form correlated approximate equilibria. These are important, but the logical implication ``an individually rational profile can always be enforced by threats'' fails without more structure.
+
+A two-player game chooses an absorbing payoff at the first stage:
+\[
+\begin{array}{c|cc}
+ & C&D\\\hline
+C&(3,3)^*&(0,5)^*\\
+D&(5,0)^*&(1,1)^*
+\end{array}.
+\]
+Each player's minmax value is $1$. The profile $(C,C)$ gives both players $3$, strictly above that bound; every subsequently absorbing subgame trivially meets its own minmax benchmark. Nonetheless either player can change only their first action from $C$ to $D$ and raise their payoff to $5$. Because the game has already absorbed, no continuation punishment is available.
+
+The game itself \emph{does} have a uniform equilibrium, namely $(D,D)$. The point of the example is limited and precise: subgamewise acceptable payoffs do not automatically supply the off-path incentive inequalities required in Definition \ref{def:uniform}.
+
+\section{What remains open and actionable}\label{sec:frontier}
+The attempts above delimit three distinct unsolved constructions.
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Quitting games, index-one regime.} The degree argument excludes $R_0$ matrices of degree other than one with negative incoming entries. It gives no conclusion for degree-one matrices such as \eqref{eq:Mone}, matrices outside $R_0$, or cases lacking the negative-incoming property. A counterexample would require a \emph{complete} simultaneous-quitting payoff table and a proof excluding all strategy profiles, including paths with discrete jumps and accumulation phenomena. Failure of stationarity or of SFAPs is insufficient.
+\item \textbf{Small Bellman defects.} Proposition \ref{prop:weighted} would yield uniform approximate equilibria from profiles whose opponent-survival-weighted defects tend to zero with controlled tails. No universal selection theorem producing such profiles has been established here.
+\item \textbf{Arbitrary finite-state games.} Theorem \ref{thm:potential} yields uniform equilibrium from common independent strategies and playerwise continuation-potential certificates, but neither vanishing-discount limits nor minmax acceptable profiles alone construct the required certificates. History-dependent deviation control remains the missing step.
+\end{enumerate}
+
+\textbf{Final conclusion.} The unrestricted existence problem remains unsolved in this note. The genuine achievements are the two verification lemmas, an explicit degree-based sufficient class and its exact four-player certificate, and precise counterexamples to two natural \emph{methods of proof}. None is a counterexample to existence of uniform equilibrium in finite stochastic games.
+
+\appendix
+\section{Complete absorbing payoff table for the explicit completion}\label{app:table}
+The completion \eqref{eq:completion} with $b=(-1,-1,-1,-1)$ has the following fifteen absorbing vectors:
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{cl@{\hspace{6mm}}cl}\toprule
+$T$ & $r(T)$ & $T$ & $r(T)$\\\midrule
+$\{1\}$ & $(0,6,-3,-5)$ & $\{2,4\}$ & $(10,-5,6,-1)$\\
+$\{2\}$ & $(6,0,3,-4)$ & $\{3,4\}$ & $(2,2,0,5)$\\
+$\{3\}$ & $(-2,4,0,3)$ & $\{1,2,3\}$ & $(-1,16,-4,-6)$\\
+$\{4\}$ & $(4,-2,3,0)$ & $\{1,2,4\}$ & $(8,4,3,-8)$\\
+$\{1,2\}$ & $(3,9,0,-9)$ & $\{1,3,4\}$ & $(1,8,-5,-2)$\\
+$\{1,3\}$ & $(-4,10,-5,-2)$ & $\{2,3,4\}$ & $(8,2,1,4)$\\
+$\{1,4\}$ & $(5,4,0,-7)$ & $\{1,2,3,4\}$ & $(4,11,-4,-3)$\\
+$\{2,3\}$ & $(4,7,1,-1)$ &&\\\bottomrule
+\end{tabular}
+\end{center}
+This table is included so the example is completely specified without any auxiliary file.
+
+\section{Reproducibility and limitations of the arithmetic audit}\label{app:repro}
+The matrix arithmetic in Sections \ref{sec:search} and \ref{sec:index} is rational. For the proposed matrix \eqref{eq:Rdag}, the complete sixteen-support enumeration, all principal minors, the terminal equilibrium, the payoff table, and the uniform-regret constant were checked with exact SymPy arithmetic in the earlier research audit. The diagnostic code is not included with this manuscript; the key numerical certificates are fully displayed above. The analytic degree and strategy arguments are mathematical proofs, \emph{not} formally machine-verified proofs. Before an external research claim is made, an independent mathematical audit is appropriate.
+
+\begingroup
+\footnotesize
+\setlength{\parskip}{1pt}
+\begin{thebibliography}{99}
+\setlength{\itemsep}{1pt}
+\bibitem{sv2001}
+E.~Solan and N.~Vieille, ``Quitting games,'' \emph{Mathematics of Operations Research} \textbf{26}(2), 265--285 (2001). \href{https://doi.org/10.1287/moor.26.2.265.10549}{doi:10.1287/moor.26.2.265.10549}.
+
+\bibitem{sv2002example}
+E.~Solan and N.~Vieille, ``Quitting games---an example,'' \emph{International Journal of Game Theory} \textbf{31}, 365--381 (2002). \href{https://doi.org/10.1007/s001820200125}{doi:10.1007/s001820200125}.
+
+\bibitem{solansolan2020}
+E.~Solan and O.~N.~Solan, ``Quitting games and linear complementarity problems,'' \emph{Mathematics of Operations Research} \textbf{45}(2), 434--454 (2020). \href{https://doi.org/10.1287/moor.2019.0996}{doi:10.1287/moor.2019.0996}.
+
+\bibitem{akrs2024}
+G.~Ashkenazi-Golan, I.~Krasikov, C.~Rainer, and E.~Solan, ``Absorption paths and equilibria in quitting games,'' \emph{Mathematical Programming} \textbf{203}, 735--762 (2024; online 2022). \href{https://doi.org/10.1007/s10107-022-01807-6}{doi:10.1007/s10107-022-01807-6}.
+
+\bibitem{aps2026}
+G.~Ashkenazi-Golan, I.~Krasikov, C.~Rainer, and E.~Solan, ``The APS approach for undiscounted quitting games,'' \emph{International Journal of Game Theory} \textbf{55}, article 19 (2026). \href{https://doi.org/10.1007/s00182-026-00982-6}{doi:10.1007/s00182-026-00982-6}.
+
+\bibitem{apslecture}
+G.~Ashkenazi-Golan, I.~Krasikov, C.~Rainer, and E.~Solan, discussion of the APS approach to quitting games, presentation notes, Example~3.5. \url{https://www.tse-fr.eu/sites/default/files/TSE/documents/sem2022/madstat/rainer.pdf}. (A precursor source; not a claim about the unrestricted equilibrium set.)
+
+\bibitem{sv2025}
+E.~Solan and N.~Vieille, ``Undiscounted equilibrium in positive recursive absorbing games with non-rectangular absorption structure,'' preprint (December 2025), \href{https://arxiv.org/abs/2512.04306}{arXiv:2512.04306}.
+
+\bibitem{solanvieille2002corr}
+E.~Solan and N.~Vieille, ``Correlated equilibrium in stochastic games,'' \emph{Games and Economic Behavior} \textbf{38}(2), 362--399 (2002). \href{https://doi.org/10.1006/game.2001.0887}{doi:10.1006/game.2001.0887}.
+
+\bibitem{gowda2016}
+M.~S.~Gowda, ``Polynomial complementarity problems,'' preprint (2016), \href{https://arxiv.org/abs/1609.05267}{arXiv:1609.05267}. Used for standard complementarity-degree terminology; the particular index argument is proved here.
+
+\bibitem{fleschsolan2023}
+J.~Flesch and E.~Solan, ``Stochastic games with general payoff functions,'' \emph{Mathematics of Operations Research} \textbf{49}(3), 1349--1371 (2024; online 2023). \href{https://doi.org/10.1287/moor.2023.1385}{doi:10.1287/moor.2023.1385}.
+
+\bibitem{grandclementvieille2025}
+J.~Grand-Cl\'ement and N.~Vieille, ``Playing against a stationary opponent,'' preprint (2025), \href{https://arxiv.org/abs/2503.15346}{arXiv:2503.15346}. Additional context for the Big Match; all calculations in Section \ref{sec:bigmatch} are self-contained.
+\end{thebibliography}
+\endgroup
+\end{document}

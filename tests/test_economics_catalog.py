@@ -183,6 +183,60 @@ class EconomicsCatalogueTests(unittest.TestCase):
         self.assertEqual((self.root / RANKINGS_PATH).read_bytes(), before)
         self.assertEqual((self.root / 'docs/data/economics_data.js').read_bytes(), javascript)
 
+    def write_attempt(self, record, version=1, notation=r'\mathbb R'):
+        filename = record['id'] + (f'_v{version}' if version > 1 else '') + '.tex'
+        path = self.root / 'attacks/open_problems/economics/gpt_6_astra_pro' / filename
+        path.parent.mkdir(parents=True, exist_ok=True)
+        metadata = {key: record[key] for key in ('id', 'title', 'jel_code', 'source_id')}
+        path.write_text('% ECONOMICS_PROBLEM: ' + json.dumps(metadata) + '\n'
+                        '% FIRST_POSTED: 2026-10-09\n% ATTEMPT_STATUS: unresolved\n'
+                        + r'\documentclass{article}' + '\n'
+                        + r'\newcommand{\Local}{' + notation + '}\n'
+                        + r'\begin{document}' + '\n'
+                        + r'\section{Claimed lemma, not the entire problem}' + '\n'
+                        + r'$x\in\Local$ with \label{eq:shared}\ref{eq:shared}.' + '\n'
+                        + r'\end{document}' + '\n', encoding='utf-8')
+        return path
+
+    def test_attempt_versions_have_independent_notation_and_exact_downloads(self):
+        registry = self.imported()
+        target = registry['problems'][1]
+        first = self.write_attempt(target)
+        second = self.write_attempt(target, 2, r'\Delta')
+        before = (self.root / target['statement_file']).read_bytes()
+        data = generate_economics_data(self.root)
+        attacks = data[target['id']]['attacks']
+        self.assertEqual([attack['version'] for attack in attacks], [1, 2])
+        self.assertEqual([attack['model'] for attack in attacks], ['GPT 6 Astra Pro'] * 2)
+        self.assertEqual([attack['status'] for attack in attacks], ['unresolved'] * 2)
+        self.assertIn(r'\mathbb{R}', attacks[0]['raw'])
+        self.assertNotIn(r'\Delta', attacks[0]['raw'])
+        self.assertIn(r'\Delta', attacks[1]['raw'])
+        for attack, source in zip(attacks, [first, second]):
+            self.assertEqual((self.root / 'docs' / attack['download_url']).read_bytes(), source.read_bytes())
+        self.assertEqual(data[target['id']]['llm_status'], 'unresolved')
+        # The other problem reuses the same source OP ID; it must receive no attack.
+        self.assertEqual(data[registry['problems'][2]['id']]['attacks'], [])
+        self.assertEqual((self.root / target['statement_file']).read_bytes(), before)
+        update_economics_ranks(self.write_ranks('Problem ID,New rank\nC73-1,3\nC72-2,2\nC72-3,1\n'), self.root)
+        self.assertEqual(len(build_economics_data(self.root)[target['id']]['attacks']), 2)
+
+    def test_attempt_identity_and_explicit_status_are_required(self):
+        target = self.imported()['problems'][0]
+        path = self.write_attempt(target)
+        original = path.read_text()
+        for content, error in [
+            (original.replace('"id": "C73-1"', '"id": "C72-2"'), 'id mismatch'),
+            (original.replace('"jel_code": "C73"', '"jel_code": "C72"'), 'jel_code mismatch'),
+            (original.replace('% ATTEMPT_STATUS: unresolved\n', ''), 'ATTEMPT_STATUS'),
+            (original.replace(r'\end{document}', ''), 'complete Economics attempt'),
+        ]:
+            with self.subTest(error=error):
+                path.write_text(content)
+                with self.assertRaisesRegex(ValueError, error):
+                    build_economics_data(self.root)
+        path.write_text(original)
+
 
 class CompleteEconomicsImportTests(unittest.TestCase):
     def test_all_657_classified_statements_have_unique_frozen_ids_and_rank_coverage(self):
@@ -209,7 +263,30 @@ class CompleteEconomicsImportTests(unittest.TestCase):
             self.assertNotIn('difficulty-rank:', record['definition_tex'])
             self.assertNotIn('\\ProblemClassification', record['definition_tex'])
             self.assertNotIn('Primary JEL index', record['definition_tex'])
-            self.assertEqual(record['attacks'], [])
+            if record['id'] not in {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'}:
+                self.assertEqual(record['attacks'], [])
+
+    def test_six_public_attacks_cover_five_canonical_problems(self):
+        data = build_economics_data()
+        attacked = {problem_id: record for problem_id, record in data.items() if record['attacks']}
+        self.assertEqual(set(attacked), {'C73-1', 'C72-4', 'C73-10', 'C72-14', 'D44-83'})
+        self.assertEqual(sum(len(record['attacks']) for record in attacked.values()), 6)
+        self.assertEqual([attack['version'] for attack in attacked['C73-1']['attacks']], [1, 2])
+        self.assertEqual(data['D63-97']['attacks'], [])  # Reused auction source OP-0592.
+        for record in attacked.values():
+            self.assertEqual(record['status'], 'open')
+            self.assertEqual(record['llm_status'], 'unresolved')
+            for attack in record['attacks']:
+                public = (BASE_DIR / attack['file_path']).read_text()
+                self.assertEqual(attack['status'], 'unresolved')
+                self.assertEqual(attack['model'], 'GPT 6 Astra Pro')
+                self.assertNotRegex(public, r'/Users/|/home/|/mnt/data|uploaded filename|user-supplied|ProblemClassification|MERGED_PROBLEM')
+                self.assertEqual(public.count(r'\begin{document}'), 1)
+                self.assertEqual(public.count(r'\end{document}'), 1)
+        catchup = (BASE_DIR / attacked['C72-14']['attacks'][0]['file_path']).read_text()
+        self.assertNotIn('Exact Counting of Turn-Boundary Positions', catchup)
+        self.assertIn(r'\bibitem{isaksen2015}', catchup)
+        self.assertIn('small-deficit strategy fails', catchup)
 
     def test_specialized_and_merged_source_conventions_are_present(self):
         data = build_economics_data()

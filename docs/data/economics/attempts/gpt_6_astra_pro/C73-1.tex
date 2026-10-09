@@ -1,0 +1,825 @@
+% ECONOMICS_PROBLEM: {"id": "C73-1", "title": "Equilibrium payoffs in finite multiplayer stochastic games", "jel_code": "C73", "source_id": "OP-0590"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=1.08in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{fancyhdr}
+\usepackage{authblk}
+\usepackage{mathrsfs}
+\usepackage{bbm}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{question}[theorem]{Open question}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{warning}[theorem]{Caution}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\calH}{\mathcal H}
+\newcommand{\calS}{\mathcal S}
+\newcommand{\sig}{\sigma}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\mathrm d}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Finite multiplayer stochastic games}
+\fancyhead[R]{\small Research note}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+\setlist[itemize]{topsep=3pt,itemsep=2pt}
+\setlist[enumerate]{topsep=3pt,itemsep=2pt}
+
+\title{On Equilibrium Payoffs in Finite Multiplayer Stochastic Games\\[5pt]
+\large Partial Results, Explicit Obstructions, and a Conditional Reduction}
+\author{GPT 6 Astra Pro}
+\date{8 October 2026}
+
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C73-1}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 1\par
+\noindent\textbf{Status:} Unresolved for the complete catalogue problem; this manuscript records partial results and research attempts.\par
+\maketitle
+\begin{abstract}
+The existence of uniform, limiting-average, or liminf-average Nash equilibrium
+payoffs in arbitrary finite multiplayer stochastic games remains an open problem.
+This note collects and critically audits several attempts to address it. We prove
+a sufficient condition based on a state-independent vanishing-discount equilibrium
+payoff; exhibit elementary counterexamples to a proposed additive-eigenpair
+criterion and to naive concatenation of exact finite-horizon equilibria; and
+formulate a history-dependent finite-deviation criterion. Using a finite-prefix
+deviator-identification theorem, we prove a conditional conversion from
+approximate acceptability and small finite-deviation regret to approximate
+liminf-average Nash equilibrium. For each fixed finite deviation horizon we
+establish the two required properties simultaneously. The missing step is to
+produce one profile satisfying the deviation inequalities for \emph{every}
+finite horizon. An example shows why pointwise compactness of strategies cannot
+supply this step automatically. No general existence proof or counterexample is
+claimed. Statements proved in this note are distinguished from unproved
+candidate principles and unsuccessful approaches.
+\end{abstract}
+\noindent\textbf{Status.} \emph{Research-progress note; not a solution of the general open problem.}
+\tableofcontents
+
+\section{The question and precise payoff conventions}
+\label{sec:model}
+A finite stochastic game is a tuple
+\[
+\Gamma=(I,S,(A_i(s))_{i\in I,s\in S},q,(g_i)_{i\in I}),
+\]
+where $I=\{1,\ldots,m\}$ and $S$ are nonempty finite sets, each action set
+$A_i(s)$ is finite and nonempty, $q(\cdot\mid s,a)$ is a probability
+distribution on $S$, and $g_i(s,a)\in\mathbb R$ is a bounded stage payoff.
+At stage $t$ the current state $s_t$ is publicly observed, the players
+independently randomize their actions $a_{i,t}$ conditional on the publicly
+observed history, receive $g_i(s_t,a_t)$, and the next state is sampled from
+$q(\cdot\mid s_t,a_t)$. Actions and states are publicly observed after the
+stage. Unless stated otherwise, strategies are arbitrary behavioral strategies
+with perfect recall and no external mediator.
+
+Write
+\[
+\bar g_{i,n}=\frac1n\sum_{t=1}^n g_i(s_t,a_t),\qquad
+f_i^-(\omega)=\liminf_{n\to\infty}\bar g_{i,n}(\omega),\qquad
+f_i^+(\omega)=\limsup_{n\to\infty}\bar g_{i,n}(\omega).
+\]
+We use the expected liminf payoff
+$u_i^-(s,\sig)=\E_{s,\sig}f_i^-$, with analogous notation $u_i^+$.
+One also encounters $\liminf_n\E_{s,\sig}\bar g_{i,n}$ and
+$\lim_n\E_{s,\sig}\bar g_{i,n}$ (when the latter exists).
+The \emph{expected liminf} and \emph{liminf of expectations} are different:
+interchanging expectation and liminf is not justified in general.
+A behavioral profile $\sig$ is an $\eps$-equilibrium for $u^-$ from state
+$s$ when
+\begin{equation}\label{eq:liminfeq}
+ u_i^-(s,\tau_i,\sig_{-i})\le u_i^-(s,\sig)+\eps
+ \quad\text{for every player }i\text{ and every behavioral }\tau_i.
+\end{equation}
+A \emph{liminf-average equilibrium payoff} is a vector $c$ such that for
+every $\eps>0$ there is an $\eps$-equilibrium (from the specified initial
+state) with payoff within $\eps$ of $c$. This is an \emph{approximate}
+equilibrium-payoff concept, not an assertion that a zero-error equilibrium
+exists.
+
+A profile is a \emph{uniform $\eps$-equilibrium} when, for every sufficiently
+large finite horizon $n$, its expected $n$-stage average admits no unilateral
+gain above $\eps$, and its payoff is also nearly constant across all sufficiently
+large horizons; one may additionally require the analogous inequality for every
+sufficiently small normalized discount factor $\lambda$, where
+\[
+\gamma_i^\lambda(s,\sig)
+ =\E_{s,\sig}\sum_{t=1}^\infty
+ \lambda(1-\lambda)^{t-1}g_i(s_t,a_t).
+\]
+A \emph{uniform equilibrium payoff} $c$ is realized asymptotically by
+uniform approximate equilibria with their finite-horizon and discounted payoffs
+converging to $c$. The formulations above are made precise in the statement
+and proof of Theorem~\ref{thm:flat}. We distinguish these concepts rather than
+silently identifying them.
+
+\begin{question}[General multiplayer existence problem]\label{q:main}
+For every finite stochastic game, and every initial state, does there exist
+(a) a uniform equilibrium payoff; or at least (b) a limiting-average equilibrium
+payoff; or at least (c) a liminf-average equilibrium payoff in the sense of
+\eqref{eq:liminfeq}?
+\end{question}
+Two-player finite stochastic games have uniform equilibrium payoffs by work of
+Vieille; corresponding assertions for arbitrary finite numbers of players are
+not established by the references reviewed here
+\cite{vieille2002,fleschsolan2023,solanvieille2025,aps2026}.
+
+\section{Established background and a map of the attempts}
+For each $\lambda\in(0,1]$, finite discounted stochastic games have stationary
+Nash equilibria \cite{fink1964}. Their payoff vectors generally depend on the
+starting state, and a discounted equilibrium need not remain approximately
+optimal under a limiting-average criterion. In the general-payoff framework,
+Flesch and Solan prove the existence of \emph{minmax-acceptable} profiles in
+all subgames and of approximate equilibria in at least one subgame, not
+necessarily at an arbitrarily prescribed initial state \cite{fleschsolan2023}.
+Deviator identification for nearly certain target events is available by
+Alon, Gunby, He, Shmaya, and Solan \cite{alon2024}.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{0.34\linewidth}p{0.57\linewidth}@{}}
+\toprule
+\textbf{Approach} & \textbf{What survives the audit}\\
+\midrule
+State-flat discounted branch & A genuine sufficient condition for uniform and liminf-average equilibrium payoffs (Theorem~\ref{thm:flat}).\\
+State-independent additive eigenpair & False already for unequal absorbing states (Proposition~\ref{prop:AEfalse}).\\
+Repeat exact finite-stage equilibria & False as a general construction: the Big Match supplies a deviation with gain $1/2$ (Proposition~\ref{prop:bigmatch}).\\
+Predetermined discount or stopping schedule & Cannot alone secure the Big Match value; observed history matters (Proposition~\ref{prop:hazard}).\\
+History-dependent continuation supermartingale & Gives a conditional conversion to liminf-average equilibrium (Theorem~\ref{thm:conversion}).\\
+Backward induction for a fixed deviation cutoff & Works for each $N$ separately (Theorem~\ref{thm:prefix}); simultaneous $N$ remains open.\\
+Compactness of behavioral strategies & Insufficient: actual tail payoffs may jump under pointwise convergence (Example~\ref{ex:compact}).\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{A valid conditional vanishing-discount theorem}
+\label{sec:flat}
+Choose a semialgebraic branch $\lambda\mapsto(x^\lambda,v^\lambda)$ of
+stationary discounted Nash equilibria for all sufficiently small $\lambda>0$.
+Such a branch can be selected because the finite-dimensional discounted
+stationary equilibrium correspondence has a semialgebraic graph; a stationary
+equilibrium exists for every positive $\lambda$. At finitely many other
+discount parameters, choose arbitrary stationary equilibria.
+Assume $|g_i|\le M$.
+
+\begin{theorem}[State-flat sufficient condition]\label{thm:flat}
+Suppose there are constants $c_i$ such that
+\begin{equation}\label{eq:flat}
+ \lim_{\lambda\downarrow0}v_i^\lambda(s)=c_i
+ \quad\text{for every }i\in I,\ s\in S.
+\end{equation}
+Thus the limit is independent of the starting state for each player.
+Then $c=(c_i)_{i\in I}$ is a uniform equilibrium payoff. The same profiles
+also yield equilibrium payoffs $c$ for the expected liminf-average criterion
+and for the corresponding limsup-average criterion and the standard
+finite-horizon limit-payoff formulations.
+\end{theorem}
+\begin{proof}
+For player $i$, state $s$, and pure action $b_i$, optimality against
+$x_{-i}^\lambda$ implies
+\begin{equation}\label{eq:bellmandisc}
+ v_i^\lambda(s)\ge\lambda
+ g_i(s,b_i,x_{-i}^\lambda(s))
+ +(1-\lambda)Q_{b_i,x_{-i}^\lambda(s)}v_i^\lambda.
+\end{equation}
+Here $Q_{b_i,x_{-i}}v=\sum_{s'}q(s'\mid s,b_i,x_{-i})v(s')$.
+Equality holds on averaging over $x_i^\lambda(s)$.
+
+With $r\in\mathbb N$, set $v_{i,r}=v_i^{1/r}$ and $x_r=x^{1/r}$.
+Multiplying \eqref{eq:bellmandisc} by $r$ yields
+\begin{equation}\label{eq:bellmanr}
+ r v_{i,r}(s)\ge g_i(s,b_i,x_{-i,r}(s))
+ +(r-1)Q_{b_i,x_{-i,r}(s)}v_{i,r}.
+\end{equation}
+Let $\pi^N$ prescribe $x_r$ when $r$ stages remain in a block of
+length $N$. Define
+\[
+ \Delta_r=\max_{i,s}|v_{i,r-1}(s)-v_{i,r}(s)|,\qquad
+ E_N=\sum_{r=2}^N(r-1)\Delta_r.
+\]
+Induction on $r$, using \eqref{eq:bellmanr}, gives for all starting states
+and every unilateral deviation during the block
+\begin{equation}\label{eq:blocks}
+ \E_{\tau_i,\pi^N_{-i},s}\sum_{t=1}^N g_i
+ \le N v_{i,N}(s)+E_N,
+\end{equation}
+and, using equality under the prescribed mixed actions,
+\begin{equation}\label{eq:blockbaseline}
+ \left|\E_{\pi^N,s}\sum_{t=1}^N g_i-Nv_{i,N}(s)\right|
+ \le E_N.
+\end{equation}
+The induction works for arbitrary within-block history-dependent deviations:
+a best-response continuation can be optimized at each successor history,
+while $\Delta_r$ bounds the error from replacing $v_{i,r-1}$ by $v_{i,r}$.
+
+A bounded one-variable semialgebraic function with a finite limit has a
+Puiseux expansion near zero. In particular, for some $\alpha>0$ and $C<\infty$,
+\[
+ \left\|\frac{\dd v_i^\lambda}{\dd\lambda}\right\|_\infty
+ \le C\lambda^{\alpha-1}
+\]
+for sufficiently small $\lambda>0$. Therefore
+$\Delta_r=O(r^{-1-\alpha})$ and
+\begin{equation}\label{eq:error}
+ E_N=O\left(\sum_{r=2}^Nr^{-\alpha}\right)+O(1)=o(N).
+\end{equation}
+Under \eqref{eq:flat}, the errors
+\[
+ d_N=\max_{i,s}|v_{i,N}(s)-c_i|+E_N/N
+\]
+converge to zero. Consequently every $N$-block, from every initial state,
+has equilibrium expected average within $d_N$ of $c_i$, and a deviator's
+expected average is at most $c_i+d_N$.
+
+Repeat $\pi^N$ periodically, restarting only the \emph{countdown} after each
+block; the physical state is \emph{not} reset. Call this profile $\sig^N$.
+Conditioning at the start of each block and summing the bounds gives, for
+all $n$,
+\begin{align}
+ \E_{s,\sig^N}\bar g_{i,n}&\ge c_i-d_N-2MN/n,\label{eq:uniformlower}\\
+ \E_{s,\tau_i,\sig^N_{-i}}\bar g_{i,n}
+ &\le c_i+d_N+2MN/n.\label{eq:uniformupper}
+\end{align}
+The same argument gives an upper bound on the prescribed payoff. Since
+$N$ is fixed while $n\to\infty$, this proves the long finite-horizon part
+of uniform equilibrium.
+
+For completeness, the discounted criterion follows from the same block
+bounds. Let $\theta\downarrow0$ be an \emph{evaluation} discount factor,
+distinct from the within-block parameters $1/r$. The normalized discount
+weights of successive complete blocks satisfy
+\[
+ \frac{\theta\sum_{t=kN+1}^{(k+1)N}(1-\theta)^{t-1}g_t}
+ {\theta\sum_{t=kN+1}^{(k+1)N}(1-\theta)^{t-1}}
+ =\frac1N\sum_{t=kN+1}^{(k+1)N}g_t+O(MN\theta),
+\]
+uniformly in the block index and realization; the geometric weights within
+one block have relative variation $O(N\theta)$. The block inequalities
+then imply that discounted prescribed payoffs are within
+$d_N+O(MN\theta)$ of $c_i$ and deviations yield at most
+$c_i+d_N+O(MN\theta)$. First take $N$ large, then $\theta$ small.
+
+For the pathwise liminf/limsup criteria, let $Y_{i,k}$ be the total reward
+in block $k$. Under either prescribed play or one fixed arbitrary unilateral
+deviation, the bounded martingale differences
+\[
+ Y_{i,k}-\E[Y_{i,k}\mid\calH_{kN}]
+\]
+have averages converging almost surely to zero. Under prescribed play,
+all conditional block expectations are within $Nd_N$ of $Nc_i$;
+under a unilateral deviation, they are at most $N(c_i+d_N)$.
+Thus almost surely under $\sig^N$,
+\[
+ c_i-d_N\le\liminf_n\bar g_{i,n}
+ \le\limsup_n\bar g_{i,n}\le c_i+d_N,
+\]
+and under any $\tau_i$,
+$\limsup_n\bar g_{i,n}\le c_i+d_N$ almost surely.
+Bounded convergence inequalities then show that $\sig^N$ is a
+$2d_N$-equilibrium for both $\E\liminf$ and $\E\limsup$, with payoffs
+within $d_N$ of $c$. For formulations using $\liminf_n\E\bar g_{i,n}$ or
+$\limsup_n\E\bar g_{i,n}$, the same conditional-block estimates
+apply directly. For the prescribed periodic finite-memory profile,
+the ordinary limit $\lim_n\E\bar g_{i,n}$ exists by finite-state
+Markov-chain ergodic theory. An arbitrary deviating strategy need not
+have a well-defined ordinary limit of expected average payoffs; no
+unqualified assertion is made here for a criterion that is undefined
+under such deviations. This completes the claimed approximate-payoff
+conclusions.
+\end{proof}
+
+\begin{remark}
+The state-flat hypothesis is essential to this proof. Without it,
+\eqref{eq:blocks} bounds the payoff in block $k$ by
+$N v_{i,N}(S_{kN+1})+E_N$. A deviator can change the next block's
+starting-state distribution. The state-dependent benchmarks need not
+telescope or be bounded by one common target. Thus Theorem~\ref{thm:flat}
+is a sufficient result, not a proof of Question~\ref{q:main}.
+\end{remark}
+
+\section{Two false generalizations of the discounted argument}
+\subsection{A state-independent additive eigenpair need not exist}
+An earlier attempt asked for a constant $c\in\mathbb R^m$, a potential
+$\Phi:S\to\mathbb R^m$, a length $N$, and Nash equilibrium payoffs
+$y(s)$ in the $N$-stage game with terminal payment $\Phi(S_{N+1})$ such that
+\begin{equation}\label{eq:AE}
+ \max_{s\in S}\norm{y(s)-\Phi(s)-Nc}_\infty\le N\eta.
+\tag{AE}
+\end{equation}
+If valid, the terminal potentials would telescope across blocks. But the
+assertion that \eqref{eq:AE} holds for every finite stochastic game and
+arbitrarily small $\eta$ is false.
+
+\begin{proposition}\label{prop:AEfalse}
+For $\eta<\tfrac12$, there is a finite stochastic game for which no $N$,
+$c$, or $\Phi$ satisfies \eqref{eq:AE}.
+\end{proposition}
+\begin{proof}
+Take two absorbing states $z_0,z_1$, no meaningful choices, and reward $0$
+per stage at $z_0$ and reward $1$ per stage at $z_1$ for every player.
+From $z_j$ the only terminal-reward payoff is
+$y_i(z_j)=Nj+\Phi_i(z_j)$. Condition \eqref{eq:AE} would imply
+$|c_i|\le\eta$ and $|1-c_i|\le\eta$, a contradiction.
+\end{proof}
+\begin{remark}
+This is \emph{not} a counterexample to equilibrium existence: every
+profile is an equilibrium. It only rules out a state-independent
+additive-eigenpair principle of the stated form.
+\end{remark}
+
+\subsection{Exact countdown blocks fail in the Big Match}
+\label{sec:bigmatch}
+Consider the two-player constant-sum Big Match, with player 1's reward
+shown below and player 2's reward equal to $1-g_1$. A star denotes
+permanent absorption at the indicated payoff:
+\begin{equation}\label{eq:BM}
+\begin{array}{c|cc}
+ & L&R\\\hline
+ T&1^{*}&0^{*}\\
+ B&0&1
+\end{array}.
+\end{equation}
+At $r$ remaining stages, if the value of the continuation with $r-1$
+stages is $(r-1)/2$, the matrix of \emph{total} continuation rewards is
+\[
+\begin{array}{c|cc}
+ &L&R\\\hline
+ T&r&0\\
+ B&(r-1)/2&(r+1)/2
+\end{array}.
+\]
+Player 1 plays $T$ with probability $p_r=1/(r+1)$ and player 2 mixes
+$L,R$ equally. Direct indifference checks and induction show that this is
+an \emph{exact} equilibrium of the $N$-stage game with value $N/2$.
+It agrees with the countdown $x^{1/r}$ of stationary discounted equilibria:
+\[
+ v^\lambda=\tfrac12\quad\text{at the nonabsorbing state},
+ \qquad p^\lambda=\frac{\lambda}{1+\lambda}.
+\]
+The state-flat hypothesis fails: the two absorbing states have discounted
+payoffs $0$ and $1$.
+
+\begin{proposition}[Exact blocks, fixed profitable deviation]
+\label{prop:bigmatch}
+Repeat the exact $N$-stage equilibrium countdown block forever, restarting
+the countdown after each $N$ stages but not resetting the physical state.
+For every $N$, player 2 has a unilateral deviation increasing expected
+liminf-average payoff by $1/2$.
+\end{proposition}
+\begin{proof}
+Conditional on entering a block without prior absorption, the probability
+of surviving its $N$ stages is
+\begin{equation}\label{eq:survival}
+ \prod_{r=1}^N\left(1-\frac1{r+1}\right)
+ =\prod_{r=1}^N\frac r{r+1}=\frac1{N+1}.
+\end{equation}
+Thus absorption occurs almost surely during the infinite concatenation.
+Under prescribed play, the absorbing column is fair, so both players'
+expected limiting average payoffs equal $1/2$. If player 2 plays $R$
+forever, the stopping hazard is unchanged, but absorption always yields
+player 1 reward $0$ and player 2 reward $1$. The deviation gain of player 2
+is exactly $1/2$ for every $N$.
+\end{proof}
+A quantitative finite-horizon version makes the failure especially clear.
+Against the deviation $R$ forever, player 1's expected total reward in
+each reached block equals $N/2$. By \eqref{eq:survival}, the expected total
+reward over \emph{all} time is $(N/2)\sum_{k\ge0}(N+1)^{-k}=(N+1)/2$.
+Therefore $\E\bar g_{1,n}\le(N+1)/(2n)$, whereas the prescribed
+profile yields expected average $1/2$. Exact block Nash optimality does
+not prevent deviations with effects that persist after the nominal block.
+
+\begin{proposition}[Predetermined stopping hazards are insufficient]
+\label{prop:hazard}
+Suppose player 1's stopping probability at date $t$, conditional on
+nonabsorption, is a fixed number $p_t$, independent of observed play.
+Then player 2 can force player 1's \emph{expected liminf-average reward}
+to be arbitrarily close to $0$.
+\end{proposition}
+\begin{proof}
+If $\sum_t p_t=\infty$, playing $R$ forever causes absorption at payoff
+$0$ almost surely. If $\sum_t p_t<\infty$, choose $K$ with
+$\sum_{t>K}p_t<\delta$; player 2 plays $R$ through $K$ and $L$
+thereafter. Absorption before $K$ yields $0$, while positive limiting
+payoff is possible only if player 1 stops after $K$. The probability of
+that event is at most $\sum_{t>K}p_t<\delta$. Since payoffs lie in
+$[0,1]$, player 1's expected liminf-average payoff is at most $\delta$.
+\end{proof}
+The Big Match itself has approximate long-run equilibria; the propositions
+refute \emph{time-only implementations}, not its equilibrium existence
+\cite{bigmatchspace}.
+
+\subsection{Discounted equilibrium limits need not be uniform payoffs}
+Even without the block-concatenation error, a direct assertion that every
+vanishing-discount Nash payoff limit is uniform is false: Sorin's example,
+discussed by Renault and Ziliotto, has a nonempty discounted equilibrium
+payoff limit set disjoint from the set of uniform equilibrium payoffs
+\cite{renaultziliotto}. This is a distinct reason why a universal
+vanishing-discount proof needs additional hypotheses or a different target.
+
+\section{A history-dependent, finite-deviation conversion theorem}
+\label{sec:conversion}
+The previous failures suggest avoiding one state-independent payoff target
+at \emph{every} intermediate date. We now let the continuation benchmark
+be an actual payoff conditional on the entire finite public history.
+Normalize rewards in this and the remaining sections to $[0,1]$.
+
+For a profile $\sig$, history $h$, and player $i$, put
+\begin{equation}\label{eq:V}
+ V_i^\sig(h)=\E_{h,\sig}f_i^-.
+\end{equation}
+Let
+\begin{equation}\label{eq:minmax}
+ v_i(s)=\inf_{\rho_{-i}}\sup_{\tau_i}
+ \E_{s,\tau_i,\rho_{-i}}f_i^-
+\end{equation}
+be the individual \emph{minmax} level. Opponents in $\rho_{-i}$ use an
+ordinary joint \emph{profile} of independently randomized behavioral
+strategies, rather than a mediator. Since $f_i^-$ is shift-invariant, the
+minmax level after a finite history depends only on the current state.
+By the definition of the infimum, for every $\zeta>0$ there is a
+joint-profile punishment against $i$ yielding at most $v_i(s)+\zeta$
+against any strategy of $i$.
+
+Let $\tau_i\star_N\sig_i$ be a strategy that may differ from $\sig_i$
+through stage $N$ and equals $\sig_i$ at all subsequent histories. Define
+\begin{align}
+ A(\sig)&=\sup_{i,h}[v_i(s_h)-V_i^\sig(h)]_+,\label{eq:A}\\
+ R_N(\sig)&=\max_i\sup_{\tau_i}\Bigl[
+  u_i^-(s_0,\tau_i\star_N\sig_i,\sig_{-i})
+   -u_i^-(s_0,\sig)\Bigr],\label{eq:RN}\\
+ R_{\mathrm{fin}}(\sig)&=\sup_{N\ge1}R_N(\sig).\label{eq:Rfin}
+\end{align}
+These $R_N$ use \emph{infinite-horizon tail payoffs}; only the length of
+the deviation is bounded. This is not an $N$-stage expected-payoff test.
+
+\begin{theorem}[Finite-deviation conversion; conditional on a starting
+profile]\label{thm:conversion}
+Suppose $A(\sig)\le\alpha$ and $R_{\mathrm{fin}}(\sig)\le\beta$.
+For every $\rho,\delta\in(0,1)$ there is an ordinary behavioral profile
+$\widehat\sig$ such that, from $s_0$,
+\begin{align}
+ |u_i^-(\widehat\sig)-u_i^-(\sig)|&\le\delta
+ &&\text{for every }i,\label{eq:convpay}\\
+ \sup_{\tau_i}\bigl[
+ u_i^-(\tau_i,\widehat\sig_{-i})-u_i^-(\widehat\sig)
+ \bigr]
+ &\le\alpha+\beta+\rho+2\sqrt{m\delta}+\delta
+ &&\text{for every }i.\label{eq:conveps}
+\end{align}
+Here $m=|I|$; the estimate uses the finite-prefix identification
+form of \cite[Theorem~2.6 and Section~4]{alon2024}, with stochastic
+transitions treated as prescribed moves of Nature in an alternating
+perfect-information expansion. In particular, the conclusion does
+\emph{not} add an actual mediator to the game.
+\end{theorem}
+\begin{proof}
+\emph{Step 1: a continuation supermartingale.}
+For a finite history $h$ define
+\begin{equation}\label{eq:W}
+ W_i(h)=\sup_{N\ge |h|}\sup_{\tau_i\text{ through }N}
+ \E_{h,\tau_i,\sig_{-i}}\!
+ \left[V_i^\sig(H_N)\right].
+\end{equation}
+The player returns to $\sig_i$ after $N$. (The indexing of $H_N$ may
+be shifted by one without changing the argument.) Then
+\begin{equation}\label{eq:Wbound}
+ 0\le V_i^\sig(h)\le W_i(h)\le1,
+ \qquad W_i(s_0)\le u_i^-(\sig)+\beta.
+\end{equation}
+Concatenating a current pure deviation with almost optimal bounded-time
+deviations from the finitely many successor histories, using one common
+terminal date, shows
+\begin{equation}\label{eq:Wsuper}
+ \E\left[W_i(H_{t+1})\mid H_t=h,a_i,\sig_{-i}(h)\right]
+ \le W_i(h).
+\end{equation}
+Thus, when the opponents use $\sig_{-i}$, $W_i(H_t)$ is a bounded
+supermartingale under \emph{every} unilateral deviation. The common-date
+argument is legitimate because at any stage there are finitely many
+successor public histories.
+
+\emph{Step 2: a compact full-payoff-realization set.}
+Under $\sig$, the bounded martingale
+$V_i^\sig(H_t)=\E_\sig[f_i^-\mid\calH_t]$ converges almost surely to
+$f_i^-$. Accordingly, if
+\[
+ G=\{\omega: V_i^\sig(H_t(\omega))\to f_i^-(\omega)
+ \text{ for every }i\},
+\]
+then $\Pp_\sig(G)=1$. The infinite-play space is compact metrizable;
+regularity of its probability measures gives a compact $K\subset G$
+with $\Pp_\sig(K)>1-\delta$.
+Let $T$ be the first finite public history whose cylinder has empty
+intersection with $K$. Closedness of $K$ implies
+\begin{equation}\label{eq:exit}
+ \{T=\infty\}=K.
+\end{equation}
+
+\emph{Step 3: identify an offending player at a finite exit prefix.}
+Apply the closed-target finite-prefix blame theorem
+\cite[Section~4]{alon2024} to the prescribed law and target $K$.
+The standard reduction of stochastic transitions to an additional
+non-strategic Nature agent is performed by splitting each stage into
+(i) simultaneous player actions and (ii) Nature's publicly observed
+state draw according to $q$. Nature has a prescribed behavioral strategy
+and does not deviate. There are $m+1$ agents in the identification
+problem; map any attribution to Nature to an arbitrary genuine player.
+We obtain a \emph{finite-exit-prefix-measurable} blame assignment
+$j(H_T)\in I$ such that, for each genuine sole deviator $i$,
+\begin{equation}\label{eq:blame}
+ \Pp_{\tau_i,\sig_{-i}}\{T<\infty,\ j(H_T)\ne i\}
+ \le 2\sqrt{m\delta}.
+\end{equation}
+At $T$, modify the continuation: the players other than $j(H_T)$
+switch permanently to a $\rho$-minmax punishment of that player from
+the current state. Call the resulting profile $\widehat\sig$.
+The event $T<\infty$ has prescribed probability at most $\delta$;
+therefore boundedness of $f_i^-$ gives \eqref{eq:convpay}.
+
+\emph{Step 4: bound an arbitrary infinite deviation.}
+Fix $i$ and an unrestricted $\tau_i$. Before $T$, the opponents use
+$\sig_{-i}$; hence $W_i(H_{t\wedge T})$ is a bounded supermartingale,
+converging almost surely to some $Z_i$ with
+$\E Z_i\le W_i(s_0)$. On $\{T=\infty\}$, the path lies in $K$, so
+\begin{equation}\label{eq:onK}
+ f_i^-=\lim_tV_i^\sig(H_t)
+ \le\lim_tW_i(H_t)=Z_i.
+\end{equation}
+On $\{T<\infty,j(H_T)=i\}$, the punishment yields conditional expected
+payoff at most
+\begin{equation}\label{eq:correctblame}
+ v_i(s_{H_T})+\rho
+ \le V_i^\sig(H_T)+\alpha+\rho
+ \le W_i(H_T)+\alpha+\rho.
+\end{equation}
+On incorrect blame use the payoff bound $1$ and \eqref{eq:blame}.
+Because the law of the stopped history is unaffected by the punishment
+that follows the exit,
+\[
+ u_i^-(\tau_i,\widehat\sig_{-i})
+ \le\E Z_i+\alpha+\rho+2\sqrt{m\delta}
+ \le u_i^-(\sig)+\beta+\alpha+\rho+2\sqrt{m\delta}.
+\]
+Together with \eqref{eq:convpay}, this proves \eqref{eq:conveps}.
+\end{proof}
+
+\begin{remark}[Nature and observability]
+The identification step requires public observation of realized actions
+and states and a known transition law. It should not be applied verbatim
+to games with hidden actions, private states, or an endogenous unobserved
+mediator. The alternating Nature construction is a device for applying a
+finite-prefix testing theorem; it does not expand the feasible deviations
+in the original game.
+\end{remark}
+
+\subsection{The Big Match passes the finite-deviation test}
+In \eqref{eq:BM}, prescribe player 1 to play $B$ forever and player 2
+to choose independent fair $L/R$ forever. At every unabsorbed history,
+\[
+ V^\sig(h)=(1/2,1/2),
+\]
+and at absorbing histories $V^\sig$ is the absorbing reward vector.
+The minmax value to each player is $1/2$ in the nonabsorbing state and
+the fixed terminal reward after absorption; hence $A(\sig)=0$.
+Every bounded-duration deviation of player 1 either leads to an absorption
+whose \emph{expected} payoff is $1/2$, or returns to continuation payoff
+$1/2$. Every bounded-duration deviation of player 2 affects only finitely
+many rewards, because player 1 never stops. Thus
+\begin{equation}\label{eq:BMcriteria}
+ A(\sig)=R_{\mathrm{fin}}(\sig)=0.
+\end{equation}
+Yet this $\sig$ is not itself an equilibrium: player 2 can play $L$
+forever to obtain payoff $1$. Theorem~\ref{thm:conversion} yields
+approximate equilibria by testing deviations and assigning punishment.
+This is a consistency check on the \emph{conditional} conversion theorem,
+not a new solution of the Big Match.
+
+\section{A fixed-cutoff construction in every finite game}
+\label{sec:prefix}
+The following is the strongest unconditional step from the
+finite-deviation approach.
+
+\begin{theorem}[Finite-prefix construction]\label{thm:prefix}
+For every finite stochastic game, every $\alpha>0$, and every integer
+$N\ge1$, there is a behavioral strategy profile $\sig^{(N)}$ satisfying
+\begin{equation}\label{eq:prefix}
+ A(\sig^{(N)})\le\alpha,
+ \qquad R_N(\sig^{(N)})=0.
+\end{equation}
+\end{theorem}
+\begin{proof}
+The minmax-acceptability theorem of Flesch and Solan
+\cite[Theorem~4.4]{fleschsolan2023} supplies a profile $\pi$ with
+\begin{equation}\label{eq:acceptablepi}
+ V_i^\pi(h)\ge v_i(s_h)-\alpha
+ \qquad\text{for all players and all finite histories }h.
+\end{equation}
+Construct a finite extensive-form game for the first $N$ stages, with
+terminal payoff $V_i^\pi(h_N)$ at each date-$N$ history; after date $N$
+prescribe $\pi$. Choose a mixed Nash equilibrium in every finite
+continuation game by backward induction and call the full profile
+$\sig^{(N)}$.
+
+A deviation ending by date $N$ cannot improve player $i$'s expected
+tail payoff: conditional on the date-$N$ history, the remaining payoff
+is precisely $V_i^\pi(h_N)$. Thus $R_N(\sig^{(N)})=0$.
+
+To propagate acceptability backward, use the dynamic-programming identity
+for the state-dependent minmax level with shift-invariant payoff:
+\begin{equation}\label{eq:minmaxBellman}
+ v_i(s)=\min_{x_{-i}\in\prod_{j\ne i}\Delta(A_j(s))}
+ \max_{a_i\in A_i(s)}
+ \sum_{a_{-i},s'}x_{-i}(a_{-i})q(s'\mid s,a_i,a_{-i})v_i(s').
+\end{equation}
+For clarity, \eqref{eq:minmaxBellman} uses \emph{product} mixed actions
+of the opponents. It follows by decomposing an arbitrary opponent
+strategy into its first-stage product mixed action and continuation
+profiles and using the shift-invariance of $f_i^-$. The upper bound
+concatenates near-minmax opponent continuation profiles after each
+observed action-state history; the lower bound responds optimally at
+the first stage and then nearly best-responds to the opponents'
+continuations. Only finitely many first-stage successors arise, so the
+approximation errors can be made arbitrarily small.
+
+If all next-history continuation values $y_i(h')$ satisfy
+$y_i(h')\ge v_i(s_{h'})-\alpha$, the current one-shot Nash equilibrium
+with opponent product mixed action $x_{-i}$ gives
+\[
+\begin{split}
+ y_i(h)
+ &\ge\max_{a_i}\E[y_i(H_{t+1})\mid h,a_i,x_{-i}]\\
+ &\ge\max_{a_i}\E[v_i(S_{t+1})\mid h,a_i,x_{-i}]-\alpha\\
+ &\ge v_i(s_h)-\alpha,
+\end{split}
+\]
+by \eqref{eq:minmaxBellman}. This inducts backward from
+\eqref{eq:acceptablepi}. After date $N$, acceptability again follows
+from \eqref{eq:acceptablepi}.
+\end{proof}
+
+\section{The remaining quantifier gap and a compactness warning}
+\label{sec:gap}
+By Theorem~\ref{thm:conversion}, the following \emph{unproved}
+selection principle would settle the liminf-average part of
+Question~\ref{q:main}:
+\begin{question}[Simultaneous finite-deviation criterion]\label{q:criterion}
+Does every finite stochastic game, for each initial state $s_0$ and
+$\eta>0$, admit a single profile $\sig$ such that
+\begin{equation}\label{eq:missing}
+ A(\sig)\le\eta,
+ \qquad \sup_{N\ge1}R_N(\sig)\le\eta\ ?
+\tag{FD}
+\end{equation}
+\end{question}
+If \eqref{eq:missing} held for arbitrarily small $\eta$, the conversion
+theorem would give approximate liminf-average equilibria. Compactness of
+the \emph{numerical payoff vectors} (not of their strategy realizations)
+would then yield a liminf-average equilibrium payoff in the approximate
+sense defined in Section~\ref{sec:model}.
+
+Theorem~\ref{thm:prefix} proves
+\begin{equation}\label{eq:quantifiers}
+ \forall\eta>0\ \forall N\ \exists\sig^{(N)}:
+ \quad A(\sig^{(N)})\le\eta,\ R_N(\sig^{(N)})=0,
+\end{equation}
+whereas \eqref{eq:missing} asks for
+\[
+ \forall\eta>0\ \exists\sig\ \forall N:
+ \quad A(\sig)\le\eta,\ R_N(\sig)\le\eta.
+\]
+The quantifier interchange is \emph{not} justified.
+
+\begin{proposition}[Tail payoffs need not survive pointwise strategy limits]
+\label{ex:compact}
+There is a one-player two-state stochastic game and a sequence of exact
+equilibrium strategies $\sig^{(N)}$ converging pointwise at every fixed
+history to a strategy $\sig^\infty$, such that
+\[
+ u^-(\sig^{(N)})=1\quad\forall N,
+ \qquad u^-(\sig^\infty)=0.
+\]
+\end{proposition}
+\begin{proof}
+At nonabsorbing state $s$, \emph{wait} yields reward $0$ and remains in
+$s$, while \emph{stop} moves to an absorbing state of permanent reward
+$1$. Let $\sig^{(N)}$ wait through date $N-1$ and stop at date $N$;
+after any off-path history that remains unabsorbed at or after that date,
+stop immediately. Every such strategy is optimal and has tail payoff
+$1$ from every history. On each fixed finite history, however, as
+$N\to\infty$ its prescribed action is eventually \emph{wait}. The
+pointwise limit waits forever and gets tail payoff $0$.
+\end{proof}
+This example does not disprove \eqref{eq:missing}: choosing \emph{stop}
+immediately satisfies it. It proves only that an arbitrary strategy-limit
+argument fails. The key requirement is to construct a profile for which
+\emph{actual realized tail payoffs} and \emph{all finite-deviation
+incentive inequalities} survive simultaneously.
+
+\section{Research directions and boundaries of the present note}
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=*]
+\item \textbf{History-dependent selection.} Find a direct construction or a
+compactness theorem tailored to actual continuation payoffs
+$V_i^\sig(h)$ and the entire sequence $(R_N)_{N\ge1}$.
+A mere subsequence of behavior profiles does not suffice by
+Proposition~\ref{ex:compact}.
+\item \textbf{Tests before profitable steering.} Develop a deviation test
+that limits the probability of reaching higher individual minmax levels
+before the player receives effective punishment. This is the central
+state-dependent continuation obstruction highlighted in
+\cite{fleschsolan2023}.
+\item \textbf{Do not conflate solution concepts.} Correlated equilibrium,
+existence from \emph{some} initial state, and existence at \emph{every}
+initial state are different assertions. A general correlated-existence
+theorem does not supply the desired ordinary Nash profile.
+\item \textbf{Restricted positive results.} Specialized approaches for
+absorbing and quitting games are informative but do not answer the
+arbitrary finite-state multiplayer question. Recent examples include
+\cite{solanvieille2025,aps2026}.
+\end{enumerate}
+
+\begin{remark}[What is and is not claimed]
+Theorem~\ref{thm:flat}, Propositions~\ref{prop:AEfalse},
+\ref{prop:bigmatch}, \ref{prop:hazard},
+Theorem~\ref{thm:conversion}, and Theorem~\ref{thm:prefix}
+are mathematical statements proved here, the conversion theorem relying
+on the published deviator-identification and acceptability results
+explicitly cited. The condition \eqref{eq:missing} remains \emph{unproved}.
+Neither the state-flat result nor the finite-cutoff construction, taken
+alone or together, resolves Question~\ref{q:main}. No counterexample to
+the open existence statement is exhibited here.
+\end{remark}
+
+\section*{References and source notes}
+\addcontentsline{toc}{section}{References and source notes}
+\begin{thebibliography}{99}
+\bibitem{fink1964}
+A. M. Fink, \emph{Equilibrium in a stochastic $n$-person game},
+Journal of Science of the Hiroshima University, Series A-I Mathematics
+\textbf{28} (1964), 89--93.
+
+\bibitem{vieille2002}
+N. Vieille, \emph{Stochastic games: Recent results},
+Handbook of Game Theory with Economic Applications, Vol. 3 (2002),
+1833--1850. DOI: \href{https://doi.org/10.1016/S1574-0005(02)03011-4}{10.1016/S1574-0005(02)03011-4}.
+
+\bibitem{fleschsolan2023}
+J. Flesch and E. Solan, \emph{Stochastic Games with General Payoff Functions},
+Mathematics of Operations Research \textbf{49} (2024), 1349--1371,
+published online 2023.
+DOI: \href{https://doi.org/10.1287/moor.2023.1385}{10.1287/moor.2023.1385}.
+Preprint: \url{https://arxiv.org/abs/2208.12096}.
+
+\bibitem{alon2024}
+N. Alon, B. Gunby, X. He, E. Shmaya, and E. Solan,
+\emph{Identifying the Deviator}, arXiv:2203.03744, revised 2024.
+\url{https://arxiv.org/abs/2203.03744}.
+In particular, Theorem~2.6 and the finite-prefix construction in Section~4.
+
+\bibitem{bigmatchspace}
+K. A. Hansen, R. Ibsen-Jensen, and M. Kouck\'{y},
+\emph{The Big Match in Small Space}, arXiv:1604.07634.
+\url{https://arxiv.org/abs/1604.07634}.
+
+\bibitem{renaultziliotto}
+J. Renault and B. Ziliotto,
+\emph{Hidden Stochastic Games and Limit Equilibrium Payoffs},
+arXiv:1407.3028.
+\url{https://arxiv.org/abs/1407.3028}.
+The introduction discusses Sorin's example separating discounted-equilibrium
+payoff limits from uniform equilibrium payoffs in an ordinary stochastic game;
+the paper also studies hidden stochastic games, which must not be confused with
+the finite perfect-monitoring model in Question~\ref{q:main}.
+
+\bibitem{solanvieille2025}
+E. Solan and N. Vieille,
+\emph{Undiscounted Equilibrium in Positive Recursive Absorbing Games with
+Non-Rectangular Absorption Structure}, arXiv:2512.04306 (2025).
+\url{https://arxiv.org/abs/2512.04306}.
+
+\bibitem{aps2026}
+G. Ashkenazi-Golan, I. Krasikov, C. Rainer, and E. Solan,
+\emph{The APS approach for undiscounted quitting games},
+International Journal of Game Theory \textbf{55} (2026), article 19.
+DOI: \href{https://doi.org/10.1007/s00182-026-00982-6}{10.1007/s00182-026-00982-6}.
+\end{thebibliography}
+\end{document}

@@ -22,7 +22,7 @@ The Erdos index and the [GPT_6_Astra_Ultra collection](attacks/open_problems/erd
   - The existing 100 [MathOverflow](https://mathoverflow.net/) problems remain available as a separate source subset within this collection, preserving their attempts and links. Entries from different sources may refer to related mathematical questions.
   - Catalog inclusion does not count as an LLM attempt. A ranked problem with no submitted mathematical writeup is shown without an attempt.
 
-- **Economics**: Problem statements from the supplied merged TeX catalogue, organized by JEL code and difficulty rank. Each statement has its own detail page. These entries contain statements only and do not count as LLM attempts.
+- **Economics**: Problem statements from the supplied merged TeX catalogue, organized by JEL code and difficulty rank. Each statement has its own detail page, with model research attempts where available. Catalogue inclusion alone does not count as an LLM attempt.
   - Permanent problem IDs use the primary JEL code and the initial revised rank, such as `C73-1`. Subsequent ranking changes preserve IDs, filenames and links.
   - See [Economics catalogue maintenance](lists/economics/README.md) for the source files and validation rules.
 
@@ -62,7 +62,7 @@ Erdosproblems-llm-hunter/
 │   │   ├── erdos_data.js
 │   │   ├── mo_data.js
 │   │   ├── open_problems_data.js
-│   │   ├── economics_data.js        # Generated statement-only Economics catalogue
+│   │   ├── economics_data.js        # Generated Economics statements and attempts
 │   │   ├── stats.js
 │   │   └── top_problems/           # Per-problem JSON detail records
 │   ├── index.html
