@@ -1,0 +1,102 @@
+% ECONOMICS_PROBLEM: {"id": "I38-537", "title": "Preventing persistent homelessness", "jel_code": "I38", "source_id": "OP-0469"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\dist}{dist}
+\title{Benefit targeting with capacities and uncertain service responses}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Status: Partial; the full catalogue target remains unresolved.}
+\begin{abstract}
+A finite-covariate allocation problem has an exact linear-program characterization and a small bound on how many covariate cells need randomization. A budget-tightened plug-in rule has a proved value guarantee when response and cost errors are uniformly bounded. A risk-ranking counterexample and missing-outcome bounds identify the empirical work that optimization cannot replace.
+\end{abstract}
+\section{Target and units}
+Fix adults entering one city's assessment system in a declared year. Actions $a=0,1,2$ denote existing services, temporary rental assistance, and permanent supportive housing. Let $U(a)=\lambda Q(a)-H(a)$, where $H$ is days without stable housing in the next twenty-four months, $Q$ is quality-adjusted health over that window, and $\lambda$ converts health to housing-day units. This composite is a declared objective, not an interpersonal utility measure inferred from data.
+
+For a tractable subclass, baseline covariates take values $x=1,\ldots,J$ with known probabilities $p_x>0$. Write $u_{xa}=\E[U(a)\mid X=x]$ and $c_{xa}=\E[C(a)\mid X=x]$. Costs are real resources. Benefits paid to landlords or clients must not be counted twice as both a transfer and service cost. A randomized rule assigns action $a$ with probability $d_{xa}$, conditional on $x$. For now there are no between-person housing-market spillovers, and these response functions are invariant to allocation scale.
+\section{The exact known-response problem}
+Suppose the expected resource budget is $B$, and action capacities are $\kappa_1,\kappa_2$ as shares of eligible adults. The allocation program is
+\[
+ \max_{d\ge0}\sum_{x,a}p_xd_{xa}u_{xa}
+ \quad\text{subject to}\quad
+ \sum_a d_{xa}=1,\quad
+ \sum_{x,a}p_xd_{xa}c_{xa}\le B,\quad
+ \sum_xp_xd_{xa}\le\kappa_a\ (a=1,2).
+ \tag{1}
+\]
+Assume a baseline rule is feasible. Equity requirements can be added as explicitly stated linear constraints; their weights and populations are inputs.
+
+\begin{theorem}
+Program (1) attains its optimum. With $K$ additional linear inequality constraints besides the cell normalizations, an optimal extreme rule randomizes in at most $K$ covariate cells.
+\end{theorem}
+\begin{proof}
+The feasible set is a nonempty closed subset of the product of $J$ finite simplices, hence compact. Its linear objective attains its maximum, including at an extreme point.
+
+At an extreme point let $s_x$ count positive actions in cell $x$. Perturbations supported on those positive coordinates and preserving each cell sum form a vector space of dimension $\sum_x(s_x-1)$. If this dimension exceeds the number of binding additional constraints, a nonzero perturbation also preserves every binding constraint. Sufficiently small perturbations of either sign retain nonnegativity and all slack inequalities. This writes the point as the midpoint of distinct feasible points, a contradiction. Thus $\sum_x(s_x-1)\le K$, and each randomized cell contributes at least one.
+\end{proof}
+For the budget and two capacities in (1), at most three cells need randomization. This does not mean only three people are randomized, or that a finite realized budget is met on every path. Expected resource and capacity limits differ from a hard bed-by-bed assignment cap. A fixed cohort with indivisible placements needs a corresponding integer allocation or a dependent lottery.
+
+An operational optimality certificate is also simple. Suppose nonnegative multipliers $t,\eta_1,\eta_2$ exist such that positive $d_{xa}$ maximize
+$u_{xa}-tc_{xa}-\eta_a$ over actions, with $\eta_0=0$, and complementary slackness holds for all constraints. Then that rule is optimal: sum the cellwise maximizing inequalities for any competitor, add the weighted resource and capacity inequalities, and use complementary slackness to cancel the multiplier terms. This certificate expresses opportunity costs; it does not identify the responses supplied to the program.
+\section{Predicted risk is not treatment benefit}
+Take two equally prevalent groups with baseline expected housing-loss days $600$ and $200$. Suppose a service reduces those losses by ten and one hundred days respectively, with equal costs and no health change. A capacity covering half the population can serve one whole group. Risk ranking selects the first group, saving five days per eligible adult. Benefit ranking selects the second, saving fifty days per eligible adult.
+
+The example respects the twenty-four-month outcome range and illustrates a tenfold difference without any statistical uncertainty. It does not say high-risk people should be deprioritized under every objective: an equity constraint or a nonlinear value of relieving extreme deprivation can change the optimization. It proves only that a risk score does not encode the treatment-benefit objective in (1).
+\section{A guarantee with estimated benefits and costs}
+Let $V(d),C(d)$ be population value and cost under the fixed known cell weights. Suppose estimates satisfy uniformly
+$|\widehat u_{xa}-u_{xa}|\le e_u$ and
+$|\widehat c_{xa}-c_{xa}|\le e_c$.
+Maximize estimated value subject to the exact capacities and estimated cost at most $B-e_c$. Assume this tightened program is nonempty and call its optimizer $\widehat d$.
+
+\begin{proposition}
+The selected rule satisfies $C(\widehat d)\le B$. For every capacity-feasible comparator $d$ with $C(d)\le B-2e_c$,
+\[
+ V(\widehat d)\ge V(d)-2e_u.
+ \tag{2}
+\]
+\end{proposition}
+\begin{proof}
+Because the policy weights sum to one, value and cost errors for every rule are at most $e_u,e_c$. Thus $C(\widehat d)\le\widehat C(\widehat d)+e_c\le B$. The comparator has $\widehat C(d)\le B-e_c$, so it is eligible for estimated optimization. Therefore
+$V(\widehat d)\ge\widehat V(\widehat d)-e_u
+\ge\widehat V(d)-e_u\ge V(d)-2e_u$.
+\end{proof}
+The comparator uses a smaller true budget. Claiming the same guarantee against the optimum at budget $B$ would require controlling how value changes with budget, for example a bound on its shadow price. Feasibility tightening can sacrifice a valuable discrete service when the budget is exactly at a threshold. If the uniform errors hold on a simultaneous confidence event, feasibility and (2) inherit that event's probability.
+\section{What the experiment must identify}
+Randomized offers with positive probabilities in each baseline cell identify offer-specific conditional mean outcomes under consistency. They do not automatically identify the effect of actual receipt; refusals, service substitutions, and exclusion restrictions matter. Defining action $a$ as an offer package lets (1) optimize the directly randomized intervention.
+
+Attrition cannot be equated with stable housing. If $U(a)\in[L,U]$, follow-up probability in cell-action pair is $r_{xa}$, and the observed-follow-up mean is $\bar u_{xa}$, unrestricted missing outcomes give the sharp mean interval
+\[
+ [\,r_{xa}\bar u_{xa}+(1-r_{xa})L,\
+    r_{xa}\bar u_{xa}+(1-r_{xa})U\,].
+\]
+For $r_{xa}=0$, take the full interval $[L,U]$ without defining a conditional observed mean. The decomposition of the full mean proves necessity; assigning all missing outcomes to either endpoint proves attainability. The operational definition of housing and mortality must justify the outcome bounds. Tracking municipal moves reduces missingness without assuming a move is either failure or success.
+
+Repeated six-month reassessment requires sequential response laws and a history-dependent rule. A one-time trial does not identify that dynamic policy by reusing its baseline effect at every decision. Housing supply and landlord responses can also invalidate scale invariance. These identification and equilibrium issues leave the broad homelessness agenda unresolved; the proved optimization and error guarantees are restricted tools.
+\begin{thebibliography}{9}
+\bibitem{h} W. N. Evans, D. C. Phillips, and K. Ruffini (2019).
+\emph{Reducing and Preventing Homelessness: A Review of the Evidence and Charting a Research Agenda}, targeting discussion.
+\url{https://www.povertyactionlab.org/sites/default/files/research-paper/reducing-preventing-homelessness-review-research-agenda.pdf}.
+The primary review motivates benefit targeting; the finite program here is an explicit specialization.
+\end{thebibliography}
+
+\end{document}
