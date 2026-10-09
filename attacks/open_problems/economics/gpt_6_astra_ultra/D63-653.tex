@@ -1,0 +1,190 @@
+% ECONOMICS_PROBLEM: {"id": "D63-653", "title": "Complexity of verifying epistemic EFX for additive goods", "jel_code": "D63", "source_id": "OP-0193"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Complexity of verifying epistemic EFX for additive goods}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\section*{Status and target}
+The unrestricted recognition problem remains unresolved in this attempt.
+The results below are an exact packing formulation, polynomial algorithms
+for several special cases, and a pseudo-polynomial algorithm when the
+number of agents is fixed. None supplies a polynomial algorithm for
+arbitrary binary-encoded additive values or a matching hardness theorem.
+The existence of an efficiently computable epistemic EFX allocation does
+not answer whether a particular input allocation has that property.
+
+Let $A=(A_1,\ldots,A_n)$ partition the goods. Agent $i$ has nonnegative
+rational additive values $v_i$ and value $V_i=v_i(A_i)$. Its epistemic EFX
+certificate is another complete allocation $Y^{(i)}$ with
+$Y^{(i)}_i=A_i$ such that, for every $j\ne i$ and every good $g$ of strictly
+positive $i$-value in $Y^{(i)}_j$,
+\[
+ V_i\geq v_i(Y^{(i)}_j\setminus\{g\}).                 \tag{1}
+\]
+Different agents may use different certificates. Requiring a single common
+certificate would impose an additional condition absent from the problem.
+
+\section*{Exact reduction to packing with one free minimum}
+Fix $i$, discard the zero-valued goods outside $A_i$, and write the remaining
+positive values as $w_1,\ldots,w_m$. There are $k=n-1$ other bundles.
+For a nonempty group of positive goods define
+\[
+ f(B)=\sum_{g\in B}w_g-\min_{g\in B}w_g,
+ \qquad f(\varnothing)=0.
+\]
+\begin{proposition}
+Agent $i$ has a certificate if and only if the positive goods outside
+$A_i$ can be partitioned into $k$ groups, including empty groups, each
+satisfying $f(B)\leq V_i$.
+\end{proposition}
+\begin{proof}
+The largest residual bundle value after deleting a positive good is obtained
+by deleting a minimum-valued positive good. Thus all inequalities (1) for
+a bundle are equivalent to its single $f$ inequality. Zero-valued goods
+change neither side and may be assigned to arbitrary other bundles.
+Conversely, extending a feasible positive-good partition in this way and
+leaving $A_i$ fixed gives the required allocation. If $n=1$, the original
+allocation already contains every good and the condition is vacuous.
+\end{proof}
+
+This formulation also proves membership in $\mathsf{NP}$. Guess, separately
+for each agent, a recipient for every good outside that agent's fixed
+bundle. There are at most $nm$ recipient labels if $m$ now denotes the total
+number of goods. Compute sums and minima by exact rational arithmetic.
+The bit length of a sum is polynomial in the input bit length; multiplying
+all input denominators is permissible for this certificate check even
+though their numerical product may be large. The verification consists
+of a polynomial number of rational comparisons.
+
+\section*{Cases that admit direct decisions}
+With two agents there is only one other bundle, so the test is simply
+$f(M\setminus A_i)\leq V_i$ for each $i$. With $V_i=0$, every feasible group
+contains at most one positive good; hence the test is $m\leq k$.
+
+More generally suppose the positive values of a particular agent all equal
+$a>0$, and its own bundle contains $q$ such goods. A group containing $r$
+positive goods has cost $a\max\{r-1,0\}$. Consequently a certificate exists
+exactly when
+\[
+                 m\leq k(q+1).                      \tag{2}
+\]
+Necessity follows by adding the $k$ capacity bounds. For sufficiency, place
+up to $q+1$ positive goods in each successive group; (2) guarantees space.
+The argument applies independently to each agent and allows their unit
+values $a$ and own counts $q$ to differ.
+
+There is a useful preprocessing rule even for arbitrary values. Any good
+with $w_g>V_i$ must be the sole positive good in its group: if another
+positive good is present, deleting a smallest good leaves either $w_g$ or
+a still larger good, violating the bound. Let $r$ count these forced
+singletons. If $r>k$, reject. Otherwise reserve $r$ groups and solve the
+remaining problem with $k'=k-r$. If $k'=0$, feasibility requires that no
+positive good remain. This rule does not constrain where zero-valued goods
+go and therefore respects the convention in (1).
+
+\section*{A complete pseudo-polynomial dynamic program}
+Scale rational values by a common positive denominator to obtain integers.
+Apply the singleton rule; if no positive goods remain, accept immediately.
+Otherwise suppose the remaining values are positive
+integers at most $V=V_i$, with maximum $W_{\max}$. The dynamic program
+processes these goods one at a time. A state records for each of the $k'$
+labeled groups its sum $s_j$ and minimum $\mu_j$, using $(0,0)$ for an empty
+group. On assigning the next value $w$ to group $j$, update
+\[
+ (s_j,\mu_j)\longmapsto
+ \begin{cases}
+ (w,w),&s_j=0,\\
+ (s_j+w,\min\{\mu_j,w\}),&s_j>0.
+ \end{cases}
+\]
+Retain the transition precisely when the new sum minus the new minimum
+is at most $V$. The initial all-empty state is accepted after the last
+good if any state survives.
+
+\begin{lemma}
+This dynamic program accepts exactly the feasible partitions.
+\end{lemma}
+\begin{proof}
+Every transition explicitly constructs a feasible group assignment, so
+acceptance implies feasibility. For completeness, order the goods of any
+feasible final partition by their processing order. The function $f$ is
+nondecreasing when a good is added: if its weight is at least the old minimum,
+$f$ increases by that weight; if it is smaller, $f$ increases by the old
+minimum. Addition to an empty group leaves $f=0$. Thus every prefix of a
+feasible group is feasible, and no prefix along the prescribed partition
+is pruned. Induction on the processing index retains that final partition.
+\end{proof}
+
+A feasible nonempty group has $s_j\leq V+W_{\max}$. Its minimum belongs to
+the set of input values, with one extra empty symbol. Therefore at most
+\[
+       \bigl[(V+W_{\max}+1)(m+1)\bigr]^{k'}           \tag{3}
+\]
+states are needed per layer, with at most $k'$ transitions per state.
+When $n$ is fixed, this is polynomial in the numerical values and number
+of goods. It is not polynomial in their binary encoding. Clearing
+denominators does not cure that distinction; it can increase the numbers
+exponentially while increasing their bit lengths only polynomially.
+When $n$ varies, the exponent in (3) varies too. No fixed-parameter or
+strongly polynomial conclusion follows from this state count.
+
+\section*{Why two tempting shortcuts fail}
+Consider outside values $4,5,6,7,8,9$, two available groups, and $V=15$.
+The partition
+\[
+       \{4,6,9\},\quad\{5,7,8\}
+\]
+has costs $15$ and $15$. No partition into two consecutive intervals of
+the sorted list works. A split after one or two values leaves a second
+cost exceeding $15$; a split after three gives second cost $17$; a split
+after four or five gives first cost at least $18$. An empty group leaves
+cost $35$ in the other. Thus restricting to contiguous sorted groups can
+reject a feasible instance. This example is realizable in a full
+three-agent allocation by giving the distinguished agent a good of value
+$15$ and assigning zero valuations to the other agents.
+
+Ordinary bin-packing hardness also does not transfer without a reduction.
+A single item with value larger than $V$ is infeasible in an ordinary
+capacity-$V$ bin but is feasible here as a singleton because its cost is
+zero. Proposed anchor gadgets must prove that each intended free minimum
+is placed in the intended group and that no unintended packing exists.
+The exact formulation and dynamic program above do not establish those
+properties for a general hardness construction.
+
+\section*{Remaining gap and source}
+The unresolved step is either a polynomial binary-input recognition
+algorithm exploiting this special sum-minus-minimum constraint, or a
+valid hardness reduction that preserves it. An algorithm constructing
+some epistemic EFX allocation can return a different allocation from $A$;
+it supplies no certificate for the fixed bundles in this decision problem.
+
+The source for the fairness definition and the distinction between
+existence, computation, and verification is Ioannis Caragiannis, Jugal
+Garg, Nidhi Rathi, Eklavya Sharma, and Giovanna Varricchio,
+\emph{New Fairness Concepts for Allocating Indivisible Items},
+arXiv:2206.01710v3 (2025), especially its epistemic EFX discussion.
+\url{https://arxiv.org/html/2206.01710v3}.
+The packing equivalence, algorithms, and examples here are fully specified
+calculations for the stated nonnegative-goods convention; they are not
+claims of a new resolution of unrestricted recognition.
+\end{document}

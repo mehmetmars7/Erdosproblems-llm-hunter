@@ -1,0 +1,196 @@
+% ECONOMICS_PROBLEM: {"id": "D82-650", "title": "Markov persuasion regret--violation tradeoffs: resolved gap", "jel_code": "D82", "source_id": "OP-0181"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\title{Markov persuasion regret--violation tradeoffs: resolved gap: a research attempt}
+\author{GPT-6 (Codex)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+
+\section*{Status and the source's full exponent interval}
+The alleged tradeoff gap is already resolved in the cited partial-feedback
+model. Bacchiocchi, Stradi, Castiglioni, Marchesi, and Gatti establish
+upper bounds throughout $\alpha\in[1/2,1]$, with the corresponding
+simultaneous little-$o$ improvement excluded by their lower bound.
+Theorems 3--4 and Theorem 5 are the relevant inspected statements.
+This attempt derives the exponent arithmetic and gives a self-contained
+one-state statistical experiment explaining it. It does not claim the
+full unknown-transition theorem as a new result or independently prove
+all of that theorem's state-visitation bounds.
+
+Suppressing fixed process dimensions and logarithmic factors, the
+source's exploration parameter $N$ gives the structure
+\[
+ R_T\lesssim N+\sqrt T,\qquad
+ V_T\lesssim\frac{T}{\sqrt N}+\sqrt N+\sqrt T.
+ \tag{1}
+\]
+For $N=\lceil T^\alpha\rceil$, $1/2\leq\alpha\leq1$, the first term
+dominates regret and $T^{1-\alpha/2}$ dominates violation, yielding
+\[
+ R_T=\widetilde O(T^\alpha),\qquad
+ V_T=\widetilde O(T^{1-\alpha/2}).
+ \tag{2}
+\]
+The equal-exponent point is $\alpha=2/3$. At $\alpha=1$ the regret
+bound is linear; (2) should not be described as simultaneously
+sublinear at that endpoint.
+
+\section*{A restricted experiment retaining the information tension}
+Consider one decision per episode, a single state, no informative
+outcome, and two actions. Sender rewards are known and deterministic:
+$1$ for action 1 and $0$ for action 2. Receiver reward from action 1
+is deterministically $1/2$; reward from action 2 is an independent Bernoulli
+variable of unknown mean $1/2+\theta$, where
+$\theta\in[-1/4,1/4]$. Only the chosen action's reward is observed.
+This is a restricted submodel of the canonical feedback experiment.
+Recommendations are obeyed during learning, even before their
+persuasiveness has been established.
+
+For $\theta<0$, the unique persuasive action is 1, so the benchmark
+sender value is one. If $N_2$ is the cumulative probability of
+recommending action 2, then
+\[
+ R_T=N_2,\qquad V_T=(-\theta)N_2.
+ \tag{3}
+\]
+For $\theta>0$, only action 2 is persuasive; the benchmark sender value
+is zero, and
+\[
+ R_T=-(T-N_2),\qquad V_T=\theta(T-N_2).
+ \tag{4}
+\]
+At $\theta=0$, either action is persuasive and the optimal sender
+value is one. Regret can be negative in (4) because an unpersuasive
+policy can outperform the feasible persuasive benchmark. Replacing
+regret by its absolute value changes the problem.
+
+\section*{A sequential procedure and finite-sample bounds}
+Choose an integer exploration cap $1\leq N\leq T$ and confidence level
+$\delta\in(0,1)$. After $s$ observations of action 2, write
+$\widehat\mu_s$ for their mean and set
+\[
+ L=\log(2N/\delta),\qquad r_s=\sqrt{L/(2s)}.
+\]
+Initially recommend action 2. After every such observation, if
+$\widehat\mu_s+r_s<1/2$, stop exploration and recommend action 1
+thereafter. Otherwise continue until the cap. At the cap, recommend
+action 2 forever if $\widehat\mu_N-r_N>1/2$, and action 1 otherwise.
+There is no assumption of an unobserved reward for the other action.
+
+Regard the observations of action 2 as an initial segment of a
+pre-generated independent sequence. Hoeffding's inequality and a union
+bound give, with probability at least $1-\delta$,
+\[
+ |\widehat\mu_s-(1/2+\theta)|\leq r_s
+ \quad\hbox{for every }s=1,\ldots,N.
+ \tag{5}
+\]
+This simultaneous event remains valid at a data-dependent stopping time.
+
+Suppose first $\theta=-\Delta<0$. Event (5) prevents a false positive
+certificate at the cap. Thus $R_T\leq N$. Let $K\leq N$ be the number
+of exploratory actions. If $K\geq2$, the procedure did not stop at
+$K-1$, so (5) implies
+\[
+ \Delta\leq2r_{K-1},\qquad
+ V_T=\Delta K\leq2K\sqrt{L/(2(K-1))}
+ \leq2\sqrt{NL}.
+ \tag{6}
+\]
+For $K=1$ the violation is at most $1/4$. When $\theta=0$, violation
+is zero and regret is again at most $N$.
+
+For $\theta>0$, event (5) prevents a negative certificate, so exploration
+lasts exactly $N$ rounds and causes no violation. If action 1 is chosen
+after the cap, its failure to trigger a positive certificate and (5)
+imply $\theta\leq2r_N$. Consequently
+\[
+ R_T\leq0,\qquad V_T\leq2Tr_N=T\sqrt{2L/N}.
+ \tag{7}
+\]
+Together these cases give a uniform high-probability bound
+\[
+ R_T\leq N,\qquad
+ V_T\leq\max\{1/4,\,2\sqrt{NL},\,T\sqrt{2L/N}\}.
+ \tag{8}
+\]
+Substituting $N=\lceil T^\alpha\rceil$ explains the exponents in the
+restricted model. The confidence guarantee is conditional only on
+the specified independent reward law, with the sampling adaptivity
+already covered by (5).
+
+\section*{A two-instance lower bound}
+The same experiment shows why faster learning cannot uniformly remove
+the tradeoff. Compare $\theta=-\varepsilon$ and
+$\theta=+\varepsilon$, for $0<\varepsilon\leq1/4$. Let $P_-,P_+$ be
+the complete history laws, including the learner's private randomization.
+For an arbitrary adaptive algorithm, write $p_t$ for its conditional
+probability of recommending action 2 and let $N_2=\sum_t p_t$.
+This quantity matches cumulative occupancy, rather than a realized
+sample count when the rule randomizes. Conditional likelihood factors
+for chosen action 1 are identical in the two instances, and the
+chain rule for relative entropy gives
+\[
+ D(P_-\Vert P_+)
+ =\mathbb E_-N_2\,
+   \operatorname{kl}(1/2-\varepsilon,1/2+\varepsilon)
+ \leq16\varepsilon^2\mathbb E_-N_2.
+ \tag{9}
+\]
+The scalar bound follows by expanding the binary divergence as
+$2\varepsilon\log((1+2\varepsilon)/(1-2\varepsilon))$ and using
+$\log((1+z)/(1-z))\leq2z/(1-z)$ for $0\leq z\leq1/2$.
+
+Assume $\mathbb E_-R_T=\mathbb E_-N_2\leq r$, where
+$1\leq r\leq T/8$, and choose $\varepsilon=1/(16\sqrt r)$.
+Pinsker's inequality gives
+\[
+ \|P_--P_+\|_{\mathrm{TV}}
+ \leq\sqrt{8\varepsilon^2r}<1/4.
+\]
+Markov's inequality gives $P_-(N_2\leq4r)\geq3/4$, and hence
+$P_+(N_2\leq4r)\geq1/2$. On this event, (4) yields
+\[
+ V_T\geq\varepsilon(T-4r)\geq\frac{T}{32\sqrt r}.
+ \tag{10}
+\]
+In particular $\mathbb E_+V_T\geq T/(64\sqrt r)$. A guarantee of
+small expected regret in the negative instance therefore forces
+violation of order $T/\sqrt r$ in a statistically nearby positive
+instance. This is an expectation-regret, constant-probability-violation
+statement for the restricted experiment. It is not a substitution for
+the precise uniform high-probability quantifiers of the source's
+full Theorem 5.
+
+\section*{Scope and outcome}
+The calculation preserves the important distinction between obeyed
+recommendations during learning and retrospective violations of myopic
+incentives. Individual outcome terms in the canonical violation formula
+can be negative; the sum for each recommendation is nonnegative by
+best-response optimality. In the one-outcome experiment that distinction
+collapses to the nonnegative gaps in (3)--(4).
+
+Unknown transitions, state reachability, and estimating outcome kernels
+require additional machinery beyond (8)--(10). That machinery and the
+full-interval resolution are credited to the inspected source. The
+attempt's unresolved label records incomplete independent verification
+of that full result, not an asserted open exponent gap. Strategically
+learning receivers or other feedback conventions would be different
+problems and are not substituted for the canonical target here.
+
+Francesco Bacchiocchi, Francesco Emanuele Stradi, Matteo Castiglioni,
+Alberto Marchesi, and Nicola Gatti, \emph{Markov Persuasion Processes:
+Learning to Persuade from Scratch}, arXiv:2402.03077v2, 2024.
+Inspected locators: Sections 2--3, Theorems 3--4 in Section 5.2,
+and Theorem 5 in Section 5.3.
+\url{https://arxiv.org/html/2402.03077v2}.
+
+\end{document}

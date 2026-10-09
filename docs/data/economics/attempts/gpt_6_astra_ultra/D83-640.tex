@@ -1,0 +1,187 @@
+% ECONOMICS_PROBLEM: {"id": "D83-640", "title": "AI-generated marketplace summaries", "jel_code": "D83", "source_id": "OP-0403"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Pp}{\mathbb{P}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\title{AI-generated marketplace summaries\\\large Information value and interference in marketplace summary experiments}
+\author{GPT-6 (Codex)}
+\date{October 9, 2026}
+\begin{document}
+\maketitle
+
+\section{Policy, cohort, and welfare target}
+The target is the six-month consumer-welfare effect of a specified
+AI-summary policy, including users who do not buy. Fix eligibility before
+the summary is displayed, and retain everyone in that cohort. Freeze the
+model version, prompt, review cutoff, and refresh rule. For user $i$, let
+$Y_i$ be independently assessed money-valued satisfaction less price and
+search cost, including returns and disappointing purchases. The no-purchase
+alternative has zero gross consumption value and price but still incurs
+any search cost. This attempt establishes a rational-information benchmark,
+an explicit failure example, and an estimator under an interference model.
+It does not determine the actual six-month effect or seller response.
+
+\section{A benchmark in which optional summaries cannot reduce welfare}
+Consider a fixed review corpus, fixed offers, a finite state space $\Omega$,
+a finite action set including no purchase, and utility $u(a,\omega)$.
+Let $R$ denote the complete review information and let a summary $S$ be
+produced by a stochastic kernel depending only on $R$. With correct beliefs
+and no processing costs, write
+\[
+ V(R)=\E\max_a\E[u(a,\omega)\mid R],\qquad
+ V(S)=\E\max_a\E[u(a,\omega)\mid S].
+\]
+Since $\omega,R,S$ form a Markov chain, conditional averaging implies
+\[
+ V(R)\ge V(S).                                           \tag{1}
+\]
+To prove this, choose an $S$-optimal action for each signal. An observer of
+$R$ can simulate $S$ from its known kernel and take that action. This
+achieves $V(S)$, while choosing an optimal action given $R$ does at least
+as well. Equivalently, apply convexity of the maximum to posterior expected
+utilities. The summary need not add statistical information to add value
+when acquiring or interpreting the underlying reviews is costly.
+
+A stronger conclusion applies to the catalogue's optional-access design.
+Let $\mathcal P_0$ be the feasible information-acquisition and action
+policies under the old interface, with their full search costs. If every
+old policy remains available at the same cost after summaries are added,
+then $\mathcal P_0\subseteq\mathcal P_1$, so
+\[
+ \sup_{\pi\in\mathcal P_1}\E[u(\pi,\omega)-c(\pi)]
+ \ge\sup_{\pi\in\mathcal P_0}\E[u(\pi,\omega)-c(\pi)].     \tag{2}
+\]
+No informational ordering between summaries is needed for (2). Its proof
+is set inclusion, and its assumptions are demanding: correct decision
+models, free ability to ignore summaries, unchanged old-interface costs,
+and no price or seller-quality response. Keeping a link to all reviews
+does not establish those behavioral and institutional conditions.
+
+\section{A checked negative-welfare example}
+Let product quality be high with probability $1/4$ and low otherwise.
+Gross values are three and zero, and the price is one, giving purchase
+surpluses two and minus one. A full review perfectly reveals quality and
+costs $0.1$ to read. Under the control interface, reading and buying only
+high-quality products gives expected welfare
+\[
+ (1/4)2-0.1=0.4,
+\]
+which exceeds both no search/no purchase, with payoff zero, and uninformed
+purchase, with payoff $-0.25$. The optimal purchase rate is $1/4$.
+
+Suppose a misleading summary causes consumers to believe both that the
+high-quality probability is $0.8$ and that the full review contains no
+information beyond the summary. Their perceived immediate purchase
+surplus is $0.8(2)+0.2(-1)=1.4$. Under these stated beliefs, further
+inspection leaves that perceived surplus unchanged and adds cost $0.1$,
+so buying immediately is subjectively optimal. Actual mean welfare becomes
+\[
+ (1/4)2+(3/4)(-1)=-0.25,
+\]
+a decrease of $0.65$, while purchases rise from $1/4$ to one. Full reviews
+remain available throughout. This example intentionally violates correct
+beliefs in (2), through both quality beliefs and beliefs about incremental
+information. It shows why greater conversion and nominal review access
+are insufficient welfare evidence. It does not claim that all AI summaries
+produce these errors.
+
+The control cohort's nonbuyers have paid the review cost. Dropping them
+would replace $0.4$ by a selected purchaser average and conceal the proper
+policy comparison. Audits should therefore measure omitted adverse
+information and consumer interpretation as well as literal falsehoods.
+A technically true summary can change beliefs about what further search
+would reveal.
+
+\section{A design-based result allowing cross-cluster exposure}
+Let clusters $j=1,\ldots,J$ be independently assigned $Z_j\sim
+\operatorname{Bernoulli}(p)$, with $0<p<1$. For each baseline user fix a
+nonempty set $N_i$ of potentially relevant clusters before assignment.
+Assume the six-month potential outcome is $Y_i(z_{N_i})$: all interference
+relevant to that user is confined to this set. Define
+\[
+ E_i^1=\{Z_j=1\ \forall j\in N_i\},\quad
+ E_i^0=\{Z_j=0\ \forall j\in N_i\},
+\]
+with probabilities $\pi_i^1=p^{|N_i|}$ and
+$\pi_i^0=(1-p)^{|N_i|}$. The finite-cohort contrast between full exposure
+to summaries and no exposure is
+\[
+ \tau_N=\frac1n\sum_i[Y_i(\mathbf1_{N_i})-Y_i(\mathbf0_{N_i})].
+\]
+Then the Horvitz--Thompson estimator
+\[
+ \widehat\tau_N=\frac1n\sum_i\left\{
+ \frac{\mathbf1(E_i^1)Y_i^{\rm obs}}{\pi_i^1}
+ -\frac{\mathbf1(E_i^0)Y_i^{\rm obs}}{\pi_i^0}\right\}       \tag{3}
+\]
+is unbiased. On $E_i^a$, consistency and the exposure restriction make the
+observed outcome equal the corresponding fixed potential outcome;
+taking expectations cancels the exposure probability in each summand.
+No independence between users is needed for this expectation calculation.
+
+Exposure overlap can nevertheless make precision poor. Under the extra
+bound $|Y_i(z)|\le B$, define
+\[
+ c_j=\frac{B}{n}\sum_{i:j\in N_i}
+       \left(\frac1{\pi_i^1}+\frac1{\pi_i^0}\right).
+\]
+Changing one assignment $Z_j$ can change only summands for users with
+$j\in N_i$. Each such summand, before division by $n$, takes one of the
+three values $Y_i(\mathbf1)/\pi_i^1$, zero, or
+$-Y_i(\mathbf0)/\pi_i^0$; their pairwise distances are bounded by the
+quantity defining $c_j$. Bounded differences for independent cluster
+assignments therefore gives
+\[
+ \Pp(|\widehat\tau_N-\tau_N|\ge t)
+ \le2\exp\left(-\frac{2t^2}{\sum_jc_j^2}\right).           \tag{4}
+\]
+This is conservative but fully design-based under the stated assumptions.
+For one cluster per user, weights are ordinary inverse assignment
+probabilities. For users linked to many clusters, the exponential growth
+of inverse exposure probabilities explains why more observations may
+still leave little useful precision.
+
+The set $N_i$ must include potential exposure routes, not merely products
+a user actually viewed after treatment. Summary-induced search can change
+those realized sets. Selecting $N_i$ after observing views would invalidate
+the assignment-probability calculation and could condition on a treatment
+mediator. Likewise, market-wide prices or sellers influenced by clusters
+outside $N_i$ invalidate the assumed outcome mapping.
+
+\section{What remains for the original problem}
+A frozen-corpus trial estimates a direct interface effect only under its
+fixed offers and review supply. A market-level six-month trial can include
+seller adaptation, review manipulation, and changing availability, but its
+assignment unit must encompass the relevant feedback. One cannot transfer
+(3) to that ecosystem without expanding its exposure sets or defending a
+new interference restriction. Broad exposure sets may make (4) vacuous;
+that is an identification-and-design limitation, not a reason to silently
+assume individual randomization.
+
+Farronato's 2025 conference paper, Section 1.1, explicitly identifies
+AI aggregation of textual reviews as a research direction and discusses
+average/distributional effects and interference. That source motivates
+this problem; it does not supply the welfare sign. Equations (1)--(4)
+are restricted decision-theoretic and randomization calculations.
+Actual monetary satisfaction, search costs, misleading omissions, group
+heterogeneity, and seller adaptation remain to be measured under a
+specified policy. The original empirical welfare question is unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{f} Chiara Farronato (2025),
+\emph{Digital Platforms as Information Aggregators: Implications for their
+Design and Regulation}, conference-paper version, Section 1.1.
+\url{https://conference.nber.org/confer/2025/DTs25/farronato.pdf}.
+\end{thebibliography}
+
+\end{document}
