@@ -1,0 +1,127 @@
+% ECONOMICS_PROBLEM: {"id": "C78-387", "title": "Popularity probability under uncertain house-allocation preferences", "jel_code": "C78", "source_id": "OP-0546"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{Popularity probability under uncertain house-allocation preferences: independent sets and \#P-hardness}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For a perfect matching $M$, we show that popularity under a realised profile depends only on which applicants
+receive their top choice, and on the houses ranked above $M(a)$ by the others. This reduces $\pi_I(M)$ to a hard-core
+(independent-set) partition function. Consequences: (1) in the independent-lottery encoding, with two orders per applicant
+and probability $1/2$ each, $\pi_I(M)=i(G)/2^n$, where $i(G)$ counts independent sets of an arbitrary graph; (2) in the
+uniform-tie-refinement encoding, $\pi_I(M)$ is a nondegenerate two-spin partition function, which polynomial interpolation
+reduces to $i(G)$. Exact evaluation is therefore \#P-hard under polynomial-time Turing reductions in both compact
+encodings, and lies in $\mathrm{FP}^{\#\mathrm P}$. The threshold problem lies in PP and is \#P-hard under Turing
+reductions. The explicit joint encoding is polynomial. As a by-product, approximation in the lottery encoding inherits the
+hard-core model's computational threshold at maximum degree~$6$.
+\end{abstract}
+
+\section*{1. A characterisation for perfect matchings}
+Add a last-resort house at the end of each list, as in \cite{aikm}. For a profile $P$, let $f(a)$ be $a$'s first choice,
+$F=\{f(a)\}$, and $s(a)$ the best house on $a$'s list outside $F$. By \cite[Thm.~2.1]{aikm}, an applicant-complete matching
+is popular iff every $f$-house is matched and $M(a)\in\{f(a),s(a)\}$ for all $a$. Write $G_P=\{a:f(a)=M(a)\}$ for the
+\emph{top} applicants, $T_P=M(G_P)$, and $\mathrm{Up}_a=\{h:h\succ_aM(a)\}$.
+
+\begin{lemma}\label{lem:char}
+Suppose $|A|=|H|$ and $M$ is perfect. Then $M$ is popular for $P$ iff $\mathrm{Up}_a\subseteq T_P$ for every
+$a\notin G_P$.
+\end{lemma}
+\begin{proof}
+All houses are matched, so we need only $M(a)=s(a)$ for $a\notin G_P$. This holds iff $\mathrm{Up}_a\subseteq F$ and
+$M(a)\notin F$.
+($\Leftarrow$) $T_P\subseteq F$, so $\mathrm{Up}_a\subseteq F$. Suppose $M(a)=f(b)$; then $b\ne a$. If $b\in G_P$, then
+$f(b)=M(b)\ne M(a)$. If $b\notin G_P$, then $f(b)\in\mathrm{Up}_b\subseteq T_P$, so $M(a)\in T_P$ and $a\in G_P$. Both cases are contradictions.
+($\Rightarrow$) Let $h\in\mathrm{Up}_a\subseteq F$ and $h=M(c)$. If $c\notin G_P$, then $M(c)=s(c)\notin F$, a
+contradiction. Hence $h\in T_P$.
+\end{proof}
+Equivalently, let $S=A\setminus G_P$ and $O_a=M^{-1}(\mathrm{Up}_a)$. Then $M$ is popular iff $O_a\cap S=\varnothing$ for every $a\in S$.
+
+\section*{2. Independent lotteries: independent sets}
+Given a graph $G=(V,E)$, create applicant $a_v$ and house $h_v$ for each $v$, and let $M=\{a_vh_v\}$. Applicant $a_v$
+finds $\{h_v\}\cup\{h_u:u\in N(v)\}$ acceptable. With probability $1/2$ each, it uses order (top) $h_v\succ$ neighbours,
+or order (non-top) neighbours $\succ h_v$.
+\begin{theorem}\label{thm:lot}
+$\pi_I(M)=i(G)/2^{|V|}$, where $i(G)$ is the number of independent sets of $G$.
+\end{theorem}
+\begin{proof}
+Isolated vertices are always top. Otherwise, $a_v\in S$ iff it uses the non-top order, and then $O_{a_v}=N(v)$. By
+Lemma~\ref{lem:char}, $M$ is popular iff $S$ is independent. Each $S$ has probability $2^{-|V|}$.
+\end{proof}
+Counting independent sets is \#P-complete \cite{pb}. Hence evaluating $\pi_I$ in the independent-lottery encoding is
+\#P-hard. The threshold problem ``$\pi_I(M)\ge\tau$'' is in PP: scale by the product of denominators, and verify popularity
+for each profile choice in polynomial time \cite{aikm}. It is \#P-hard under Turing reductions, since binary search over
+$\tau$ recovers $i(G)$. It is therefore not in P unless $\mathrm P=\mathrm{PP}$.
+
+\begin{corollary}[Approximation]
+In this encoding, with $\deg(v)+1$ acceptable houses per applicant, approximating $\pi_I(M)$ is approximating the
+hard-core partition function at activity $\lambda=1$. An FPTAS exists when every list has length at most $6$ (maximum
+degree $\le5$) \cite{weitz}. For lists of length $7$ there is no FPRAS unless $\mathrm{NP}=\mathrm{RP}$ \cite{sly}, because
+$\lambda=1$ exceeds the uniqueness threshold $\lambda_c(6)=5^5/4^6$.
+\end{corollary}
+
+\section*{3. Uniform refinements of weak orders}
+Given a multigraph $G$, create for each vertex $v$ an applicant $a_v$ with tie $[h_v\sim g_v]$, and a dummy $z_v$ whose
+only acceptable house is $g_v$. For each edge $e=uv$, create an applicant $a_e$ with tie $[h_u\sim h_v\sim h_e]$. Let $M$
+match $a_v h_v$, $z_v g_v$ and $a_e h_e$.
+\begin{lemma}
+$\pi_I(M)=2^{-|V|}\sum_{X\in\{0,1\}^V}\prod_{uv\in E}w(X_u,X_v)$, where $X_v=1$ means $a_v$ is top, and
+$w(0,0)=1/3$, $w(0,1)=w(1,0)=1/2$, $w(1,1)=1$.
+\end{lemma}
+\begin{proof}
+Each $z_v$ is always top. If $a_v$ is not top, $O_{a_v}=\{z_v\}$, so it imposes no constraint. The applicant $a_e$ is top
+with probability $1/3$. Otherwise $\mathrm{Up}_{a_e}$ is $\{h_u\}$, $\{h_v\}$ or $\{h_u,h_v\}$ with probabilities
+$1/6,1/6,1/3$. It requires the corresponding vertex applicants to be top. Refinements are independent, and the formula
+follows from Lemma~\ref{lem:char}.
+\end{proof}
+\begin{theorem}
+Evaluating $\pi_I$ in the uniform-refinement encoding is \#P-hard under Turing reductions.
+\end{theorem}
+\begin{proof}
+Replace each edge of a simple graph $G$ by $k$ parallel edges, giving $G^{(k)}$. With $S=\{X=0\}$ and $T=\{X=1\}$,
+\[
+2^{|V|}\,2^{k|E|}\ \pi_I^{(k)}(M)=\sum_{a,b}N(a,b)\,c_{ab}^{\,k},\qquad c_{ab}=(2/3)^a2^b.
+\]
+This follows because an edge contributes $(1/3)^k$, $(1/2)^k$ or $1$ according to whether it lies inside $S$, crosses, or lies inside $T$.
+Here $N(a,b)$ counts assignments with $a$ edges of $G$ inside $S$ and $b$ inside $T$.
+The numbers $c_{ab}=2^{a+b}3^{-a}$ are distinct for distinct $(a,b)$. Evaluating at $k=1,\dots,(|E|+1)^2$ and solving the
+Vandermonde system recovers every $N(a,b)$. Then $i(G)=\sum_bN(0,b)$, because $S$ must be independent.
+\end{proof}
+
+\section*{4. Explicit joint lotteries and verification}
+For an explicit list of profiles, sum the weights of the support profiles at which $M$ passes the polynomial popularity test
+\cite{aikm}. Both problems are then in P. We verified Theorem~\ref{thm:lot} and the two-spin formula by brute force on small
+graphs, where popularity was checked against \emph{all} matchings rather than through the characterisation. Lottery
+encoding: five random graphs on $3$--$4$ vertices; for example $i=10,8,4,6$ matched exactly. Tie encoding: four graphs;
+for example $\pi=53/144$, $55/216$ and $7/12$ matched exactly.
+
+\section*{What remains}
+(i) Whether the threshold problem is PP-complete under many-one reductions. (ii) The complexity when $M$ is not perfect.
+Unmatched houses then add the constraint that no first choice is unmatched, which is again a hard-core-type event.
+(iii) Natural bounded restrictions in the tie encoding: hardness above uses ties of size $3$ and unbounded multiplicity.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh, D. F. Manlove, Selected open problems in Matching Under Preferences,
+\emph{Bull. EATCS} (2019), Sections 2.1 and 3.1.2. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{abgdmr} H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei, B. Rastegari, Stable matching with uncertain
+linear preferences, \emph{Algorithmica} 82 (2020), 1410--1433.
+\bibitem{aikm} D. J. Abraham, R. W. Irving, T. Kavitha, K. Mehlhorn, Popular matchings, \emph{SIAM J. Comput.} 37 (2007), 1030--1045.
+\bibitem{pb} J. S. Provan, M. O. Ball, The complexity of counting cuts and of computing the probability that a graph is
+connected, \emph{SIAM J. Comput.} 12 (1983), 777--788.
+\bibitem{weitz} D. Weitz, Counting independent sets up to the tree threshold, \emph{STOC} 2006.
+\bibitem{sly} A. Sly, Computational transition at the uniqueness threshold, \emph{FOCS} 2010.
+\end{thebibliography}
+\end{document}

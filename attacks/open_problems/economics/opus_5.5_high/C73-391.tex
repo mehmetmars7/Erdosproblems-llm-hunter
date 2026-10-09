@@ -1,0 +1,130 @@
+% ECONOMICS_PROBLEM: {"id": "C73-391", "title": "Threshold-constrained infinite-horizon equilibrium realizability", "jel_code": "C73", "source_id": "OP-0160"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{Threshold-constrained subgame-perfect realizability in concurrent stochastic reachability games: decidable fragments and the obstruction to transferring NE undecidability}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The constrained-NE language is undecidable, and the statement asks about the separately defined SPE language
+$\mathcal L_{\rm SPE}$. We do not settle its decidability. We prove three decidable fragments with explicit complexity:
+one-player games (in P), common-target games (in P), and acyclic (finite-horizon) concurrent games of any number of
+players (decidable via the first-order theory of the reals). We then identify the precise step at which the known
+non-r.e.\ proof for NE uses non-credible threats. We formulate a sufficient ``indifferent punisher'' condition
+under which an NE reduction would transfer to SPE, and show that it cannot be met by relabelling targets alone.
+\end{abstract}
+
+\section*{1. Setting}
+A finite concurrent game has states $S$, action sets $A_i(s)$ and a rational kernel $\delta(s,a)\in\Delta(S)$. Player $i$
+receives $1$ if the play ever visits $F_i$. Histories record states and joint actions. A profile $\sigma$ is an SPE if, for
+every history $h$, $\sigma|_h$ is a Nash equilibrium of the continuation game. Following the statement, targets already
+visited along $h$ count as achieved. We may make every state of $\bigcup_iF_i$ \emph{flag-recording}: replace $S$ by
+$S\times2^{[n]}$, recording which targets have been reached. This is an exponential blow-up for unbounded $n$, polynomial
+for fixed $n$. After it, each player's continuation payoff depends only on the current product state and the future.
+
+\section*{2. Decidable fragments}
+\begin{proposition}[One player]\label{prop:mdp}
+For $n=1$, $(G,s_0,F_1,t_1)\in\mathcal L_{\rm SPE}$ iff $\mathrm{val}(s_0)\ge t_1$, where $\mathrm{val}$ is the maximal
+reachability probability. This is decidable in polynomial time by linear programming.
+\end{proposition}
+\begin{proof}
+An SPE of a one-player game is a strategy that is optimal after every history. Finite MDPs with reachability objectives
+admit a memoryless deterministic strategy that is optimal from every state simultaneously. Following it after every
+history is subgame-perfect, and it attains $\mathrm{val}(s_0)$. No strategy exceeds the value. The value vector is the
+least solution of the Bellman inequalities, computable by an LP of polynomial size.
+\end{proof}
+
+\begin{proposition}[Common target]\label{prop:common}
+If $F_1=\dots=F_n=F$, then $\mathcal L_{\rm SPE}$ membership is decidable in polynomial time. The answer is yes iff
+$\min_it_i\le\mathrm{val}^{\rm team}(s_0)$, where $\mathrm{val}^{\rm team}$ is the optimum of the MDP whose actions are
+\emph{joint} action profiles.
+\end{proposition}
+\begin{proof}
+Every player's payoff is the common probability $\Pr(\text{reach }F)$, so every payoff is at most $\mathrm{val}^{\rm team}$.
+Take a memoryless deterministic joint-action policy optimal from every state of the team MDP, and let each player play its
+component. After any history, the continuation is optimal for the team. Hence no unilateral deviation can raise the common
+payoff, and the profile is an SPE attaining $\mathrm{val}^{\rm team}(s_0)$ for all players.
+\end{proof}
+
+\begin{theorem}[Acyclic games]\label{thm:acyclic}
+Suppose the support graph of $\delta$ is acyclic apart from absorbing self-loops; this covers every finite-horizon
+unfolding. Then $\mathcal L_{\rm SPE}$ is decidable for any fixed number of players. The set $E(s,\phi)$ of SPE payoff
+vectors from flag-state $(s,\phi)$ is semialgebraic, and is computable by backward induction in the first-order theory of
+$(\mathbb R,+,\cdot,\le)$.
+\end{theorem}
+\begin{proof}
+At an absorbing state, $E=\{\phi\}$ (indicator payoffs). At a non-absorbing state $s$, an SPE consists of a mixed profile
+$x\in\prod_i\Delta(A_i(s))$ and, for each joint action $a$ and successor $s'$, a continuation SPE with payoff
+$c_{a,s'}\in E(s',\phi')$. Continuations may depend on the realised $(a,s')$, since histories are observed. Write
+$U_i(a)=\sum_{s'}\delta(s,a)(s')\,c_{a,s',i}$. Then $(x,c)$ is an SPE at $s$ iff $x$ is a Nash equilibrium of the
+one-shot game $U$. The payoff is $\sum_ax(a)U(a)$. Every successor lies strictly lower in the topological order, so
+$E(s,\phi)$ is the projection of a set defined by polynomial inequalities over the semialgebraic sets $E(s',\phi')$. By
+Tarski--Seidenberg, it is semialgebraic and effectively computable. Membership asks whether $E(s_0,\phi_0)$ meets
+$\prod_i[t_i,1]$, which is a first-order sentence.
+\end{proof}
+
+\begin{remark}[Cost]
+The quantifier structure gives a doubly-exponential bound in the depth, using generic quantifier elimination.
+Fixed-depth instances with a fixed number of players are decidable in PSPACE via the existential theory of the reals
+\emph{only if} existential formulas suffice. The NE condition at each stage, ``for all deviations'', reduces to finitely
+many pure deviations, so the formula is existential at each stage. However, nesting the semialgebraic sets $E(s',\cdot)$
+reintroduces quantifiers. We do not claim a tight bound.
+\end{remark}
+
+\section*{3. Why NE undecidability does not transfer directly}
+The non-r.e.\ proof for NE \cite{uw} builds strategy profiles whose on-path behaviour simulates a machine. Deviations
+are deterred by \emph{punishment phases} in which the other players minimise the deviator's reachability probability. In
+an SPE, a punishment phase must itself be an equilibrium of the continuation game. Punishers must therefore be best-responding
+\emph{in their own reachability objectives}, which are generally not aligned with minimising the deviator.
+
+\begin{proposition}[Indifferent punishers suffice]\label{prop:transfer}
+Let $\mathcal C$ be a class of games in which, for every player $i$ and every state $s$ reachable after a deviation by
+$i$, there is a minimising profile for $i$ such that every punisher $j\ne i$ is indifferent among all its continuation
+strategies. That is, $j$'s reachability probability from $s$ is a constant independent of play. Assume further that this
+profile attains $i$'s punishment value, the infimum over independent punisher profiles, and that against it player $i$ has
+a strategy optimal after every history. Then on $\mathcal C$, the NE and SPE threshold languages coincide.
+\end{proposition}
+\begin{proof}
+Take an NE $\sigma$ meeting the thresholds. Modify it off path: after the first deviation by $i$, switch to an SPE of the
+continuation in which punishers play the minimising profile and $i$ best-responds. Punishers are indifferent, so they have
+no profitable deviation. Player $i$ best-responds and is held to its punishment value. This value is no larger than the payoff $i$ would get
+from the same deviation against $\sigma$'s own (independent) punishment. Since $\sigma$ is an NE, $i$ gains nothing by deviating. Multiple deviators can be ignored, because SPE checks unilateral deviations
+after every history. The converse holds because every SPE is an NE.
+\end{proof}
+The difficulty is that indifference of punisher $j$ requires $j$'s target to be decided independently of the play once a
+deviation occurs. In a reachability game, this means that from the punishment region, $F_j$ is reached with a fixed
+probability under all strategies. Relabelling targets cannot achieve this in general. If $F_j$ is unreachable from the
+punishment region, $j$ is indifferent, but then $j$'s on-path incentive to enter or avoid that region changes. The reduction
+of \cite{uw} uses players whose \emph{winning} depends on entering such regions. A complete transfer would need a gadget
+that decouples the two. We could not construct one, and we conjecture $\mathcal L_{\rm SPE}$ is undecidable for some
+fixed number of players. A natural first target is the turn-based (simple stochastic multiplayer) fragment, where
+pure deviations are observable.
+
+\section*{4. Open questions in precise form}
+(Q1) Is $\mathcal L_{\rm SPE}$ undecidable for turn-based reachability games with $\ge10$ players?
+(Q2) Is the SPE language restricted to finite-memory strategies decidable?
+Theorem~\ref{thm:acyclic} handles bounded depth only.
+(Q3) For two players, is constrained SPE existence decidable? The unconstrained two-player question is itself the
+open problem discussed in \cite{rv}.
+
+\begin{thebibliography}{9}
+\bibitem{uw} M. Ummels, D. Wojtczak, The complexity of Nash equilibria in stochastic multiplayer games, \emph{Logical
+Methods in Computer Science} 7(3:20) (2011), Theorem 4.9. \url{https://arxiv.org/pdf/1109.4017}.
+\bibitem{rv} S. Rajasekaran, M. Y. Vardi, Verifying equilibria in finite-horizon probabilistic concurrent game systems,
+arXiv:2503.14690v7 (2026), Section 1. \url{https://arxiv.org/html/2503.14690v7}.
+\bibitem{tarski} A. Tarski, \emph{A Decision Method for Elementary Algebra and Geometry}, RAND (1948).
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,104 @@
+% ECONOMICS_PROBLEM: {"id": "C78-369", "title": "Parameterized computation of a reachable Pareto-optimal allocation", "jel_code": "C78", "source_id": "OP-0552"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{Parameterized computation of a reachable Pareto-optimal allocation: frozen agents, active kernels and output-sensitive search}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give fixed-parameter algorithms for finding a reachable Pareto-optimal allocation, together with a legal swap sequence.
+The parameters are: the number $p$ of applicants permitted to exchange; the number $q$ of applicants that are not
+\emph{frozen}, where frozen applicants hold their top house or, recursively, have only frozen neighbours; and the
+size of the reachable set (an output-sensitive bound). The algorithms rest on three lemmas. Every reachable Pareto-optimal
+allocation is terminal. Inactive applicants never move. Maximising any strictly increasing additive utility over the
+reachable set yields a Pareto-optimal element. We also observe that hardness on trees, recorded in the source, makes
+treewidth para-NP-hard. Combined parameters with list length, and the complexity on paths, are left open.
+\end{abstract}
+
+\section*{1. Structural lemmas}
+Let $\mathcal R=\mathcal R_G(M_0)$ and $n=|A|$.
+\begin{lemma}[PO implies terminal]\label{lem:term}
+If $M\in\mathcal R$ is Pareto optimal relative to $\mathcal R$, then no legal swap is available at $M$.
+\end{lemma}
+\begin{proof}
+A legal swap at $M$ yields $N\in\mathcal R$ in which the two participants are strictly better off and everyone else is
+unchanged. This contradicts Pareto optimality.
+\end{proof}
+The converse fails: the source notes that greedy termination can stop at a Pareto-dominated terminal allocation \cite{ccm}.
+
+\begin{lemma}[Monotone utilities]\label{lem:util}
+Let $u_a$ be any utility strictly increasing in $\succ_a$, for example $u_a(h)=\ell_a-\mathrm{rank}_a(h)$. Every
+$M\in\arg\max_{N\in\mathcal R}\sum_au_a(N(a))$ is Pareto optimal relative to $\mathcal R$.
+\end{lemma}
+\begin{proof}
+A reachable Pareto improvement strictly raises the sum.
+\end{proof}
+
+\begin{lemma}[Frozen applicants]\label{lem:frozen}
+Let $Z_0$ be the set of applicants holding their top acceptable house in $M_0$, together with any applicants not permitted
+to exchange. Let $Z_{i+1}=Z_i\cup\{a:\text{every neighbour of }a\text{ lies in }Z_i\}$, and let $Z=\bigcup_iZ_i$. No
+applicant of $Z$ ever participates in a legal swap, so its house never changes.
+\end{lemma}
+\begin{proof}
+An applicant holding its top acceptable house cannot strictly improve, so it never participates. A frozen applicant never
+participates, so an applicant whose neighbours are all frozen has no legal partner. Induction on the iteration completes
+the proof.
+\end{proof}
+
+\section*{2. Algorithms}
+\begin{theorem}[FPT in the permitted or active set]\label{thm:fpt}
+Let $Y=A\setminus Z$ be the non-frozen applicants of Lemma~\ref{lem:frozen}, and let $q=|Y|$. Then $q\le p$ when
+only $p$ applicants are permitted to exchange. A reachable Pareto-optimal allocation and a legal sequence reaching it can be
+computed in time $O(q!\,q^2+n^2)$.
+\end{theorem}
+\begin{proof}
+Frozen applicants keep their houses, and every swap is between adjacent members of $Y$. So $\mathcal R$ is in bijection
+with the allocations of $M_0(Y)$ to $Y$ that are reachable in $G[Y]$, and $|\mathcal R|\le q!$. Breadth-first search with
+parent pointers enumerates $\mathcal R$ in $O(|\mathcal R|\,q^2)$. Then return a maximiser of $\sum_au_a$
+(Lemma~\ref{lem:util}) and its parent path.
+\end{proof}
+
+\begin{proposition}[Output-sensitive search]\label{prop:out}
+The same procedure runs in time $O(|\mathcal R|\cdot|F|)$ without any parameter. It is polynomial whenever
+$|\mathcal R|$ is polynomially bounded, as for example when $G$ has $O(\log n/\log\log n)$ non-frozen applicants.
+\end{proposition}
+
+\begin{proposition}[Interval bound]\label{prop:interval}
+Each applicant $a$ swaps at most $\ell_a^{\uparrow}=|\{h:h\succ_aM_0(a)\}|$ times along any legal sequence. Hence
+$|\mathcal R|\le\prod_{a\in Y}(\ell_a^{\uparrow}+1)$, and the algorithm is FPT in $(q,\lambda)$ in time
+$O(\lambda^{q}q^2)$, where $\lambda=\max_a\ell_a^{\uparrow}+1$.
+\end{proposition}
+\begin{proof}
+Each swap moves the participant strictly upward in its list, and the houses above $M_0(a)$ number $\ell_a^{\uparrow}$.
+\end{proof}
+
+\section*{3. Hardness boundaries}
+The source records NP-hardness of the task on trees \cite{ccm,glw}. Trees have treewidth one, so no
+$f(w)|I|^{O(1)}$ algorithm exists for treewidth $w$ unless $\mathrm P=\mathrm{NP}$; that is, the problem is para-NP-hard
+in $w$. Since $q\le n$ always and the problem is FPT in $q$, the hard tree instances must have many active applicants. For
+maximum list length $L$, Proposition~\ref{prop:interval} bounds individual swap counts by $L-1$, but the state space can
+still be exponential in $n$. Whether the problem is para-NP-hard in $L$ alone, or FPT in $(w,L)$, is open. We pose two
+precise questions. (Q1) Is the search problem polynomial on paths? (Q2) Is it W[1]-hard parameterized by the number of
+applicants whose final house differs from $M_0$, the natural solution-size parameter? The kernel argument used for target
+reachability does not apply here, because the movers are not known in advance.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh, D. F. Manlove, Selected open problems in Matching Under Preferences,
+\emph{Bull. EATCS} (2019), Section 3.1.3, Theorem 6. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{glw} L. Gourv\`es, J. Lesca, A. Wilczynski, Object allocation via swaps along a social network, \emph{IJCAI}
+2017. \url{https://doi.org/10.24963/ijcai.2017/31}.
+\end{thebibliography}
+\end{document}
