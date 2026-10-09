@@ -1,0 +1,116 @@
+% ECONOMICS_PROBLEM: {"id": "I11-628", "title": "Realized returns to medical AI", "jel_code": "I11", "source_id": "OP-0447"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\ind}{\mathbf{1}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\title{Medical AI returns: review thresholds, induced workload, and a clinic-trial estimand}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\textbf{Status: Unresolved.} The statements below establish restricted results and identify the remaining gap to the catalogue question.
+
+\section{Question and scope}
+When does an AI deployment create a positive realized return after errors, review, follow-up care and implementation costs are counted? This attempt solves a declared care-accounting model and a review-allocation problem, then gives an unbiased trial estimator for a baseline-fixed patient population. It is a theoretical analysis, not medical advice or a claim about the performance of any deployed system.
+
+\section{Accounting over a fixed two-year cohort}
+Patients belong to baseline types $j=1,\ldots,J$ with shares $\pi_j>0$, summing to one. All quantities below cover the same two-year period and include patients with zero visits. Under usual care, type $j$ has expected visit count $v_{0j}$, quality-adjusted life-year gain $q_{0j}$ per episode, real nonlabor cost $c_{0j}$ per episode and clinician time $h_{0j}$ per episode. Under a frozen AI package these become visit count $v_{Aj}$, error-free gain $q_{Aj}$, nonlabor cost $c_{Aj}$ and initial clinician time $h_{Aj}$.
+
+Each AI episode has error probability $p_j\in[0,1]$. An uncorrected error causes QALY loss $d_j\geq0$, nonlabor follow-up cost $f_j\geq0$ and clinician follow-up time $h_{Fj}\geq0$. A fraction $r_j\in[0,1]$ of episodes is reviewed, independently of the latent error conditional on type. Review uses $h_{Rj}>0$ clinician hours and catches an error with probability $\eta_j\in[0,1]$, with full correction and no review-induced errors. These are strong assumptions that make the benchmark solvable.
+
+Assume additive gains across nonoverlapping episodes; in particular, the same health gain or follow-up episode is never counted twice. Actual patient-level QALYs should replace this approximation when episodes overlap. Clinician time has common real opportunity cost $w\geq0$ per hour and the welfare conversion is $\lambda>0$ money units per QALY. Let $k\geq0$ be deployment cost per baseline patient that is not already included in any care cost. There are no interpatient spillovers in this accounting exercise, and visit counts are held fixed when review fractions change.
+
+Define usual-care net benefit per episode $n_{0j}=\lambda q_{0j}-c_{0j}-wh_{0j}$ and unreviewed AI benefit
+\[
+ n_{Aj}=\lambda(q_{Aj}-p_jd_j)-c_{Aj}-p_jf_j-w(h_{Aj}+p_jh_{Fj}).
+\]
+The incremental benefit per reviewed AI episode is
+\[
+ b_j=p_j\eta_j(\lambda d_j+f_j+wh_{Fj})-wh_{Rj}.
+\]
+
+\begin{theorem}[Deployment return and total clinician time]
+For any review policy $r$, the net monetary benefit and clinician-time effects per baseline patient are
+\[
+ \tau_W(r)=\sum_j\pi_j[v_{Aj}(n_{Aj}+b_jr_j)-v_{0j}n_{0j}]-k,\tag{1}
+\]
+\[
+ \tau_L(r)=\sum_j\pi_j\{v_{Aj}[h_{Aj}+p_jh_{Fj}
+ +(h_{Rj}-p_j\eta_jh_{Fj})r_j]-v_{0j}h_{0j}\}.\tag{2}
+\]
+For a single type with $v_0>0$ and positive AI time per visit $\ell_A(r)$, total clinician hours fall if and only if
+\[
+ \frac{v_A}{v_0}<\frac{h_0}{\ell_A(r)}.
+\]
+\end{theorem}
+\begin{proof}
+The uncorrected error probability is $p_j(1-\eta_jr_j)$. Multiply it by each harm and follow-up resource, and add initial care and review inputs. This gives QALYs $q_{Aj}-p_j(1-\eta_jr_j)d_j$ and clinician time $h_{Aj}+h_{Rj}r_j+p_j(1-\eta_jr_j)h_{Fj}$ per episode. The corresponding nonlabor cost is $c_{Aj}+p_j(1-\eta_jr_j)f_j$. Forming $\lambda Q-C$ and collecting review terms yields $n_{Aj}+b_jr_j$. Multiply by the expected number of episodes, average over baseline types, subtract usual care and the separately recorded deployment cost to obtain (1)--(2). The one-type condition follows by dividing $v_A\ell_A(r)<v_0h_0$ by positive quantities.
+\end{proof}
+
+A 40 percent reduction in clinician time per episode, combined with a doubling of episodes, increases total clinician hours by 20 percent. This is the exact arithmetic $2\times0.6=1.2$, not evidence that any particular AI system induces that demand response. The cohort denominator is essential: conditioning on people who visited would omit the extensive margin in both (1) and (2).
+
+\section{Allocating scarce review capacity}
+Suppose a dedicated review service has $H\geq0$ hours per baseline patient. Its capacity constraint is $\sum_j\pi_jv_{Aj}h_{Rj}r_j\leq H$. These are gross review hours: follow-up time saved elsewhere does not automatically create capacity in this service. Assume $v_{Aj}>0$ for included types; types with zero visits can be dropped.
+
+\begin{proposition}[Optimal review threshold]
+A policy maximizing (1) under this constraint reviews positive-benefit types in decreasing order of $b_j/h_{Rj}$, fully until capacity is exhausted and fractionally at a possible last type. Equivalently, there is a shadow value $\nu\geq0$ such that types with $b_j>\nu h_{Rj}$ are fully reviewed and those with $b_j<\nu h_{Rj}$ are not reviewed, with ties allocated feasibly. For $\eta_j(\lambda d_j+f_j+wh_{Fj})>0$, the strict-review condition is
+\[
+ p_j>\frac{(w+\nu)h_{Rj}}{\eta_j(\lambda d_j+f_j+wh_{Fj})}.
+\]
+\end{proposition}
+\begin{proof}
+The varying part of (1) is the linear objective $\sum_j\pi_jv_{Aj}b_jr_j$ on a compact feasible box, so an optimum exists. Negative-benefit reviews can be removed. Moving one unit of review-service time from a lower-ratio positive type to a higher-ratio unfilled type changes the objective by the difference in their ratios; thus an optimum has the stated ordering. A threshold $\nu$ between the last filled and first unfilled ratios supports that allocation; if capacity is slack, choose $\nu=0$. Rearranging $b_j>\nu h_{Rj}$ gives the displayed probability threshold.
+\end{proof}
+
+The optimized right side of (1), before subtracting $k$, is the break-even implementation cost. Deployment has positive return precisely when actual $k$ is below it. This is conditional on the declared QALY conversion and response model. Review capacity, labor-market adjustment and adaptive visit demand can change that threshold. Review costs already in care spending must not be added again as a second supervision charge.
+
+\section{An estimand for a randomized clinic trial}
+There are $G$ clinics, with baseline eligible patient counts $N_g$ fixed before assignment and $N=\sum_gN_g$. Let $T_g(d)$ be the sum over that fixed roster of patient-level $\lambda Q-C$ under clinic package $d\in\{0,1\}$, including downstream care and errors over two years. Let $L_g(d)$ be total clinician hours. Potential outcomes are fixed for the design; there is no cross-clinic interference. Independently randomize clinics with $\Pr(D_g=1)=\rho_g\in(0,1)$. Outcomes are observed for the entire roster, not only retained visitors.
+
+\begin{proposition}[An unbiased cohort-weighted estimator]
+With $T_g^{\mathrm{obs}}=T_g(D_g)$,
+\[
+ \widehat\tau_W=\frac1N\sum_g\left[\frac{D_gT_g^{\mathrm{obs}}}{\rho_g}
+ -\frac{(1-D_g)T_g^{\mathrm{obs}}}{1-\rho_g}\right]-k
+\]
+is unbiased for $N^{-1}\sum_g[T_g(1)-T_g(0)]-k$. Replacing $T$ by $L$ and omitting $k$ estimates the corresponding clinician-time effect. The monetary estimator has exact variance
+\[
+ \frac1{N^2}\sum_g\left\{\frac{T_g(1)^2}{\rho_g}
+ +\frac{T_g(0)^2}{1-\rho_g}-[T_g(1)-T_g(0)]^2\right\}.
+\]
+\end{proposition}
+\begin{proof}
+For each clinic the two inverse-probability terms have expectations $T_g(1)$ and $T_g(0)$. Their difference takes the value $T_g(1)/\rho_g$ under treatment and $-T_g(0)/(1-\rho_g)$ otherwise. Its second moment is the sum of the first two terms in braces; subtracting its squared mean gives the bracket. Independent clinic assignments make cross-clinic covariances zero. Division by $N^2$ proves the variance formula, and the same expectation argument applies to hours.
+\end{proof}
+
+\section{Remaining gap and reference}
+The exact variance involves unobserved potential outcomes and is not itself a plug-in uncertainty estimator. A practical trial needs enough independent clinics, a valid variance bound or design-based inference procedure, prespecified missing-outcome handling, and a complete package definition including updates. The two-year effect also does not identify a ten-year organizational response. These empirical and dynamic requirements leave the catalogue question unresolved.
+
+Nikhil Sahni, George Stein, Rodney Zemmel and David M. Cutler (2023), \emph{The Potential Impact of Artificial Intelligence on Healthcare Spending}, NBER Working Paper 30857, revised October 2023, \url{https://www.nber.org/papers/w30857}, \url{https://doi.org/10.3386/w30857}. That paper motivates potential spending effects. The review model and trial formulas above do not convert those potential estimates into realized causal savings.
+
+\end{document}

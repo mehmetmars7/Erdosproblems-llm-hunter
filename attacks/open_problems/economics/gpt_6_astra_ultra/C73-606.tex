@@ -1,0 +1,147 @@
+% ECONOMICS_PROBLEM: {"id": "C73-606", "title": "Learning to sustain cooperation", "jel_code": "C73", "source_id": "OP-0282"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Learning off-path detection and choosing credible forgiveness}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C73-606}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and normalization}
+The catalogue concerns how information about off-path punishment and forgiveness changes cooperation in repeated games, with a fully specified monitoring process. Fudenberg and Levine \cite{FL} motivate off-path learning and cooperation. We solve a public-monitoring automaton, give a confidence-based learning rule for its unknown monitoring parameters, and separately calculate the effect of correlated monitoring errors. These restricted results do not estimate subjects' behavior or claim convergence of arbitrary learning algorithms.
+
+Stage payoffs are $(2,2)$ at $(C,C)$, $(1,1)$ at $(D,D)$, $(0,3)$ at $(C,D)$, and $(3,0)$ at $(D,C)$. The last played period $N$ satisfies $\Prob(N\ge t)=\beta^{t-1}$, $0<\beta<1$, independently of actions and monitoring. There is no additional time discount. The cooperation statistic is
+\[
+ C=(1-\beta)\E\sum_{t=1}^N\ind\{a_{1t}=a_{2t}=C\}.
+\]
+Equivalently it is the discounted occupancy of mutual cooperation in the continuing game. Survival supplies the factor $\beta^{t-1}$ exactly once; it is not applied again to observed surviving rounds.
+
+\section{A public-monitoring game with forgiveness}
+Each period produces a common signal, good or bad, conditionally independent over time given actions. The complete kernel is
+\[
+ \Prob(\mathrm{bad}\mid C,C)=\alpha,
+ \quad\Prob(\mathrm{bad}\mid D,C)=\Prob(\mathrm{bad}\mid C,D)=d,
+ \quad\Prob(\mathrm{bad}\mid D,D)=1,
+\]
+where $0<\alpha<1/2$ and $\alpha\le d\le1$. Public state $G$ prescribes mutual cooperation; state $B$ prescribes mutual defection. In $G$, a bad signal moves the next surviving round to $B$, while a good signal retains $G$. In $B$, a fresh public coin moves the next surviving round to $G$ with probability $f\in[0,1]$, regardless of actions or signals; otherwise it remains in $B$. Start in $G$.
+
+\begin{theorem}[Exact incentives and cooperative occupancy]
+Let $V_G,V_B$ denote one player's expected undiscounted payoff until random termination under this automaton. Then
+\[
+ V_G-V_B=\frac1{1-\beta+\beta(\alpha+f)}.
+\]
+The automaton is a perfect public equilibrium, and remains optimal against deviations using additional private history, if and only if
+\[
+ f\le f_{\max}:=d-2\alpha-\frac{1-\beta}{\beta}. \tag{1}
+\]
+If the right side is negative, no forgiveness rate in this automaton family supports cooperation. Its correctly normalized cooperation is
+\[
+ C_G(f)=\frac{1-\beta+\beta f}{1-\beta+\beta(\alpha+f)}. \tag{2}
+\]
+\end{theorem}
+\begin{proof}
+The continuation equations are
+\[
+ V_G=2+\beta[(1-\alpha)V_G+\alpha V_B],\qquad
+ V_B=1+\beta[fV_G+(1-f)V_B].
+\]
+Subtract them to obtain the value difference. In $G$, a unilateral deviation to $D$ gains one now and changes the bad-signal probability from $\alpha$ to $d$. It is unprofitable exactly when
+$1\le\beta(d-\alpha)(V_G-V_B)$.
+Substitution and rearrangement give (1). In $B$, deviating from $D$ to $C$ loses one immediately while leaving the public reset rule unchanged, so it is strictly unprofitable.
+
+These inequalities suffice for arbitrary multi-period deviations. Given the opponent's public strategy, each possible own action has current payoff plus $\beta$ times the prescribed continuation value at most the current state's $V$. Iterate that inequality along any deviating strategy for a finite number of rounds. The bounded continuation values make the remaining term vanish as the horizon increases. Thus no deviation, including one conditioning on additional private information, improves value. Conversely, violating (1) supplies the profitable one-period deviation just calculated.
+
+For occupancy, let $C_G,C_B$ be normalized discounted time in state $G$ starting from the two states. They satisfy
+$C_G=(1-\beta)+\beta[(1-\alpha)C_G+\alpha C_B]$ and
+$C_B=\beta[fC_G+(1-f)C_B]$.
+Solving gives (2), and $C_B=\beta f/[1-\beta+\beta(\alpha+f)]$. The equivalence between geometric survival and these discounted recursions follows by conditioning on independent continuation after each round.
+\end{proof}
+
+\begin{corollary}[The most forgiving credible rule]
+If $f_{\max}\ge0$, the unique cooperation-maximizing equilibrium in this automaton family has $f=f_{\max}$ and
+\[
+ C_G(f_{\max})=\frac{d-2\alpha}{d-\alpha}. \tag{3}
+\]
+Existence is equivalent to $\beta\ge1/(1+d-2\alpha)$; this requires $d>2\alpha$. Formula (3) is independent of $\beta$ within this feasible region, although the selected forgiveness rate is not.
+\end{corollary}
+\begin{proof}
+Because $\beta<1$ and $d\le1$, $f_{\max}<1$. Differentiating (2) gives
+$C_G'(f)=\beta^2\alpha/[1-\beta+\beta(\alpha+f)]^2>0$.
+Thus its maximum over the nonempty feasible interval $[0,f_{\max}]$ is unique at the upper endpoint. Substitute (1) into (2) to obtain (3). Solving $f_{\max}\ge0$ gives the stated continuation condition. Since $(1-\beta)/\beta>0$, feasibility implies $d>2\alpha$.
+\end{proof}
+The patience cancellation in (3) is specific to maximizing forgiveness in this two-state family from a cooperative initial state. It is not a claim that patience never affects cooperation. At a fixed $f$, or in another strategy family, the comparative static differs.
+
+\section{A specified off-path learning rule}
+Suppose $\alpha,d$ are unknown. Before play, a shared audit supplies independent signals from $n$ prescribed $(C,C)$ rounds and $n$ prescribed unilateral-deviation rounds. These are experimental calibration observations, not endogenous on-path deviations. Let $\widehat\alpha_n,\widehat d_n$ be their bad-signal frequencies. For $0<\delta<1$ define
+\[
+ r_n=\sqrt{\frac{\log(2\pi^2n^2/(3\delta))}{2n}},\quad
+ \alpha_n^+=\min\{1,\widehat\alpha_n+r_n\},\quad
+ d_n^-=\max\{0,\widehat d_n-r_n\},
+\]
+\[
+ \widehat f_n=d_n^--2\alpha_n^+-\frac{1-\beta}{\beta}.
+\]
+The learning rule chooses the cooperative automaton with $f=\widehat f_n$ when $\widehat f_n\ge0$, and otherwise chooses permanent mutual defection. Both players use the same audit and decision rule. This is an explicit confidence-set learning model, not a Bayesian interpretation of unspecified beliefs or a behavioral claim about experimental subjects.
+
+\begin{theorem}[Uniformly credible learning and convergence]
+With probability at least $1-\delta$, every policy selected at every audit size $n$ is an equilibrium of the true monitoring game. If the true margin $f_{\max}>0$, then whenever $6r_n<f_{\max}$ on this event, the cooperative automaton is selected and
+\[
+ 0\le f_{\max}-\widehat f_n\le6r_n,
+\]
+\[
+ 0\le C_G(f_{\max})-C_G(\widehat f_n)
+ \le\frac{6\beta^2\alpha r_n}{(1-\beta+\beta\alpha)^2}. \tag{4}
+\]
+For every fixed true game with $f_{\max}>0$, the chosen forgiveness and cooperation converge almost surely to the optima in the corollary.
+\end{theorem}
+\begin{proof}
+For a mean of $n$ independent Bernoulli variables, the exponential moment bound for a variable in $[0,1]$ gives
+$\Prob(|\widehat p-p|>r)\le2e^{-2nr^2}$.
+At the specified $r_n$, summing this probability over the two audit streams and all $n\ge1$ gives
+$\sum_n6\delta/(\pi^2n^2)=\delta$.
+On the simultaneous event, $d_n^-\le d$ and $\alpha_n^+\ge\alpha$. Therefore $\widehat f_n\le f_{\max}$, and any nonnegative selected rate satisfies the incentive condition. Permanent defection is itself an equilibrium because defection is a strict stage best response and its continuation never changes with actions.
+
+The same event gives $d-d_n^-\le2r_n$ and $\alpha_n^+-\alpha\le2r_n$, hence $f_{\max}-\widehat f_n\le6r_n$. If this is smaller than the true positive margin, the rate is nonnegative. Integrating the derivative from the corollary, bounded above by its value at zero, proves (4). Finally, both sample means converge almost surely: for any fixed positive tolerance the Hoeffding failure probabilities are summable, so the probability of infinitely many such failures is zero; intersect over rational tolerances. Since $r_n\to0$, $\widehat f_n\to f_{\max}>0$, eventually the cooperative choice is made, and continuity of (2) proves convergence.
+\end{proof}
+Observing only prescribed $(C,C)$ and $(D,D)$ play cannot identify $d$: every such history has the same distribution for all values of $d$ with fixed $\alpha$. Yet (1) depends on $d$. Two complete monitoring kernels can therefore agree on all this on-path evidence and disagree about whether the proposed cooperation is incentive compatible. The audit addresses precisely that missing off-path information. Its costs and feasibility would need to be included in an experimental implementation.
+
+\section{Matched marginal errors do not determine cooperation}
+For a separate mechanical-policy comparison, let each player start cooperative and switch permanently to defection upon the first private signal saying the opponent defected. Every opponent action is misclassified with marginal probability $\rho\in(0,1)$, independently over dates. Specify either independent error coins across players, or one common error coin that flips both players' observations. This defines the signal kernel at every action profile by applying the indicated flips to the true opponent actions. No equilibrium claim is made for these private grim policies.
+
+Joint cooperation continues to the next date exactly when neither player receives a false defection signal while both cooperate. Once either switches, mutual cooperation can never return. Therefore the two normalized cooperation values are
+\[
+ C_{\rm independent}=\frac{1-\beta}{1-\beta(1-\rho)^2},\qquad
+ C_{\rm common}=\frac{1-\beta}{1-\beta(1-\rho)}.
+\]
+To verify them, the probability of mutual cooperation at date $t$, conditional on survival, is respectively $[(1-\rho)^2]^{t-1}$ and $(1-\rho)^{t-1}$. Sum the geometric series with the single survival factor. The common-error value is strictly larger despite identical marginal accuracy. This calculation isolates why a lone error probability is insufficient to specify a monitoring treatment.
+
+A population experiment must randomize the complete information or monitoring intervention by pair and measure the correctly normalized outcome. The results here neither identify participants' perceived punishment strategies from choices nor validate an unmeasured belief-report process. Those empirical learning and out-of-sample prediction tasks remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{FL} D. Fudenberg and D. K. Levine (2016), ``Whither Game Theory? Towards a Theory of Learning in Games,'' \emph{Journal of Economic Perspectives} 30(4), 151--170, especially pp.162--165. \href{https://doi.org/10.1257/jep.30.4.151}{doi:10.1257/jep.30.4.151}. The source motivates off-path learning; the automaton, audit rule, and monitoring comparisons above are fully specified restricted calculations.
+\end{thebibliography}
+
+\end{document}

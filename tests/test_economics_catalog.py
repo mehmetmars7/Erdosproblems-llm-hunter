@@ -390,7 +390,12 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['status'], expected_claim)
                 self.assertEqual(data[problem_id]['status'], 'open')
-                self.assertEqual(data[problem_id]['llm_status'], expected_claim)
+                # The Pro manuscript for C71-12 separately claims a full solution.
+                aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12'} else 'unresolved'
+                self.assertEqual(data[problem_id]['llm_status'], aggregate_claim)
+                if problem_id == 'C71-12':
+                    pro = [a for a in data[problem_id]['attacks'] if a['model'] == 'GPT 6 Astra Pro']
+                    self.assertEqual([a['status'] for a in pro], ['solved'])
                 self.assertTrue(attack['file_path'].startswith('attacks/open_problems/economics/gpt6_astra_ultra/'))
                 self.assertTrue(attack['download_url'].startswith('data/economics/attempts/gpt6_astra_ultra/'))
                 source = (BASE_DIR / attack['file_path']).read_bytes()

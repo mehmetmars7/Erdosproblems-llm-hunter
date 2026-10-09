@@ -1,0 +1,146 @@
+% ECONOMICS_PROBLEM: {"id": "L41-605", "title": "Prospective merger prediction versus ex-post effects", "jel_code": "L41", "source_id": "OP-0071"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Evaluating merger forecasts with noisy retrospectives and selected cases}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{L41-605}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and observation scheme}
+The catalogue asks how prospective causal merger predictions should be evaluated against retrospectively identified effects, including proposals that never become consummated mergers. Simulation and retrospective studies \cite{Nevo,Peters} motivate the comparison, but realized price changes are not themselves causal effects. We solve a scoring problem with explicitly unbiased retrospective estimates, and show which conclusions require stronger information about their error distribution or case selection.
+
+A proposal has baseline information $B$, including the remedy regime, horizon, preregistered prediction, and all variables used for selection adjustment. Its causal effect $\Delta$ is a scalar outcome contrast under a fixed counterfactual closure. A prediction $m(B)$ is fixed before retrospective outcomes are observed. The population of interest is all proposals with the given law of $B$. Let $A=1$ indicate that a usable retrospective is available. When $A=1$, observe
+\[
+ R=\Delta+\epsilon,\qquad
+ \E[\epsilon\mid\Delta,B,A=1]=0,\qquad
+ \E[\epsilon^2\mid\Delta,B,A=1]=v(B). \tag{1}
+\]
+The variance $v(B)$ is known in this idealized retrospective experiment. Equation (1) requires a causal identification argument and uncertainty calculation for each retrospective; it is not implied by a before--after comparison or by reporting a standard error. Assume finite moments wherever used.
+
+First suppose selection is conditionally ignorable,
+\[
+ \Delta\perp A\mid B,\qquad e(B)=\Prob(A=1\mid B)\ge e_0>0. \tag{2}
+\]
+All proposals supply $B,A$, so the target population and selection probabilities are observable in principle. Independent proposal draws are assumed only for the finite-sample bound below.
+
+\section{Absolute scoring and paired model comparisons}
+\begin{theorem}[Noise-corrected prediction risk]
+Under (1)--(2), the squared causal prediction risk is identified by
+\[
+ \mathcal R(m)=\E[(m(B)-\Delta)^2]
+ =\E\left[\frac A{e(B)}\{(R-m(B))^2-v(B)\}\right]. \tag{3}
+\]
+For a Gaussian predictive distribution $Q_B=N(m(B),s(B)^2)$, its expected negative log score is similarly identified by weighting
+\[
+ \frac12\log(2\pi s(B)^2)
+ +\frac{(R-m(B))^2-v(B)}{2s(B)^2}, \tag{4}
+\]
+provided $s(B)>0$ and the displayed quantities are integrable. The true effect need not itself have a Gaussian distribution for (4) to be its Gaussian forecast's score.
+\end{theorem}
+\begin{proof}
+Conditional on $\Delta,B,A=1$, expand the square in (3). The cross term has mean zero and the error square has mean $v(B)$, leaving $(\Delta-m(B))^2$. Average over the conditional effect distribution. Ignorability in (2) makes this the full-proposal conditional risk given $B$, and multiplication by $A/e(B)$ followed by conditioning on $B$ restores its target-population expectation. A Gaussian density's negative logarithm is exactly the quadratic expression in (4) with $R$ replaced by $\Delta$. The same conditional calculation proves the second assertion.
+\end{proof}
+Individual corrected scores can be negative; their expectation in (3) is a nonnegative risk. Truncating negative observations to zero generally biases the score upward. Predictive distributions with other scoring rules need their own treatment of retrospective uncertainty.
+
+\begin{theorem}[Ranking point forecasts needs less error information]
+For two frozen predictions $m_1,m_2$, define
+\[
+ D_{12}(R,B)=(m_1-m_2)(m_1+m_2-2R).
+\]
+Under (1)'s mean-zero restriction and (2), even without knowing $v$,
+\[
+ \mathcal R(m_1)-\mathcal R(m_2)
+ =\E[A D_{12}/e(B)]. \tag{5}
+\]
+When (1)'s variance is known, the retrospective-noise contribution to conditional variance is exactly
+\[
+ \Var(D_{12}\mid\Delta,B,A=1)=4(m_1-m_2)^2v(B). \tag{6}
+\]
+\end{theorem}
+\begin{proof}
+Subtract the two squared forecast errors. The $R^2$ and any variance correction cancel, giving $D_{12}$. Conditional expectation replaces $R$ by $\Delta$, yielding the desired difference of squared causal errors. Selection weighting works as in (3). Conditional on $\Delta,B$, the only random term in this difference is $-2(m_1-m_2)\epsilon$, proving (6).
+\end{proof}
+Equation (6) favors evaluating competing forecasts against the same retrospective: its common error cancels more when their predictions agree. Absolute risk can fail to be identified without a variance restriction even though rankings remain identified. For example, observed $R$ may be a fair sign under either model $\Delta=R,\epsilon=0$ or model $\Delta=0,\epsilon=R$. Both obey conditional unbiasedness and produce the same data, but the risk of $m=0$ is respectively one and zero.
+
+For a finite-sample comparison, suppose $|m_i|\le M$, $|\Delta|\le M$, and $|\epsilon|\le E_0$. Then
+$|D_{12}|\le D_0=8M^2+4ME_0$.
+With $n$ independent proposals and known $e$, the sample average of $A D_{12}/e(B)$ differs from (5) by at most
+\[
+ \frac{D_0}{e_0}\sqrt{\frac{2\log(2/\alpha)}n}
+\]
+with probability $1-\alpha$. Indeed the summands lie in an interval of length $2D_0/e_0$. The bounded-variable exponential inequality gives tail $2\exp[-n r^2e_0^2/(2D_0^2)]$; solving it proves the bound. This evaluates a preregistered pair, or permits a finite family with an additional union bound. It does not authorize choosing forecasts after inspecting the same retrospective outcomes.
+
+\section{Selection adjustment with an augmented score}
+Let $T=(R-m(B))^2-v(B)$ and $\mu(B)=\E[(\Delta-m(B))^2\mid B]$. For any fixed working functions $\widetilde e(B)>0$ and $\widetilde\mu(B)$, define
+\[
+ \psi=\widetilde\mu(B)+\frac A{\widetilde e(B)}[T-\widetilde\mu(B)].
+\]
+Under (1)--(2), direct conditioning yields the exact bias identity
+\[
+ \E\psi-\mathcal R(m)=
+ \E\left[\left(1-\frac{e(B)}{\widetilde e(B)}\right)
+ (\widetilde\mu(B)-\mu(B))\right]. \tag{7}
+\]
+To prove it, replace the conditional expectation of $AT$ by $e\mu$, expand, and subtract $\mu$ before integrating. Thus either correct selection probabilities or a correct conditional risk function removes bias. If both are estimated, independent training data allow this identity to be applied conditional on their fitted values. A limit distribution and standard-error formula require further regularity and are not claimed here.
+
+\section{Corrected risk does not identify interval calibration}
+\begin{proposition}[Known variance is insufficient for calibration]
+There are two retrospective models satisfying (1) with the same constant known variance, the same complete observed law, and different coverage probabilities for the same prespecified prediction interval.
+\end{proposition}
+\begin{proof}
+Take no selection and constant $B$. Let $U$ be a fair sign, and independently let $V$ equal zero with probability $1/2$ and each of $\pm\sqrt2$ with probability $1/4$. Both are centered with variance one. In model I set $\Delta=U$, $\epsilon=V$; in model II set $\Delta=V$, $\epsilon=U$. Both observe exactly the same distribution of $R=U+V$. In each model the retrospective error is independent of the effect, has conditional mean zero, and has the same known conditional variance $v=1$. Yet the interval $[-1/2,1/2]$ covers the effect with probability zero in model I and $1/2$ in model II. The corrected risk of $m=0$ equals one in both, consistent with (3). Thus even knowing both first error moments does not identify the interval's coverage.
+\end{proof}
+A fully known error law with a suitable invertible convolution operator would be an additional assumption, not a consequence of unbiasedness. Independent high-quality retrospective designs or validation data could supply other information about calibration. The proposition explains why a noise-corrected quadratic score cannot simply be interpreted as a calibrated causal prediction interval.
+
+\section{Sharp bounds without ignorable case selection}
+Drop the first condition in (2). Suppose only that every proposal's effect belongs to a known interval $[L,U]$, $L<U$, and selected-case conditional risk
+$\mu_1(B)=\E[(m(B)-\Delta)^2\mid B,A=1]$
+is identified using (1). Write $q(B)=\Prob(A=1\mid B)$, and interpret $q\mu_1=0$ when $q=0$.
+
+\begin{theorem}[Sharp proposal-population risk interval]
+Without restrictions on the effects of unobserved cases, the exact risk interval is
+\[
+ \left[
+ \E\{q\mu_1+(1-q)\operatorname{dist}(m,[L,U])^2\},
+ \E\{q\mu_1+(1-q)\max[(m-L)^2,(m-U)^2]\}
+ \right]. \tag{8}
+\]
+For comparing two predictions, the analogous sharp bounds use the minimum and maximum over $d\in\{L,U\}$ of
+$(m_1-m_2)(m_1+m_2-2d)$ for unobserved cases. Separate worst-case risks need not give sharp bounds on their difference.
+\end{theorem}
+\begin{proof}
+Condition on $B,A$. On selected cases the contribution is identified. For unselected cases, squared distance to $m$ is minimized at the projection of $m$ onto $[L,U]$ and maximized at a farthest endpoint. Set the unobserved effects to these measurable choices to attain each bound while leaving all observed data unchanged. Mixtures of the two unobserved-case constructions attain every intermediate expectation. For a risk difference, the displayed loss difference is affine in $d$, so its extrema occur at the endpoints and the same construction proves sharpness. The same missing effect must be used for both models; optimizing their separate risks independently can ignore that constraint.
+\end{proof}
+
+The original program still requires credible causal retrospectives, a specified population of proposals and remedies, and stable outcome measurement across quality and entry changes. The results establish what several explicit observation schemes permit; they do not validate any existing merger simulator or turn consummated cases automatically into a representative proposal sample.
+
+\begin{thebibliography}{9}
+\bibitem{Nevo} A. Nevo (2000), ``Mergers with Differentiated Products: The Case of the Ready-to-Eat Cereal Industry,'' \emph{RAND Journal of Economics} 31(3), 395--421. \href{https://pages.stern.nyu.edu/~acollard/NevoRand.pdf}{University-hosted article}.
+\bibitem{Peters} C. Peters (2006), ``Evaluating the Performance of Merger Simulation: Evidence from the U.S. Airline Industry,'' \emph{Journal of Law and Economics} 49(2), 627--649. \href{https://doi.org/10.1086/505369}{doi:10.1086/505369}. These are primary examples motivating forecast evaluation; the scoring and identification results above concern the specified retrospective experiment.
+\end{thebibliography}
+
+\end{document}

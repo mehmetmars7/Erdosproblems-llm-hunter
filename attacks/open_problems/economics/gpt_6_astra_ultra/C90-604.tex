@@ -1,0 +1,151 @@
+% ECONOMICS_PROBLEM: {"id": "C90-604", "title": "Laboratory-to-field transfer", "jel_code": "C90", "source_id": "OP-0306"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\TV}{TV}
+\DeclareMathOperator{\OPT}{OPT}
+\title{Laboratory transport through context designs: identification and optimal extrapolation}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{C90-604}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models; they do not resolve the full catalogue problem.
+
+\section{Question and a multicontext experiment}
+Randomization inside a laboratory does not establish external validity. The catalogue asks how contextual moderators and deliberate variation across environments can support field predictions. Levitt and List \cite{LL} motivate differences in scrutiny, stakes, framing, and selection. We solve a finite context-design problem, quantify the cost of extrapolation, and separate a context restriction from ordinary covariate overlap.
+
+Fix one baseline participant stratum and a treatment with the same conceptual meaning and outcome units in every setting. There are $K$ laboratory environments with measured contexts $c_j\in\R^d$, and a target field context $c_*$. Put $z_j=(1,c_j^\top)^\top$ and $z_*=(1,c_*^\top)^\top$, and let $Z$ have rows $z_j^\top$. Within each laboratory, randomized treatment identifies its conditional mean effect $\tau_j$. We posit
+\[
+ \tau_j=z_j^\top\theta+e_j,\qquad
+ \tau_*=z_*^\top\theta+e_*,\qquad \theta\in\R^{d+1}. \tag{1}
+\]
+The departures $e_j$ represent unmeasured environment features and may differ even when measured contexts coincide. For the statistical calculations assume independent experimental contrast estimates
+\[
+ T_j\sim N(\tau_j,\sigma_j^2/n_j),\qquad\sigma_j>0,\quad n_j>0. \tag{2}
+\]
+This is an explicit Gaussian contrast experiment with known variances, not an automatic finite-sample approximation for every randomized trial. No bounded-outcome restriction is used until the separate final section.
+
+\section{The rank condition supplied by varied contexts}
+\begin{theorem}[Exact affine transport]
+Under exact invariance $e_j=e_*=0$ and exact knowledge of laboratory effects, the field effect is identified if and only if $z_*$ lies in the row space of $Z$. Equivalently, there are weights $\lambda\in\R^K$ with
+\[
+ Z^\top\lambda=z_*,\qquad
+ \tau_*=\sum_j\lambda_j\tau_j. \tag{3}
+\]
+If this condition fails, the field effect is unbounded above and below among models having the same laboratory effects.
+\end{theorem}
+\begin{proof}
+If (3) holds, substitute $\tau=Z\theta$ to obtain the formula, proving identification. Conversely, if $z_*$ is outside the row space, its orthogonal projection onto the null space of $Z$ is a nonzero vector $v$ with $z_*^\top v\ne0$. All coefficient vectors $\theta+tv$, $t\in\R$, produce the same laboratory effects, while their field effects differ by $t z_*^\top v$. This proves both nonidentification and unboundedness. The row-space equivalence follows from elementary orthogonal decomposition in finite dimensions.
+\end{proof}
+In particular, one laboratory where a context variable is constant cannot identify its moderation slope merely by increasing the number of participants. More settings must supply independent variation, or that slope must be restricted using other evidence. Being outside the laboratories' convex hull does not itself prevent affine identification, but it forces extrapolating weights and increases sensitivity to misspecification.
+
+\section{Variance and exact worst-case linear risk}
+Let $\Omega=\operatorname{diag}(\sigma_j^2/n_j)$. For feasible weights in (3), estimate the field effect by $\widehat\tau_*=\lambda^\top T$.
+
+\begin{theorem}[Efficient affine prediction and bounded departures]
+If $Z$ has full column rank and invariance is exact, the unique minimum-variance linear unbiased estimator uses
+\[
+ \lambda_0=\Omega^{-1}Z(Z^\top\Omega^{-1}Z)^{-1}z_*,
+ \qquad V_0=z_*^\top(Z^\top\Omega^{-1}Z)^{-1}z_*.
+\]
+More generally, suppose $|e_j|\le\gamma_j$ and $|e_*|\le\gamma_*$, with departures unrestricted across environments within those bounds. For any weights satisfying (3), set
+\[
+ V(\lambda)=\sum_j\lambda_j^2\sigma_j^2/n_j,
+ \qquad B(\lambda)=\gamma_*+\sum_j|\lambda_j|\gamma_j.
+\]
+Its exact worst-case mean squared error over (1) is
+\[
+ V(\lambda)+B(\lambda)^2. \tag{4}
+\]
+For $0<\alpha<1$, write $z_q$ for the standard normal $q$-quantile. An honest $1-\alpha$ interval is
+\[
+ \lambda^\top T\ \pm\bigl[B(\lambda)+z_{1-\alpha/2}\sqrt{V(\lambda)}\bigr]. \tag{5}
+\]
+Minimizing (4), or the radius in (5), over (3) is a convex optimization problem. No claim is made that this linear class is optimal among all nonlinear procedures.
+\end{theorem}
+\begin{proof}
+The stated $\lambda_0$ satisfies (3). Any other feasible weight vector is $\lambda_0+v$ with $Z^\top v=0$. Since $\Omega\lambda_0$ belongs to the column space of $Z$, the cross term $v^\top\Omega\lambda_0$ vanishes. Thus its variance equals $V_0+v^\top\Omega v$, proving optimality and uniqueness because $\Omega$ is positive definite.
+
+Under departures the estimation error is a centered normal with variance $V(\lambda)$ plus bias $\sum_j\lambda_j e_j-e_*$. Its absolute bias is at most $B(\lambda)$, and the bound is attained by taking $e_j=\gamma_j\operatorname{sign}(\lambda_j)$ and $e_*=-\gamma_*$. Mean squared error is variance plus squared bias, giving (4). On the event that the centered normal's absolute value is at most its two-sided normal quantile, total error is at most the radius in (5), proving coverage. The weighted $\ell^1$ norm plus a constant is convex and nonnegative; its square is convex by the increasing convex square function on nonnegative arguments. Variance is a positive quadratic form, and its square root is a norm. These facts prove the optimization assertions.
+\end{proof}
+Weights violating (3) have infinite worst-case squared bias when $\theta$ is unrestricted, unless their discrepancy vector is zero. Thus the restriction defining this linear class is necessary for a finite uniform risk, not merely a cosmetic unbiasedness preference. The departure bounds are sensitivity inputs: the experiment does not validate them simply by producing small standard errors.
+
+\section{How to allocate a context experiment}
+Consider continuous information budgets $n_j\ge0$ with $\sum_jn_j=N$. A setting with a nonzero prediction weight must receive positive information; zero-weight settings can receive zero. Fractional $n_j$ describe the information-allocation benchmark before rounding actual sample sizes.
+
+\begin{proposition}[Optimal information allocation for given weights]
+For any nonzero feasible weight vector, the minimum variance is
+\[
+ \frac{\left(\sum_j|\lambda_j|\sigma_j\right)^2}{N},
+ \qquad
+ n_j^*=\frac{N|\lambda_j|\sigma_j}{\sum_k|\lambda_k|\sigma_k}.
+\]
+\end{proposition}
+\begin{proof}
+Cauchy--Schwarz gives
+\[
+ \left(\sum_j|\lambda_j|\sigma_j\right)^2
+ \le\left(\sum_j\frac{\lambda_j^2\sigma_j^2}{n_j}\right)
+       \left(\sum_jn_j\right).
+\]
+Equality holds exactly at the displayed allocation on the nonzero coordinates. The intercept constraint in (3) implies $\sum_j\lambda_j=1$, so the denominator is positive. Assigning zero information to zero-weight coordinates completes the proof.
+\end{proof}
+
+\begin{theorem}[Sharp design cost for extrapolating beyond all laboratory contexts]
+Suppose context is one-dimensional, every available laboratory context belongs to $[a,b]$, $a<b$, and the field context is $x>b$. All laboratory contrasts have common noise scale $\sigma$, and all departure bounds, including the field bound, equal $\gamma\ge0$. Among all finite choices of laboratory contexts, affine-exact weights, and continuous information allocations of total size $N$, the smallest worst-case linear squared risk is
+\[
+ \frac{\sigma^2 t^2}{N}+\gamma^2(1+t)^2,
+ \qquad t=\frac{2x-a-b}{b-a}>1. \tag{6}
+\]
+It is attained using only the endpoint contexts, with weights
+\[
+ \lambda_a=-\frac{x-b}{b-a},\qquad
+ \lambda_b=\frac{x-a}{b-a},
+\]
+and sample sizes proportional to their absolute weights.
+\end{theorem}
+\begin{proof}
+Any affine-exact weights obey $\sum\lambda_j=1$ and $\sum\lambda_jc_j=x$. The function $h(c)=(2c-a-b)/(b-a)$ has absolute value at most one on the laboratory interval. Therefore
+\[
+ t=\sum_j\lambda_jh(c_j)\le\sum_j|\lambda_j|.
+\]
+The two displayed endpoint weights satisfy the constraints and have absolute sum exactly $t$. For a given weight vector, the preceding proposition makes minimum variance $\sigma^2(\sum|\lambda_j|)^2/N$, and its worst bias is $\gamma(1+\sum|\lambda_j|)$. Both expressions increase with the absolute sum. The lower bound and endpoint construction prove (6) and attainment.
+\end{proof}
+Even infinite participant samples cannot remove the departure term in (6). Moving experimental contexts closer to the field can reduce both noise amplification and sensitivity, whereas repeating one distant context cannot identify a missing moderation direction.
+
+\section{Covariate overlap remains a separate restriction}
+The calculations can be applied within observed participant strata and then averaged with known field-population weights. They require adequate context variation in every stratum that contributes to the field target. A rank condition on contexts does not repair absence of a participant stratum from all experiments.
+
+For a separate bounded-outcome model, suppose $Y(d)\in[0,1]$, the transported conditional effect is identified on a covariate set $S$, and the field mass outside it is $r$. Without restrictions on effects outside $S$, the sharp field-effect interval is
+\[
+ \left[\int_S\tau(x)\,dP_F(x)-r,\quad
+       \int_S\tau(x)\,dP_F(x)+r\right]. \tag{7}
+\]
+The unobserved conditional contrast lies in $[-1,1]$, proving inclusion. To attain either endpoint set unobserved potential outcomes to $(Y(0),Y(1))=(1,0)$ or $(0,1)$; mixtures attain intermediate values without changing any laboratory data or field covariates. Thus (7) is sharp for that declared class. It is not added to the Gaussian model without changing its assumptions.
+
+The original problem still requires credible moderator selection, invariance assessment on independent environments, and compatible treatment and outcome versions. The present results quantify what a specified affine or bounded-departure model licenses; they do not establish that such a model holds in a particular laboratory--field comparison.
+
+\begin{thebibliography}{9}
+\bibitem{LL} S. D. Levitt and J. A. List (2007), ``What Do Laboratory Experiments Measuring Social Preferences Reveal About the Real World?'' \emph{Journal of Economic Perspectives} 21(2), 153--174. \href{https://doi.org/10.1257/jep.21.2.153}{doi:10.1257/jep.21.2.153}. The source provides the contextual-generalizability agenda; the rank, sensitivity, and design results above are proved for the stated experiments.
+\end{thebibliography}
+
+\end{document}

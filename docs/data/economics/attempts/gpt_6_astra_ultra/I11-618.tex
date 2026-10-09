@@ -1,0 +1,132 @@
+% ECONOMICS_PROBLEM: {"id": "I11-618", "title": "Economic allocation of mental-health care", "jel_code": "I11", "source_id": "OP-0058"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\clip}{\operatorname{clip}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
+\title{Economic allocation of mental-health care\\[4pt]\large Hard-capacity allocation with family spillovers and identified offer values}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Question and scope}
+The task is to allocate specified mental-health services using baseline information, with health and economic consequences, real budget costs, and provider capacity treated consistently. Symptoms and earnings associations do not by themselves identify treatment benefits. The source studies \cite{currie,chatterji,layard} motivate economic and educational consequences and cost-benefit accounting; they do not establish the intervention coefficients used below. This attempt solves a restricted allocation problem with pairwise family spillovers, gives an explicit experimental identification design, and derives a robust policy guarantee under coefficient uncertainty. It makes no clinical recommendation or empirical claim about a treatment's effectiveness.
+
+\section*{A feasible offer policy and a monetary objective}
+There are $n$ patients with recorded pretreatment characteristics. The intervention is one fully specified service package, including duration and provider quality; the alternative is the specified usual-care option. A binary decision $s_i$ reserves and offers one service slot to patient $i$. Reservation costs a real amount $c>0$ even if declined, and an accepted offer consumes at most that one slot. A hard budget $B\ge0$ and an integer provider-slot limit $L\ge0$ therefore permit
+\[
+ |S|\le K:=\min\{n,\lfloor B/c\rfloor,L\},\qquad S=\{i:s_i=1\}.
+\]
+This is a conservative hard-capacity design, not an assumption that expected attendance can replace a pathwise capacity constraint.
+
+Conditional on the recorded baseline information, suppose the expected monetary welfare increment is
+\[
+ F(S)=\sum_{i\in S}v_i+\sum_{\{i,j\}\in E:\ i,j\in S}b_{ij},
+ \tag{1}
+\]
+where $(\{1,\ldots,n\},E)$ is a known forest. Coefficients can have either sign. They include declared distributional weights and monetized health, earnings and education consequences, with education benefits not counted again when already included through earnings. Any reservation-resource cost included in welfare is subtracted once in $v_i$, as well as being a feasibility constraint. Nonattendance and substitution away from other care are already part of the offer effect. Formula (1) is a conditional mean restriction on the entire joint assignment; it allows family spillovers but excludes higher-order and nonforest interactions.
+
+\begin{theorem}[Exact hard-budget allocation on a forest]
+For rational coefficients in (1), an optimal deterministic offer set under $|S|\le K$ can be computed in $O(nK^2)$ arithmetic operations when $K\ge1$, with polynomial bit complexity. The case $K=0$ has the unique feasible set $S=\varnothing$. The algorithm is valid for positive or negative interaction coefficients and recovers an actual feasible set, not merely fractional inclusion probabilities.
+\end{theorem}
+\begin{proof}
+Root each tree. For a vertex $v$, let $f_v(s,k)$ be the maximum welfare from its rooted subtree, including all internal edge terms, conditional on $v$ having selection state $s\in\{0,1\}$ and exactly $k$ selected vertices in that subtree. Impossible states have value minus infinity. Before its children are processed, initialize $f_v(0,0)=0$ and $f_v(1,1)=v_v$, with all other states impossible. If a child $u$ has been processed, combine it with the previously processed part by the recurrence
+\[
+ f_v^{\rm new}(s,k)=
+ \max_{\substack{t\in\{0,1\}\\k_1+k_2=k}}
+ \{f_v^{\rm old}(s,k_1)+f_u(t,k_2)+b_{vu}st\}.
+ \tag{2}
+\]
+Only counts at most $K$ need be kept. A forest has no edge between two different child subtrees, so conditional on $s,t$ and their counts, (2) includes every welfare term exactly once. Conversely every feasible subtree set decomposes into exactly such states. Induction from leaves proves that every table entry is the stated optimum. At each root maximize over its selection state; convolve the component tables in the same way, with no connecting edge. Finally maximize over total counts $0,\ldots,K$.
+
+There are $O(n)$ child and component combinations, each requiring $O(K^2)$ comparisons and additions up to fixed factors for the two states. Record maximizing choices to reconstruct the selected set. Every finite value is the sum of at most $n+|E|$ input coefficients; rational numerator and denominator lengths remain polynomial in total input length. Thus the arithmetic implementation also has polynomial bit complexity.
+\end{proof}
+
+The forest condition is an explicit structural restriction, not a claim that real family and provider networks are always acyclic. Even on this restricted class, ranking individual benefits can fail. With three patients, $K=2$, individual values $(3,2,2)$ and a single edge $\{2,3\}$ of value $4$, selecting the two highest individual values gives welfare $5$, while selecting patients 2 and 3 gives $8$. The dynamic program evaluates the complementarity instead of treating it as noise.
+
+\section*{A design that identifies the coefficients}
+For identification, suppose independent replicates of the same baseline-defined cluster are available. Across replicates, offers $Z_i$ are mutually independent Bernoulli variables with known probabilities $\pi_i\in(0,1)$. The research design has enough reserved research capacity to implement its assignments; it need not obey the smaller deployment limit $K$. Let the observed monetary cluster outcome satisfy
+\[
+ \E[Y\mid Z]=\beta_0+\sum_i v_iZ_i+\sum_{\{i,j\}\in E}b_{ij}Z_iZ_j.
+ \tag{3}
+\]
+If real reservation costs are known, they can first be subtracted from $Y$ to match the coefficients in (1). Set $\sigma_i^2=\pi_i(1-\pi_i)>0$.
+
+\begin{theorem}[Factorial moment identification with spillovers]
+Under (3) and integrability of $Y$, the observable joint law identifies every interaction and individual coefficient through
+\[
+ b_{ij}=\frac{\E[Y(Z_i-\pi_i)(Z_j-\pi_j)]}{\sigma_i^2\sigma_j^2},
+ \qquad
+ v_i=\frac{\Cov(Y,Z_i)}{\sigma_i^2}-\sum_{j:\{i,j\}\in E}b_{ij}\pi_j.
+ \tag{4}
+\]
+These are offer-effect coefficients; (4) does not by itself identify effects of actual treatment receipt.
+\end{theorem}
+\begin{proof}
+Write $Y$ as the conditional mean (3) plus a residual with zero conditional mean. Multiplication by any bounded function of $Z$ makes the residual expectation vanish. For the first expression, every constant or single-variable term in (3) has at least one independent centered factor with mean zero. Any pair term other than $b_{ij}Z_iZ_j$ also leaves at least one of $Z_i-\pi_i$, $Z_j-\pi_j$ unpaired and independent. The surviving expectation is
+$b_{ij}\E[Z_i(Z_i-\pi_i)]\E[Z_j(Z_j-\pi_j)]=b_{ij}\sigma_i^2\sigma_j^2$. Similarly multiplying (3) by $Z_i-\pi_i$ leaves $v_i\sigma_i^2$ and the terms $b_{ij}\sigma_i^2\pi_j$ from its neighbors. Rearranging gives the second formula. Neither calculation conditions on attendance or substitutes it for randomized offers, proving the final distinction.
+\end{proof}
+
+Repeated clusters with a common coefficient vector are a strong transport and homogeneity assumption. With heterogeneous baselines, (3) must be interpreted within adequately supported strata or replaced by a justified conditional model. A single realized family does not reveal the expectations in (4). Generalizing from experimental reservation and provider quality to a scaled service is another empirical task.
+
+\section*{Robust allocation under joint coefficient uncertainty}
+Let the uncertainty set be a nonempty rectangular box
+\[
+ |v_i-\widehat v_i|\le r_i,\qquad
+ |b_e-\widehat b_e|\le r_e,\qquad r_i,r_e\ge0.
+\]
+Nature selects one coefficient array from this common box after the deterministic policy is fixed. Write $F_-$ for (1) with every coefficient at its lower endpoint, and let $\widehat S$ maximize $F_-$ under the hard limit.
+
+\begin{theorem}[Exact robust rule and a simultaneous-error guarantee]
+The set $\widehat S$, computed by the preceding dynamic program, maximizes worst-case welfare over all feasible deterministic sets. On every event where the true coefficient array lies in the box, if $S^*$ maximizes its true welfare, then
+\[
+ F(S^*)-F(\widehat S)
+ \le 2\sum_{i\in S^*}r_i+
+ 2\sum_{e\subseteq S^*}r_e.
+ \tag{5}
+\]
+If all vertex radii are at most $r_V$ and edge radii at most $r_E$, the right side is at most $2Kr_V+2(K-1)_+r_E$. Thus a simultaneous coverage probability $1-\alpha$ for the box implies the same probability for this policy-value guarantee, despite selecting the policy from those estimates.
+\end{theorem}
+\begin{proof}
+All coefficients in (1) multiply zero-one nonnegative indicators. For every fixed set, nature minimizes its value by selecting all included coefficients at their lower endpoints. The same lower-endpoint array lies in the box and minimizes every set simultaneously. Hence worst-case optimization is exactly maximization of $F_-$. On the stated coverage event, $F(\widehat S)\ge F_-(\widehat S)\ge F_-(S^*)$. Subtracting yields $F(S^*)-F(\widehat S)\le F(S^*)-F_-(S^*)$. Each included true coefficient exceeds its lower endpoint by at most twice its radius, proving (5). An induced subgraph of a forest on $k$ vertices has at most $(k-1)_+$ edges, giving the uniform bound. Since the inequalities hold for every parameter array in the box, no independence between policy selection and the estimates is needed.
+\end{proof}
+
+The box is a declared ambiguity set. Correlated coefficient restrictions can make it conservative; lower endpoints need not be jointly feasible in a narrower identified set. Likewise, confidence radii must account for the cluster design, monetary-outcome bounds or tails, and simultaneous estimation. The theorem does not manufacture such coverage from point estimates.
+
+\begin{proposition}[Expected capacity is a different allocation problem]
+Replacing the hard constraint by $\E|S|\le K$ can strictly increase achievable expected welfare, even in a forest with two patients.
+\end{proposition}
+\begin{proof}
+Take two patients with $v_1=v_2=0$, $b_{12}=1$, and $K=1$. Every hard-feasible set has welfare zero. A lottery selecting both patients with probability $1/2$ and neither otherwise has expected size one and expected welfare $1/2$. It violates the physical slot limit on half its realizations, proving both the strict difference and the reason it cannot implement the hard-capacity optimum.
+\end{proof}
+
+The remaining work is substantive empirical identification: choosing a defensible service package and usual-care baseline, measuring effects and spillovers over the relevant horizon, monetizing outcomes without duplication, treating dropout, and establishing transport to the target patients and provider capacity. The allocation theorem solves the stated forest offer model once those inputs are supplied; it does not resolve arbitrary treatment portfolios, latent clinical need or unknown network structure.
+
+\begin{thebibliography}{9}
+\bibitem{currie} J. Currie and M. Stabile (2006), Child mental health and human capital accumulation: The case of ADHD, \emph{Journal of Health Economics} 25(6), 1094--1118. \url{https://doi.org/10.1016/j.jhealeco.2006.03.001}.
+\bibitem{chatterji} P. Chatterji, M. Alegria and D. Takeuchi (2011), Psychiatric disorders and labor market outcomes: Evidence from the National Comorbidity Survey-Replication, \emph{Journal of Health Economics} 30(5), 858--868. \url{https://doi.org/10.1016/j.jhealeco.2011.06.006}; author manuscript \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC3640302/}.
+\bibitem{layard} R. Layard, D. Clark, M. Knapp and G. Mayraz (2007), Cost-benefit analysis of psychological therapy, \emph{National Institute Economic Review} 202, 90--98. \url{https://doi.org/10.1177/0027950107086171}; primary discussion-paper version \url{https://eprints.lse.ac.uk/19673/1/Cost-Benefit_Analysis_of_Psychological_Therapy.pdf}.
+\end{thebibliography}
+
+\end{document}

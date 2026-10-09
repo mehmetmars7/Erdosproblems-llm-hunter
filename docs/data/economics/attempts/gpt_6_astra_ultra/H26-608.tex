@@ -1,0 +1,149 @@
+% ECONOMICS_PROBLEM: {"id": "H26-608", "title": "Digital tax administration and compliance", "jel_code": "H26", "source_id": "OP-0047"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=26mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\TV}{\operatorname{TV}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\title{Digital tax features: network experiments and validation without perfect audits}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Catalogue problem:} \texttt{H26-608}. \textbf{Status:} Unresolved. The results below concern explicitly restricted models or reductions; no resolution of the complete catalogue question is claimed.
+
+\section{Question and scope}
+The catalogue asks for the welfare value of digital tax features, accounting for transaction-network spillovers, corrected collections, private burdens and enforcement errors. Its integrated refinement also asks whether records become more accurate relative to policy-dependent real activity. Pomeranz~\cite{pomeranz} provides experimental evidence on information and supply-chain enforcement; this does not identify every feature or privacy cost. We derive a factorial exposure design, a two-audit correction for record error and explicit limits on what bundled rollout and rare-event observations establish.
+
+\section{A fixed-cohort network design}
+There are $N$ baseline firms on a fixed undirected simple graph of maximum degree $D$. The two features are e-invoicing $E_i$ and prefilling $P_i$, independently randomized with probabilities $p_E,p_P\in(0,1)$ across firms and features. Define peer counts
+\[
+ H_i=\left(\sum_{j\sim i}E_j,\sum_{j\sim i}P_j\right),\qquad
+ X_i=(E_i,P_i,H_i).
+\]
+Assume an exposure mapping: each firm's potential endpoint is a fixed function of $X_i$ rather than the rest of the assignment. This excludes unrecorded higher-order exposure and endogenous network rewiring. All outcomes refer to the same horizon and initial firm cohort, including closures by a declared outcome convention.
+
+For exposure $x=(e,p,h_E,h_P)$, its assignment probability is
+\begin{align*}
+ \pi_i(x)={}&p_E^e(1-p_E)^{1-e}p_P^p(1-p_P)^{1-p}\\
+ &\times {d_i\choose h_E}p_E^{h_E}(1-p_E)^{d_i-h_E}
+ {d_i\choose h_P}p_P^{h_P}(1-p_P)^{d_i-h_P},
+\end{align*}
+where $d_i$ is degree. Restrict a target population to firms for which the specified counts are feasible, so every relevant $\pi_i(x)>0$. Relabel its size as $N$ if necessary. Exposure comparisons average over this same population; one must not compare different degree-selected populations without declaring it.
+
+Let $Y_i(x)$ be an endpoint, such as collected net tax after reversals and refunds, or a measured compliance burden. A validation procedure may observe a noisy variable $\widetilde Y_i$ with conditional mean $Y_i(x)$. It is performed with known probability $q_i(x)\geq q_*>0$, using an independent local audit coin $A_i$. Assume $|\widetilde Y_i|\leq B$. For administrative outcomes observed on every firm, take $A_i=q_i=1$ and no measurement noise.
+
+\begin{theorem}[Exposure identification with a network variance bound]\label{th:ht}
+The estimator
+\[
+ \widehat\mu(x)=\frac1N\sum_i
+ \frac{\ind\{X_i=x\}A_i\widetilde Y_i}{\pi_i(x)q_i(x)}
+\]
+is unbiased for $\mu(x)=N^{-1}\sum_iY_i(x)$. Suppose audit noises and audit coins are generated independently across firms and independently of feature assignments, conditional on the firm's exposure and fixed potential quantities. If $\pi_i(x)\geq\pi_*>0$, then
+\[
+ \Var\{\widehat\mu(x)\}
+ \leq\frac{(D^2+1)B^2}{N\pi_*q_*}.
+\]
+Consequently the factorial interaction at fixed peer counts,
+\[
+ \iota(h)=\mu(1,1,h)-\mu(1,0,h)-\mu(0,1,h)+\mu(0,0,h),
+\]
+has an unbiased estimator with variance at most
+$16(D^2+1)B^2/(N\pi_*q_*)$ when the same lower bounds hold for all four exposures.
+\end{theorem}
+\begin{proof}
+Condition first on the full feature assignment. Independent audit sampling and conditional unbiasedness make the conditional expectation of $A_i\widetilde Y_i/q_i(x)$ equal to $Y_i(x)$ whenever $X_i=x$. Averaging over assignment then cancels $\pi_i(x)$, proving unbiasedness.
+
+Write $T_i$ for the summand before division by $N$. Its second moment is at most $B^2/(\pi_iq_i)$, because it is nonzero with probability $\pi_iq_i$ and then has absolute value at most $B/(\pi_iq_i)$. If the closed graph neighborhoods of $i,j$ are disjoint, the summands depend on disjoint independent assignment and validation variables and are independent. Each firm has at most $D+D(D-1)=D^2$ other firms within distance two. For possibly dependent pairs, Cauchy--Schwarz bounds covariance in absolute value by $B^2/(\pi_*q_*)$. There are at most $N(D^2+1)$ ordered pairs including diagonals that need be retained in the variance sum. Dividing by $N^2$ gives the result. Finally, the standard deviation of a sum is at most the sum of the standard deviations, by Cauchy--Schwarz in $L^2$; summing four bounds and squaring gives the factor sixteen.
+\end{proof}
+
+The positivity constants can be very small for extreme exposure counts, so formal identification does not ensure useful precision. A cluster or saturation design may improve support for policy-relevant exposures, but its probabilities and covariance structure must be recalculated rather than importing the formula above.
+
+\section{Record accuracy when audits have errors}
+For a fixed exposure let true activity be $T_i$, administrative record $Z_i$ and usable-linkage indicator $M_i\in\{0,1\}$. A missing record is assigned a predeclared loss $L_{\rm miss}\geq0$. The fixed-cohort accuracy endpoint is
+\[
+ L_i=M_i(Z_i-T_i)^2+(1-M_i)L_{\rm miss}.
+\]
+This definition avoids conditioning on a post-policy linkage outcome. True activity is allowed to change with policy.
+
+Two validation measurements satisfy $V_{ir}=T_i+\varepsilon_{ir}$, $r=1,2$. Conditional on exposure and $(T_i,Z_i,M_i)$, assume each error has mean zero and their cross product has mean zero. Conditional independence is sufficient but stronger than necessary.
+
+\begin{proposition}[Two noisy audits identify squared record loss]\label{pr:audit}
+Under these conditions,
+\[
+ \widetilde L_i=M_i(Z_i-V_{i1})(Z_i-V_{i2})
+                 +(1-M_i)L_{\rm miss}
+\]
+has conditional expectation $L_i$. Therefore Theorem~\ref{th:ht} identifies policy-specific mean record loss and its exposure contrasts from independently sampled paired audits. If $|Z_i|,|T_i|,|V_{ir}|\leq K$, one may use
+$B=\max\{4K^2,L_{\rm miss}\}$ in that theorem. The validation variable itself can be negative even though its target is nonnegative.
+\end{proposition}
+\begin{proof}
+Expand the observed cross product as
+\[
+ (Z_i-T_i)^2-(Z_i-T_i)(\varepsilon_{i1}+\varepsilon_{i2})
+                    +\varepsilon_{i1}\varepsilon_{i2}.
+\]
+Conditional mean-zero errors and zero conditional cross moment remove the last three contributions. The missing-record term is already observed and fixed by convention. The absolute bound follows because each record--audit difference is at most $2K$.
+\end{proof}
+
+\begin{proposition}[One mean-unbiased audit is insufficient]
+If the audit-error variance is unknown and may change with policy, the joint observed law of a record and one conditionally mean-unbiased audit does not generally identify a policy contrast in squared record accuracy.
+\end{proposition}
+\begin{proof}
+Take two randomized policy regimes, with every record linked and equal to zero. Under each regime the observed audit is an independent equiprobable $+1$ or $-1$. In model A, true activity is zero under both regimes and audit error is this sign, so both squared record losses are zero. In model B, keep the same construction under regime zero, but under regime one let true activity itself be the equiprobable sign and make the audit exact. Both models satisfy conditional audit mean-unbiasedness and generate the same observed record--audit law in both randomized arms. Their accuracy contrasts are zero and one. The second audit in Proposition~\ref{pr:audit} distinguishes the models through cross-measurement dependence.
+\end{proof}
+
+The example is in common centered measurement units; adding a sufficiently large common constant to truth, record and audit makes all levels nonnegative without changing the loss or argument. Correlated audit errors would contribute their conditional covariance to the paired-audit estimator and require a separate correction or sensitivity bound.
+
+\section{Two further design limits}
+\begin{proposition}[A bundle does not identify a feature interaction]
+A design that assigns only $(E_i,P_i)=(0,0)$ or $(1,1)$ cannot, without extra restrictions, identify the two-feature interaction even in the absence of network interference.
+\end{proposition}
+\begin{proof}
+Let every unit's endpoint be bounded in $[0,1]$, with potential values $Y(0,0)=0$ and $Y(1,1)=1$. Model A sets both unobserved discordant-arm outcomes to zero, giving interaction one. Model B sets both to one, giving interaction minus one. All observed potential outcomes under the bundled design agree exactly. No assignment sample size distinguishes the models.
+\end{proof}
+
+\begin{proposition}[Zero observed breaches and bounded severity]
+In $n\geq1$ independent audit-period observations with common breach probability $p$, observing no breaches gives a one-sided $(1-\alpha)$ upper confidence bound
+\[
+ p\leq u_n:=1-\alpha^{1/n},\qquad 0<\alpha<1.
+\]
+More precisely, the rule reporting this bound on zero events and the bound one otherwise has coverage at least $1-\alpha$ for every $p$. If breach severity is bounded by a known $S_{\max}$, expected breach loss is at most $S_{\max}u_n$ on the covered event. Without a finite severity restriction, zero events cannot imply a finite uniform upper bound on expected loss.
+\end{proposition}
+\begin{proof}
+If $p>u_n$, the only way the stated rule fails is to observe zero events, whose probability is $(1-p)^n<\alpha$. For $p\leq u_n$ it cannot fail. Expected loss is at most $S_{\max}p$. Without a severity bound, fix any sufficiently small positive $p$ so zero events remain likely and let loss conditional on a breach tend to infinity; the expected loss becomes arbitrarily large while the zero-event probability is unchanged.
+\end{proof}
+
+\section{Welfare interpretation and remaining gaps}
+Use the identified corrected revenue, private welfare and measured cost endpoints in the catalogue's declared monetary objective. Transfer payments, private equivalent variation and separately valued errors must have disjoint accounting roles. If a finite policy menu has simultaneous welfare intervals $[L_d,U_d]$, choosing a feasible policy maximizing $L_d$ has regret at most $\max_d(U_d-L_d)$ relative to an optimal policy included in the same feasible set: its lower bound is at least the optimum's lower bound. Unmeasured burden or breach losses must widen these intervals, not be set to zero.
+
+The results depend on a valid fixed network exposure map, known assignment probabilities, independent validation noise and externally chosen loss valuations. They do not identify the consequences of nationwide network rewiring, nonrandom staggered adoption, endogenous audit targeting without known propensities, or unbounded privacy harm. Those issues and the empirical feature-response surfaces remain unresolved. The contribution here is an explicit design-and-validation calculation rather than an asserted universal benefit of digitization.
+
+\begin{thebibliography}{9}
+\bibitem{pomeranz} D. Pomeranz (2015), ``No Taxation without Information: Deterrence and Self-Enforcement in the Value Added Tax,'' \emph{American Economic Review} 105(8), 2539--2569. \url{https://doi.org/10.1257/aer.20130393}. Primary publisher abstract verifies the information and supply-chain experimental motivation; no paired-audit theorem or comprehensive privacy valuation is attributed to it.
+\end{thebibliography}
+
+\end{document}
