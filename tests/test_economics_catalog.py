@@ -429,6 +429,40 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertIn(r'\begin{thebibliography}', text)
                 self.assertNotRegex(text, r'/Users/|/home/|/mnt/data|/workspace/|TODO|proof omitted')
 
+    def test_astra_ultra_rank_451_to_500_batch_preserves_ids_and_reviewed_claims(self):
+        # These permanent IDs identify the batch even after future rank updates.
+        expected = '''E32-451 J14-452 C21-453 I38-454 G12-455 E32-456 L95-457 D31-458
+            D83-459 D24-460 J16-461 I13-462 E43-463 C78-464 I38-465 G23-466
+            E31-467 H22-468 C21-469 E42-470 E32-471 D84-472 D63-473 I15-474
+            L41-475 D72-476 G28-477 O33-478 D83-479 D83-480 G12-481 D91-482
+            L94-483 I18-484 Q54-485 I11-486 C73-487 C72-488 C72-489 Q16-490
+            C31-491 C73-492 F18-493 C21-494 L51-495 C73-496 J62-497 F23-498
+            D91-499 Q58-500'''.split()
+        self.assertEqual(len(set(expected)), 50)
+        data = build_economics_data()
+        for problem_id in expected:
+            with self.subTest(problem_id=problem_id):
+                attempts = [attack for attack in data[problem_id]['attacks']
+                            if attack['model'] == 'GPT 6 Astra Ultra' and attack['version'] == 1]
+                self.assertEqual(len(attempts), 1)
+                attack = attempts[0]
+                claim = 'solved' if problem_id in {'C73-487', 'C73-496'} else 'unresolved'
+                self.assertEqual(attack['status'], claim)
+                self.assertEqual(data[problem_id]['llm_status'], claim)
+                self.assertEqual(data[problem_id]['status'], 'open')
+                self.assertEqual(attack['entry_kind'], 'research_attempt')
+                self.assertEqual(attack['date_posted'], '2026-10-09')
+                self.assertEqual(attack['file_path'],
+                                 f'attacks/open_problems/economics/gpt6_astra_ultra/{problem_id}.tex')
+                self.assertEqual(attack['download_url'],
+                                 f'data/economics/attempts/gpt6_astra_ultra/{problem_id}.tex')
+                source = (BASE_DIR / attack['file_path']).read_bytes()
+                self.assertEqual(source, (BASE_DIR / 'docs' / attack['download_url']).read_bytes())
+                text = source.decode()
+                self.assertIn(r'\begin{proof}', text)
+                self.assertIn(r'\begin{thebibliography}', text)
+                self.assertNotRegex(text, r'/Users/|/home/|/mnt/data|/workspace/|TODO|proof omitted')
+
     def test_astra_ultra_rank_201_to_250_attempts_preserve_problem_identity(self):
         # Fixed IDs of the batch selected on 2026-10-09, independent of reranking.
         expected = set('L52-201 C21-202 C78-203 O34-204 D82-205 C21-206 O31-207 Q54-208 C63-209 C21-210 R42-211 O34-212 C78-213 C31-214 C18-215 D72-216 C78-217 D83-218 C31-219 J12-220 G12-221 F18-222 Q54-223 E42-224 C78-225 C23-226 C78-227 F13-228 D15-229 F13-230 E32-231 C21-232 C83-233 C21-234 G28-235 I18-236 C78-237 D44-238 C44-239 Q41-240 I32-241 D63-242 D83-243 C21-244 H22-245 C61-246 F32-247 C44-248 G12-249 F16-250'.split())
