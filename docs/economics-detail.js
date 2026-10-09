@@ -272,6 +272,7 @@
                 return '<div class="attempt"><div class="attempt-header"><h3>' +
                     escapeHtml((attack.model || '').replace(/_/g, ' ')) + ' (v' + version + ')</h3>' +
                     '<span class="status-text">' + escapeHtml(shared.getAttemptClaim(attack)) + '</span>' +
+                    ' <a href="#comments">comments</a>' +
                     (source ? ' <a href="' + escapeHtml(source) + '" target="_blank" rel="noopener">source</a>' : '') +
                     (safeDownload ? ' <a href="' + escapeHtml(download) + '" download="' + escapeHtml(filename) + '">Download attack TeX</a>' : '') +
                     '</div>' + (attack.date_posted ? '<div class="attack-date">Posted: ' + escapeHtml(attack.date_posted) + '</div>' : '') +
@@ -292,6 +293,7 @@
                 console.warn('Economics statement typesetting failed:', error);
             }
         }
+        return true;
     }
 
     window.EconomicsDetail = { render, orderedProblems, referenceTargets, normalizedReferences, normalizedStatement };
