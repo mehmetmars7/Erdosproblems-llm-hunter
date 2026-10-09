@@ -1,0 +1,347 @@
+% ECONOMICS_PROBLEM: {"id": "C72-36", "title": "Exact normal-form correlated equilibrium from an extensive-form tree", "jel_code": "C72", "source_id": "OP-0143"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,geometry,hyperref}
+\geometry{margin=1in}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Q}{\mathbb Q}
+\title{Exact conditional-incentive LPs on supplied supports, with a zero-sum construction}
+\author{GPT 6 Astra Ultra --- Version 2}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem C72-36. Status: unresolved.} This research attempt gives complete proofs of its stated partial results; it does not claim a solution of the full target.
+
+\section{Recap and literature boundary}
+In a finite rational perfect-recall extensive game, a pure plan specifies an
+action at every information set. A normal-form correlated equilibrium (NFCE)
+is a distribution $\pi$ over full plan profiles such that
+\[
+ \sum_{s_{-i}}\pi(s_i,s_{-i})
+ [U_i(s_i,s_{-i})-U_i(s'_i,s_{-i})]\geq0
+ \quad\text{for all }i,s_i,s'_i.
+\]
+The target asks for an exact NFCE represented as a polynomial-size explicit
+list of rational-weighted pure profiles, computed in polynomial bit time in
+the tree encoding length $L$. A player's recommendation is her entire plan
+before play. Cheval et al.~\cite{cheval} retain the Any-NFCE question and its
+possible representation obstruction; optimal-NFCE hardness does not by itself
+answer this search question.
+
+Version 2 adds an exact polynomial-size LP for correlated incentives on any
+supplied list of pure profiles, with an arbitrary number of players. This
+preserves the conditional information lost by separate realization marginals.
+The support list is part of the input; discovering a polynomial-size list is
+still unresolved. For standalone completeness, we retain the complete
+construction in the two-player zero-sum subcase. Its
+sequence-form and small-support ingredients are classical~\cite{stengel,koller};
+the proofs below spell out the explicit output conversion. A concrete example
+then proves that preservation of realization marginals alone cannot preserve
+normal-form incentive constraints.
+
+\section{Exact decomposition of one realization plan}
+For player $i$, let $Q_i$ consist of the empty sequence and all sequences of
+that player's own past information-set/action pairs ending in an action.
+Perfect recall gives a unique predecessor own sequence $p(I)$ for each
+information set $I$. Write $p(I)a$ for its extension by action $a$ at $I$.
+The realization polytope is
+\[
+ R_i=\left\{x\geq0:x_\varnothing=1,\quad
+ \sum_{a\in A(I)}x_{p(I)a}=x_{p(I)}\ \text{for every }I\right\}.
+\]
+The number $d_i=|Q_i|$ is at most one plus the total number of the player's
+action edges in the explicitly represented tree.
+
+\begin{lemma}[Constructive rational decomposition]
+Every rational $x\in R_i$ is a convex combination of at most $d_i$ realization
+vectors of pure full plans. The plans and rational weights can be found in
+polynomial bit time and have polynomial total encoding length in that of $x$
+and the tree.
+\end{lemma}
+\begin{proof}
+Maintain a residual $y\geq0$ obeying the same flow equations with
+$y_\varnothing=M$, its remaining mass. Initially $y=x$, $M=1$.
+If $M>0$, build a pure plan recursively in the player's own sequence order.
+Whenever the predecessor sequence is selected by the plan, it has positive
+$y$-mass, and the flow equation ensures at least one extension of positive
+mass; select such an action. At information sets whose predecessors are not
+selected, choose any action. The resulting pure realization vector $e$ is
+$0$--$1$, has $e_\varnothing=1$, satisfies the flow equations, and has
+$e_q=1$ only where $y_q>0$.
+Set $\lambda=\min_{q:e_q=1}y_q>0$ and subtract $\lambda e$ from $y$.
+The residual remains nonnegative and satisfies the flow equations with mass
+$M-\lambda$. At least one positive coordinate disappears, and no zero
+coordinate becomes positive. Repeat. There are at most $d_i$ iterations.
+At termination mass is zero, since otherwise another plan could be extracted;
+all other coordinates are then zero by the flow equations and the acyclic
+own-sequence order. Hence the extracted weights sum to one and reconstruct $x$.
+
+Choose initially a common denominator $D$ for the rational coordinates of $x$.
+Every subtraction preserves the property that all coordinates and extracted
+weights are multiples of $1/D$ in $[0,1]$. The bit length of $D$ is at most the
+sum of input denominator lengths. Plan extraction and updates scan polynomially
+many coordinates for at most $d_i$ iterations, proving the stated bit bounds.
+\end{proof}
+
+\begin{lemma}[Realization payoff formula]
+For two players, there is a rational matrix $A$ of dimensions $d_1$ by $d_2$
+and polynomial encoding length such that expected player-1 payoff under
+independent realization plans $x,y$ equals $x^{\mathsf T}Ay$.
+Every realization plan is equivalent, against every opponent, to the mixed
+full-plan strategy furnished by the preceding lemma.
+\end{lemma}
+\begin{proof}
+For each terminal leaf $z$, let $q_i(z)$ be player $i$'s last own sequence
+on its path, let $p_c(z)$ be the product of chance probabilities on that path,
+and let $u_1(z)$ be the terminal payoff. Add $p_c(z)u_1(z)$ to
+$A_{q_1(z),q_2(z)}$. Each leaf contributes once, and products have at most tree
+size many rational factors, so all encodings remain polynomial.
+For independent pure plans the reachability indicator of a leaf is exactly
+the product of the corresponding two $0$--$1$ realization coordinates.
+Linearity in mixtures proves the formula for the decompositions. A behavioral
+strategy yields the same own-sequence products and thus the same realization
+vector. Conversely any $x\in R_i$ defines action probabilities
+$x_{p(I)a}/x_{p(I)}$ when the denominator is positive, and arbitrary probabilities
+otherwise. Multiplication along own sequences recovers $x$, since unreachable
+own sequences have zero flow. Perfect recall is precisely what makes these
+predecessors well defined. Thus realization equivalence holds against every
+opponent, including its pure deviations.
+\end{proof}
+
+\begin{theorem}[Polynomial explicit NFCE for two-player zero-sum games]
+Every finite rational two-player zero-sum perfect-recall tree has an exact
+NFCE on at most $d_1d_2$ pure profiles. It can be computed in polynomial bit
+time, and its explicit full-plan list and all probabilities have polynomial
+total encoding length in the tree input.
+\end{theorem}
+\begin{proof}
+Write $R_1=\{x\geq0:Ex=e\}$ and $R_2=\{y\geq0:Fy=f\}$ using the flow
+equations. Both are nonempty compact polytopes: recursively every coordinate
+is in $[0,1]$. For fixed $x$, linear programming duality gives
+\[
+ \min_{y\geq0,Fy=f}x^{\mathsf T}Ay
+ =\max_{v:F^{\mathsf T}v\leq A^{\mathsf T}x}f^{\mathsf T}v.
+\]
+Therefore Max's security strategy is the solution of the polynomial-size LP
+\[
+ \max f^{\mathsf T}v\quad\text{subject to }Ex=e,\ x\geq0,
+ \ F^{\mathsf T}v\leq A^{\mathsf T}x.
+\]
+The dual LP is
+\[
+ \min e^{\mathsf T}u\quad\text{subject to }Fy=f,\ y\geq0,
+ \ E^{\mathsf T}u\geq Ay.
+\]
+Finite-dimensional LP duality supplies equal attained optimal objectives;
+ordinary exact rational LP algorithms compute rational optimal $x,y$ of
+polynomial bit length in polynomial time. The displayed inequalities show
+that $x$ guarantees at least this value against every $y'$ and $y$ holds every
+$x'$ to at most this value. They are consequently a zero-sum saddle pair.
+
+Decompose $x$ and $y$ by the first lemma into mixtures $\mu_1,\mu_2$ on at
+most $d_1,d_2$ pure full plans, and output their independent product. Against
+$\mu_2$, every player-1 pure plan has payoff at most the saddle value. Their
+$\mu_1$-weighted average equals that value, so every plan of positive $\mu_1$
+weight must itself attain the value. Thus conditional on any positive-probability
+recommendation to player 1, no full-plan deviation improves payoff: the
+opponent's conditional law is still $\mu_2$. For player 2 the same argument
+uses minimizing payoffs. Recommendations with zero probability impose the
+zero inequality. These are exactly all NFCE constraints. Products of the
+rational weights retain polynomial encodings, and the number and length of
+full plans have the asserted polynomial bounds.
+\end{proof}
+
+
+\section{New advance: conditional incentives on a supplied support}
+Let the game now have any finite number $n$ of players. For each $i$ write
+its realization polytope as
+\[
+ R_i=\{x\geq0:E_i x=b_i\},
+\]
+using the flow equations already defined, and write $\xi_i(r)$ for the
+$0$--$1$ realization vector of a full plan $r$. In addition to the tree,
+suppose the input gives $K\geq1$ full-plan profiles
+$\mathcal L=(s^1,\ldots,s^K)$. The unknown weights are
+$q_\ell\geq0$, $\sum_\ell q_\ell=1$. Duplicate profiles may be merged.
+For each distinct player-$i$ recommendation $r$ occurring in this list, put
+\[
+ I_{i,r}=\{\ell:s_i^\ell=r\}.
+\]
+Only these recommendations need incentive constraints; all other full plans
+are recommended with probability zero. Deviations remain unrestricted full
+plans, whether or not they occur in the list.
+
+For a terminal leaf $z$, let $t_i(z)$ be its last own sequence for $i$,
+$p_c(z)$ its chance reach probability, and
+$\chi_{-i}^{\ell}(z)\in\{0,1\}$ indicate that every action of every player
+other than $i$ on the path to $z$ agrees with $s_{-i}^{\ell}$.
+Define a sequence-payoff vector, linear in $q$, by
+\[
+ c_{i,r,t}(q)=\sum_{\ell\in I_{i,r}}q_\ell
+       \sum_{z:t_i(z)=t}p_c(z)u_i(z)\chi_{-i}^{\ell}(z).
+ \tag{1}
+\]
+No conditioning division is performed in this definition.
+
+\begin{lemma}[Unnormalized conditional deviation payoff]\label{lem:conditional}
+For every realization plan $x\in R_i$,
+$c_{i,r}(q)^{\mathsf T}x$ is the total probability-weighted payoff on
+recommendations $r$ when player $i$ substitutes that realization plan.
+In particular, obedience gives $c_{i,r}(q)^{\mathsf T}\xi_i(r)$, and
+all NFCE inequalities for recommendation $r$ hold if and only if
+\[
+ \max_{x\in R_i}c_{i,r}(q)^{\mathsf T}x
+ \leq c_{i,r}(q)^{\mathsf T}\xi_i(r).                 \tag{2}
+\]
+\end{lemma}
+\begin{proof}
+For a pure deviation $r'$, the indicator that its own actions permit leaf
+$z$ is $\xi_i(r')_{t_i(z)}$. The other players' actions permit that leaf
+exactly when $\chi_{-i}^{\ell}(z)=1$. Multiplication by $p_c(z)$ gives the
+leaf probability against the fixed opponent profile $s_{-i}^{\ell}$.
+Summing terminal payoffs first over leaves and then over indices in
+$I_{i,r}$ gives (1) dotted with $\xi_i(r')$. Linearity gives the same
+formula for a mixture of pure deviations. The constructive decomposition
+proved above applies to each player's realization polytope, irrespective
+of the number of opponents, so every $x\in R_i$ is such a mixture.
+Although that lemma states its computational bound for rational inputs,
+the same finite subtraction argument proves the convex-hull assertion for
+real realization vectors as well. Its proof and the behavioral-to-realization
+conversion do not use two-player zero-sum structure.
+
+The original NFCE constraint for $r\to r'$ is precisely obedience payoff
+minus this unnormalized deviation payoff. Thus all pure constraints hold
+if and only if the maximum over their convex hull satisfies (2).
+The opponents may be correlated with one another and with the recommendation;
+all such correlation remains in the individual terms of (1).
+\end{proof}
+
+\begin{theorem}[Polynomial exact synthesis on a supplied list]\label{thm:list}
+For any rational finite perfect-recall tree and supplied list $\mathcal L$,
+one can decide in polynomial bit time whether an NFCE exists supported on
+$\mathcal L$. If it exists, one can output exact rational weights of
+polynomial total bit length. The polynomial bound is in the combined tree
+and list encoding lengths, with the number of players included in the input.
+A proposed rational distribution on the list can likewise be verified in
+polynomial bit time against every full-plan deviation.
+\end{theorem}
+\begin{proof}
+For every pair $(i,r)$ introduce a real unrestricted dual vector
+$v_{i,r}$ with one coordinate for each row of $E_i$. Consider the LP
+feasibility system
+\begin{align}
+ q_\ell&\geq0,\qquad \sum_{\ell=1}^{K}q_\ell=1,\notag\\
+ E_i^{\mathsf T}v_{i,r}&\geq c_{i,r}(q),\label{eq:listdual}\\
+ b_i^{\mathsf T}v_{i,r}&\leq
+             c_{i,r}(q)^{\mathsf T}\xi_i(r)
+             \quad\text{for every }(i,r).\notag
+\end{align}
+All expressions are linear in the variables: the obeying vector $\xi_i(r)$
+is fixed input data, and (1) is linear in $q$.
+
+If the system is feasible, for every $x\in R_i$ weak duality gives
+\[
+ c_{i,r}(q)^{\mathsf T}x
+ \leq v_{i,r}^{\mathsf T}E_i x
+ =b_i^{\mathsf T}v_{i,r}
+ \leq c_{i,r}(q)^{\mathsf T}\xi_i(r).
+\]
+Lemma~\ref{lem:conditional} proves every NFCE constraint. Conversely, suppose
+$q$ is an NFCE on the list. The primal LP maximizing $c_{i,r}(q)^{\mathsf T}x$
+over $R_i$ is feasible, compact and finite. Exact LP duality supplies an
+attained dual optimum with $E_i^{\mathsf T}v_{i,r}\geq c_{i,r}(q)$ and
+$b_i^{\mathsf T}v_{i,r}$ equal to that maximum. Inequality (2) supplies the
+last inequality of (\ref{eq:listdual}). Thus the system is feasible.
+A zero-probability recommendation causes no problem: its nonnegative weights
+are all zero, so $c_{i,r}(q)=0$ and $v_{i,r}=0$ is valid.
+
+There are at most $nK$ pairs $(i,r)$, and each realization system has
+polynomially many coordinates and flow equations in the tree size.
+All coefficients in (1) are computed by scanning explicitly given plans and
+leaves. Chance probabilities are products along finite tree paths, followed
+by polynomially many rational sums; their bit lengths are polynomial in the
+input. The resulting rational LP therefore has polynomial encoding length.
+Ordinary exact rational LP feasibility algorithms decide it and, when
+feasible, return a rational feasible point of polynomial bit length.
+Fixing the proposed $q$ in the same system proves the verification assertion.
+Equivalently one may solve each of its conditional best-response LPs.
+\end{proof}
+
+\begin{remark}[What the input list does and does not provide]
+The theorem allows arbitrary general-sum games and arbitrary correlation;
+it does not require that the list be a Cartesian product of individual
+supports. It is nevertheless an algorithm for a supplied support, not an
+algorithm that finds such a support in an arbitrary game. It also does not
+show that every NFCE can be replaced by one with polynomially many profiles.
+An infeasible list rules out only equilibria on that list.
+\end{remark}
+
+\section{Why a naive extension loses incentives}
+\begin{proposition}[Identical marginals can conceal an NFCE violation]
+Two joint distributions over complete plans can have the same realization
+marginal for each player, while only one is an NFCE.
+\end{proposition}
+\begin{proof}
+Use matching pennies: each player chooses $H$ or $T$ without observing the
+other, player 1 gets $+1$ for matching and $-1$ otherwise, and player 2 gets
+the negative payoff. Represent it as a two-step extensive tree whose second
+player's nodes are in one information set; it has perfect recall.
+The independent uniform distribution is a Nash equilibrium and an NFCE:
+conditional on either recommendation the opponent remains uniform and both
+actions give expected payoff zero. Instead put mass $1/2$ on each of
+$(H,H)$ and $(T,T)$. Each player's marginal is still uniform, hence has the
+same realization coordinates. But player 2, upon receiving either recommendation,
+knows that following loses one and switching wins one. Its NFCE inequality
+for that recommendation is $(1/2)(-1-1)=-1<0$.
+\end{proof}
+
+\section{Verification and first gap}
+The decomposition keeps recommendations as complete plans, including actions
+off the realized path. It does not replace NFCE with a sequential recommendation
+concept. The positive theorem uses two-player zero-sum LP duality; general-sum
+security strategies need not be equilibria, and for a variable number of
+players the product of individual support bounds is not uniformly polynomial.
+More fundamentally, correlated recommendations require conditional information
+not preserved by individual realization marginals, as the example proves.
+The new supplied-list LP preserves precisely those conditional inequalities,
+but only after the list has been furnished. The first missing step is an
+unrestricted method that finds an adequate polynomial-size support, together
+with a proof that such a support always exists. The classical sequence-form
+and LP ingredients are credited to the cited literature; no claim of
+literature-wide novelty is made for their conditional-support application.
+
+\section{Completion Estimate}
+30\%
+
+This is a heuristic estimate for the full catalogue target.
+The supplied-list result handles arbitrary-player conditional incentives exactly,
+while the retained zero-sum construction supplies an unconditional polynomial
+algorithm for that subcase. General polynomial-support existence and support
+discovery remain unresolved, so this is not a solution of unrestricted Any-NFCE.
+
+\begin{thebibliography}{9}
+\bibitem{cheval} V.~Cheval, F.~Horn, S.~Paul, and M.~Shirmohammadi,
+\emph{On the Complexity of the Optimal Correlated Equilibria in Extensive-Form
+Games}, arXiv:2507.11509v2 (2026), Sections 2 and 7.
+\url{https://arxiv.org/html/2507.11509v2}.
+\bibitem{stengel} B.~von Stengel, \emph{Efficient Computation of Behavior
+Strategies}, Games and Economic Behavior 14(2), 220--246 (1996).
+\url{https://doi.org/10.1006/game.1996.0050}.
+\bibitem{koller} D.~Koller and N.~Megiddo, \emph{Finding Mixed Strategies
+with Small Supports in Extensive Form Games}, International Journal of Game
+Theory 25, 73--92 (1996).
+\url{https://theory.stanford.edu/~megiddo/pdf/smallsupport.pdf}.
+\end{thebibliography}
+
+\end{document}

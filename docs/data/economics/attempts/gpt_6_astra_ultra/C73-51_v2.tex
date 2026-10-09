@@ -1,0 +1,185 @@
+% ECONOMICS_PROBLEM: {"id": "C73-51", "title": "Uniform coalition reachability with unknown population size", "jel_code": "C73", "source_id": "OP-0170"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\title{Uniform coalition reachability: Exact one-nontarget synthesis beyond finite memory}
+\author{GPT 6 Astra Ultra --- Version 2}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+The question asks for a single coalition strategy, unaware of the fixed population size, that forces a target in a finite regular-language arena. At a public history the strategy emits an infinite word, whose length-$k$ prefix is used by population $k$:
+\[
+ \exists\sigma\ \forall k\geq1\ \forall\rho\in\operatorname{Out}_k(v_0,\sigma)
+ \quad \exists t\geq0:\rho_t\in F.
+\]
+The time bound is allowed to depend on $k$. Version 2 adds an exact decision and synthesis theorem for unrestricted
+history-dependent strategies when there is one non-target vertex. This class
+includes the unbounded-memory example retained below. We first retain the
+finite-memory decision procedure and its limitation to make the comparison
+self-contained.
+
+\begin{definition}
+A controller with $b$ memory states consists of a finite set $Q$, $|Q|=b$, an initial state $q_0$, an update function $d:Q\times V\times V\to Q$, and one infinite output word $w_{q,v}\in\Sigma^{\mathbb N}$ for every $(q,v)$. Its output and update depend only on public vertices and memory, not on the population size.
+\end{definition}
+
+\begin{theorem}
+Given a complete finite regular-language arena and a positive integer $b$, it is decidable whether a winning controller with at most $b$ memory states exists. If one exists, one exists whose output words are all ultimately periodic, with a common preperiod and a common period. Any winning $b$-state controller, including one with nonperiodic outputs, reaches the target within $b|V|$ transitions for every population and every outcome.
+\end{theorem}
+\begin{proof}
+Enumerate the finitely many initial states and update functions on a $b$-element memory set. Fix one such update. Determinize and complete the automata for all $L(v,v')$. For every triple $(q,v,v')$ maintain an independent copy of the automaton for $L(v,v')$. A letter in the finite alphabet $\Sigma^{Q\times V}$ specifies the next symbol of every output word simultaneously. Reading a sequence of these letters produces a finite product-automaton state $z_k$ after $k$ symbols.
+
+From $z_k$ construct a directed graph on $Q\times V$: include the edge
+\[
+ (q,v)\longrightarrow(d(q,v,v'),v')
+\]
+exactly when the corresponding automaton accepts the length-$k$ output prefix. Completeness of the arena makes this graph nonblocking. Population $k$ loses against the controller precisely when this graph has a directed cycle reachable from $(q_0,v_0)$ by a path avoiding $Q\times F$, with that cycle also avoiding $Q\times F$. Indeed, an infinite avoiding path in a finite graph repeats a vertex, and a reachable avoiding cycle can be repeated by the environment.
+
+Call a product state good when its associated graph has no such cycle. The desired output words are therefore exactly infinite paths in the finite product automaton for which $z_k$ is good for every $k\geq1$. No condition is imposed on $z_0$, since populations are nonempty. Such a path exists if and only if a good state reached in one step has a path through good states to a directed cycle of good states. This is an effective finite graph test. A path followed by endless repetitions of a cycle supplies the claimed common ultimate periodicity.
+
+Finally, for any fixed population, a target-avoiding prefix of length at least $b|V|$ transitions repeats a controller-arena vertex. Repeating that cycle would produce a losing outcome. A winning controller therefore has the asserted uniform bound, without any periodicity assumption.
+\end{proof}
+
+\begin{example}[Winning strategies may require unbounded public memory]
+Let $V=\{s,f\}$, $F=\{f\}$, $v_0=s$, and $\Sigma=\{a,b\}$. Put
+\[
+ L(s,f)=a^*b,\qquad L(s,s)=\Sigma^+\setminus a^*b,
+ \qquad L(f,f)=\Sigma^+,
+\]
+and let other transition languages be empty. This deterministic arena is complete and all languages are regular. At the $t$th visit to $s$, starting with $t=0$, output $a^tba^\omega$. Population $k$ reaches $f$ precisely at step $k$, because its prefix belongs to $a^*b$ precisely when $t=k-1$. Thus the arena has a winning uniform strategy.
+
+For any single infinite output word, at most one prefix belongs to $a^*b$: that prefix must end at the first occurrence of $b$. A finite-memory controller has only finitely many outputs while the public vertex remains $s$. Choose a population size outside the finite set of accepted prefix lengths of those outputs. That population stays at $s$ forever. No finite-memory controller wins this arena.
+\end{example}
+
+The example also disproves a direct compactness argument that replaces population-dependent reaching times by one finite bound. At most one new population can be served at each step of its only nonterminal history.
+
+
+\section{New advance: exact unrestricted-history synthesis with one non-target vertex}
+Suppose $V\setminus F=\{s\}$ and $v_0=s$. Vertices in $F$ may be made
+absorbing, since behavior after the first target visit has no bearing on
+reachability. Let $L=L(s,s)\subseteq\Sigma^+$; all regular transition
+languages into target vertices may overlap each other and $L$.
+The environment still chooses adversarially among every enabled successor.
+Fix any letter $a_0\in\Sigma$, where the alphabet is nonempty.
+
+\begin{theorem}[Length universality criterion]\label{thm:onevertex}
+In this one-non-target subclass, an unrestricted uniform winning strategy
+exists if and only if
+\[
+ \forall k\geq1\quad \Sigma^k\setminus L\neq\varnothing.       \tag{1}
+\]
+The criterion is decidable from the given finite automata. Whenever it holds,
+there is an explicitly computable history-dependent winning strategy under
+which population $k$ reaches a target within $k$ transitions. No bound on
+memory independent of time is asserted.
+\end{theorem}
+\begin{proof}
+If (1) fails for some $k$, every possible length-$k$ prefix belongs to
+$L(s,s)$. The environment can therefore choose $s$ after every output,
+regardless of the strategy and its history. This is a losing outcome for
+that fixed population, proving necessity even when target transitions are
+also enabled.
+
+Conversely, for each positive integer $t$, choose a word
+$u_t\in\Sigma^t\setminus L$. On the $t$th nonterminal round, whose public
+history is $s^t$, output the infinite word $u_t a_0^\omega$.
+Define the output arbitrarily on histories already containing a target.
+For an actual population $k$, if a target has not been visited before round
+$k$, its public history then is $s^k$. Its played prefix is exactly $u_k$,
+which does not belong to $L(s,s)$. The environment cannot stay at $s$;
+completeness of the arena guarantees at least one enabled successor and
+every other vertex is a target. Thus every outcome reaches a target by that
+round. The round counter is derived from public history and is not knowledge
+of $k$. Agent $m$ can compute its prescribed letter as the $m$th letter of
+$u_t$ when $m\leq t$, and $a_0$ otherwise.
+
+For decidability, determinize and complete an automaton for $L$ and complement
+its final states. This yields a complete DFA
+$D=(Q,\Sigma,d,q_0,A)$ for the complement on positive-length words; whether
+it accepts the empty word is immaterial. Define subsets
+\[
+ S_0=\{q_0\},\qquad
+ S_{k+1}=\{d(q,a):q\in S_k,\ a\in\Sigma\}.
+\]
+Induction on $k$ shows that $S_k$ consists exactly of states reachable in $D$
+by some word of length $k$. Condition (1) is therefore equivalent to
+$S_k\cap A\neq\varnothing$ for every $k\geq1$.
+The subset update is a deterministic map on the finite set $2^Q$.
+Start at $S_1$, test each encountered set and iterate until a set repeats.
+If a test fails, its positive index witnesses failure of (1). If a repetition
+occurs with all tests passed, all subsequent sets repeat the tested cycle,
+so (1) holds. This is a terminating algorithm, with no polynomial bound
+claimed relative to the original nondeterministic automata.
+
+Finally, a witness $u_t$ is effectively obtained by dynamic programming in
+$D$: retain a predecessor state and letter for each state first reached at
+each length up to $t$, choose an accepting state at length $t$, and backtrack.
+Condition (1) ensures that this succeeds at every length. This supplies
+computable outputs for the strategy already proved winning.
+\end{proof}
+
+\begin{corollary}[The memory separation lies inside a decidable subclass]
+In the two-vertex example above, a winning unrestricted strategy exists but
+no winning finite-memory controller exists. Its unrestricted winning status
+is decided by Theorem~\ref{thm:onevertex}.
+\end{corollary}
+\begin{proof}
+There $L(s,s)=\Sigma^+\setminus a^*b$, and the complement contains the
+length-$k$ witness $a^{k-1}b$ for every $k\geq1$. Hence (1) holds and the
+new theorem's schedule is exactly the earlier witness strategy.
+The earlier finite-memory impossibility proof remains applicable: finitely
+many fixed outputs serve at most finitely many distinct population sizes.
+\end{proof}
+
+\begin{remark}[Quantifiers and the scope of the criterion]
+The construction supplies one strategy for all populations. Its guarantee is
+$\forall k\,\forall\rho\, t_{\rm hit}(\rho)\leq k$, not a single time bound
+independent of $k$. At each scheduled round, populations not yet served may
+remain at $s$ or reach a target; neither possibility destroys their later
+opportunity. This is the key fact specific to one non-target vertex.
+With several such vertices, an action chosen for one population may send
+another to an unhelpful region, so length-wise individual witnesses alone
+need not combine into a uniformly winning strategy.
+\end{remark}
+
+\paragraph{Source relationship and remaining gap.}
+Bertrand et al.~\cite{reach} solve their specialized repeated population game and distinguish the general-arena question. The regular-language strategy model is developed in \cite{safe}. The finite-controller construction and the explicit separating arena above are derived here; no priority claim is made. Increasing the controller size cannot decide the unrestricted question
+because the example has no finite-controller witness at all. The new length
+criterion resolves unrestricted history in the one-non-target class, using
+elementary automaton constructions proved above. Arbitrary multi-vertex
+arenas still require a method to coordinate safe progress for different
+populations along branching public histories. No such general decision
+procedure is proved here.
+
+\section{Completion Estimate}
+35\%
+
+This is a heuristic estimate for the full catalogue target.
+The one-non-target theorem gives exact unrestricted-history decision and
+constructive synthesis, including instances where every finite-memory
+controller fails. Multiple non-target vertices and branching histories,
+which are central to the full arbitrary-arena question, remain unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{reach} N. Bertrand, P. Bouyer, L. Lapointe, and C. Mascle.
+\emph{Reach together: How populations win repeated games}. 2025.
+\url{https://arxiv.org/abs/2510.02984}.
+\bibitem{safe} N. Bertrand, P. Bouyer, and A. Majumdar.
+\emph{Synthesizing Safe Coalition Strategies}. FSTTCS 2020.
+\url{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.FSTTCS.2020.39}.
+\end{thebibliography}
+
+\end{document}

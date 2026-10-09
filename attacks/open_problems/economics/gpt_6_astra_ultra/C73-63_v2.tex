@@ -1,0 +1,259 @@
+% ECONOMICS_PROBLEM: {"id": "C73-63", "title": "Minimax self-play regret under adversarially valid decentralized learning", "jel_code": "C73", "source_id": "OP-0147"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\title{Minimax self-play regret: Harmonic candidate elimination with adversarial protection}
+\author{GPT 6 Astra Ultra --- Version 2}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+Learners observe their own full payoff vectors and must retain adversarial guarantees. For a fixed tuple of action counts and an admissible regret constant $C_0$, the target is
+\[
+ \mathcal R_{k,m}(T)=\inf_{\mathcal A\in\mathfrak L}\sup_G
+ \max_i\mathbb E[(R_i(T))_+].
+\]
+The question is whether the dependence on $T$ can be bounded. Version 2 adds a harmonic-regret wrapper for sequences with a persistent
+maximizing action, even when the payoff vectors change over time. This covers
+strategically coupled games with weakly dominant actions. The lower bound
+and constant-vector wrapper from Version 1 are retained for comparison.
+No superconstant minimax lower bound or bounded-regret algorithm for all
+games is established.
+
+\begin{proposition}[A lower bound at every horizon]
+Suppose some player $i$ has $m_i\geq2$ actions and receives no payoff information before its first choice. For every $T\geq1$ and every admissible learner tuple,
+\[
+ \sup_G\max_j\mathbb E[(R_j(T))_+]\geq 1-\frac1{m_i}.
+\]
+Consequently $\mathcal R_{k,m}(T)\geq\max_{i:m_i\geq2}(1-1/m_i)$.
+\end{proposition}
+\begin{proof}
+Let $q_a=\mathbb E[x_i^1(a)]$. Choose an action $a^*$ with $q_{a^*}\leq1/m_i$. Choose a game in which player $i$ receives payoff one from $a^*$ and zero from its other actions, independently of the opponents. Give the other players arbitrary constant payoffs. The vector seen by $i$ is the same at every round. Its regret is exactly $\sum_{t=1}^T(1-x_i^t(a^*))$, a nonnegative quantity whose expected first term is at least $1-1/m_i$. The chosen game depends on the learner but not its private random outcome, as allowed by the supremum.
+\end{proof}
+
+\begin{theorem}[A switch wrapper]
+Fix $m\geq2$. Suppose a full-information learner $B$ has the pathwise guarantee
+\[
+ \left(\max_a\sum_{t=1}^{s}v^t(a)-\sum_{t=1}^{s}\langle z^t,v^t\rangle\right)_+
+ \leq C_B\sqrt{s\log m}
+\]
+for every $s\geq1$ and every nonanticipating sequence of vectors in $[0,1]^m$. Then there is a learner $W$ satisfying both of the following:
+\begin{enumerate}
+\item Against every such sequence, its positive regret is at most $2+C_B\sqrt{T\log m}$.
+\item If the vector is constant over time, its regret is at most one at every horizon.
+\end{enumerate}
+The wrapper adds $O(m)$ comparisons and arithmetic operations per round to $B$. It is admissible for any constant $C_0\geq C_B+2/\sqrt{\log 2}$ in the same computational model as $B$.
+\end{theorem}
+\begin{proof}
+At round one play any distribution and store the observed vector $v^1$. On each later round play a fixed maximizer of $v^1$, until the first round $\tau\geq2$ on which the observed vector differs from $v^1$. Starting at round $\tau+1$, run a fresh copy of $B$ forever. Equality is tested only after receiving the current feedback, so this rule uses no future information.
+
+For any comparator action $a$, its advantage over the wrapper in round one is at most one. In rounds $2,\ldots,\tau-1$ the stored maximizer gives at least as much as $a$. The advantage in the detection round is at most one. Thus the regret of the entire prefix ending at $\tau$ is at most two. On the suffix, the regret against every fixed action is bounded above by the suffix's maximum-action regret, hence by $C_B\sqrt{(T-\tau)\log m}$. Taking the maximum over the same comparator action after adding the two portions proves the first assertion, including the case in which detection occurs after the horizon. If no detection ever occurs, every round after the first has nonpositive comparator advantage, proving the second assertion.
+
+Finally $2\leq(2/\sqrt{\log2})\sqrt{T\log m}$ for $T\geq1$, $m\geq2$. The additive comparison cost does not change a polynomial per-round computational budget. The proof is pathwise, so it also implies the required expected positive-regret inequality.
+\end{proof}
+
+\begin{corollary}
+In every separable game $u_i(a_i,a_{-i})=h_i(a_i)$ with payoffs in $[0,1]$, the wrapped learners have self-play regret at most one per player, while preserving the preceding adversarial guarantee. Thus on this subclass the worst-case horizon dependence is $\Theta(1)$ whenever the allowed constant accommodates the wrapper.
+\end{corollary}
+\begin{proof}
+Each learner observes the fixed vector $h_i$, irrespective of all other players' choices. Apply the theorem and the preceding lower bound. Players with a single action have zero regret.
+\end{proof}
+
+
+\section{New advance: eliminate inconsistent maximizing actions}
+Write
+\[
+ H_m=\sum_{j=1}^m\frac1j.
+\]
+Use a base learner $B$ with the same pathwise guarantee as in the preceding
+switch theorem. The new wrapper $E$ maintains a nonempty candidate set,
+initially $D_0=\{1,\ldots,m\}$. While this mode is active, at round $t$
+it plays the uniform mixed vector on $D_{t-1}$. After observing $v^t$, put
+\[
+ M_t=\operatorname*{arg\,max}_{a\in\{1,\ldots,m\}}v^t(a),
+ \qquad D_t=D_{t-1}\cap M_t.
+\]
+If $D_t=\varnothing$, call this the detection round $\tau=t$ and start a
+fresh copy of $B$ on round $t+1$, using it forever. In particular, no action
+at round $t$ depends on the as-yet unobserved vector $v^t$.
+
+\begin{lemma}[Harmonic elimination accounting]\label{lem:harmonic}
+Suppose nested candidate sets are used until the first empty set, if any.
+For every round in this phase, including the detection round,
+\[
+ \max_a v^t(a)-\langle x^t,v^t\rangle
+ \leq \frac{|D_{t-1}\setminus D_t|}{|D_{t-1}|}.
+                                                        \tag{1}
+\]
+The sum of the right side over any prefix of that phase is at most $H_m$.
+\end{lemma}
+\begin{proof}
+Each member of $D_t$ attains the global maximum of $v^t$. Each remaining
+member of $D_{t-1}$ is below that maximum by at most one, because all
+coordinates lie in $[0,1]$. Averaging these gaps under the uniform mixed
+vector proves (1). If $D_t$ is empty, the same argument gives the upper
+bound one; thus the detection round is included.
+
+For a deletion from $b$ candidates to $a$ candidates, where $0\leq a<b$,
+\[
+ \frac{b-a}{b}\leq\sum_{j=a+1}^{b}\frac1j.
+\]
+These reciprocal intervals are disjoint along a nested decreasing sequence
+of candidate counts. Steps without deletion contribute zero, and summing
+the displayed bound gives at most $\sum_{j=1}^m1/j=H_m$.
+\end{proof}
+
+\begin{theorem}[Pathwise protected harmonic regret]\label{thm:harmonic}
+For $m\geq2$, the wrapper $E$ has the following properties.
+\begin{enumerate}
+\item Against every nonanticipating sequence of payoff vectors in $[0,1]^m$,
+\[
+ (R_E(T))_+\leq H_m+C_B\sqrt{T\log m}
+ \quad\text{for every }T\geq1.                         \tag{2}
+\]
+\item If an action $a^*$ maximizes every observed payoff vector up to time
+$T$, then no detection occurs by that time and
+\[
+ 0\leq R_E(T)\leq H_m.                                \tag{3}
+\]
+The maximizing action may be unknown, and other maximizing actions may
+appear and disappear with time.
+\item Candidate maintenance uses $O(m)$ comparisons and arithmetic
+operations per round and $O(m)$ additional storage, in the same exact
+payoff-vector computational model as $B$. The wrapper is admissible for
+\[
+ C_0\geq C_B+\frac{H_m}{\sqrt{\log m}}.                \tag{4}
+\]
+For several fixed action counts, (4) is required for every player having
+at least two actions. A one-action player needs no wrapper and has zero
+regret.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+Fix a comparator action $a$. Its advantage over $E$ during the candidate
+phase is at most the sum of the instantaneous maximum-payoff gaps.
+Lemma~\ref{lem:harmonic} bounds this sum by $H_m$, including the round on
+which the last candidate is removed. If detection occurs at time
+$\tau\leq T$, the fresh base learner's suffix guarantee bounds the advantage
+of that same comparator on rounds $\tau+1,\ldots,T$ by
+$C_B\sqrt{(T-\tau)\log m}$. Add the two inequalities and maximize over
+$a$. The result is bounded by the nonnegative right side of (2), so taking
+positive part preserves it. If no detection occurs, the prefix estimate
+alone proves (2). This proof is pathwise and permits feedback depending on
+past observations and actions within the nonanticipating model.
+
+Under the hypothesis of (3), $a^*$ belongs to every $M_t$, so it remains in
+every candidate set and prevents detection. Because it maximizes each
+round separately, it also maximizes the total payoff of every fixed action.
+Thus its cumulative advantage is exactly $R_E(T)$, is nonnegative, and
+is at most the harmonic bound by the lemma. No inference from closeness of
+payoff vectors or a positive payoff gap is needed; weak ties are retained
+correctly by intersecting the full argmax sets.
+
+Compute a round's maximum by scanning all $m$ entries and update a length-$m$
+candidate indicator vector by another scan. The uniform mixed action is
+represented by that indicator and its cardinality. These operations give
+the stated time and storage bounds. Once the base learner is activated its
+own declared polynomial per-round work is used. Finally
+\[
+ H_m\leq \frac{H_m}{\sqrt{\log m}}\sqrt{T\log m}
+ \quad(T\geq1),
+\]
+so (2) implies the prescribed adversarial budget under (4). A pathwise bound
+also implies its expected positive-regret version.
+\end{proof}
+
+\begin{corollary}[Changing feedback in weak-dominant-action games]\label{cor:dominant}
+Suppose each player $i$ has a pure action $a_i^*$ satisfying
+\[
+ u_i(a_i^*,a_{-i})\geq u_i(a_i,a_{-i})
+ \quad\text{for every }a_i,a_{-i}.
+\]
+For payoffs in $[0,1]$, players using the wrappers of
+Theorem~\ref{thm:harmonic} have self-play regret at most $H_{m_i}$ for every
+horizon. Their individual adversarial guarantees continue to hold on all
+payoff sequences under the explicit budget condition (4).
+\end{corollary}
+\begin{proof}
+Take the expectation of the displayed pointwise dominance inequality under
+any mixed opponent profile. It implies
+$v_i^t(a_i^*)\geq v_i^t(a_i)$ at every round and for every action $a_i$,
+regardless of the opponents' changing play. Thus $a_i^*$ is a persistent
+maximizer and (3) applies. This reasoning uses no knowledge by player $i$
+of the other players' utilities. The separate pathwise statement (2)
+provides the guarantee when the sequence has no persistent maximizer.
+\end{proof}
+
+For example, with actions $0,1$ for each of two players, let
+\[
+ u_i(0,a_{-i})=\tfrac35+\tfrac25\mathbf1_{\{a_{-i}=0\}},
+ \qquad
+ u_i(1,a_{-i})=\tfrac1{10}+\tfrac3{10}\mathbf1_{\{a_{-i}=0\}}.
+\]
+Action $0$ is strictly dominant, but both payoff-vector coordinates depend
+on the opponent's play. The example lies outside the separable-game
+constant-vector premise from Version 1. More generally the theorem requires
+only a persistent maximizer along the realized sequence, not dominance in
+every unvisited opponent profile.
+
+\begin{corollary}[Sharp separable-game value under sufficient budget slack]
+If every player starts with all actions as candidates and (4) holds, then
+on the separable-game subclass
+\[
+ \sup_G\max_i\mathbb E[(R_i(T))_+]
+ \leq \max_i(1-1/m_i)
+ \quad(T\geq1).
+\]
+Together with the retained first-round lower bound, this gives equality for
+the minimax value restricted to that subclass, with the same adversarial
+admissibility requirement.
+\end{corollary}
+\begin{proof}
+Each vector is constant. In round one the uniform choice loses at most
+$1-1/m_i$: at least one coordinate attains the maximum and every other gap
+is at most one. After that round all surviving actions are maximizing and
+there is no further loss. The earlier lower-bound game is separable, so it
+applies to every admissible learner tuple on this restricted class.
+\end{proof}
+
+\paragraph{Source relationship and remaining gap.}
+Soleymani, Piliouras, and Farina~\cite{source} study fast self-play regret with adversarial protection; their setting motivates the target. Both wrappers are elementary specializations, not improvements of the
+source's general-game bounds. Their admissibility depends explicitly on
+slack in $C_0$; no claim is made for a smaller prescribed budget. The new
+candidate argument accommodates changing strategically coupled feedback
+when a persistent maximizing action exists. General games need not have
+such an action, and detection can force reversion to the adversarial rate.
+Neither bounded regret for the full minimax class nor a diverging lower
+bound is proved here. The results concern mixed-vector external regret,
+not realized-action sampling regret or last-iterate Nash convergence.
+
+\section{Completion Estimate}
+20\%
+
+This is a heuristic estimate for the full catalogue target.
+The new wrapper proves constant regret for persistent maximizing actions,
+including strategically coupled weak-dominance games, and retains a proved
+adversarial guarantee with explicit budget slack. The full general-game
+minimax horizon dependence and admissibility at smaller fixed budgets remain
+unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{source} A. Soleymani, G. Piliouras, and G. Farina.
+\emph{Cautious Optimism: A Meta-Algorithm for Near-Constant Regret in General Games}, version 1, 2025.
+\url{https://arxiv.org/html/2506.05005v1}.
+\end{thebibliography}
+
+\end{document}

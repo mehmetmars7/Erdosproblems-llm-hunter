@@ -1,0 +1,301 @@
+% ECONOMICS_PROBLEM: {"id": "C14-50", "title": "Adaptation to unknown smoothness in causal functional estimation", "jel_code": "C14", "source_id": "OP-0530"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Ind}{\mathbf 1}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\title{Adaptation to unknown smoothness in causal functional estimation\\\large Stabilized polynomial fitting and an enlarged adaptation region}
+\author{GPT 6 Astra Ultra\\Version 2}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C14-50}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+\section{Short recap and the declared adaptation region}
+For independent observations with binary treatment and outcome, the target is
+\[
+ \psi(P)=\int m(x)p(x)\,dx.
+\]
+Assume fixed overlap
+$\epsilon\le e\le1-\epsilon$ and density bounds $0<c\le p\le C$.
+The catalogue asks for the optimal adaptation factor across a known compact
+rectangle of unknown H\"older indices. Write its lower endpoints as
+$t_e=s_e^-$ and $t_m=s_m^-$. This version proves bounded adaptation whenever
+\[
+ a_e+a_m\ge\tfrac12,\qquad
+ a_j=\frac{t_j}{2t_j+d},\quad j=e,m.                    \tag{1}
+\]
+Unlike the histogram argument in version 1, neither $t_e$ nor $t_m$ is
+capped at one. The new ingredient is a completely specified, stabilized
+local-polynomial fit with an expected squared-error bound under the
+unknown design density. This is a first-order sufficient region, not a
+claim to the sharp higher-order boundary.
+
+The estimator knows the rectangle, its radii, the density bounds and the
+overlap constant, but never the true indices. Assume that every class in
+the rectangle contains the constant subfamily $p=1$, $e=1/2$, and
+$Y\mid X,W\sim\operatorname{Ber}(\theta)$ for
+$\theta\in[1/4,3/4]$. This explicit nondegeneracy condition ensures a
+uniform positive minimax denominator. It is satisfied by the usual
+compatible balls with sufficient radius. The source agenda is
+\cite[Section 3.5.3]{challenge}; higher-order estimation background is
+\cite{robins}. Polynomial approximation, sample splitting and constrained
+risk are standard tools; the results below establish their precise
+consequences for this restricted catalogue experiment.
+
+\section{A stabilized polynomial regression with random cell counts}
+Consider $N$ independent triples $(X_i,B_i,Z_i)$, where $X_i\in[0,1]^d$,
+$B_i\in\{0,1\}$, $0\le Z_i\le1$, $c\le p_X\le C$ and
+$\Pr(B=1\mid X=x)\ge\epsilon$. Suppose
+$f(x)=\E[Z\mid X=x,B=1]$ belongs to a H\"older ball of a supplied order
+$t>0$ and radius $L_0$. Only observations with $B_i=1$ are used.
+The function is defined almost everywhere and a H\"older version is used
+for the approximation statements.
+
+Partition the cube into $J^d$ half-open cells of side $h=1/J$ (including
+the outer boundary in the last cells). Put $k=\lceil t\rceil-1$ and
+$q=\binom{d+k}{k}$. On the unit cube choose a fixed orthonormal basis
+$b=(b_1,\ldots,b_q)^\top$ for polynomials of total degree at most $k$,
+with respect to Lebesgue measure. Its entries are bounded and
+$M_b=\sup_z\|b(z)\|<\infty$. In a cell $A$ with lower corner $x_A$,
+use $b_A(x)=b((x-x_A)/h)$.
+
+Let $D_A$ be the qualifying count and, for $D_A=j>0$, put
+\[
+ G_A=\frac1j\sum_{i:X_i\in A,B_i=1}b_A(X_i)b_A(X_i)^\top,
+ \qquad
+ V_A=\frac1j\sum_{i:X_i\in A,B_i=1}b_A(X_i)Z_i.
+\]
+Set $\gamma=c\epsilon/C$. If $j>0$ and
+$\lambda_{\min}(G_A)\ge\gamma/2$, predict
+$b_A(x)^\top G_A^{-1}V_A$ on $A$ and clip it to $[0,1]$.
+Otherwise predict $1/2$. Thus even a singular empirical matrix has a
+specified output. For a propensity fit subsequently clip to
+$[\epsilon,1-\epsilon]$.
+
+\begin{lemma}[Expected risk without a logarithmic design penalty]
+For fixed $d,t,L_0,c,C,\epsilon$, the preceding estimator satisfies
+\[
+ \E\|\widehat f-f\|_{L^2(P_X)}^2
+ \le C_0\{h^{2t}+J^d/(N+1)\}.                       \tag{2}
+\]
+The constant is independent of $J,N$ and of the particular design density
+or selection probabilities. If $f$ ranges over higher H\"older orders in
+a fixed compact interval with lower endpoint $t$, one common constant
+applies after replacing $L_0$ by a uniform embedding bound.
+\end{lemma}
+\begin{proof}
+Write $\pi_A=P_X(A)$ and
+$\rho_A=\Pr(X\in A,B=1)$. Then
+$\rho_A\ge\epsilon\pi_A\ge c\epsilon h^d$ and
+$\rho_A\le C h^d$. Conditional on qualification and membership in $A$,
+the rescaled design has density
+\[
+ z\longmapsto
+ \frac{h^d p_X(x_A+hz)\Pr(B=1\mid X=x_A+hz)}{\rho_A}
+ \ge\gamma.
+\]
+Hence its population Gram matrix is at least $\gamma I_q$.
+Conditional on $D_A=j$, the qualifying observations are iid from this
+conditional law. Each Gram entry is an average of bounded variables.
+For a $q\times q$ matrix, its operator norm is at most $q$ times its
+largest absolute entry. Hoeffding's inequality and a union bound on the
+$q^2$ entries therefore give, for constants $C_1,c_1>0$,
+\[
+ \Pr\{\lambda_{\min}(G_A)<\gamma/2\mid D_A=j\}
+ \le C_1e^{-c_1j}.                                  \tag{3}
+\]
+For example use entrywise deviations $\gamma/(2q)$ and the fixed bound
+$|b_u b_v|\le M_b^2$; all constants in (3) are independent of the cell.
+
+Taylor's formula with a H\"older remainder supplies a polynomial
+$p_A=b_A^\top\beta_A$ of total degree at most $k$ such that
+$\sup_A|f-p_A|\le C_2h^t=:\delta_h$.
+For $t\le1$ this is the constant Taylor polynomial. For $t>1$ use the
+order-$k$ Taylor expansion; the catalogue's integer-order convention
+makes its final derivative Lipschitz when $t$ is an integer, so the
+same remainder bound holds. Higher-order H\"older balls embed into the
+fixed order-$t$ ball by bounded derivatives and their H\"older modulus,
+with constants uniform over the stated compact range.
+
+On the good Gram event, write $Z_i=f(X_i)+\eta_i$. Conditional on the
+qualifying design points, the $\eta_i$ are independent, centered, and
+have variance at most $1/4$. Before clipping,
+\[
+ G_A^{-1}V_A-\beta_A
+ =G_A^{-1}\left\{\frac1j\sum_i b_A(X_i)[f(X_i)-p_A(X_i)]
+                      +\frac1j\sum_i b_A(X_i)\eta_i\right\}.
+\]
+The first vector inside braces has norm at most $M_b\delta_h$.
+The expected squared norm of the second, conditional on the design, is
+at most $M_b^2/(4j)$, since its cross terms vanish. On this event
+$\|G_A^{-1}\|\le2/\gamma$. It follows that, uniformly at every $x\in A$,
+conditional mean squared prediction error on the good event is at most
+$C_3(\delta_h^2+j^{-1})$. Clipping reduces error to $f(x)\in[0,1]$.
+On the bad event the bounded default has squared error at most one.
+Together with (3), and $e^{-c_1j}\le C_4/(j+1)$, this gives, for $j>0$,
+\[
+ \E[\|\widehat f-f\|_{L^2(P_X(\cdot\mid A))}^2\mid D_A=j]
+ \le C_5\{h^{2t}+(j+1)^{-1}\}.
+\]
+For $j=0$ the same bound holds after increasing $C_5$.
+The binomial identity
+\[
+ \E\frac1{D_A+1}
+ =\frac{1-(1-\rho_A)^{N+1}}{(N+1)\rho_A}
+ \le\frac1{(N+1)\rho_A}
+\]
+follows by integrating $(1-\rho_A+\rho_A z)^N$ on $[0,1]$.
+Multiply the last conditional risk bound by $\pi_A$, average over the
+count, and sum the cells. Since $\pi_A/\rho_A\le1/\epsilon$, the sum
+is bounded by $C_0h^{2t}+C_0J^d/(N+1)$, proving (2).
+\end{proof}
+
+\section{A single estimator and its adaptation factor}
+For $n\ge6$, take three disjoint blocks of size $N=\lfloor n/3\rfloor$.
+In block 1 use the lemma with $B=1$, response $Z=W$, degree determined
+by $t_e$, and a dyadic $J_e$ within a factor two of
+$N^{1/(2t_e+d)}$. Clip the result to $[\epsilon,1-\epsilon]$ and call it
+$\widehat e$. In block 2 use $B=W$, $Z=Y$, degree determined by $t_m$,
+and $J_m\asymp N^{1/(2t_m+d)}$, obtaining $\widehat m\in[0,1]$.
+The density and selection constants in the lemma are supplied bounds,
+not estimates of $p$. On block 3 form
+\[
+ \widetilde\psi=\frac1N\sum_{i\in I_3}
+ \left\{\widehat m(X_i)+\frac{W_i}{\widehat e(X_i)}
+                    [Y_i-\widehat m(X_i)]\right\},
+ \qquad \widehat\psi=\operatorname{proj}_{[0,1]}\widetilde\psi.
+                                                               \tag{4}
+\]
+For $n<6$ use $1/2$.
+
+\begin{theorem}[Uncapped first-order region]
+Uniformly in the true index $s$ in the supplied compact rectangle,
+\[
+ \sup_{P\in\mathcal P_s}\E_P(\widehat\psi-\psi(P))^2
+ \le C_6\{n^{-1}+n^{-2(a_e+a_m)}\}.                  \tag{5}
+\]
+Under (1) and the constant-subfamily condition, there are constants
+$0<c_6<C_7<\infty$ independent of $n,s$ such that
+\[
+ c_6/n\le R_n^\star(s)\le C_7/n,
+ \qquad 1\le A_n^\star\le C_7/c_6.
+\]
+This includes equality in (1), without asserting asymptotic normality.
+\end{theorem}
+\begin{proof}
+Lemma (2) gives expected nuisance squared errors at most
+$C N^{-2a_e}$ and $C N^{-2a_m}$. Condition on both pilots.
+Each summand in (4) is bounded in absolute value by $1+1/\epsilon$,
+so the conditional variance is at most $(1+1/\epsilon)^2/N$.
+Its exact conditional bias is
+\[
+ B=\int\frac{(\widehat e-e)(\widehat m-m)}{\widehat e}\,dP_X.
+\]
+Cauchy--Schwarz gives
+$B^2\le\epsilon^{-2}\|\widehat e-e\|_2^2\|\widehat m-m\|_2^2$.
+The two pilots use independent blocks, so expectation factors the
+product into the two expected errors. Conditional variance plus squared
+bias proves (5), and projection cannot increase squared loss. Enlarge the
+constant for $n<6$. Under (1) this is $O(n^{-1})$.
+
+For the lower bound in every class, take constant-subfamily parameters
+$\theta_0=1/2$ and $\theta_1=1/2+1/(4\sqrt n)$. The likelihood depends
+only on the Bernoulli outcomes and
+\[
+ \chi^2(P_1^n,P_0^n)=(1+1/(4n))^n-1\le e^{1/4}-1.
+\]
+Cauchy--Schwarz bounds total variation by
+$\tfrac12\sqrt{e^{1/4}-1}<1/2$. Classify an estimate by its nearer
+parameter value. Misclassification incurs squared loss at least one
+quarter of their squared separation, and the sum of error probabilities
+is at least $1-\operatorname{TV}>1/2$. Thus maximum risk is at least
+$1/(256n)$. Both laws lie in every class, giving a uniform denominator
+bound. For any estimator its worst risk in each fixed class is at least
+that class's minimax risk, so $A_n^\star\ge1$. Estimator (4) and the
+uniform lower denominator establish the upper ratio bound.
+\end{proof}
+
+For example, $d=5$ and lower nuisance indices $t_e=t_m=3$ give
+$a_e+a_m=6/11>1/2$. The histogram cap in version 1 gives only $2/7$
+in that example and therefore proves no parametric-risk bound there.
+This is a strict enlargement of the established sufficient region, while
+the density smoothness index remains unused by the construction.
+
+\section{A constrained-risk tool for the remaining region}
+Let $P_0$ be an experiment law with target $\psi_0$, and let
+$\{P_\lambda:\lambda\in\Lambda\}$ have common target $\psi_1$.
+For a mixing probability $\nu$ let $Q=\int P_\lambda\,d\nu(\lambda)$.
+The mixture need not itself belong to the model. Suppose $Q\ll P_0$
+and $\chi^2(Q,P_0)<\infty$.
+\begin{proposition}
+If $\E_0(\widehat\psi-\psi_0)^2\le r$, then
+\[
+ \sup_\lambda\E_{P_\lambda}(\widehat\psi-\psi_1)^2
+ \ge\left(|\psi_1-\psi_0|-
+       \sqrt{r}\sqrt{1+\chi^2(Q,P_0)}\right)_+^2.
+\]
+Independent randomization of the estimator is allowed.
+\end{proposition}
+\begin{proof}
+With $L=dQ/dP_0$, Cauchy--Schwarz bounds
+$|\E_Q(\widehat\psi-\psi_0)|\le\sqrt r\sqrt{\E_0L^2}$.
+Subtract the target difference and use the reverse triangle inequality.
+Jensen bounds the resulting squared mean error by risk under $Q$.
+That risk averages the risks under $P_\lambda$, because their targets
+are identical, and is therefore bounded above by their supremum.
+Adjoining the same independent randomizer leaves $L$ unchanged.
+\end{proof}
+
+\section{Verification and remaining gaps}
+The Gram threshold is computable from supplied density and overlap bounds;
+empty or ill-conditioned cells have an explicit default. Expected risk
+accounts for those cells, rather than conditioning the theorem on a
+simultaneous high-probability event. Neither polynomial degree nor
+resolution uses the unknown indices. The boundary in (1) is sufficient
+for risk order only; it does not establish an unbiased normal limit or
+honest adaptive confidence sets.
+
+The sharp higher-order parametric boundary and any logarithmic adaptation
+penalty outside (1) remain unresolved. In particular the constrained-risk
+proposition is only a tool: applying it sharply requires explicit rough
+alternatives and a calculated mixture divergence inside the stated causal
+experiment. This version proves no such matching low-smoothness result.
+
+\section{Completion Estimate}
+30\%
+
+This is a heuristic estimate for the full catalogue target. The stabilized
+polynomial construction strictly enlarges the proved bounded-adaptation
+region and supplies complete uniform risk bounds. The optimal factor over
+general rectangles, higher-order transition behavior and matching
+adaptation lower bounds remain open in this attempt.
+
+\begin{thebibliography}{9}
+\bibitem{challenge} C. Cinelli, A. Feller, G. Imbens, E. Kennedy,
+S. Magliacane and J. Zubizarreta (2025), Challenges in Statistics:
+A Dozen Challenges in Causality and Causal Inference,
+arXiv:2508.17099v1, Section 3.5.3, Adaptivity.
+\url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}.
+\bibitem{robins} J. Robins, L. Li, E. Tchetgen and A. van der Vaart (2008),
+Higher order influence functions and minimax estimation of nonlinear
+functionals, arXiv:0805.3040. \url{https://arxiv.org/abs/0805.3040}.
+\end{thebibliography}
+\end{document}
