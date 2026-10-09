@@ -1,0 +1,117 @@
+% ECONOMICS_PROBLEM: {"id": "C72-131", "title": "Expected-polynomial exact Nash computation for random rational games", "jel_code": "C72", "source_id": "OP-0137"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\OPT}{\operatorname{OPT}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\supp}{\operatorname{supp}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\begin{document}
+\noindent\textbf{Problem ID:} \texttt{C72-131}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 2\par
+\section*{Expected-polynomial exact Nash computation for random rational games}
+
+\textbf{Status.} The literal fixed finite-support question is resolved affirmatively. This is an elementary consequence of atoms at both players' highest payoffs and an exponentially bounded exact fallback. It is not a resolution of continuous random games or of support probabilities varying with $n$, and no novelty claim is made.
+
+\textbf{Version 2 scope and provenance.} This Pro revision incorporates the scope annotation in the supplied \texttt{proposed\_corrections.md}: the affirmative claim concerns only the catalogue's fixed finite rational-support product laws. The audit's executable checks concern other problems, not the present random-game theorem. The mathematical proof and its attribution below are retained from Version 1; this revision reports no fresh external-source check or computational verification.
+
+\subsection*{Precise target}
+Fix two distributions $\nu_A,\nu_B$ with nonempty finite rational supports in $[0,1]$ and fixed rational probabilities. All $2n^2$ entries of the two matrices are sampled independently, the $A$ entries from $\nu_A$ and the $B$ entries from $\nu_B$. The requested algorithm must output an exact rational Nash equilibrium on \emph{every} rational bimatrix input and have expected polynomial bit complexity under the specified product law. The constants may depend on the two fixed laws. We assume standard explicit binary encodings of rational matrix entries.
+
+The assertion quantifies over each fixed pair of laws separately: it does not give a polynomial bound uniform over laws encoded as part of a varying input. Arbitrary continuous payoff distributions and laws whose support or probabilities change with $n$ are outside the theorem.
+
+Let $a^*=\max\supp\nu_A$ and $b^*=\max\supp\nu_B$, with respective masses $p_A,p_B>0$, and write $q=p_Ap_B>0$. These constants are used only in the analysis; the algorithm does not require them as input.
+
+\begin{lemma}[A very small failure event]
+For the random $n\times n$ input,
+\[
+ \Prb\{\text{there is no pure Nash equilibrium}\}
+ \leq(1-q)^{n^2}\leq e^{-qn^2}.
+\]
+\end{lemma}
+\begin{proof}
+If $A_{ij}=a^*$ and $B_{ij}=b^*$, neither player can improve by changing its action: the row player already receives its largest possible matrix entry, and so does the column player. Thus $(i,j)$ is a pure equilibrium, regardless of ties elsewhere. The event that both equalities hold has probability $q$. The events for distinct cells involve disjoint independent entries. Therefore the probability that no jointly maximal cell exists is $(1-q)^{n^2}$. Absence of any pure equilibrium is contained in that event. We use an inequality, since pure equilibria can exist without a jointly maximal cell.
+\end{proof}
+
+\begin{lemma}[A degeneracy-safe exact fallback]
+For arbitrary rational matrices $A,B\in\mathbb Q^{n\times n}$ of total binary input length $L$, an exact rational Nash equilibrium can be found with at most $4^n\operatorname{poly}(L)$ bit operations, where the polynomial is independent of the matrices.
+\end{lemma}
+\begin{proof}
+Enumerate all pairs of nonempty subsets $I,J\subseteq[n]$. For each, solve the following two rational linear feasibility problems:
+\[
+ \begin{split}
+ &y\geq0,\quad\sum_jy_j=1,\quad y_j=0\ (j\notin J),\\
+ &(Ay)_i=v\ (i\in I),\qquad (Ay)_i\leq v\ (i\notin I);
+ \end{split}
+\]
+\[
+ \begin{split}
+ &x\geq0,\quad\sum_ix_i=1,\quad x_i=0\ (i\notin I),\\
+ &(x^TB)_j=w\ (j\in J),\qquad(x^TB)_j\leq w\ (j\notin J).
+ \end{split}
+\]
+If both are feasible, return any rational feasible solutions $x,y$. Every action with $x_i>0$ belongs to $I$ and has payoff $v$, while all other actions have payoff at most $v$. The analogous assertion holds for $y$. Hence the returned pair is an exact Nash equilibrium. Zero probabilities inside the enumerated sets are permitted: equality constraints on such extra best replies cannot invalidate an output.
+
+Existence of a mixed equilibrium in finite games ensures that some pair of its actual supports makes both programs feasible. The feasibility problems are separate because, for fixed candidate supports, the row best-response restrictions involve only $y$ and the column restrictions only $x$. Standard exact rational linear programming solves each in polynomial bit time and returns a polynomial-bit rational point. One can additionally bound $v,w$ between the smallest and largest corresponding matrix entries to make the displayed polyhedra bounded. Thus degeneracy does not require a strict-positivity search or a nondegeneracy promise.
+There are $(2^n-1)^2<4^n$ support pairs, each of polynomial encoding length in $L$, proving the bound. For an arbitrary rectangular $r\times s$ input, the identical construction enumerates row and column supports separately and takes at most $2^{r+s}\operatorname{poly}(L)$ bit operations. Thus the fallback covers rectangular rational bimatrix inputs as well.
+\end{proof}
+
+\begin{theorem}[Expected polynomial time for every fixed pair of finite laws]
+There exists a deterministic algorithm $\mathcal A$, independent of $\nu_A,\nu_B$, which terminates and returns an exact rational equilibrium on every rational bimatrix input, and for every fixed finite-support pair there exist finite constants $C,d$ such that
+\[
+ \E_{A,B}T_{\mathcal A}(A,B)\leq Cn^d\qquad(n\geq1).
+\]
+Consequently the Las Vegas assertion in the catalogue holds, with unused internal randomness.
+\end{theorem}
+\begin{proof}
+First compute each column maximum of $A$ and each row maximum of $B$. Scan all cells for one attaining both respective maxima; return its pure profile if found. This detects all pure equilibria in polynomial bit time. If none exists, use the preceding fallback.
+Because the payoff supports are fixed, every sampled entry has bit length bounded by a law-dependent constant, so the sampled input length is at most $C_0n^2$ under an ordinary matrix encoding. For a fixed polynomial $P$ the running time is at most $P(L)$ on the first branch and at most $4^nP(L)$ on the fallback branch. Therefore
+\[
+ \E T_{\mathcal A}\leq P(C_0n^2)
+       \{1+\exp(n\log4-qn^2)\}.
+\]
+Completing the square gives
+\[
+ n\log4-qn^2
+ =-q\left(n-\frac{\log4}{2q}\right)^2
+                  +\frac{(\log4)^2}{4q}
+ \leq\frac{(\log4)^2}{4q}.
+\]
+The exponential factor is a finite constant depending only on the laws. Absorb it and $C_0$ into $C$ and the polynomial degree into $d$. The fallback already proves unconditional termination and exactness on arbitrary rational inputs, including inputs outside the sampled supports.
+\end{proof}
+
+\subsection*{Why this does not settle the broader random-game agenda}
+The quantifier that the supports and probabilities are fixed is decisive. When $q=q_n$ tends to zero, the same proof yields only the factor $\exp(n\log4-q_nn^2)$; it is bounded polynomially if, for example, $q_nn^2\geq n\log4-O(\log n)$, but no such estimate holds for arbitrary sequences. A continuous payoff law has no positive atom at its supremum, so the jointly maximal cell event disappears. The argument also relies on independence of the two matrices and across cells; it does not cover arbitrary correlated random games.
+
+The constants can be extremely large when a top atom has tiny mass. This is permitted by the catalogue's model-specific assertion and should not be interpreted as a useful uniform bound over encoded distributions. The proof addresses expectation, including rare expensive inputs, rather than only a high-probability running time.
+
+\section{Completion Estimate}
+100\%
+
+This is a post hoc, heuristic estimate for the exact catalogue target.
+The top-atom failure bound and degeneracy-safe rational fallback prove expected polynomial bit complexity for every fixed finite rational-support pair, while maintaining correctness on every rational bimatrix input. The estimate does not concern arbitrary continuous models, correlated entries, or dimension-dependent payoff laws, and it makes no novelty claim.
+
+\subsection*{Reference and relation to established work}
+Andrea Collevecchio, G\'abor Lugosi, Adrian Vetta and Rui-Ray Zhang (2025), \emph{Finding a Nash equilibrium of a random win-lose game in expected polynomial time}, arXiv:2510.12846, Sections 2.2 and 3, Theorem 1. \url{https://arxiv.org/pdf/2510.12846}. Version 1 reports that the primary text already uses pure-equilibrium search with an exact fallback and the probability of joint $(1,1)$ cells in Bernoulli games. The proof here extends that elementary top-atom observation to the precise fixed finite-support encoding in the catalogue and uses support-feasibility linear programs for a transparent bit-complexity bound. It does not claim a new solution to the paper's density-dependent difficult regimes.
+
+\end{document}

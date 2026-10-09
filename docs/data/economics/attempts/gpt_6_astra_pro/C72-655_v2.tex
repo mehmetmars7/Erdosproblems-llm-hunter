@@ -1,0 +1,256 @@
+% ECONOMICS_PROBLEM: {"id": "C72-655", "title": "Exact Nash computation in extensive-form games: resolved classification", "jel_code": "C72", "source_id": "OP-0141"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+% REVISION_VERSION: 2
+% REVISION_BASIS: supplied independent audit; attribution and scope clarification
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,xurl,hyperref}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\title{Exact Nash computation in extensive-form games: resolved classification}
+\author{GPT 6 Astra Pro}
+\date{9 October 2026}
+\setlength{\emergencystretch}{3em}
+\begin{document}
+\maketitle
+\textbf{Problem ID:} \texttt{C72-655}\quad\textbf{Model:} GPT 6 Astra Pro\quad\textbf{Version:} 2\par
+\section*{Scope and submitted result}
+The historical classification is already known: exact Nash computation
+in explicitly represented finite perfect-recall extensive-form games is
+FIXP-complete. This attempt reconstructs a polynomial-size continuous
+fixed-point map and its correctness proof. Normal-form FIXP-hardness is
+used as a cited external theorem. The result concerns exact real search,
+not a polynomial algorithm for finding rational equilibrium coordinates.
+It is a submitted mathematical claim with its proof below, not a claim
+that the historical theorem is new or has received external verification.
+
+\textbf{Version 2 status and provenance.} The attached audit recommends
+retaining the attribution and separating a reconstructed published theorem
+from a newly resolved research problem. This revision makes that distinction
+explicit while retaining the argument below. The submitted solved status
+means that the exact catalogue classification is accounted for, conditional
+on the cited normal-form hardness theorem; it is not a new-discovery or
+community-verification claim. The audit's finite coalition and matching
+checks do not computationally validate this manuscript, and no fresh
+external source check is claimed here.
+
+Let $b_{I,a}$ be the behavioral probability of action $a$ at information
+set $I$. Chance probabilities and leaf utilities are rational, and the
+input explicitly lists the tree and information partition. Perfect recall
+implies that all nodes of an information set have the same sequence of
+that player's prior information sets and actions. In particular, a player
+cannot visit the same information set twice along one play.
+
+\section*{Polynomial counterfactual quantities without conditioning}
+Fix player $i$, its information set $I$, and action $a$ there. For a
+terminal leaf $\ell$ descending from a node in $I$ through action $a$, let
+$\pi_{-i}(\ell;b)$ be the product of all chance probabilities and all
+other players' behavioral probabilities on the root-to-$\ell$ path.
+Let $\pi_{i,>I}(\ell;b)$ be the product of player $i$'s behavioral
+probabilities strictly after the action at $I$ on that path. Define
+\[
+ Q_{I,a}(b)=\sum_{\ell\text{ below }(I,a)}
+       u_i(\ell)\pi_{-i}(\ell;b)\pi_{i,>I}(\ell;b),
+ \quad
+ \overline Q_I(b)=\sum_a b_{I,a}Q_{I,a}(b),
+\]
+\[
+                   d_{I,a}(b)=Q_{I,a}(b)-\overline Q_I(b).          \tag{1}
+\]
+Player $i$'s probabilities before $I$ and its probability of choosing $a$
+at $I$ are deliberately omitted from $Q_{I,a}$. The action at $I$ is
+being forced, and reach through its own earlier decisions is treated
+separately. Each expression is polynomial in the behavioral coordinates.
+There is at most one relevant visit to $I$ per leaf by perfect recall.
+The explicit tree bounds both the number of terms and their lengths,
+so all quantities admit arithmetic circuits of polynomial size.
+
+The elementary identity
+\[
+                         \sum_a b_{I,a}d_{I,a}(b)=0               \tag{2}
+\]
+holds at every information set. If opponents and chance make $I$
+unreachable under every strategy of $i$, every $Q_{I,a}$ is zero.
+No division by an information-set reach probability is necessary. This
+also makes (1) continuous as such reach probabilities approach zero.
+
+\section*{The fixed-point map and its local consequence}
+On the product $P$ of the information-set probability simplexes, put
+\[
+ F_{I,a}(b)=
+ \frac{b_{I,a}+\max\{0,d_{I,a}(b)\}}
+      {1+\sum_c\max\{0,d_{I,c}(b)\}}.                            \tag{3}
+\]
+The denominator is at least one. For each $I$ the coordinates are
+nonnegative and sum to one, so $F$ maps $P$ into itself continuously.
+
+\begin{lemma}
+At every fixed point of $F$, $d_{I,a}(b)\leq0$ for all $I,a$.
+\end{lemma}
+\begin{proof}
+Fix $I$ and abbreviate $S=\sum_a\max\{0,d_{I,a}\}$. If $S>0$, the
+fixed-point equation implies $b_{I,a}S=\max\{0,d_{I,a}\}$ for every $a$.
+Consequently every action with $b_{I,a}>0$ has
+$d_{I,a}=b_{I,a}S>0$. But then
+$\sum_a b_{I,a}d_{I,a}=S\sum_a b_{I,a}^2>0$, contradicting (2).
+Thus $S=0$, which is the desired conclusion.
+\end{proof}
+
+These inequalities express optimality for counterfactual decisions even
+when $i$'s current earlier strategy assigns zero probability to reaching
+$I$. Checking only the actual payoff effect of changing one information
+set would lose precisely this information.
+
+\section*{Why a fixed point is a Nash equilibrium}
+Fix the opponents' behavior and any alternative full strategy $b'_i$.
+Order $i$'s information sets so that any predecessor in an own-action
+history appears before its successors. Such an order exists because the
+game tree is finite and perfect recall rules out cycles in own histories.
+Transform $b_i$ into $b'_i$ by changing the information sets one at a time
+in that order.
+
+At the step changing $I$, all of its own predecessors already use $b'_i$
+and all its own successors still use $b_i$. Let
+$r'_i(I)$ be the product of the new probabilities of the actions in the
+common own history before $I$. The payoff change at this step is exactly
+\[
+ \begin{aligned}
+ \Delta_I
+ &=r'_i(I)\sum_a (b'_{I,a}-b_{I,a})Q_{I,a}(b)\\
+ &=r'_i(I)\sum_a b'_{I,a}d_{I,a}(b).
+ \end{aligned}
+ \tag{4}
+\]
+To verify the first equality, expand the expected utility as a sum over
+terminal leaves. Leaves not descending through $I$ do not change.
+For the others, the factors before $I$ involving player $i$ are the
+common product $r'_i(I)$; the action factor changes from $b_{I,a}$ to
+$b'_{I,a}$; all later own factors and every opponent/chance factor are
+exactly those in $Q_{I,a}(b)$. Information sets incomparable with $I$
+do not occur on a root-to-leaf path through $I$, so previous modifications
+there have no effect on this equality. The second equality uses that
+both action distributions sum to one.
+
+At a fixed point every term on the second line of (4) is nonpositive.
+Summing the hybrid payoff changes therefore gives
+\[
+                         U_i(b'_i,b_{-i})-U_i(b)\leq0.
+\]
+The alternative strategy and player were arbitrary. Hence every fixed
+point is a Nash equilibrium. This proof handles arbitrary simultaneous
+changes in one player's contingent plan, including changes that make
+previously unreached information sets reachable.
+
+\section*{The circuit domain and the upper bound}
+If the definition of FIXP uses the unit cube rather than a product of
+simplexes, first retract cube coordinates $x$ to $P$. For a block of $r$
+actions with sum $s$, define
+\[
+ R_a(x)=\frac{x_a+\max\{0,1-s\}/r}{\max\{1,s\}}.                  \tag{5}
+\]
+This is continuous, maps each block into its simplex, and is the identity
+on that simplex. The circuit $F\circ R$ maps the cube into itself.
+Every fixed point lies in $P$, because its output lies there; hence
+$R(x)=x$ and it is a fixed point of $F$. Brouwer supplies existence.
+Equations (1), (3), and (5) use rational constants and the permitted
+arithmetic and maximum gates, with nonzero denominators throughout.
+Their total size is polynomial in the explicit input. Returning their
+fixed point therefore solves exact Any-Nash, establishing FIXP membership.
+
+\section*{Hardness, a diagnostic example, and limits}
+Use the established FIXP-hardness of exact three-player normal-form Nash.
+Represent a three-player normal-form payoff table by a three-level game
+tree: each player acts once, and later players are not told earlier
+actions. All nodes at a player's level belong to one information set.
+Perfect recall holds because each player has no earlier own action to
+forget. The leaves correspond exactly to entries of the input table;
+the tree has polynomial size in that table. Behavioral profiles and mixed
+normal-form profiles have identical payoff formulas and unilateral
+deviations. An exact extensive-form equilibrium thus returns an exact
+normal-form equilibrium. Together with the upper bound, this proves the
+claimed FIXP-completeness relative to the cited hardness theorem.
+
+\begin{theorem}[Reconstructed published classification]
+For explicitly listed finite perfect-recall extensive-form games with
+binary-encoded rational chance probabilities and terminal utilities,
+and with the number of players included in the input, the exact real
+Any-Nash search problem is $\mathsf{FIXP}$-complete. The output is a
+behavioral strategy profile $b$ satisfying
+\[
+ U_i(b)\geq U_i(b_i',b_{-i})
+ \quad\text{for every player }i\text{ and every behavioral deviation }b_i'.
+\]
+The completeness statement uses the established normal-form hardness
+theorem cited below; it is a reconstruction of the published classification.
+\end{theorem}
+\begin{proof}
+The polynomial counterfactual circuits, continuous map, cube retraction,
+and hybrid-deviation proof above establish membership, including at
+unreached information sets. The three-level hidden-action construction
+above is a polynomial reduction from the cited exact three-player
+normal-form Nash problem and preserves every payoff and unilateral
+deviation. Its imported hardness therefore gives the matching lower bound.
+\end{proof}
+
+A small example checks why counterfactual rather than ordinary local
+gains are needed. One player first chooses Stop, obtaining $1$, or Enter,
+then chooses Bad for $0$ or Good for $2$. At Stop/Bad, changing only the
+root action hurts, and changing only the off-path later action changes
+nothing. Nevertheless Enter/Good is a profitable full deviation. In (1)
+the later Good action has positive counterfactual gain, so this profile
+is correctly excluded as a fixed point.
+
+This construction does not prove that every Nash equilibrium is a fixed
+point; the search reduction needs only that every returned fixed point
+is an equilibrium. It does not yield the same result for imperfect recall,
+where the common-history factorization in (4) can fail, or for succinct
+trees whose leaves cannot be enumerated in polynomial input size.
+
+\textbf{Verification and final scope.} The algebraic checks here are
+(2), the fixed-point contradiction, the exact hybrid identity (4), and
+the polynomial-size reduction. They reconstruct a proof for the canonical
+explicit-tree model. The general classification is credited to Cheval,
+Horn, Paul, and Shirmohammadi's cited Theorem 5; the normal-form lower
+bound is credited to Etessami and Yannakakis. This manuscript supplies
+neither a new resolution of an open classification nor an efficient
+rational-coordinate algorithm, and reports no new computational audit
+of these external theorems.
+
+\section{Completion Estimate}
+100\%
+
+This is a post hoc, heuristic estimate for the full catalogue target.
+The canonical target is the exact real-search classification for the
+explicit-tree perfect-recall model. The retained counterfactual map and
+hybrid proof establish membership, and the cited normal-form hardness
+theorem supplies the lower bound. The estimate measures coverage of this
+already published classification, not novelty or independent verification;
+it assigns no completion to other representations or subclasses.
+
+\section*{References and attribution}
+The already reported extensive-form classification is Theorem 5 of
+Vincent Cheval, Florian Horn, Soumyajit Paul, and Mahsa Shirmohammadi,
+\emph{On the Complexity of the Optimal Correlated Equilibria in
+Extensive-Form Games}, arXiv:2507.11509v2 (2026).
+\url{https://arxiv.org/pdf/2507.11509v2}.
+The external normal-form hardness theorem is due to Kousha Etessami and
+Mihalis Yannakakis, \emph{On the Complexity of Nash Equilibria and Other
+Fixed Points}, SIAM Journal on Computing (2010).
+\url{https://epubs.siam.org/doi/10.1137/080720826}.
+The unnormalized formulas and hybrid proof above provide the explicit
+verification made in this attempt; they are not a novelty claim.
+\end{document}
