@@ -1,0 +1,96 @@
+% ECONOMICS_PROBLEM: {"id": "D91-530", "title": "A portable model of cognitive biases", "jel_code": "D91", "source_id": "OP-0301"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=27mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newcommand{\E}{\mathbb E}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\KL}{KL}
+\title{When a shared shrinkage parameter is identified and portable}
+\author{GPT 6 Astra Ultra}\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Problem ID:} \texttt{D91-530}. \textbf{Status: Unresolved.} The following restricted results do not establish the empirical catalogue target.
+
+\section{Target and restrictions}
+The catalogue asks whether cognitive uncertainty, task difficulty and defaults support a low-dimensional model that predicts across domains. Its displayed mixture is a hypothesis to test, not a universal behavioral law. Enke and Graeber's discussion of cognitive defaults and noise motivates the question \cite{eg}. This attempt isolates three separate requirements: identifying a shrinkage coefficient within a domain, measuring response noise independently, and testing prediction in a genuinely held-out domain. None follows merely from a significant regression coefficient on reported uncertainty.
+
+For a tractable scalar submodel, prespecify benchmarks $m(X)$ and defaults $b(X)$ on the same response scale, observe $Q\in[0,1]$, and posit
+\[
+ Y=m(X)+\gamma w(X,Q)+\varepsilon,\qquad
+ w=Q\{b(X)-m(X)\},\quad 0\le\gamma\le1.                 \tag{1}
+\]
+Thus the shrinkage intensity is $\lambda=\gamma Q$. For binary actions, $Y$ can be a response indicator and (1) a probability model whose conditional mean lies in $[0,1]$. An individual preference parameter hidden inside $m$ must have been independently identified or fixed before the following argument. Jointly fitting an unrestricted benchmark would erase the identifying restriction.
+
+\begin{proposition}[Identification and a precise failure]
+If $0<\E w^2<\infty$, $\E|w(Y-m)|<\infty$, and $\E[w\varepsilon]=0$, then
+\[
+ \gamma=\frac{\E[w(Y-m)]}{\E w^2}.                     \tag{2}
+\]
+If instead $Q=q\in(0,1)$ is constant, $b=0$, and the unknown benchmark is $m=\theta$, the conditional mean alone generally identifies only $(1-q\gamma)\theta$.
+\end{proposition}
+\begin{proof}
+Multiply (1) by $w$, take expectations, and divide by its positive second moment. For the second assertion let $c>0$ be the observed mean. Every $\gamma\in[0,1]$ paired with $\theta=c/(1-q\gamma)$ produces that mean; with a common additive error law it produces the same entire response law. For example $q=1/2,c=1/4$ permits $(\gamma,\theta)=(0,1/4)$ and $(1,1/2)$, even with benchmarks restricted to $[0,1]$.
+\end{proof}
+
+The relevance condition concerns uncertainty times the benchmark--default difference. Variation in reported uncertainty has no identifying power when benchmark and default coincide. The moment restriction also is substantive: endogenous reporting error, changing attention or omitted preferences can correlate $w$ with $\varepsilon$. Random assignment of a description does not automatically randomize subjective $Q$. Equation (2) identifies a predictive coefficient under the stated model; it is not, without more restrictions, the causal effect of increasing uncertainty.
+
+\section{What repeated answers measure}
+Let $L$ denote stable latent individual parameters and fix the task, report and presentation. Suppose two responses satisfy
+\[
+ Y_r=f(X,Q,L)+\varepsilon_r,\qquad r=1,2,
+\]
+with errors conditionally independent given $(X,Q,L)$, conditional mean zero and common conditional variance $\sigma^2(X,Q,L)$. Then
+\[
+ \E\left[\frac{(Y_1-Y_2)^2}{2}\mid X,Q\right]
+       =\E[\sigma^2(X,Q,L)\mid X,Q].                  \tag{3}
+\]
+Indeed the common latent mean cancels before squaring, the two error variances add, and the conditional cross product vanishes; averaging over $L$ proves the identity. This distinguishes within-person response variation from heterogeneity in preference levels. Regressing the squared difference on a preregistered transformation of $Q$ can therefore validate a predictive noise relationship under these assumptions.
+
+The independence requirement cannot be replaced by equal marginal variances. If the errors have conditional covariance $c(X,Q,L)$, the right side of (3) becomes $\E[\sigma^2-c\mid X,Q]$. A perfectly persistent common error is invisible to differencing. Conversely, genuine learning or fatigue that changes the latent mean contributes to the squared difference and is misclassified as noise. Repeated reports of $Q$ can themselves change reflection. A useful implementation separates the uncertainty-measurement session from randomized repeat timing, records order, and interprets failures of stationarity explicitly. These are design implications of (3), not empirical claims about any existing sample.
+
+\section{A calculation of the cost of failed portability}
+Assume for this calculation that the $n$ training covariates are fixed, $S=\sum_{j=1}^n w_j^2>0$, and errors are independent with mean zero and variance $\sigma^2$. The unconstrained least-squares estimator is
+\[
+ \widehat\gamma=\frac{\sum_jw_j(Y_j-m_j)}S,\qquad
+ \Var(\widehat\gamma)=\sigma^2/S.                     \tag{4}
+\]
+If training observations in domain $d_j$ have true coefficients $\gamma_{d_j}$, its expectation is the weighted average
+$\gamma_{\rm pool}=\sum_j w_j^2\gamma_{d_j}/S$.
+In an independent target domain with coefficient $\gamma_T$ and mean-zero noise conditional on covariates, squared prediction loss above the target conditional-mean oracle equals
+\[
+ \E_T[w^2]\left\{\frac{\sigma^2}{S}
+                 +(\gamma_{\rm pool}-\gamma_T)^2\right\}.       \tag{5}
+\]
+To prove this, write the prediction error as $(\widehat\gamma-\gamma_T)w-\varepsilon_T$. Its cross term has zero expectation. Subtract target noise risk and apply the bias--variance identity to (4). Clipping to $[0,1]$ can only reduce coefficient squared error when $\gamma_T$ lies there, but (5) is the exact formula for the unclipped estimator.
+
+A larger pooled sample reduces the first term and leaves the portability bias intact. For example, if all training tasks have $\gamma=0$ and target tasks have $\gamma_T=1$, even infinite training data leave excess risk $\E_Tw^2$. Conversely, with a genuinely shared coefficient and matched response scales, pooling can lower variance. These two completely specified models refute any unconditional claim that the shared specification must outperform separate domain models. Which situation describes people is the unresolved empirical question.
+
+\section{A finite-sample comparison that tests the intended claim}
+Train a shared predictor and its comparator without the held-out observations, with their tuning rules fixed. On $n_T$ independent target observations let $D_j$ be shared-model loss minus comparator loss. Suppose each loss is scaled to $[0,1]$, so $D_j\in[-1,1]$. Conditional on the training data, Hoeffding gives
+\[
+ \left|n_T^{-1}\sum_j D_j-\E_T D_j\right|
+ \le\sqrt{\frac{2\log(2/\alpha)}{n_T}}                 \tag{6}
+\]
+with probability at least $1-\alpha$. A negative upper endpoint establishes improvement for that target distribution and those trained rules. Searching across many domains, losses or uncertainty scales requires simultaneous correction or another holdout; it cannot use (6) unchanged. If individuals contribute correlated tasks, the independence unit must instead be the person or an appropriately analyzed cluster.
+
+Calibration is distinct from average loss. Conditional residual means across prespecified uncertainty bins can detect systematic over-shrinkage even when average loss improves. Description and experience treatments require their own target populations and scales. A model can be portable across tasks within one sample yet fail across populations through a changed default or reporting kernel. No data are supplied here to determine these quantities, compare actual prediction risks, or establish a universal model. Equations (2)--(6) provide exact identification restrictions, noise diagnostics and falsifiable comparisons for the specified submodel only.
+
+\begin{thebibliography}{9}
+\bibitem{eg} B. Enke and T. Graeber (2023), \emph{Cognitive Uncertainty}, March manuscript, discussion section 8, printed pp.32--34. \href{https://thomasgraeber.com/assets/papers/EnkeGraeber_CognitiveUncertainty.pdf}{Author manuscript}. The source motivates defaults and noise validation; (1)--(6) are self-contained restricted calculations, not attributed empirical findings.
+\end{thebibliography}
+
+\end{document}

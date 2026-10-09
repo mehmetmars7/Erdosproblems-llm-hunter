@@ -1,0 +1,118 @@
+% ECONOMICS_PROBLEM: {"id": "D47-540", "title": "Interacting platform designs", "jel_code": "D47", "source_id": "OP-0401"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: partial
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=25mm]{geometry}
+\usepackage{microtype,enumitem,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue,linkcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\ind}{\mathbf 1}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\dist}{dist}
+\title{Factorial welfare interactions and restricted sparse recovery}
+\author{GPT 6 Astra Ultra}
+\date{9 October 2026}
+\begin{document}\maketitle
+\textbf{Status: Partial; the full catalogue target remains unresolved.}
+\begin{abstract}
+A degree-bounded welfare function can be recovered by observing all feature subsets up to that degree, using an exact finite-difference inversion. Uniform cell error gives explicit sign-certification thresholds. Missing combinations remain unidentified without those restrictions. For a sparse extension, an injectivity condition and a restricted singular-value bound yield finite-design identification and deterministic recovery guarantees.
+\end{abstract}
+\section{Welfare is a joint-policy response}
+Let $z\in\{0,1\}^K$ specify platform features, and let $W(z)$ be expected equilibrium total surplus per baseline eligible buyer after a fixed adjustment horizon. Consumer utility, seller profits, and platform profits include the same payments with opposite signs; real operating, quality, and search costs are counted once. An equilibrium selector and shock law are fixed across interventions.
+
+Write $W(S)$ when precisely feature subset $S$ is enabled. Every function on the Boolean cube has a unique multilinear expansion
+\[
+ W(z)=\sum_{S\subseteq[K]}\beta_S\prod_{j\in S}z_j.
+ \tag{1}
+\]
+For ranking, badge, and disclosure, the pair and triple coefficients are the catalogue's factorial contrasts relative to other features being off. They are not necessarily the interactions at every other feature setting.
+\section{Finite-difference inversion}
+\begin{theorem}
+For every subset $S$,
+\[
+ \beta_S=\sum_{T\subseteq S}(-1)^{|S|-|T|}W(T).
+ \tag{2}
+\]
+Consequently, if $\beta_S=0$ whenever $|S|>d$, observing all $W(T)$ with $|T|\le d$ identifies the entire welfare function using
+$\sum_{j=0}^d\binom Kj$ cells.
+\end{theorem}
+\begin{proof}
+At an indicator vector of $T$, equation (1) gives $W(T)=\sum_{U\subseteq T}\beta_U$. Substituting into (2), the coefficient on $\beta_U$ is
+$\sum_{T:U\subseteq T\subseteq S}(-1)^{|S|-|T|}$.
+It is one when $U=S$ and zero otherwise by the binomial identity. This proves inversion and uniqueness. Under degree at most $d$, all remaining coefficients are known to be zero, so the recovered low-order coefficients determine every cell.
+\end{proof}
+For $K=3,d=2$, baseline, three single-feature, and three pair cells identify the model. The missing all-three value is predicted as
+\[
+ W(111)=W(110)+W(101)+W(011)
+        -W(100)-W(010)-W(001)+W(000).
+ \tag{3}
+\]
+The formula follows from setting the triple interaction to zero. It is a testable restriction if the eighth cell is later observed, not an implication of randomization in the other seven.
+
+Without the degree restriction, changing only $W(111)$ preserves all seven observations while changing the triple interaction by the same amount. For example, seven zero-valued cells are compatible with $W(111)=1$ or $-1$ if the declared outcome range permits both. Equivalently, one may add $\theta z_1z_2z_3$ to any response function. Even a single nonzero interaction can be invisible to all lower-order cells.
+\section{Noise and material sign recovery}
+Suppose each estimated tested cell satisfies
+$|\widehat W(T)-W(T)|\le e$ simultaneously. Formula (2) gives
+\[
+ |\widehat\beta_S-\beta_S|\le2^{|S|}e.
+ \tag{4}
+\]
+There are $2^{|S|}$ terms, each with coefficient of absolute value one, so the triangle inequality proves the bound. Thus a displayed coefficient with absolute value greater than $2^{|S|}e$ certifies its sign; alternatively, a true coefficient exceeding twice that threshold guarantees both a detected nonzero interval and the correct sign.
+
+If each cell has $n$ independent market observations in $[-M,M]$, its mean error exceeds $e$ with probability at most $2\exp(-ne^2/(2M^2))$. For $J$ tested cells, a union bound gives simultaneous error at most $\alpha$ when
+\[
+ e=M\sqrt{2\log(2J/\alpha)/n}.
+\]
+Independence is between experimental markets; many buyers within one market do not create that many independent equilibrium realizations. Unequal counts can be handled with cell-specific error radii and their sum in (4).
+
+For pair interactions the worst-case cell error multiplier is four; for a triple it is eight. With $e=0.01$ surplus units, an estimated pair contrast $0.08$ has a positive interval $[0.04,0.12]$, while an estimated triple contrast $0.05$ is not sign-certified. These are numerical checks, not estimated platform effects.
+\section{What sparsity additionally requires}
+Restrict possible coefficients to a dictionary $\mathcal S$ of subsets with $|S|\le d$. For tested assignments $z_1,\ldots,z_J$, define matrix
+$A_{jS}=\prod_{k\in S}z_{jk}$. Suppose $\beta$ has at most $s$ nonzero coordinates. Observations of expected welfare satisfy $w=A\beta$.
+
+\begin{proposition}
+All $s$-sparse coefficient vectors are uniquely identified from $w$ if and only if no nonzero vector in $\ker A$ has at most $2s$ nonzero coordinates.
+\end{proposition}
+\begin{proof}
+Two distinct $s$-sparse vectors with the same image have a nonzero difference in the kernel supported on at most $2s$ coordinates. Conversely, split the support of any such kernel vector into two sets of size at most $s$. Assign its coordinates on the first to one vector and their negatives on the second to another. Their difference is the kernel vector, so they are distinct $s$-sparse vectors with the same image.
+\end{proof}
+This equivalence is for unrestricted coefficient magnitudes and signs. Extra nonnegativity or welfare-range constraints can change the necessary condition by excluding one of the constructed vectors.
+
+For quantitative stability suppose every vector $v$ supported on at most $2s$ coordinates obeys
+\[
+ \|Av\|_2/\sqrt J\ge\gamma\|v\|_2,\qquad\gamma>0.
+ \tag{5}
+\]
+Let the true coefficient vector satisfy $\|\beta\|_2\le R$, and choose an $s$-sparse vector in that ball minimizing squared fit to $\widehat w$. A minimizer exists because the feasible set is a finite union of compact balls. If $\|\widehat w-w\|_2/\sqrt J\le e$, comparison to the true vector gives fitted residual at most $e$, and therefore
+\[
+ \|A(\widehat\beta-\beta)\|_2/\sqrt J\le2e,\qquad
+ \|\widehat\beta-\beta\|_2\le2e/\gamma.
+ \tag{6}
+\]
+The second inequality uses (5), since the difference is $2s$-sparse. Every coordinate error is bounded by the same quantity. Large coefficients consequently have stable signs.
+
+This is an exhaustive sparse-search guarantee, not a claim that the optimization is computationally easy or that a proposed platform design satisfies (5). Random design results would need their own probability and sample-size proofs. A design with duplicated columns cannot satisfy even the necessary injectivity condition.
+\section{Equilibrium and identification limitations}
+Feature interactions can emerge from seller repricing even when immediate buyer responses are additive. Measuring cells before quality investment or entry adjusts defines another $W$. Conversely, a statistical interaction is not proof of a specific strategic mechanism. A matched price, quality, and entry model must explain it.
+
+The finite factorial and sparse linear-algebra results are standard tools supplied with complete proofs. They solve restricted recovery tasks, while the broad catalogue question still requires defensible degree/sparsity assumptions, welfare measurement, independent market assignment, and a common equilibrium horizon. No actual interaction sign or optimal platform bundle is asserted.
+\begin{thebibliography}{9}
+\bibitem{f} C. Farronato (2025). \emph{Digital Platforms as Information Aggregators: Implications for their Design and Regulation}, section 1.1.
+\url{https://conference.nber.org/confer/2025/DTs25/farronato.pdf}.
+The primary draft motivates combinatorial design experiments; the degree and recovery restrictions here are stated assumptions.
+\end{thebibliography}
+
+\end{document}
