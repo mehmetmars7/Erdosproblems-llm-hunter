@@ -10,7 +10,7 @@ const elements = Object.fromEntries(ids.map(id => [id, {
     value: '', textContent: '', innerHTML: '', handlers: {},
     addEventListener(type, handler) { this.handlers[type] = handler; }
 }]));
-const headers = Object.fromEntries(['rank', 'title', 'jel_code', 'status', 'review', 'claim', 'completion', 'models'].map(key => {
+const headers = Object.fromEntries(['rank', 'title', 'status', 'completion', 'claim', 'review', 'jel_code', 'models'].map(key => {
     const header = { attributes: {}, setAttribute(name, value) { this.attributes[name] = value; } };
     const indicator = { textContent: '' };
     return [key, { dataset: { sort: key }, header, indicator, handlers: {},

@@ -13,7 +13,7 @@
         R: 'Urban, Rural, Regional, Real Estate and Transportation Economics',
         Y: 'Miscellaneous Categories', Z: 'Other Special Topics'
     };
-    const validSorts = ['rank', 'title', 'jel_code', 'status', 'review', 'claim', 'completion', 'models'];
+    const validSorts = ['rank', 'title', 'status', 'completion', 'claim', 'review', 'jel_code', 'models'];
     const escape = value => window.ProblemHunting.escapeHtml(value);
     const href = record => `problem.html?type=economics&id=${encodeURIComponent(record.id)}`;
     const familyLabel = code => families[String(code).charAt(0)] || 'Economics';
@@ -60,11 +60,11 @@
             return `<tr>
             <td>${escape(record.rank)}</td>
             <td class="catalogue-problem"><a href="${href(record)}">${escape(record.title)}</a></td>
-            <td><span title="${escape(familyLabel(record.jel_code))}">${escape(record.jel_code)}</span></td>
             <td>${escape(columnValue(record, 'status'))}</td>
-            <td class="${escape(shared.getReviewClass(record.review))}">${escape(columnValue(record, 'review'))}</td>
-            <td class="claim-status"><a href="${href(record)}">${escape(columnValue(record, 'claim'))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td>${attempts.length ? escape(shared.formatCompletion(record.completion)) || '—' : '—'}</td>
+            <td class="claim-status"><a href="${href(record)}">${escape(columnValue(record, 'claim'))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td class="${escape(shared.getReviewClass(record.review))}">${escape(columnValue(record, 'review'))}</td>
+            <td><span title="${escape(familyLabel(record.jel_code))}">${escape(record.jel_code)}</span></td>
             <td>${models.length ? models.map(escape).join(', ') : '—'}</td>
         </tr>`;
         }).join('');
