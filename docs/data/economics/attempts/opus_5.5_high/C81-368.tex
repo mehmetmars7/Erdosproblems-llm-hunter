@@ -1,0 +1,118 @@
+% ECONOMICS_PROBLEM: {"id": "C81-368", "title": "LLM-based economic measurement", "jel_code": "C81", "source_id": "OP-0427"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{LLM-based economic measurement under drift: a bias bound, an optimal audit-refresh rule, and an impossibility result}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For the projection coefficient $\beta$ on a human-adjudicated latent measure $L$, measured at deployment with LLM outputs
+$\widehat L_v$, we prove the following.
+(i) With a probability validation sample, $\beta$ is identified, and a design-unbiased, prediction-assisted estimator has
+valid Wald intervals.
+(ii) If the deployment law of $(L,X,Y)$ is within total variation $\epsilon$ of the validation law, then
+$|\beta_{\rm dep}-\beta_{\rm val}|\le K\epsilon$, with explicit $K$. Intervals widened by $K\epsilon$ have uniform
+coverage. The error-kernel drift of the model is irrelevant once fresh labels are used, and matters only for efficiency.
+(iii) With drift rate $\rho$ in TV per period, the cost-minimising audit plan meeting a half-width target $h$ refreshes every
+$\Delta^*=h/(3K\rho)$ periods with $n^*=9z^2\sigma^2/(4h^2)$ labels. Its cost rate is $27z^2\sigma^2K\rho/(4h^3)$.
+(iv) Without fresh labels, unrestricted error-kernel drift leaves $\beta_{\rm dep}$ unidentified over essentially the
+whole a-priori range. Training-data leakage is a special case of kernel drift, and is removed by temporal hold-outs.
+\end{abstract}
+
+\section*{1. Fixed population}
+Let $W=(L,b(X))$, $A=\mathbb E[WW^\top]$ and $c=\mathbb E[WY]$, so that $\beta=e_1^\top A^{-1}c$. The validation
+indicator $V_i$ has known probability $\pi_i\ge\pi_{\min}$.
+\begin{proposition}\label{prop:fixed}
+Define $\widehat A=n^{-1}\sum_i[\widehat W_i\widehat W_i^\top+\frac{V_i}{\pi_i}(W_iW_i^\top-\widehat W_i\widehat W_i^\top)]$,
+and $\widehat c$ analogously, where $\widehat W$ uses $\widehat L$. Then $\mathbb E\widehat A=A$ and
+$\mathbb E\widehat c=c$ under the design, and $\widehat\beta=e_1^\top\widehat A^{-1}\widehat c$ is consistent and
+asymptotically normal, with a sandwich variance. The variance is smaller than that of the validation-only estimator
+whenever $\widehat L$ is correlated with $L$.
+\end{proposition}
+\begin{proof}
+Horvitz--Thompson unbiasedness of the correction term, followed by the delta method. This is the prediction-powered
+construction; the fixed-population case is covered by the source \cite{ludwig}.
+\end{proof}
+
+\section*{2. Drift bias bound}
+Assume $|L|,|Y|\le1$, $\|b(X)\|_\infty\le C_b$ with $d$ basis functions, $\lambda_{\min}(A_P)\ge a_0>0$ for all laws in the
+class (this implies $\kappa\ge a_0$), and $C=\max(1,C_b)$.
+\begin{proposition}\label{prop:tv}
+If $\mathrm{TV}(P,Q)\le\epsilon$ for laws of $(L,X,Y)$, and $2\epsilon C^2(d+1)<a_0$, then
+\[
+ |\beta_Q-\beta_P|\le K\epsilon,\qquad K=\frac{2C^2(d+1)\bigl(1+\|\theta_P\|_2\bigr)}{a_0-2\epsilon C^2(d+1)},
+\]
+where $\theta_P=A_P^{-1}c_P$.
+\end{proposition}
+\begin{proof}
+Each entry of $A$ and $c$ is the expectation of a function bounded by $C^2$, so it moves by at most $2\epsilon C^2$.
+Hence $\|\Delta A\|_2\le2\epsilon C^2(d+1)$ and $\|\Delta c\|_2\le2\epsilon C^2\sqrt{d+1}$. Then
+$\theta_Q-\theta_P=A_Q^{-1}(\Delta c-\Delta A\,\theta_P)$, with $\|A_Q^{-1}\|\le(a_0-\|\Delta A\|)^{-1}$.
+\end{proof}
+\begin{corollary}
+If the last validation sample was drawn from $P$ and deployment is $Q$ with $\mathrm{TV}\le\epsilon$, then
+$C=\widehat\beta\pm(z_{\alpha/2}\widehat{se}+K\epsilon)$ has asymptotic coverage $\ge1-\alpha$, uniformly over the drift class.
+\end{corollary}
+
+\section*{3. Optimal audit and refresh}
+Suppose drift accumulates at rate $\rho$ (TV per period), audit labels cost $c_v$ each, and the target is half-width $h$
+at every deployment date. With a fresh sample of size $n$ every $\Delta$ periods, the worst-case half-width is
+$a/\sqrt n+b\Delta$, where $a=z_{\alpha/2}\sigma$ and $b=K\rho$.
+\begin{proposition}\label{prop:opt}
+The cost rate $c_vn/\Delta$ subject to $a/\sqrt n+b\Delta\le h$ is minimised at $\Delta^*=h/(3b)$ and $n^*=9a^2/(4h^2)$,
+with minimal cost rate $c_v\cdot27a^2b/(4h^3)$.
+\end{proposition}
+\begin{proof}
+For fixed $\Delta$, the constraint binds: $n=a^2/(h-b\Delta)^2$. Minimise $a^2/[\Delta(h-b\Delta)^2]$, i.e.\ maximise
+$\Delta(h-b\Delta)^2$ on $(0,h/b)$. The first-order condition gives $\Delta^*=h/(3b)$, and then $h-b\Delta^*=2h/3$.
+\end{proof}
+So the audit budget scales as $h^{-3}$, not $h^{-2}$. Halving the width target multiplies the audit cost rate by eight.
+This is the quantitative answer to ``minimum design and refresh frequency'' within this drift class.
+
+\section*{4. Impossibility without labels}
+\begin{proposition}\label{prop:imp}
+Suppose the deployment joint law of $(\widehat L,X,Y)$ is observed, but no deployment labels are. Suppose the class
+allows any conditional law of $L$ given $(\widehat L,X,Y)$ that is consistent with $L\in[0,1]$ and residual variance
+$\ge\kappa$. Then the identified set for $\beta_{\rm dep}$ is
+$\{e_1^\top A^{-1}c:\ \text{some coupling of }L\text{ with the observed law}\}$. This set contains both signs whenever $Y$
+is non-degenerate given $X$ and $\kappa$ is small.
+\end{proposition}
+\begin{proof}
+Since $L$ is unobserved at deployment, any $L$ that is a measurable function of $(Y,X)$ is a valid coupling with the
+observed law. Take $L=Y$, which lies in $[0,1]$. Its residual $R_L=Y-\Pi_{b(X)}Y$ has variance
+$\mathbb E[R_L^2]>0$ when $Y$ is not a linear function of $b(X)$; assume this is at least $\kappa$. Then
+$\beta(L)=\mathbb E[R_LY]/\mathbb E[R_L^2]=1$. Taking $L'=1-Y$ instead gives $\beta(L')=-1$, because $b(X)$ contains an
+intercept.
+\end{proof}
+\begin{remark}[Leakage]
+Training-data leakage makes the error kernel on validation documents differ from that on deployment documents. It is
+therefore an instance of kernel drift. A temporal hold-out, with validation documents created after the model's training
+cutoff and sampled from the deployment population, restores exchangeability of the kernel between validation and
+deployment. Since Proposition~\ref{prop:tv} concerns $(L,X,Y)$ and the estimator uses fresh labels, kernel drift affects
+efficiency, through the correlation of $\widehat L$ with $L$, but not validity.
+\end{remark}
+
+\section*{5. Remaining}
+The TV class is conservative. Shift classes adapted to text, for example covariate shift with bounded density ratio,
+would give sharper $K$. Adjudication disagreement makes $L$ itself uncertain; multiple adjudicators give a
+measurement-error model for $L$ whose impact on $\beta$ requires a second validation layer. Sequential (anytime-valid)
+refresh rules would replace the fixed schedule \cite{ludwig}.
+
+\begin{thebibliography}{9}
+\bibitem{ludwig} J. Ludwig, S. Mullainathan, A. Rambachan, Large language models: an applied econometric framework, arXiv:2412.07031v4 (registry revision December 2025), Sections 3.3, 4.3--4.4 and 6. \url{https://arxiv.org/html/2412.07031v4}.
+\bibitem{ppi} A. N. Angelopoulos, S. Bates, C. Fannjiang, M. I. Jordan, T. Zrnic, Prediction-powered inference, \emph{Science} 382 (2023), 669--674.
+\end{thebibliography}
+\end{document}

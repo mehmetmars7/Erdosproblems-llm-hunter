@@ -1,0 +1,119 @@
+% ECONOMICS_PROBLEM: {"id": "C72-366", "title": "Reduced-game validity", "jel_code": "C72", "source_id": "OP-0289"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{Reduced-game validity: certified full-game regret under a computation budget}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For the known-Lipschitz variant, we give a certified upper confidence bound on full exploitability $e_S$ that combines
+net radius, simulation error and solver error. We optimise the budget split and obtain the rate
+$\widetilde O\bigl(L^{d/(d+2)}(B/n)^{-1/(d+2)}\bigr)$ for $d$-dimensional strategy spaces. A two-point lower bound shows
+that no allocation policy improves the exponent. Without an oracle or regularity, no finite procedure certifies anything better than
+the trivial bound $1-u_i(\sigma)$. We give an explicit game in which enlarging the restricted strategy set \emph{raises} the full regret of
+the restricted equilibrium a solver selects. In contrast, selecting the candidate with the smallest certified bound makes the
+certificate monotone. The general characterisation of exploration policies remains open.
+\end{abstract}
+
+\section*{1. A certified bound}
+Payoffs lie in $[0,1]$, and $(S_i,d_i)\subseteq[0,1]^{d}$ is compact. Assume
+$|u_i(s,\tau)-u_i(s',\tau)|\le L\,d_i(s,s')$ for all mixed $\tau$ of the opponents. Let $X_i$ be an $h$-net of $S_i$ with
+$|X_i|\le N_h:=(c_d/h)^d$. The candidate $\sigma$ is supported on $X=\prod X_i$.
+\begin{proposition}\label{prop:cert}
+Estimate each $u_i(x,\sigma_{-i})$, $x\in X_i$, and each $u_i(\sigma)$ by $m$ independent simulations, sampling opponents'
+actions from $\sigma_{-i}$, and let $\hat e_X$ be the plug-in restricted exploitability. With probability at least $1-\delta$,
+\[
+ e_S(\sigma)\ \le\ \hat e_X(\sigma)+2\sqrt{\frac{\log\bigl(2n(N_h+1)/\delta\bigr)}{2m}}+Lh=:\mathrm{UCB}(\sigma).
+\]
+\end{proposition}
+\begin{proof}
+For $s\in S_i$, choose $x\in X_i$ with $d_i(s,x)\le h$. Then
+$u_i(s,\sigma_{-i})-u_i(\sigma)\le u_i(x,\sigma_{-i})-u_i(\sigma)+Lh$. Hoeffding's inequality and a union bound over the
+$n(N_h+1)$ estimated means bound each estimation error by the square-root term.
+\end{proof}
+
+\section*{2. Budget allocation}
+Let one simulation cost one unit, and let solving the restricted game cost $\Gamma(N_h)$ units. With total budget $B$ and
+$m=(B-\Gamma(N_h))/(n(N_h+1))$, minimise $\mathrm{UCB}$ over $h$.
+\begin{theorem}[Rate]\label{thm:rate}
+If $\Gamma(N_h)\le B/2$ at the optimiser, then choosing $h^*\asymp\bigl(L^{-2}(n/B)\log(B/\delta)\bigr)^{1/(d+2)}$ gives
+\[
+ \mathrm{UCB}-\hat e_X=O\!\Bigl(L^{d/(d+2)}\bigl(\tfrac nB\log\tfrac B\delta\bigr)^{1/(d+2)}\Bigr).
+\]
+\end{theorem}
+\begin{proof}
+Up to logarithms, the two terms are $Lh$ and $\sqrt{nN_h/B}\asymp\sqrt{n/B}\,h^{-d/2}$. Equating them gives
+$h^{(d+2)/2}\asymp L^{-1}\sqrt{n/B}$.
+\end{proof}
+\begin{proposition}[Lower bound]\label{prop:lb}
+For every policy using $B$ noisy payoff evaluations (Bernoulli outcomes), some $L$-Lipschitz two-player game and
+candidate $\sigma$ with $e_S(\sigma)=0$ make every valid $(1-\delta)$-upper bound satisfy
+$\mathbb E[\mathrm{UCB}]\ge c\,L^{d/(d+2)}B^{-1/(d+2)}$.
+\end{proposition}
+\begin{proof}[Proof sketch]
+Fix $\sigma_{-1}$ and the payoffs of player 2. Let $u_1(s,\sigma_{-1})=1/2$ with $\sigma_1$ a point mass. Partition $S_1$
+into $K\asymp(L/\epsilon)^d$ cells. Alternative game $k$ adds an $L$-Lipschitz bump of height $2\epsilon$ in cell $k$,
+so $e_S=2\epsilon$ in game $k$. An evaluation in cell $k$ has KL divergence $O(\epsilon^2)$ from the null, so some
+cell receives at most $B/K$ evaluations. Le Cam's two-point method then shows that, when $B/K\cdot\epsilon^2\lesssim1$, a
+valid bound must exceed $2\epsilon$ with constant probability under the null. Setting
+$\epsilon^{2+d}\asymp L^dB^{-1}$ gives the claim.
+\end{proof}
+
+\section*{3. Impossibility without regularity}
+\begin{proposition}\label{prop:imp}
+Let $S_1$ be infinite and payoffs merely continuous. Fix any procedure that evaluates payoffs at finitely many profiles,
+and any reported $\sigma$ with finite support. Some continuous game agrees with every evaluation and satisfies
+$\sup_{s}u_1(s,\sigma_{-1})=1$. Hence every valid certificate is at least $1-u_1(\sigma)$, which is the trivial bound.
+\end{proposition}
+\begin{proof}
+Choose $s^\dagger\in S_1$ outside the finite set $Q$ of evaluated first coordinates and outside $\mathrm{supp}\,\sigma_1$.
+Let $r>0$ be smaller than the distance from $s^\dagger$ to $Q\cup\mathrm{supp}\,\sigma_1$, and let
+$\beta(s)=\max\{0,1-d_1(s,s^\dagger)/r\}$. Redefine
+$u_1(s,\cdot)\mapsto(1-\beta(s))u_1(s,\cdot)+\beta(s)$. This is continuous, equals $1$ at $s^\dagger$ against every
+opponent profile, and is unchanged on $Q\cup\mathrm{supp}\,\sigma_1$, so all evaluations and $u_1(\sigma)$ are preserved.
+\end{proof}
+
+\section*{4. Expansion can hurt the selected equilibrium}
+\begin{proposition}\label{prop:hurt}
+In the symmetric two-player game with strategies $\{a,b,c\}$ and row payoffs $u(a,a)=0.5$, $u(b,b)=0.4$,
+$u(c,a)=0.6$, $u(c,b)=0.9$, and $0$ otherwise, the restricted equilibrium $(a,a)$ on $X=\{a\}$ has $e_S=0.1$. On
+$X'=\{a,b\}$, the restricted game has pure equilibria $(a,a)$ and $(b,b)$. Selecting $(b,b)$ gives $e_S=0.5$.
+\end{proposition}
+\begin{proof}
+On $\{a,b\}$, off-diagonal payoffs are $0$, so both diagonal profiles are equilibria. The full-game regrets are
+$u(c,a)-u(a,a)=0.1$ and $u(c,b)-u(b,b)=0.5$.
+\end{proof}
+\begin{proposition}[Monotone certification]\label{prop:mono}
+Suppose the candidates are restricted to the union of all restricted equilibria found so far, and the output minimises
+$\mathrm{UCB}$, with simultaneous coverage across rounds by allocating $\delta_r=\delta/(r(r+1))$. Then the certified bound is
+non-increasing in the round number, and is valid with probability $1-\delta$ throughout.
+\end{proposition}
+\begin{proof}
+The minimum over a growing set is non-increasing. Since $\sum_r\delta_r=\delta$, a union bound gives simultaneous validity.
+\end{proof}
+
+\section*{5. What remains}
+The certified approach is near-optimal in the exponent for Lipschitz classes. It does not address (i) adaptive nets
+that refine only near promising deviations, where the rate could depend on a margin or level-set dimension, as in
+$\mathcal X$-armed bandits \cite{bmss}; (ii) the restricted-solver error when $\Gamma$ dominates the cost, where
+general-sum NE computation is PPAD-hard; (iii) a held-out-games validation protocol, which needs a declared game
+distribution. We regard (i) as the most promising route to the full characterisation the source requests \cite{egta}.
+
+\begin{thebibliography}{9}
+\bibitem{egta} \emph{Empirical game-theoretic analysis survey}, arXiv:2403.04018, \S7.3, pp.\ 1057--1058. \url{https://arxiv.org/pdf/2403.04018}.
+\bibitem{bmss} S. Bubeck, R. Munos, G. Stoltz, C. Szepesv\'ari, $\mathcal X$-armed bandits, \emph{JMLR} 12 (2011), 1655--1695.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,116 @@
+% ECONOMICS_PROBLEM: {"id": "C78-373", "title": "A most-probably rank-maximal house allocation", "jel_code": "C78", "source_id": "OP-0549"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\title{A most-probably rank-maximal house allocation: NP-completeness for explicit joint lotteries, FPT in the support size}
+\author{Claude Opus 5.5 (high)}
+\date{9 October 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For the explicit joint-distribution encoding, deciding whether some matching is rank-maximal with probability at least
+$\tau$ is NP-complete. This holds even with strict lists of length two, a uniform distribution, and a support of size
+$2|E|$ for a MAX-CUT instance $(V,E)$. Consequently, computing $M^*$ is NP-hard. The problem is solvable in time
+$2^K\mathrm{poly}(|I|)$ when the support has $K$ profiles, by intersecting optimal faces of the matching polytope. For
+both independent encodings, we show that instances decomposing into acceptable-pair components are solved componentwise in
+polynomial time, and that the general threshold problems lie in $\mathrm{NP}^{\mathrm{PP}}$. Hardness for the independent
+encodings is left open.
+\end{abstract}
+
+\section*{1. Lexicographic weights}
+Let $R$ be the maximal list length and $n=|A|$. Give an edge of applicant rank $r$ the weight $\omega(r)=(n+1)^{R-r}$.
+Since at most $n$ edges share a rank, the lexicographic order of signatures coincides with the order of total weight.
+Thus the rank-maximal matchings of $P$ are exactly the maximum-$\omega_P$-weight matchings \cite{ikmmp}. Testing whether a
+given $M$ is rank-maximal for $P$ takes polynomial time.
+
+\begin{lemma}[Additivity over components]\label{lem:add}
+Suppose $E$ is a disjoint union of components $E_1,\dots,E_q$ (no applicant or house shared). Then $M$ is rank-maximal
+for $P$ iff each $M\cap E_c$ is rank-maximal for the restriction of $P$ to $E_c$.
+\end{lemma}
+\begin{proof}
+Signatures add over components, and $(\mathbb Z^R,+,\le_{\rm lex})$ is an ordered group. A strict improvement in one
+component, with the others fixed, strictly improves the sum. Conversely, componentwise maxima maximise the sum.
+\end{proof}
+
+\section*{2. NP-completeness for explicit joint lotteries}
+\begin{theorem}\label{thm:np}
+With an explicitly listed lottery over complete profiles, deciding $\max_M\Pr_P\{M\text{ rank-maximal for }P\}\ge\tau$ is
+NP-complete, even when all lists are strict of length $2$ and the lottery is uniform.
+\end{theorem}
+\begin{proof}
+\emph{Membership.} Guess $M$, test rank-maximality at each support profile, and add the weights.
+
+\emph{Hardness.} Reduce from MAX-CUT. For a graph $(V,E)$, create for each $v\in V$ a block with applicants $a_v,a'_v$ and
+houses $h_v,h'_v$, all four pairs acceptable. Its two perfect matchings are $\mathsf A_v=\{a_vh_v,a'_vh'_v\}$ and
+$\mathsf B_v=\{a_vh'_v,a'_vh_v\}$. A profile can treat block $v$ in three ways:
+\begin{itemize}
+\item \emph{force} $\mathsf A_v$: $a_v:h_v\succ h'_v$ and $a'_v:h'_v\succ h_v$; the signature is $(2,0)$ for $\mathsf A_v$
+and $(0,2)$ for $\mathsf B_v$;
+\item \emph{force} $\mathsf B_v$: the mirror image;
+\item \emph{free}: both applicants rank $h_v\succ h'_v$; both perfect matchings have signature $(1,1)$, and every
+non-perfect block matching is lexicographically smaller.
+\end{itemize}
+For each edge $uv$, include two profiles of probability $1/(2|E|)$ each. One forces $\mathsf A_u,\mathsf B_v$ and the other
+forces $\mathsf B_u,\mathsf A_v$; all other blocks are free.
+By Lemma~\ref{lem:add}, a matching that is rank-maximal in some profile is perfect in every block, so it encodes
+$X\in\{\mathsf A,\mathsf B\}^V$. It is rank-maximal in the profile $(\mathsf A_u,\mathsf B_v)$ iff $X_u=\mathsf A$ and $X_v=\mathsf B$.
+Hence its probability is $\mathrm{cut}(X)/(2|E|)$, and $\max_M=\mathrm{maxcut}/(2|E|)$. MAX-CUT is NP-complete \cite{gj}.
+\end{proof}
+Selecting $M^*$ is therefore NP-hard, and $M^*$ yields a maximum cut. The reduction is approximation-preserving up to the
+factor $2|E|$, so constant-factor inapproximability thresholds for MAX-CUT transfer to the optimisation version.
+
+\section*{3. Tractable regimes}
+\begin{proposition}[FPT in the support size]\label{prop:fpt}
+With $K$ support profiles, $\max_M\Pr$ can be computed in time $2^K\mathrm{poly}(|I|)$.
+\end{proposition}
+\begin{proof}
+For $S\subseteq[K]$, let $\mathcal R_S=\bigcap_{j\in S}\mathcal R(P_j)$, where $\mathcal R(P_j)$ is the set of
+rank-maximal matchings of $P_j$. Each $\mathcal R(P_j)$ is the vertex set of the face of the matching polytope maximising
+$\omega_{P_j}$. Compute $\mu_j=\max\omega_{P_j}$ and any $M_S\in\arg\max_M\sum_{j\in S}\omega_{P_j}(M)$. If
+$\mathcal R_S\ne\varnothing$, then the optimum equals $\sum_{j\in S}\mu_j$, and it is attained exactly on $\mathcal R_S$. So
+$\mathcal R_S\ne\varnothing$ iff $\omega_{P_j}(M_S)=\mu_j$ for all $j\in S$. The answer is the maximum weight of a
+feasible $S$, with $M_S$ as a witness.
+\end{proof}
+
+\begin{proposition}[Independent encodings on separated instances]
+Under independent lotteries or independent uniform tie refinements, suppose no applicant's support orders link two
+acceptable-pair components. Then the probability is a product over components, by Lemma~\ref{lem:add} and independence.
+Each component is optimised separately, and is polynomial when each component has $O(\log|I|)$ applicants.
+\end{proposition}
+
+\begin{proposition}[Upper bounds]
+For both independent encodings, the threshold problem lies in $\mathrm{NP}^{\mathrm{PP}}$. Guess $M$; the probability of
+rank-maximality is a ratio of a GapP-computable count to an explicit denominator, because each profile choice is checkable
+in polynomial time.
+\end{proposition}
+
+\section*{4. What remains, and a possible route}
+The joint encoding's hardness exploits correlation across blocks. Independent encodings destroy this correlation on
+separated instances. We conjecture NP-hardness nonetheless. A route is a single random \emph{selector} applicant $\sigma$
+whose $j$-th listed order makes a house $q_j$ its first choice. If the deterministic remainder can be arranged so that
+$\sigma$'s switch to $q_j$ yields a lexicographically improving alternating path exactly when block $u_j$ or block $v_j$ is
+in a forbidden state, then $\Pr$ simulates the joint lottery. Lemma~\ref{lem:add} shows that this requires non-separated
+gadgets. We have not completed such a gadget, and evaluation hardness of $\Pr\{M\text{ rank-maximal}\}$ in the
+independent encodings is also open.
+
+\begin{thebibliography}{9}
+\bibitem{ccm} K. Cechl\'arov\'a, \'A. Cseh, D. F. Manlove, Selected open problems in Matching Under Preferences,
+\emph{Bull. EATCS} (2019), Sections 2.1 and 3.1.2. \url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{abgdmr} H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei, B. Rastegari, Stable matching with uncertain
+linear preferences, \emph{Algorithmica} 82 (2020), 1410--1433.
+\bibitem{ikmmp} R. W. Irving, T. Kavitha, K. Mehlhorn, D. Michail, K. Paluch, Rank-maximal matchings,
+\emph{ACM Trans. Algorithms} 2 (2006), 602--610.
+\bibitem{gj} M. R. Garey, D. S. Johnson, \emph{Computers and Intractability}, Freeman (1979).
+\end{thebibliography}
+\end{document}
