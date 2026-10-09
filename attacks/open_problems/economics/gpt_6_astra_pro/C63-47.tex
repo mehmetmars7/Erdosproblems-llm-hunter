@@ -1,0 +1,205 @@
+% ECONOMICS_PROBLEM: {"id": "C63-47", "title": "The computational cost of minimax-optimal causal estimation", "jel_code": "C63", "source_id": "OP-0534"}
+% FIRST_POSTED: 2026-10-09
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+% !TeX program = pdflatex
+% Self-contained: no external input or bibliography files required.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array,enumitem,microtype,xurl,hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue,pdftitle={Checked research attempts: nine economics and stochastic-analysis problems}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{3em}
+\widowpenalty=10000\clubpenalty=10000\displaywidowpenalty=10000
+\setlist[enumerate]{leftmargin=*,itemsep=2pt,topsep=3pt}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\F}{\mathcal F}
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\cE}{\mathcal E}
+\newcommand{\Law}{\operatorname{Law}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\TV}{\operatorname{TV}}
+\newcommand{\Lip}{\operatorname{Lip}}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newcommand{\report}[3]{\clearpage\setcounter{theorem}{0}\renewcommand{\thetheorem}{#1.\arabic{theorem}}\renewcommand{\theHtheorem}{#1.\arabic{theorem}}\section*{#1: #2}\addcontentsline{toc}{section}{#1: #2}\textbf{Outcome:} #3.\par\textbf{Tools:} web browsing available; Python computation available. Literature checked on 9 October 2026.}
+\newcommand{\stage}[2]{\subsection*{#1) #2}}
+\newcommand{\unresolved}{\textbf{LABEL: UNRESOLVED.}}
+\newcommand{\disproof}{\textbf{LABEL: FULL SOLUTION. SUBLABEL: COUNTEREXAMPLE/DISPROOF.}}
+
+\begin{document}
+\section*{C63-47: Computational minimax causal estimation}
+\textbf{Outcome:} UNRESOLVED in general; an information lower bound and two fast subclasses proved.\par\textbf{Tools:} web browsing available; Python computation available. Literature checked on 9 October 2026.
+\subsection*{1) FORMAL RESTATEMENT}
+Fix dimension $d\ge1$, overlap $\varepsilon\in(0,1/2]$, positive smoothness indices $s_e,s_m,s_p$, positive radii, and constants $0<c\le C$. Observations $O_i=(X_i,A_i,Y_i)$ are i.i.d., with $X\in[0,1]^d$, $A,Y\in\{0,1\}$,
+\[
+ e(x)=\Pp(A=1\mid X=x)\in[\varepsilon,1-\varepsilon],\quad
+ m(x)=\E[Y\mid A=1,X=x],\quad c\le p(x)\le C,
+\]
+where $p$ is the density of $X$. The three functions belong to the specified H\"older balls. For $0<s\le1$ we use
+$\|f\|_\infty\le L$ and $|f(x)-f(x')|\le L|x-x'|^s$; for higher indices the ball requires bounded derivatives through order $\lceil s\rceil-1$ and H\"older exponent $s-\lceil s\rceil+1$ for those derivatives. The target is
+$\psi(P)=\int m(x)p(x)dx\in[0,1]$.
+Under consistency, exchangeability $Y(1)\perp A\mid X$, and overlap, this equals $\E Y(1)$ by iterated conditional expectation. The statistical proofs use the observable functional directly.
+
+Let $R_n^\star$ be the minimax squared error over all measurable estimators. In the declared real-arithmetic RAM model, all fitting, comparisons, arithmetic, tuning, and dictionary evaluations count. We make explicit the usual RAM convention that accessing an input record and memory operations are charged, that records are stored separately rather than pre-aggregated for free, and that any random seed is independent of the data. This clarification is necessary for a data-access lower bound. No bit-complexity assertion is made.
+\[
+ R_n^{\mathrm{comp}}(a)=
+ \inf_{\mathcal A:\ \sup_{P\in\mathcal P}\E_PT_\mathcal A\le n^a}
+       \sup_{P\in\mathcal P}\E_P(\mathcal A-\psi(P))^2.
+\]
+The question asks for the smallest such exponent attaining a constant multiple of $R_n^\star$, or a sharp penalty, and then for adaptation to unknown smoothness over a fixed compact range. An infimum of feasible exponents need not be an attained minimum; $O(n\log n)$ and a literal budget $n$ are distinguished below. We assume the balls contain the simple parametric subfamily used in the lower bound; the exact stated version is $e=1/2$, $p=1$, $m\in[1/4,3/4]$. For narrower nondegenerate balls one can center a smaller interval at another interior constant and change the constants. A class excluding any such interval needs a separate lower-bound check.
+
+\subsection*{2) QUICK LITERATURE/CONTEXT CHECK}
+Cinelli--Feller--Imbens--Kennedy--Magliacane--Zubizarreta \cite{CausalChallenges}, Section 3.5.3, motivates implementation and tuning issues for refined causal estimators. That discussion is not a computational lower-bound theorem. We do not claim a sharp unrestricted minimax formula for all smoothness triples from it. The bounds below are independently derived.
+
+\subsection*{3) ATTACK PLAN}
+\textbf{Proof routes.} Solve the known-propensity submodel directly; give an explicitly counted, sample-split histogram estimator in a high-smoothness regime; compare its risk with a matching parametric lower bound.
+
+\textbf{Disproof/lower-bound routes.} Limit information by the number of distinct inspected records; use two nearby Bernoulli laws to show that too small a budget cannot attain a root-$n$ risk; examine whether unknown smoothness changes the tuning cost. The adaptive-read information route gives the clean checked lower bound.
+
+\textbf{Landscape and tools.} This is statistical-computational minimax analysis. Two-point testing yields risk lower bounds; the chain rule for relative entropy controls adaptive reads; Pinsker's inequality converts entropy to testing error; inverse-propensity weighting solves a submodel; independent sample splitting separates nuisance risks; H\"older approximation controls histogram bias; binomial count identities control variance in sparsely occupied cells; and explicit dyadic searches count runtime without free matrix operations.
+
+\subsection*{4) WORK}
+\begin{theorem}[An adaptive data-access lower bound]
+Suppose the model contains $X$ uniform, $A$ independent Bernoulli$(1/2)$, $Y\mid A=1$ Bernoulli$(\theta)$ independent of $X$, and $Y\mid A=0$ Bernoulli$(1/2)$, for every $\theta\in[1/4,3/4]$. Then any algorithm with worst-case expected runtime at most $B$ satisfies
+\[
+ \sup_P\E_P(\widehat\psi-\psi(P))^2
+ \ge\frac{1}{1024(\min\{n,B\}+1)}.
+\]
+The bound includes randomized, adaptively stopping algorithms in the specified access model.
+\end{theorem}
+\begin{proof}
+Let $b=\min(n,B)$, $h=1/(16\sqrt{b+1})$, and $\theta_\pm=1/2\pm h$. Here $\psi(P_\pm)=\theta_\pm$ and both laws are allowed. They have a causal realization: draw $X$, $A$, $Y(1)\sim\operatorname{Ber}(\theta)$, and $Y(0)\sim\operatorname{Ber}(1/2)$ independently, and set $Y=AY(1)+(1-A)Y(0)$. This verifies consistency and exchangeability as well as overlap. A full record has relative entropy
+\[
+ \KL(P_+,P_-)=\tfrac12\KL(\operatorname{Ber}(\theta_+),\operatorname{Ber}(\theta_-))
+ \le11h^2.
+\]
+To verify the constant, the Bernoulli bound $\KL(\operatorname{Ber}(u),\operatorname{Ber}(v))\le(u-v)^2/[v(1-v)]$ follows from $\log x\le x-1$. Since $v\in[1/4,3/4]$, its denominator is at least $3/16$; multiplying $(2h)^2$ by $16/3$ and by $1/2$ gives $(32/3)h^2<11h^2$.
+
+Enhance the algorithm's information by revealing the entire record whenever it first accesses any component of that record. This can only strengthen it for purposes of a lower bound and uses no more than one fresh record per charged access. Every unqueried record is independent of the prior revealed transcript and has law $P_+$ or $P_-$. Choices of the next index, stopping decisions, and the independent random seed have no additional conditional relative entropy beyond the information already revealed. The chain rule, applied to the at most $n$ successive fresh reads and padded stop symbols, gives
+\[
+ \KL(\mathrm{Transcript}_+,\mathrm{Transcript}_-)
+ \le11h^2\E_+N\le11h^2b\le11/256,
+\]
+where $N$ is the number of distinct read records. Finite expected runtime implies termination a.s.; the same inequality follows first for truncated transcripts and then by monotone information approximation if the internal computation length is unbounded. The estimator is a function of the transcript and seed, so it cannot improve its testing separation.
+
+Pinsker's inequality states $\TV(P,Q)\le\sqrt{\KL(P,Q)/2}$; here this is less than $1/4$. Classify the law by whichever of $\theta_\pm$ is closer to $\widehat\psi$, breaking ties arbitrarily. A classification error forces squared estimation error at least $h^2$. For any test the sum of its two error probabilities is at least $1-\TV\ge3/4$, by the definition of total variation. Thus the maximum of the two squared risks is at least $h^2(3/4)/2\ge h^2/4$, proving the displayed constant.
+\end{proof}
+
+For $B=n^a$ this implies a penalty of order at least $1/(\min(n,n^a)+1)$. If the unrestricted statistical risk is of order $n^{-r}$ in a particular class, the bound forces $a\ge r$ to attain that rate. It does not force $a\ge1$ in a class whose minimax risk is slower than $n^{-1}$.
+
+\begin{theorem}[Known propensity: exact runtime exponent one]
+In the submodel with known $e\equiv1/2$, containing the preceding nondegenerate constant subfamily, the unrestricted minimax risk is $\Theta(n^{-1})$, and the smallest runtime exponent attaining its order is $a=1$. More generally its computational penalty is of order $1/\min(n,n^a)$ up to constants for sufficiently large $n$.
+\end{theorem}
+\begin{proof}
+For $m\le n$ inspected observations, use the projection onto $[0,1]$ of
+\[
+ \widehat\psi_m=\frac2m\sum_{i=1}^m A_iY_i.
+\]
+Before projection this is unbiased, since $\E[2AY\mid X]=m(X)$. Also $\E[(2AY)^2]=2\psi$, so its variance is $(2\psi-\psi^2)/m\le1/m$. Projection onto $[0,1]$ cannot increase squared error for a target in $[0,1]$. The estimator uses at most $c_0m+c_1$ charged operations for fixed constants: each observation requires only a fixed number of reads, arithmetic operations, and updates; the final division and projection add a fixed cost. Choose $m$ as a fixed constant fraction of $\min(n,n^a)$, rounded down with overhead reserved. For all sufficiently large $n$ this meets the literal $n^a$ budget and has the stated risk. Finitely many smaller $n$ can use a one-operation constant output; the risk-comparison constant can be enlarged to cover them.
+
+Taking $m=n$ without a runtime restriction gives $R_n^\star\le1/n$. The lower bound with all $n$ records gives $R_n^\star\ge c/(n+1)$. For $a<1$, the budget lower bound is of order $n^{-a}$, whose ratio to $n^{-1}$ diverges. For $a=1$, reading a constant fraction of the records already attains $O(n^{-1})$ with at most $n$ operations as above. This proves attainment at exponent one in this submodel.
+\end{proof}
+
+\begin{theorem}[An explicitly counted unknown-propensity subclass]
+Suppose $0<s_e,s_m\le1$ are supplied, $d$ is fixed, overlap holds, and $p$ is bounded above and below as stated. There is a deterministic-tuning, sample-split estimator using $O(n\log n)$ charged operations and satisfying
+\[
+ \sup_P\E_P(\widehat\psi-\psi)^2
+ \le C_0\left[n^{-1}+n^{-2(r_e+r_m)}\right],
+ \qquad r_e=\frac{s_e}{2s_e+d},\quad r_m=\frac{s_m}{2s_m+d}.
+\]
+The constant depends only on the fixed dimension, radii, overlap and density bounds. In particular, if $r_e+r_m\ge1/2$, the risk is $O(n^{-1})$, matching the parametric lower bound whenever that subfamily is contained in the model.
+\end{theorem}
+\begin{proof}
+For $n\ge9$, divide the data into three groups with sizes bounded above and below by fixed positive multiples of $n$. Use the first group only to estimate $e$, the second only to estimate $m$, and the third only for evaluation.
+
+For each nuisance function use a regular dyadic grid with side length $h_j$ and $K_j=h_j^{-d}$ cells. In a cell, estimate $e$ by the fraction treated, with default $1/2$ for an empty cell, then clip to $[\varepsilon/2,1-\varepsilon/2]$. Estimate $m$ using the fraction of successes among treated records in the cell, with default $1/2$ when there are no treated records, then clip to $[0,1]$.
+
+We first prove, for either nuisance function $j$, the integrated mean-square bound
+\[
+ \E\|\widehat j-j\|_{L^2(p)}^2
+      \le C_1(h_j^{2s_j}+K_j/n).
+\]
+The H\"older oscillation of $j$ within a cell is at most $L(\sqrt d\,h_j)^{s_j}$. For $e$, the conditional cell mean is its average under $p$; for $m$, the mean among treated observations is its average under $ep$. Each average lies between the cell's minimum and maximum, so the same oscillation bound controls approximation error, even though $p$ is not estimated.
+
+If a cell count is $N\sim\operatorname{Bin}(n_{
+m tr},q)$, then
+\[
+ \E\frac1{N+1}=\frac{1-(1-q)^{n_{
+m tr}+1}}{(n_{
+m tr}+1)q}
+       \le\frac1{(n_{
+m tr}+1)q}.
+\]
+The identity follows by writing $1/(k+1)=\int_0^1t^kdt$ and integrating the binomial generating function. On $N>0$, $1/N\le2/(N+1)$, and
+$\Pp(N=0)\le\E[1/(N+1)]$. Conditional sampling variance of a Bernoulli mean is at most $1/(4N)$; the squared error of the default is at most one. Thus the mean-square cell estimation error is bounded by a constant times $1/[(n_{
+m tr}+1)q]$. For propensity cells $q=\int_Cp$; for regression cells $q=\int_Cep\ge\varepsilon\int_Cp$. Multiplying by the cell's $p$ mass and summing over $K_j$ cells gives $C K_j/n$. The squared oscillation contributes $C h_j^{2s_j}$. Clipping cannot increase squared distance to the true function, which lies within the clipping interval. This proves the nuisance risk bound.
+
+On the validation group of size $n_v$, take the projection onto $[0,1]$ of
+\[
+ \widehat\psi=\frac1{n_v}\sum_{i\in I_v}
+ \left[\widehat m(X_i)+\frac{A_i}{\widehat e(X_i)}
+       (Y_i-\widehat m(X_i))\right].
+\]
+Conditionally on the two training samples, the unprojected bias is exactly
+\[
+ \int\frac{\widehat e-e}{\widehat e}(\widehat m-m)p.
+\]
+Cauchy--Schwarz and $\widehat e\ge\varepsilon/2$ bound its square by
+$4\varepsilon^{-2}\|\widehat e-e\|_{L^2(p)}^2
+\|\widehat m-m\|_{L^2(p)}^2$.
+The two fitted functions are independent because their training samples are disjoint. Hence the expectation of this product is the product of their expected squared norms. The validation summand is bounded in absolute value by $1+2/\varepsilon$, so its conditional variance is at most a constant divided by $n_v$. Decomposing mean squared error into expected conditional variance plus expected squared conditional bias, and using that projection decreases squared error, proves
+\[
+ \E(\widehat\psi-\psi)^2
+ \le C_2\left[n^{-1}
+ +(h_e^{2s_e}+K_e/n)(h_m^{2s_m}+K_m/n)\right].
+\]
+Choose $h_j$ within a fixed multiplicative factor of $n^{-1/(2s_j+d)}$. This gives $h_j^{2s_j}+K_j/n\le Cn^{-2r_j}$ and the asserted rate.
+
+Here is an operation-counted choice, without assuming a free logarithm, floor, or nuisance fit. Compute $\ell=\lfloor\log_2 n\rfloor$ by repeated doubling, in $O(\log n)$ steps. Find the integer
+$J_j=\lfloor\ell/(2s_j+d)\rfloor$ by binary search over $\{0,\ldots,\ell\}$, comparing $(2s_j+d)J$ with $\ell$. Put $h_j=2^{-J_j}$, computable by repeated multiplication or division. These choices have the required constant-factor relation to the optimal powers. Since $K_j=2^{dJ_j}\le n$, initialization of count arrays costs $O(n)$. Locating any fixed-dimensional observation in its cells takes $O(dJ_j)=O(\log n)$ comparisons by binary search along the dyadic coordinates. Updating counts, forming cell estimates, and evaluating a validation summand require a fixed number of arithmetic and memory operations after the cell is located. There are $O(n)$ observations, so the entire procedure, including tuning, costs $O(n\log n)$. For the finitely many $n<9$, use a constant estimate and enlarge the risk constant.
+\end{proof}
+
+For example, $d=1$, $s_e=s_m=1$ gives $r_e+r_m=2/3$ and a nuisance bias-squared term of order $n^{-4/3}$. This proves root-$n$ mean-square performance in a concrete unknown-propensity subcase. It implies feasibility for every exponent $a>1$ for sufficiently large $n$, and, with a finite-small-$n$ adjustment, uniformly in $n$. Together with the lower bound, the infimum feasible exponent in this high-smoothness subclass is one. This $O(n\log n)$ construction does not prove that the exact budget exponent $a=1$ is attained there, nor that it is impossible.
+
+\subsection*{5) VERIFICATION}
+The lower bound charges fresh data access and permits adaptive sampling; it does not assume the algorithm reads a predetermined prefix. It applies to risk, not to the cost of producing confidence intervals. At budget $B=100$, the script checks the per-record Bernoulli entropy and the bound $11h^2B\approx0.04254$. The constants keep the two laws inside the stated interval and the transcript total variation below $1/4$.
+
+The upper bound uses no assumed accuracy of a black-box regression routine. The count identity includes empty cells; overlap controls treated-cell sparsity. Independence of the two nuisance fits is essential to the product-risk bound and is ensured by construction. No density estimator is required. Known smoothness is used in the explicit grid tuning. The argument is limited to $s_e,s_m\le1$; it does not claim higher-order polynomial approximation from piecewise constants. In a slower minimax regime, the parametric access bound alone cannot identify the optimal runtime exponent.
+
+\subsection*{6) FINAL}
+\unresolved
+
+\textbf{Strongest checked partial result.} The report proves a $c/(\min(n,n^a)+1)$ adaptive-access risk lower bound in the declared nondegenerate class. For known constant propensity, it gives the exact smallest exponent $a=1$ and a matching computational penalty. With unknown propensity and supplied low-order smoothness, it gives a fully specified $O(n\log n)$ estimator and a root-$n$ optimal high-smoothness subclass.
+
+\textbf{Exact first gap for the full target.} For arbitrary specified smoothness triples, establish a matching upper and lower characterization of computational risk relative to the actual unrestricted minimax risk. The two-point lower bound and first-order histogram estimator do not match in general low-smoothness regimes. Adaptation to unknown smoothness is a further unproved part, not hidden in the stated tuning.
+
+\textbf{Next three moves.} (1) Give explicitly counted higher-order or bias-corrected estimators across the remaining smoothness regimes. (2) Derive lower bounds using nonparametric alternatives that can distinguish runtime penalties from statistical difficulty. (3) Design an operation-counted multi-resolution adaptation rule and prove both its statistical adaptation penalty and its runtime, including selection costs.
+
+\textbf{Likely minimal hard regime.} Low smoothness with $r_e+r_m<1/2$ and unknown propensity is where the provided root-$n$ argument stops. A genuine computational separation must be demonstrated there by matched statistical and information/algorithmic bounds, not inferred from an expensive implementation of one estimator.
+
+\clearpage
+\begin{thebibliography}{99}
+\bibitem{CausalChallenges}
+Carlos Cinelli, Avi Feller, Guido Imbens, Edward Kennedy, Sara Magliacane and Jose Zubizarreta. \emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference}. arXiv:2508.17099v1, 23 August 2025, Section 3.5.3, ``Implementation.'' \url{https://arxiv.org/html/2508.17099v1#S3.SS5.SSS3}.
+
+\end{thebibliography}
+\end{document}
