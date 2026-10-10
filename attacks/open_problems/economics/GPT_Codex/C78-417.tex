@@ -1,0 +1,319 @@
+% ECONOMICS_PROBLEM: {"id": "C78-417", "title": "Stability probability under compact indifference", "jel_code": "C78", "source_id": "OP-0544"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Counting stable tie refinements},pdfauthor={Ji Ho Bae}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\FP}{\mathsf{FP}}
+\newcommand{\PP}{\mathsf{PP}}
+\newcommand{\sharpP}{\mathsf{\#P}}
+\newcommand{\Stab}{\operatorname{Stab}}
+\newcommand{\PM}{\operatorname{PM}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+% AI assistance: OpenAI Codex with automated collaboration on 10 October 2026.
+% Model version was not exposed. No human edits to the mathematical proof.
+% Citation, provenance, and reproduction metadata are recorded in CitationAudit.json.
+\begin{document}
+\begin{center}
+{\Large\bfseries Counting stable tie refinements}\\[5pt]
+{\small Ji Ho Bae}
+\end{center}
+
+There are equally many agents on two sides. Each agent gives a complete
+weak preference order, and $M$ is a specified perfect matching.
+Break each tie uniformly and independently into a strict order.
+An unmatched pair blocks $M$ when both agents prefer each other to their
+partners.
+This is the compact-indifference model of
+\cite[Section 3.1.2, Table 1]{survey} and
+\cite[Sections 2 and 5, Table 3]{uncertain}.
+If the tie sizes are $t_{a,j}$, set
+\[
+ D(I)=\prod_{a,j}t_{a,j}!,\qquad
+ N(I,M)=\#\{\text{strict refinement profiles in which }M\text{ is stable}\}.
+\]
+Thus $p_I(M)=N(I,M)/D(I)$. The weak orders are explicit and any rational
+threshold is encoded in binary.
+
+\begin{theorem}\label{thm:classification}
+The integer function $N$ is $\sharpP$-complete under polynomial-time
+Turing reductions. Computing the exact rational probability $p$ and
+computing $N$ are polynomial-time Turing equivalent.
+The language
+\[
+ \{(I,M,\tau):\ \tau\in[0,1]\text{ is rational and }p_I(M)\geq\tau\}
+\]
+is $\PP$-complete under polynomial-time Turing reductions.
+No complexity separation is assumed. Here Turing reductions allow
+polynomially many adaptive oracle queries.
+\end{theorem}
+
+Counting perfect matchings of a simple balanced bipartite graph is equivalent
+to computing the permanent of a $0$--$1$ matrix, which is
+$\sharpP$-complete~\cite[Theorem 1]{valiant}. Section 2 of that paper
+uses polynomial-time oracle reductions.
+
+For a simple bipartite graph $H=(V,E)$ of minimum degree at least two,
+write $h=|V|$, $e=|E|$, and $d_v=\deg_H(v)$.
+Let $C(H)$ be the number of ways for every vertex to choose one incident
+edge such that no edge is chosen by both endpoints.
+
+\begin{lemma}\label{lem:inner}
+$C(H)$ can be computed in polynomial time with an exact
+compact-indifference stability-probability oracle.
+\end{lemma}
+\begin{proof}
+If $H$ is empty, $C(H)=1$. For nonempty $H$ and an integer
+$t\geq\Delta(H)$, give each original vertex $v$ a unique
+private partner on the opposite side. Add $r_v=t-d_v$ distinct probe
+agents on the opposite side, each with its own private partner.
+The matching $M$ consists of these private pairs.
+Every original vertex has one top tie containing its partner, its
+$H$-neighbors, and its probes; it has size $t+1$.
+A probe of $v$ strictly ranks $v$ first, its own partner second, and all
+others below. Every private partner ranks its matched agent first.
+Put all remaining names in a fixed strict order below the partner.
+Every private pair adds one agent to each side, so the sides are balanced.
+
+Only edges of $H$ and original-vertex--probe pairs can block: every other
+unmatched pair has an endpoint that ranks its partner above the other
+agent. Generate each top-tie permutation using independent uniform
+priorities in $[0,1]$, smaller first.
+Write $x_v$ for its partner's priority.
+Conditional on all $x_v$, a given tied competitor precedes the partner
+with probability $x_v$. Different unmatched pairs use distinct competitor
+priorities, so their safety events are conditionally independent.
+A probe pair is safe with probability $1-x_v$; an edge $vw$ of $H$
+is safe with probability $1-x_vx_w$. Therefore the oracle gives
+\[
+ p_H(t)=\int_{[0,1]^h}
+       \prod_v(1-x_v)^{t-d_v}
+       \prod_{vw\in E}(1-x_vx_w)\,dx.               \tag{1}
+\]
+The $h$ top ties are the only nontrivial ties, giving
+$D=((t+1)!)^h$ refinement profiles.
+
+For $F\subseteq E$, let $k_v=\deg_F(v)$.
+Expanding the finite edge product and using
+\[
+ \int_0^1 x^k(1-x)^r\,dx=\frac{k!\,r!}{(r+k+1)!}
+\]
+gives, for the nonnegative integers $r=t-d_v$,
+\[
+ Q(t):=p_H(t)\prod_v(t-d_v+1)
+      =\sum_{F\subseteq E}(-1)^{|F|}
+          \prod_v L_{t-d_v}(k_v),\qquad
+ L_r(k)=\frac{k!}{\prod_{j=2}^{k+1}(r+j)}.         \tag{2}
+\]
+The empty denominator product is one. The integral identity follows by
+$k$ integrations by parts, starting with
+$\int_0^1(1-x)^r dx=1/(r+1)$.
+Set
+\[
+ P(t)=\prod_v P_v(t),\qquad
+ P_v(t)=\prod_{j=2}^{d_v+1}(t-d_v+j),\qquad
+ K=\sum_v d_v=2e.
+\]
+Multiplying each term in (2) by $P$ cancels all denominators:
+\[
+ A(t):=P(t)Q(t)
+   =\sum_{F\subseteq E}(-1)^{|F|}
+       \prod_v\left[
+          k_v!\prod_{j=k_v+2}^{d_v+1}(t-d_v+j)
+       \right].                                  \tag{3}
+\]
+Thus $A$ is a polynomial of degree at most $K$.
+Query (1) at the $K+1$ valid integers
+$t=\Delta(H),\ldots,\Delta(H)+K$, calculate $A(t)$, and interpolate
+its value at zero. All queries use nonnegative probe counts; evaluation
+at zero takes place only in polynomial (3).
+
+Since $d_v\geq2$, the vertex factor in (3) at zero is
+\[
+ k!\prod_{j=k+2}^{d_v+1}(j-d_v)
+   =
+   \begin{cases}
+   0,&k\leq d_v-2,\\
+   (d_v-1)!,&k=d_v-1,\\
+   d_v!,&k=d_v.
+   \end{cases}
+   =(d_v-1)!\binom{k}{d_v-1}.
+\]
+Consequently
+\[
+ \frac{A(0)}{\prod_v(d_v-1)!}
+      =\sum_{F\subseteq E}(-1)^{|F|}
+          \prod_v\binom{\deg_F(v)}{d_v-1}.          \tag{4}
+\]
+For each $v$, the binomial factor counts a selection $B_v$ of $d_v-1$
+incident edges contained in $F$. Exchange the finite sums: a fixed
+family $(B_v)$ contributes
+$\sum_{F\supseteq B}(-1)^{|F|}$, where $B=\bigcup_v B_v$.
+This sum is zero if $B\ne E$, by pairing subsets according to any edge
+of $E\setminus B$; it equals $(-1)^e$ if $B=E$.
+Selecting $B_v$ omits exactly one incident edge at $v$.
+The union is $E$ precisely when no edge is omitted at both endpoints.
+The omitted edges therefore give precisely the choices counted by $C(H)$:
+\[
+ C(H)=\frac{(-1)^e A(0)}{\prod_v(d_v-1)!}.          \tag{5}
+\]
+
+Put $T=\Delta+K$. Each query uses $O(h(T+1))$ agents with explicit
+complete lists, and its profile denominator has $O(hT\log(T+1))$ bits.
+At a query point, $0\leq p_H(t)\leq1$ and all $K+h$ factors in
+$P(t)\prod_v(t-d_v+1)$ are at most $T+1$; hence the integer $A(t)$
+has at most $O((K+h)\log(T+1))$ bits.
+Each Lagrange coefficient at zero uses $K$ numerators of magnitude at
+most $T$ and $K$ nonzero denominator differences of magnitude at most
+$K$. A common denominator over the $K+1$ summands therefore has
+$O(K^2\log(T+1))$ bits. All arithmetic is consequently polynomial.
+\end{proof}
+
+\begin{lemma}\label{lem:outer}
+The number of perfect matchings of any simple balanced bipartite graph can be
+computed in polynomial time with an oracle for $C(H)$ on simple bipartite
+graphs of minimum degree at least two.
+\end{lemma}
+\begin{proof}
+Let $G$ be simple and balanced bipartite, with $V=2n>0$ vertices and
+degrees $d_v$. The empty graph on
+zero vertices has one perfect matching and needs no oracle.
+For each integer
+$R=\Delta(G)+1,\ldots,\Delta(G)+V+1$, attach
+$\ell_v=3(R-d_v)$ disjoint four-cycles to $v$, using one bridge from
+$v$ to a designated vertex $z$ of each cycle. Call the resulting graph
+$H_R$ and write $L=\sum_v\ell_v$.
+Each cycle can be bipartitioned with $z$ opposite $v$, so $H_R$ is
+bipartite and simple. The original vertices have degree at least three,
+the designated cycle vertices have degree three, and the others degree
+two.
+
+Consider one cycle $z-a-b-c-z$ and its bridge to $v$.
+If $v$ chooses the bridge, $z$ cannot choose it.
+The four cycle vertices must then choose cycle edges with no mutual
+choice. Following choices reaches a directed cycle; with mutual choices
+excluded it must use all four vertices. There are two orientations.
+If $v$ does not choose the bridge, those same two choices remain, and
+there are four choices with $z$ choosing $v$.
+For the latter count, $b$ chooses either $a$ or $c$; its chosen neighbor
+must choose $z$, while the other neighbor has two choices. These two
+cases give four.
+
+Factor out six choices per cycle. At an original vertex, choosing an
+original edge has weight one, and choosing one of its bridges has
+weight $2/6=1/3$. Its total choice weight is therefore
+$d_v+\ell_v/3=R$.
+Apply inclusion-exclusion to the remaining forbidden events, in which
+both endpoints choose an original edge. An intersection
+of events sharing an endpoint is impossible, since a vertex chooses
+only one edge. The nonzero intersections therefore correspond to
+matchings $F$ of $G$. Each fixes choices at $2|F|$ vertices,
+with weight one, and leaves total weight $R$ at every other vertex.
+We obtain
+\[
+ Z_G(R):=\frac{C(H_R)}{6^L}
+       =\sum_{\substack{F\subseteq E(G)\\F\ \mathrm{matching}}}
+          (-1)^{|F|}R^{V-2|F|}.                   \tag{6}
+\]
+The right side is a polynomial of degree $V$.
+Its constant coefficient is $(-1)^n\PM(G)$, since the only matchings
+with $V-2|F|=0$ are perfect matchings. Interpolating at the $V+1$
+chosen $R$ values therefore recovers $\PM(G)$.
+
+Here $R=O(V)$, $L=O(V^2)$, and $H_R$ has $O(V^2)$ vertices and edges.
+The factor $6^L$ has polynomial bit length, and $0\leq Z_G(R)\leq R^V$
+by the weighted-choice interpretation. Exact interpolation has the same
+polynomial bit bound as above. Combining with Lemma~\ref{lem:inner},
+the largest matching instance has $O(V^4)$ agents and $O(V^8)$
+preference-list entries, and the total number of queries is polynomial.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:classification}]
+Encode every tie permutation by a fixed-length list of its element
+indices, rejecting invalid lists. Every complete strict refinement has
+exactly one valid encoding. A nondeterministic machine guesses the
+concatenation, checks validity, and checks all unmatched pairs for
+blocking in polynomial time. Its accepting-branch count is exactly $N$,
+so $N\in\sharpP$.
+
+The product $D$ is computable in polynomial time and has polynomial
+bit length. Given $N$, compute $p=N/D$; given exact $p$, compute the
+integer $N=Dp$. Thus the functions are Turing equivalent. Lemmas
+\ref{lem:inner}--\ref{lem:outer} and Valiant's theorem prove
+$\sharpP$-hardness and hence the stated completeness of $N$.
+
+For threshold membership, write $\tau=a/b$ with $b>0$ and set
+$k=\lceil aD/b\rceil$. Then $p\geq\tau$ is equivalent to $N\geq k$.
+Let $B$ be the length of the fixed encoding just used, so the counting
+machine has $2^B$ branches and $N\leq D\leq2^B$.
+If $k=0$, accept deterministically.
+Otherwise construct a machine with $2^{B+1}$ branches by guessing a
+leading bit and then $B$ further bits. In its first half it performs the
+counting test, giving $N$ accepting branches.
+In its second half it interprets the $B$ bits as an integer and accepts
+exactly the first $2^B-k+1$ integers. Its accepting count is
+$N+2^B-k+1$, strictly above half of all branches exactly when $N\geq k$.
+The bound $1\leq k\leq D\leq2^B$ makes that second-half count valid.
+The machine runs in polynomial time, proving membership in $\PP$.
+
+A threshold oracle recovers $N$ by binary search over $0,\ldots,D$,
+using thresholds $k/D$ and $O(\log(D+1))$ calls.
+Thus the threshold oracle computes every $\sharpP$ function.
+For any language in $\PP$, take a polynomial-time majority machine
+making a fixed $q(|x|)\geq1$ binary guesses.
+Its accepting count is a $\sharpP$ function; test whether it exceeds
+$2^{q(|x|)-1}$. This gives a polynomial-time Turing
+reduction from every $\PP$ language to the threshold problem and proves
+the claimed $\PP$-hardness.
+\end{proof}
+
+\paragraph{Source and verification.}
+\href{https://github.com/jbaelaw/compact-indifference-stability/blob/10b2dac3c6addbd32205f328c222b4c20a48b52b/paper/Proof.pdf}{Four-page proof PDF}
+and \href{https://github.com/jbaelaw/compact-indifference-stability/blob/10b2dac3c6addbd32205f328c222b4c20a48b52b/paper/Proof.tex}{complete original generated source}.
+The \href{https://github.com/jbaelaw/compact-indifference-stability/tree/10b2dac3c6addbd32205f328c222b4c20a48b52b/lean}{pinned Lean companion}
+checks the finite cancellation and polynomial-factor identities;
+it does not formalize the whole probability construction or the complexity classes.
+Lean 4.35.0-rc3 with mathlib commit
+\href{https://github.com/leanprover-community/mathlib4/tree/b84a70d6a5ed793cc46184160f4d4188d8c825fb}{b84a70d6}
+passed \texttt{lake build} and the axiom audit without warnings or placeholders.
+\href{https://github.com/jbaelaw/compact-indifference-stability/blob/10b2dac3c6addbd32205f328c222b4c20a48b52b/verification/LeanVerification.json}{Verification scope and source hashes}
+and \href{https://github.com/jbaelaw/compact-indifference-stability/blob/10b2dac3c6addbd32205f328c222b4c20a48b52b/paper/CitationAudit.json}{checked citation locations}
+are recorded separately. The exact-arithmetic tests and complete-profile enumeration
+are reproducible from the project. Model: GPT Codex, serving revision not exposed.
+The proof was generated with automated collaboration following the user's instructions.
+This is a proof claim submitted for expert review.
+
+\section*{Completion Estimate}
+100\%
+The claimed classification uses polynomial-time Turing reductions, as stated in the theorem.
+
+\begin{thebibliography}{3}
+\small
+\bibitem{survey}
+K. Cechl\'arov\'a, \'A. Cseh, and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences}.
+Bulletin of the EATCS, no.~128 (2019).
+Section 3.1.2 and Table 1, PDF pp.~8--9.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+
+\bibitem{uncertain}
+H. Aziz, P. Bir\'o, S. Gaspers, R. de Haan, N. Mattei, and B. Rastegari.
+\emph{Stable Matching with Uncertain Linear Preferences}.
+Algorithmica 82, 1410--1433 (2020).
+Section 2; Section 5; Table 3.
+\href{https://doi.org/10.1007/s00453-019-00650-0}{doi:10.1007/s00453-019-00650-0}.
+
+\bibitem{valiant}
+L. G. Valiant. \emph{The Complexity of Computing the Permanent}.
+Theoretical Computer Science 8, 189--201 (1979).
+Section 2, p.~191 (oracle reductions); Theorem 1, p.~194.
+\href{https://doi.org/10.1016/0304-3975(79)90044-6}{doi:10.1016/0304-3975(79)90044-6}.
+\href{https://www.math.cmu.edu/users/af1p/Teaching/MCC17/Papers/permanent.pdf}{Primary paper scan}.
+\end{thebibliography}
+\end{document}
