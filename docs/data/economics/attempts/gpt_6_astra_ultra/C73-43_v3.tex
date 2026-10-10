@@ -1,0 +1,677 @@
+% ECONOMICS_PROBLEM: {"id":"C73-43","title":"Approximate stopping equilibrium with nested information","jel_code":"C73","source_id":"OP-0166"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prb}{\mathbb P}
+\newcommand{\R}{\mathbb R}
+\title{Finite-horizon stopping games:\\public signals, conditional compression and measurable equilibrium selection}
+\author{GPT 6 Astra Ultra --- Version 3}
+\date{10 October 2026}
+\begin{document}
+\maketitle
+
+\section*{Target and the obstruction addressed}
+The target asks for ex-ante $\varepsilon$-equilibrium in bounded finite-horizon stopping games on an arbitrary probability space, under contemporaneously nested player filtrations. Each player has an independent private random seed. Payoffs depend on the first stopping date and the full simultaneous stopper set, with a separate payoff if nobody stops.
+
+Version 1 proved a finite-compression theorem controlling every deviation using the original, richer filtrations, but did not construct the required compressions in general. We retain its proof. Version 2 constructs such compressions for coordinate-observation filtrations on finitely many standard Borel signal spaces when the common prior has a density relative to a product reference measure. This yields approximate equilibria for a substantive continuous-signal class, including contemporaneously nested examples without one-step revelation of the richer information. Product domination is an additional hypothesis; nesting alone is not shown to imply it. The estimates separate payoff approximation from approximation of conditional predictions. Version 3 retains an arbitrary initially public signal exactly, allows conditional product reference kernels depending on that signal, and proves measurable finite-equilibrium selection with integrated and public-conditional regret bounds. This is a construction under explicit representation assumptions, without a claim that these cover arbitrary nested information.
+
+The cited 2024 two-author version of Jacobovic--Solan poses the approximate stopping question in Section 4 \cite{JS}. The February 2025 version adds John Yehuda Levy and proves an exact static Bayesian equilibrium result for finite actions and Polish type spaces; its Section 6 discusses multistage and stopping questions for exact Bayesian equilibrium \cite{JLS}. Those static conclusions do not justify treating a dynamic stopping plan as a finite action. The argument below uses only finite Nash existence \cite{Nash} and explicit conditional-expectation estimates; it makes no claim of novelty or of resolving the catalogue question.
+
+\section*{Finite information and its prediction error}
+Let dates be $0,\ldots,T$, and let all actual payoff variables $X_{i,J,t}$ and $Y_i$ satisfy absolute bound $B<\infty$. Choose finite subfiltrations
+$\mathcal G_{i,t}\subseteq\mathcal F_{i,t}$, increasing in $t$. Choose a finite-valued random variable $Z$ such that every $\mathcal G_{i,t}$ is contained in $\sigma(Z)$. Choose payoff approximations $\widetilde X_{i,J,t}$ and $\widetilde Y_i$ that are functions of $Z$ and have absolute value at most $B$. Set
+\[
+ \eta_i=\E\max\left\{|Y_i-\widetilde Y_i|,
+                  \max_{t,J\ne\varnothing}|X_{i,J,t}-\widetilde X_{i,J,t}|\right\},
+\]
+\[
+ d_{i,t}=\frac12\sum_z\left|
+ \Prb(Z=z\mid\mathcal F_{i,t})-
+ \Prb(Z=z\mid\mathcal G_{i,t})\right|,
+ \qquad \Delta_i=\sum_{t=0}^T\E d_{i,t}.                       \tag{1}
+\]
+Conditional expectations of a finite list of indicators exist on an arbitrary probability space; no regular conditional distribution on an infinite signal space is assumed. Null-set changes in their versions do not affect (1).
+
+\begin{lemma}[Finite prediction estimate]\label{lem:prediction}
+For every function $f$ of $Z$ with $|f|\leq B$,
+\[
+ \left|\E[f(Z)\mid\mathcal F_{i,t}]
+       -\E[f(Z)\mid\mathcal G_{i,t}]\right|\leq2B d_{i,t}
+ \quad\text{almost surely}.                                   \tag{2}
+\]
+The same assertion holds after adjoining player $i$'s independent private random seed to $\mathcal F_{i,t}$ on the left.
+\end{lemma}
+\begin{proof}
+Expand both conditional expectations as the finite sum of $f(z)$ times the corresponding conditional probabilities and apply the triangle inequality. Independence of the seed from the underlying probability space leaves the conditional probabilities unchanged upon adjoining that seed. This proves both claims.
+\end{proof}
+
+\section*{A stopping problem with additional information}
+\begin{lemma}[Value of additional predictions]\label{lem:stopping}
+Fix one player, write its two filtrations as $\mathcal G_t\subseteq\mathcal F_t$, and let $R_0(Z),\ldots,R_T(Z),R_\infty(Z)$ have absolute value at most $B$. If $V^{\mathcal G}$ is the maximum of $\E R_\tau(Z)$ over $\mathcal G$-adapted randomized stopping times in $\{0,\ldots,T,\infty\}$, then every $\mathcal F$-adapted randomized stopping time satisfies
+\[
+ \E R_\tau(Z)\leq V^{\mathcal G}+2B\sum_{t=0}^T\E d_t.         \tag{3}
+\]
+Here $d_t$ is defined by (1) for these filtrations and the same $Z$.
+\end{lemma}
+\begin{proof}
+Define the coarse Snell recursion
+\[
+ V_T=\max\{\E[R_T\mid\mathcal G_T],\E[R_\infty\mid\mathcal G_T]\},
+\]
+\[
+ V_t=\max\{\E[R_t\mid\mathcal G_t],\E[V_{t+1}\mid\mathcal G_t]\}
+ \quad(0\leq t<T).
+\]
+Each $V_t$ is a function of $Z$ and lies in $[-B,B]$. Backward induction shows that $\E V_0=V^{\mathcal G}$: at every date select the maximizing alternative, choosing either stopping at $T$ or never stopping at the terminal comparison. All selections are measurable since there are two alternatives. The same recursion bounds any coarse randomized rule from above by conditional expectation.
+
+Put $e_t=2Bd_t$. By Lemma~\ref{lem:prediction}, on the full filtration,
+\[
+ \E[R_t\mid\mathcal F_t]\leq V_t+e_t,\qquad
+ \E[V_{t+1}\mid\mathcal F_t]\leq V_t+e_t\quad(t<T),
+\]
+and the first inequality at $T$ also holds with $R_\infty$ in place of $R_T$. These inequalities remain valid with the player's seed adjoined. For an arbitrary full-information stopping rule, telescoping gives
+\[
+ \E V_{\min\{\tau,T\}}-\E V_0
+ =\sum_{t=0}^{T-1}\E\bigl[\mathbf1_{\{\tau>t\}}(V_{t+1}-V_t)\bigr]
+ \leq\sum_{t=0}^{T-1}\E[\mathbf1_{\{\tau>t\}}e_t].
+\]
+The reward inequalities on the events $\{\tau=t\}$, and the terminal alternative on $\{\tau=\infty\}$, imply
+\[
+ \E R_\tau\leq\E V_{\min\{\tau,T\}}
+ +\sum_{t<T}\E[\mathbf1_{\{\tau=t\}}e_t]
+ +\E[\mathbf1_{\{\tau\geq T\}}e_T].
+\]
+Combining the last two displays bounds the total error by $\sum_t\E e_t$, since for each $t<T$ the stopping and continuation events are disjoint. This is (3).
+\end{proof}
+
+\begin{theorem}[An equilibrium transfer theorem]\label{thm:main}
+Under the choices preceding (1), the original stopping game admits a profile, using only the finite subfiltrations and independent private seeds, such that every player $i$ and every deviation using its full original filtration and private seeds satisfy
+\[
+ U_i(\widehat\tau_i,\tau_{-i})-U_i(\tau)
+       \leq 2\eta_i+2B\Delta_i.                               \tag{4}
+\]
+No nesting assumption is required for this sufficient condition. In particular, if each $\eta_i=\Delta_i=0$, an exact equilibrium exists in the original game. If such compressions exist with $\max_i(2\eta_i+2B\Delta_i)\to0$, the approximate existence conclusion of the target follows.
+\end{theorem}
+\begin{proof}
+Using the finite subfiltrations and approximate payoffs, form a finite strategic game. A pure strategy is a stopping plan on the finite atoms of the player's filtration, and only finitely many such plans exist. Their expected payoffs are finite. Finite Nash existence therefore supplies independent mixed strategies over these plans, implemented by the players' independent seeds.
+
+Fix a player $i$ and its opponents' equilibrium mixed plans. For each date $t$, define $R_t(Z)$ as its expected approximate payoff when it plans to stop exactly at $t$, averaging only over opponents' independent mixed-plan choices. Define $R_\infty$ similarly. These functions include outcomes in which an opponent stopped earlier; they also retain the entire simultaneous stopper set at a tie. They are functions of $Z$ because opponents' coarse stopping plans and all approximate payoff variables are functions of $Z$. Their absolute values are at most $B$.
+
+For any full-filtration stopping time of player $i$, independence of opponents' seeds implies that its approximate expected payoff equals $\E R_{\tau_i}(Z)$. Lemma~\ref{lem:stopping} bounds this payoff by its best coarse response plus $2B\Delta_i$. The finite-game equilibrium makes the prescribed strategy a best coarse response, so its approximate regret is at most that amount. A randomized coarse stopping time is a distribution over the finitely many pure plans, since fixing its seed specifies one such plan; thus the finite-game comparison includes all coarse randomized deviations.
+
+For any profile, original and approximate realized payoffs differ in absolute value by at most the random maximum defining $\eta_i$: precisely one date/stopper-set outcome or the no-stop outcome is realized. Expected payoffs consequently differ by at most $\eta_i$, uniformly over all strategies. Applying this to both the deviation and prescribed profile adds $2\eta_i$, proving (4). The two concluding assertions follow directly.
+\end{proof}
+
+\begin{corollary}[Exact equilibria with irrelevant extra signals]\label{cor:noise}
+Suppose actual payoffs are bounded functions of a finite variable $Z$, $\mathcal G_{i,t}\subseteq\sigma(Z)$ are finite filtrations, and
+$\mathcal F_{i,t}=\mathcal G_{i,t}\vee\mathcal H_{i,t}$, where each $\mathcal H_{i,t}$ is independent of $\sigma(Z)$. Then the original stopping game has an exact equilibrium, even if the additional signals have infinite or nonatomic ranges. This applies in particular when these filtrations also satisfy the target's contemporaneous nesting condition.
+\end{corollary}
+\begin{proof}
+Independence gives
+$\E[f(Z)\mid\mathcal G_{i,t}\vee\mathcal H_{i,t}]
+=\E[f(Z)\mid\mathcal G_{i,t}]$ for every function of $Z$. To verify the identity, integrate both sides over sets $G\cap H$ with $G\in\mathcal G_{i,t}$ and $H\in\mathcal H_{i,t}$; independence factors out $\Prb(H)$. The identity extends to the generated sigma field by the monotone-class argument for indicators and bounded simple functions. Thus $d_{i,t}=0$. Set approximate payoffs equal to the actual payoffs, giving $\eta_i=0$, and apply Theorem~\ref{thm:main}.
+\end{proof}
+
+
+\section*{Constructing the compressions: progress beyond Version 1}
+We now give sufficient information-structure assumptions under which the
+errors in Theorem~\ref{thm:main} do tend to zero. These assumptions allow
+correlated and nonatomic signals and genuinely dynamic observation.
+They are not inferred from contemporaneous nesting.
+
+Let $d\geq1$ be finite, let $(S_\ell,\mathcal S_\ell,\mu_\ell)$
+be standard Borel probability spaces, and put
+\[
+ S=\prod_{\ell=1}^d S_\ell,\qquad
+ \mu=\bigotimes_{\ell=1}^d\mu_\ell,\qquad
+ d\Prb=p\,d\mu,\quad p\geq0,\quad\int p\,d\mu=1.
+\]
+Thus $p$ is integrable; it need not be continuous, bounded, or bounded
+away from zero. Let $\omega_\ell$ denote the primitive coordinates.
+For each player and date choose subsets $A_{i,t}\subseteq\{1,\ldots,d\}$
+with $A_{i,t}\subseteq A_{i,t+1}$ and set
+\[
+ \mathcal F_{i,t}=\sigma(\omega_\ell:\ell\in A_{i,t}),
+\]
+allowing completion under $\Prb$. To obtain the catalogue's nested
+filtrations impose also $A_{n,t}\subseteq\cdots\subseteq A_{1,t}$.
+The construction below does not otherwise use nesting. All payoffs may
+be arbitrary bounded Borel functions on $S$, with common absolute bound
+$B$. As before, player seeds are independent of $S$ and of one another.
+A coordinate observed by several players is the same primitive
+coordinate, not duplicated as perfectly correlated copies.
+
+For each $\ell$, choose increasing finite partitions
+$\mathcal A_{\ell,k}$ whose union generates $\mathcal S_\ell$.
+Such partitions exist because a standard Borel sigma field has a
+countable generating family: use the atoms of the first $k$ generators.
+Let $Z_k$ list the partition cells of all $d$ coordinates, and let
+\[
+ \mathcal G_{i,t,k}
+    =\sigma(\text{cell of }\omega_\ell\text{ in }\mathcal A_{\ell,k}
+                            :\ell\in A_{i,t}),\qquad
+ p_k=\E_\mu[p\mid\sigma(Z_k)].
+\]
+These are finite subfiltrations and $p_k$ is a probability density.
+Write $\mathbb Q_k$ for the measure with density $p_k$ relative to
+$\mu$. The measures $\mathbb Q_k$ and $\Prb$ agree on $\sigma(Z_k)$,
+because conditional expectation preserves the integral on every cell.
+
+\begin{lemma}[Changing a prior changes conditional predictions in mean]
+\label{lem:priorTV}
+Let $P,Q$ have densities $p,q$ relative to a probability measure $\mu$,
+and let $Z$ be finite-valued. For any sub-sigma field $\mathcal H$,
+one can choose conditional-probability vectors under $P$ and $Q$ such
+that
+\[
+ \E_P\left[\frac12\sum_z
+   |P(Z=z\mid\mathcal H)-Q(Z=z\mid\mathcal H)|\right]
+       \leq\|p-q\|_{L^1(\mu)}.                            \tag{5}
+\]
+The inequality holds for every choice of the $Q$ probability vector on
+its zero marginal-density sets. No regular conditional law of an
+infinite-valued signal is required.
+\end{lemma}
+\begin{proof}
+Use $\mu$-conditional expectations to define
+\[
+ a_z=\E_\mu[p\mathbf1_{\{Z=z\}}\mid\mathcal H],\quad
+ b_z=\E_\mu[q\mathbf1_{\{Z=z\}}\mid\mathcal H],\quad
+ A=\sum_z a_z,\quad B_0=\sum_z b_z.
+\]
+Where the respective denominator is positive, the conditional vectors
+are $a_z/A$ and $b_z/B_0$. To verify this, integrate over any
+$H\in\mathcal H$: multiplying $a_z/A$ by the $P$ marginal density
+$A$ gives $a_z$, whose integral on $H$ equals $P(H\cap\{Z=z\})$.
+The same reasoning applies under $Q$. Use arbitrary probability vectors
+on zero denominator sets.
+On $A,B_0>0$, adding and subtracting $b_z$ gives
+\[
+ \frac A2\sum_z\left|\frac{a_z}A-\frac{b_z}{B_0}\right|
+ \leq\frac12\sum_z|a_z-b_z|+\frac12|A-B_0|.              \tag{6}
+\]
+If $A=0$, the left side vanishes. If $A>0$ and $B_0=0$, its value
+is at most $A$, while the right side is exactly $A$. Thus (6) holds
+with the stipulated choices everywhere up to a $\mu$ null set.
+The integrand on the left is $\mathcal H$-measurable, so its integral
+against $\mu$ is the expectation in (5). Conditional Jensen and the
+finite partition into the events $\{Z=z\}$ give
+\[
+ \E_\mu\sum_z|a_z-b_z|\leq\E_\mu|p-q|,\qquad
+ \E_\mu|A-B_0|\leq\E_\mu|p-q|.
+\]
+Integrating (6) proves (5).
+\end{proof}
+
+\begin{lemma}[Exact coarse predictions for a cellwise density]
+\label{lem:cellprior}
+For every $i,t,k$ there are versions such that
+\[
+ \mathbb Q_k(Z_k=\cdot\mid\mathcal F_{i,t})
+   =\mathbb Q_k(Z_k=\cdot\mid\mathcal G_{i,t,k})
+       \quad\Prb\text{-almost surely}.                    \tag{7}
+\]
+Consequently the prediction error in (1), computed under the true prior
+$\Prb$, satisfies
+\[
+ \E_{\Prb}d_{i,t,k}\leq2\|p-p_k\|_{L^1(\mu)}.           \tag{8}
+\]
+\end{lemma}
+\begin{proof}
+Fix the observed coordinate subset $A=A_{i,t}$. For each full cell
+indexed by the pair of observed and unobserved cell labels $(a,b)$,
+write $c_{a,b}$ for the constant value of $p_k$ there. Ignore cells of
+zero $\mu$ measure, which are also $\Prb$ null. Under the product
+reference, the unobserved coordinates are independent of the full
+observed coordinates. On an observed cell $a$, integrating out the
+unobserved coordinates gives the marginal density
+\[
+ q_A(a)=\sum_b c_{a,b}\,
+        \mu_{A^c}(\text{unobserved cell }b).
+\]
+This quantity is constant throughout that observed cell. When it is
+positive, the conditional probability under $\mathbb Q_k$ of the full
+cell $(a,b)$, given the exact observed coordinates, is
+\[
+ \frac{c_{a,b}\mu_{A^c}(\text{unobserved cell }b)}{q_A(a)}.
+                                                               \tag{9}
+\]
+The same formula results when conditioning only on the observed cell:
+its observed-coordinate reference mass cancels between numerator and
+denominator. Conditional probabilities of full cells with a different
+observed label are zero in both cases. This proves (7) on the positive
+marginal-density cells. Where $q_A(a)=0$, choose the same arbitrary
+probability vector for both conditioning fields. Such an observed cell
+has zero $\mathbb Q_k$ probability. It belongs to $\sigma(Z_k)$,
+where $\mathbb Q_k$ and $\Prb$ agree, so it is also $\Prb$ null.
+This verifies the asserted equality under the true prior, which is
+needed for the next step; equality only under $\mathbb Q_k$ would
+not suffice without this justification.
+
+Insert the common vector in (7) between the two true-prior conditional
+vectors defining $d_{i,t,k}$ and use the triangle inequality. Apply
+Lemma~\ref{lem:priorTV} once with $\mathcal H=\mathcal F_{i,t}$
+and once with $\mathcal H=\mathcal G_{i,t,k}$, using densities
+$p,p_k$ and finite variable $Z_k$. Each expected distance is at most
+$\|p-p_k\|_1$, which proves (8). Passing to completed information
+fields changes none of these conditional vectors outside true-prior
+null sets; representatives in the uncompleted fields give the same
+expected inequalities.
+\end{proof}
+
+\begin{theorem}[Approximate equilibrium for product-dominated signals]
+\label{thm:construct}
+In the coordinate-observation model above, every bounded finite-horizon
+stopping game has an ex-ante $\varepsilon$-equilibrium for every
+$\varepsilon>0$, with independent private randomization and against all
+deviations using the original filtrations. Ties and the no-stop payoff
+are retained exactly as in the catalogue.
+More precisely, approximate each payoff variable $H$ by
+$\widetilde H_k=\E_{\Prb}[H\mid\sigma(Z_k)]$, define $\eta_{i,k}$
+from these approximations as in (1), and put $e_k=\|p-p_k\|_{L^1(\mu)}$.
+There is a profile using the finite subfiltrations such that every
+player's regret in the original game is at most
+\begin{equation}\label{eq:constructregret}
+ 2\eta_{i,k}+4B(T+1)e_k.
+\end{equation}
+Both terms tend to zero as $k\to\infty$.
+The result applies in particular when the coordinate sets are nested
+across players, as required by the catalogue.
+\end{theorem}
+\begin{proof}
+Every approximate payoff is a bounded function of the finite $Z_k$,
+with absolute value at most $B$, and all $\mathcal G_{i,t,k}$ are
+contained in $\sigma(Z_k)$. By (8),
+$\Delta_{i,k}=\sum_{t=0}^T\E d_{i,t,k}\leq2(T+1)e_k$.
+Theorem~\ref{thm:main} therefore supplies a finite-information profile
+with full-information regret at most \eqref{eq:constructregret}.
+That theorem includes every simultaneous stopper set and all deviations,
+so this step imposes no additional restriction on either.
+
+For completeness, the convergence of the errors can be seen directly
+from increasing finite partitions. If $Z_k$ generate the whole product
+sigma field, finite-cell simple functions from their union are dense
+in $L^1$ for any probability measure on that sigma field. To justify
+this density, the class of measurable sets whose indicators can be
+approximated in $L^1$ by such simple functions contains the algebra of
+finite cells, is closed under complements, and is closed under increasing
+countable unions: approximate a sufficiently large finite union first,
+using continuity of measure, then approximate its constituent indicators.
+The monotone-class theorem gives all measurable sets; simple-function
+approximation and truncation then give every integrable function.
+If $H_K$ is an approximation of $H$ measurable on the $K$th partition,
+conditional-expectation contraction yields, for $k\geq K$,
+\[
+ \|\E[H\mid Z_k]-H\|_1
+ \leq\|\E[H-H_K\mid Z_k]\|_1+\|H_K-H\|_1
+ \leq2\|H-H_K\|_1.
+\]
+Apply this first under $\mu$ to $H=p$ to obtain $e_k\to0$,
+and then under $\Prb$ to each payoff to obtain its $L^1$ approximation.
+For each player there are only finitely many dates and stopper sets.
+The expectation of their maximum absolute error is bounded by the sum
+of the finitely many $L^1$ errors, so $\eta_{i,k}\to0$.
+There are finitely many players, hence one sufficiently large $k$
+makes every bound in \eqref{eq:constructregret} smaller than the given
+$\varepsilon$. This proves the asserted approximate equilibrium.
+\end{proof}
+
+\begin{corollary}[An explicit mesh bound]\label{cor:mesh}
+Let $S=[0,1]^d$, let $\mu$ be Lebesgue probability measure, and suppose
+$p$ is $L_p$-Lipschitz and every payoff is $L_X$-Lipschitz for the
+$\ell^1$ metric. Use equal product cells of side length $h=2^{-k}$,
+and approximate payoffs by their values at each cell's midpoint.
+Then there is a finite-information profile with each player's
+full-information regret at most
+\[
+ d\bigl[L_X+4B(T+1)L_p\bigr]h.
+\]
+The result is an approximation bound, not a polynomial-time algorithm
+for finding a Nash equilibrium of the finite compressed game.
+\end{corollary}
+\begin{proof}
+The midpoint is at $\ell^1$ distance at most $dh/2$ from every point
+of its cell. Thus every realized payoff error is at most $L_Xdh/2$,
+including the maximum over all outcomes, and $2\eta_i\leq L_Xdh$.
+The density $p_k$ is the average of $p$ on each cell. Any two points
+in a cell have $\ell^1$ distance at most $dh$, so
+$|p-p_k|\leq L_pdh$ there. Consequently $e_k\leq L_pdh$.
+The finite-compression theorem and (8), which do not require the payoff
+approximants to be conditional expectations, give the displayed bound.
+\end{proof}
+
+For a concrete nested example without one-step revelation, take three
+primitive coordinates $(s_1,s_2,s_3)\in[0,1]^3$ and the prior density
+\[
+ p(s_1,s_2,s_3)=1+\vartheta(2s_1-1)(2s_2-1),
+ \qquad |\vartheta|\leq1.
+\]
+It is nonnegative and integrates to one. At date zero let player 1
+observe $(s_1,s_2)$ and player 2 observe $s_1$. At date one let player 1
+observe all three coordinates and player 2 observe $(s_1,s_3)$.
+Each player's information increases, and player 2's information is
+contained in player 1's at each date. The date-zero variable $s_2$
+known to player 1 is not revealed to player 2 at date one (for example
+at $\vartheta=0$ it remains an independent uniform variable).
+Theorem~\ref{thm:construct} nevertheless supplies approximate equilibria
+for all bounded Borel stopping payoffs in this information structure.
+The stronger one-step inclusion is not needed for this class.
+
+\section*{An initially public signal: progress beyond Version 2}
+The construction in Version 2 used one fixed product reference for all
+primitive coordinates. We now retain an arbitrary initially public signal
+exactly and allow the private reference distributions to depend on that
+signal. The new issues are measurable equilibrium selection across the
+public states and preservation of conditional predictions in each public
+state. The public signal is never quantized. The result removes the need
+for unconditional product domination in the supplied coordinate
+representation. It is not a claim that the class is intrinsically larger
+under every equivalent recoding of signals.
+
+Let $C$ take values in a standard Borel space $\mathsf C$ with probability
+law $\Lambda$. For $\ell=1,\ldots,d$, let $S_\ell$ be standard Borel
+and let $c\mapsto\mu_{\ell,c}$ be probability kernels on $S_\ell$.
+Write
+\[
+ S=\prod_{\ell=1}^d S_\ell,\qquad
+ \mu_c=\bigotimes_{\ell=1}^d\mu_{\ell,c}.
+\]
+Assume $p:\mathsf C\times S\to[0,\infty)$ is jointly Borel and
+$\int p(c,s)\mu_c(ds)=1$ for $\Lambda$-almost every $c$.
+The true conditional law is $P_c(ds)=p(c,s)\mu_c(ds)$ and the true
+joint law is $\Lambda(dc)P_c(ds)$. On an exceptional public null set
+choose any probability kernel and normalized density, which does not
+change the game. All actual payoffs are bounded Borel functions of
+$(c,s)$, with absolute bound $B$.
+
+Every player observes $C$ from date zero. For deterministic increasing
+coordinate sets $A_{i,t}\subseteq\{1,\ldots,d\}$, its information is
+\[
+ \mathcal F_{i,t}=\sigma(C,s_\ell:\ell\in A_{i,t}),
+\]
+possibly completed under the true joint law. Impose
+$A_{n,t}\subseteq\cdots\subseteq A_{1,t}$ to obtain the catalogue's
+contemporaneous nesting. As before, independent private uniform seeds
+are independent of all primitives. The claims below concern deviations
+using exactly these original filtrations and private seeds.
+
+Choose increasing finite partitions of each $S_\ell$ as in Version 2,
+and let $Z_k(s)$ list all private cell labels. The variable $Z_k$ is
+finite, but $(C,Z_k)$ generally is not. For a full private cell $D_z$
+put
+\[
+ b_z(c)=\mu_c(D_z),\qquad
+ a_z(c)=\int_{D_z}p(c,s)\mu_c(ds),
+\]
+and define
+\begin{equation}\label{publicdensity}
+ p_k(c,s)=\sum_{z:b_z(c)>0}\frac{a_z(c)}{b_z(c)}
+                                      \mathbf1_{D_z}(s).
+\end{equation}
+The zero-denominator summands are assigned zero. Integrals of Borel
+functions against a probability kernel are measurable; hence all these
+functions are jointly measurable. For each public state, $p_k$ is the
+cellwise conditional expectation of $p$ under its product reference
+$\mu_c$, and it integrates to one.
+For each payoff $H$, define its approximation by the conditional cell
+average under $P_c$:
+\[
+ \widetilde H_k(c,s)=
+ \sum_{z:a_z(c)>0}
+  \frac{\int_{D_z}H(c,y)p(c,y)\mu_c(dy)}{a_z(c)}
+                                      \mathbf1_{D_z}(s),
+\]
+again assigning zero to a zero-denominator cell. These approximations
+are measurable, bounded by $B$, and depend only on $(C,Z_k)$.
+Write
+\begin{align*}
+ e_k(c)&=\int_S|p(c,s)-p_k(c,s)|\mu_c(ds),\\
+ \eta_{i,k}(c)&=
+  \int_S\max\left\{|Y_i-\widetilde Y_{i,k}|,
+       \max_{t,J\ne\varnothing}|X_{i,J,t}-\widetilde X_{i,J,t}|\right\}
+                                                       P_c(ds).
+\end{align*}
+The payoffs in the last line are all evaluated at $(c,s)$.
+Let $e_k=\int e_k(c)\Lambda(dc)$ and
+$\eta_{i,k}=\int\eta_{i,k}(c)\Lambda(dc)$.
+
+\begin{lemma}[Conditional compression and measurable finite equilibria]
+\label{publiclemma}
+For almost every public state $c$, the finite private partitions obey
+\[
+ E_{P_c}d_{i,t,k,c}\leq2e_k(c),
+\]
+where $d_{i,t,k,c}$ compares predictions of $Z_k$ under the exact
+observed private coordinates and their cell labels in that public state.
+Moreover, for every fixed $k$ and every $\varepsilon_0>0$, one can
+choose an $\varepsilon_0$-Nash equilibrium of the corresponding finite
+private-plan game as a Borel function of $c$.
+\end{lemma}
+\begin{proof}
+Fix $c$ outside the null set in the assumptions. The reference $\mu_c$
+is a product and $p_k(c,\cdot)$ is constant on its finite product cells.
+Thus the proof of Lemma~\ref{lem:cellprior} applies within this public
+state. In particular, integrating out unobserved private coordinates
+under $\mu_c$ shows that the law of $Z_k$ under density $p_k$,
+conditional on the exact observed private coordinates, equals that
+conditional on just their cell labels. In this calculation $c$ is fixed;
+the factors $\mu_{\ell,c}$ consequently do not change within a cell.
+Insert this common law between the two $P_c$ prediction vectors.
+Lemma~\ref{lem:priorTV}, applied twice with reference $\mu_c$, gives
+the stated $2e_k(c)$ bound. The null-cell argument is the same as in
+Lemma~\ref{lem:cellprior}, because the true and cellwise-density priors
+agree on all private cells conditional on this $c$.
+
+For the selection assertion, enumerate all pure stopping plans on the
+finite private observation cells at dates $0,\ldots,T$. Include plans
+on cells that might have zero probability for a particular $c$; the
+resulting finite action sets $A_i^k$ then do not depend on $c$.
+A plan specifies stop or continue at each available finite history,
+including the terminal choice of stopping or never stopping. The payoff
+$u_i^k(c,a)$ for a pure-plan profile $a$ is measurable in $c$: its
+realized approximate payoff is a bounded Borel function of $(c,s)$,
+including the full first-stopper set, and it is integrated against the
+probability kernel $P_c$. Its absolute value is at most $B$.
+
+List all profiles of rational probability vectors on the finite sets
+$A_i^k$ as $q^{(1)},q^{(2)},\ldots$. Define the maximal pure-deviation
+gain at a mixed profile by
+\[
+ D_k(c,q)=\max_i\max_{a_i\in A_i^k}
+        \{u_i^k(c,a_i,q_{-i})-u_i^k(c,q)\}.
+\]
+For each $q$ this is measurable in $c$; for each $c$ it is continuous
+in $q$, being the maximum of finitely many multilinear expressions.
+Finite Nash existence provides a profile with $D_k(c,q)=0$.
+Density of rational profiles and continuity then imply that at least
+one enumerated profile has $D_k(c,q^{(r)})<\varepsilon_0$.
+Choose the first index satisfying $D_k(c,q^{(r)})\leq\varepsilon_0$.
+The event that this index equals $r$ is the measurable set where its
+inequality holds and all preceding inequalities fail. Thus the selected
+profile $q_k(c)$ is measurable. Pure-deviation inequalities imply the
+same inequalities for every mixed deviation by linearity.
+Sampling the selected probability vector with each player's independent
+uniform seed is jointly measurable, for example by cumulative probability
+intervals. This implements the claimed finite-game equilibrium without
+an appeal to an unproved exact measurable Nash selection theorem.
+\end{proof}
+
+\begin{theorem}[Equilibrium with a public parameter and conditional product domination]
+\label{publictheorem}
+Under the stated public-signal hypotheses, for every $k$ and every
+$\varepsilon_0>0$ there is a profile using only $C$, the observed
+private cells at level $k$, and independent private seeds, such that
+every player and every original full-information deviation satisfy
+\begin{equation}\label{publicregret}
+ U_i(\widehat\tau_i,\tau_{-i})-U_i(\tau)
+ \leq\varepsilon_0+2\eta_{i,k}+4B(T+1)e_k.
+\end{equation}
+Here $e_k\to0$ and $\eta_{i,k}\to0$. Consequently the original
+finite-horizon stopping game has an ex-ante $\varepsilon$-equilibrium
+for every $\varepsilon>0$, retaining all tie and no-stop payoffs.
+\end{theorem}
+\begin{proof}
+Use the measurable $\varepsilon_0$-Nash selection of
+Lemma~\ref{publiclemma}. For each fixed public state, the proof of
+Theorem~\ref{thm:main} applies to its finite private game. Replacing
+exact finite Nash by $\varepsilon_0$-Nash changes just one step: its
+best coarse deviation can improve payoff by at most
+$\varepsilon_0$ instead of zero. The Snell-envelope comparison and
+payoff approximation are unchanged. Since
+$\Delta_{i,k,c}\leq2(T+1)e_k(c)$, the conditional regret of every
+original admissible deviation is bounded by
+\[
+ \varepsilon_0+2\eta_{i,k}(c)+4B(T+1)e_k(c).
+\]
+A strategy adapted to $\sigma(C,s_\ell:\ell\in A_{i,t})$ has,
+after fixing $C=c$, a strategy adapted to the corresponding private
+coordinate filtration for almost every $c$. One can first choose
+measurable representatives in the uncompleted fields, then use Fubini;
+there are finitely many dates, so one public null set suffices for any
+fixed deviation. The independent seeds remain independent under this
+conditioning. Thus the displayed conditional comparison applies to every
+given original deviation. Integrating in $c$ proves
+\eqref{publicregret}. The resulting unconditional bound is uniform in
+the deviation, so no common null set for an uncountable collection of
+deviations is needed.
+
+For almost every $c$, the increasing private partitions generate the
+whole Borel field of $S$. The $L^1$ finite-partition approximation
+argument given in Theorem~\ref{thm:construct}, now under $\mu_c$,
+gives $e_k(c)\to0$. Applying it to each bounded payoff under $P_c$
+gives $\eta_{i,k}(c)\to0$, because the number of outcomes is finite.
+The pointwise bounds $e_k(c)\leq2$ and
+$\eta_{i,k}(c)\leq2B$ follow from normalization of the two densities
+and boundedness of the payoffs. Dominated convergence therefore gives
+the stated integrated limits. With finitely many players, choose
+$\varepsilon_0<\varepsilon$ and one sufficiently large $k$ so that
+the right side of \eqref{publicregret} is at most $\varepsilon$ for
+all players. This proves the equilibrium assertion.
+\end{proof}
+
+\begin{corollary}[The precision can depend measurably on the public state]
+\label{publicconditional}
+Under the same hypotheses, for every $\varepsilon>0$ there is a
+measurable profile whose conditional expected regret, after conditioning
+on the public signal, is at most $\varepsilon$ for almost every public
+state. The finite private partition level may depend on that state.
+This statement conditions on public information only; it is not an
+interim-equilibrium assertion conditional on every private type.
+\end{corollary}
+\begin{proof}
+For each public state where the preceding errors converge, choose the
+first integer $K(c)$ for which
+\[
+ \max_i\{2\eta_{i,K(c)}(c)+4B(T+1)e_{K(c)}(c)\}
+                                                \leq\varepsilon/2.
+\]
+The functions being compared are measurable and the errors tend to
+zero, so $K(c)$ is finite almost everywhere and is measurable by the
+same first-success argument used for rational profiles. On an exceptional
+public null set put $K=1$. For each $k$ choose the measurable finite
+profile from Lemma~\ref{publiclemma} with
+$\varepsilon_0=\varepsilon/2$, and paste it on the measurable event
+$\{K(c)=k\}$. Countable pasting preserves measurability; every player
+knows the selected level because $C$ is public from date zero.
+The conditional regret bound in the proof of
+Theorem~\ref{publictheorem} is now at most $\varepsilon$ for each
+admissible deviation in almost every public state. This proves the
+claim without requiring one finite grid size to work in every state.
+\end{proof}
+
+\begin{corollary}[A rate with public-state-dependent reference kernels]
+\label{publicmesh}
+Suppose $S=[0,1]^d$ and, for the $\ell^1$ metric, $p(c,\cdot)$ is
+$L_p(c)$-Lipschitz and all payoffs are $L_X(c)$-Lipschitz. Assume the
+nonnegative envelopes $L_p,L_X$ are measurable and integrable under
+$\Lambda$. The conditional product reference kernels may be arbitrary,
+including atoms depending on $c$. For product cells of side length
+$h=2^{-k}$ and payoff midpoint approximations, there is a profile with
+full-information ex-ante regret at most
+\[
+ \varepsilon_0+dh\left[\int L_X(c)\Lambda(dc)
+                 +4B(T+1)\int L_p(c)\Lambda(dc)\right].
+\]
+No computational complexity bound for selecting a finite-game equilibrium
+is claimed.
+\end{corollary}
+\begin{proof}
+For any probability reference, the average of a Lipschitz function over
+a cell differs from its value at any point of that cell by at most its
+Lipschitz constant times the cell diameter. Thus conditional on $c$,
+$e_k(c)\leq L_p(c)dh$. Every payoff differs from its midpoint value
+by at most $L_X(c)dh/2$, so $2\eta_{i,k}(c)\leq L_X(c)dh$.
+Null reference cells have no effect on these bounds. Apply the proof
+of Theorem~\ref{publictheorem}, which allows these bounded cellwise
+payoff approximations as well as conditional averages, and integrate
+the inequalities in $c$.
+\end{proof}
+
+Keeping the public signal exact matters. If it were coarsened, the
+kernels $\mu_{\ell,c}$ could change within a public cell, and the
+cellwise posterior identity used above would no longer follow from
+product structure at each exact $c$. Conversely, conditioning on $C$
+can handle singularities in the supplied unconditional coordinates.
+For example, let $C$ be uniform on $[0,1]$ and let one private primitive
+be identically $s_1=C$, with conditional reference $\mu_{1,c}=\delta_c$.
+Other coordinates can be independent uniforms conditional on $C$,
+and one may take $p=1$. The supplied joint coordinates $(C,s_1)$
+are supported on a continuous diagonal and are not dominated by any
+product reference on these two coordinates. Indeed the atoms of any
+candidate second-coordinate reference form a countable set $A$;
+the set $\{(c,s):s=c,\ c\notin A\}$ has true probability one
+and product-reference probability zero. The conditional theorem still
+applies directly. Here the repeated coordinate is redundant and can
+be removed, illustrating why this example is a statement about a
+representation, not an invariant separation of information classes.
+The proved contribution is the conditional construction and its
+measurable selection and error control; arbitrary nested filtrations
+without this representation remain outside the theorem.
+
+\section*{A check on the missing approximation step}
+Even in a one-player problem with $T=1$, perfect payoff approximation does not imply preservation of optimal stopping. Let $Z$ be a fair bit, $R_0=1/2$, $R_1=Z$, and $R_\infty=0$. Let $\mathcal F_0=\mathcal F_1=\sigma(Z)$, while $\mathcal G_0$ is trivial and $\mathcal G_1=\sigma(Z)$. Every coarse rule has maximal expected payoff $1/2$. The full-information rule stops immediately when $Z=0$ and at date 1 when $Z=1$, giving $3/4$. Payoffs are already exact functions of the finite master variable, but $d_0=1/2$. This can be embedded in a nested multiplayer game by adding indifferent players who never stop. It refutes a payoff-only compression argument, not equilibrium existence.
+
+\textbf{Unresolved boundary.} Version 3 handles an initially public
+standard-Borel signal exactly and permits product reference kernels
+conditional on that signal. It constructs measurable approximate
+finite-game equilibria and controls all deviations using the original
+private filtrations, including a version with a publicly chosen grid
+precision. The existence of this conditional representation is an
+additional hypothesis. Arbitrary contemporaneously nested sigma fields
+and priors are not shown to admit it, so the catalogue's general target
+remains unresolved. Unconditional product domination need not hold in
+the supplied coordinates; no representation-invariant strict enlargement
+of the admissible information class is claimed. Ties, no-stop payoffs,
+independent private seeds and the original deviation class are preserved.
+Finite Nash existence is the sole equilibrium-existence input. The
+conditioning, measurable selection and error estimates are proved here;
+no numerical enumeration, fresh source retrieval or novelty claim is
+asserted.
+
+\section{Completion Estimate}
+45\%
+
+This is a heuristic assessment of the full catalogue target. The version
+adds measurable equilibrium construction with arbitrary initially public
+signals, conditional product reference kernels and explicit error bounds.
+It retains full private-information deviations and can achieve the bound
+conditional on the public signal. General nested information without the
+stated representation and domination assumptions remains unresolved.
+
+\begin{thebibliography}{9}
+\bibitem{JS} R. Jacobovic and E. Solan, \emph{Bayesian Games with Nested Information}, arXiv:2402.14450v1 (2024), Section 4. \url{https://arxiv.org/html/2402.14450v1}.
+\bibitem{JLS} R. Jacobovic, J. Y. Levy, and E. Solan, \emph{Bayesian games with nested information}, arXiv:2402.14450v3 (21 February 2025), main result and Section 6. \url{https://arxiv.org/html/2402.14450v3}. The author list and strengthened static conclusion differ from v1.
+\bibitem{Nash} J. F. Nash, \emph{Equilibrium points in n-person games}, Proceedings of the National Academy of Sciences 36 (1950), 48--49. \url{https://doi.org/10.1073/pnas.36.1.48}.
+\end{thebibliography}
+
+\end{document}
