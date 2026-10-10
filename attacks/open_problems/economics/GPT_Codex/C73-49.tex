@@ -1,0 +1,1912 @@
+% ECONOMICS_PROBLEM: {"id":"C73-49","title":"Dynamic games with incomplete information","jel_code":"C73","source_id":"OP-0004"}
+% FIRST_POSTED: 2026-10-10
+% ENTRY_KIND: research_attempt
+% ATTEMPT_STATUS: solved
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Dynamic games with incomplete information},pdfauthor={Ji Ho Bae}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2em}
+\allowdisplaybreaks[2]
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Prob}{\mathbb P}
+\newcommand{\cE}{\mathcal E}
+\newcommand{\ind}{\mathbf1}
+\DeclareMathOperator{\SE}{SE}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\Reg}{Reg}
+\DeclareMathOperator{\excess}{excess}
+\DeclareMathOperator{\TV}{TV}
+\title{Dynamic Games with Incomplete Information\\[4pt]
+ \large Sharp history-based identification and certified inference}
+\author{Ji Ho Bae\thanks{Prepared with GPT Codex assistance; the exact
+serving revision is unavailable. All mathematical arguments are hand
+proofs. No Lean formalization, external peer review, or novelty claim
+is asserted.}}
+\date{10 October 2026}
+\begin{document}
+\maketitle
+\begin{center}
+\small\textbf{C73-49 \quad JEL C73 \quad Source OP-0004}\\
+Complete hand proof with internal mathematical and source-fidelity review.
+\end{center}
+\begin{abstract}
+For arbitrary finite known perfect-recall trees, we state restrictions
+under which incomplete-information games admit informative, sharp,
+and computationally certified inference. A calibrated measurement
+channel on complete terminal histories recovers the latent law.
+Positive history mass then identifies behavior and beliefs and reduces
+the entire compatible parameter set to an explicit affine slice of
+a joint parameter polytope. A rational projection and linear program
+give finite-sample whole-set confidence, conditioned mean-square
+parameter bounds, expected diameter bounds, and an actual feasible
+Bayes assessment with a certificate for every continuation deviation.
+General policy ranges retain all sequential equilibria at a shared
+structural parameter and have exact real-algebraic endpoint certificates.
+For two-player zero-sum utility values, sequence-form linear programs
+and a coupling bound give polynomial explicit-tree computation and
+stable confidence intervals. A tie example proves that the same
+contraction claim cannot hold for arbitrary policy outcomes, at any
+fixed confidence level. Private histories are retained throughout.
+The algorithms are proved; a full QE or LP execution is not claimed.
+\end{abstract}
+
+\section{Declared class, observation design, and scope}\label{sec:model}
+The canonical entry is an editorial research-family question. It asks
+which restrictions make identified and counterfactual sets informative,
+and requests verified computation, approximation, sampling confidence,
+and an explicit policy-selection convention. The results below give a
+complete response for the following declared class. They do not assert
+identification under every unrepresented primitive family.
+
+The input is an arbitrary finite known extensive-form tree with perfect
+recall. It may be the complete history tree of a finite-horizon game
+with persistent private states, correlated signals, and arbitrary
+observation histories. Strategic information sets and their common
+nonempty action sets are known. No public Markov reduction is made.
+Let \(Z\) be the terminal-history set, \(L=|Z|\), \(N_{\rm tr}\) the
+number of nodes, and \(H\) the maximum number of edges on a terminal path.
+Each \(z\) records the \emph{complete} latent history, including private
+signals and Nature events, not merely public outcomes.
+
+The structural parameter is
+\(\gamma=(\alpha,\beta)\in\Gamma\subset\R^d\), where \(\Gamma\) is a
+nonempty compact rational polytope and \(d\) is the ambient coordinate
+count. Joint restrictions on \(\alpha,\beta\) are retained. Empty
+parameter domains are detected and reported separately.
+The vector of all included Nature-edge probabilities is
+\begin{equation}\label{eq:primitives}
+ c(\alpha)=c^0+B\alpha,\qquad
+ u_{i,z}(\beta)=u^0_{i,z}+\varphi_{i,z}\cdot\beta .
+\end{equation}
+All displayed coefficients are known and rational. On \(\Gamma\),
+Nature rows are proper probability vectors and every included edge
+is uniformly positive. Structurally absent edges are omitted; strategic
+off-path actions are retained. Repeated transition and signal kernels
+are imposed by repeated rows or primitive equalities, not fitted as
+unrelated probabilities.
+
+The known discount factor of the underlying dynamic game is denoted
+\(\delta_0\), to distinguish it from the unknown payoff vector \(\beta\).
+Discounted stage-utility features are summed along a terminal history
+to obtain \eqref{eq:primitives}. Cardinal units, known utility entries,
+and any normalization are fixed as primitives. Additive or scale
+directions not removed by those restrictions remain unidentified.
+Let \(d_\beta\) be the dimension of \(\beta\), and suppose
+\begin{equation}\label{eq:payoffbounds}
+ \|\beta\|_1\le B_1,\quad
+ U_0=\max_{i,z}|u^0_{i,z}|,\quad
+ F=\max_{i,z,j}|\varphi_{i,z,j}|,\quad U=U_0+FB_1 .
+\end{equation}
+Empty maxima are zero. Thus \(|u_{i,z}(\beta)|\le U\) on \(\Gamma\).
+
+After history \(z\), the researcher observes one of \(K\) cells through
+a known column-stochastic channel \(M(o\mid z)\). This calibrated
+post-play measurement is conditionally determined by \(z\); it changes
+neither players' information nor their payoffs during play.
+Calibration aligns latent labels with their transition and payoff
+features. If \(q\) is the terminal law, the observed law is
+\begin{equation}\label{eq:channel}p=Mq.\end{equation}
+The generic exact method allows rank-deficient \(M\) and zero components
+of \(q\). The informative branch assumes \(M\) has full column rank and
+the recovered population \(q\) is strictly positive. Quantitative
+statements additionally use a declared known rational \(\lambda>0\)
+with \(q_z\ge\lambda\), necessarily \(L\lambda\le1\).
+
+Independent markets share one baseline assessment, with independent
+Nature and behavioral randomization across markets. An observed
+selection stratum can be analyzed separately. An unobserved mixture
+over different assessments is a different sampling model.
+The sample size is \(n\) throughout this paper.
+
+For each declared policy \(\ell\), another known finite perfect-recall
+tree satisfies the same compact, affine, positive-Nature assumptions
+at the \emph{same} \(\gamma\). A declared scalar outcome has the form
+\begin{equation}\label{eq:policyoutcome}
+ W_\ell(\gamma,\sigma)
+   =\sum_{z\in Z_\ell}q^\ell_z(\gamma,\sigma)w_{\ell,z}(\gamma),
+\end{equation}
+where \(w_{\ell,z}\) are known rational polynomials. This includes
+probabilities, counts, and calibrated affine utility or welfare
+statistics. The attainment assertions concern these continuous
+outcomes. Vector targets use the joint image, not a Cartesian product
+of coordinate ranges.
+
+Exact algorithms require rational or effectively represented algebraic
+numerical inputs, including the channel and numerical population law.
+Population statements also make sense for fixed known real inputs;
+an arbitrary unencoded real is not finite computational input.
+The polynomial-bit claims use rational encodings. The complete tree
+and channel may be exponentially large in a succinct horizon description.
+
+The prior catalogue attempt \cite{Prior} already proves the
+fixed-positive-Nature exact equilibrium reduction, compactness, sharp
+policy projections, endpoint bisection, and whole-set sampling coverage.
+We reproduce those arguments and attribute them. The additional content
+is the general informative inverse and affine fiber, its quantitative
+statistical and actual-assessment certificates, and qualified stable
+policy-value inference. Classical sequential equilibrium
+\cite{KW}, real quantifier elimination \cite{Basu}, sequence form
+\cite{KMS}, and rational linear programming are named inputs;
+no priority claim is made.
+
+\section{Exact sequential equilibrium, existence, and compactness}
+\label{sec:se}
+Fix a baseline or policy tree. Let \(\mathcal B\) be its product of
+behavioral simplexes, \(\mathcal B^+\) its strictly positive part,
+and \(\mathcal U\) the product of belief simplexes over the nodes of
+each information set. Write
+\[
+ \begin{gathered}
+ R_h(\gamma,b)=\prod_{\text{edges on the prefix of }h}
+                     \text{their Nature or behavioral probabilities},\\
+ R_I(\gamma,b)=\sum_{h\in I}R_h(\gamma,b).
+ \end{gathered}
+\]
+For \(b\in\mathcal B^+\), every \(R_I\) is positive. Its Bayes graph is
+\[
+ b\in\mathcal B^+,\quad \nu\in\mathcal U,\quad
+ R_I(\gamma,b)>0,\quad
+ \nu_{I,h}R_I(\gamma,b)=R_h(\gamma,b)\quad(h\in I).
+\]
+The following formula defines consistency:
+\begin{equation}\label{eq:consistency}
+ \forall r>0\ \exists(b,\nu)\text{ in this Bayes graph}:
+       \|b-\sigma\|_2^2+\|\nu-\mu\|_2^2<r^2 .
+\end{equation}
+Here \(\gamma\) and all game primitives are held fixed.
+One common pair \((b,\nu)\) serves every information set.
+The witnesses need not be equilibria or rational.
+
+For player \(i\), information set \(I\), and complete pure continuation
+plan \(a_i\), let \(V_{i,I}(\gamma,a_i,\sigma_{-i};\mu)\) be the
+terminal-utility sum over suffix paths starting at \(h\in I\), weighted
+by \(\mu_{I,h}\). The corresponding prescribed-continuation value is
+\(V_{i,I}(\gamma,\sigma;\mu)\). These are finite polynomials.
+Require the legitimate-assessment simplex conditions and
+\begin{equation}\label{eq:sr}
+ V_{i,I}(\gamma,\sigma;\mu)\ge
+ V_{i,I}(\gamma,a_i,\sigma_{-i};\mu)
+       \quad\text{for every }i,I,a_i .
+\end{equation}
+Their conjunction with \eqref{eq:consistency} is denoted
+\(\SE(\gamma,\sigma,\mu)\).
+
+\begin{lemma}[Exact fixed-game predicate]\label{lem:exactse}
+The predicate \(\SE\) describes exactly the sequential-equilibrium
+assessments, including consistent off-path beliefs.
+\end{lemma}
+\begin{proof}
+A converging consistency sequence supplies a witness for every \(r>0\).
+Conversely, choose witnesses for \(r=1/m\). They give a single sequence
+of completely mixed profiles with jointly convergent Bayes beliefs
+in the same game.
+
+Perfect recall prevents a path from revisiting an information set.
+Given any behavioral continuation deviation, independently draw in
+advance its action at each own information set. Every terminal suffix
+then has the same product probability as under behavioral play.
+The deviation's value is consequently a convex combination of values
+of the pure continuation plans in \eqref{eq:sr}, and is no larger
+than the prescribed value. Necessity is immediate because pure plans
+are admissible. This proves full sequential rationality and the claim.
+\end{proof}
+
+All conditions are first-order ordered-field formulas. The radius
+in \eqref{eq:consistency} is a real variable, not a quantifier over
+sequences. Pure continuation plans are finite and can be enumerated;
+alternatively behavioral deviations can be universally quantified using
+the same polynomial suffix sums. Real quantifier elimination therefore
+makes the exact relation effectively semialgebraic. This observation
+alone is not an unrestricted efficiency claim.
+
+\begin{lemma}[Nonempty equilibrium fibers]\label{lem:existence}
+Every fixed admitted game has a sequential equilibrium.
+\end{lemma}
+\begin{proof}
+When there are no strategic information sets, the empty assessment
+suffices. Otherwise choose \(0<\varepsilon<1/\max_I|A(I)|\) and require
+each action probability to be at least \(\varepsilon\).
+Give each information set one decision agent with the original
+player's unconditional utility. Parameterize its behavior by
+\[
+ \sigma_{I,a}=\varepsilon+
+                  (1-|A(I)|\varepsilon)x_{I,a},
+ \qquad x_I\text{ in the ordinary simplex}.
+\]
+An agent's payoff \(H_A(x)\) is continuous and affine in its own block.
+To prove an agent equilibrium exists, put
+\[
+ g_{A,a}=\max\{0,H_A(a,x_{-A})-H_A(x)\},\qquad
+ x_{A,a}\longmapsto
+       \frac{x_{A,a}+g_{A,a}}{1+\sum_b g_{A,b}}.
+\]
+This continuous map of the compact convex product of simplexes has
+a fixed point by Brouwer's theorem. If
+\(G_A=\sum_b g_{A,b}>0\), the fixed-point equation gives
+\(g_{A,a}=x_{A,a}G_A\). Every supported pure action would strictly
+improve \(H_A(x)\), contradicting its expression as their weighted
+average. Thus \(G_A=0\) for every agent.
+
+Let \(\sigma^\varepsilon\) be the resulting constrained agent equilibrium
+and \(\mu^\varepsilon\) its Bayes beliefs. Every information set has
+positive reach. A unilateral agent change alters unconditional utility
+by that reach probability times its conditional local payoff change.
+The prescribed choice is therefore conditionally optimal among
+\(\varepsilon\)-constrained distributions.
+
+Perfect recall gives all nodes of an own information set \(J\) the same
+remembered own sequence of earlier information sets and actions.
+The product of own earlier action probabilities is common to those
+nodes and cancels from Bayes' rule. With opponents and Nature fixed,
+the conditional belief at \(J\) is independent of one's earlier
+positive behavior. Moreover, if \(J\) follows \(I\) on one path,
+all its nodes remember \(I\) and lie in its continuation.
+
+Start with any constrained full continuation from \(I\). Replace its
+own decisions by \(\sigma^\varepsilon\) in decreasing order of remembered
+own-decision length. At a replacement at \(J\), later own decisions
+already agree with \(\sigma^\varepsilon\), and the conditional belief
+is \(\mu^\varepsilon_J\) by the cancellation just proved.
+Local optimality makes the payoff change nonnegative; its contribution
+at \(I\) is multiplied by the probability of reaching \(J\).
+This proves optimality against every constrained continuation.
+
+Let \(\varepsilon_m\downarrow0\) and take a convergent subsequence of
+the compact assessment product. Its limit is consistent by construction.
+For an arbitrary unconstrained continuation \(\delta_i\), use at each
+own information set the constrained distribution
+\(\varepsilon_m+(1-|A(J)|\varepsilon_m)\delta_{i,J,a}\).
+It converges to \(\delta_i\). Passing to the limit in the finite
+polynomial continuation inequalities proves \eqref{eq:sr}.
+\end{proof}
+
+The specially chosen perturbed equilibria in this existence proof
+are not imposed on the witnesses of \eqref{eq:consistency}.
+
+\begin{lemma}[Compact joint graph]\label{lem:compact}
+The graph
+\[
+ \mathcal S=\{(\gamma,e):\gamma\in\Gamma,\
+                   e=(\sigma,\mu),\ \SE(\gamma,e)\}
+\]
+is compact and semialgebraic, including at strategically off-path
+information sets.
+\end{lemma}
+\begin{proof}
+Semialgebraicity follows from Lemma~\ref{lem:exactse} and quantifier
+elimination. Consider a convergent sequence
+\((\gamma_m,\sigma_m,\mu_m)\in\mathcal S\) with limit
+\((\gamma,\sigma,\mu)\). The weak polynomial inequalities
+\eqref{eq:sr} persist at the limit.
+For each \(m\), consistency supplies a completely mixed \(b_m\)
+within \(1/m\) of \(\sigma_m\), whose Bayes beliefs at \(\gamma_m\)
+are within \(1/m\) of \(\mu_m\).
+
+Factor each prefix reach as
+\[
+ R_h(\gamma,b)=c_h(\gamma)a_h(b),
+\]
+where \(c_h\) is the product of Nature factors and \(a_h\) the product
+of strategic factors. The finitely many \(c_h\) are positive and
+continuous on \(\Gamma\). Consequently
+\[
+ \rho_m=\max_h\left|
+     \frac{c_h(\gamma)}{c_h(\gamma_m)}-1\right|\longrightarrow0 .
+\]
+For \(\rho_m<1\), each reach weight at \(\gamma\) is its weight at
+\(\gamma_m\) multiplied by a factor in
+\([1-\rho_m,1+\rho_m]\). If the old normalized weights are \(v_h\)
+and those factors are \(t_h\), their new normalized weights are
+\(v_ht_h/\sum_jv_jt_j\). Their \(\ell^1\) difference is at most
+\[
+ \sum_h v_h
+   \frac{|t_h-\sum_jv_jt_j|}{\sum_jv_jt_j}
+       \le \frac{2\rho_m}{1-\rho_m}.
+\]
+This bound is independent of how small strategic reach becomes.
+Hence the Bayes beliefs of \(b_m\) at the fixed \(\gamma\) converge
+to \(\mu\), while \(b_m\to\sigma\). Consistency holds at the limit.
+The graph is closed in the compact parameter/assessment product.
+\end{proof}
+
+The proof requires fixed uniformly positive Nature support.
+It does not close a Bayes graph across a vanishing Nature-support
+boundary. No such extension is used below.
+
+\section{History recovery and the sharp informative fiber}\label{sec:fiber}
+Assume \(M\) has full column rank and fix a known left inverse, for example
+\begin{equation}\label{eq:leftinverse}
+ A=(M^{\mathsf T}M)^{-1}M^{\mathsf T},\qquad AM=I_L.
+\end{equation}
+Then \(q=Ap\). A candidate population vector must satisfy \(Mq=p\)
+and \(q\) must be a probability vector; otherwise it is incompatible.
+For the present informative branch suppose \(q_z>0\) for every \(z\).
+
+Let \(Z(h)\) be the terminal descendants of node \(h\), and put
+\[
+ r_h=\sum_{z\in Z(h)}q_z.
+\]
+At a Nature edge \(h\to ha\), recover
+\begin{equation}\label{eq:naturerecovery}
+ c^q_{h,a}=r_{ha}/r_h.
+\end{equation}
+Perfect recall makes each strategic information set \(I\) an antichain.
+Let \(Z(I)\) be the disjoint union of \(Z(h)\), \(h\in I\), and
+\(Z(I,a)\) the union of descendants of their action-\(a\) children.
+Write \(r_I=\sum_{h\in I}r_h\) and \(r_{I,a}=\sum_{h\in I}r_{ha}\).
+The candidate behavior and beliefs are
+\begin{equation}\label{eq:behaviorrecovery}
+ \sigma^q_{I,a}=\frac{r_{I,a}}{r_I},\qquad
+ \mu^q_{I,h}=\frac{r_h}{r_I}.
+\end{equation}
+They are positive probability vectors, but behavioral compatibility
+also requires
+\begin{equation}\label{eq:compatibility}
+ \frac{r_{ha}}{r_h}=\frac{r_{h'a}}{r_{h'}}
+ \quad\text{for every }h,h'\in I,\ a\in A(I).
+\end{equation}
+These are testable polynomial equalities after cross multiplication.
+
+\begin{lemma}[Recovery and its converse]\label{lem:recovery}
+A positive \(q\) is generated by the stated information structure
+and an admitted Nature vector exactly when \eqref{eq:compatibility}
+holds and \(c^q\) is admitted. Nature probabilities, behavioral
+probabilities, and consistent beliefs are then uniquely recovered
+by \eqref{eq:naturerecovery}--\eqref{eq:behaviorrecovery}.
+\end{lemma}
+\begin{proof}
+In any behavioral model, action probabilities agree at all nodes of
+one information set, and conditional Nature probabilities equal the
+primitive row. This proves necessity and uniqueness of the ratios.
+Conversely start with root probability one and use each recovered
+edge probability. At strategic nodes, \eqref{eq:compatibility}
+makes that probability the common \(\sigma^q_{I,a}\).
+Induction along the tree assigns node \(h\) probability \(r_h\),
+because the factor on each edge is the child/parent mass ratio.
+Thus the generated terminal law is exactly \(q\).
+Bayes' rule gives \(\mu^q\). Every history and action has positive
+probability, so consistent beliefs are unique; the constant completely
+mixed strategy sequence supplies a consistency witness.
+\end{proof}
+
+The lemma has not assumed equilibrium. In particular, measurement
+inversion alone does not establish information-set compatibility or
+the shared Nature restrictions.
+
+For an information set \(I\) owned by \(i\), define
+\begin{align}
+ m^0_{i,I,a}(q)&=
+     \frac{\sum_{z\in Z(I,a)}q_zu^0_{i,z}}{r_{I,a}},&
+ m^\varphi_{i,I,a}(q)&=
+     \frac{\sum_{z\in Z(I,a)}q_z\varphi_{i,z}}{r_{I,a}}.
+ \label{eq:conditionalfeatures}
+\end{align}
+Fix a reference action \(a_0(I)\). For each other action form a row
+\begin{equation}\label{eq:Dandb}
+ D_{i,I,a}=m^\varphi_{i,I,a}-m^\varphi_{i,I,a_0},\qquad
+ b_{i,I,a}=m^0_{i,I,a_0}-m^0_{i,I,a}.
+\end{equation}
+Forced-action information sets add no row.
+
+\begin{lemma}[Conditional features and full optimality]\label{lem:indifference}
+At the recovered compatible profile, the value of choosing \(a\) at
+\(I\) and then following the recovered continuation is
+\begin{equation}\label{eq:Qconditional}
+ Q_{i,I,a}(\beta)
+    =m^0_{i,I,a}(q)+m^\varphi_{i,I,a}(q)\cdot\beta
+    =\E_q[u_{i,Z}(\beta)\mid Z(I,a)].
+\end{equation}
+Its Bayes assessment is sequentially rational if and only if
+\(D(q)\beta=b(q)\).
+\end{lemma}
+\begin{proof}
+At every hidden node in \(I\), the probability of \(a\) is the same
+positive \(\sigma^q_{I,a}\). Conditioning on that action leaves the
+node distribution equal to \(\mu^q_I\). Later play is unchanged, so
+the terminal conditional distribution is \(q\) restricted to \(Z(I,a)\).
+This proves \eqref{eq:Qconditional}, with terminal utilities including
+any already incurred costs under the fixed utility convention.
+
+Sequential rationality implies
+\(Q_{i,I,a}\le\sum_b\sigma^q_{I,b}Q_{i,I,b}\) for every \(a\).
+All weights are positive, so all action values must coincide.
+These are precisely the equations \(D(q)\beta=b(q)\).
+
+Conversely suppose all those equations hold. Fix an arbitrary full
+continuation deviation from \(I\), allowing zero action probabilities.
+At every later own information set \(J\), perfect recall makes the
+product of earlier own probabilities common to all its nodes.
+When \(J\) is reached it cancels, leaving the original Bayes belief;
+when it is not reached, it has no payoff contribution. Every node
+of a later \(J\) lies in \(I\)'s continuation by perfect recall.
+Replace deviating decisions by the prescribed behavior in decreasing
+order of remembered own-decision length. At each replacement, later
+behavior is already prescribed and all local action values coincide
+by \eqref{eq:Qconditional}. The replacement changes no payoff.
+After finitely many replacements the prescribed continuation remains.
+Thus no original deviation improves the payoff. Consistency was
+already established by Lemma~\ref{lem:recovery}.
+\end{proof}
+
+\begin{theorem}[Sharp informative identification]\label{thm:fiber}
+If the inverse \(q=Ap\) is a positive probability vector, failure
+of \(Mq=p\) or \eqref{eq:compatibility} makes the single-assessment
+model incompatible. Otherwise its entire parameter identified set is
+\begin{equation}\label{eq:sharpfiber}
+ \Gamma_I(p)=\mathcal F(q)
+   =\{(\alpha,\beta)\in\Gamma:
+        B\alpha=c^q-c^0,\ D(q)\beta=b(q)\}.
+\end{equation}
+Every retained parameter has the recovered \((\sigma^q,\mu^q)\)
+as an actual baseline sequential equilibrium with observation law \(p\).
+\end{theorem}
+\begin{proof}
+Full column rank fixes \(q\) for every compatible assessment.
+Lemma~\ref{lem:recovery} fixes its Nature vector, behavior, and beliefs;
+Lemma~\ref{lem:indifference} imposes exactly the payoff equations.
+This proves that every compatible parameter belongs to
+\eqref{eq:sharpfiber}. Conversely each point in that polytope
+supplies the admitted Nature vector and the compatible positive
+profile, with consistent beliefs and full sequential optimality
+by the same lemmas. Its terminal and observed laws are \(q,p\).
+Both inclusions use actual assessments, proving sharpness.
+\end{proof}
+
+An empty polytope in \eqref{eq:sharpfiber} reports incompatibility
+with the primitive restrictions. A zero terminal component does
+not by itself report incompatibility: it places the problem in the
+general exact branch of Section~\ref{sec:policysets}, retaining
+strategically off-path histories and beliefs.
+
+Let
+\begin{equation}\label{eq:operator}
+ \mathsf K(q)=\diag(B,D(q)).
+\end{equation}
+Full column rank is sufficient for point identification when the
+fiber is nonempty. In general the fiber is a singleton exactly when
+all its coordinate minima and maxima coincide; linear programs decide
+this condition. If a true point lies in the relative interior of
+\(\Gamma\), whose affine hull is \(E\gamma=f\), the singleton condition is
+\begin{equation}\label{eq:relativecriterion}
+ \ker\mathsf K(q)\cap\ker E=\{0\}.
+\end{equation}
+A nonzero vector in this intersection can be moved a small distance
+in both signs within \(\Gamma\), preserving the data equations.
+Conversely, a trivial intersection allows at most one point in
+their affine-hull intersection. At a boundary, inequalities can make
+the fiber a singleton without ambient full rank; the coordinate test
+handles that case.
+
+Observable primitive probabilities need not identify an arbitrary
+structural index. Null directions of \(B\), additive utility shifts,
+free scale changes expressible in the family, and payoff changes
+invisible to continuation differences remain in \eqref{eq:sharpfiber}
+unless joint primitive restrictions remove them.
+
+Recovery uses finite sums, positive divisions, and linear algebra.
+The feature formulas require terminal-event lists, not exponential
+enumeration of pure continuation plans. With rational \(p\) and
+rational primitives, the arrays have polynomial bit size in the
+explicit tree, channel, features, and constraints. Standard rational
+linear programming decides feasibility and coordinate extrema and
+returns exact rational witnesses in polynomial bit complexity.
+For algebraic data its representation must be specified; symbolic
+population statements keep \(p\) as a free variable.
+
+\section{Calibration, selection, and a nonempty informative family}
+\label{sec:examples}
+\begin{example}[An unknown channel is not calibration]
+For two terminal labels let
+\[
+ M_\xi=
+ \begin{pmatrix}(1+\xi)/2&(1-\xi)/2\\
+                 (1-\xi)/2&(1+\xi)/2\end{pmatrix},
+ \qquad 0<\xi\le1.
+\]
+Each matrix is invertible, but
+\(p_1=1/2+\xi(q_1-1/2)\). Unknown \(\xi\) permits many pairs
+\((\xi,q_1)\) with the same observed law. Known full rank without
+known calibration and aligned labels is insufficient.
+\end{example}
+
+\begin{example}[Hidden equilibrium mixtures need not be one assessment]
+In the simultaneous two-player coordination game, both players receive
+one if their actions \(L,R\) match and zero otherwise. Its pure
+equilibria \(LL,RR\) and its independent fair mixed equilibrium are
+sequential equilibria in the standard perfect-recall tree.
+Mix their selection probabilities as
+\((1-\zeta)/2,(1-\zeta)/2,\zeta\), with \(0<\zeta<1\).
+The resulting terminal law is positive and satisfies
+\[
+ q_{LL}=q_{RR}=(2-\zeta)/4,\qquad
+ q_{LR}=q_{RL}=\zeta/4 .
+\]
+The second player's information set joins the nodes after \(L,R\).
+Its conditional probability of choosing \(L\) is
+\((2-\zeta)/2\) at the first node and \(\zeta/2\) at the second.
+They differ, violating \eqref{eq:compatibility}. No single behavioral
+assessment in that information structure generates this law.
+Observed selector strata can instead be conditioned on separately.
+\end{example}
+
+\begin{proposition}[A primitive-guaranteed correlated Bayesian family]
+\label{prop:bayesian}
+For every positive integer \(m\), there is a nonempty compact class
+with unknown correlated private-type law and unknown normalized payoff
+coefficients, uniquely determined equilibrium behavior, and primitive
+uniform lower bounds on all terminal probabilities and payoff rank.
+\end{proposition}
+\begin{proof}
+There are two zero-sum players with private types \(t,s\in\{1,\ldots,m\}\).
+Their unknown joint law is a matrix \(\mathsf Q\) with entries summing
+to one and restrictions
+\begin{equation}\label{eq:typeclass}
+ \mathsf Q_{ts}\ge q_{\min}>0,\qquad
+ \mathsf Q_{tt}\ge3\sum_{s\ne t}\mathsf Q_{ts}.
+\end{equation}
+This compact polytope is nonempty when
+\(q_{\min}\le1/(4m^2)\), as witnessed by
+\[
+ \mathsf Q=\frac1m\left(\frac34 I_m+
+                           \frac1{4m}\mathbf1\mathbf1^{\mathsf T}\right).
+\]
+It is invertible: if \(\mathsf Qx=0\), take \(t\) with
+\(|x_t|=\|x\|_\infty\). Then
+\(\mathsf Q_{tt}|x_t|
+ \le\sum_{s\ne t}\mathsf Q_{ts}|x_s|
+ \le\mathsf Q_{tt}|x_t|/3\), forcing \(x=0\).
+
+After learning only their own types, the players simultaneously choose
+zero or one. Player 1 receives \(\theta_t\) when both choose one,
+one when both choose zero, and zero otherwise; player 2 receives
+the negative. The unknown \(\theta_t\in[3/4,5/4]\) are calibrated
+by the known zero and one payoffs.
+Let \(p^a_t,q^a_s\) be their probabilities of action one, and put
+\[
+ K^{\rm type}_{ts}=\frac{\mathsf Q_{ts}}{\sum_s\mathsf Q_{ts}},
+ \qquad r_t=\frac1{1+\theta_t}.
+\]
+Player 1's typewise indifference and player 2's typewise indifference
+are respectively
+\begin{equation}\label{eq:bayesindifference}
+ K^{\rm type}q^a=r,\qquad
+ \mathsf Q^{\mathsf T}
+       \big((1+\theta)\mathbin{\odot}p^a-\mathbf1\big)=0 .
+\end{equation}
+Here \(\odot\) means coordinatewise multiplication. Invertibility gives
+the only possible interior solution
+\begin{equation}\label{eq:bayesbehavior}
+ p^a=r,\qquad q^a=(K^{\rm type})^{-1}r .
+\end{equation}
+
+It is interior. The diagonal restrictions give
+\(K^{\rm type}_{tt}\ge3/4\), so
+\(\|K^{\rm type}-I\|_\infty\le1/2\).
+The geometric matrix series gives
+\(\|(K^{\rm type})^{-1}\|_\infty\le2\).
+Since \(K^{\rm type}\mathbf1=\mathbf1\) and
+\[
+ r_t\in[4/9,4/7],\qquad
+ \|r-\tfrac12\mathbf1\|_\infty\le1/14,
+\]
+we have \(\|q^a-\tfrac12\mathbf1\|_\infty\le1/7\).
+Both players' action probabilities and their complements exceed \(1/3\).
+Every conditional indifference holds. Each type has one genuine
+decision, so the positive profile with its Bayes beliefs is a Bayesian
+Nash and sequential equilibrium.
+
+It is the unique equilibrium behavior. The ex ante game is bilinear
+and zero-sum on the cubes of typewise probabilities. At the interior
+opponent in \eqref{eq:bayesbehavior}, all own actions are indifferent.
+Any other optimal \(p'\) must have zero payoff gradient in \(q^a\):
+otherwise a small feasible perturbation of the interior opponent
+would lower its guaranteed payoff below the saddle value.
+The gradient equation in \eqref{eq:bayesindifference} and invertibility
+of \(\mathsf Q\) imply \(p'=r\).
+The symmetric argument with interior \(p^a\) gives
+\(K^{\rm type}q'=r\), hence \(q'=q^a\).
+Every Bayesian equilibrium is root saddle-optimal by the zero-sum
+minimax inequalities; this argument does not posit general-sum uniqueness.
+
+Every complete terminal \((t,s,a,b)\) consequently has probability
+at least \(q_{\min}/9\). The correlated law \(\mathsf Q\) is recovered
+by summing complete-history masses. In the payoff fiber, player 1's
+type-\(t\) equation is
+\[
+ (K^{\rm type}q^a)_t\theta_t
+       =1-(K^{\rm type}q^a)_t.
+\]
+Its coefficient matrix in \(\theta\) is diagonal with entries
+\(r_t\ge4/9\), proving the claimed rank and conditioning.
+\end{proof}
+
+This family may have noisy post-play measurement. On its \(L\)
+terminal labels take, for known rational \(0<\xi\le1\),
+\begin{equation}\label{eq:noisychannel}
+ M_\xi=\xi I_L+(1-\xi)L^{-1}\mathbf1\mathbf1^{\mathsf T}.
+\end{equation}
+It is stochastic, with eigenvalue one along \(\mathbf1\) and
+\(\xi\) on its orthogonal complement. Its Euclidean operator inverse
+norm is \(\|M_\xi^{-1}\|_2=1/\xi\).
+It reveals no private type during play. Private types can also be
+paths revealed in pieces before the terminal actions and persisting
+through the earlier history. The general theorem itself concerns
+arbitrary dynamic trees; this family demonstrates nonvacuous primitive
+conditions, not a replacement of that theorem by one example.
+
+\section{A statistical projection and parameter estimator}\label{sec:stats}
+For the quantitative informative branch assume \(q_z\ge\lambda>0\).
+Let \(m_c\) be the number of Nature entries,
+\(J=\sum_I(|A(I)|-1)\) the number of contrast rows, and
+\(R=m_c+J\). Let \(H_i\) be the maximum number of player \(i\)'s
+decision nodes on a terminal path and \(H_*=\max_iH_i\), or zero
+if there are no strategic decisions. Put \(a_M=\|A\|_2\).
+
+Let \(\widehat p\) be the empirical cell-frequency vector and define
+\begin{equation}\label{eq:projection}
+ \Delta_\lambda=\{v\in\R^L:v_z\ge\lambda,\ \sum_zv_z=1\},
+ \quad
+ \widehat q=\underset{v\in\Delta_\lambda}{\operatorname{argmin}}\,
+                 \|v-A\widehat p\|_2^2,\quad
+ \Delta=\|\widehat q-q\|_1.
+\end{equation}
+The nonempty compact convex domain and strict convexity give a unique
+projection. If \(L\lambda=1\), it is the constant vector \(\lambda\).
+Otherwise its water-filling formula is
+\[
+ \widehat q_z=\max\{\lambda,(A\widehat p)_z-\tau\},
+ \qquad \sum_z\widehat q_z=1 .
+\]
+Sort \(A\widehat p\), enumerate the active-coordinate counts, and solve
+the last linear equation on each corresponding interval.
+The feasible interval supplies \(\tau\); ties give the same vector.
+Subtracting \(\tau\) at free coordinates and truncating the others
+verifies the projection optimality inequalities. With rational inputs
+this is an exact rational algorithm.
+
+The statistic \(\widehat q\) need not satisfy
+\eqref{eq:compatibility} or shared Nature restrictions.
+It is never called an equilibrium law without those checks.
+
+\begin{lemma}[Inversion risk and global conditioning]\label{lem:statbasic}
+The projection satisfies
+\begin{equation}\label{eq:S1}
+ \E\Delta^2\le\frac{La_M^2}{n},\qquad
+ \E\Delta\le\frac{\sqrt L\,a_M}{\sqrt n},\qquad \Delta\le2 .
+\end{equation}
+If probability vectors \(v,w\) and an event \(E\) satisfy
+\(v(E)\ge\lambda\), \(w(E)>0\), and \(|f|\le F_0\), then
+\begin{equation}\label{eq:S2}
+ |\E_v[f\mid E]-\E_w[f\mid E]|
+          \le\frac{2F_0}{\lambda}\|v-w\|_1.
+\end{equation}
+For nonnegative vectors \(x,y\) with positive sums \(s,t\),
+\begin{equation}\label{eq:S3}
+ \|x/s-y/t\|_1\le 2\|x-y\|_1/s .
+\end{equation}
+\end{lemma}
+\begin{proof}
+Euclidean projection is nonexpansive. Indeed, if \(x=\Pi(v)\) and
+\(y=\Pi(w)\), optimality gives
+\(\langle v-x,y-x\rangle\le0\) and
+\(\langle w-y,x-y\rangle\le0\). Adding yields
+\[
+ \|x-y\|_2^2\le\langle x-y,v-w\rangle
+                    \le\|x-y\|_2\|v-w\|_2 .
+\]
+Because \(q=Ap\in\Delta_\lambda\),
+\[
+ \|\widehat q-q\|_2\le a_M\|\widehat p-p\|_2,\qquad
+ \Delta\le\sqrt L\,a_M\|\widehat p-p\|_2 .
+\]
+The multinomial coordinate variances give
+\(\E\|\widehat p-p\|_2^2=(1-\|p\|_2^2)/n\le1/n\).
+Cauchy--Schwarz gives the first two assertions of \eqref{eq:S1};
+the last follows because both vectors are probability vectors.
+
+For \eqref{eq:S2}, put \(b=v(E)\), \(b'=w(E)\),
+\(t_0=\sum_Ev_zf_z\), and \(t'_0=\sum_Ew_zf_z\).
+The exact identity
+\[
+ \frac{t_0}{b}-\frac{t'_0}{b'}
+   =\frac{t_0-t'_0}{b}
+      +\frac{t'_0}{b'}\,\frac{b'-b}{b}
+\]
+and \(|t'_0/b'|\le F_0\) prove the bound.
+Only the reference denominator requires a lower bound.
+Finally
+\[
+ x/s-y/t=(x-y)/s+(y/t)(t-s)/s,\qquad
+ |t-s|\le\|x-y\|_1
+\]
+proves \eqref{eq:S3}. Both conditional bounds are global; no
+small-error event is needed.
+\end{proof}
+
+Every nonempty prefix or information-action event contains a terminal,
+so its \(q\)- and \(\widehat q\)-mass is at least \(\lambda\).
+Define \(c^{\rm raw}_{h,a}=\widehat q(Z(ha))/\widehat q(Z(h))\)
+at Nature nodes. Define \(\widehat D,\widehat b\) by
+\eqref{eq:conditionalfeatures}--\eqref{eq:Dandb} with \(\widehat q\)
+in place of \(q\). They are rational conditional-moment statistics,
+whether or not \(\widehat q\) is behaviorally compatible.
+Lemma~\ref{lem:statbasic} gives
+\begin{equation}\label{eq:S4}
+ \begin{split}
+ \|c^{\rm raw}-c^q\|_\infty&\le2\Delta/\lambda,\\
+ \max_{j,k}|(\widehat D-D)_{j,k}|&\le4F\Delta/\lambda,\\
+ \|\widehat b-b\|_\infty&\le4U_0\Delta/\lambda .
+ \end{split}
+\end{equation}
+Uniformly for every \(\beta\) admitted by \(\Gamma\),
+\begin{equation}\label{eq:S5}
+ \|(\widehat D-D)\beta-(\widehat b-b)\|_\infty
+                    \le4U\Delta/\lambda .
+\end{equation}
+This follows from the entry bounds and \(\|\beta\|_1\le B_1\),
+or by applying \eqref{eq:S2} directly to \(u_{i,Z}(\beta)\).
+
+Put \(C=\max\{2,4U\}/\lambda\). The estimator solves the rational LP
+\begin{equation}\label{eq:fitLP}
+ \begin{aligned}
+ \text{minimize }&t\\
+ \text{over }&(\alpha,\beta)\in\Gamma,\quad t\ge0\\
+ \text{subject to }&
+   \|B\alpha-(c^{\rm raw}-c^0)\|_\infty\le t,\qquad
+   \|\widehat D\beta-\widehat b\|_\infty\le t .
+ \end{aligned}
+\end{equation}
+Its optimizer \((\widehat\gamma,\widehat t)\) exists because the
+minimized residual is continuous on compact \(\Gamma\).
+A deterministic exact rational choice is obtained by optimizing \(t\)
+and then successively minimizing coordinates on its optimizer face.
+
+\begin{theorem}[Every-sample fit and conditioned risk]\label{thm:risk}
+For every point \(\gamma\) of the entire true fiber \(\mathcal F(q)\),
+\begin{align}
+ \widehat t&\le C\Delta, \label{eq:S6}\\
+ \|\mathsf K(q)(\widehat\gamma-\gamma)\|_\infty
+       &\le2C\Delta. \label{eq:S7}
+\end{align}
+If \(\mathsf K(q)\) has full column rank with smallest singular
+value \(\kappa>0\), the fiber is a singleton \(\gamma_0\), and
+for any known \(G\ge\diam_2(\Gamma)\),
+\begin{equation}\label{eq:S8}
+ \E\|\widehat\gamma-\gamma_0\|_2^2
+ \le\min\left\{G^2,\frac{4RC^2La_M^2}{\kappa^2n}\right\}.
+\end{equation}
+\end{theorem}
+\begin{proof}
+Every fiber point has residual at most \(C\Delta\) in
+\eqref{eq:fitLP}, proving \eqref{eq:S6}.
+The fitted chance block differs from the true chance block by at
+most \(\widehat t+2\Delta/\lambda\).
+The fitted payoff block satisfies
+\(\|D\widehat\beta-b\|_\infty
+ \le\widehat t+4U\Delta/\lambda\), since
+\(\widehat\gamma\in\Gamma\) permits \eqref{eq:S5}.
+Both are at most \(2C\Delta\). Subtracting any fiber point's exact
+equations proves \eqref{eq:S7}.
+Under full rank,
+\(\|\widehat\gamma-\gamma_0\|_2\le2\sqrt R\,C\Delta/\kappa\).
+Square, use \eqref{eq:S1}, and separately use both points'
+membership in \(\Gamma\) to obtain \eqref{eq:S8}.
+\end{proof}
+
+The bound is unconditional, without an estimated inverse,
+a logarithm of \(n\), or a fixed-probability remainder.
+A valid \(G\) is the square root of the sum of squared coordinate
+range widths of \(\Gamma\), found by \(2d\) LPs.
+Computing its exact Euclidean diameter is not claimed to be an LP.
+Under rank deficiency, \eqref{eq:S7} estimates the observable linear
+combinations; it does not identify an arbitrary chosen point of the fiber.
+
+\section{Whole-fiber confidence and diameter certificates}
+\label{sec:confidence}
+Fix a confidence error \(0<\eta<1\), distinct from the chance parameter
+\(\alpha\). The elementary coordinate Hoeffding bound gives, with
+probability at least \(1-\eta\),
+\[
+ \|\widehat p-p\|_\infty\le h_n,\qquad
+ h_n=\sqrt{\frac{\log(2K/\eta)}{2n}}.
+\]
+For completeness, the logarithm of the centered moment-generating
+function of a Bernoulli variable has value and derivative zero at
+zero, and second derivative equal to a tilted Bernoulli variance,
+at most \(1/4\). Twice integrating yields
+\(\log\E e^{t(X-\E X)}\le t^2/8\) for every real \(t\).
+Independence and exponential Markov, optimized at \(t=4h\),
+give each upper tail \(e^{-2nh^2}\); negative \(t\) gives the
+same lower-tail bound. A union bound over both tails and all \(K\)
+coordinates proves the assertion.
+
+Define
+\begin{equation}\label{eq:S9}
+ e_n=\min\{2,\sqrt{LK}\,a_Mh_n\}.
+\end{equation}
+The same event gives \(\Delta\le e_n\).
+Our outer confidence polytope is
+\begin{equation}\label{eq:confidencepoly}
+ \begin{split}
+ \mathcal C_n=\{(\alpha,\beta)\in\Gamma:\;&
+  \|B\alpha-(c^{\rm raw}-c^0)\|_\infty\le2e_n/\lambda,\\
+ &\|\widehat D\beta-\widehat b\|_\infty\le4Ue_n/\lambda\}.
+ \end{split}
+\end{equation}
+
+\begin{theorem}[Finite-sample coverage of the entire fiber]
+\label{thm:confidence}
+Uniformly over the declared quantitative law class,
+\begin{equation}\label{eq:S10}
+ \Prob\{\mathcal F(q)\subseteq\mathcal C_n\}\ge1-\eta .
+\end{equation}
+This remains valid at rank-deficient chance/payoff operators.
+\end{theorem}
+\begin{proof}
+On \(\Delta\le e_n\), \eqref{eq:S4}--\eqref{eq:S5} imply both
+inequalities in \eqref{eq:confidencepoly} simultaneously for every
+point of the exact fiber. The implication is deterministic on the
+single concentration event; no parameter or equilibrium is selected.
+\end{proof}
+
+A fully rational implementation can replace \(e_n\) everywhere by
+a conservative rational radius. For rational \(\eta\), let \(b_n\)
+be the least nonnegative integer with \(2^{b_n}\ge2K/\eta\), and put
+\begin{equation}\label{eq:rationalradius}
+ \bar h_n=\frac{\lceil\sqrt{2nb_n}\rceil}{2n},\qquad
+ g=\lceil\sqrt{LK}\rceil,\qquad
+ \bar e_n=\min\{2,g\bar a_M\bar h_n\},
+\end{equation}
+where rational \(\bar a_M\ge a_M\) can upper-bound the Frobenius norm
+of \(A\). Since \(\log(2K/\eta)\le b_n\) and
+\(\bar h_n\ge\sqrt{b_n/(2n)}\), we have \(\bar e_n\ge e_n\).
+Integer comparisons and square roots construct it. At fixed input
+and confidence it is \(O(n^{-1/2})\), with an additional
+\(O(n^{-1})\) rounding term. All subsequent formulas permit this
+replacement. The radius cap uses the deterministic \(\Delta\le2\).
+
+The polytope can be empty outside the coverage event and is reported
+as empty. It is not silently replaced by a point estimate.
+An optional replacement by \(\Gamma\) is conservative but is not
+used in the expected-diameter proof. At radius two,
+\(\mathcal C_n=\Gamma\): the compared chance entries are probabilities
+and every payoff contrast has magnitude at most \(2U\).
+
+For a nonempty \(\mathcal C_n\), obtain each coordinate's minimum
+\(l_j\) and maximum \(u_j\) with \(2d\) LPs. Then
+\[
+ \diam_2(\mathcal C_n)\le
+             \sqrt{\sum_{j=1}^d(u_j-l_j)^2}.
+\]
+With the rational radius these endpoints are exact rational extrema.
+The coordinate ranges are sharp for this outer polytope; the resulting
+bounding-box diameter need not equal its Euclidean diameter.
+
+Let \(\widehat{\mathsf K}=\diag(B,\widehat D)\).
+If its smallest singular value \(\widehat\kappa\) is positive,
+the difference of any two candidate vectors obeys the rowwise
+tolerances in \eqref{eq:confidencepoly}, giving
+\begin{equation}\label{eq:S11}
+ \begin{split}
+ \diam_2(\mathcal C_n)
+ &\le\min\left\{G,
+  \frac{2e_n\sqrt{m_c(2/\lambda)^2+J(4U/\lambda)^2}}
+       {\widehat\kappa}\right\}\\
+ &\le\min\{G,2\sqrt R\,Ce_n/\widehat\kappa\}.
+ \end{split}
+\end{equation}
+A certified positive lower bound for \(\widehat\kappa\) suffices.
+An estimated rank test is unnecessary for coverage and does not,
+by itself, establish population point identification.
+
+\begin{proposition}[Every-sample and expected diameter]
+\label{prop:diameter}
+Suppose the true \(\mathsf K(q)\) has smallest singular value
+\(\kappa>0\). With \(\diam(\varnothing)=0\),
+\begin{align}
+ \diam_2(\mathcal C_n)
+  &\le\min\{G,2\sqrt R\,C(e_n+\Delta)/\kappa\},
+                                      \label{eq:S12}\\
+ \E\diam_2(\mathcal C_n)
+  &\le\min\{G,2\sqrt R\,C(e_n+\sqrt L\,a_M/\sqrt n)/\kappa\}.
+                                      \label{eq:S13}
+\end{align}
+\end{proposition}
+\begin{proof}
+Fix any true fiber point \(\gamma_0\). For any
+\(\gamma=(\alpha,\beta)\in\mathcal C_n\), the chance block differs
+from the true one by at most \(2(e_n+\Delta)/\lambda\).
+For its payoff block, \eqref{eq:S5} applies to this candidate
+\(\beta\in\Gamma\), giving a difference at most
+\(4U(e_n+\Delta)/\lambda\). Thus
+\[
+ \|\mathsf K(q)(\gamma-\gamma_0)\|_\infty
+                    \le C(e_n+\Delta).
+\]
+Every candidate is within
+\(\sqrt R\,C(e_n+\Delta)/\kappa\) of \(\gamma_0\), whether or not
+\(\gamma_0\) belongs to this sample's confidence polytope.
+Triangle inequality proves \eqref{eq:S12}; the empty set satisfies
+it by convention. Take expectations, use \eqref{eq:S1}, and retain
+the independent \(G\) cap to obtain \eqref{eq:S13}.
+\end{proof}
+
+There is no \(\eta G\) remainder. Fixed positive conditioning gives
+an \(O(n^{-1/2})\) expected diameter at fixed confidence. No point-
+shrinking claim is made when a nontrivial true fiber remains.
+For reference, \eqref{eq:S4} also implies
+\[
+ \|\widehat{\mathsf K}-\mathsf K(q)\|_2
+          \le (4F\sqrt{Jd_\beta}/\lambda)\Delta .
+\]
+This Frobenius bound can transfer a supplied population rank margin
+on a concentration event; neither the estimator risk nor
+\eqref{eq:S12} requires such a transfer.
+
+\section{An actual assessment and every-continuation certificates}
+\label{sec:actual}
+Use one behavior vector per information set,
+\begin{equation}\label{eq:actualconstruction}
+ \widehat\sigma_{I,a}
+   =\frac{\widehat q(Z(I,a))}{\widehat q(Z(I))},\qquad
+ c^\star=c^0+B\widehat\alpha,\qquad
+ u^\star_{i,z}=u_{i,z}(\widehat\beta).
+\end{equation}
+The action events partition \(Z(I)\), so this is a proper distribution.
+Its numerator is at least \(\lambda\) and denominator at most one;
+hence \(\widehat\sigma_{I,a}\ge\lambda\).
+Let \(q^\star,r^\star_h\) be the actual terminal and prefix
+probabilities obtained by multiplying \(c^\star,\widehat\sigma\)
+along the original tree, and define
+\begin{equation}\label{eq:actualbelief}
+ \mu^\star_{I,h}
+     =\frac{r^\star_h}{\sum_{h'\in I}r^\star_{h'}}.
+\end{equation}
+
+Because \(\widehat\gamma\in\Gamma\), all shared Nature restrictions
+are exactly satisfied. Let \(c_{\min}>0\) be the minimum included
+Nature entry over \(\Gamma\), computed by finitely many LPs;
+take \(c_{\min}=1\) if there are no Nature edges.
+Every terminal has probability at least
+\(\min\{c_{\min},\lambda\}^{H}>0\).
+Thus \(\mu^\star\) is defined and satisfies Bayes' rule exactly.
+The constant completely mixed strategy sequence proves consistency.
+In general \(q^\star\ne\widehat q\); node-normalized
+\(\widehat q\) weights are not used as these beliefs.
+
+Equations \eqref{eq:S4} and \eqref{eq:S6} give
+\[
+ \|c^\star-c^q\|_\infty\le\widehat t+2\Delta/\lambda
+                         \le2C\Delta,\qquad
+ \|\widehat\sigma-\sigma^q\|_\infty\le2\Delta/\lambda\le C\Delta.
+\]
+Every edge factor therefore differs by at most
+\(\delta_{\rm edge}=2C\Delta\).
+For factors in \([0,1]\), telescoping products gives
+\[
+ \left|\prod_{j=1}^s x_j-\prod_{j=1}^s y_j\right|
+                    \le\sum_{j=1}^s|x_j-y_j|.
+\]
+Each path has at most \(H\) factors. Consequently
+\begin{equation}\label{eq:S14}
+ |q^\star_z-q_z|\le H\delta_{\rm edge},\qquad
+ \|q^\star-q\|_1\le2LHC\Delta .
+\end{equation}
+The last right-hand side may always be capped by two.
+The same prefix-product bound and \eqref{eq:S3}, using true
+information-set reach at least \(\lambda\), yield
+\begin{equation}\label{eq:S15}
+ \|\mu^\star_I-\mu^q_I\|_1
+ \le\frac{2|I|H\delta_{\rm edge}}{\lambda}
+ \le\frac{4N_{\rm tr}HC\Delta}{\lambda}.
+\end{equation}
+This is a global normalization bound, requiring no small-error split
+or estimated reach lower bound.
+
+All following action values concern this \emph{actual} reconstructed
+game. The common positive action probability at \(I\) cancels in
+conditioning, so
+\begin{equation}\label{eq:S16}
+ Q^\star_{i,I,a}
+    =\E_{q^\star}[u_{i,Z}(\widehat\beta)\mid Z(I,a)],\qquad
+ V^\star_{i,I}=\sum_a\widehat\sigma_{I,a}Q^\star_{i,I,a}.
+\end{equation}
+Define the exact local certificate
+\[
+ \ell_{\rm loc}=\max_{i,I,a}[Q^\star_{i,I,a}-V^\star_{i,I}]_+,
+\]
+or zero if no player moves. It is computable as a rational number
+under the rational implementation.
+
+The true-\(q\) contrasts at \(\widehat\beta\) are the entries of
+\(D(q)\widehat\beta-b(q)\), bounded by \(2C\Delta\).
+Apply \eqref{eq:S2} with reference \(q\), other law \(q^\star\),
+and payoff bounded by \(U\), separately for two actions. With
+\eqref{eq:S14} this gives
+\begin{equation}\label{eq:S17}
+ |Q^\star_{i,I,a}-Q^\star_{i,I,a_0}|
+       \le C_{\rm loc}\Delta,\qquad
+ C_{\rm loc}=2C+\frac{8ULHC}{\lambda}.
+\end{equation}
+Two arbitrary actions differ by at most \(2C_{\rm loc}\Delta\);
+the prescribed value is a convex combination, whence
+\begin{equation}\label{eq:S18}
+ \ell_{\rm loc}\le2C_{\rm loc}\Delta .
+\end{equation}
+
+\begin{lemma}[Quantitative backward replacement]\label{lem:backwardbound}
+In any finite perfect-recall game with positive Nature probabilities,
+completely mixed behavior, and its exact Bayes beliefs, let
+\(\ell_{\rm loc}\) be the local certificate just defined using
+that game. For every player \(i\), starting information set \(I\),
+and full continuation deviation \(\delta_i\),
+\begin{equation}\label{eq:S19}
+ V_{i,I}(\delta_i)-V_{i,I}(\text{prescribed continuation})
+                         \le H_i\ell_{\rm loc}.
+\end{equation}
+The deviation can randomize, use zero action probabilities, and depend
+on the full information histories allowed by the tree.
+\end{lemma}
+\begin{proof}
+At an own information set \(J\), perfect recall fixes the remembered
+sequence of own earlier information sets and actions. The product
+of one's earlier behavioral probabilities is common at all nodes
+of \(J\). Replacing that earlier behavior multiplies their reach
+weights by the same factor. A positive factor cancels in conditional
+beliefs; a zero factor makes \(J\) unreachable.
+Thus any reached \(J\) under a deviation has the original Bayes belief.
+The same argument applies to play started conditionally at \(I\):
+a later own \(J\) remembers \(I\) and the action there, so all its
+nodes belong to that continuation, and the common factor cancels.
+
+Order own information sets after \(I\), including \(I\), by decreasing
+remembered own-decision length. Replace deviating choices by the
+prescribed ones in this order. When replacing \(J\), all later own
+choices are prescribed. If \(J\) is reached, its belief is the one
+used to compute \(Q_{i,J,a}\). The current deviating mixture can
+exceed the prescribed mixture value by at most \(\ell_{\rm loc}\).
+The reduction in payoff from replacing it is therefore at most
+\(\ell_{\rm loc}\) times the probability of reaching \(J\) from \(I\).
+An unreached set contributes zero.
+
+Earlier own decisions are still the original deviation's decisions.
+Replacements later than \(J\) cannot affect its reach, and sets with
+the same remembered depth cannot follow one another.
+All these reach probabilities are therefore those under the
+\emph{same original} deviation from \(I\).
+Their sum is its expected number of own decision nodes visited,
+at most \(H_i\). Summing the payoff changes telescopically proves
+\eqref{eq:S19}. This proves the full continuation bound rather than
+assuming a one-step-deviation principle.
+
+Behavioral deviations are covered directly. For privately randomized
+complete plans, condition on the private randomization, apply the
+bound to each deterministic plan, and average.
+\end{proof}
+
+Let \(\Reg_{\SE}\) be the maximum positive full continuation improvement
+over all players and information sets, evaluated with \(\mu^\star\)
+in the actual reconstructed game. Then
+\begin{equation}\label{eq:S20}
+ \begin{split}
+ \Reg_{\SE}(\widehat\gamma,\widehat\sigma,\mu^\star)
+   &\le H_*\ell_{\rm loc}\le C_{\rm eq}\Delta,\\
+ C_{\rm eq}&=2H_*C_{\rm loc}
+       =4H_*C(1+4ULH/\lambda).
+ \end{split}
+\end{equation}
+Equation \eqref{eq:S1} and the concentration event give
+\begin{align}
+ \E\Reg_{\SE}^2
+       &\le\min\{4U^2,C_{\rm eq}^2La_M^2/n\},\label{eq:S21}\\
+ \Prob\{\Reg_{\SE}\le\min\{2U,C_{\rm eq}e_n\}\}
+       &\ge1-\eta .\label{eq:S22}
+\end{align}
+Both utility comparisons lie in \([-U,U]\), which justifies the caps.
+The rational radius can replace \(e_n\).
+
+More strongly, \(H_*\ell_{\rm loc}\) is an a posteriori certificate
+valid on every data set without knowledge of \(q,\Delta\), or the
+true parameter. Primitive feasibility, common information-set
+behavior, and Bayes consistency are exact. Only sequential optimality
+has a residual. If \(\ell_{\rm loc}=0\), the assessment is an exact
+sequential equilibrium; otherwise that assertion is not made.
+
+\section{Effective statistical computation and its limits}
+\label{sec:statcomputation}
+For rationally encoded \(M,c^0,B,u^0,\varphi,\lambda,B_1,\Gamma,\eta\),
+the following procedure is finite and explicit:
+\begin{enumerate}
+\item Compute \(A\) by exact rational linear algebra, form the
+cell frequencies, and compute \(\widehat q\) by sorting and water filling.
+\item Sum prefix and information-action masses and features, then form
+\(c^{\rm raw},\widehat D,\widehat b\).
+\item Solve \eqref{eq:fitLP} over the full joint \(\Gamma\);
+construct \(\bar e_n\) and \(\mathcal C_n\).
+\item Decide confidence-polytope feasibility and, when nonempty,
+compute its coordinate extrema and certified diameter bound.
+\item Form \(c^\star,\widehat\sigma,q^\star,\mu^\star\), compute actual
+action values, and report the certificate \(H_*\ell_{\rm loc}\).
+\end{enumerate}
+
+There are polynomially many rational operations and LPs in the
+explicit tree, channel, utility features, and parameter inequalities.
+Sorting uses \(O(L\log L)\) comparisons.
+Even naively listing the terminal incidence of each event has
+polynomial explicit-input size.
+Empirical event denominators are at least \(\lambda\).
+Actual Bayes denominators are positive, possibly as small as
+\(\min\{c_{\min},\lambda\}^{H}\); finite path products and sums
+still have polynomial rational bit length in the explicit tree
+and input bit length. Small probability is not large representation
+length by itself.
+
+Standard exact rational linear algebra has polynomial bit complexity.
+We use the classical polynomial-bit algorithm for rational linear
+programming, with explicitly listed rational constraints of polynomial
+bit length. Deterministic optimizer selection takes at most \(d\)
+additional LPs. Integer comparisons and square roots construct
+\eqref{eq:rationalradius}; a rational sum of squares supplies a
+certified upper bound for \(\|A\|_{\rm F}^2\).
+Spectral computation is not needed for coverage, the estimator,
+or the coordinate-range certificate. To report a spectral diameter
+bound, a rational positive-semidefiniteness certificate for
+\(\widehat{\mathsf K}^{\mathsf T}\widehat{\mathsf K}
+ -\kappa_{\rm low}^2I_d\) supplies a valid positive
+\(\kappa_{\rm low}\).
+
+The procedure is polynomial in the explicit input and in \(\log n\)
+when cell counts are supplied. Reading \(n\) raw observations costs
+at least \(n\) operations. This is neither a strongly polynomial LP
+claim nor a polynomial claim in succinct horizon \(T\).
+Algebraic data need their exact representation and corresponding
+arithmetic guarantees; arbitrary unencoded real input is excluded
+from finite-bit assertions.
+
+The population fiber is sharp. Its confidence polytope is a conservative
+outer set, not another sharp population fiber.
+Finite-sample incompatibility of the raw projection with
+\eqref{eq:compatibility} is expected, not an exact rejection test.
+An empty confidence polytope, in contrast, has probability at most
+\(\eta\) under the declared model because the nonempty true fiber
+is contained on the coverage event.
+
+The quantitative constants expose measurement conditioning \(a_M\),
+history conditioning \(\lambda\), payoff bounds, and the identification
+margin \(\kappa\). They do not remain bounded as those conditions
+degenerate. No optimal dependence on these constants is claimed.
+Unknown calibration or a rank-deficient channel does not inherit
+the inversion rate. Without full history support the generic exact
+method remains valid, but these ratio rates require another analysis.
+A nontrivial payoff/chance fiber remains set-valued.
+
+\section{Sharp general policy sets and comparative selection}
+\label{sec:policysets}
+Return to the generic class, permitting rank-deficient \(M\) and
+strategically zero terminal probabilities. Let \(\mathcal S_0\)
+be the baseline equilibrium graph and \(\mathcal S_\ell\) the
+policy graph from Section~\ref{sec:se}. Let
+\(O(\gamma,\sigma)=Mq(\gamma,\sigma)\). For population law \(p\), define
+\begin{equation}\label{eq:policysets}
+ \begin{aligned}
+ \mathcal A(p)&=\{(\gamma,e^0)\in\mathcal S_0:
+                         O(\gamma,\sigma^0)=p\},\\
+ \Gamma_I(p)&=\operatorname{proj}_\gamma\mathcal A(p),\\
+ \mathcal J_\ell(p)&=\{(\gamma,e^0,e^\ell):
+        (\gamma,e^0)\in\mathcal A(p),\
+        (\gamma,e^\ell)\in\mathcal S_\ell\},\\
+ \mathcal W_I(\ell;p)&=
+   \{W_\ell(\gamma,\sigma^\ell):
+                       (\gamma,e^0,e^\ell)\in\mathcal J_\ell(p)\}.
+ \end{aligned}
+\end{equation}
+
+\begin{theorem}[Exact ranges with attained scalar endpoints]
+\label{thm:generalsets}
+These are exactly the canonical parameter set and all-selection
+policy range. They are compact semialgebraic sets, possibly empty.
+If \(\Gamma_I(p)\ne\varnothing\), each policy range is nonempty and
+its scalar minimum and maximum are attained.
+The full range need not be an interval.
+\end{theorem}
+\begin{proof}
+Lemma~\ref{lem:exactse} makes every feasible tuple an actual baseline
+SE producing \(p\) and an actual policy SE at the same parameter.
+Conversely every canonical compatible model supplies such a tuple.
+This proves sharpness in both directions, not merely containment.
+Lemma~\ref{lem:compact} and the closed observation equality make
+\(\mathcal A(p)\) compact. Its projection and the shared-parameter
+product defining \(\mathcal J_\ell(p)\) are compact.
+Continuity of \eqref{eq:policyoutcome} preserves compactness of
+its image; polynomial quantification preserves semialgebraicity.
+Nonempty policy fibers follow from Lemma~\ref{lem:existence},
+and continuous scalar functions attain extrema on compact sets.
+None of these operations fills gaps in a disconnected image.
+\end{proof}
+
+Without a supplied cross-policy selector, a sharp same-parameter
+adverse comparison range is
+\begin{equation}\label{eq:pairedpolicy}
+ \begin{split}
+ \{W_\ell(\gamma,\sigma^\ell)-W_{\ell'}(\gamma,\sigma^{\ell'}):\
+ &(\gamma,e^0)\in\mathcal A(p),\\
+ &(\gamma,e^\ell)\in\mathcal S_\ell,\
+   (\gamma,e^{\ell'})\in\mathcal S_{\ell'}\}.
+ \end{split}
+\end{equation}
+It permits every pair of policy equilibria, retaining the same
+structural parameter. Its endpoints are attained by the same argument.
+Subtracting marginal endpoints can use different parameters and
+is only an explicitly broader bound. A supplied closed semialgebraic
+joint selection relation can instead be intersected with
+\eqref{eq:pairedpolicy}; nonemptiness must then be checked.
+No such relation is assumed by default.
+
+\section{Exact computation, endpoint errors, and coverage transfer}
+\label{sec:qe}
+All defining constraints above are explicit finite first-order formulas.
+Classical effective real-closed-field quantifier elimination
+\cite{Basu} gives descriptions of the full \(\Gamma_I\) and
+\(\mathcal W_I\), including disconnected parts.
+Emptiness is checked first. Rational and represented algebraic
+numerical inputs are admissible; alternatively \(p\) is left symbolic.
+
+For a nonempty feasible tuple set \(\mathcal J\), its scalar extrema
+are specified by
+\begin{equation}\label{eq:endpointformula}
+ \begin{aligned}
+ &\exists y\in\mathcal J:\ W(y)=w_{\min},\qquad
+   \forall y\in\mathcal J:\ W(y)\ge w_{\min},\\
+ &\exists y\in\mathcal J:\ W(y)=w_{\max},\qquad
+   \forall y\in\mathcal J:\ W(y)\le w_{\max}.
+ \end{aligned}
+\end{equation}
+Quantifier elimination and real-root isolation compute these algebraic
+numbers. Semialgebraic sample-point extraction supplies algebraic
+tuples attaining them, including actual baseline and policy SE
+assessments. Their incentive residuals and consistency constraints
+are exact; they are not only numerical best-response tests.
+
+A rational bound \(|W|\le B_W\) is computable.
+First bound the coordinates of compact \(\Gamma\) by rational LPs;
+then bound each terminal polynomial by the sum of its absolute
+coefficient-monomial bounds. Expected \(W\) is a convex combination
+of those terminal values.
+Start from rational \([L_{\rm init},U_{\rm init}]\), for instance
+\([-B_W,B_W]\), and any feasible tuple.
+For the maximum, query whether there exists a feasible tuple with
+\(W\ge q_{\rm mid}\). A true answer gives a lower bound and a
+witness; a false answer gives an upper bound. For the minimum use
+\(W\le q_{\rm mid}\), with reversed interval updates.
+After
+\begin{equation}\label{eq:bisectcount}
+ \max\left\{0,\left\lceil
+       \log_2\frac{U_{\rm init}-L_{\rm init}}{\varepsilon}
+                     \right\rceil\right\}
+\end{equation}
+queries when the initial width is positive, the interval width is
+at most \(\varepsilon\). Zero width requires no queries.
+For the maximum, the saved witness has value at least the maintained
+lower bound, even if no midpoint query was true because the initial
+witness is at least \(L_{\rm init}\). It is within \(\varepsilon\)
+of the global maximum. The minimum argument is the reverse.
+The certificate records the formulas, initial bounds, true-query
+witnesses, and exact real-algebraic decision certificates for false
+queries. This is a complete algorithm, not a presumed global oracle.
+
+Unrestricted quantifier elimination may be expensive.
+When \emph{all} compiled variable counts, degrees, and structural
+tree bounds are fixed, the operation bound and integer bit-size clause
+of Basu's Theorem 2.27 \cite[p.~16]{Basu} give polynomial bit cost
+in dense coefficient/formula size and rational precision-input length.
+Theorem 2.4 \cite[p.~6]{Basu} gives the usual CAD arithmetic bound.
+All belief, tremble, continuation, and primitive variables must be
+counted. This claim is distinct from polynomial explicit-tree LP
+computation and implies no polynomial succinct-horizon algorithm.
+
+For generic iid sampling, with probability at least \(1-\eta\),
+\(\|\widehat p-p\|_\infty\le h_n\), by the Bernoulli argument
+of Section~\ref{sec:confidence}. Replace the baseline observation
+equality by
+\[
+ \|O(\gamma,\sigma^0)-\widehat p\|_\infty\le h_n,
+\]
+or a rational conservative radius. On that event, every tuple in
+\(\mathcal A(p)\) remains feasible with its original exact SE witness.
+Projection covers the whole parameter set; attaching every exact
+policy equilibrium covers every policy range, simultaneously on the
+same event. The same reasoning covers \eqref{eq:pairedpolicy}.
+This generic coverage argument is retained from \cite{Prior}.
+
+More generally, let \(E_n\) be a measurable event of probability at
+least \(1-\eta\) on which an outer parameter set \(\mathcal C_n\)
+contains the whole identified set. Define
+\[
+ \mathcal V_n(\ell)=
+ \{W_\ell(\gamma,\sigma^\ell):
+          \gamma\in\mathcal C_n\cap\Gamma,\
+          (\gamma,e^\ell)\in\mathcal S_\ell\}.
+\]
+Set inclusion gives the following common-event assertion, writing
+\(\omega\) for the sampled data:
+\begin{equation}\label{eq:S23}
+ \Prob(E_n)\ge1-\eta,\qquad
+ \forall\omega\in E_n\ \forall\ell:\quad
+ \mathcal W_I(\ell;p)\subseteq\mathcal V_n(\ell;\omega).
+\end{equation}
+It holds for every policy on one measurable event, without needing
+measurability of an uncountable intersection of policy-specific events.
+Thus the informative confidence polytope can be used without solving
+the baseline equilibrium problem again.
+Use the identical joint selection relation on both sides if one is
+part of the target. Exact policy ranges over the outer polytope can
+be computed by the preceding algorithm.
+Certified outer supersets preserve coverage; a small equilibrium
+residual alone does not imply outer containment.
+The approximate baseline assessment in Section~\ref{sec:actual}
+is never substituted for an exact policy equilibrium here.
+
+\section{Zero-sum policies: realization flows and a value LP}
+\label{sec:sequences}
+For the faster policy branch there are two strategic players and
+Nature, perfect recall, and \(u_{2,z}=-u_{1,z}\).
+The target \(W_\ell\) is precisely player 1's expected zero-sum
+utility, not an arbitrary action, allocation, revenue, or welfare
+statistic. The following classical sequence construction
+\cite[Section~2, pp.~249--250]{KMS} is proved to specify its value
+and certificates.
+
+Give an action its information-set-and-action label.
+A player's sequence is its ordered list of own action labels along
+a history. Perfect recall gives a single preceding sequence \(s(I)\)
+at all nodes in one information set \(I\). For player \(i\), the
+sequence set consists of the empty sequence and each \(s(I)a\).
+Its realization vector \(x_i\) obeys
+\begin{equation}\label{eq:sequenceflow}
+ x_i(\varnothing)=1,\qquad x_i(s)\ge0,\qquad
+ \sum_{a\in A(I)}x_i(s(I)a)=x_i(s(I))\quad\text{for every }I .
+\end{equation}
+Write these equalities as \(E_ix_i=e_i\), where \(E_i\) has
+entries in \(\{-1,0,1\}\) and \(e_i=(1,0,\ldots,0)\).
+Let \(\mathcal R_i\) be this nonnegative flow polytope.
+
+\begin{lemma}[Behavior and realization weights]\label{lem:sequence}
+The nonempty compact polytope \(\mathcal R_i\) describes exactly
+the own terminal realization weights of behavioral strategies,
+against every opponent strategy.
+\end{lemma}
+\begin{proof}
+A behavior assigns each sequence the product of its own probabilities,
+which satisfies \eqref{eq:sequenceflow}. Conversely, from a feasible
+vector set
+\[
+ \sigma_i(I,a)=x_i(s(I)a)/x_i(s(I))
+\]
+when the denominator is positive, using any distribution otherwise.
+If a parent weight is zero, nonnegativity and the flow equation force
+every child weight to zero. Induction on sequence length therefore
+recovers every prescribed realization weight, including zero-prefix
+sequences. Each coordinate lies between zero and its parent, hence
+in \([0,1]\). The constraints are closed and admit uniform behavior,
+proving compactness and nonemptiness.
+For any opponent behavior, a terminal probability depends on player
+\(i\) only through its final own sequence product.
+Thus the equivalence is opponent-independent.
+\end{proof}
+
+Preselected random pure plans are covered as well: their probabilities
+of agreeing with each sequence satisfy the same flow equations, and
+the behavioral reconstruction has the same terminal law against every
+opponent. Exponential normal-form enumeration is unnecessary.
+
+For a policy terminal \(z\), let \(s_i(z)\) be player \(i\)'s final
+sequence and let \(k_z(\alpha)\) be the product of Nature probabilities
+on its complete path. Define
+\begin{equation}\label{eq:sequencematrix}
+ G_{s,t}(\gamma)=
+    \sum_{\substack{z:s_1(z)=s\\s_2(z)=t}}
+                   k_z(\alpha)u_{1,z}(\beta).
+\end{equation}
+For \(x\in\mathcal R_1,y\in\mathcal R_2\), expected utility is
+\begin{equation}\label{eq:sequencepayoff}
+ x^{\mathsf T}G(\gamma)y .
+\end{equation}
+Indeed each terminal probability is
+\(k_z(\alpha)x(s_1(z))y(s_2(z))\); summing its utility proves
+the identity. There are \(1+\sum_{I\text{ of }i}|A(I)|\) variables
+and \(1+\#\{I\text{ of }i\}\) rows for player \(i\), linear in the
+explicit tree size. Each leaf contributes to one matrix location.
+Leaves sharing a sequence pair are summed, so a sparse matrix has
+at most the number of leaves nonzero locations.
+
+For fixed \(x\), player 2's minimization is
+\[
+ \min_{y\ge0,\ E_2y=e_2}(G^{\mathsf T}x)^{\mathsf T}y .
+\]
+It is feasible and bounded. LP strong duality identifies its value
+with \(\max_v e_2^{\mathsf T}v\) subject to
+\(E_2^{\mathsf T}v\le G^{\mathsf T}x\), where \(v\) is free.
+Maximizing also over \(x\) gives the primal-dual pair
+\begin{equation}\label{eq:sequenceLP}
+ \begin{aligned}
+ (\mathrm P)\quad&\max_{x,v} e_2^{\mathsf T}v\\
+ &\text{subject to }E_1x=e_1,\ x\ge0,\quad
+        E_2^{\mathsf T}v\le G^{\mathsf T}x,\ v\text{ free};\\[3pt]
+ (\mathrm D)\quad&\min_{y,w} e_1^{\mathsf T}w\\
+ &\text{subject to }E_2y=e_2,\ y\ge0,\quad
+        E_1^{\mathsf T}w\ge Gy,\ w\text{ free}.
+ \end{aligned}
+\end{equation}
+The signs can be checked directly: every feasible pair satisfies
+\begin{equation}\label{eq:weakdual}
+ e_2^{\mathsf T}v
+   =y^{\mathsf T}E_2^{\mathsf T}v
+   \le x^{\mathsf T}Gy
+   \le x^{\mathsf T}E_1^{\mathsf T}w
+   =e_1^{\mathsf T}w .
+\end{equation}
+Equality constraints give free dual variables, and nonnegative
+realization variables give the displayed inequality directions.
+The direct dual construction of \((\mathrm P)\) gives
+\((\mathrm D)\).
+
+Both LPs are feasible: choose any \(x\), respectively \(y\), and use
+a dual optimizer for the bounded opponent best-response LP.
+The primal objective is bounded above and the dual objective below
+by the finite expected-utility range.
+Strong duality yields equal attained optima \(v_\ell(\gamma)\),
+and proves the minimax identity
+\begin{equation}\label{eq:minimax}
+ v_\ell(\gamma)
+ =\max_{x\in\mathcal R_1}\min_{y\in\mathcal R_2}x^{\mathsf T}Gy
+ =\min_{y\in\mathcal R_2}\max_{x\in\mathcal R_1}x^{\mathsf T}Gy .
+\end{equation}
+At equality in \eqref{eq:weakdual}, \(x\) guarantees at least \(v_\ell\)
+against every \(y'\), and \(y\) at most \(v_\ell\) against every \(x'\).
+They form a saddle pair. Conversely every root Nash payoff equals
+this value.
+
+Exact rational vectors satisfying \eqref{eq:sequenceLP} certify
+\begin{equation}\label{eq:valuecertificate}
+ \underline v_\ell=e_2^{\mathsf T}v
+       \le v_\ell(\gamma)\le e_1^{\mathsf T}w=\overline v_\ell .
+\end{equation}
+Checking rows, signs, and inner products gives a finite exact
+certificate. A gap at most \(\varepsilon_\ell\) certifies that
+numerical error for the \emph{value}; zero gap gives its exact value.
+
+For rational \(\gamma\), the matrix entries are computed from path
+products and leaf sums with polynomial bit length and time in the
+explicit tree and input. Rational LP has polynomial-bit optimal
+primal and dual certificates and a polynomial-bit algorithm.
+Thus the exact zero-sum value has polynomial explicit-tree computation,
+without fixing structural dimension. This is not a strongly polynomial
+LP assertion. The identities hold for real \(\gamma\), but unencoded
+real numerical input has no asserted bit algorithm.
+
+An arbitrary LP saddle behavior, especially behavior freely completed
+at zero-realization information sets, is \emph{not} a certified
+sequential assessment off path. The LP neither constructs consistent
+beliefs nor imposes off-path sequential rationality.
+
+\begin{lemma}[The LP computes the value of every SE]\label{lem:sevalue}
+Every sequential equilibrium of a zero-sum policy game has expected
+player-1 utility \(v_\ell(\gamma)\), and at least one exists.
+Therefore, when \(W_\ell\) is that utility,
+\begin{equation}\label{eq:valueimage}
+ \mathcal W_I(\ell;p)
+       =\{v_\ell(\gamma):\gamma\in\Gamma_I(p)\}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+A sequential equilibrium is root Nash. To prove this directly,
+partition each player's initially reachable paths by its first own
+information set. The probabilities of reaching those sets depend only
+on Nature and opponents, not on its deviation. At a positive-reach
+first set, consistency gives the actual Bayesian conditional belief,
+and \eqref{eq:sr} compares the entire alternative continuation.
+Multiply by those reach probabilities and add to prove the root
+Nash inequality. Paths on which the player never moves have unchanged
+payoff; a zero-reach first set remains unreachable under its deviation.
+
+The root behavior gives feasible realizations by Lemma~\ref{lem:sequence}.
+The saddle value \eqref{eq:minimax} forces its zero-sum utility to
+equal \(v_\ell\). Existence follows from Lemma~\ref{lem:existence},
+not from a false assertion about arbitrary off-path LP completion.
+Taking all compatible parameters proves \eqref{eq:valueimage}.
+\end{proof}
+
+\section{Value stability without equilibrium-selector continuity}
+\label{sec:valuestability}
+Fix one policy tree and two parameters \(\gamma,\gamma'\in\Gamma\).
+Let \(H_\ell^{\rm N}\) be the maximum number of Nature draws along
+a terminal path, including initial states, signals, and transitions.
+Define
+\begin{equation}\label{eq:perturbdefs}
+ \begin{aligned}
+ \delta_c&=\max_{\text{Nature nodes }h}
+       \sum_{e\text{ leaving }h}|c_e(\alpha)-c_e(\alpha')|,\\
+ \delta_u&=\max_z|u_{1,z}(\beta)-u_{1,z}(\beta')|,\qquad
+ U_\ell=\max_{\gamma\in\Gamma,z}|u_{1,z}(\beta)|.
+ \end{aligned}
+\end{equation}
+The maximum over no Nature nodes is zero; rational LPs compute
+\(U_\ell\) exactly.
+
+\begin{lemma}[Uniform fixed-profile perturbation]\label{lem:coupling}
+For every pair of behavioral strategies, held fixed as functions
+on the original information sets, the two expected utilities differ
+by at most
+\begin{equation}\label{eq:profileperturb}
+ \delta_u+U_\ell H_\ell^{\rm N}\delta_c .
+\end{equation}
+\end{lemma}
+\begin{proof}
+Couple the plays while their histories agree, using the same strategic
+random draws at identical information sets. At each Nature node use
+a maximal coupling of its two finite rows, whose failure probability
+is their total variation and at most \(\delta_c/2\).
+There are at most \(H_\ell^{\rm N}\) opportunities for a first failure.
+Summing conditional first-failure probabilities bounds the probability
+of different terminal histories by \(H_\ell^{\rm N}\delta_c/2\).
+At identical terminals the utility difference is at most \(\delta_u\).
+At different terminals, separate the parameter change at one terminal,
+at most \(\delta_u\), from the difference between two utilities at
+\(\gamma'\), at most \(2U_\ell\).
+Taking expectation proves \eqref{eq:profileperturb}.
+Private persistent information is preserved: before histories differ,
+the same history uses the same information-set distribution.
+\end{proof}
+
+If two functions differ uniformly by at most \(\varepsilon\),
+their minima and maxima differ by at most \(\varepsilon\):
+the pointwise inequalities imply both one-sided bounds after
+optimization. Apply this fact twice to \eqref{eq:minimax} and
+Lemma~\ref{lem:coupling} to get
+\begin{equation}\label{eq:valuestability}
+ |v_\ell(\gamma)-v_\ell(\gamma')|
+                \le\delta_u+U_\ell H_\ell^{\rm N}\delta_c .
+\end{equation}
+No unique equilibrium, strict incentive gap, nonsingular policy
+Jacobian, or continuous selector is used.
+For Nature coefficient rows \(B_e\), set
+\begin{equation}\label{eq:valueLipschitzconstants}
+ \begin{aligned}
+ L_{c,\ell}&=\max_h\sum_{e\text{ leaving }h}\|B_e\|_1,\\
+ L_{u,\ell}&=\max_z\|\varphi_{1,z}\|_1,\qquad
+ L_\ell=L_{u,\ell}+U_\ell H_\ell^{\rm N}L_{c,\ell}.
+ \end{aligned}
+\end{equation}
+These explicit constants give
+\begin{equation}\label{eq:valueLipschitz}
+ \begin{split}
+ |v_\ell(\gamma)-v_\ell(\gamma')|
+ &\le L_{u,\ell}\|\beta-\beta'\|_\infty
+       +U_\ell H_\ell^{\rm N}L_{c,\ell}\|\alpha-\alpha'\|_\infty\\
+ &\le L_\ell\|\gamma-\gamma'\|_\infty .
+ \end{split}
+\end{equation}
+Repeated rows and joint parameter restrictions do not invalidate
+these inequalities; sharper rowwise constants are optional.
+
+\section{Polynomial confidence enclosures for policy values}
+\label{sec:valueconfidence}
+Suppose the statistical construction returns a rational
+\(\mathcal C_n\subseteq\Gamma\) and a common measurable coverage
+event \(E_n\) on which \(\Gamma_I(p)\subseteq\mathcal C_n\).
+On that event the polytope is nonempty.
+When nonempty, choose a \emph{fresh} rational
+\(\gamma_{\rm center}\in\mathcal C_n\) by LP.
+It is distinct from the minimax-fit \(\widehat\gamma\):
+the fit uses one common residual tolerance, while
+\eqref{eq:confidencepoly} uses different block tolerances, so
+\(\widehat\gamma\) need not belong to \(\mathcal C_n\).
+
+Compute a certified bound
+\[
+ D_n\ge\sup_{\gamma\in\mathcal C_n}
+                  \|\gamma-\gamma_{\rm center}\|_\infty.
+\]
+The \(2d\) coordinate LPs, for ambient dimension \(d\), give such
+a radius exactly by taking the largest distance from the center
+to any coordinate endpoint. Any certified diameter upper bound
+also suffices because the center belongs to \(\mathcal C_n\).
+An empty set is reported as empty and cannot arise on the coverage
+event under a correctly specified nonempty population model.
+
+For each zero-sum policy, compute at \(\gamma_{\rm center}\)
+feasible LP bounds
+\([\underline v_\ell,\overline v_\ell]\) with gap at most
+\(\varepsilon_\ell\). Equations \eqref{eq:valuecertificate},
+\eqref{eq:valueimage}, and \eqref{eq:valueLipschitz} imply that
+\begin{equation}\label{eq:valueinterval}
+ I_{\ell,n}=
+  [\,\underline v_\ell-L_\ell D_n,\
+                 \overline v_\ell+L_\ell D_n\,]
+\end{equation}
+contains every value in \(\mathcal W_I(\ell;p)\) for every declared
+policy on the same event \(E_n\). Its length is at most
+\begin{equation}\label{eq:valueintervallength}
+ \varepsilon_\ell+2L_\ell D_n .
+\end{equation}
+This separates LP numerical error from sampling uncertainty.
+The interval is a certified enclosure, not a claim of sharpness
+over \(\mathcal C_n\).
+
+For two policy values, bracket
+\(v_\ell(\gamma_{\rm center})-v_{\ell'}(\gamma_{\rm center})\),
+then enlarge each side by \((L_\ell+L_{\ell'})D_n\).
+The numerical gap is at most
+\(\varepsilon_\ell+\varepsilon_{\ell'}\).
+The same parameter is kept. Selection is immaterial only because
+each target is the zero-sum utility value, not because policy
+equilibria are unique.
+
+Under the full-rank statistical condition, on
+\(\Delta\le e_n\), equation \eqref{eq:S12} gives
+\[
+ D_n\le\diam_2(\mathcal C_n)
+          \le4\sqrt R\,Ce_n/\kappa
+\]
+if the exact coordinate radius is used.
+Indeed each coordinate distance is bounded by the true diameter.
+Thus \eqref{eq:valueintervallength} is an honest root-\(n\)
+enclosure at fixed input, confidence, and positive conditioning.
+Choose \(\varepsilon_\ell\) of the same or smaller order.
+Weak conditioning enlarges the constants explicitly.
+All computations for these intervals are polynomial in the explicit
+tree and rational confidence-polytope input; this makes no succinct-
+horizon claim.
+
+\section{A limit to general outcome contraction at every confidence level}
+\label{sec:impossibility}
+Parameter rates alone do not imply continuity of a policy's entire
+equilibrium-outcome range. The following example lies inside the
+declared affine class.
+Let \(\theta\in[-1/4,1/4]\) and let baseline Nature draw
+\(Y\sim\operatorname{Bernoulli}(1/2+\theta)\).
+Baseline utilities are zero. If an action stage is desired, one active
+player chooses \(a\in\{0,1\}\), still with zero utility, and the same
+independent fair mixed behavior is selected at every parameter
+and across markets. The researcher observes \((Y,a)\) completely.
+The ancillary action supplies no information about \(\theta\).
+The identity measurement is full rank, all complete-history probabilities
+are at least \(1/8\), and Nature probabilities are uniformly positive.
+The identified parameter is
+\[
+ \theta=\Prob(Y=1)-1/2,\qquad
+ \widehat\theta=\overline Y-1/2,\qquad
+ \E(\widehat\theta-\theta)^2\le1/(4n).
+\]
+Ordinary Hoeffding intervals give uniform root-\(n\) coverage.
+
+The policy changes only the active player's utility to \(\theta a\),
+and the outcome statistic is \(W=a\). Its complete range over
+sequential equilibria is
+\begin{equation}\label{eq:tierange}
+ \mathcal R(\theta)=
+ \begin{cases}
+  \{0\},&\theta<0,\\
+  [0,1],&\theta=0,\\
+  \{1\},&\theta>0.
+ \end{cases}
+\end{equation}
+Strict preference forces the nonzero-sign cases at every information
+set. At zero, every behavior is rational and admits fixed-game
+completely mixed approximations with the corresponding Bayes beliefs;
+every expected action between zero and one is attained.
+
+Use the joint rational polytope
+\(\alpha=\beta=\theta\in[-1/4,1/4]\).
+Its equality transfers the identified chance coefficient to the
+payoff coefficient, so the example meets the common model even though
+an ambient-rank test need not be necessary. A dummy second player
+with utility \(-\theta a\) embeds it into a zero-sum game.
+Its utility value \(\max\{0,\theta\}\) is Lipschitz, while the
+different outcome \(a\) has the discontinuous range
+\eqref{eq:tierange}. Zero-sum structure does not make every outcome
+equal to the value.
+
+\begin{theorem}[No uniformly contracting honest general-outcome sets]
+\label{thm:impossibility}
+Fix any \(0<\eta<1\). Let \(\mathcal D_n\) be measurable random
+closed sets with whole-range finite-sample honesty
+\begin{equation}\label{eq:honesttie}
+ \inf_{\theta\in[-1/4,1/4]}
+   \Prob_\theta\{\mathcal R(\theta)\subseteq\mathcal D_n\}
+                         \ge1-\eta.
+\end{equation}
+For \(\theta_n=1/n\), \(n\ge4\),
+\begin{equation}\label{eq:tielower}
+ \begin{split}
+ \Prob_{\theta_n}\{\diam(\mathcal D_n)\ge1,\
+     \excess(\mathcal D_n,\mathcal R(\theta_n))\ge1\}
+ \ \ge\ 1-\eta-\tfrac12\sqrt{(1+4/n^2)^n-1}.
+ \end{split}
+\end{equation}
+Here
+\(\excess(A,B)=\sup_{x\in A}\inf_{y\in B}|x-y|\).
+Thus Hausdorff error cannot vanish uniformly in probability.
+The same conclusion holds under asymptotic uniform honesty, with
+an additional vanishing slack.
+\end{theorem}
+\begin{proof}
+Let \(P_0,P_\theta\) be the one-market Bernoulli laws.
+Their likelihood ratio under \(P_0\) takes values
+\(1+2\theta\) and \(1-2\theta\). Hence
+\[
+ \E_0\left[\left(\frac{dP_\theta}{dP_0}\right)^2\right]
+      =1+4\theta^2,\qquad
+ \chi^2(P_\theta^n,P_0^n)=(1+4\theta^2)^n-1.
+\]
+The product identity follows by independence. Cauchy--Schwarz
+applied to the centered likelihood ratio gives
+\[
+ \TV(P_\theta^n,P_0^n)
+          \le\tfrac12\sqrt{(1+4\theta^2)^n-1}.
+\]
+An independent ancillary action leaves this distance unchanged.
+At \(\theta_n=1/n\) the bound tends to zero.
+
+At zero, honesty says the single event
+\(A_n=\{[0,1]\subseteq\mathcal D_n\}\) has probability
+at least \(1-\eta\).
+The probabilities of that same event under \(P_0^n\) and
+\(P_{\theta_n}^n\) differ by at most their total variation,
+giving the right-hand side of \eqref{eq:tielower}.
+On \(A_n\), the reported set contains zero and one, while
+\(\mathcal R(\theta_n)=\{1\}\). Its diameter and its excess
+over the true range are both at least one, proving the result.
+The excess also lower-bounds the Hausdorff error.
+Asymptotic uniform honesty repeats the argument with its vanishing
+coverage slack. There is no intersection of two confidence events,
+so the proof works for every \(0<\eta<1\).
+\end{proof}
+
+The obstruction is equilibrium indifference, not a discontinuous
+primitive statistic or vanishing Nature probability. The terminal
+statistic \(a\) is bounded and polynomial. General policy outcomes
+therefore retain the exact range and confidence-coverage methods;
+they do not inherit the value contraction theorem.
+
+\section{Scope, attribution, and a rational illustration}
+\label{sec:conclusion}
+The results retain every baseline and policy sequential assessment
+in the declared fixed-tree, positive-Nature class.
+The generic exact branch includes rank-deficient observation channels
+and strategically zero baseline histories.
+The informative branch provides a proved observation restriction,
+compatibility test, and sharp affine slice for arbitrary finite known
+private-history trees. Its complete proofs, not just the Bayesian
+family, yield the inference results.
+
+The statistical construction separates three questions.
+The minimax parameter fit estimates admitted primitives.
+The outer polytope covers the full sharp parameter fiber.
+The reconstructed profile has exact feasibility and Bayes consistency,
+with a computed certificate for all continuation deviations.
+The latter is not a replacement for exact policy-equilibrium coverage.
+General counterfactual sets retain exact endpoints and numerical
+error certificates, while the fast contraction result concerns
+zero-sum utility values. Comparative effects keep a shared structural
+parameter and either all policy pairs or an explicitly supplied
+joint selection relation.
+
+All polynomial-time claims specify an explicit rational input.
+The complete history tree can be exponentially larger than a compact
+state/horizon description. Full-history measurement calibration is
+substantive. Unknown labels, hidden equilibrium mixtures, missing
+payoff normalization, weak support, or weak rank cannot be removed by
+reporting a successful optimizer. The bounds display where those
+conditions enter. Varying primitive support, arbitrary unencoded
+utilities, and infinite horizons require different theorems.
+
+As one rational instance of Proposition~\ref{prop:bayesian}, take
+\[
+ \mathsf Q=
+   \begin{pmatrix}7/16&1/16\\1/16&7/16\end{pmatrix},\qquad
+ \theta=(3/4,5/4),\qquad \xi=1/2.
+\]
+Then
+\[
+ p^a=(4/7,4/9),\qquad q^a=(16/27,80/189),\qquad
+ v=31/63 .
+\]
+There are sixteen complete terminal histories, and their minimum
+mass is \(11/972\ge1/144=q_{\min}/9\) with \(q_{\min}=1/16\).
+The inverse channel and conditional equations recover the same
+labeled type law and payoff coefficients.
+These exact arithmetic identities illustrate the general proof;
+they do not constitute a full run of the QE, LP, or statistical
+pipeline, and no such execution is claimed here.
+
+The exact SE/QE baseline, compactness, endpoint method, and elementary
+whole-set coverage are retained from the prior attempt \cite{Prior}.
+The general informative fiber and its conditioning, diameter, and
+actual-assessment certificates supply the additional obligations
+left there. Sequence form, real quantifier elimination, Brouwer's
+fixed-point theorem, and rational LP strong duality and polynomial-bit
+algorithms are classical inputs. The manuscript supplies the
+reductions, equivalences, and bounds needed for their present use.
+It makes no claim of external peer review, formal proof-assistant
+verification, or historical novelty.
+
+\begin{thebibliography}{9}
+\bibitem{KW}
+D.~M. Kreps and R. Wilson,
+\emph{Sequential Equilibria},
+Econometrica 50 (1982), 863--894.
+\url{https://doi.org/10.2307/1912767}.
+Institutional bibliographic record:
+\url{https://www.gsb.stanford.edu/faculty-research/publications/sequential-equilibrium}.
+Used for the equilibrium concept; the fixed-game encoding and
+equivalences used here are proved in Section~\ref{sec:se}.
+
+\bibitem{Basu}
+S. Basu, \emph{Algorithms in Real Algebraic Geometry: A Survey},
+arXiv:1409.1534v1 (4 September 2014).
+\url{https://arxiv.org/pdf/1409.1534v1}.
+Inspected locators: Theorem 2.27, printed p.~16, including its
+integer bit-size clause; Theorem 2.4, printed p.~6.
+These supply the imported effective quantifier-elimination and
+fixed-compiled-size complexity bounds.
+
+\bibitem{KMS}
+D. Koller, N. Megiddo, and B. von Stengel,
+\emph{Efficient Computation of Equilibria for Extensive Two-Person Games},
+Games and Economic Behavior 14 (1996), 247--259.
+\url{https://ai.stanford.edu/~koller/Papers/Koller%2Bal%3AGEB96.pdf}.
+Inspected locator: Section 2, pp.~249--250, for realization flows,
+behavioral reconstruction, Nature-weighted terminal matrices, and
+best-response primal/dual LPs. No polynomial-time general-sum LCP
+claim is imported.
+
+\bibitem{Prior}
+GPT 6 Astra Ultra,
+\emph{Exact finite-game identification with consistent off-path beliefs},
+prior catalogue attempt C73-49, 9 October 2026,
+at pinned repository commit
+\texttt{00ced55ba1223fb48603e1f15028d753997ee515}.
+\href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/00ced55ba1223fb48603e1f15028d753997ee515/attacks/open_problems/economics/gpt6_astra_ultra/C73-49.tex}
+{Pinned complete prior source}.
+Its exact SE reduction, compactness, sharp policy projections,
+endpoint bisection, and whole-set coverage are reproduced with
+attribution. Informative reconstruction and quantitative statistical
+and value certificates are the additional obligations addressed here.
+\end{thebibliography}
+\end{document}
