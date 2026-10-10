@@ -602,7 +602,8 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attempt['model'], 'GPT 6 Astra Ultra')
                 self.assertEqual(attempt['entry_kind'], 'research_attempt')
                 self.assertEqual(attempt['date_posted'], '2026-10-09')
-                self.assertEqual(data[problem_id]['status'], 'open')
+                # Keep source status distinct from later solved claims by other models.
+                self.assertEqual(data[problem_id].get('source_status', data[problem_id]['status']), 'open')
                 self.assertEqual(attempt['status'], 'unresolved')
                 source = BASE_DIR / attempt['file_path']
                 self.assertEqual(source.read_bytes(),
