@@ -19,7 +19,9 @@ class EconomicsAstraUltra251To300Tests(unittest.TestCase):
                 self.assertEqual(attempt['status'], 'unresolved')
                 self.assertEqual(attempt['entry_kind'], 'research_attempt')
                 self.assertEqual(attempt['date_posted'], '2026-10-09')
-                self.assertEqual(record['status'], 'open')
+                # Later attempts may solve the aggregate; the frozen attempt stays unresolved.
+                aggregate = 'solved' if any(a['status'] == 'solved' for a in record['attacks']) else 'open'
+                self.assertEqual(record['status'], aggregate)
                 source = BASE_DIR / attempt['file_path']
                 self.assertEqual(source.name, problem_id + '.tex')
                 self.assertEqual(source.read_bytes(), (BASE_DIR/'docs'/attempt['download_url']).read_bytes())

@@ -1,0 +1,233 @@
+% ECONOMICS_PROBLEM: {"id": "C78-268", "title": "House exchanges along longer social-network cycles", "jel_code": "C78", "source_id": "OP-0550"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\FP}{\mathsf{FP}}
+\newcommand{\RA}{\mathcal R}
+\title{Reachability and Pareto selection with longer network trades}
+\author{Ji Ho Bae}
+\date{10 October 2026}
+\hypersetup{pdftitle={Reachability and Pareto selection with longer network trades},pdfauthor={Ji Ho Bae}}
+\begin{document}
+\maketitle
+
+\paragraph{Authorship and provenance.}
+Author: Ji Ho Bae. Prepared with GPT Codex assistance; the precise serving
+revision was not exposed. The complete original argument is retained in
+the \href{https://github.com/jbaelaw/long-cycle-trade-reachability/blob/6ff34b79452d2e25ee6490852608610a949f911b/paper/Proof.tex}{immutable TeX source} and
+\href{https://github.com/jbaelaw/long-cycle-trade-reachability/blob/6ff34b79452d2e25ee6490852608610a949f911b/paper/Proof.pdf}{hand-proof PDF}. This submission adds catalogue metadata,
+provenance and a completion statement to that argument. Its preparation
+included exact-target and primary-source checks and separate mathematical
+reviews. This is a full hand-proof claim submitted for independent expert
+review; community acceptance remains pending.
+
+\begin{abstract}
+We classify improving cyclic trades on an undirected social network.
+For every fixed length bound $k\geq3$, for an input bound $k\geq3$,
+and for unrestricted length, both allocation reachability and agent--house
+reachability are NP-complete. Selecting an allocation that is Pareto
+optimal within the entire reachable set is polynomial-time Turing
+equivalent to an NP-complete decision oracle. A private-house invariant
+prevents longer trades from invalidating the completion reduction.
+\end{abstract}
+
+\section{Model and result}
+There are $n$ agents, $n$ houses, an undirected graph on the agents, and
+an initial bijection. Write $M(i)$ for agent $i$'s house in an allocation $M$.
+Each agent strictly orders her acceptable houses,
+which include her endowment. A trade uses distinct agents
+$a_1,\ldots,a_\ell$, with $2\leq\ell\leq k$, consecutive graph edges
+including the closing edge, and gives $a_i$ the current house of
+$a_{i+1}$, cyclically. Every participant must strictly improve.
+A two-agent trade uses one graph edge. Unrestricted length means $k=n$;
+an input bound is effectively capped at $n$.
+
+Let $\RA$ be all endpoints reachable from the initial allocation.
+A member of $\RA$ is Pareto optimal in $\RA$ if no other member weakly
+improves every agent and strictly improves at least one. The comparison
+is with all of $\RA$, not just the continuations of the selected endpoint.
+These are the network-edge conventions in catalogue problem C78-268.
+The motivating survey proposes longer-cycle exchanges as a research
+direction without specifying these conventions~\cite[\S3.1.3]{survey}.
+
+\begin{theorem}\label{main}
+The following statements hold for each fixed $k\geq3$, for an input
+bound $k\geq3$, and for unrestricted length.
+\begin{enumerate}
+\item Reachability of a specified allocation is NP-complete.
+\item Reachability of a specified house for a specified agent is NP-complete,
+      even on trees.
+\item Reachable Pareto selection admits an $\FP^{\NP}$ algorithm.
+      Conversely, every $\FP^{\NP}$ function can be computed in polynomial
+      time with an oracle returning any valid reachable Pareto allocation.
+\end{enumerate}
+The decision reductions are polynomial-time many-one reductions. The
+search equivalence uses polynomial-time Turing reductions that succeed
+for every valid oracle answer. In particular, each of the three tasks
+has a polynomial-time algorithm if and only if $\mathsf P=\NP$.
+\end{theorem}
+
+\section{Short paths and upper bounds}
+Give agent $i$ integer ranks $r_i(h)\in\{0,\ldots,n-1\}$ increasing
+with preference. Every trade increases $\sum_i r_i(M(i))$ by at least
+two, while this sum is at most $n(n-1)$. Every legal sequence therefore
+has at most $\lfloor n(n-1)/2\rfloor$ trades. A certificate lists these
+cycles; distinctness, graph edges, acceptability, improvement and the
+endpoint can all be checked in polynomial time. This proves both NP
+upper bounds in all three regimes.
+
+For Pareto selection, fix agents in order. For the current agent,
+test her houses from best to worst, asking whether a reachable endpoint
+assigns that house and all previously fixed houses. Each question is
+in NP by the path bound. At least one answer is positive, since the
+previous choices preserved a reachable endpoint. After at most $n^2$
+queries, all agents' houses are fixed. If a reachable allocation Pareto
+dominated the result, its first different agent would have received a
+better feasible choice at her selection step. This is a contradiction.
+All queries start from the original endowment. A witnessing path can
+also be recovered by polynomially many certificate-prefix queries.
+
+\section{A completion gadget that blocks mixed cycles}
+We use the following established hardness result: under improving
+\emph{swaps}, agent--house reachability is NP-complete on trees
+\cite[Theorem 1]{swaps}. Those hard instances have a target house
+initially held by a different agent. Relabel the target agent as $1$
+and write the original house set as $X=\{x_1,\ldots,x_n\}$ and the target as
+$t\ne x_1$. A tree has no simple cycle of length at least three,
+so this theorem already proves part~2 of Theorem~\ref{main}.
+
+To reduce this tree problem to allocation reachability, keep its agents
+and edges. For each original agent $j$, add a copy $c_j$ endowed with a
+new house $d_j$, and add the edge $\{j,c_j\}$. Make the copies a clique;
+there are no other edges between the two parts. Original agent $j$
+ranks $d_j$ first, then all original houses in her original order,
+then all other private houses. These lists may be completed strictly;
+all original instances used here already have complete lists.
+
+Copy $c_1$ ranks $t$ first, then $d_1$, then all other houses. List
+$X\setminus\{t\}$ as distinct houses $t_2,\ldots,t_n$ in any fixed
+order. For $j=2,\ldots,n$, copy $c_j$ ranks $t_j$ first, then the other
+houses in the list $t_n,t_{n-1},\ldots,t_2$, then $d_j$, then $t$ and
+all foreign private houses. Order any otherwise unspecified houses arbitrarily.
+The distinct top choices define one allocation
+\[
+ T(j)=d_j\quad(1\leq j\leq n),\qquad
+ T(c_1)=t,\qquad T(c_j)=t_j\quad(2\leq j\leq n).
+\]
+The construction has $2n$ agents and polynomial encoding size. It
+modifies the copy-clique completion used for swaps in
+\cite[Theorem 2]{swaps}; the next lemma is needed because longer trades
+are now allowed.
+
+\begin{lemma}\label{cut}
+Every legal trade of length at least three in the constructed instance
+uses only copies. A trade between the two parts is necessarily the swap
+of $j$ with $c_j$, after which $j$ never trades again.
+\end{lemma}
+\begin{proof}
+Every agent other than $j$ and $c_j$ ranks $d_j$ below her endowment. Strict improvement keeps every agent's holding
+at least as good as her endowment. Thus $d_j$ can leave $c_j$ only for
+$j$. On receiving $d_j$, agent $j$ obtains her top choice and never
+trades again. In particular, whenever $j$ participates in a trade,
+$c_j$ still holds $d_j$.
+
+Consider a legal cycle of length at least three that meets both parts.
+It must transfer a house from an original agent $j$ to a copy, which
+can only be $c_j$. This copy still holds $d_j$ and must give it to
+its other neighbor in the cycle, a different copy: returning it to $j$
+would repeat a vertex and make the cycle a two-agent swap. That recipient
+cannot improve by receiving $d_j$, a contradiction. No mixed cycle is
+legal. The original part is a tree, so it contains no remaining cycle
+of length at least three. Finally, a crossing swap gives $j$ the house
+$d_j$ and hence retires $j$ permanently.
+\end{proof}
+
+\begin{lemma}\label{equiv}
+The original tree instance can deliver $t$ to agent $1$ if and only if
+$T$ is reachable in the constructed instance, for every allowed length
+bound at least two.
+\end{lemma}
+\begin{proof}
+Suppose first that original swaps deliver $t$ to $1$. Perform the same
+swaps in the original part, then swap each $j$ with $c_j$. Original
+agents obtain their top choices. Copy $c_1$ obtains $t$; every other
+copy receives an original house different from $t$ and therefore improves
+from her private house.
+
+The remaining copies hold a permutation of $t_2,\ldots,t_n$.
+Process $c_2,\ldots,c_n$ in this order. If $c_j$ does not hold $t_j$,
+swap it with its holder $c_s$. Previously processed copies already hold
+their distinct targets, so $s>j$. The house currently at $c_j$ is some
+$t_q$ with $q>j$. Copy $c_j$ receives its top choice. Copy $c_s$ prefers
+$t_q$ to $t_j$: either $q=s$ gives its own top choice, or both houses
+are ordered by the common descending index order. The swap is legal.
+At the end the allocation is $T$. Only swaps were used.
+
+Conversely, suppose a sequence reaches $T$. A copy other than $c_1$
+never holds $t$, since she ranks it below her initial house. The first
+transfer of $t$ into the copy part must therefore deliver it to $c_1$.
+By Lemma~\ref{cut}, this is the swap of $1$ with $c_1$, so agent $1$
+held $t$ just before that swap.
+
+Retain only the original--original swaps preceding this event.
+They form a legal sequence in the original tree. To see this inductively,
+ignore each copy-only trade and each crossing swap. A crossing swap
+retires its original participant, who never appears in a later retained
+swap; in the projected sequence she simply keeps the original house
+she surrendered. Every still-active original agent has exactly the same
+house in the projected and enlarged sequences. Hence each retained swap
+has the same two houses and remains improving. The projected sequence
+therefore delivers $t$ to $1$.
+\end{proof}
+
+All newly allowed longer cycles are covered by Lemma~\ref{cut}, even
+when the bound is input or unrestricted. Lemma~\ref{equiv} and the
+source tree hardness prove part~1 of Theorem~\ref{main}.
+
+\section{Pareto search hardness}
+Every agent has a distinct top house in the constructed instance.
+If the source instance is positive, $T$ is reachable and Pareto dominates
+every different allocation, so every valid reachable Pareto answer is
+$T$. If the source instance is negative, $T$ is unreachable, so every
+valid answer differs from $T$. One oracle call and an equality test
+therefore decide the NP-complete tree problem. This is the all-top
+argument for swaps in \cite[Proposition 4]{swaps}, with longer-cycle
+soundness supplied by Lemma~\ref{cut}.
+
+More precisely, let $f$ be computed by a polynomial-time transducer
+with an NP oracle. Reduce each oracle question to the NP-complete tree
+problem, construct the gadget, call a reachable Pareto oracle and test
+whether its answer is $T$. The answer is correct regardless of which
+valid Pareto allocation the oracle returns. Replacing every adaptive NP
+query in this way computes $f$ in polynomial time. Together with the
+selector already proved, this establishes part~3 in the stated Turing
+sense. It does not assert polynomial-time verification of arbitrary
+Pareto answers or completeness under a stronger reduction notion.
+
+\section*{Completion Estimate}
+100\%
+The stated theorem covers allocation reachability, agent--house reachability
+and Pareto selection for every length regime in the catalogue question.
+This is the author's complete hand-proof claim, pending independent review.
+
+\begin{thebibliography}{9}
+\bibitem{swaps}
+L. Gourv\`es, J. Lesca and A. Wilczynski.
+Object Allocation via Swaps along a Social Network.
+\emph{Proceedings of IJCAI 2017}, 213--219.
+\href{https://doi.org/10.24963/ijcai.2017/31}{doi:10.24963/ijcai.2017/31}.
+\bibitem{survey}
+K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+Selected open problems in Matching Under Preferences.
+\emph{Bulletin of the EATCS} 128 (2019), 14--38, \S3.1.3.
+\href{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}{Primary manuscript}.
+\end{thebibliography}
+\end{document}
