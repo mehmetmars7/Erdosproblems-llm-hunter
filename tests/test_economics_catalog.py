@@ -501,6 +501,12 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['status'], expected_claim)
                 # The Pro manuscripts separately claim full solutions for C71-12 and C65-29.
                 aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12', 'C65-29'} else 'unresolved'
+                if problem_id == 'C73-30' and any(
+                        a['file_path'] == 'attacks/open_problems/economics/gpt_codex/C73-30.tex'
+                        and a['status'] == 'solved' for a in data[problem_id]['attacks']):
+                    # Retain the frozen Ultra verdict while a new independent
+                    # submission changes the aggregate claim.
+                    aggregate_claim = 'solved'
                 self.assertEqual(data[problem_id]['llm_status'], aggregate_claim)
                 self.assertEqual(data[problem_id]['status'],
                                  'solved' if aggregate_claim == 'solved' else 'open')
