@@ -1,0 +1,286 @@
+% ECONOMICS_PROBLEM: {"id": "C73-113", "title": "Constant regret in general-sum Markov games", "jel_code": "C73", "source_id": "OP-0151"}
+% FIRST_POSTED: 2026-10-11
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\title{Constant regret with finite preparation in Markov games}
+\author{Ji Ho Bae}
+\date{October 2026}
+\hypersetup{pdftitle={Constant regret with finite preparation in Markov games},pdfauthor={Ji Ho Bae}}
+\begin{document}
+\maketitle
+
+\paragraph{Authorship and provenance.}
+Author: Ji Ho Bae. Prepared with GPT Codex assistance; the precise serving
+revision was not exposed. The complete original argument is retained in
+the \href{https://github.com/jbaelaw/markov-game-constant-regret-proof/blob/bae26db857293585b886da154ab9e4b2fcc16949/paper/Proof.tex}{immutable TeX source} and
+\href{https://github.com/jbaelaw/markov-game-constant-regret-proof/blob/bae26db857293585b886da154ab9e4b2fcc16949/paper/Proof.pdf}{proof PDF}. This submission adds catalogue metadata,
+provenance and a completion statement to that argument. Its preparation
+included exact-target and primary-source checks and separate mathematical
+reviews. This is a complete proof claim submitted for independent expert
+review; community acceptance remains pending.
+
+\begin{abstract}
+We answer the computational formulation of catalogue problem C73-113
+under its rational input convention and observable-action feedback.
+Players reconstruct their local tables, communicate through observed
+actions, and compute a rational coarse equilibrium over pure Markov
+plans. A maximum-deficit schedule tracks its weights with uniformly
+bounded error. This gives constant cumulative external regret against
+all history-dependent within-episode policies, with polynomial work per
+episode. The finite preparation period is included in the regret bound
+and may be very large as a function of the game.
+\end{abstract}
+
+\section{The stated target}
+There are $n$ players, a finite state set $S$, nonempty finite action
+sets $A_i$, a horizon $H\geq1$, and a fixed initial state $s_1$.
+Rewards $r_{i,h}(s,a)$ lie in $[0,1]$, and $P_h(\cdot\mid s,a)$ is the
+next-state distribution. We use the catalogue's computational convention:
+the finite game data are rational and binary encoded
+\cite[Common conventions, Computational representations]{catalogue}.
+Let $L$ be their description length. The labeled finite structure is
+public, while reward and transition entries are initially accessible
+through the prescribed feedback only.
+
+At a queried $(h,s,a_i)$, player $i$ receives its own reward averaged
+against the opponents' current Markov policies and the corresponding
+averaged transition distribution, both exactly. All realized states and actions are observed. A behavioral
+policy may depend on the entire observed history within an episode.
+Let $\Pi_i$ be this policy class, and let $V_i(\pi)$ be expected total
+reward in one episode. Thus $0\leq V_i(\pi)\leq H$. The target is
+\[
+ R_i(T)=\sup_{\tau_i\in\Pi_i}\sum_{t=1}^T
+       \bigl(V_i(\tau_i,\pi^t_{-i})-V_i(\pi^t)\bigr)\leq C_G
+ \qquad(T\geq1),
+\]
+where $\tau_i$ is one fixed within-episode policy and $C_G$ is finite
+and independent of $T$. Neither $C_G$ nor total preparation time is
+required to be polynomial in $L$. The resource requirement is polynomial
+work and polynomially many feedback queries in each episode, as a
+function of the game description and the current episode number.
+
+The source motivates constant regret and supplies the own-feedback
+oracles \cite[\S\S2.3--2.5 and 5]{yb}. The catalogue specifies the
+ordinary external-regret target above. The distinction matters: the
+construction below uses a finite initial calculation and action signals,
+and its bound is stated explicitly in terms of that calculation.
+
+\begin{theorem}\label{main}
+One deterministic decentralized procedure, independent of the final
+number of episodes, achieves the target for every game in this model.
+Every played profile is pure Markov. Each player makes at most one
+feedback query per episode, and its bit operations are bounded by a
+fixed polynomial in $L$ and the current episode number.
+More precisely, the procedure has a finite preparation duration $T_0$
+and computes a distribution with finite support size $K$, for which
+\[
+                  R_i(T)\leq H T_0+2H(K-1)
+                  \qquad\text{for every }i\text{ and }T\geq1.
+\]
+\end{theorem}
+
+If every action set is a singleton, play the unique profile forever;
+all regrets are zero. Otherwise, call players with $|A_i|\geq2$ active.
+A remaining player's regret is always zero, so its reward table is
+irrelevant to the computation below.
+
+\section{A rational distribution covering every deviation}
+The played plans depend only on $(h,s)$; comparison policies may also
+depend on earlier states and actions.
+Let $\Sigma_i$ be all pure Markov plans $[H]\times S\to A_i$, and put
+$\Sigma=\prod_i\Sigma_i$. Let $D_i$ be all pure policies on the finite
+set of player $i$'s pre-action histories, including histories of zero
+probability. Histories contain past states and joint actions and the
+current state, before the current actions are selected. Define
+\[
+ g_{i,d}(\sigma)=V_i(d,\sigma_{-i})-V_i(\sigma)
+ \qquad(d\in D_i,\ \sigma\in\Sigma).
+\]
+These are rational numbers computable by finite enumeration of play
+histories. Consider the finite linear system
+\begin{equation}\label{lp}
+ \mu_\sigma\geq0,\qquad \sum_{\sigma\in\Sigma}\mu_\sigma=1,
+ \qquad \sum_{\sigma\in\Sigma}\mu_\sigma g_{i,d}(\sigma)\leq0
+ \quad(i\text{ active},\ d\in D_i).
+\end{equation}
+
+This system is nonempty. To prove it, set $v_{i,H+1}(s)=0$ and work
+backward. At $(h,s)$ choose a mixed Nash equilibrium of the finite
+stage game with payoffs
+\[
+ r_{i,h}(s,a)+\sum_{s'}P_h(s'\mid s,a)v_{i,h+1}(s'),
+\]
+and let $v_{i,h}(s)$ be its expected payoff. Such equilibria exist by
+Nash's finite-game theorem \cite{nash}. The resulting behavioral Markov
+profile $x$ resists every history-dependent unilateral deviation.
+Indeed, at any history ending in $(h,s)$, the opponents' current actions
+have the prescribed stage distribution. By induction, a deviator's
+future payoff is at most $v_{i,h+1}$ at the next state. The stage Nash
+inequality then bounds its current reward plus continuation by
+$v_{i,h}(s)$. This proves the assertion backward through all histories.
+
+Independently sample an action from $x_{i,h}(s)$ for each player and
+each $(h,s)$, thereby obtaining a random member of $\Sigma$.
+Its law implements $x$, including against any fixed history-dependent
+deviation: a given stage-state pair is visited at most once, and its
+unused action sample is independent of the samples that determined
+the past. The induced distribution on $\Sigma$ satisfies
+\eqref{lp}. It is used only to prove nonemptiness.
+
+The feasible set is a nonempty compact rational polytope, so it has a
+rational vertex. For completeness, successively maximizing each
+coordinate on the preceding maximizing face produces a vertex.
+At a vertex, active constraint normals span the whole coordinate space;
+otherwise a small perturbation in both directions orthogonal to them
+would preserve all constraints and contradict extremality. A full-rank
+active rational system therefore determines that vertex by Gaussian
+elimination. This also gives a finite exact algorithm: enumerate all
+full-rank active systems, solve them, test all constraints, and keep the
+first passing solution in a fixed public enumeration order.
+
+Discard zero weights and write its support as
+$\sigma^1,\ldots,\sigma^K$, with positive rational weights
+$\mu_1,\ldots,\mu_K$. For any behavioral $\tau_i$, independently
+pre-sampling its action at each finite history gives a distribution on
+$D_i$ that implements $\tau_i$ against every fixed $\sigma_{-i}$.
+The distribution is the same for all $\sigma$. Averaging the corresponding
+rows of \eqref{lp} proves
+\begin{equation}\label{allpolicies}
+ \sum_{j=1}^K\mu_j
+       \bigl(V_i(\tau_i,\sigma^j_{-i})-V_i(\sigma^j)\bigr)\leq0
+       \qquad(\tau_i\in\Pi_i).
+\end{equation}
+Singleton-action players satisfy this with equality. Thus the supported
+profiles are Markov, while the comparison class retains all histories.
+
+\section{Legal decentralized preparation}
+Fix public orders on players, states, actions and table entries, and
+one baseline action for each player. Enumerate $(h,s,a)\in[H]\times
+S\times\prod_iA_i$, reserving one episode for each triple.
+In that episode every player $j$ uses the constant Markov plan $a_j$.
+Each active player $i$ queries $(h,s,a_i)$ once. The opponents' policy
+is a point mass, so the reply is exactly $r_{i,h}(s,a)$ and
+$P_h(\cdot\mid s,a)$. After these finitely many episodes, each active
+player has its own reward table and the same full transition table.
+All queries concern the actual current opponent policy, including when
+the queried state is unreachable in that episode.
+
+Active players next broadcast their reward tables, in public player
+order. For a sender $i$, fix two distinct actions labeled zero and one.
+It sends a bit through its action at $(1,s_1)$; every other action follows
+the baseline. Everyone observes the bit with certainty, independently
+of subsequent state transitions. These signaling plans are pure Markov.
+No player queries another player's reward oracle.
+
+Use canonical finite binary encodings of rational entries and the fixed
+table order. A payload of length $b\geq1$ is prefixed by
+$1^\ell0\,\operatorname{bin}(b)$, where
+$\ell=\lfloor\log_2 b\rfloor+1$ and $\operatorname{bin}(b)$ has $\ell$
+bits. Receivers count the initial ones, read the length and then the
+payload. All players therefore know exactly when the next sender starts.
+All these strings have finite length, polynomial in $L$ under the stated
+finite-table encoding. Preparing, sending and reading them has
+polynomial cost per episode. A sole active player already has every
+relevant reward table; the same protocol is harmless in that case.
+
+Every active player now has identical input for \eqref{lp}. Each runs
+the same deterministic exact program just described, executing one
+transition of a fixed binary Turing machine per episode while playing
+the baseline plan. This finite program eventually halts, in the same
+episode for every active player. Its simulation includes generating the
+linear system, solving it and writing the support plans and weights.
+Let $T_0$ count all exploration, signaling and computation episodes,
+including input and output preparation. It is finite and depends only
+on the game and the fixed procedure.
+
+\section{A schedule with uniformly bounded error}
+For $m\geq0$, let $N_j(m)$ count uses of $\sigma^j$ in the first $m$
+episodes after preparation, and put
+\[
+                     d_j(m)=m\mu_j-N_j(m).
+\]
+Start with all counts zero. In episode $m\geq1$, choose the least index
+maximizing $d_j(m-1)+\mu_j$, play $\sigma^j$, and increment its count.
+All active players have the same weights, counts and tie rule, so they
+select the same joint plan and execute their own components.
+
+For every $m$, the deficits sum to zero and each is greater than $-1$.
+The latter holds initially. Before the next selection, the numbers
+$d_j(m-1)+\mu_j$ sum to one, so the selected number is positive.
+Subtracting one leaves it greater than $-1$; unselected numbers have
+only increased. Induction proves the claim. If $K=1$ the deficit is zero.
+Otherwise at most $K-1$ coordinates are negative, and each has magnitude
+less than one. Zero total sum consequently gives
+\begin{equation}\label{discrepancy}
+                       \sum_j|d_j(m)|\leq2(K-1).
+\end{equation}
+
+\newpage
+Fix any player $i$ and any $\tau_i\in\Pi_i$, and abbreviate
+$g_j=V_i(\tau_i,\sigma^j_{-i})-V_i(\sigma^j)$.
+We have $|g_j|\leq H$ and $\sum_j\mu_jg_j\leq0$ by
+\eqref{allpolicies}. Its total deviation gain after preparation is
+\[
+ \sum_jN_j(m)g_j
+   =m\sum_j\mu_jg_j-\sum_jd_j(m)g_j
+   \leq H\sum_j|d_j(m)|\leq2H(K-1).
+\]
+Each preparation episode contributes at most $H$. This proves the bound
+in Theorem~\ref{main}, also when $T\leq T_0$. The bound is uniform in
+$\tau_i$, so taking its supremum proves the claim. By linearity, the
+ordinary uniform empirical mixture has coarse-deviation gain at most
+$\{H T_0+2H(K-1)\}/T$.
+
+\section{Per-episode resources}
+Exploration uses one own-feedback query per active player per episode;
+later phases use none. Communication and its counters have polynomial
+bit cost. During the simulated exact computation, at most
+$O(\operatorname{poly}(L)+t)$ tape cells have been initialized by episode
+$t$. Even direct tape scans therefore implement each simulated transition
+with polynomially many bit operations in $L,t$.
+
+The final support and weights were written before episode $T_0$.
+Their total encoded length, and hence $K$, are bounded by the same tape
+bound. Write $\mu_j=p_j/q_j$ with $q_j>0$. The next comparison value is
+\[
+          d_j(m-1)+\mu_j
+             =\frac{m p_j-N_j(m-1)q_j}{q_j}.
+\]
+Counts use $O(\log m)$ bits. Exact cross multiplication, scanning the
+stored support and retrieving the selected local Markov plan all have
+polynomial cost in its stored length and $\log m$, hence in $L,t$.
+This establishes a single per-episode polynomial bound for the entire
+procedure. All preparation is charged to $T_0$; the resulting
+$C_G=H T_0+2H(K-1)$ is finite but may grow rapidly with the game size.
+The algorithm never uses the final episode count $T$.
+
+\section*{Completion Estimate}
+100\%
+The stated result resolves the original catalogue question under its full
+model and quantifiers. This is the author's complete proof claim, pending
+independent expert review.
+
+\begin{thebibliography}{9}
+\bibitem{catalogue} Economics problem C73-113, Constant regret in
+general-sum Markov games. Statement and Common conventions,
+Computational representations. Catalogue snapshot at commit
+\texttt{3cf5ae3}.
+\href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/3cf5ae39f671cb748fa7ba6d0ccc253611620f9d/attacks/open_problems/economics/statements/C73-113.tex}{Immutable problem statement}.
+\bibitem{yb} A. E. Yorulmaz and T. Ba\c{s}ar.
+Near Optimal Convergence to Coarse Correlated Equilibrium in
+General-Sum Markov Games. 2025.
+\href{https://arxiv.org/html/2511.02157v1}{arXiv:2511.02157v1},
+\S\S2.3--2.5 and 5.
+\bibitem{nash} J. F. Nash, Jr. Equilibrium points in n-person games.
+\emph{Proceedings of the National Academy of Sciences} 36(1)
+(1950), 48--49.
+\href{https://doi.org/10.1073/pnas.36.1.48}{doi:10.1073/pnas.36.1.48}.
+\end{thebibliography}
+\end{document}
