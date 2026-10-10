@@ -1,41 +1,322 @@
 # Contributing to Problem Hunting with LLMs
 
-Thank you for your interest in contributing to this project. This document outlines the guidelines for submitting new LLM attempts or improvements.
+This is the authoritative contribution policy for research attempts and catalogue
+statements. Partial progress and honest unresolved attempts are welcome. Formatting,
+a successful build, an LLM self-review, and a community submission record do not
+establish mathematical correctness or novelty.
 
-## Accepted LLM Models
+These stronger requirements apply prospectively to new or changed mathematical
+submissions. Unchanged historical manuscripts, completion estimates, attribution,
+model folders, IDs, links, source statuses, and review records remain intact.
+Prefer a new `_v2` or `_v3` manuscript for substantive revisions; preserve original
+outputs and disclose corrections. Do not rewrite historical research to satisfy
+these rules. Specialist external claims and human contributions have the explicit
+exceptions described below.
 
-Only contributions featuring attempts from the most advanced frontier LLMs are accepted:
+## Accepted frontier models and exact identification
 
-- **GPT Pro** 
-- **GPT** 
-- **GPT Codex**
-- **Gemini Deep Think** 
-- **Opus**
-- Other comparable frontier models with demonstrated mathematical reasoning capabilities such as Aristotle from Harmonic.
+We prioritize advanced frontier systems with demonstrated mathematical reasoning:
+GPT Astra Pro/Ultra (with exact GPT generation), advanced GPT Codex reasoning
+configurations, Gemini Deep Think, Claude Opus high-reasoning configurations,
+Harmonic Aristotle, and comparable mathematical reasoning systems. No model is
+permanently designated the most advanced; explain a comparable system's suitability
+in the PR. Historical folder spellings continue to work and must not be renamed.
 
-We focus on frontier models because they have shown the most promise in making meaningful progress on open mathematical problems.
+Identify the provider, actual model/version, reasoning configuration where exposed,
+generation date, other models materially used to draft/revise/check the mathematics,
+and external computation or theorem-proving tools. Generic “GPT”, “ChatGPT”,
+“Claude”, or “Gemini” alone is insufficient unless the platform truly does not expose
+the underlying version: explicitly record that uncertainty, never invent a version.
+The model folder and GitHub submitter are not sufficient attribution.
 
-## Submission Guidelines
+## Mathematical research manuscripts
 
-### For Erdos Problem Attempts
+Submit the complete mathematical output as repository-compatible LaTeX. A standalone
+article is recommended; Erdős and MO fragments remain supported. Preserve the
+original target, permanent ID, source, references, and original mathematical meaning.
+Include the following information in clearly identifiable sections (mathematically
+appropriate titles are allowed; only the Completion Estimate heading is exact):
 
-1. **File Location**: Place your TeX file in `attacks/open_problems/erdos/<MODEL_NAME>/`.
-2. **File Naming**: Use the problem number as the filename (e.g., `x.tex`). If it already exists, use `x_v2.tex`.
-3. **Recommended Content Format**: If possible, follow the structure used in existing attempts:
-   - Formal statement
-   - Literature/context check
-   - Attack plan
-   - Work (the actual attempt)
-   - Verification
-   - Final status (SOLVED, UNRESOLVED, or PARTIAL)
+- Original problem and source; exact statement investigated, definitions, conventions,
+  assumptions, quantifiers, parameter ranges, and boundary cases.
+- Literature/context check, actual results, proofs or explicit counterexamples,
+  verification undertaken, and the first remaining gaps.
+- Scope comparison with the entire original target; final status and completion
+  estimate; References or standard bibliography.
+- Actual LLM identity/version and process; human mathematical contributions, edits,
+  independent verification, and model-assisted checking, with their scopes.
 
-### For Top Open Problems Attempts
+Keep a modified, restricted, or strengthened formulation separate from the original.
+For example, continuous and Borel payoffs, finite and infinite horizons, one prior
+and all priors, necessary and sufficient conditions, an equivalence and an effective
+algorithm, restricted parameter ranges and the full range, and conditional and
+unconditional results are different targets. Explain whether the result covers the
+complete original problem. Do not silently repair ambiguities or redefine success.
+A generic plan or a restatement of known results alone is not a new research result;
+identify known material and any actual progress honestly.
 
-1. **Choose the Target**: Use the numbered definition in `attacks/open_problems/top_problems/definitions/<unsolvedmath_id>.tex`, preserving its mathematical scope and cited sources. The `TOP_PROBLEM` comment provides the numerical `id` used by URLs and reviews. Display rank is independent of this ID.
-2. **File Location**: Place your TeX file in `attacks/open_problems/top_problems/<MODEL_NAME>/`.
-3. **File Naming**: Use `<unsolvedmath_id>.tex`, for example `1.tex` for P versus NP. Further versions use `1_v2.tex`, `1_v3.tex`, and so on. Keep the root definition file separate from model attempts.
-4. **Mathematical Content**: Include a precise statement, definitions and conventions, a literature check, the actual mathematical attempt, verification, and a final status. Cite relevant sources for the definition and concepts as well as theorems, reductions, or prior work used during the attempt. Use identifiable bibliographic references and source URLs; do not invent citations.
-5. **Honest Scope**: Identify what is proved, what is known, and the first remaining gap. An unresolved attempt is welcome. Do not present a statement, generic plan, untested idea, or restatement of known results as a new solution.
+## Full-solution claims and status
+
+`ATTEMPT_STATUS` accepts `solved`, `partial`, or `unresolved`. `solved`, SOLVED,
+and FULL SOLUTION may describe the original problem only when the manuscript claims
+to settle **all** its quantifiers, assumptions, ranges, boundary cases, and bundled
+questions by proof or disproof. A special case, improved bound, necessary condition,
+auxiliary counterexample, or conditional theorem does not settle the original target.
+A “complete characterization” in a title does not automatically make a result solved;
+a tautological reformulation may not provide the requested substantive characterization.
+Use `partial` for proved progress with remaining gaps, or `unresolved` when the target
+remains unresolved without a substantiated progress claim. Make title, abstract,
+status, conclusion, and estimate consistent. Quotations of rejected solved claims
+must be explicitly identified as such.
+
+Every new solved attempt needs a full-solution scope declaration stating the exact
+original target, theorem/counterexample, coverage of all cases and quantifiers,
+every significant external dependency, whether independent human proof checking
+occurred, unverified portions, and whether novelty was checked. Supply it in the
+manuscript and in the `FULL_SOLUTION_SCOPE` header below. This declaration is a claim,
+not evidence that the proof is correct.
+
+The build currently normalizes `partial` to `unresolved` for ordinary attempt
+aggregation; the literal TeX status preserves the finer distinction. Source-catalogue
+status, LLM claim status, and community-review verdict are separate. Economics
+may show **solved (LLM claim)** and `source_status` separately; OpenAI external claims
+use their scoped rules below. Erdős LLM column labels include a saved-database display
+rule, not newly verified mathematics. Do not change source status or review metadata
+to agree with a model claim. Never call a build or LLM self-assessment independent
+proof verification.
+
+## Completion estimates
+
+Every new or changed research attempt must include the exact LaTeX heading and a
+numeric declaration immediately below it (within the next three lines):
+
+```tex
+\section{Completion Estimate}
+\noindent\textbf{COMPLETION: 25\%}
+Proved [precise result]; [precise original-target gaps] remain.
+```
+
+Use one value between 0 and 100, including decimal percentages, and briefly justify
+it mathematically. The existing `build_site.extract_completion` reads this syntax.
+Keep confidence discussions and other percentages out of those first four lines.
+This is subjective progress toward the **original problem**, not confidence in the
+proof, probability of success, independent verification, length, or lemma count.
+Only a full-solution claim may use 100%; partial/unresolved work must use less.
+Legacy estimates are preserved. Statement-only catalogue documentation requires
+neither this heading nor an estimate; complete documentation is not a solved problem.
+
+## Model attribution and human authorship
+
+An LLM-generated manuscript primarily identifies the actual LLM/version generating
+its mathematics. Credit all material models and human contributions accurately.
+Prompting, copying output, submitting files, formatting, compilation, a site build,
+a superficial reading, or asking another model to check a proof does not by itself
+justify human mathematical authorship.
+
+A human may be an author for significant intellectual work, substantial development
+of results, correction of a major proof, or rigorous checking of significant portions.
+Describe that scope. Limited checking belongs in verification/contributions/
+acknowledgments rather than automatically conferring authorship. For example:
+“Jane Doe independently checked Lemma 3 and the hypotheses of Theorem 5. The remaining
+proofs were generated by GPT-6 Astra Ultra and have not been independently verified
+by a human.” Distinguish mathematical authorship, prompting/submission, editing,
+verification, repository maintenance, and community review. Model-assisted checking
+is not independent human checking. Use an explicit contributor declaration; automated
+checks cannot infer intellectual significance from a person's name. Do not remove
+historical names or infer authorship from a GitHub account.
+
+## References and mathematical dependencies
+
+Every attempt needs an identifiable References section (section/subsection,
+starred or unstarred), `thebibliography`, `\bibliography{...}`, or
+`\printbibliography`. A Sources subsection also counts for catalogue-style batches.
+At minimum cite the original problem source. For every external theorem used, give
+an identifiable bibliographic source, state the mathematical content precisely,
+check hypotheses in the application, and explain its role. Disclose source uncertainty
+and what was actually consulted. Do not invent citations, theorem numbers, publication
+facts, novelty, or assertions that a source was verified. Prefer primary sources,
+permanent links, DOI and arXiv records. Preserve third-party attribution, licence terms,
+and change notices from [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Verification and reproducibility
+
+Describe boundary/counterexample checks, proof audits, computation, and external
+theorem-hypothesis checks with actual outcomes, failures, or “not performed”. Name
+who checked which portions and whether checking was human independent or LLM-assisted.
+Identify prompts/process, dates, material revisions, public scripts/input/output links
+where available, software versions, seeds, dependencies, and theorem prover settings.
+Do not publish private transcripts or secrets. Disclose missing artifacts and inaccessible
+sources. Computation may support a proof without replacing it. Explain the scope of
+formalization, extra axioms, `sorry`/`admit`, and what has not been checked.
+
+## Adding New Open Problem Statements
+
+This is a separate process from submitting research attempts. A statement is not a
+solution and belongs in a category's catalogue mechanism, not a model folder merely
+to increase attempt counts. Catalogue size alone is not a reason to accept conjectures.
+
+### Established open problems
+
+Supply a mathematical title, primary source and original proposer attribution, exact
+original formulation, assumptions and quantifiers, definitions/notation, short English
+explanation, known partial results, accurate references, current-status evidence and
+date checked, and duplicate/related-problem checks. Use credible literature, preprints,
+research databases, or appropriate scholarly sources; do not treat a model's recollection
+as status evidence. Explain discrepancies with older source statuses instead of silently
+changing them.
+
+### Newly formulated conjectures
+
+Additionally identify the proposer and every LLM's role, mathematical motivation,
+relationship to known questions, elementary/boundary tests, counterexample search,
+literature and duplicate checks, and why the question is nontrivial. Explicitly disclose
+that model generation alone establishes neither novelty nor open status. Unsupported
+LLM conjectures must not be presented as established literature problems.
+
+### Identity and duplicate review
+
+Before acceptance, compare repository statements, authoritative source databases,
+relevant literature, equivalent formulations, already solved variants, permanent IDs,
+and parent/subproblem relationships. Normally reuse an existing identity for the same
+question. A restricted variant needs mathematical justification and maintainer-approved
+identity review. IDs must never come from display ranks or be invented by an LLM.
+Include the evidence and approval/allocation reference in the PR; automation cannot
+detect mathematical equivalence or establish open status.
+
+## Category-specific locations and catalogue requirements
+
+| Category | Research attempts | Statement/identity authority |
+| --- | --- | --- |
+| Erdős | `attacks/open_problems/erdos/<model>/<number>[_vN].tex` | Authoritative Erdős number; `lists/erdos_status.json` and `lists/erdos_problems.csv`; source statement is linked externally |
+| Top Open Problems | `attacks/open_problems/top_problems/<model>/<id>[_vN].tex` | `definitions/<id>.tex`, `lists/unsolvedmath/problems.json`, `display_order.json` |
+| MathOverflow | `attacks/open_problems/mo/<model>/<question_id>-<title-slug>[_vN].tex` | Original question ID and verified `link` in `lists/mo_problems.csv` |
+| Economics | `attacks/open_problems/economics/<model>/<permanent-id>[_vN].tex` | `statements/<permanent-id>.tex`, `lists/economics/problems.json`, `rankings.csv` |
+
+`N` is an unused integer at least 2; existing versions must not be overwritten or
+renamed. Use existing folder spellings. The website groups ranked and MO records under
+Top Open Problems while retaining their separate identities and review paths.
+
+### Erdős and MathOverflow
+
+Never invent an Erdős number. Review/register an authoritative new number in the saved
+source catalogue before adding attempts; preserve database status provenance and use
+`scripts/sync_erdos_status.py` for source refreshes. Do not turn a new local conjecture
+into an Erdős problem. MO proposals must retain the original numeric question ID and
+verified `https://mathoverflow.net/questions/<id>/...` URL; check accepted answers,
+edits, and recent evidence before calling it open. Add the corresponding CSV entry
+without removing or changing existing identities. These catalogues link to source
+statements; they have no generic new statement-only TeX importer. Record source,
+status, duplicate, and attribution review in the PR rather than creating an unsupported
+statement directory. Newly formulated local conjectures go through a reviewed local
+Top Open Problems identity, not a fabricated MO question.
+
+### Top Open Problems
+
+Use canonical UnsolvedMath IDs, never display positions or public-code guesses.
+Statement-only files preserve a matching `TOP_PROBLEM` JSON header,
+`% ENTRY_KIND: statement_only`, and these nonempty subsections:
+
+```tex
+\subsection{Definitions and mathematical statement}
+\subsection{Short English statement}
+\subsection{Sources}
+```
+
+Keep source links/citations and relevant source licences. The portable registry,
+definition metadata (`id`, `title`, `category_id`, `status`), and display order must
+agree. Use the existing statement importer
+`scripts/import_unsolvedmath_statements.py` with its full upstream registry and
+labelled source input; it verifies identity and extends both site registry and order.
+Inspect `--help` and review intended changes. Do not run migration scripts as an
+append tool. New standalone outputs also need the prospective declaration below.
+
+For genuinely new local targets, maintainers review provenance, duplicates, and scope
+first. Allocate above all full-registry IDs and the external `id_registry.json`
+watermark, retain an allocation report, use `LOCAL-<id>`, `published: false`, no
+upstream URL, and parent IDs for a justified subcase. The specialized
+`scripts/allocate_openai_problem_ids.py` can produce/reserve IDs from identity-reviewed
+proposals against a **complete external registry and watermark**; it is not a universal
+allocator, source-status reviewer, or page writer. Its OpenAI adjudication requirements
+remain in force for that workflow. Commit the reviewed site registry, definition, and
+order together; preserve legacy URL aliases.
+
+### Economics
+
+Use the registered permanent ID, not current rank or the sometimes reused source OP
+ID. Every research attempt is a complete standalone document with exactly one matching
+`ECONOMICS_PROBLEM` JSON header (`id`, `title`, `jel_code`, `source_id`),
+`FIRST_POSTED: YYYY-MM-DD`, and explicit `ATTEMPT_STATUS`. Statement-only files use
+that identity header and exactly one `% BEGIN ECONOMICS STATEMENT` / `% END ECONOMICS
+STATEMENT` boundary pair enclosing substantive subsections. No research status or
+completion belongs in a statement. Preserve source labels and shared conventions.
+
+The original importer is deliberately one-time; it refuses to rebuild an existing
+registry. **Do not rerun it or simply append a statement.** A new Economics proposal
+requires maintainer source/scope/duplicate review and registration in `problems.json`
+with provenance, statement path, count, and a fresh unused initial identity slot above
+all previous `initial_rank` values. Freeze the resulting JEL/initial-slot ID forever;
+the slot is an identity allocation, not a current difficulty rank. Add a ranking row
+and preserve existing ranks (append initially); the registry's initial slots and current
+ranks must each remain contiguous. Review the complete registry/statement/ranking diff
+and run `scripts/economics_catalog.py` and the validator before acceptance. No generic
+Economics allocator is introduced here. A future alternative ID namespace needs a
+separate schema migration. See [Economics catalogue](lists/economics/README.md) for rank
+updates, imported-source history, and the original importer.
+
+## Prospective machine-readable declarations
+
+These comment headers support submission checks; they are **documentation-only** and
+do not change site status, authorship, or proof validity. Use one single-line JSON
+object per header, before the document (or at the start of an Erdős/MO fragment).
+All named text fields must be nonempty; use honest “None” / “Not performed” / uncertainty
+statements when applicable. Also include these facts in the readable manuscript.
+
+A research attempt needs `SUBMISSION` plus exactly one `% ATTEMPT_STATUS: ...`:
+
+```tex
+% SUBMISSION: {"kind":"research_attempt","category":"erdos","problem_id":"5","model":{"provider":"OpenAI","version":"GPT-6","reasoning":"Astra Ultra","generated_on":"2026-10-10"},"other_models":"None","tools":"None","target":"Exact original target, including all quantifiers","scope":"Theorem proved and comparison with the original target","human_contributions":"None; submitter supplied prompts only","verification":"Model self-audit only; no independent human proof verification","reproducibility":"Prompt A then B; public artifacts or unavailable artifacts disclosed"}
+% ATTEMPT_STATUS: partial
+```
+
+Use category `erdos`, `top_problems`, `mo`, or `economics`; `problem_id` is the canonical
+string ID. If model version is unavailable, include a nonempty `version_uncertainty`
+inside `model` explaining why. Set `reasoning` to “Not exposed” when necessary. Do not
+copy the example's version or date as if it described your model. Top attempts also
+copy their definition's `TOP_PROBLEM` header; Economics uses its matching header and
+FIRST_POSTED above. New attempts in all categories require source attribution,
+References and Completion Estimate in active LaTeX.
+
+For `solved`, also add this single-line JSON header and readable scope declaration:
+
+```tex
+% FULL_SOLUTION_SCOPE: {"target":"Entire original statement","result":"Theorem/counterexample with locator","coverage":"Explanation covering all cases and quantifiers","dependencies":"All significant external results, or none","human_verification":"Who independently checked what, or none","unverified":"Portions not independently checked","novelty":"Search undertaken and result, or not checked"}
+```
+
+A Top/Economics statement needs this different declaration (no model required):
+
+```tex
+% SUBMISSION: {"kind":"statement_only","category":"top_problems","problem_id":"1","proposal_type":"established","source":"Primary citation and permanent URL","status_evidence":"Evidence of current status and limitations","status_checked_on":"2026-10-10","duplicate_check":"Repository/source/literature/equivalence checks and related IDs","attribution":"Original proposer and any preparation assistance"}
+```
+
+For `proposal_type: new_conjecture`, additionally supply nonempty text fields
+`proposer`, `motivation`, `related_problems`, `boundary_tests`, `counterexample_search`,
+`nontriviality`, and `novelty_disclosure` (including the unestablished novelty/open-status
+caveat). Top definitions require ENTRY_KIND; Economics is identified by its statements
+path (ENTRY_KIND statement_only may also be supplied). Do not add `ATTEMPT_STATUS`,
+`FULL_SOLUTION_SCOPE`, model/research fields, or completion to statement-only files.
+
+## Mandatory initial and final LLM prompts
+
+Use [the four complete copy-ready prompts](docs/contribution_prompts.md): **A** before
+research and **B** after a proposed result; **C** before statement preparation and
+**D** before submitting a statement. Fill in actual model, tools, source, canonical ID,
+and category. If a tool/source is unavailable, disclose that fact and arrange a source
+check rather than pretending it was consulted. Retain prompt/audit provenance in the
+submission's reproducibility notes. Self-audits improve quality but are not independent
+human verification. Human-only contributions use the corresponding scope/source review
+checklists without falsely claiming an LLM was used.
+
+## Specialist research batch imports
 
 For catalogue-style research batches, use the importer from the repository root:
 
@@ -161,18 +442,7 @@ targets use adjudication pool C and require the same independent scope review
 and solved-label confirmation as existing records. Keep allocation reports and
 full local registries outside the site repository.
 
-### For the MathOverflow Subset
-
-1. **File Location**: Place your TeX file in `attacks/open_problems/mo/<MODEL_NAME>/`.
-2. **File Naming**: Preserve the existing convention `<question_id>-<title-slug>.tex` (and version suffixes where used).
-3. **Add to List**: If it is a new problem, add an entry to `lists/mo_problems.csv`.
-4. **Content**: Follow the same statement, definition, citation, mathematical work, and verification requirements as ranked open-problem attempts.
-
-The website groups ranked problems and MathOverflow records under **Top Open Problems**.
-The numbered definitions contain stable IDs for existing problem links and reviews. Keep the number-to-ID mapping consistent with any numbered model attempts.
-MathOverflow entries retain their numeric source IDs and existing links.
-
-### Lean Code Contributions
+## Lean formalizations
 
 Submit a short `.tex` description using the same problem directory, model folder,
 and filename/version convention as a normal LLM attempt above. It will appear as
@@ -180,7 +450,9 @@ an attempt on that problem's page. Keep the Lean source in an external repositor
 submit only the description here, so contributors and readers do not need to
 download `.lean` files into this website repository.
 
-The description must include:
+These descriptions follow the research declaration, References, and Completion Estimate rules below,
+with a link to the complete external output instead of embedding the entire proof.
+The description must also include:
 
 - **Lean source**: A public HTTPS link to the complete Lean code, such as a GitHub
   file or repository. Prefer a link pinned to a commit, and identify the relevant
@@ -222,7 +494,8 @@ result; use the appropriate problem/model path):
 ```tex
 \documentclass{article}
 \usepackage{hyperref}
-% ATTEMPT_STATUS: unresolved
+% ATTEMPT_STATUS: partial
+% Add SUBMISSION JSON as described above; retain category-specific headers.
 \begin{document}
 \section*{Lean formalization of Erdos problem 5}
 Model and process: [model/version, prompting, and human contributions].
@@ -235,40 +508,79 @@ Reproduction: [Lean version and Mathlib commit, or Lean Web project].
 Checking outcome: [actual result, warnings, or not tested].
 Additional assumptions or placeholders: [list, or none].
 
+\section{Completion Estimate}
+\noindent\textbf{COMPLETION: 25\%}
+[Replace 25 with your actual estimate and explain proved scope and remaining gaps.]
+\section*{References}
+[Original problem source and formalization dependencies.]
 \section*{Final status}
 PARTIAL formalization; the original problem remains UNRESOLVED.
 \end{document}
 ```
 
-## Pull Request Process
+## Pull requests and checks
 
-1. **Fork the Repository**: Create your own fork of the project
-2. **Create a Branch**: Use a descriptive branch name (e.g., `add-opus45-erdos-352`)
-3. **Add Your Files**: Place the attempt files in the correct directories
-4. **Check the Build**: Run `python3 build_site.py`, `python3 -m unittest discover -s tests`, and `for test_file in tests/test_*.js; do node "$test_file"; done`. Confirm the problem statement, references, and actual attempt render on the detail page.
-5. **Submit PR**: Create a pull request with a clear description
+Fork, create a descriptive branch, add/version files in the correct locations, and
+complete the [mathematical PR template](.github/pull_request_template.md). Research PRs
+state category/ID, exact models/configuration/date, status/percentage, theorem, original
+scope comparison, dependencies, contributions, verification, gaps, and reproducibility.
+Statement PRs give source/formulation, status evidence/search date, duplicate checks,
+attribution, proposal type, identity approval, and registry/order changes.
 
-### PR Description Template
+Run from the repository root (substitute your actual base branch/reference):
 
-```markdown
-## Summary
-- Problem Type: [Erdos/Top Open Problems/MathOverflow subset]
-- Problem Number/ID:
-- LLM Model Used:
-- Claimed Status: [Solved/Partial/Unresolved]
-
-## Notes
-[Any additional context about the attempt]
+```sh
+python3 scripts/validate_submissions.py --base origin/main
+python3 -m unittest discover -s tests
+for test_file in tests/test_*.js; do node "$test_file"; done
+python3 build_site.py
 ```
 
-## Quality Standards
+Inspect the final diff and rendered statements, references, attempts, downloads and
+review links. Do not commit generated site data unless the contribution needs it.
+Report exact results; a successful build is not proof checking. Review issue forms
+remain available independently of mathematical submission PRs.
 
-- **Reproducibility**: Include information about the prompt strategy used and if possible a public link
-- **Completeness**: Include the full LLM output, not just excerpts. For Lean contributions, the short TeX description may link to the complete original output and Lean source hosted externally.
-- **Formatting**: Use proper LaTeX formatting for mathematical content
-- **Sources**: Cite primary sources for the target and definitions, and cite the results used in the mathematical argument. Check cited statements and explain how their hypotheses apply.
-- **Substance**: Include actual mathematical reasoning or a checked construction. Keep catalogs and statement-only records separate from attempts.
-- **Status**: State unresolved gaps plainly. Completion estimates are the author's estimates, not external verification.
+## Automated validation and limitations
+
+`python3 scripts/validate_submissions.py PATH.tex ...` explicitly checks prospective
+requirements. `--base REF` instead checks only added/modified submissions against
+that Git commit, including working-tree changes and untracked TeX files; unchanged
+historical files are skipped even if supplied explicitly. Missing/invalid base refs
+fail, not silently fall back to checking every historical file. PR CI uses the PR base
+SHA and full history. Push builds retain their historical build validation without
+retroactive manuscript linting.
+
+The validator checks location/filename/version, registered identity and matching
+headers, declarations, exact completion heading and build-compatible percentage,
+partial/unresolved versus 100%, solved scope fields, references/bibliography, Top
+statement headings, Economics boundaries, registry duplicates/order/rank consistency,
+and removal/rename of stable files/identities relative to the base. The three existing
+identical MO CSV repetitions (339137, 377545, 185834) are grandfathered at their current
+two-row counts; new duplicates and conflicting rows fail. Comments and literal
+code cannot satisfy body requirements. It handles ordinary LaTeX, not arbitrary macro
+execution, conditionals, included files, or TeX package code; unusual valid structures
+need maintainer review rather than a fabricated success. It checks declaration
+presence, not truth, authorship significance, citation accuracy, novelty, mathematical
+equivalence, proof completeness, or correctness. Human mathematical judgment remains
+required for those questions.
+
+**Exceptions:** `top_problems/openai` is a scoped external-claim summary, not a new
+LLM-generated proof: it keeps the strict OPENAI_CLAIM/manifest/no-copy/adjudication
+workflow and build checks, rather than research percentage/model declarations.
+`top_problems/Human_Contribution` is a human mathematical contribution, not an LLM
+attempt: preserve its dedicated identity/entry convention and accurately disclose
+human authorship, source, scope, references, and checking in the PR; prospective LLM
+checks do not infer a model for it. Historical reused-writeup and statement-only
+collection provenance remains readable; new statement proposals use the catalogue
+routes above. Lean descriptions use the research declarations/estimate/references
+but may link the full external output. Batch importers preserve TeX word for word;
+prepare new batch sections with accurate scope and attribution. After importing,
+add declaration headers and a standalone Completion Estimate section outside the
+preserved problem section; its Sources subsection supplies references. The importer
+expects one problem section and cannot itself import a second completion section.
+Do not change old batches or definitions. Import success alone does not
+satisfy prospective checks.
 
 ## Community Reviews
 
@@ -286,110 +598,10 @@ Maintainers use the `ready-for-pr` label to create that pull request. Its requir
 `build` check must pass before merging; if GitHub displays an **Approve workflows
 to run** banner, a maintainer must review and approve the workflow run first.
 
-## Important Reminders
+## Conduct and questions
 
-1. **No Verification Claims**: Do not claim a problem is definitively solved. All claims are subject to expert review.
-2. **Original Output**: Submit the actual LLM output, not human-edited versions. For Lean contributions, the short TeX summary may be written by the contributor; preserve the original generated output at the external source link and disclose any subsequent human edits separately.
-3. **Disclosure**: If you used any special prompting techniques, document them.
-
-## Code of Conduct
-
-- Acknowledge that LLM outputs require verification
-- Credit original problem sources appropriately
-
-## Questions?
-
-For questions about contributing, use [GitHub Discussions](https://github.com/mehmetmars7/Erdosproblems-llm-hunter/discussions). The issue form is reserved for reviews of specific attempts.
-
-## Recommended prompt:
-ROLE
-You are in “research mathematician + adversarial proof checker mode.
-
-MISSION
-Given the open problem below, work toward one of the following:
-(A) produce a COMPLETE, gap-free PROOF of the statement as written, or
-(B) produce an EXPLICIT COUNTEREXAMPLE and a rigorous DISPROOF.
-If neither is achieved, report UNRESOLVED with checked partial results and exact remaining gaps. No handwaving. No unstated assumptions. No “it is clear”. Every nontrivial step must be justified.
-
-If the statement is ambiguous/misstated, do not ask me questions: instead
-1) identify the ambiguity/misstatement precisely,
-2) give the *minimal* corrected statement consistent with standard conventions,
-3) then either prove the corrected statement or give a counterexample to the literal statement (or both),
-clearly separating “literal statement” vs “corrected statement”.
-
-TOOLS / CONSTRAINTS (fill these in)
-- Web browsing available? [YES]
-- Computation available (Python/Sage/Mathematica)? [YES]
-
-PROBLEM
-
-OUTPUT FORMAT (you must follow)
-1) “FORMAL RESTATEMENT” (quantifiers explicit; all terms defined; edge cases stated)
-2) “QUICK LITERATURE/CONTEXT CHECK” (only if browsing is available; otherwise: what you recall + uncertainty)
-3) “ATTACK PLAN” (1–3 proof strategies + 1–3 disproof/construction strategies; pick the best path)
-4) “WORK” (lemmas + proofs or explicit counterexample + verification)
-5) “VERIFICATION” (attempt to break your own proof/counterexample; boundary cases; quantifier checks)
-6) FINAL (select the label supported by the work):
-  LABEL: **FULL SOLUTION**
-   SUBLABEL:
-   - **FULL PROOF** (clean theorem statement + complete proof)
-   - **COUNTEREXAMPLE/DISPROOF** (explicit object(s) + step-by-step verification + conclusion)
-  Or LABEL: **UNRESOLVED**, followed by the strongest checked partial result and exact remaining gap.
-
-WORKFLOW (do this, tightly and efficiently)
-PHASE 0 — HYGIENE (must do)
-- Rewrite the statement with explicit quantifiers (∀, ∃, “for infinitely many”, etc.).
-- List definitions and conventions (e.g., ℕ starts at 0 or 1; graphs simple?; logs base e?).
-- Identify the “stress points”: extreme parameters, degenerate cases, hidden dependencies.
-
-PHASE 1 — FAST REALITY CHECK (must do)
-- Test tiny cases by hand (n=1,2,3; smallest nontrivial instances).
-- Actively try to falsify the claim with small constructions.
-- If computation is available, write minimal pseudocode to search small cases and report what it finds.
-
-PHASE 2 — LANDSCAPE (must do)
-- Classify the problem type: extremal / probabilistic / additive number theory / analytic / Ramsey / etc.
-- List 5–10 likely tools, each with a one-line “why relevant” (e.g., pigeonhole, double counting,
-  energy/Cauchy–Schwarz, container method, dependent random choice, Fourier, sieve, PNT, etc.).
-- Look for equivalent formulations, monotonicity, reduction to “minimal counterexample”, or scaling.
-
-PHASE 3 — DUAL-TRACK SOLVE (must do)
-Run both tracks in parallel; stop as soon as one succeeds.
-
-(A) PROOF TRACK
-- Propose a concrete proof outline with named lemmas in dependency order.
-- Prove each lemma fully; after each lemma, state exactly what it gives and how it will be used.
-- Avoid “standard” leaps: if using a known theorem, state it precisely and verify hypotheses.
-
-(B) DISPROOF TRACK
-- Try to build a counterexample systematically:
-  • extremal constructions (balanced/unbalanced, structured/random),
-  • known families (AP-free sets, Sidon sets, Behrend-type, projective planes, etc.),
-  • parameter pushing (largest/smallest density, tightness cases),
-  • “cheap” technicality checks (misstated quantifiers, missing constraints).
-- Keep the smallest/cleanest candidate counterexample.
-- If you find one, verify every condition line-by-line and conclude disproof.
-
-PHASE 4 — ADVERSARIAL VERIFICATION (must do)
-Before finalizing, attempt to refute your own solution:
-- Check boundary cases and quantifiers again.
-- Check any hidden use of choice/compactness/limit arguments.
-- Try to find a counterexample to each lemma.
-- Ensure constants/ranges are correct and not circular.
-If anything breaks: fix and re-run verification.
-
-RULES (non-negotiable)
-- Do NOT fabricate references, prior results, or “known facts”. If unsure, say so.
-- Do NOT present an argument with gaps as a full solution.
-- If the literal statement is false, prefer an explicit counterexample over “it seems false”.
-
-FAIL-SAFE (only if genuinely unavoidable)
-If you cannot reach FULL PROOF or COUNTEREXAMPLE after exhausting the workflow, output:
-**UNRESOLVED**
-and include:
-(i) the strongest fully proved partial result you *did* obtain,
-(ii) the exact first gap (a single crisp statement you could not prove),
-(iii) the top 3 next moves (specific lemmas to target or constructions to test),
-(iv) what a minimal counterexample would likely look like (structure/parameters).
-
-BEGIN NOW.
+Credit sources and contributions accurately, respect source licences, and describe
+uncertainty plainly. For contribution questions use
+[GitHub Discussions](https://github.com/mehmetmars7/Erdosproblems-llm-hunter/discussions).
+The review issue form is reserved for reviews of specific attempts; Economics reviews
+currently need a manual maintainer workflow because that form has no Economics option.

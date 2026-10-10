@@ -262,7 +262,15 @@ before records are generated. See the contribution guide for the record contract
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting new LLM attempts.
+We welcome advanced frontier-model research attempts, including partial progress.
+New submissions require exact model/version attribution, explicit mathematical scope,
+Completion Estimate and References, and accurate human contribution and verification
+disclosures. Full-solution labels apply only to the entire original problem and
+remain claims subject to mathematical review. New statements undergo source, permanent
+identity, duplicate and current-status checks separately from research attempts.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete instructions and prospective
+validation, and [the four contributor prompts](docs/contribution_prompts.md) for
+initial work and final audits.
 Lean formalizations follow the same problem/model folder and filename conventions:
 submit a short `.tex` description with a public external source link, scope,
 model attribution, Lean/Mathlib versions, and actual checking outcome. The website
