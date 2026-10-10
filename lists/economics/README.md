@@ -87,3 +87,21 @@ python scripts/import_economics.py --tex Merged_Open_Problems_JEL_difficulty_ran
 The registry records SHA-256 hashes of both original attachments. Actual
 section/`ProblemClassification` pairs govern parsing; stale or absent
 `MERGED_PROBLEM` comments do not determine problem identity.
+
+## New statements and prospective submissions
+
+Follow [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-new-open-problem-statements)
+for source, scope, duplicate, status and attribution review. The original importer
+is not an append tool. Maintainers must register an approved addition with provenance,
+statement path and updated count, allocating a fresh initial identity slot above all
+existing slots; freeze its JEL/slot ID independently of current difficulty rank.
+Update the statement and full ranking together, appending initially to preserve old
+ranks. Both initial slots and current ranks must remain contiguous. No new allocator
+or identity migration is provided.
+
+New/changed attempts require the research SUBMISSION declaration, exact model/version,
+References, Completion Estimate, and a full-solution scope declaration if solved.
+New/changed statement-only files instead require the statement SUBMISSION declaration
+and exact existing boundaries; omit research statuses and completion estimates.
+Run `python3 scripts/validate_submissions.py --base origin/main` plus the normal build
+and tests. Legacy files and their estimates/status labels remain unchanged.
