@@ -16,12 +16,23 @@ class EconomicsCompletionSectionsTests(unittest.TestCase):
         cls.ids = {record['id'] for record in load_registry()['problems']
                    if 201 <= record['initial_rank'] <= 657}
         cls.sources = []
+        cls.historical_sources = []
         for path in sorted((BASE_DIR / 'attacks/open_problems/economics').glob('*/*.tex')):
             if path.parent.name in {'statements', 'definitions'}:
                 continue
             match = re.fullmatch(r'([A-Z]\d{2}-\d+)(?:_v\d+)?\.tex', path.name)
             if match and match[1] in cls.ids:
-                cls.sources.append((match[1], path, path.read_text(encoding='utf-8')))
+                content = path.read_text(encoding='utf-8')
+                source = (match[1], path, content)
+                cls.sources.append(source)
+                posted = re.search(r'^% FIRST_POSTED: (\d{4}-\d{2}-\d{2})$',
+                                   content, re.MULTILINE)
+                if posted is None:
+                    raise AssertionError(f'Missing FIRST_POSTED metadata: {path}')
+                # Preserve estimates in the fixed 2026-10-09 batch. The
+                # contribution guide permits later attempts to omit estimates.
+                if posted[1] <= '2026-10-09':
+                    cls.historical_sources.append(source)
 
     @staticmethod
     def stated_estimate(content):
@@ -36,10 +47,10 @@ class EconomicsCompletionSectionsTests(unittest.TestCase):
         return section.start(), float(value[1])
 
     def test_each_attempt_has_a_valid_extractable_estimate_before_references(self):
-        self.assertEqual({problem_id for problem_id, _, _ in self.sources}, self.ids)
+        self.assertEqual({problem_id for problem_id, _, _ in self.historical_sources}, self.ids)
         bibliography = re.compile(r'\\begin\{thebibliography\}|\\(?:bibliography|printbibliography)\b')
         heading = re.compile(r'\\(?:section|subsection|subsubsection)\*?\s*\{([^}\n]*)\}')
-        for _, path, content in self.sources:
+        for _, path, content in self.historical_sources:
             with self.subTest(path=path.relative_to(BASE_DIR)):
                 section, value = self.stated_estimate(content)
                 self.assertGreaterEqual(value, 0)
@@ -67,11 +78,15 @@ class EconomicsCompletionSectionsTests(unittest.TestCase):
         expected = {}
         for problem_id, path, content in self.sources:
             with self.subTest(path=path.relative_to(BASE_DIR)):
-                _, value = self.stated_estimate(content)
-                expected[problem_id] = max(expected.get(problem_id, 0), value)
+                value = extract_completion(content)
                 attack = next(attack for attack in published[problem_id]['attacks']
                               if attack['file_path'] == path.relative_to(BASE_DIR).as_posix())
-                self.assertEqual(attack['completion'], value)
+                published_value = 100 if attack['status'] == 'solved' else value
+                self.assertEqual(attack.get('completion'), published_value)
+                if published_value is not None:
+                    self.assertGreaterEqual(published_value, 0)
+                    self.assertLessEqual(published_value, 100)
+                    expected[problem_id] = max(expected.get(problem_id, 0), published_value)
                 self.assertEqual((BASE_DIR / 'docs' / attack['download_url']).read_bytes(),
                                  path.read_bytes())
         for problem_id, value in expected.items():
