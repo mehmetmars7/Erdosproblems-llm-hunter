@@ -1,0 +1,283 @@
+% ECONOMICS_PROBLEM: {"id": "C78-237", "title": "Stable-roommates robustness to preference perturbations", "jel_code": "C78", "source_id": "OP-0561"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\FP}{\mathsf{FP}}
+\title{Robust stable-roommates matchings:\\existence and optimization}
+\author{Ji Ho Bae}
+\date{10 October 2026}
+\hypersetup{pdftitle={Robust stable-roommates matchings: existence and optimization},pdfauthor={Ji Ho Bae}}
+\begin{document}
+\maketitle
+
+\paragraph{Authorship and provenance.}
+Author: Ji Ho Bae. Prepared with GPT Codex assistance; the precise serving
+revision was not exposed. The complete original argument is retained in
+the \href{https://github.com/jbaelaw/robust-roommates-proof/blob/07e1c1655e18eaee6bb20468771afe6beabd93e5/paper/Proof.tex}{immutable TeX source} and
+\href{https://github.com/jbaelaw/robust-roommates-proof/blob/07e1c1655e18eaee6bb20468771afe6beabd93e5/paper/Proof.pdf}{proof PDF}. This submission adds catalogue metadata,
+provenance and a completion statement to that argument. Its preparation
+included exact-target and primary-source checks and separate mathematical
+reviews. This is a complete proof claim submitted for independent expert
+review; community acceptance remains pending.
+
+\begin{abstract}
+For complete strict roommates preferences, a matching stable against
+at most $d$ adjacent swaps in total across all lists can be found in polynomial time,
+or its nonexistence certified. The algorithm adds symmetry constraints
+to the rotation representation for robust marriage. Minimum-cost robust
+matching is NP-hard at every fixed swap radius. Maximizing stability
+probability under an explicit joint perturbation law is NP-hard even
+when that law is a point mass. We give the corresponding verification,
+decision and exact-search bounds.
+\end{abstract}
+
+\section{Model and classification}
+Let $I$ give strict complete rankings on an even set of $N$ agents.
+A matching partitions the agents into pairs. An unmatched pair blocks
+when both agents prefer each other to their assigned partners.
+A matching is $d$-robust if it is stable after every sequence of at most
+$d$ adjacent swaps across all lists, where $d\geq0$ is encoded in binary.
+For the separate probability question, specify a finite joint law
+$\nu=\sum_{\ell=1}^s w_\ell\delta_{J_\ell}$ by listing complete strict
+profiles and nonnegative binary rational weights summing to one. Write
+\[
+ r_\nu(M)=\sum_{\ell=1}^s w_\ell
+       \mathbf1\{M\text{ is stable in }J_\ell\},\qquad M\in\mathcal S(I).
+\]
+Here $\mathcal S(I)$ is the set of originally stable matchings. The law
+need not be supported in the swap ball; every listed profile is obtainable
+by some finite sequence of adjacent swaps. Edge costs and objective
+thresholds are binary rationals.
+
+\begin{theorem}\label{classification}
+For the model above, the following statements hold.
+\begin{enumerate}
+\item Verification, existence and construction of a $d$-robust matching
+      are polynomial-time problems.
+\item Deciding whether a $d$-robust matching of cost at most a given
+      threshold exists is NP-complete for every fixed $d\geq0$, even
+      with zero-one edge costs. It is also NP-complete for input $d$.
+\item Evaluating $r_\nu(M)$ is polynomial-time. Deciding whether some
+      $M\in\mathcal S(I)$ satisfies $r_\nu(M)\geq\lambda$ is NP-complete,
+      even for a point-mass law and $\lambda=1$. Its maximization admits
+      no deterministic polynomial-time multiplicative approximation
+      with any finite factor unless $\mathsf P=\NP$.
+\item Minimum cost subject to $M\in\mathcal S(I)$ and
+      $r_\nu(M)\geq\lambda$ also has an NP-complete threshold problem.
+      Both cost optimizations and probability maximization admit
+      $\FP^{\NP}$ algorithms, reporting infeasibility when necessary.
+\end{enumerate}
+\end{theorem}
+
+These statements answer catalogue problem C78-237 with the perturbation
+representation specified above. They impose no restriction on the
+original complete strict profile. The survey motivating the question
+distinguishes preference perturbations from pair-failure robustness
+\cite[\S3.3.2]{survey}; our model concerns the former.
+
+\section{Verification and a polynomial existence criterion}
+Number positions in agent $i$'s original list from one, writing $r_i(j)$.
+For an unmatched pair put
+\[
+ b_M(i,j)=\max\{r_i(j)-r_i(M(i)),0\}
+          +\max\{r_j(i)-r_j(M(j)),0\}.
+\]
+This is exactly the minimum total number of adjacent swaps needed to
+make the pair block. If a name is already above the assigned partner,
+its contribution is zero. Otherwise reversing their order costs their
+position distance: they must cross each other, and each intervening
+name must cross one of them. Moving the candidate directly above the
+partner attains this bound. The two lists are distinct, so the costs add.
+Consequently
+\begin{equation}\label{radius}
+ M\text{ is }d\text{-robust}
+ \quad\Longleftrightarrow\quad
+ b_M(i,j)>d\text{ for every unmatched pair }\{i,j\}.
+\end{equation}
+This gives a quadratic verification algorithm. For $N=0$ or $2$, the
+unique matching is robust at every radius. For $N\geq4$, every pair cost
+is at most $2(N-2)$, so $d\geq2(N-2)$ is immediately infeasible.
+
+We use the following established marriage representation. For a strict
+bipartite profile, allowing incomplete lists, stable matchings correspond
+to predecessor-closed sets of rotations. With a variable $x_\rho$ saying
+that rotation $\rho$ is eliminated, predecessor closure consists of
+implications. Chen, Skowron and Sorge give polynomially many further
+implications and unit clauses whose satisfying closed sets correspond
+\emph{exactly} to all $d$-robust stable marriages
+\cite[Proposition 3.9, Lemmas 3.15 and 3.19, and proof of Theorem 3.24]{css}.
+In their notation, a relevant stable quadruple has associated rotations
+$\pi,\rho$. When both exist its clause is $x_\pi\Rightarrow x_\rho$;
+when only $\pi$ exists it is $\neg x_\pi$; when only $\rho$ exists it is
+$x_\rho$; when neither exists the instance is infeasible. Only mutually
+acceptable prospective blocking pairs are considered. Thus these
+constraints form a polynomially constructible 2-CNF formula.
+
+Replace each original agent $i$ by a left copy $L_i$ and a right copy
+$R_i$. Both copies rank opposite-side names in $i$'s original order;
+$L_iR_i$ is unacceptable. Run deferred acceptance on this doubled
+marriage instance. If its matching is not perfect, reject: all stable
+marriages match the same subsets of agents, whereas a stable roommate
+matching would give a perfect stable marriage
+\cite[Proposition 2.3]{css}. Otherwise every stable marriage is perfect.
+
+Write such a matching as a permutation $p$, pairing $L_i$ with $R_{p(i)}$.
+The partner name of $R_i$ is $p^{-1}(i)$. For each $i$ and
+$t\in\{1,\ldots,N-1\}$ consider the two predicates
+\[
+ H^L_{i,t}=[r_i(p(i))\leq t],\qquad
+ H^R_{i,t}=[r_i(p^{-1}(i))\leq t].
+\]
+Each predicate is constant, a rotation variable, or its negation. Left partners worsen as
+rotations are eliminated; right partners improve. The rotations affecting
+an agent are ordered and traverse her stable partners without repetition.
+A nonconstant threshold is therefore crossed by exactly one rotation:
+$H^L_{i,t}=\neg x_\alpha$ or $H^R_{i,t}=x_\beta$, respectively.
+The crossing inequalities are $r_{\rm old}\leq t<r_{\rm new}$ on the
+left and $r_{\rm old}>t\geq r_{\rm new}$ on the right.
+The extreme stable matchings determine the constant cases, and the
+explicit rotations determine the crossings
+\cite[Proposition 3.6(ii),(iv)]{css}.
+
+Add $H^L_{i,t}\leftrightarrow H^R_{i,t}$ for all $i,t$ to the marriage
+robustness formula. Equality of two literals, including constants, is
+2-CNF. Since the copies have identical strict rankings, these equalities
+hold precisely when $p(i)=p^{-1}(i)$ for every $i$. Hence $p$ is an
+involution; the forbidden diagonal excludes fixed points. Its pairs
+define a roommate matching.
+
+Ordinary stability is preserved by this correspondence. Moreover, for
+a symmetric matching the cheapest attack by $L_iR_j$ has cost exactly
+$b_M(i,j)$. Formula~\eqref{radius} therefore shows that robustness is
+preserved too: each attack concerns only the two lists of its blocking pair.
+
+The final 2-CNF formula is satisfiable if and only if a $d$-robust
+roommate matching exists. A satisfying assignment specifies a closed
+rotation set; eliminate it and project its symmetric matching.
+Unsatisfiability certifies nonexistence. There are polynomially many
+rotations, robustness clauses and threshold equalities. The preliminary
+radius bound handles binary $d$ without enumerating perturbations.
+
+\section{Minimum cost is hard at every fixed radius}
+We first give the ordinary weighted-roommates reduction explicitly.
+Its four-agent gadget is the Feder construction reproduced in
+\cite[\S4.1, proof of Proposition 6]{adapting}.
+For a Vertex Cover instance $G=(V,E)$, create $p_v,a_v,b_v,c_v$ for
+each vertex $v$. Their preference prefixes are
+\[
+\begin{aligned}
+ p_v&:a_v\succ \{p_u:uv\in E\}\succ c_v,&
+ a_v&:b_v\succ p_v,\\
+ b_v&:c_v\succ a_v,& c_v&:p_v\succ b_v.
+\end{aligned}
+\]
+Order each neighbor block strictly and append all omitted names after
+the displayed prefix. Thus every list is complete.
+
+In any stable matching, $p_v$ must have partner $a_v$ or $c_v$.
+Otherwise the pair $p_va_v$ forces $a_v$ to be paired with $b_v$, its
+only preferred alternative; then $b_vc_v$ blocks. If $p_va_v$ is used,
+$b_vc_v$ must also be used, since otherwise it blocks. If $p_vc_v$ is
+used, $a_vb_v$ must be used for the same reason. The two possible modes
+are therefore
+\[
+ A_v=\{p_va_v,b_vc_v\},\qquad B_v=\{p_vc_v,a_vb_v\}.
+\]
+Both are internally stable. A graph-edge pair $p_up_v$ blocks exactly
+when both vertices use $B$. All other cross-gadget pairs are below
+the assigned local partners. Thus stable matchings correspond exactly
+to vertex covers $\{v:A_v\text{ is used}\}$. Give $p_va_v$ cost one
+and every other edge cost zero. Matching cost equals cover size.
+
+Fix any $d\geq0$, and let this core have $n\geq4$ agents. Choose an
+even integer $m>\max\{d+1,(n-2)d\}$. Add dummies
+$z_0,\ldots,z_{m-1}$, with indices modulo $m$. Dummy $z_a$ ranks its
+antipodal mate $z_{a+m/2}$ first, then the other dummies by increasing
+cyclic offset $1,\ldots,m-1$, omitting the mate, then all core agents.
+In every core list insert $d$ distinct dummy names between each
+consecutive pair of core names, and append unused dummies last.
+This uses $(n-2)d<m$ dummies per list, with reuse across different lists.
+
+Every stable matching pairs the mutually first-choice dummy mates.
+It therefore restricts to a stable core matching, and every stable core
+matching extends by the dummy pairs. Such an extension is $d$-robust.
+For an unmatched core pair, stability provides an endpoint that prefers
+its core partner; the inserted names make its attack cost at least $d+1$.
+For a core--dummy pair the dummy's attack cost is at least $m-1>d$.
+For an unmatched dummy pair of offset $h\ne m/2$, the forward cost is
+$h$ if $h<m/2$, and $h-1$ otherwise. Adding the reverse cost gives
+$m-1>d$. These cases exhaust all unmatched pairs, so
+\eqref{radius} applies. Conversely, a robust matching is stable and
+projects to the core.
+
+Preserve core costs and give all dummy edges cost zero. The correspondence
+preserves the objective. Its size is polynomial for each fixed $d$,
+including zero. Vertex Cover hardness and the polynomial verifier prove
+part~2. This also proves hardness for input $d$; the padding itself need
+not be polynomial in an unbounded binary value of $d$.
+
+\section{Stability probability and exact search}
+Checking stability in all explicitly listed profiles evaluates $r_\nu(M)$
+in polynomial bit time. For hardness use the NP-completeness of finding
+a marriage matching stable in two complete strict profiles $P,Q$
+\cite[Corollary 5]{joint}. Turn both into roommates profiles by putting
+every opposite-side name above every same-side name. Any stable roommate
+matching is bipartite: a same-side pair would force a same-side pair on
+the other side, and one member of each pair would mutually prefer to
+match together. Bipartite stability is precisely marriage stability.
+
+Take $I$ to be the converted $P$, and let $\nu$ be a point mass at the
+converted $Q$. Originally stable matchings exist because complete
+marriage instances have stable matchings. Among them $r_\nu$ is either
+zero or one, and its maximum is one exactly when $P,Q$ have a common
+stable matching. This proves part~3, including the approximation claim:
+any finite multiplicative guarantee on a positive optimum must return
+value one and would decide the NP-complete problem. Giving every edge
+cost zero also proves hardness with both a probability threshold and a
+cost bound. All threshold problems are in NP by the explicit verifiers.
+
+Finally, scale rational costs, or listed probabilities, by the product
+of their positive denominators. This product has polynomial bit length.
+Each objective is then integer-valued in a range with polynomially many
+bits. Test feasibility first, then use binary search with NP queries to
+find its exact optimum. Recover an optimizer by fixing matching edges
+successively while retaining an optimal feasible completion; these
+queries remain in NP. This proves the stated $\FP^{\NP}$ upper bounds.
+These are polynomial-time Turing upper bounds; the decision hardness
+reductions above are polynomial-time many-one reductions.
+
+\section*{Completion Estimate}
+100\%
+The stated result resolves the original catalogue question under its full
+model and quantifiers. This is the author's complete proof claim, pending
+independent expert review.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+Selected open problems in Matching Under Preferences.
+\emph{Bulletin of the EATCS} 128 (2019), 14--38, \S3.3.2.
+\href{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}{Primary manuscript}.
+\bibitem{css} J. Chen, P. Skowron and M. Sorge.
+Matchings under Preferences: Strength of Stability and Trade-Offs.
+\emph{EC 2019}, 41--59.
+\href{https://arxiv.org/pdf/1902.10535v2}{arXiv:1902.10535v2}.
+The proposition and lemma numbers cited here refer to this full version.
+\bibitem{adapting} R. Bredereck, J. Chen, D. Knop, J. Luo and R. Niedermeier.
+Adapting Stable Matchings to Evolving Preferences.
+\emph{AAAI 2020}, 1830--1837.
+\href{https://arxiv.org/pdf/1907.01375v2}{arXiv:1907.01375v2}, \S4.1,
+proof of Proposition 6.
+\bibitem{joint} S. Miyazaki and K. Okamoto.
+Jointly Stable Matchings.
+\emph{ISAAC 2017}, LIPIcs 92, 56:1--56:12.
+\href{https://doi.org/10.4230/LIPIcs.ISAAC.2017.56}{doi:10.4230/LIPIcs.ISAAC.2017.56}.
+\end{thebibliography}
+\end{document}
