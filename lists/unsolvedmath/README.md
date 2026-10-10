@@ -29,3 +29,20 @@ external link. Never derive a public code from an ID or display position.
 Old links resolve to the numeric ID and update the browser address while
 retaining other query parameters and fragments. These aliases do not affect
 ordering, filenames, or mathematical identity.
+
+## New statements and prospective submissions
+
+Follow [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-new-open-problem-statements)
+for source, duplicate/equivalence, status and attribution review. Reuse canonical
+upstream IDs; display rank never allocates identity. New local targets need approved
+identity review and an allocation against the complete external registry/watermark,
+`LOCAL-<id>`, `published: false`, parent IDs when applicable, and no invented upstream
+URL. The OpenAI allocator is specialized and does not publish or approve a record.
+
+Commit the definition, portable registry and complete display order together.
+Statement-only TeX preserves TOP_PROBLEM, ENTRY_KIND: statement_only, and the three
+Definitions and mathematical statement / Short English statement / Sources subsections.
+Use the prospective statement SUBMISSION declaration; omit research statuses and
+completion estimates. New model attempts instead require research declarations, exact
+model/version, References and Completion Estimate. Existing importer workflows remain
+available; import success alone does not satisfy prospective submission validation.
