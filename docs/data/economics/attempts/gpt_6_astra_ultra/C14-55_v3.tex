@@ -1,0 +1,545 @@
+% ECONOMICS_PROBLEM: {"id": "C14-55", "title": "Minimax estimation of longitudinal intervention effects", "jel_code": "C14", "source_id": "OP-0526"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: unresolved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+\title{Minimax estimation of longitudinal intervention effects: Doubly robust nested regression and a larger parametric region}
+\author{GPT 6 Astra Ultra\\Version 3}
+\date{10 October 2026}
+\begin{document}
+\maketitle
+\noindent\textbf{Problem ID:} \texttt{C14-55}. \textbf{Status:} Unresolved; rigorous restricted results.
+
+
+\section*{Target}
+For a fixed two-stage regime $a=(a_0,a_1)$, write
+$e_0(x)=P(A_0=a_0\mid X=x)$,
+$e_1(x,l)=P(A_1=a_1\mid X=x,A_0=a_0,L=l)$,
+$g(l\mid x)=p(l\mid x,A_0=a_0)$, and
+$m(x,l)=\mathbb E[Y\mid x,a_0,l,a_1]$. Then
+\[
+ Q(x)=\int m(x,l)g(l\mid x)dl,\qquad \psi_a=\int Q(x)p(x)dx.
+\]
+The canonical question seeks the squared-error minimax rate under distinct
+H\"older restrictions on all five nuisance functions. The agenda is
+\cite[Section 3.5.3]{agenda}. Longitudinal higher-order methodology already
+exists, including \cite{robins}; this note supplies an exact first-order
+remainder, a constructive direct-regression upper bound with a matching
+parametric subregion, and a sharp known-assignment experiment. The full
+longitudinal smoothness phase diagram remains unresolved.
+
+\section*{A count identity used in the regression constructions}
+\begin{lemma}
+If $J\sim\operatorname{Bin}(N,\rho)$ with $N\ge0$ and $0<\rho\le1$,
+then
+\[
+ \mathbb E\frac1{J+1}
+ =\frac{1-(1-\rho)^{N+1}}{(N+1)\rho},\qquad
+ \mathbb E\frac{\mathbf1\{J>0\}}J
+          \le\frac2{(N+1)\rho},\qquad
+ \Pr(J=0)\le\frac1{(N+1)\rho}.
+\]
+\end{lemma}
+\begin{proof}
+Integrate $\mathbb E t^J=(1-\rho+\rho t)^N$ from zero to one.
+The finite sum and integral can be interchanged, giving the first identity.
+For $J>0$, $1/J\le2/(J+1)$, while
+$\mathbf1\{J=0\}\le1/(J+1)$ for every $J$.
+Taking expectations and bounding the first numerator by one proves
+both inequalities.
+\end{proof}
+
+\section*{Exact two-stage bias}
+Train pilots $h_0,h_1,\widehat m,\widehat Q$ independently of an evaluation
+block of size $N$, with $h_t\in[\varepsilon,1-\varepsilon]$ and outcome
+pilots in $[0,1]$. Put $I_t=\mathbf1\{A_t=a_t\}$ and average
+\[
+ S=\widehat Q(X)+\frac{I_0}{h_0(X)}
+       \{\widehat m(X,L)-\widehat Q(X)\}
+       +\frac{I_0I_1}{h_0(X)h_1(X,L)}\{Y-\widehat m(X,L)\}.       \tag{1}
+\]
+Let $\mu(dx,dl)=p(x)g(l\mid x)dx\,dl$.
+\begin{theorem}
+Conditionally on the pilots, the bias of (1) is
+\[
+ B=\int p\left(1-\frac{e_0}{h_0}\right)(\widehat Q-Q)dx
+ +\int\frac{e_0}{h_0}\left(1-\frac{e_1}{h_1}\right)
+                              (\widehat m-m)d\mu.        \tag{2}
+\]
+Consequently its projected mean has risk bounded by
+\[
+ \frac{C_\varepsilon}{N}+C_\varepsilon\mathbb E\left[
+ \|h_0-e_0\|_{L^2(p)}^2\|\widehat Q-Q\|_{L^2(p)}^2
+ +\|h_1-e_1\|_{L^2(\mu)}^2\|\widehat m-m\|_{L^2(\mu)}^2\right].    \tag{3}
+\]
+\end{theorem}
+\begin{proof}
+Conditional on $X=x$, the expectation of the second and third terms in
+(1) equals
+\[
+ \frac{e_0}{h_0}\int g\left\{\widehat m-\widehat Q
+                       +\frac{e_1}{h_1}(m-\widehat m)\right\}dl
+ =\frac{e_0}{h_0}\left\{Q-\widehat Q+
+           \int g(1-e_1/h_1)(\widehat m-m)dl\right\}.
+\]
+Adding $\widehat Q$ proves (2). Cauchy--Schwarz and the clipped denominator
+bounds give the two products in (3), after $(x+y)^2\le2x^2+2y^2$.
+The score is bounded by $1+\varepsilon^{-1}+\varepsilon^{-2}$, so its
+conditional variance divided by $N$ proves the remaining term.
+\end{proof}
+
+\begin{proposition}
+If $g\le G$, $\widehat g$ is a nonnegative conditional density, and
+$\widehat Q(x)=\int\widehat m(x,l)\widehat g(l\mid x)dl$, then
+\[
+ \|\widehat Q-Q\|_{L^2(p)}
+ \le \|\widehat m-m\|_{L^2(\mu)}
+       +\|\widehat g-g\|_{L^2(p(x)dx\,dl)}.              \tag{4}
+\]
+In particular, suppose the evaluation size satisfies $N\asymp n$, and
+all four pilot errors have fourth moments of orders
+$n^{-4\gamma_0},n^{-4\gamma_1},n^{-4\gamma_m},n^{-4\gamma_g}$ in these respective norms.
+Then (3) is at most
+\[
+ C\{n^{-1}+n^{-2(\gamma_0+\min(\gamma_m,\gamma_g))}
+             +n^{-2(\gamma_1+\gamma_m)}\}.                        \tag{5}
+\]
+\end{proposition}
+\begin{proof}
+Write $\widehat Q-Q=\int(\widehat m-m)g+
+\int\widehat m(\widehat g-g)$. Jensen bounds the first term's norm by
+the first term on the right of (4). Cauchy--Schwarz in $l$, whose unit
+cube has volume one, and $0\le\widehat m\le1$ bound the second term.
+Minkowski proves (4). For (5), apply Cauchy--Schwarz to the expectations
+of products in (3), then (4) and $(x+y)^4\le8(x^4+y^4)$.
+\end{proof}
+Thus an explicitly sufficient parametric region for any pilots satisfying
+these moment bounds is $\gamma_0+\min(\gamma_m,\gamma_g)\ge1/2$ and
+$\gamma_1+\gamma_m\ge1/2$. This is a conditional statement about pilot performance,
+not an unproved assertion that every indicated exponent is attainable
+for arbitrary joint H\"older indices. Formula (2) also shows that density
+and transition errors do not necessarily enter as independent additive
+first-order errors. In particular, a sufficiently good direct $Q$ estimator
+may be preferable to separately estimating $g$.
+
+\section*{An exact result with supplied assignment probabilities}
+Consider $T$ treatment decisions, each with the probability of the requested
+action at least $\varepsilon$. Histories and their transitions may otherwise
+be arbitrary. Let $p_t$ denote those supplied, history-dependent probabilities,
+$Y\in[0,1]$, and retain sequential exchangeability and consistency.
+\begin{theorem}
+The minimax risk over this known-assignment experiment is at most
+\[
+ \min\{1,\,(n\varepsilon^T)^{-1}\}.
+\]
+Over the subexperiment with independent assignments of probability
+$\varepsilon$, ancillary uniform continuous histories, and an unknown
+constant Bernoulli outcome mean only on the requested treatment path,
+it is at least
+$c\min\{1,(n\varepsilon^T)^{-1}\}$ for a universal $c>0$.
+All continuous-coordinate transition and outcome functions in this
+subexperiment are smooth of every order.
+\end{theorem}
+\begin{proof}
+Let $R=\prod_{t=1}^T\mathbf1\{A_t=a_t\}/p_t(H_t)$.
+Iterated conditional expectations, or cancellation of the assignment
+factors in the joint density, give $\mathbb E[RY]=\psi_a$ and
+$\mathbb E R=1$. Since $R\le\varepsilon^{-T}$,
+$\mathbb E(RY)^2\le\mathbb E R^2\le\varepsilon^{-T}$.
+The projected empirical mean therefore has risk at most
+$(n\varepsilon^T)^{-1}$; the constant estimator gives the other bound.
+For the lower bound let $q=\varepsilon^T$, set all off-path outcome means
+to $1/2$, and set the on-path mean to $1/2\pm\Delta$.
+The one-observation KL is at most $Cq\Delta^2$ for
+$0<\Delta\le1/4$. Choose
+$\Delta=b\min\{1,(nq)^{-1/2}\}$ with $b$ small. Then sample total
+variation is at most $1/2$ and the two targets differ by $2\Delta$.
+Testing by the nearer target gives maximal squared risk at least
+$\Delta^2/4$. Uniform ancillary histories do not change this likelihood
+calculation or any smoothness constraint with sufficient fixed radius.
+\end{proof}
+
+\section*{A direct nested regression with explicit attainable rates}
+This section constructs all pilots rather than assuming their moment
+rates. It uses the canonical five-function model and the fixed two-stage
+horizon. Let $D=d_0+d_1$, and set
+\[
+ t_0=\min(s_0,1),\quad t_1=\min(s_1,1),\quad
+ t_m=\min(s_m,1),\quad t_Q=\min(s_m,s_g,1),
+\]
+\[
+ \gamma_0=\frac{t_0}{2t_0+d_0},\quad
+ \gamma_1=\frac{t_1}{2t_1+D},\quad
+ \gamma_m=\frac{t_m}{2t_m+D},\quad
+ \gamma_Q=\frac{t_Q}{2t_Q+d_0}.                            \tag{6}
+\]
+All these indices are supplied for this minimax upper bound. We make no
+adaptation claim here. The construction estimates $Q$ directly from a
+pseudo-outcome and never estimates $g$ or $p$.
+
+\begin{lemma}[Integrated regression and contamination]
+The integrated regression $Q$ has a H\"older modulus of
+order $t_Q$, with a constant depending only on the fixed dimensions and
+radii. Let $\widetilde m:[0,1]^D\to[0,1]$ be any random function
+independent of a new block of $N$ trajectories. On that block regress
+the response $\widetilde m(X,L)$ among observations with $A_0=a_0$
+on $X$ by a histogram of side length $h$, using $1/2$ in empty cells.
+Call the result $\widetilde Q$. Then, conditionally on $\widetilde m$,
+\[
+ \mathbb E[\|\widetilde Q-Q\|_{L^2(p)}^2\mid\widetilde m]
+ \le C\left\{h^{2t_Q}+\frac{h^{-d_0}}{N+1}
+                    +\|\widetilde m-m\|_{L^2(\mu)}^2\right\}.
+                                                               \tag{7}
+\]
+No smoothness of the fitted function $\widetilde m$ is required.
+\end{lemma}
+\begin{proof}
+For two covariate points, add and subtract $m(x',l)g(l\mid x)$:
+\[
+ Q(x)-Q(x')=\int[m(x,l)-m(x',l)]g(l\mid x)dl
+                +\int m(x',l)[g(l\mid x)-g(l\mid x')]dl.
+\]
+The first term is bounded by a constant times
+$\|x-x'\|^{\min(s_m,1)}$, since $g$ integrates to one.
+The second is bounded by a constant times
+$\|x-x'\|^{\min(s_g,1)}$, since $0\le m\le1$ and the $l$-cube has
+volume one. Indices above one imply Lipschitz moduli through bounded
+first derivatives. The bounded support absorbs the constants needed to
+replace both exponents by $t_Q$.
+
+For an $X$-cell $A$, write
+$\pi_A=\int_Ap$ and $\rho_A=\int_A e_0p\ge\varepsilon\pi_A$.
+The true selected mean of $Q$ is
+$q_A=\rho_A^{-1}\int_A e_0p Q$ and differs from every $Q(x)$ in that
+cell by at most $Ch^{t_Q}$. Conditional on $\widetilde m$, the selected
+pseudo-response mean in the cell is $q_A+r_A$, where
+\[
+ r_A=\frac1{\rho_A}\int_A e_0(x)p(x)
+       \int [\widetilde m(x,l)-m(x,l)]g(l\mid x)\,dl\,dx.
+\]
+Jensen's inequality for the selected conditional law gives
+\[
+ \sum_A\pi_A r_A^2
+ \le\sum_A\frac{\pi_A}{\rho_A}\int_Ae_0p
+                       \int(\widetilde m-m)^2g\,dl\,dx
+ \le\varepsilon^{-1}\|\widetilde m-m\|_{L^2(\mu)}^2. \tag{8}
+\]
+On a positive count $j$, the empirical pseudo-response mean is unbiased
+for $q_A+r_A$ and has conditional variance at most $1/(4j)$.
+The binomial reciprocal identity and empty-cell bound used earlier give
+an integrated sampling contribution at most $C h^{-d_0}/(N+1)$.
+Using $(u+v)^2\le2u^2+2v^2$ for approximation and contamination,
+then (8), proves (7). The argument conditioned on the whole random
+function first; it therefore does not assume that a fitted histogram is
+smooth or that its evaluation errors are independent across cells.
+\end{proof}
+
+\begin{theorem}[Constructive five-index upper bound]
+There is an explicitly tuned, five-block estimator with
+\[
+ \sup_{P\in\mathcal P(s_p,s_0,s_g,s_1,s_m)}
+   \mathbb E_P(\widehat\psi_a-\psi_a)^2
+ \le C\left\{n^{-1}+n^{-2(\gamma_0+\gamma_Q)}
+                 +n^{-2(\gamma_0+\gamma_m)}+n^{-2(\gamma_1+\gamma_m)}\right\}.       \tag{9}
+\]
+Its constant depends only on the fixed dimensions, indices, radii,
+density bounds and overlap. Thus
+\[
+ \gamma_0+\min(\gamma_Q,\gamma_m)\ge\tfrac12,\qquad
+ \gamma_1+\gamma_m\ge\tfrac12                                  \tag{10}
+\]
+is an attained parametric-risk region. If the class contains a fixed
+nondegenerate constant Bernoulli outcome subfamily with uniform histories
+and constant assignments, its minimax risk is $\Theta(n^{-1})$ throughout
+(10).
+\end{theorem}
+\begin{proof}
+For sufficiently large $n$, use five disjoint blocks of size
+$N=\lfloor n/5\rfloor$. On block 1 fit $h_0$ by regressing
+$I_0=\mathbf1\{A_0=a_0\}$ on $X$. On block 2 fit $h_1$ by regressing
+$I_1=\mathbf1\{A_1=a_1\}$ on $(X,L)$ among $I_0=1$. On block 3 fit
+$\widehat m$ by regressing $Y$ on $(X,L)$ among $I_0I_1=1$.
+Use equal-cube histograms with side lengths within a fixed factor of
+$N^{-1/(2t_0+d_0)}$, $N^{-1/(2t_1+D)}$, and
+$N^{-1/(2t_m+D)}$, respectively. Clip the propensity fits to
+$[\varepsilon,1-\varepsilon]$ and the outcome fit to $[0,1]$.
+
+Here is the elementary risk calculation for these pilots. For each cell
+the regression oscillation is at most a constant times its side length
+to the relevant $t$ power. The positive-count response mean is unbiased
+for its selected cell mean and has variance at most $1/(4j)$.
+For the $h_1$ fit the selected cell probability is
+$\int_{\text{cell}}e_0\,d\mu\ge\varepsilon\mu(\text{cell})$;
+for the $\widehat m$ fit it is
+$\int_{\text{cell}}e_0e_1\,d\mu\ge\varepsilon^2\mu(\text{cell})$.
+For $h_0$ it is $P_X(\text{cell})$. Multiplying the binomial reciprocal
+and empty-cell bounds by the respective target cell masses and summing
+gives risk at most $C\{h^{2t}+h^{-d'}/(N+1)\}$ in dimension $d'$.
+This argument uses the intervention design measure $\mu=p g$ for the
+last two errors; it does not silently replace it by the observed marginal
+law of $(X,L)$. The resulting bounds are
+\[
+ \mathbb E\|h_0-e_0\|_{L^2(p)}^2\le Cn^{-2\gamma_0},\quad
+ \mathbb E\|h_1-e_1\|_{L^2(\mu)}^2\le Cn^{-2\gamma_1},\quad
+ \mathbb E\|\widehat m-m\|_{L^2(\mu)}^2\le Cn^{-2\gamma_m}.
+                                                               \tag{11}
+\]
+
+On block 4 construct $\widehat Q$ from pseudo-response
+$\widehat m(X,L)$ as in (7), using side length
+$h_Q\asymp N^{-1/(2t_Q+d_0)}$. Independence of blocks 3 and 4,
+followed by (7) and (11), gives
+\[
+ \mathbb E\|\widehat Q-Q\|_{L^2(p)}^2
+ \le C\{n^{-2\gamma_Q}+n^{-2\gamma_m}\}.                        \tag{12}
+\]
+The fit already lies in $[0,1]$. On block 5 average the longitudinal
+score (1) and project its average to $[0,1]$.
+
+The exact remainder (2) and bounded-score variance give (3).
+The function $h_0$ uses only block 1, whereas $\widehat Q$ uses only
+blocks 3 and 4. Thus their squared errors in the first product in (3)
+are independent. Similarly $h_1$ uses only block 2 and $\widehat m$
+only block 3, so the second product also factors in expectation.
+Independence of $\widehat Q$ and $\widehat m$ is neither true nor
+needed. Substitution of (11)--(12) into (3) proves (9) using only
+second-moment pilot bounds, without the fourth-moment premise of (5).
+Small sample sizes are handled by the constant estimator and a larger
+constant. Condition (10) makes all displayed terms $O(n^{-1})$.
+
+For the matching lower bound in that region, let histories be independent
+uniform variables, assignments independent Bernoulli$(1/2)$, and
+$Y\mid X,A_0,L,A_1\sim\operatorname{Ber}(\theta)$ with
+$\theta=1/2\pm b/\sqrt n$. The target is $\theta$ and the outcome
+law is constant in every continuous coordinate, hence lies in every
+stated smoothness ball under the explicit subfamily assumption. Product
+KL is $O(b^2)$. Choose fixed $b>0$ so total variation is at most $1/2$;
+the nearer-target test yields a lower bound $c/n$ for squared-error risk.
+Together with (9) this proves the restricted sharp rate.
+\end{proof}
+
+For a concrete improvement, take $d_0=d_1=1$, $s_0=s_1=s_m=1$ and
+$s_g=2/5$, with any positive $s_p$. Then
+\[
+ \gamma_0=1/3,\qquad \gamma_1=\gamma_m=1/4,\qquad \gamma_Q=2/9,
+\]
+so (10) holds. Separate histogram estimation of the transition density
+would instead yield
+\[
+ \gamma_g=\frac{2/5}{2(2/5)+2}=\frac17,\qquad
+ \gamma_0+\min(\gamma_m,\gamma_g)=\frac{10}{21}<\frac12,
+\]
+which does not satisfy the earlier sufficient condition.
+The comparison concerns these proved first-order constructions; it is not
+a lower bound against every estimator that explicitly estimates $g$.
+
+\section*{Version 3: regress the doubly robust pseudo-outcome}
+Version 2 regressed $\widehat m(X,L)$ to construct the first-stage
+regression. Its contamination term in (12) has the rate of $\widehat m$
+alone. We now replace that response by a second-stage augmented response.
+This changes the proved sufficient region, while preserving the same
+canonical two-stage model and the capped histogram approximation orders.
+The indices $s_p,s_0,s_g,s_1,s_m$ are supplied for this minimax construction;
+no adaptation to unknown indices is asserted.
+
+Retain $t_j=\min(s_j,1)$, $D=d_0+d_1$,
+$t_Q=\min(s_m,s_g,1)$ and
+\[
+ \gamma_0=\frac{t_0}{2t_0+d_0},\quad
+ \gamma_1=\frac{t_1}{2t_1+D},\quad
+ \gamma_m=\frac{t_m}{2t_m+D},\quad
+ \gamma_Q=\frac{t_Q}{2t_Q+d_0}.
+\]
+The density assumptions used below are the canonical bounds
+$0<c_p\le p\le C_p$ and $0<c_g\le g\le C_g$ on their full cubes.
+They yield a lower bound for the selected design density, not merely an
+integrated overlap condition. All constants below may depend on these
+bounds, fixed dimensions, smoothness indices, radii and $\varepsilon$.
+
+\begin{lemma}[Pointwise histogram error and a second-order contamination]
+Construct $h_1$ and $\widehat m$ on independent blocks of $N$
+trajectories, exactly as above, with side lengths tuned to $t_1,t_m$.
+Then, for almost every $z=(x,l)$, uniformly in $z$ and the model,
+\[
+ \mathbb E|h_1(z)-e_1(z)|^2\le C N^{-2\gamma_1},\qquad
+ \mathbb E|\widehat m(z)-m(z)|^2\le C N^{-2\gamma_m}.
+                                                        \tag{13}
+\]
+On a third, independent block define
+\[
+ U=\widehat m(X,L)+\frac{I_1}{h_1(X,L)}
+                         \{Y-\widehat m(X,L)\}.
+\]
+Conditionally on both fitted functions, its selected regression is
+\[
+ \begin{aligned}
+ \mathbb E[U\mid X=x,I_0=1,h_1,\widehat m]&=Q(x)+r(x),\\
+ r(x)&=\int g(l\mid x)
+       \left(1-\frac{e_1(x,l)}{h_1(x,l)}\right)
+                        [\widehat m(x,l)-m(x,l)]\,dl.
+ \end{aligned}                                          \tag{14}
+\]
+Consequently
+\[
+ \mathbb E\|r\|_{L^2(p)}^2
+                  \le C N^{-2(\gamma_1+\gamma_m)}.       \tag{15}
+\]
+\end{lemma}
+\begin{proof}
+For a histogram cell of side $h$ in dimension $D$, the probability
+of selection and membership is at least
+$c_p c_g\varepsilon h^D$ for $h_1$, and at least
+$c_p c_g\varepsilon^2h^D$ for $\widehat m$.
+The selected cell mean differs from the target regression at every
+point of the cell by at most $C h^t$. Given a positive count $j$, the
+sample response mean has variance at most $1/(4j)$. The binomial
+reciprocal identity already proved, including the empty-cell default,
+therefore bounds pointwise squared error by
+$C\{h^{2t}+[(N+1)h^D]^{-1}\}$. Clipping cannot increase the error.
+Substitution of the two bandwidths proves (13); importantly, no
+integration over $z$ was required for this bound.
+
+Conditional on $X,L,I_0=1$, the expectation of $I_1Y$ is $e_1m$.
+Expanding $U$ and integrating over $L$ gives (14). Jensen's inequality
+for the conditional density $g$, and $h_1\ge\varepsilon$, give
+\[
+ \|r\|_{L^2(p)}^2\le\varepsilon^{-2}
+  \int (h_1-e_1)^2(\widehat m-m)^2\,d\mu.
+\]
+At every fixed $z$, the two squared errors are independent because their
+entire training blocks are independent. Taking expectations, using
+Tonelli's theorem for the nonnegative integrand, and applying the two
+uniform bounds in (13) proves (15). This factorization does not assert
+independence of prediction errors at different covariate points.
+\end{proof}
+
+On the independent $U$ block, among observations with $I_0=1$, regress
+$U$ on $X$ by an equal-cell histogram with
+$h_Q\asymp N^{-1/(2t_Q+d_0)}$, use default $1/2$ for empty cells,
+and clip the fitted function to $[0,1]$. Denote it by $\widehat Q_{\rm dr}$.
+The response need not lie in $[0,1]$, but it obeys
+$|U|\le 1+1/\varepsilon$ deterministically.
+
+\begin{lemma}[Risk of the augmented nested fit]
+For this construction,
+\[
+ \mathbb E\|\widehat Q_{\rm dr}-Q\|_{L^2(p)}^2
+ \le C\{N^{-2\gamma_Q}+N^{-2(\gamma_1+\gamma_m)}\}.
+                                                        \tag{16}
+\]
+\end{lemma}
+\begin{proof}
+Condition on the two pilots. In an $X$-cell $A$, let
+$\rho_A=\int_A e_0p$ and $\pi_A=\int_A p$.
+The conditional mean of a selected response equals the selected
+cell average of $Q+r$. The selected average of $Q$ differs from
+$Q(x)$ throughout the cell by at most $C h_Q^{t_Q}$, by the integrated
+regression modulus proved earlier. The selected average $r_A$ of $r$
+satisfies
+\[
+ \sum_A\pi_A r_A^2
+ \le\sum_A\frac{\pi_A}{\rho_A}\int_A e_0p r^2
+ \le\varepsilon^{-1}\|r\|_{L^2(p)}^2.
+\]
+A positive-count response mean has conditional variance at most
+$(1+1/\varepsilon)^2/j$. The same count calculation as in (7)
+gives an integrated variance and empty-cell contribution
+$C h_Q^{-d_0}/(N+1)$. Use $(a+b+c)^2\le3(a^2+b^2+c^2)$ for
+sampling error, approximation and contamination; clipping reduces error
+to the true $Q\in[0,1]$. Thus the conditional risk is at most
+$C\{h_Q^{2t_Q}+h_Q^{-d_0}/(N+1)+\|r\|_2^2\}$.
+Average over the pilots, use (15), and tune $h_Q$ to prove (16).
+\end{proof}
+
+\begin{theorem}[A strictly enlarged attained parametric region]
+There is a five-block estimator, using the augmented fit above in the
+longitudinal score (1), such that
+\[
+ \sup_{P\in\mathcal P(s_p,s_0,s_g,s_1,s_m)}
+ \mathbb E_P(\widehat\psi_a-\psi_a)^2
+ \le C\left\{n^{-1}+n^{-2(\gamma_0+\gamma_Q)}
+                       +n^{-2(\gamma_1+\gamma_m)}\right\}.
+                                                        \tag{17}
+\]
+Under the same constant-subfamily condition used for the lower bound
+above, the squared-error minimax risk is $\Theta(n^{-1})$ whenever
+\[
+ \gamma_0+\gamma_Q\ge\tfrac12,\qquad
+ \gamma_1+\gamma_m\ge\tfrac12.                         \tag{18}
+\]
+\end{theorem}
+\begin{proof}
+Use blocks 1, 2 and 3 to fit $h_0,h_1,\widehat m$ respectively;
+block 4 to fit $\widehat Q_{\rm dr}$ from $U$; and block 5 to
+average (1) with $\widehat Q=\widehat Q_{\rm dr}$ and project its
+mean to $[0,1]$. All block sizes are $N=\lfloor n/5\rfloor$;
+small $n$ are handled by a constant estimator.
+The exact remainder (2) is valid for this new fit without alteration.
+The first product in (3) factors in expectation because $h_0$ uses
+only block 1 and $\widehat Q_{\rm dr}$ uses only blocks 2--4.
+The second product factors because $h_1$ and $\widehat m$ use
+independent blocks 2 and 3. Their mutual dependence with
+$\widehat Q_{\rm dr}$ is immaterial to this sum of two bounds.
+Using (11) and (16) gives the right side of (17), plus
+$C n^{-2(\gamma_0+\gamma_1+\gamma_m)}$.
+Since $\gamma_0>0$, this extra term is bounded by the last term in
+(17). The bounded-score evaluation variance is $C/n$.
+This proves (17). Conditions (18) give the upper parametric rate;
+the constant Bernoulli two-point lower bound previously proved supplies
+the matching lower rate in every such class.
+\end{proof}
+
+For a strict comparison take $d_0=d_1=1$,
+$s_0=1/3$ and $s_1=s_m=s_g=1$, with any positive $s_p$.
+Then $\gamma_0=1/5$, $\gamma_1=\gamma_m=1/4$ and
+$\gamma_Q=1/3$. The new sums are $8/15$ and $1/2$, so (18)
+holds, whereas version 2 additionally required
+$\gamma_0+\gamma_m=9/20\ge1/2$, which fails.
+This is a strict enlargement of the region established by these
+constructions; it is not an impossibility theorem for other estimators
+outside that region. Doubly robust augmentation is a standard methodological tool
+\cite{bang}; the new contribution within this attempt is the
+fully proved, index-specific improvement over its previous bound.
+
+\section*{Unresolved minimax interactions}
+The augmented nested fit removes the extra first-stage-propensity times
+final-outcome-regression condition from the previous sufficient region.
+The result retains the canonical unknown transition and assignment laws,
+but its histogram approximation orders remain capped at one. Conditions
+(18) are sufficient, not claimed necessary. Higher-order corrections,
+matching slow-region lower bounds, the full five-index phase diagram and
+the fixed-multistage characterization remain unresolved here. The earlier
+known-assignment horizon obstruction concerns a separate growing-horizon
+experiment and does not supply those missing lower bounds.
+
+\section{Completion Estimate}
+40\%
+
+This is a heuristic estimate for the full catalogue target. Version 3 gives
+a strict, constructive enlargement of the attained parametric region by
+proving the second-order contamination bound and all required sample
+independences. The full sharp slow-rate characterization and its
+fixed-multistage extension remain missing.
+
+\begin{thebibliography}{9}
+\bibitem{agenda} C. Cinelli, A. Feller, G. Imbens, E. Kennedy, S. Magliacane and J. Zubizarreta.
+\emph{Challenges in Statistics: A Dozen Challenges in Causality and Causal Inference} (2025), arXiv:2508.17099v1.
+\url{https://arxiv.org/html/2508.17099v1}.
+\bibitem{robins} J. Robins, L. Li, E. Tchetgen Tchetgen and A. van der Vaart.
+\emph{Technical Report: Higher Order Influence Functions and Minimax Estimation of Nonlinear Functionals} (2016).
+\url{https://arxiv.org/abs/1601.05820}.
+\bibitem{bang} H. Bang and J. M. Robins.
+\emph{Doubly Robust Estimation in Missing Data and Causal Inference Models}.
+Biometrics 61 (2005), 962--973.
+\end{thebibliography}
+\end{document}
