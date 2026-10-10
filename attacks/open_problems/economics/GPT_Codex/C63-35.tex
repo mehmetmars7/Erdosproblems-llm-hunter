@@ -1,0 +1,1515 @@
+% ECONOMICS_PROBLEM: {"id":"C63-35","title":"Scalable heterogeneous-agent macroeconomics","jel_code":"C63","source_id":"OP-0016"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt,a4paper]{article}
+\usepackage[left=20mm,right=20mm,top=18mm,bottom=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{xurl,hyperref}
+\hypersetup{hidelinks,hypertexnames=false,pdftitle={C63-35: Certified global nonlinear heterogeneous-agent computation}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\allowdisplaybreaks
+\raggedbottom
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\mathbb E}
+\newcommand{\N}{\mathbb N}
+\title{C63-35: Certified global nonlinear\\heterogeneous-agent computation}
+\author{Ji Ho Bae}
+\date{10 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+For an explicit nonempty class of heterogeneous-agent economies, we construct
+and verify a competitive equilibrium on the full probability-measure state
+domain, including transitions between binding asset constraints. Endogenous
+prices, profits and distribution evolution enter a globally contractive Euler
+update whose constants are derived from the primitives. Exact piecewise-affine
+inversion gives a finite global solver with polynomial real-arithmetic cost in
+inverse accuracy for the fixed shock-state count. A separately certified finite
+precision implementation has an explicit quasipolynomial bit bound. Economic
+residuals control distance to an actual equilibrium. A concrete identified
+Gaussian experiment propagates numerical error through estimation, likelihoods
+and equilibrium counterfactual confidence intervals. Reproducible remote
+benchmarks measure policy and complete value queries, including preprocessing
+and actual exact-rational bit lengths.
+\end{abstract}
+
+\section*{Scope and process}
+\textbf{Model:} GPT Codex. \textbf{Contributor:} Ji Ho Bae.
+The exact serving revision was not exposed. The construction and hand proof
+were produced by parallel derivation and independent adversarial review.
+The catalogue asks for a declared restricted primitive class $\mathcal H$,
+a global residual guarantee, stability, estimation propagation and a controlled
+benchmark. We specify every member of $\mathcal H$ below and prove these
+requirements on its full state domain. The announced industry-price selection
+is explicit; other competitive boundary-price selections may exist.
+
+Heterogeneous-agent saving and aggregate-risk computation have established
+benchmarks~\cite{Aiyagari,KS,HANK}. The sequence-space approach supplies efficient
+solution and estimation tools, including nonlinear perfect-foresight
+transitions~\cite{ABRS}. Our storage economy, global certificate and local
+Taylor comparison are the constructions specified here. The comparison is
+not an implementation of those authors' algorithms. All mathematical steps
+needed for the result are proved below; citations acknowledge this background.
+This is an AI-assisted hand proof, with no proof-assistant or historical-priority
+claim; community expert review remains separate.
+
+The complete original generated output is preserved at the immutable
+\href{https://github.com/jbaelaw/certified-heterogeneous-agent-computation/blob/629e26c2cc4fce0c729a0545c296e537fcd38491/paper/Proof.tex}{manuscript TeX}
+and \href{https://github.com/jbaelaw/certified-heterogeneous-agent-computation/blob/629e26c2cc4fce0c729a0545c296e537fcd38491/paper/Proof.pdf}{manuscript PDF}.
+
+\paragraph{Notation.}
+The claim price is $q=\beta Q$, the technological marginal-cost intercept is
+$q_0=4/5$, and $\rho$ is the coupled policy-update modulus, bounded uniformly
+by $\bar\rho=0.021$. Input representations, arithmetic and bit costs
+are distinguished in Section~\ref{sec:finite-solver}.
+
+% Body component: concrete global heterogeneous-agent economy and its proof.
+% Other agents own solver/inference/audit components. This file alone is not
+% a completion claim for the whole C63-35 statement.
+\section{A concrete primitive class on the full distribution domain}
+\label{sec:economy}
+
+Let $E=\{L,H\}$, assets lie in $A=[0,1]$, and $Z$ is a fixed two-element
+aggregate-shock set with a declared Markov matrix $P$ whose entries lie
+in $[0.1,0.9]$. Every agent
+observes its own asset and current idiosyncratic state and the public
+aggregate state $(z,\mu)$. Put
+\[
+ \mathcal D=A\times E\times Z\times\mathcal P(E\times A),\qquad
+ d((e,a),(f,b))=|a-b|+\mathbf1\{e\ne f\},
+ \tag{EC1}
+\]
+and equip population laws with the corresponding $1$-Wasserstein distance
+$W_1$. No restriction to stationary or simulated population laws is made.
+Next period's idiosyncratic state is a fair independent draw from $E$,
+independent of assets and aggregate shocks. Population laws evolve by this
+kernel exactly, rather than by a finite-sample approximation. One concrete
+population realization uses initial law $\mu$ times a countable product of
+uniform coordinates, splitting each state cohort equally by each successive
+coordinate; future coordinates are not in households' information sets.
+
+The primitive class has
+\[
+\begin{gathered}
+ 0.005\leq\beta\leq0.01,\quad 0.0001\leq\kappa\leq0.001,\quad q_0=4/5,\\
+ y_L(z)=1+\delta_z,\quad y_H(z)=3+\delta_z,\quad |\delta_z|\leq1/10.
+\end{gathered}
+ \tag{EC2}
+\]
+Household utility is $u(c)=5c-c^2/2$. An asset is a one-period claim to one
+unit of next period's consumption good. A household begins with $a$ mature
+claims, backed by installed output; the initial stock is an endowment.
+There is no other asset, borrowing or storage. If the new-claim price is
+$q=\beta Q$ and the equal per-household current dividend is $\pi$, the
+budget and choice are
+\[
+ c=y_e(z)+a+\pi-\beta Qb,\qquad b\in[0,1].
+ \tag{EC3}
+\]
+An atomless household takes aggregate states and prices as given.
+
+A competitive investment industry sells $K$ new claims for $qK$, uses
+$\beta C(K)$ current goods, and produces $K$ goods next period, where
+$C(K)=q_0K+\kappa K^2/2$. Households own equal shares of its profits.
+We use the explicit marginal-cost price selection
+\[
+ K=\int g(a,e,z,\mu)\,d\mu(e,a),\qquad
+ Q=q_0+\kappa K,\qquad
+ \pi=qK-\beta C(K)=\frac{\beta\kappa K^2}{2}.
+ \tag{EC4}
+\]
+It is a competitive selection: $K$ maximizes
+$qk-\beta C(k)$ over $k\geq0$. At $K=0$ a competitive firm alone also
+permits prices below marginal cost; equality in \textup{(EC4)} is the
+announced selection there, not a consequence claimed from an interior
+first-order condition.
+
+For every household policy $g$ define $K_g,Q_g,\pi_g$ by
+\textup{(EC4)} and
+\[
+ \Phi_g(z,\mu)=\mathcal L\bigl(e',g(a,e,z,\mu)\bigr),
+ \qquad (e,a)\sim\mu,\quad e'\sim\operatorname{Unif}(E)
+ \text{ independently}.
+ \tag{EC5}
+\]
+The next aggregate state is $(z',\Phi_g(z,\mu))$ with $z'\sim P(z,\cdot)$.
+This is the endogenous full population transition. Integrating
+\textup{(EC3)} verifies goods clearing exactly:
+\[
+ \int c\,d\mu+\beta C(K_g)=\int y_e(z)\,d\mu+\int a\,d\mu.
+ \tag{EC6}
+\]
+Claims clearing is $K_g=\int g\,d\mu$, and next period's mature output
+is $K_g=\int a'\,d\Phi_g$. Thus profits are counted once as household
+income and once as the industry's net revenue, not as extra resources.
+
+Let $\mathcal S$ consist of policies $g:\mathcal D\to[0,1]$ satisfying
+\[
+ |g(a,e,z,\mu)-g(b,e,z,\mu)|\leq|a-b|,
+ \quad |g(a,e,z,\mu)-g(a,e,z,\nu)|\leq W_1(\mu,\nu).
+ \tag{EC7}
+\]
+They are continuous in assets and population laws. Different idiosyncratic
+labels have distance one, and boundedness makes the policy $1$-Lipschitz
+in $(e,a)$ as well. With the uniform norm, $\mathcal S$ is nonempty,
+closed and complete. The domain includes every probability law in
+\textup{(EC1)}. Throughout put
+\[
+ Q_{\max}=0.801,\quad \pi_{\max}=0.000005,
+ \quad \lambda=1-\beta Q_{\max}\geq0.99199.
+ \tag{EC8}
+\]
+Every feasible household choice under the induced prices has
+\[
+ 0.89199\leq c\leq4.100005<5,
+ \qquad 0<u'(c)\leq4.1+\beta Q_{\max},\qquad |u(c)|\leq12.5.
+ \tag{EC9}
+\]
+Consequently every adapted asset plan is consumption-feasible and every
+discounted objective is bounded.
+
+\section{A global Euler update for the declared selection}
+\label{sec:euler-update}
+For $g\in\mathcal S$ and current state $(a,e,z,\mu)$ put
+$\mu'=\Phi_g(z,\mu)$ and define
+\begin{align*}
+ A_g(b;z,\mu)
+ &=\sum_{z'}\frac{P_{zz'}}2\sum_{e'\in E}
+ \bigl[5-y_{e'}(z')-\pi_g(z',\mu')
+       +\beta Q_g(z',\mu')g(b,e',z',\mu')\bigr],\\
+ D_g(b;a,e,z,\mu)
+ &=A_g(b;z,\mu)-Q_g(z,\mu)
+       [5-y_e(z)-a-\pi_g(z,\mu)]
+       -(1+\beta Q_g(z,\mu)^2)b.
+ \tag{EC10}
+\end{align*}
+The update $F_g(a,e,z,\mu)$ is the unique $b\in[0,1]$ satisfying
+\[
+ b=\operatorname{clip}_{[0,1]}
+ \frac{A_g(b;z,\mu)-Q_g(z,\mu)[5-y_e(z)-a-\pi_g(z,\mu)]}
+      {1+\beta Q_g(z,\mu)^2}.
+ \tag{EC11}
+\]
+It is a future-policy Euler update, not the household best-response map
+for an arbitrary candidate $g$. Household optimality is proved below only
+at a fixed point.
+
+\begin{lemma}[Well-defined update and its root bound]\label{lem:euler-root}
+The inner map in \textup{(EC11)} contracts in $b$ with constant at most
+$\beta Q_{\max}<1$. Equivalently $b=F_g$ obeys
+\[
+ D_g(b)\begin{cases}\leq0,&b=0,\\=0,&0<b<1,\\\geq0,&b=1.\end{cases}
+ \tag{EC12}
+\]
+For $b'>b$, $D_g(b')-D_g(b)\leq-\lambda(b'-b)$.
+If two such decreasing functions differ uniformly by at most $\eta$,
+their constrained roots differ by at most $\eta/\lambda$.
+\end{lemma}
+\begin{proof}
+The $b$-Lipschitz bound for $A_g$ is $\beta Q_{\max}$ by
+\textup{(EC7)}; its other terms do not depend on the individual asset
+choice, since an atomless household cannot change $\mu'$. The clipping
+map is $1$-Lipschitz. This proves inner contraction and strict decrease
+of $D_g$ with the stated modulus. Clipping gives exactly
+\textup{(EC12)}. To prove the root bound, suppose roots $b_1>b_2$.
+Then the first function is nonnegative at $b_1$, hence at least
+$\lambda(b_1-b_2)$ at $b_2$, while the second is nonpositive at $b_2$.
+Their uniform difference bounds $\lambda(b_1-b_2)$ by $\eta$.
+The reverse ordering is identical.
+\end{proof}
+
+\begin{theorem}[Global self-mapping and contraction]\label{thm:economy-contraction}
+$F$ maps $\mathcal S$ into itself. More precisely,
+\begin{align*}
+ \operatorname{Lip}_a(F_g)&\leq Q_{\max}/\lambda<0.808,\\
+ \operatorname{Lip}_\mu(F_g)&\leq
+ \frac{8.2\kappa+\beta[(6Q_{\max}+8)\kappa+2Q_{\max}]}\lambda<0.025,\\
+ \|F_g-F_h\|_\infty&\leq \rho\|g-h\|_\infty,\qquad
+ \rho:=\frac{4.1\kappa+\beta[(3Q_{\max}+6)\kappa+2Q_{\max}]}\lambda<0.021.
+ \tag{EC13}
+\end{align*}
+It has one fixed point $g^*\in\mathcal S$ on the entire domain
+\textup{(EC1)}.
+\end{theorem}
+\begin{proof}
+For $d=\|g-h\|_\infty$ at the same $(z,\mu)$,
+\[
+ |K_g-K_h|\leq d,\quad |Q_g-Q_h|\leq\kappa d,
+ \quad |\pi_g-\pi_h|\leq\beta\kappa d,
+ \quad W_1(\Phi_g,\Phi_h)\leq d.
+ \tag{EC14}
+\]
+For one policy at population laws distance $w$, integration of its
+$1$-Lipschitz state function and \textup{(EC7)} gives
+\[
+ |K_g(z,\mu)-K_g(z,\nu)|\leq2w,
+ \qquad W_1(\Phi_g(z,\mu),\Phi_g(z,\nu))\leq2w.
+ \tag{EC15}
+\]
+In \textup{(EC14)}, the next-state $K$ difference is therefore at most
+$3d$; the next-policy difference at fixed $b,e',z'$ is at most $2d$.
+Next dividends differ by at most $3\beta\kappa d$, and next prices by
+at most $3\kappa d$. Thus the $A$-difference is at most
+$\beta(6\kappa+2Q_{\max})d$. The current product $Q[5-y-a-\pi]$
+differs by at most $(4.1\kappa+\beta Q_{\max}\kappa)d$, because
+$0<5-y-a-\pi\leq4.1$. The coefficient $\beta Q^2b$ contributes at most
+$2\beta Q_{\max}\kappa d$. Adding proves the numerator of $\rho$.
+Apply Lemma~\ref{lem:euler-root}.
+
+For population variation, next-state $K$ differs by at most $4w$ and
+next-policy values by at most $2w$. The corresponding $A$ bound is
+$\beta(8\kappa+2Q_{\max})w$. The current product and quadratic
+coefficient contribute respectively
+$(8.2\kappa+2\beta Q_{\max}\kappa)w$ and
+$4\beta Q_{\max}\kappa w$. Their sum gives the asserted population
+modulus. Asset variation contributes only $Q_g|a-b|$ to $D_g$.
+All three inequalities are global. Substituting the endpoint bounds in
+\textup{(EC2)} and \textup{(EC8)} gives the displayed numerical upper
+bounds. Clipping gives range $[0,1]$, so $F_g\in\mathcal S$.
+
+Starting from any $g_0\in\mathcal S$, consecutive iterates have distances
+at most $\rho^k\|F_{g_0}-g_0\|_\infty$. Their geometric tail proves a
+uniform Cauchy limit in the complete set $\mathcal S$. Continuity of $F$
+gives a fixed point. Two fixed points have distance at most $\rho$ times
+that distance, hence coincide. No market-clearing contraction has been
+assumed; its constants have just been derived from the stated primitives.
+\end{proof}
+
+\section{Household verification, markets and binding constraints}
+\begin{theorem}[Actual competitive equilibrium]\label{thm:actual-equilibrium}
+The policy $g^*$, prices and dividends \textup{(EC4)}, and transition
+\textup{(EC5)} form a recursive competitive equilibrium under the
+marginal-cost selection. Household optimization holds against all adapted,
+possibly randomized asset plans, at every state in $\mathcal D$.
+Conversely every such selected recursive equilibrium with policy in
+$\mathcal S$ is this fixed point. No uniqueness outside $\mathcal S$ or
+across other competitive boundary-price selections is asserted.
+\end{theorem}
+\begin{proof}
+Fix any initial state and let $(a_t^*,e_t,z_t,\mu_t)$ follow $g^*$.
+An individual deviation leaves $(z_t,\mu_t)$ and its prices unchanged.
+Couple the same idiosyncratic and aggregate shocks, and write the deviating
+assets as $a_t$, with $a_0=a_0^*$. All its choices in $[0,1]$ are feasible
+by \textup{(EC9)}. Put $\Delta a_t=a_t-a_t^*$ and
+$m_t=u'(c_t^*)$. Concavity gives
+\[
+ u(c_t)-u(c_t^*)\leq m_t[\Delta a_t-\beta Q_t\Delta a_{t+1}].
+ \tag{EC16}
+\]
+Summing its discounted expectation through date $N-1$ yields
+\[
+ \sum_{t=1}^{N-1}\beta^t
+ \E[(\E[m_t\mid\mathcal F_{t-1}]-Q_{t-1}m_{t-1})\Delta a_t]
+ -\beta^N\E[Q_{N-1}m_{N-1}\Delta a_N].
+ \tag{EC17}
+\]
+Here $\mathcal F_{t-1}$ includes the deviator's private randomization and
+its date-$t-1$ choice; $\Delta a_t$ is measurable there. The conditional
+marginal-utility difference is precisely $D_{g^*}$ evaluated at its
+baseline choice $a_t^*$. By \textup{(EC12)}, its product with
+$a_t-a_t^*$ is nonpositive: the difference is nonpositive at a lower
+bound, nonnegative at an upper bound, and zero in the interior.
+The final term in absolute value is at most
+$\beta^NQ_{\max}(4.1+\beta Q_{\max})$, tending to zero.
+Bounded discounted utility allows $N\to\infty$, proving optimality
+against every adapted deviation. This does not differentiate a value
+function or assume an envelope theorem across binding constraints.
+
+Necessity of the Euler inequalities uses a two-period deviation.
+Perturb the current choice by a small feasible amount, then at the next
+date choose the baseline next asset irrespective of the perturbed asset.
+Consumption remains positive by \textup{(EC9)}, and from the following
+date onward the original asset path is restored. The directional
+utility derivative is $\beta D_g$ times that perturbation. Optimality
+therefore implies exactly \textup{(EC12)}, including its boundary signs.
+This proves the converse through uniqueness of the constrained root and
+Theorem~\ref{thm:economy-contraction}. Industry optimality and both goods
+and claims clearing were verified in \textup{(EC4)--(EC6)}.
+\end{proof}
+
+Define the actual policy value
+\[
+ V_g(a,e,z,\mu)=\E\sum_{t\geq0}\beta^t u(c_t^g),
+ \qquad \|V_g\|_\infty\leq12.5/(1-\beta).
+ \tag{EC18}
+\]
+At $g=g^*$ this is the household optimal value and obeys the full Bellman
+maximization equation: decomposition of \textup{(EC18)} gives equality
+at $g^*$, and any current choice followed by $g^*$ is among the deviations
+just bounded. Finite-horizon policy values are continuous, and their
+uniformly convergent discounted limit is continuous. Thus the value and
+Euler descriptions concern the same fully specified optimization problem.
+
+\begin{proposition}[Both boundaries and an interior occur globally]\label{prop:actual-binding}
+For every admissible primitive and aggregate state $(z,\mu)$,
+\[
+ g^*(0,L,z,\mu)=0,\qquad
+ g^*(a,H,z,\mu)=1\ (0\leq a\leq1),\qquad
+ 0.2<g^*(0.75,L,z,\mu)<0.6.
+ \tag{EC19}
+\]
+\end{proposition}
+\begin{proof}
+The same signs hold for every $F_g$, $g\in\mathcal S$. The average
+$5-y_{e'}(z')$ is between $2.9$ and $3.1$. Consequently
+$2.9-\pi_{\max}\leq A_g(b)\leq3.1+\beta Q_{\max}$.
+For low income and zero assets,
+\[
+ D_g(0)\leq3.1+0.00801-0.8(3.9-0.000005)=-0.011986<0.
+\]
+For high income and any assets,
+\[
+ D_g(1)\geq2.899995-0.801(2.1)-(1+0.01\cdot0.801^2)
+ =0.21147899>0.
+\]
+For low income and assets $0.75$,
+$D_g(0)\geq2.899995-0.801(3.35)=0.216645$ and
+$D_g(1)\leq3.10801-0.8(3.15-0.000005)-1=-0.411986$.
+The absolute $b$-Lipschitz constant of $D_g$ is at most
+$1+\beta Q_{\max}^2+\beta Q_{\max}\leq1.01442601$.
+Thus $D_g(0.2)>0$ and $D_g(0.6)<0$, placing its root strictly between
+them. Pass to the fixed point. Continuity in assets connects genuinely
+binding and interior regimes throughout the full population domain.
+\end{proof}
+
+\section{Useful uniform output and primitive stability bounds}
+\begin{proposition}\label{prop:economy-output-stability}
+For $g,h\in\mathcal S$, $d=\|g-h\|_\infty$, at the same state
+\[
+ \|K_g-K_h\|_\infty\leq d,\quad
+ \|Q_g-Q_h\|_\infty\leq\kappa d,\quad
+ \|\pi_g-\pi_h\|_\infty\leq\beta\kappa d,\quad
+ \sup_{z,\mu}W_1(\Phi_g,\Phi_h)\leq d.
+ \tag{EC20}
+\]
+The policy values in \textup{(EC18)} obey
+\[
+\begin{gathered}
+ \|V_g-V_h\|_\infty\leq L_Vd<0.08d,\\
+ L_V=(4.1+\beta Q_{\max})
+ \left[(1+2\beta Q_{\max}+4\beta\kappa)
+ \left(\frac1{1-2\beta}-\frac1{1-\beta}\right)
+ +\frac{\beta(Q_{\max}+2\kappa)}{1-\beta}\right].
+\end{gathered}
+ \tag{EC21}
+\]
+For fixed $\beta,P$ the equilibrium policy has the primitive sensitivities
+\[
+ \|g^*_{\kappa,\delta}-g^*_{\tilde\kappa,\delta}\|_\infty
+\leq\frac{4.1+\beta(2.5Q_{\max}+1.5)}{\lambda(1-\bar \rho)}
+ |\kappa-\tilde\kappa|<5|\kappa-\tilde\kappa|,
+ \tag{EC22}
+\]
+\[
+ \|g^*_{\kappa,\delta}-g^*_{\kappa,\tilde\delta}\|_\infty
+\leq\frac{1+Q_{\max}}{\lambda(1-\bar \rho)}
+ \|\delta-\tilde\delta\|_\infty<2\|\delta-\tilde\delta\|_\infty.
+ \tag{EC23}
+\]
+Here $\bar \rho=0.021$ is the common uniform contraction bound when
+comparing different primitives.
+\end{proposition}
+\begin{proof}
+The first inequalities are \textup{(EC14)}. For values, couple the same
+$e,z$ shocks from a common initial state. If $r_t$ is population $W_1$
+distance and $b_t$ individual asset distance, then
+$r_{t+1}\leq2r_t+d$ and $b_{t+1}\leq b_t+r_t+d$.
+Both start at zero, hence both are at most $(2^t-1)d$.
+At the coupled states current prices and dividends differ by at most
+$\kappa(2r_t+d)$ and $\beta\kappa(2r_t+d)$.
+Using the budgets, the consumption difference is at most
+\[
+ (1+\beta Q_{\max})b_t+
+ \beta(Q_{\max}+4\kappa)r_t+\beta(Q_{\max}+2\kappa)d.
+\]
+The bound on $u'$ in \textup{(EC9)} and the geometric sums
+$\sum\beta^t(2^t-1)=(1-2\beta)^{-1}-(1-\beta)^{-1}$ and
+$\sum\beta^t=(1-\beta)^{-1}$ prove \textup{(EC21)}.
+
+For one fixed candidate policy, changing $\kappa$ does not change
+$\Phi_g$. It changes $Q$ by at most $|\Delta\kappa|$ and $\pi$ by
+at most $\beta|\Delta\kappa|/2$. In \textup{(EC10)} the current product,
+quadratic coefficient and future bracket together change by at most
+$[4.1+\beta(2.5Q_{\max}+1.5)]|\Delta\kappa|$.
+Changing income offsets changes only current and expected future income,
+so its effect is at most $(1+Q_{\max})\|\Delta\delta\|_\infty$.
+Apply the root bound, then write the difference of the two fixed points
+as a same-primitive contraction difference plus this primitive difference.
+Moving its $\rho$ term to the left gives \textup{(EC22)--(EC23)}.
+\end{proof}
+
+This is a nonlinear heterogeneous-agent equilibrium with endogenous prices,
+profits and a full distribution transition. For example set every
+$\delta_z=0$. The reference policy
+$g_{\rm aux}(a,L)=\max\{0,0.8a-0.2\}$, $g_{\rm aux}(a,H)=1$ has the formal
+zero-$\beta$, zero-$\kappa$ Euler root. For the positive primitives in
+\textup{(EC2)}, direct comparison of \textup{(EC10)} with that scalar
+root gives
+\[
+ \|g^*-g_{\rm aux}\|_\infty
+ \leq\frac{4.1\kappa+\beta Q_{\max}\kappa/2+
+                  \beta\kappa/2+\beta Q_{\max}+\beta Q_{\max}^2}
+                 {\lambda}<0.019.
+ \tag{EC24}
+\]
+Thus the two initial populations concentrated on low income, respectively
+at asset $1/2$ and equally at assets $0,1$, have the same asset mean and
+type marginal but investment demands differing by at least
+$0.1-2(0.019)>0.06$. Their selected prices therefore differ because
+$\kappa>0$. This comparison uses the limiting formula only as an explicit
+auxiliary root; zero discounting is not included in the primitive class.
+The full population state cannot silently be replaced by its mean.
+
+% Root-owned body fragment. Does not alone complete the benchmark/inference task.
+\section{An economic residual and a linear error bound}
+\label{sec:residual-stability}
+
+Here is a residual norm for an explicitly specified candidate format.
+Let $g\in\mathcal S$, let $\widehat K(z,\mu)\in[0,1]$, let
+$\widehat\Phi(z,\mu)$ be a probability law, and let $\widehat V$ be
+bounded. All these maps are measurable. Set
+$\widehat Q=q_0+\kappa\widehat K$ and
+$\widehat\pi=\beta\kappa\widehat K^2/2$, and define consumption by
+the household budget with these prices. This format enforces the
+announced price selection and the industry's optimizing supply choice;
+it does not assume that capital demand or population evolution is correct.
+Use the maximum uniform norm for scalar functions and the uniform $W_1$
+distance for population transitions. The full output tuple comprises
+$(g,K,Q,\pi,\Phi,V)$ in this norm.
+
+Put $K_g=\int g\,d\mu$ and define
+\[
+ r_K=\|\widehat K-K_g\|_\infty,\qquad
+ r_\Phi=\sup_{z,\mu}W_1(\widehat\Phi(z,\mu),\Phi_g(z,\mu)).
+ \tag{R1}
+\]
+Let $\widehat D_g(b)$ be the Euler numerator \textup{(EC10)}, using
+$\widehat Q,\widehat\pi,\widehat\Phi$ in place of their induced
+counterparts. The saving-complementarity residual is
+\[
+ r_E=\sup_{\mathcal D}
+ \left|g-\operatorname{clip}_{[0,1]}(g+\widehat D_g(g))\right|.
+ \tag{R2}
+\]
+It vanishes for the correct interior equality and for each satisfied
+boundary inequality, including strict slack. Let $\widehat T_g$ be the
+one-period policy-value operator at the returned prices and transition,
+and let $\widehat B$ denote the pointwise supremum over all $b\in[0,1]$; no attainment is needed for a merely measurable candidate value. Include
+\[
+ r_V=\|\widehat V-\widehat T_g\widehat V\|_\infty,
+ \qquad
+ r_{\rm opt}=\|[\widehat B\widehat V-\widehat V]_+\|_\infty.
+ \tag{R3}
+\]
+The residual $\|\mathcal R\|$ is the maximum of these quantities,
+the absolute goods-market error, and any budget or feasibility violations.
+Budget and saving feasibility hold exactly in this format. Firm optimality
+holds exactly by the marginal-cost choice. Thus this is an economic
+residual, with zero contribution from satisfied slack inequalities.
+
+\begin{proposition}[Global residual-to-equilibrium control]
+\label{prop:full-residual-stability}
+For the stated format and every primitive in \textup{(EC2)},
+\[
+ \operatorname{dist}(\widehat f,\mathcal E)
+ \leq\|\widehat f-f^*\|\leq3\|\mathcal R(\widehat f)\|.
+ \tag{R4}
+\]
+Here $f^*$ is the constructed selected equilibrium and $\mathcal E$
+may contain other competitive equilibria. No uniqueness of that larger
+set is required. The bound is uniform over the full distribution domain.
+\end{proposition}
+\begin{proof}
+Write $r=\|\mathcal R\|$ and $\bar\rho=0.021$. At a common state,
+\[
+ |\widehat Q-Q_g|\leq\kappa r,\qquad
+ |\widehat\pi-\pi_g|\leq\beta\kappa r.
+\]
+At the two next population laws, the corresponding differences are
+at most $3\kappa r$ and $3\beta\kappa r$, because
+$K_g$ has distribution Lipschitz constant at most two. The future
+policy difference at a fixed individual asset is at most $r$.
+Expanding \textup{(EC10)} therefore gives
+\[
+ \|\widehat D_g-D_g\|_\infty
+ \leq\left[4.1\kappa+
+ \beta\{(3Q_{\max}+6)\kappa+Q_{\max}\}\right]r<0.013r.
+ \tag{R5}
+\]
+
+For any decreasing Euler numerator with decrease modulus $\lambda$,
+let $b^*$ be its constrained root. At $b>b^*$ its numerator is at
+most $-\lambda(b-b^*)$. Consequently
+$|b-\operatorname{clip}(b+D(b))|
+ =\min\{b,-D(b)\}\geq\lambda(b-b^*)$.
+At $b<b^*$ the symmetric argument applies, including an upper-bound
+root. Since $\lambda\leq1$, the clipping endpoints do not weaken this
+bound. The clipping map is also $1$-Lipschitz. By \textup{(R2),(R5)},
+\[
+ \|g-F_g\|_\infty\leq\frac{1.013r}{\lambda},\qquad
+ d:=\|g-g^*\|_\infty
+ \leq\frac{1.013r}{\lambda(1-\bar\rho)}<1.05r.
+ \tag{R6}
+\]
+Capital and population-transition errors relative to equilibrium are
+at most $r+d$; the price and dividend errors are smaller multiples of
+that bound.
+
+Compare $\widehat T_g$ with the exact tuple's policy operator $T_g$.
+Current utility changes by at most $10\beta\kappa r$, and the
+continuation of the exact policy value $V_g$ changes by at most
+$6\beta r$. The Lipschitz bound $6$ follows by coupling the same
+shocks: consumption has Lipschitz constants at most $1.009$ in assets
+and $0.0081$ in population, the joint next-state distance grows by at
+most three, and $5(1.009)/(1-3\beta)<6$.
+The policy operator contracts bounded values by $\beta$. Thus
+\[
+ \|\widehat V-V_g\|_\infty
+ \leq\frac{1+10\beta\kappa+6\beta}{1-\beta}\,r<1.072r.
+\]
+Equation \textup{(EC21)} and \textup{(R6)} then give
+$\|\widehat V-V^*\|_\infty<1.072r+0.08(1.05r)<1.16r$.
+Every tuple component is therefore within $3r$ of $f^*$. The latter
+is a competitive equilibrium, so distance to $\mathcal E$ is no larger.
+The optional Bellman-optimality and resource blocks only increase $r$.
+\end{proof}
+
+In particular, zero residual in this format is equivalent to an actual
+selected equilibrium, with the correct policy value. This does not
+require an Euler equality at a binding household constraint, or assert
+that the selected industry price is the only competitive price at zero
+production.
+
+\section{A finite solver on the entire distribution state space}
+\label{sec:finite-solver}
+
+We now construct the evaluation procedure, rather than assume a certified
+equilibrium-evaluation oracle. Use the economy and operator from the
+preceding construction. Put
+\[
+ Q_{\max}=0.801,\quad m_0=0.009,\quad \bar\rho=0.021,\quad
+ L=|Z|,\qquad
+ \mathcal D=[0,1]\times E\times Z\times\mathcal P(E\times[0,1]).
+ \tag{S1}
+\]
+The metric on $E\times[0,1]$ is
+$\mathbf1_{\{e\ne e'\}}+|a-a'|$ and its Wasserstein distance is $W_1$.
+The policy class $\mathcal S$ consists of functions valued in $[0,1]$
+with asset and distribution Lipschitz constants at most one, separately
+for each finite $(e,z)$. Its distance is the uniform norm on
+\emph{all} of $\mathcal D$.
+
+\subsection{The finite input representation}
+There is no numerical algorithm whose input is an unencoded arbitrary
+probability measure. A numerical query specifies $(a,e,z)$ and either a
+finite weighted empirical distribution, or the finite barycentric
+features of $\mu$ used below. In the latter representation, each feature
+is supplied as an exact real-arithmetic input, or by an oracle returning
+a certified interval of any requested rational width; each query and its
+precision cost is charged. Such an oracle represents input data only,
+not a household solution or an equilibrium evaluation. The global output
+is a finite program defining a function of these features for every
+$\mu\in\mathcal P(E\times[0,1])$. Its uniform certificate holds
+mathematically for every such $\mu$. Numeric evaluation is claimed only
+under the declared input representation.
+
+\subsection{A nonexpansive distribution encoding}
+For integer $M\geq1$, let $a_j=j/M$ and
+$\lambda_j(a)=(1-M|a-a_j|)_+$, $0\leq j\leq M$. Define
+\[
+ Q_M\mu(\{(e,a_j)\})=\int_{\{e\}\times[0,1]}\lambda_j(a)\,\mu(de,da).
+ \tag{S2}
+\]
+The hat functions sum to one. Equivalently a point in
+$[a_j,a_{j+1}]$ is rounded to its two endpoints with probabilities
+preserving its mean. Thus $Q_M$ is a Markov map, fixes grid-supported
+measures, and uses $N=2(M+1)$ nonnegative weights summing to one.
+It satisfies
+\[
+ W_1(Q_M\mu,Q_M\nu)\leq W_1(\mu,\nu),\qquad
+ W_1(Q_M\mu,\mu)\leq\frac1{2M}.
+ \tag{S3}
+\]
+Indeed the rounded laws of two asset points are stochastically ordered
+in the same order as those points, and have their respective means.
+Coupling them by common quantiles therefore gives expected asset
+distance exactly $|a-b|$. Keep the discrete type coordinate unchanged
+and apply this coupling to any coupling of the original measures.
+For the second bound, a point a fraction $r$ across its grid interval
+has expected displacement $2r(1-r)/M\leq1/(2M)$.
+This encoding is continuous in $W_1$; hard cell assignment would not
+have that property.
+
+\subsection{A finite operator that remains in the certified domain}
+For $g\in\mathcal S$ and a current state $\mu$, set
+\[
+ \nu=Q_M\mu,\qquad
+ \nu'=Q_M\Phi_g(z,\nu),\quad
+ Q=Q_g(z,\nu),\quad \pi=\pi_g(z,\nu).
+ \tag{S4}
+\]
+All these quantities use finite sums over the $N$ grid states.
+For a prospective saving choice $b$ define
+\[
+ \bar E_g(b)=
+ \sum_{z'}P_{zz'}\frac12\sum_{e'}
+ \left[5-y_{e'}(z')-\pi_g(z',\nu')
+       +\beta Q_g(z',\nu')g(b,e',z',\nu')\right],
+ \tag{S5}
+\]
+and the clipped map
+\[
+ \bar H_g(b)=
+ \left[\frac{\bar E_g(b)-Q\{5-y_e(z)-a-\pi\}}
+ {1+\beta Q^2}\right]_{[0,1]}.
+ \tag{S6}
+\]
+Let $\bar F_Mg$ be its unique fixed point. The next subsection supplies
+an exact finite piecewise-affine algorithm for all the iterates used
+here. Every policy evaluation and distribution integral in that
+algorithm is a finite computation; no root-evaluation oracle is assumed.
+
+Here are explicit bounds for these maps. The direct dependence of
+$\bar H$ on $b$ is at most $m_0$. For fixed $b$, its asset Lipschitz
+constant is at most $Q_{\max}$; its distribution Lipschitz constant is
+at most
+\[
+ C_\mu=
+ 8.2\kappa+\beta\{(6Q_{\max}+8)\kappa+2Q_{\max}\}
+ \leq0.02434806.
+ \tag{S7}
+\]
+For two policies its fixed-$b$ difference is at most
+\[
+ C_g\|g-h\|_\infty,\qquad
+ C_g=4.1\kappa+
+ \beta\{(3Q_{\max}+6)\kappa+2Q_{\max}\}
+ \leq0.02020403.
+ \tag{S8}
+\]
+These are the same elementary kernel and price estimates as in the
+economic construction: $Q_M$ is nonexpansive, so it increases none of
+them. One can verify the quotient step without assuming its numerator
+lies in $[0,1]$: for $d,d'\geq1$,
+\[
+ |[n/d]_{[0,1]}-[n'/d']_{[0,1]}|
+ \leq |n-n'|+|d-d'|.
+ \tag{S9}
+\]
+To prove this, first compare the numerators with the denominator fixed,
+and then compare denominators with the numerator fixed, splitting the
+three clipped regions. In the interior the derivative in the denominator
+has absolute value at most one; the boundary pieces preserve that bound.
+The denominator contribution in \textup{(S7)} is
+$4\beta Q_{\max}\kappa W_1(\mu,\tilde\mu)$ and in
+\textup{(S8)} it is $2\beta Q_{\max}\kappa\|g-h\|_\infty$.
+
+Iteration of $\bar H$ from zero and passage to its uniform limit
+give asset Lipschitz constant at most
+$Q_{\max}/(1-m_0)<0.809$ and distribution Lipschitz constant at most
+$C_\mu/(1-m_0)<0.025$. Its values lie in $[0,1]$. Thus
+\[
+ \bar F_M:\mathcal S\longrightarrow\mathcal S,\qquad
+ \|\bar F_Mg-\bar F_Mh\|_\infty
+ \leq\frac{C_g}{1-m_0}\|g-h\|_\infty
+ <\bar\rho\|g-h\|_\infty .
+ \tag{S10}
+\]
+The finite-root construction below represents this limit exactly.
+The approximate outer iterates therefore remain inside the domain
+where the actual coupled equilibrium contraction was proved.
+
+Let $F$ denote that exact equilibrium operator. Its distribution
+Lipschitz constant is less than $0.025$. Projection of the current state
+therefore changes $Fg$ by at most $0.025/(2M)$. Projection of the future
+state changes the numerator of its clipped equation by at most
+$\beta(4\kappa+Q_{\max})/(2M)$. The corresponding root changes by at most
+that number divided by $1-m_0$. Hence
+\[
+ \|\bar F_Mg-Fg\|_\infty\leq\delta_M:=\frac{0.02}{M}.
+ \tag{S11}
+\]
+No measure-state net or simulated-path coverage enters this bound.
+
+\subsection{Exact roots by finite piecewise-affine inversion}
+For a fixed grid distribution $\nu$ and aggregate state $z$, construct
+both functions $a\mapsto g_k(a,e,z,\nu)$ together. They are continuous
+piecewise affine. At level zero they are identically zero. Suppose this
+has been proved and implemented at level $k-1$.
+
+First construct the two level-$(k-1)$ functions at the current context
+$(z,\nu)$. Evaluate them at the grid points to compute $K$, $Q$, $\pi$
+and the rounded future distribution
+$\nu'=Q_M\Phi_{g_{k-1}}(z,\nu)$. These quantities do not depend on the
+individual current asset or type. Next construct the two
+level-$(k-1)$ functions at each future context $(z',\nu')$.
+The finite weighted sum \textup{(S5)} is piecewise affine in $b$,
+with knots among the union of those $2L$ functions' knots.
+
+For each current type $e$, the un-clipped Euler equation can be
+written as
+\[
+ a=A_e(b):=
+ \frac{(1+\beta Q^2)b-\bar E_{g_{k-1}}(b)
+       +Q\{5-y_e(z)-\pi\}}{Q}.
+ \tag{S11a}
+\]
+The function $A_e$ is continuous piecewise affine and strictly
+increasing: every secant slope is at least
+$(1-\beta Q_{\max})/Q_{\max}>0$. It can therefore be inverted on
+its range one affine segment at a time. Set the answer to zero for
+$a\leq A_e(0)$ and to one for $a\geq A_e(1)$, and restrict it to
+$a\in[0,1]$. This is exactly $g_k=\bar F_Mg_{k-1}$, including both
+binding regions. No root search or rounding of the root is used.
+If every preceding policy has at most $B_{k-1}$ affine pieces,
+the resulting policy has at most $2L B_{k-1}+2$ pieces. The safe
+uniform bound
+\[
+ B_k=(2L+3)^{k+1}
+ \tag{S11b}
+\]
+suffices at every context.
+
+All computations are arithmetic, comparisons and sorting of finite
+lists. Rational input primitives and grid-distribution weights give
+rational knots, slopes and intercepts; exact rational arithmetic is
+therefore an implementation. The division by $Q$ is safe because
+$Q\geq0.8$, and each segment slope of $A_e$, which is a denominator
+in the inversion, has its stated positive lower bound. For arbitrary
+encoded real inputs the same construction is an
+exact real-arithmetic algorithm; no bit-complexity assertion follows
+merely from that convention.
+
+\subsection{Global policy and economic residual certificates}
+Set $g_0=0$ and $g_{k+1}=\bar F_Mg_k$, and return $\hat g=g_K$.
+Let $g^*$ be the fixed point of the verified operator, implementing
+the declared selected competitive equilibrium. The contraction bound
+gives
+\[
+ \|\hat g-F\hat g\|_\infty\leq \bar\rho^K+\delta_M,\qquad
+ e:=\|\hat g-g^*\|_\infty
+ \leq\frac{\bar\rho^K+\delta_M}{1-\bar\rho}.
+ \tag{S12}
+\]
+For the first inequality,
+$\|g_K-\bar F_Mg_K\|\leq
+\bar\rho^K\|g_0-\bar F_Mg_0\|\leq \bar\rho^K$, then use
+\textup{(S11)}. The second inequality follows by subtracting the two
+fixed-point equations and using the exact contraction.
+
+At every state return the finite quantities
+\[
+ \hat K=\int\hat g(a,e,z,Q_M\mu)\,d(Q_M\mu),\quad
+ \hat Q=0.8+\kappa\hat K,\quad
+ \hat\pi=\tfrac12\beta\kappa\hat K^2,\quad
+ \hat\Phi=Q_M\Phi_{\hat g}(z,Q_M\mu).
+ \tag{S13}
+\]
+The output policy satisfies $\hat g(a,e,z,Q_M\mu)=\hat g(a,e,z,\mu)$
+by idempotence of $Q_M$. Therefore the capital-market, price, rebate,
+and distribution consistency errors are bounded respectively by
+\[
+ \frac1{2M},\qquad \frac{\kappa}{2M},\qquad
+ \frac{\beta\kappa}{2M},\qquad \frac3{2M}.
+ \tag{S14}
+\]
+The last follows by projecting the future law once and changing its
+input law by \textup{(S3)}, using $\operatorname{Lip}_\mu\Phi_{\hat g}\leq2$.
+Budget identities hold exactly when consumption is defined from
+\textup{(S13)}. It lies in the same strictly positive consumption
+interval as in the economic construction. Saving constraints hold
+exactly. With the firm's reported physical investment $\hat K$,
+the aggregate resource discrepancy is
+\[
+ \left|\int\hat c\,d\mu+\beta C(\hat K)
+              -\int(y_e(z)+a)\,d\mu\right|
+ =\beta\hat Q\,|\hat K-K_{\hat g}(\mu)|
+ \leq\frac{\beta Q_{\max}}{2M}.
+ \tag{S14a}
+\]
+Here $\hat\pi=\beta\hat Q\hat K-\beta C(\hat K)$ for the stated
+quadratic technology. The resource calculation uses that same
+reported firm quantity; it does not substitute household saving
+into the production cost while using a different firm quantity.
+
+Let $\hat D(b)=\bar E_{\hat g}(b)-
+\hat Q(5-y-a-\hat\pi)-(1+\beta\hat Q^2)b$ denote the Euler numerator
+using the output functions. A normalized complementarity residual is
+$|\hat g-[\hat g+\hat D(\hat g)]_{[0,1]}|$.
+This is zero precisely for the correct Euler equality in the interior,
+the correct weak inequality at saving zero, and the opposite weak
+inequality at saving one. Satisfied slack inequalities contribute zero.
+The root of \textup{(S6)} is exactly $\bar F_M\hat g$.
+The scalar clipping inequalities thus give
+\[
+ \sup_{\mathcal D}
+ |\hat g-[\hat g+\hat D(\hat g)]_{[0,1]}|
+ \leq(1+\beta Q_{\max}^2)(1+m_0)\bar\rho^K
+ <1.02\bar\rho^K.
+ \tag{S15}
+\]
+Indeed $[n/d]_{[0,1]}=[b+D(b)/d]_{[0,1]}$, and multiplying a scalar
+projected step by $d\geq1$ increases its distance from $b\in[0,1]$
+by at most a factor $d$. This check includes both binding constraints.
+
+\subsection{A finite value program and Bellman inequalities}
+Use the output policy, prices and distribution transition to compute
+$V_H$ by $H$ periods of expected discounted utility and zero terminal
+value. Each expectation is the finite sum over $E$ and $Z$.
+All intermediate population states are grid supported. This defines
+a finite recursive program on the whole domain.
+
+Here are bounds sufficient to include values and Bellman optimality
+in the certificate. For any $g\in\mathcal S$, its exact-price,
+exact-distribution policy value $V_g$ has absolute value below $13$
+and Lipschitz constant at most $6$ in the metric $|a-b|+W_1(\mu,\nu)$
+for fixed finite $(e,z)$. In fact $|u(c)|\leq12.5$ and $|u'(c)|\leq5$.
+The consumption Lipschitz constants are at most $1.009$ in assets
+and $0.0081$ in distributions. Under the common-shock coupling,
+the next-state metric is at most three times its current value.
+The geometric sum is consequently bounded by
+$5(1.009)/(1-3\beta)<6$.
+
+For two policies $g,h$, the current consumption difference is at most
+$\beta(Q_{\max}+2\kappa)\|g-h\|_\infty$, and their next asset-plus-
+distribution distance is at most $2\|g-h\|_\infty$. Subtract their
+policy-value recursions, use the Lipschitz bound $6$, and sum the
+discounted error:
+\[
+ \|V_g-V_h\|_\infty
+ \leq
+ \frac{5\beta(Q_{\max}+2\kappa)+12\beta}{1-\beta}
+ \|g-h\|_\infty
+ <0.17\|g-h\|_\infty .
+ \tag{S16}
+\]
+Replacing the exact tuple associated with $\hat g$ by
+\textup{(S13)} changes current consumption by at most
+$2\beta\kappa/M$ and the next population state by at most $3/(2M)$.
+The analogous value-recursion subtraction bounds the induced
+policy-value error by
+$\beta(9+10\kappa)/\{(1-\beta)M\}<0.1/M$.
+The terminal truncation contributes at most $13\beta^H$. Hence
+\[
+ E_V:=\|V_H-V^*\|_\infty
+ \leq0.17e+\frac{0.1}{M}+13\beta^H,
+ \tag{S17}
+\]
+where the economic verification theorem identifies $V_{g^*}=V^*$.
+
+For completeness let $\hat B$ be the true one-period maximization
+operator at the returned price and aggregate-transition functions,
+with $b$ varying over the full interval $[0,1]$. Comparing it with the
+equilibrium Bellman operator, uniformly over that entire interval,
+gives
+\[
+ \|V_H-\hat B V_H\|_\infty
+ \leq(1+\beta)E_V+
+ (10\beta\kappa+6\beta)e+
+ \frac{5\beta\kappa+9\beta}{M}
+ \leq0.25e+\frac{0.2}{M}+14\beta^H .
+ \tag{S18}
+\]
+The first additional term bounds the current-price utility change;
+the second bounds the continuation-value change when
+$W_1(\hat\Phi,\Phi^*)\leq e+3/(2M)$.
+The policy Bellman equality error is at most $13\beta^H$, by the
+finite-horizon recursion. Consequently the positive part of the
+maximal profitable one-step deviation is at most
+$0.25e+0.2/M+27\beta^H$. This is a bound for every feasible saving
+choice, not a grid-only maximization.
+
+\begin{theorem}[A global finite certificate with operation counts]
+\label{thm:finite-solver}
+For $0<\varepsilon\leq1$, choose the least nonnegative integers
+$K,H$ and the least positive integer $M$ satisfying
+\[
+ M\geq10/\varepsilon,\qquad
+ \bar\rho^K\leq\varepsilon/100,\qquad
+ (0.01)^H\leq\varepsilon/100.
+ \tag{S19}
+\]
+The piecewise-affine programs \textup{(S11a), (S13)} and $V_H$ have
+all the feasibility, market-clearing, distribution,
+Euler-complementarity and Bellman residual blocks bounded by
+$\varepsilon$ uniformly over the entire state space and every
+primitive in the declared economy class. Their policy error is below
+$0.013\varepsilon$ and their value error is below $0.15\varepsilon$.
+
+Let $N=2(M+1)$, $B_k=(2L+3)^{k+1}$,
+$\ell_M=1+\lceil\log_2(M+1)\rceil$ and
+$\ell_k=1+\lceil\log_2(B_k+1)\rceil$. Define
+\[
+ C_k=100(k+1)L^2(L+1)^k
+ \{N(\ell_M+\ell_k)+B_k\ell_k+1\}.
+ \tag{S20}
+\]
+One query of the complete output tuple, including $V_H$, requires at
+most
+\[
+ C_{\rm enc}
+ +100(2L)^{H+1}\{C_K+N\ell_K+1\}
+ \tag{S21}
+\]
+real arithmetic operations and comparisons. For fixed finite $E,Z$
+this is polynomial in $1/\varepsilon$, with logarithmic factors.
+The output program is finite and defines a function at every
+distribution state; it does not enumerate a probability simplex.
+The exact-rational implementation and the separately certified
+finite-precision alternative below have their stated costs.
+\end{theorem}
+\begin{proof}
+By \textup{(S11)--(S12)},
+$e\leq0.012\varepsilon/(1-0.021)<0.013\varepsilon$.
+Substitute \textup{(S19)} into \textup{(S14)--(S18)}. The distribution
+residual is at most $0.15\varepsilon$ and Bellman optimality violation
+is below
+$0.25(0.013)\varepsilon+0.02\varepsilon+0.27\varepsilon
+<0.30\varepsilon$. All other residuals and the value error have
+the asserted bounds.
+
+To count one context construction, build the level-$(k-1)$ policy
+pair once at its current context, and once at each of the $L$ future
+contexts. Computing the current capital needs $N$ piecewise-affine
+evaluations costing at most $O(\ell_{k-1})$ each. For rounding its
+future asset positions, locating their two adjacent grid endpoints
+by binary search costs at most $O(\ell_M)$ per point. The weights
+are then barycentric, not hard cell assignments. Computing each
+future price and dividend requires its capital from the returned
+level-$(k-1)$ future policy pair: these are an additional $LN$
+grid evaluations, not a free by-product of constructing its own
+lower-level capital. The factor $100L^2$ in \textup{(S20)} counts
+all these evaluations. Forming the union
+of the $2L$ future knot lists, its weighted affine coefficients,
+and the two inverse lists costs
+$O(L B_{k-1}\log(2L B_{k-1}+2))$. All integration, rounding,
+splitting, inversion and sorting operations are included.
+Thus the context cost $c_k$ satisfies
+\[
+ c_k\leq(L+1)c_{k-1}
+ +100L^2\{N(\ell_M+\ell_k)+B_k\ell_k+1\}.
+\]
+With a constant-cost zero policy, summing this finite recurrence
+gives $c_k\leq C_k$. The current price and population transition
+use this constructed policy pair and $N$ further grid evaluations.
+Each of the $H$ value dates has at most $2L$ children and the same
+bounded local work. Its geometric recursion gives \textup{(S21)}.
+
+For an empirical input with $n_\mu$ atoms, encoding \textup{(S2)}
+uses at most $C n_\mu(\ell_M+1)+CN$ operations by barycentric
+rounding, or at most $Cn_\mu N$ by the continuous hat formula.
+A feature-input query reads $N$ features. Add the cost of reading
+the $L^2$ shock matrix and the other primitive data once; these
+are $C_{\rm enc}$. Since $K,H=O(\log(1/\varepsilon))$ while $L$
+is fixed, every exponential in $K,H$ displayed above is a fixed
+power of $1/\varepsilon$. This proves the arithmetic cost claim.
+\end{proof}
+
+\paragraph{Bit complexity and a fully finite alternative.}
+The polynomial bound just proved uses the declared real-arithmetic
+cost model. Exact rational knots give a terminating implementation,
+but their bit lengths must be charged; no polynomial bit bound for
+nested rational composition is inferred from the arithmetic count.
+
+Here is an alternative with an explicit conservative bit bound.
+In \textup{(S6)} use exactly $J$ clipped iterations from zero instead
+of the exact piecewise-affine inverse. Call the resulting operator
+$T_{M,J}$. The proof of \textup{(S10)} applies to every finite inner
+iteration, so it still maps $\mathcal S$ into itself and contracts
+by $\bar\rho$. It differs from $\bar F_M$ by at most $m_0^J$. Iterating
+it $K$ times therefore gives the same certificates after replacing
+$\delta_M$ by $0.02/M+m_0^J$ and the Euler bound by
+$1.02(\bar\rho^K+m_0^J)$. Choose the least integers satisfying
+\[
+ M\geq20/\varepsilon,\qquad
+ \bar\rho^K,\ m_0^J,\ (0.01)^H\leq\varepsilon/200
+ \tag{S22}
+\]
+leaves strict residual margins below $\varepsilon/2$.
+
+This alternative can evaluate all hat weights using
+$(1-M|a-a_j|)_+$, rather than branching on a rounded asset-cell
+index. At a level-$k$ query it makes at most
+$N(1+L)+2LJ$ calls at level $k-1$, and at most
+$A=100LN^2(J+1)$ remaining arithmetic operations. Hence the complete
+query, including prices, distribution and $V_H$, uses at most
+\[
+ T_{\rm op}=C_{\rm enc}+100N A^{K+1}(2L)^{H+1}+10N
+ \tag{S23}
+\]
+operations. For fixed $L$ this is
+$\exp\{O(\log^2(1/\varepsilon))\}$.
+
+The program now consists only of arithmetic, absolute values and
+clipping gates; before final normalization, all nonconstant denominators are
+$1+\beta Q^2\geq1$. All exact intermediate values are bounded by
+$U=100(N+L+1)$. On the enlarged box with denominators at least
+$1/2$, each gate is Lipschitz with constant at most $C_0=100U$
+in the maximum input error. Request every primitive, the query asset
+$a$, all empirical-input atom assets and weights, and every measure
+feature to accuracy
+\[
+ \tau=\frac{\varepsilon}{2000N(2C_0)^{T_{\rm op}+1}}
+ \tag{S24}
+\]
+and round every arithmetic gate to that accuracy. Induction over
+the finite computation graph bounds every final coordinate error by
+$\delta=\varepsilon/(500N)$; the same induction keeps denominators above
+$1/2$ and intermediate values within the enlarged box.
+Interval arithmetic can therefore return certified enclosures of
+the exact program values. Reported saving approximations may be
+clipped to $[0,1]$ without increasing their error.
+For a numeric population probability vector, clip negative centre
+weights to zero and normalize their sum exactly as rational centre
+weights, with no subsequent coordinatewise rounding. Before normalization the
+sum is at least $1-N\delta>1/2$. The resulting nonnegative unit-mass
+vector has $\ell^1$ error at most $4N\delta$ from the exact vector,
+including all preceding rounding errors. Since the grid-state metric
+has diameter two, its Wasserstein error is at most this same quantity,
+$4N\delta\leq\varepsilon/125$. This prevents coordinatewise errors
+from accumulating into an uncharged distribution error. The additional
+$O(N)$ clipping, summation and division operations are included in
+\textup{(S23)}; their normalization denominator exceeds $1/2$.
+
+The program denotes the exact global function whose invariance
+and residual bounds were proved; its certified numeric evaluations
+do not redefine it as a discontinuous floating-point policy.
+The required precision is
+$O(T_{\rm op}\log C_0+\log(1/\varepsilon)+b_{\rm in})$ bits,
+where $b_{\rm in}$ includes the primitive, query and empirical-input
+bit lengths. Schoolbook
+integer arithmetic gives a polynomial overhead in this precision
+and $T_{\rm op}$. Thus the fully finite alternative remains
+quasipolynomial in $1/\varepsilon$ for fixed $L$, with the charged
+polynomial dependence on finite input length and empirical atom
+count. Add the declared
+cost of obtaining the $N$ input features at this precision, or
+their polynomial computation cost for empirical input.
+If an input-measure presentation does not supply these computable
+features with a stated precision cost, the global mathematical
+program and certificate still apply, but no numeric algorithm for
+that unencoded measure is asserted.
+
+% Concise paper component. Full optional enhancements remain in inference.tex.
+\section{Concrete estimation and numerical likelihood error}
+\label{sec:inference}
+Fix the known $\beta,P$. The unknown primitive, reference state and moments are
+\[
+ \theta=(\delta_0,\delta_1,\kappa)\in\Theta
+ :=[-0.1,0.1]^2\times[0.0001,0.001],                         \tag{I1}
+\]
+\[
+ \mu^{\rm ref}=\tfrac12\delta_{(L,3/4)}+\tfrac12\delta_{(H,3/4)},\qquad
+ p(\theta)=Q_\theta(z_0,\mu^{\rm ref}),\qquad
+ m(\theta)=(\delta_0,\delta_1,p(\theta)),                     \tag{I2}
+\]
+where $z_0$ is fixed. All quantities use the selected regular competitive
+equilibrium from Section~\ref{sec:economy}, including endogenous prices and transitions.
+\begin{lemma}[Uniform identification]\label{lem:price-identification}
+At fixed $\delta$, $p$ is continuous and, for $\kappa_2>\kappa_1$,
+\[
+ .495(\kappa_2-\kappa_1)\leq p(\delta,\kappa_2)-p(\delta,\kappa_1)
+ \leq1.005(\kappa_2-\kappa_1).                              \tag{I3}
+\]
+At fixed $\kappa$,
+\[
+ |p(\delta,\kappa)-p(\widetilde\delta,\kappa)|
+ \leq.002\|\delta-\widetilde\delta\|_\infty.                  \tag{I4}
+\]
+Thus, writing $d=\|\delta-\widetilde\delta\|_\infty$,
+$k=|\kappa-\widetilde\kappa|$ and $\gamma=.495$,
+\[
+ \gamma k\leq|p(\theta)-p(\widetilde\theta)|+.002d,\qquad
+ \|\theta-\widetilde\theta\|_\infty
+ \leq\frac{1.002}{.495}\|m(\theta)-m(\widetilde\theta)\|_\infty,
+ \qquad\frac{1.002}{.495}<3.                                \tag{I5}
+\]
+\end{lemma}
+\begin{proof}
+Let $K_i=\int g_{\delta,\kappa_i}\,d\mu^{\rm ref}$ at $z_0$.
+Proposition~\ref{prop:actual-binding} gives $K_i\geq1/2$ because the
+high-income half saves one. Equation \textup{(EC22)} gives
+$|K_2-K_1|\leq5(\kappa_2-\kappa_1)$. Hence
+\[
+ p_2-p_1=(\kappa_2-\kappa_1)K_2+\kappa_1(K_2-K_1)
+ \geq(1/2-.001\cdot5)(\kappa_2-\kappa_1).
+\]
+The same identity with $K_2\leq1$ proves the upper bound. Equation
+\textup{(EC23)} proves \textup{(I4)}; both sensitivities imply continuity.
+Compare first at fixed $\delta$, then at fixed $\widetilde\kappa$, for
+\textup{(I5)}. The income offsets themselves are the other two moments.
+\end{proof}
+
+\subsection{Experiment and a certified estimator}
+Observe three groups of $r\geq1$ measurements, with known $\sigma>0$:
+\[
+ X_{zj}=\delta_z+\sigma\xi_{zj}\ (z=0,1),\qquad
+ Y_j=p(\theta)+\sigma\xi_{pj},\qquad 1\leq j\leq r,          \tag{I6}
+\]
+where all $3r$ noises are independent standard normals. $X_{zj}$ is a
+measured low-type income minus its baseline one in state $z$; $Y_j$ is a
+measured claim price divided by known $\beta$, so its original-price noise
+standard deviation is $\beta\sigma$. Each price measurement resets the
+population to $\mu^{\rm ref}$ and aggregate state to $z_0$. This specifies
+a product Gaussian experiment with $n=3r$, rather than presuming a constant
+population along an uncontrolled time series. Equality of observable laws
+implies equality of means, so Lemma~\ref{lem:price-identification} proves identification.
+
+The constructed finite solver supplies
+\[
+ \sup_{\theta\in\Theta}|\widetilde p(\theta)-p(\theta)|\leq\eta. \tag{I7}
+\]
+If its uniform policy certificate is $e$, its encoding is $Q_M$, and its
+certified normalized-price rounding error is $\eta_{\rm fp}$, one may use
+\[
+ \eta=.001\left(e+\frac1{2M}\right)+\eta_{\rm fp}.           \tag{I8}
+\]
+Indeed encoding changes capital by at most $1/(2M)$, by the solver's
+idempotence and asset Lipschitz properties; policy error adds at most $e$,
+and $Q=.8+\kappa K$. Taking $4\mid M$ fixes $\mu^{\rm ref}$ exactly and
+removes this encoding term. The solver attains arbitrarily small requested
+$\eta$ by its proved resolution, iteration and precision choices.
+Thus numerical moments $(\delta_0,\delta_1,\widetilde p)$ have uniform error at most $\eta$.
+
+Let $\overline X_z=r^{-1}\sum_jX_{zj}$, $\overline Y=r^{-1}\sum_jY_j$, and set
+\[
+ \widehat\delta_z=\operatorname{clip}_{[-.1,.1]}\overline X_z. \tag{I9}
+\]
+Define $\kappa^\dagger$ to be the unique inverse of
+$p(\widehat\delta,\kappa)=\overline Y$ when the target lies between endpoint
+prices, and the corresponding endpoint $.0001$ or $.001$ otherwise.
+Equation \textup{(I3)} proves existence and uniqueness with this clipping convention.
+For $\eta_{\rm bis}>0$, start $[l,u]=[.0001,.001]$ and allow at most
+\[
+ B=\max\left\{0,\left\lceil\log_2\frac{.0009}{2\eta_{\rm bis}}\right\rceil\right\}
+                                                                    \tag{I10}
+\]
+updates. At midpoint $b$, query $[\widetilde p(\widehat\delta,b)-\eta,
+\widetilde p(\widehat\delta,b)+\eta]$. If its upper endpoint is strictly below
+$\overline Y$, set $l=b$; if its lower endpoint is strictly above, set $u=b$;
+otherwise return $b$. After $B$ updates return the remaining midpoint.
+Each discarded half excludes the clipped exact inverse. At an early return,
+$|p(\widehat\delta,b)-\overline Y|\leq2\eta$, so \textup{(I3)} gives
+distance at most $2\eta/\gamma$, also for a clipped inverse. At exhaustion the
+interval midpoint is within $\eta_{\rm bis}$. Therefore the returned estimator obeys
+\[
+ |\widehat\kappa-\kappa^\dagger|\leq\max\{\eta_{\rm bis},2\eta/\gamma\}
+ \leq\eta_{\rm bis}+2\eta/\gamma.                                    \tag{I11}
+\]
+This needs at most $B$ finite price queries and assumes no monotonicity of
+numerical prices. Use rational midpoints and certified comparisons, or
+include their rounding in $\eta,\eta_{\rm bis}$. Ideal Gaussian inputs use the declared
+real-arithmetic model. For finite encoded sample means of certified accuracy
+$\zeta_{\rm in}$, charge their input precision cost and use the supplied
+means with every radius $t_r$ replaced by $s_r=t_r+\zeta_{\rm in}$ below.
+No finite bit-cost bound for unencoded exact Gaussian reals is asserted.
+
+\begin{theorem}[Finite-sample confidence]\label{thm:gaussian-inference}
+For $0<\alpha<1$ put
+\[
+ t_r=\sigma\sqrt{\frac2r\log\frac6\alpha},\qquad
+ R_{\delta,r}=t_r,\qquad
+ R_{\kappa,r}=\eta_{\rm bis}+\frac{1.002t_r+2\eta}{.495}.              \tag{I12}
+\]
+Uniformly over $\theta\in\Theta$, with probability at least $1-\alpha$,
+\[
+ \|\widehat\delta-\delta\|_\infty\leq R_{\delta,r},\qquad
+ |\widehat\kappa-\kappa|\leq R_{\kappa,r}.                   \tag{I13}
+\]
+Intersect this rectangle with $\Theta$.
+\end{theorem}
+\begin{proof}
+Completing the square gives $\E e^{tG}=e^{t^2/2}$ for a standard normal $G$.
+Markov's inequality with $t=x$ and its application to $-G$ give
+$\Pr(|G|>x)\leq2e^{-x^2/2}$. Each sample-mean error is
+$\sigma G/\sqrt r$. A union bound gives, with probability at least $1-\alpha$,
+\[
+ \max\{|\overline X_0-\delta_0|,|\overline X_1-\delta_1|,
+                         |\overline Y-p(\theta)|\}\leq t_r. \tag{I16}
+\]
+Clipping cannot increase distance to the true income offsets. The ordered-price
+inequality, also at an inverse clipping boundary, gives
+$\gamma|\kappa^\dagger-\kappa|\leq
+|\overline Y-p(\widehat\delta,\kappa)|\leq1.002t_r$.
+Combine with \textup{(I11)}. Encoded means add at most $\zeta_{\rm in}$
+by the triangle inequality, proving the stated finite-input version.
+\end{proof}
+The terms $\eta_{\rm bis}+2\eta/\gamma$ are numerical bias; $t_r$ is Gaussian sampling
+error. Choosing $\eta_r,\eta_{{\rm bis},r}=o(r^{-1/2})$, and
+$\zeta_{{\rm in},r}=o(r^{-1/2})$ for encoded inputs, makes numerical additions negligible
+relative to this sampling radius and gives shrinking uniform confidence bounds.
+
+\subsection{Likelihood error}
+The exact observable log likelihood is
+\[
+ \ell_r(\theta)=-3r\log(\sigma\sqrt{2\pi})-
+ \frac1{2\sigma^2}\left\{\sum_{z=0}^1\sum_{j=1}^r(X_{zj}-\delta_z)^2
+                         +\sum_{j=1}^r(Y_j-p(\theta))^2\right\}. \tag{I17}
+\]
+Let $\widetilde\ell_r$ replace only $p$ by $\widetilde p$. Expanding one
+Gaussian square with $|\widetilde b-b|\leq\eta$, $|b|\leq B_0$, proves
+\[
+ |\widetilde\ell(y)-\ell(y)|\leq
+ \frac\eta{\sigma^2}(|y|+B_0)+\frac{\eta^2}{2\sigma^2}.       \tag{I18}
+\]
+Every exact normalized price is at most $B_0=.801$, so deterministically,
+for every observed sample and uniformly over the parameter box,
+\[
+ \sup_{\Theta}|\widetilde\ell_r-\ell_r|\leq\Delta_r
+ :=\frac\eta{\sigma^2}\left(\sum_{j=1}^r|Y_j|+rB_0\right)
+                       +\frac{r\eta^2}{2\sigma^2}.          \tag{I19}
+\]
+Since $|Y_j|\leq B_0+\sigma|\xi_{pj}|$, the Gaussian tail and a union bound
+over these $r$ noises imply, uniformly over the true primitive, with probability
+at least $1-\alpha$,
+\[
+ \Delta_r/r\leq\frac\eta{\sigma^2}
+       \{2B_0+\sigma\sqrt{2\log(2r/\alpha)}\}
+                         +\frac{\eta^2}{2\sigma^2}.         \tag{I20}
+\]
+Thus bounded Gaussian observations have not been assumed. For finite likelihood
+comparisons evaluate the quadratic part of \textup{(I17)}; its common normalizer
+cancels. Supply known $\sigma$ as positive rational or certified positive interval
+input and charge its precision cost, including evaluation of $1/\sigma^2$.
+Let each supplied raw $Z^*_{ij}$ have accuracy
+$\zeta_{\rm in}$, use group mean bounds $B=(.1,.1,.801)$ and
+$\eta_1=\eta_2=0$, $\eta_3=\eta$. Expansion with the numerical mean fixed gives
+an additional data-encoding allowance
+\[
+ D_{\rm in}=\frac{\zeta_{\rm in}}{\sigma^2}
+ \sum_{i,j}(|Z^*_{ij}|+\zeta_{\rm in}+B_i+\eta_i)
+                         +\frac{3r\zeta_{\rm in}^2}{2\sigma^2}.
+\]
+Use $\sum|Y_j|\leq\sum|Y_j^*|+r\zeta_{\rm in}$ in \textup{(I19)}, evaluate
+the finite sums and squares by rational interval arithmetic, and add its
+requested rounding allowance to $\Delta_r+D_{\rm in}$. Charge input precision
+and these arithmetic operations. This approximates the ideal Gaussian
+likelihood; it does not assign an exact Gaussian density to rounded data.
+
+\section{Counterfactual distributions and welfare}
+\label{sec:counterfactual}
+A concrete intervention is announced at date zero and permanently replaces
+the exogenous income offsets by
+\[
+ \delta_z^\tau=\operatorname{clip}_{[-.1,.1]}(\delta_z+\tau_z),\qquad
+ \theta^\tau=(\delta^\tau,\kappa),\qquad\tau\in\mathbb R^2.  \tag{I24}
+\]
+Clipping specifies the intervention's version. Initial $(z,\mu)$, discounting,
+shock kernels, technology and ownership shares are retained; households
+anticipate the new process from date zero. Prices, choices and population
+laws are solved again under the same equilibrium selection. This intervention
+always stays in $\Theta$ and its parameter map is nonexpansive.
+\begin{proposition}[Actual equilibrium counterfactual stability]
+\label{prop:counterfactual-stability}
+For two admissible primitives with common known $\beta,P$, put
+$d=\|\delta-\widetilde\delta\|_\infty$, $k=|\kappa-\widetilde\kappa|$ and
+$D=2d+5k$. Starting from the same population and aggregate state, couple the
+same shocks. For every aggregate-shock path and every finite $t\geq0$,
+\[
+ W_1(\mu_t^\theta,\mu_t^{\widetilde\theta})\leq(2^t-1)D.     \tag{I25}
+\]
+The household optimal values and equal-weight welfare
+$W_\theta(z,\mu)=\int V_\theta(a,e,z,\mu)\,d\mu(e,a)$ obey
+\[
+ \|V_\theta-V_{\widetilde\theta}\|_\infty\leq16d+27k,\qquad
+ \sup_{z,\mu}|W_\theta-W_{\widetilde\theta}|\leq16d+27k.      \tag{I26}
+\]
+\end{proposition}
+\begin{proof}
+Equations \textup{(EC22)--(EC23)} give $\|g_\theta-g_{\widetilde\theta}\|\leq D$.
+If $r_t$ is population Wasserstein distance and $b_t$ individual asset
+distance from the same initial household state, the Lipschitz bounds give
+\[
+ r_{t+1}\leq2r_t+D,\qquad b_{t+1}\leq b_t+r_t+D,\qquad
+ r_0=b_0=0.                                                 \tag{I27}
+\]
+Both are at most $(2^t-1)D$. Capital differs by at most $D+2r_t$, so
+with $\kappa_{\max}=.001$,
+$|Q_t-\widetilde Q_t|\leq k+\kappa_{\max}(D+2r_t)$ and
+$|\pi_t-\widetilde\pi_t|\leq\beta\{k/2+\kappa_{\max}(D+2r_t)\}$.
+The budgets, $b_{t+1}\leq b_t+r_t+D$ and $Q_{\max}=.801$ imply
+\[
+ |c_t-\widetilde c_t|\leq d+\tfrac32\beta k
+ +(1+\beta Q_{\max})b_t+\beta(Q_{\max}+4\kappa_{\max})r_t
+                         +\beta(Q_{\max}+2\kappa_{\max})D. \tag{I28}
+\]
+On the consumption interval \textup{(EC9)}, $|u'|\leq5$. Also
+$S_\beta:=\sum_{t\geq0}\beta^t(2^t-1)
+=\beta/\{(1-2\beta)(1-\beta)\}<.011$,
+$1+2\beta Q_{\max}+4\beta\kappa_{\max}<1.02$ and
+$\beta(Q_{\max}+2\kappa_{\max})/(1-\beta)<.009$.
+Summing \textup{(I28)} with discount $\beta^t$ therefore bounds value differences by
+\[
+ 5\left[\frac{d+\tfrac32\beta k}{1-\beta}
+ +\left\{(1+2\beta Q_{\max}+4\beta\kappa_{\max})S_\beta
+       +\frac{\beta(Q_{\max}+2\kappa_{\max})}{1-\beta}\right\}D\right]
+ \leq6d+k\leq16d+27k.                                      \tag{I29}
+\]
+Each path follows its own economy's optimal policy, so these are actual
+optimal values. Integrating over the common initial population proves welfare.
+The resource and dividend accounting remains \textup{(EC3)--(EC6)}.
+\end{proof}
+
+Use the confidence radii above and
+$\widehat\theta^\tau=(\operatorname{clip}(\widehat\delta+\tau),\widehat\kappa)$.
+The finite solver supplies uniform certificates
+\[
+ \sup_{z,\mu}W_1(\widehat\Phi_\vartheta,\Phi_\vartheta)\leq\nu_\Phi,
+ \qquad\|\widehat V_\vartheta-V_\vartheta\|_\infty\leq E_V
+ \qquad(\vartheta\in\Theta).                                \tag{I30}
+\]
+For example $\nu_\Phi=e+3/(2M)$ before rounding, and $E_V$ is the proved
+policy, encoding and discounted-tail certificate. Iterate
+$\widehat\Phi_{\widehat\theta^\tau}$ from the declared initial population
+with common aggregate shocks, giving $\widehat\mu_t^\tau$. Exact transitions
+are $2$-Lipschitz, so numerical iteration error satisfies
+$v_{t+1}\leq2v_t+\nu_\Phi$, $v_0=0$. On the parameter confidence event,
+\textup{(I25)} and nonexpansiveness of the intervention imply
+\[
+ W_1(\mu_t^{\theta^\tau},\widehat\mu_t^\tau)
+ \leq(2^t-1)\{2R_{\delta,r}+5R_{\kappa,r}+\nu_\Phi\}.       \tag{I31}
+\]
+One may cap the radius at the state-space diameter two. A declared
+$L_\psi$-Lipschitz population outcome has mean error at most $L_\psi$ times
+this radius; mean mature assets use $L_\psi=1$.
+
+Compute welfare by the finite feature sum
+\[
+ \widehat W_\vartheta(z,\mu)=
+ \int\widehat V_\vartheta(a,e,z,\mu)\,d(Q_M\mu)(e,a),\qquad
+ E_W=E_V+3/M.                                               \tag{I32}
+\]
+The exact value is $6$-Lipschitz in individual initial assets: with population
+path fixed, an initial asset difference $b$ stays at most $b$, giving utility
+difference at most $5(1+\beta Q_{\max})b/(1-\beta)$, with coefficient below six. The explicit
+$Q_M$ coupling preserves type and moves only assets, with mean displacement
+at most $1/(2M)$. Hence \textup{(I30)} proves
+$|\widehat W_\vartheta-W_\vartheta|\leq E_W$ without an arbitrary-measure
+welfare integration oracle. Equal-weight counterfactual welfare and its policy
+effect have respective confidence intervals
+\[
+ \widehat W_{\widehat\theta^\tau}(z,\mu)
+ \ \pm\ \{16R_{\delta,r}+27R_{\kappa,r}+E_W\},               \tag{I33}
+\]
+\[
+ \widehat W_{\widehat\theta^\tau}(z,\mu)-\widehat W_{\widehat\theta}(z,\mu)
+ \ \pm\ \{32R_{\delta,r}+54R_{\kappa,r}+2E_W\}.              \tag{I34}
+\]
+Individual value intervals replace $E_W$ by $E_V$. All deterministic bounds
+are uniform: the single parameter event gives joint coverage over every initial
+state, intervention, aggregate-shock path and finite horizon. The intervals
+separate sampling error, price-inversion bias, search resolution, distribution
+compression and value truncation for the fully re-solved equilibrium.
+
+
+\section{Reproducible benchmarks: local and global accuracy}
+\label{sec:benchmarks}
+The exact-rational programs in \texttt{code/} are
+\texttt{benchmark35.py} and \texttt{benchmark35\_value.py}.
+Raw machine-readable outputs,
+code hashes and resource logs accompany the manuscript. They implement
+the finite piecewise-affine construction using Python 3.12.3 exact fractions.
+Arithmetic and comparisons are counted; actual numerator and denominator
+bit lengths are recorded. Measured times also include Python bookkeeping,
+rational gcd work, distribution encoding and preprocessing.
+
+All runs used the same Linux host (Intel Xeon Platinum 8168, 2.70GHz),
+one process limited to one CPU and 2GiB RAM, no swap, an internal
+55-second combined budget and a 60-second service limit. The common primitives were
+\[
+ \beta=1/100,\quad\kappa=1/1000,\quad
+ (\delta_0,\delta_1)=(-1/10,1/10),\quad
+ P=\begin{pmatrix}3/4&1/4\\1/4&3/4\end{pmatrix}.
+\]
+The policy comparison used $K=2$ updates. Its five initial populations
+were the reference half-type population at assets $3/4$; half types at
+assets $1/2$; half high types at $1/2$ and low types split equally between
+zero and one; all low types at zero; and all high types at one.
+Both aggregate states and individual types were evaluated. The seven
+asset probes were $0,1/4,1/2,3/4,1$ and $3/4\pm1/64$.
+
+The local comparison builds its own same-resolution reference policy at
+$\mu^{\rm ref}$, takes the central own-asset slope at $3/4$ with step $1/64$,
+and freezes population dependence. It uses an independent cache and charges
+all preprocessing. Both its raw linear extension and clipped version are
+reported. The local panel restricts queries to the reference population and
+$3/4\pm1/64,3/4$; the wider panel has 140 queries. The global method's
+full-domain certificate comes from the proof, rather than these finite panels.
+
+\begin{center}\small
+\begin{tabular}{r|rr|rr|r}
+$M$ & Global s & Local s & Policy bound & Distribution bound & Clipped local lower\\\hline
+16 & 0.0650 & 0.0189 & 0.0017273 & 0.093750 & 0.0014940 \\
+32 & 0.0787 & 0.0302 & 0.0010889 & 0.046875 & 0.0021324 \\
+64 & 0.1094 & 0.0278 & 0.0007697 & 0.023438 & 0.0024516 \\
+\end{tabular}
+\end{center}
+Times are single-run wall seconds including each method's preprocessing.
+Certified upper and lower bounds in the tables are rounded outward.
+The policy and distribution columns are rigorous uniform bounds from
+\textup{(S12),(S14)}. The last column bounds the clipped local method's error
+from below on the finite wider panel: subtract the proved global policy bound
+from its exact-rational difference from the computed iterate. It is not an
+exhaustive global error bound for the local method. The raw linear extension
+violated the asset bound by approximately $0.228916838$; clipping removed
+that feasibility violation. Its local-panel comparison and all exact
+differences and two-sided bounds are in the data. No simulated-path success
+is used as a global certificate.
+
+The complete-tuple experiment also computes capital, both price units,
+dividends, the rounded next population and actual $H=2$ policy values,
+for both types and aggregate states at the same reference population and
+individual asset $3/4$. The clipped local method recomputes its own induced
+prices and transition at every continuation. Independent preprocessing
+and all value recursion are included. The global value bound is \textup{(S17)}.
+\begin{center}\small
+\begin{tabular}{r|rr|r}
+$M$ & Global tuple s & Local tuple s & Global value bound\\\hline
+16 & 0.0528 & 0.0233 & 0.0078437 \\
+64 & 0.0839 & 0.0425 & 0.0029934 \\
+\end{tabular}
+\end{center}
+The policy-only runs reached 157/176-bit maximum numerator/denominator
+lengths; complete-tuple runs reached 3466/3462 bits. These observed bit lengths
+are charged in measured exact-arithmetic times; they are not a polynomial-bit
+theorem. A separate $M=8,K=1$ exact first-iterate smoke check and all five
+reported runs completed inside their limits. There are no retries or timeouts
+in this benchmark set. The four value-query comparisons have the same
+finite-query scope, with the uniform value bound enclosing their errors.
+
+The output programs and Sections~\ref{sec:finite-solver}--\ref{sec:counterfactual}
+give uniform accuracy choices and separately visible numerical and sampling
+errors. The policy error alone is not called the full economic residual:
+distribution, market, complementarity and value blocks have their own bounds.
+
+\begin{thebibliography}{9}
+\bibitem{Aiyagari} S. Rao Aiyagari (1994).
+\emph{Uninsured Idiosyncratic Risk and Aggregate Saving}.
+Quarterly Journal of Economics 109(3), 659--684.
+\url{https://doi.org/10.2307/2118417}. Background: abstract, p.~659.
+\bibitem{KS} Per Krusell and Anthony A. Smith, Jr. (1998).
+\emph{Income and Wealth Heterogeneity in the Macroeconomy}.
+Journal of Political Economy 106(5), 867--896.
+\url{https://doi.org/10.1086/250034}. Background: publisher abstract.
+\bibitem{HANK} Greg Kaplan, Benjamin Moll and Giovanni L. Violante (2018).
+\emph{Monetary Policy According to HANK}.
+American Economic Review 108(3), 697--743.
+\url{https://doi.org/10.1257/aer.20160042}. Background: pp.~697--698.
+\bibitem{ABRS} Adrien Auclert, Bence Bard\'oczy, Matthew Rognlie and Ludwig Straub (2021).
+\emph{Using the Sequence-Space Jacobian to Solve and Estimate Heterogeneous-Agent Models}.
+Econometrica 89(5), 2375--2408. \url{https://doi.org/10.3982/ECTA17434}.
+Inspected March 2021 author manuscript: abstract, introduction and Sections~4.2,6.
+\end{thebibliography}
+\end{document}
