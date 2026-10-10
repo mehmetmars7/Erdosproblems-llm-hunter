@@ -1,0 +1,122 @@
+% ECONOMICS_PROBLEM: {"id": "C73-17", "title": "Maxmin equality with the concavified nonrevealing value", "jel_code": "C73", "source_id": "OP-0168"}
+% FIRST_POSTED: 2026-10-11
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newcommand{\N}{\mathbb N}
+\newcommand{\R}{\mathbb R}
+\newcommand{\lv}{\underline v}
+\title{A complete machine-checked proof of the local-geometry characterization of maxmin concavification}
+\author{Claude Fable 5.1 (Claude Code), submitted by Ji Ho Bae}
+\date{October 11, 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+The hand proof for this problem characterizes the bounded Borel payoffs whose maxmin equals the concavified nonrevealing value at every prior by an infinitary local-capital certificate (condition (G)): conserved likelihood flows, finite convex-hull conditions on row and column increments, all-path boundary inequalities, and a root budget. This note reports a complete Lean~4 formalization of that proof against Mathlib, in both directions and at every prior, built on the formalization of problem C73-8 (game model, laws of play, and the Borel superhedging duality of T'Joens and De Bock, which is proved there). The nonrevealing value is taken to be the lower value of the nonrevealing game, which is what the hand proof uses at every step; its identification with the value is Martin's determinacy theorem and is the only classical input that is not formalized. The development has no \texttt{sorry}, no warnings, assumes nothing beyond Mathlib, and uses only the standard axioms.
+\end{abstract}
+
+\section{The statement}
+
+Fix nonempty finite sets $K$, $I$, $J$ and put $m=|K|$. Nature draws $k\sim p\in\Delta(K)$ and reveals it to the informed player. The players choose actions in $I$ and $J$ simultaneously and observe the pair; $\mathcal H$ is the set of finite histories, $hij$ appends the pair $(i,j)$, $\Omega=(I\times J)^{\N}$ is the set of plays and $\omega|t$ the length-$t$ prefix. Behavioural strategies are $\sigma_k(i\mid h)$ and $\tau_j(h)$. For a Borel $F:K\times\Omega\to[0,1]$ put $L_F(p)=\sup_\sigma\inf_\tau\mathbb E_{p,\sigma,\tau}F$, write $F_q=\sum_kq_kF_k$, and let
+\[
+u_F(q)=\sup_{x}\inf_{\tau}\mathbb E_{x,\tau}F_q
+\]
+be the lower value of the nonrevealing game, the supremum over state-independent behavioural strategies $x(h)\in\Delta(I)$. By Martin's determinacy of Blackwell games this is the value $u_f$ of the catalogue statement; the hand proof uses determinacy only to name this number and uses only the lower value in every argument, and so does the formalization. Define $\operatorname{cav}u_F(p)$ as the supremum of $\sum_r\lambda_ru_F(q_r)$ over finite splittings $p=\sum_r\lambda_rq_r$ with $q_r\in\Delta(K)$. A general bounded Borel $f$ with $a\le f\le b$ is reduced to this case by $F=(f-a)/(b-a)$, which transforms $L_f$, $u_f$ and $\operatorname{cav}u_f$ by the same positive affine map.
+
+\begin{definition}[likelihood flow at $p$]
+An array $z_k(h)\ge0$ with $z_k(\varnothing)=p_k$, $z_k(hij)$ independent of $j$, and $\sum_iz_k(hij)=z_k(h)$ for all $k,h,j$.
+\end{definition}
+
+\begin{definition}[lower-capital package at $p$]
+An integer $1\le R\le m$, weights $\lambda_r>0$ with $\sum_r\lambda_r=1$, vectors $q_r\in\Delta(K)$ with $\sum_r\lambda_rq_r=p$, and arrays $C_r:\mathcal H\to[0,1]$ such that at every $h$ and $r$ the convex hull of the row increments $D^r_i(h)=(C_r(hij)-C_r(h))_j$, $i\in I$, meets $\R^J_-$, and $\liminf_tC_r(\omega|t)\ge1-F_{q_r}(\omega)$ on every path. Its root reference is $\beta=\sum_r\lambda_r(1-C_r(\varnothing))$.
+\end{definition}
+
+\begin{definition}[upper-capital arrays for a flow $z$]
+Arrays $A_k:\mathcal H\to[0,1]$ such that at every $h$ the convex hull of the column increments $V^z_j(h)=\big(\sum_iz_k(hij)[A_k(hij)-A_k(h)]\big)_k$, $j\in J$, meets $\R^K_-$, and $\liminf_tA_k(\omega|t)\ge F_k(\omega)$ on every path and in every state.
+\end{definition}
+
+\emph{Condition (G).} For every rational prior $p$ and every $n\ge1$ there is one lower-capital package at $p$ such that every likelihood flow $z$ at $p$ admits upper-capital arrays with $\sum_kp_kA_k(\varnothing)\le\beta+1/n$.
+
+\begin{theorem}[complete intrinsic criterion]\label{main}
+$L_F(p)=\operatorname{cav}u_F(p)$ for every $p\in\Delta(K)$ if and only if $F$ satisfies (G).
+\end{theorem}
+
+\section{What is verified}
+
+The Lean development is public at a fixed commit \cite{Lean}. The game model is that of the C73-8 formalization \cite{Lean8}: \texttt{Payoff} ($[0,1]$-valued Borel payoffs), \texttt{Informed} and \texttt{Uninformed} strategies, the laws of play (Mathlib's Ionescu--Tulcea construction \texttt{Kernel.trajMeasure}), \texttt{payoff} and \texttt{lowerValue}. The new objects are \texttt{NonRev} (nonrevealing strategies) and \texttt{nrValue} ($u_F$), \texttt{Split} and \texttt{cav}, \texttt{Flow}, \texttt{LowerPackage} with its root reference \texttt{beta}, \texttt{UpperArrays}, and \texttt{CondG}, all exactly as above. The hull conditions are written through their convex coefficients; the literal convex-hull forms are \texttt{RowHull} and \texttt{ColHull}, proved equivalent (\texttt{rowHull\_iff}, \texttt{colHull\_iff}), so that the literal condition \texttt{CondGHull} is equivalent to \texttt{CondG} (\texttt{condGHull\_iff}).
+
+\subsection*{The theorem}
+\begin{verbatim}
+theorem condG_iff (F : Payoff K I J) :
+    CondG F <-> forall p : K -> R, IsProb p ->
+      lowerValue p F = cav (fun q => nrValue q F) p
+
+theorem condGHull_iff' (F : Payoff K I J) :
+    CondGHull F <-> forall p : K -> R, IsProb p ->
+      lowerValue p F = cav (fun q => nrValue q F) p
+\end{verbatim}
+Unicode is transliterated here (\texttt{<->}, \texttt{->}, \texttt{forall}, \texttt{exists}, \texttt{sum}, \texttt{R}). Neither statement has any hypothesis beyond the finiteness and nonemptiness of $K,I,J$.
+
+\subsection*{The two directions}
+\begin{verbatim}
+theorem lowerValue_eq_cav_of_condG (F : Payoff K I J) (hG : CondG F)
+    {p : K -> R} (hp : IsProb p) : lowerValue p F = cav (fun q => nrValue q F) p
+
+theorem condG_of_eq (F : Payoff K I J)
+    (heq : forall p : K -> R, IsProb p -> lowerValue p F = cav (fun q => nrValue q F) p) :
+    CondG F
+\end{verbatim}
+Sufficiency is Sections 5--8 and 11 of the hand proof; necessity is Sections 9 and 10. The intermediate statements are also exported: the reference bound $\beta\le\sum_r\lambda_ru_F(q_r)\le\operatorname{cav}u_F(p)$ (\texttt{LowerPackage.beta\_le\_cav}), the response bound $\inf_\tau\mathbb E_{p,\sigma,\tau}F\le\sum_kp_kA_k(\varnothing)$ (\texttt{UpperArrays.iInf\_payoff\_le}), the mixture law and the universal lower bound $L_F\ge\operatorname{cav}u_F$ (\texttt{Split.payoff\_mixture}, \texttt{cav\_nrValue\_le\_lowerValue}), the common lower package with $\beta>\operatorname{cav}u_F(p)-3\delta$ (\texttt{exists\_lowerPackage}), and the upper arrays for an arbitrary flow with root cost at most $\mathbb E_{p,\sigma,\tau}F+\delta$ (\texttt{exists\_upperArrays}).
+
+\subsection*{General bounded payoffs}
+\begin{verbatim}
+theorem condG_iff_B (g : BPayoff K I J) :
+    CondG g.normalize <-> forall p : K -> R, IsProb p ->
+      lowerValueB p g = cav (fun q => nrValueB q g) p
+
+theorem condG_normalize_indep (g g' : BPayoff K I J) (hff : g.f = g'.f) :
+    CondG g.normalize <-> CondG g'.normalize
+\end{verbatim}
+Here \texttt{BPayoff} is a bounded Borel payoff with explicit bounds $a<b$, \texttt{lowerValueB} and \texttt{nrValueB} are its maxmin and nonrevealing lower value, and \texttt{normalize} is $(f-a)/(b-a)$. This is the normalization assertion of Section~1 of the hand proof.
+
+\section{Architecture of the formal proof}
+
+The probabilistic content is reduced, as in \cite{Lean8}, to the one-step recursion for the law of a policy (\texttt{integral\_pre\_shift\_succ}). On top of it:
+\begin{itemize}
+\item \emph{Flows} (Section 4). The likelihood $\prod_{s<t}\sigma_k(i_s\mid h_s)$ is defined by recursion on histories; the flow of a strategy and the reconstruction $\sigma_k(i\mid h)=z_k(hij)/z_k(h)$ are both constructed, and the identity $z_k(hij)=z_k(h)\sigma_k(i\mid h)$ is proved at every node, including zero-flow nodes (\texttt{Flow.z\_append}).
+\item \emph{Lower packages} (Section 5). The hull coefficients give a nonrevealing strategy; $C_r$ is a supermartingale against every $\tau$; the Fatou lemma for $[0,1]$-valued processes with decreasing expectations gives $u_F(q_r)\ge1-C_r(\varnothing)$.
+\item \emph{Upper arrays} (Section 6). The hull coefficients give the response $y$. Histories of zero likelihood have probability zero under the state-$k$ law (\texttt{integral\_zeroInd}, by the recursion), so the supermartingale step is only needed at positive-likelihood nodes, where it follows from the weighted column inequality by division (\texttt{integral\_le\_of\_step\_pos}). Fatou gives $\mathbb E_{k,\sigma_k,y}F_k\le A_k(\varnothing)$ for $p_k>0$.
+\item \emph{Mixture law} (Section 7). With the component index $r$ as a hidden state of prior $\alpha_r(k)=\lambda_rq_{r,k}/p_k$, the mixture strategy is the public policy of the posterior data of the components, and the public-law identification of \cite{Lean8} (\texttt{PostData.integral\_pubPol}) gives $\mathbb E_{p,\sigma,\tau}F=\sum_r\lambda_r\mathbb E_{q_r,\sigma^r,\tau}F$ without any new measure-theoretic argument. Hence $L_F$ is concave and $L_F\ge\operatorname{cav}u_F$.
+\item \emph{Splittings} (Sections 9 and 11). The reduction to at most $m$ terms with positive weights is the linear-programming argument of the hand proof: more than $m$ atoms are linearly dependent, the relation has coefficients summing to zero, and moving the weights along it (oriented so that the objective does not decrease) kills one weight (\texttt{Split.exists\_reduced}). The $\ell^1$-Lipschitz bound for $\operatorname{cav}u_F$ transports a splitting through the coupling with diagonal $\min(p_a,p'_a)$ (\texttt{cav\_le\_add}).
+\item \emph{Necessity} (Section 10). The common package comes from the duality \texttt{borelDuality\_of\_fintype} of \cite{Lean8} against the credal sets $\{x^r(h)\otimes b:b\in\Delta(J)\}$ with payoff $1-F_{q_r}$, clipped into $[0,1]$ by Lemma~3 of C73-8 (\texttt{clip}); the arrays for a flow come from the duality against the singleton kernels $\{\sigma_k(\cdot\mid h)\otimes\tau(h)\}$ with payoff $F_k$; multiplying the local inequality by $z_k(h)$ gives the weighted column inequality with the common coefficients $\tau(h)$. The root budget is closed with $\delta=1/(5n)$.
+\item \emph{Extension to every prior} (Section 11). $L_F$ and $u_F$ are $\ell^1$-Lipschitz (\cite{Lean8}, \texttt{lowerValue\_le\_add}; \texttt{nrValue\_le\_add}), rational priors are dense, and the two Lipschitz bounds transfer the equality.
+\end{itemize}
+
+\section{Scope}
+
+The formalization follows the hand proof and removes the presentational differences: the convex-hull forms of the two hull conditions are proved equivalent to the coefficient forms, and the affine normalization of a bounded payoff is proved to preserve the equality and the condition. One definitional choice is made explicit: $u_F$ is the lower value of the nonrevealing game. The catalogue statement defines $u_f$ as the value of that complete-information Borel game, which exists by Martin's determinacy theorem; the hand proof invokes determinacy only to name this number and never uses the upper value, and the formal proof does not invoke determinacy anywhere. Under determinacy the two definitions agree, so the formal theorem is Theorem~\ref{main} for the catalogue's $u_f$; determinacy itself is not formalized (it is not in Mathlib). No other external theorem is assumed: the Borel superhedging duality is proved in \cite{Lean8}. As in the hand proof, the condition is infinitary, the formal theorems provide no finite recognition algorithm, and nothing is asserted about the uninformed minimax or the existence of a value of the incomplete-information game.
+
+\section{Build and audit}
+
+Lean \texttt{v4.34.1}, Mathlib commit \texttt{d13f23b723b8a846827a245b89c10fc7d3f11612}; about 1,900 lines in 10 new files (\texttt{Maxmin/}) on top of the 4,530 lines of the C73-8 library (\texttt{BorelValue/}, included verbatim at its commit \texttt{adfa513}). The commands \texttt{lake exe cache get}, \texttt{lake build} and \texttt{lake env lean Verify.lean} were run on a fresh clone on a separate Linux machine. The build reports no errors and no warnings; the sources contain no \texttt{sorry}. Each of the 28 statements audited in \texttt{Verify.lean}, including \texttt{condG\_iff}, \texttt{condGHull\_iff'}, \texttt{condG\_iff\_B} and \texttt{condG\_normalize\_indep}, depends only on \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+
+\section*{Completion Estimate}
+100\%
+
+This is the claim for the full catalogue question as stated by the hand proof: an exact characterization of the bounded Borel payoffs with $L_f=\operatorname{cav}u_f$ at every prior. The machine check covers both directions, every prior, and the cited duality, with $u_f$ the nonrevealing lower value (equal to the value by Martin's theorem, which is not formalized). It is not an independent expert review.
+
+\begin{thebibliography}{9}
+\bibitem{Hand} Ji Ho Bae, \emph{An exact local-geometry characterization of maxmin concavification}, hand proof for C73-17, \url{https://github.com/jbaelaw/maxmin-concavification-characterization/blob/448392472b35ef2303148f78fbbd819147bab774/paper/Proof.tex}.
+\bibitem{Lean} Lean 4 formalization, \url{https://github.com/jbaelaw/maxmin-concavification-lean-20261011/tree/66e4210bc876a338361f97dfdd041b9a81747794}.
+\bibitem{Lean8} Lean 4 formalization of C73-8 (game model, laws of play, Borel superhedging duality), \url{https://github.com/jbaelaw/borel-value-certificates-lean-20261011/tree/adfa513ba33427af32e3bca4a01f0a86a1086db4}.
+\bibitem{Martin} Donald A. Martin, \emph{The determinacy of Blackwell games}, Journal of Symbolic Logic \textbf{63} (1998), 1565--1581.
+\bibitem{TDB} Natan T'Joens and Jasper De Bock, \emph{Global upper expectations for discrete-time stochastic processes: in practice, they are all the same!}, Proceedings of Machine Learning Research \textbf{147} (2021), 310--319.
+\bibitem{KLS} Gil Bar Castellon Koltun, Ehud Lehrer and Eilon Solan, \emph{The maxmin value of repeated games with incomplete information on one side and tail-measurable payoffs}, arXiv:2512.01581 (2025), Section 5.
+\end{thebibliography}
+\end{document}
