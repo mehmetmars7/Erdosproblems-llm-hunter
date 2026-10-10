@@ -1,0 +1,222 @@
+% ECONOMICS_PROBLEM: {"id": "C78-464", "title": "Rank-maximality probability under uncertain preferences", "jel_code": "C78", "source_id": "OP-0548"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\IS}{\mathcal I}
+\newcommand{\FP}{\mathsf{FP}}
+\newcommand{\PP}{\mathsf{PP}}
+\newcommand{\sharpP}{\mathsf{\#P}}
+\title{Rank-maximality probabilities under uncertain preferences}
+\author{Ji Ho Bae}
+\date{10 October 2026}
+\begin{document}
+\maketitle
+
+\paragraph{Model, authorship and original output.}
+Author: Ji Ho Bae. Prepared with GPT Codex assistance; the precise serving
+revision was not exposed. The final generated mathematical argument is
+retained at the following immutable source link. This catalogue submission
+preserves that argument, adding catalogue metadata and provenance; the
+rank-maximality title layout is simplified for browser rendering.
+\href{https://github.com/jbaelaw/rank-maximality-hand-proof-20261010/blob/e0d34b34f26033d6cef32493a65abca1480a37b2/paper/Proof.tex}{Complete original generated TeX}.
+\href{https://github.com/jbaelaw/rank-maximality-hand-proof-20261010/blob/e0d34b34f26033d6cef32493a65abca1480a37b2/paper/Proof.pdf}{Hand-proof PDF}.
+The preparation included exact target and primary-source checks, adversarial
+mathematical reviews, and finite semantic checks recorded in the public
+package. This is a complete hand-proof claim under polynomial-time Turing
+reductions, submitted for independent expert review. It does not claim
+community acceptance or an end-to-end Lean formalization.
+
+\begin{abstract}
+For a specified house allocation, we classify the probability of rank
+maximality under uncertain strict preferences. Both independent rational
+lotteries and independent uniform tie refinements give an
+$\FP^{\sharpP}$-complete exact evaluation problem and a
+$\PP$-complete threshold problem under polynomial-time Turing reductions.
+The lower bound uses only two-house lists: one exact probability reveals
+the independent-set count as a sum of integer digits. Explicit joint
+lotteries admit polynomial-time evaluation and comparison.
+\end{abstract}
+
+Applicants rank their acceptable houses; houses have no preferences.
+Acceptability is fixed. A feasible matching may leave applicants or houses
+unmatched. Its rank vector counts the assigned rank-one edges, then the
+rank-two edges, and so on, padded to the largest acceptable-list length.
+It is \emph{rank-maximal} when this vector is lexicographically maximal
+over all feasible matchings. Cardinality is not maximized beforehand.
+For a fixed feasible matching $M$, write $\eta(M)$ for the probability
+of this event. The survey \cite[\S3.1.2]{survey} proposes studying
+rank-maximal matchings under uncertainty; catalogue entry C78-464
+specifies the probability-classification problem considered here.
+
+\begin{theorem}\label{thm:main}
+For each of the following independent uncertainty models, exact rational
+evaluation of $\eta(M)$ is $\FP^{\sharpP}$-complete and deciding
+$\eta(M)\geq q$ for a rational input $q$ is $\PP$-complete, under
+polynomial-time Turing reductions:
+\begin{enumerate}
+\item each applicant has an explicitly listed rational lottery over strict
+orders;
+\item each applicant has a weak order, independently and uniformly refined
+within every tie.
+\end{enumerate}
+Hardness holds with at most two acceptable houses per applicant and,
+respectively, fair two-outcome nontrivial lotteries or nontrivial ties
+of size two. For an
+explicitly listed lottery over whole profiles, both tasks are polynomial-time.
+\end{theorem}
+
+\section*{The two-choice construction}
+Let $G=(V,E)$ be a finite simple graph, with $n$ vertices and $m$ edges,
+and let $t\geq1$. For each $v\in V$, create houses $h_v,k_v$, a variable
+applicant $a_v$ accepting $h_v,k_v$, and a guard $b_v$ accepting only $k_v$.
+For each edge $\{u,v\}$, create $t$ additional applicants accepting
+$h_u,h_v$. Every two-house list is a single tie of size two, refined
+independently and fairly. The same distribution is an explicit lottery
+over its two strict orders.
+
+The reference matching $M$ assigns $a_v$ to $h_v$ and $b_v$ to $k_v$,
+and leaves all edge applicants unmatched. It occupies every house.
+For a realized profile, let $S$ contain the vertices whose variable
+applicants rank $k_v$ first. The reference rank vector is
+$(2n-|S|,|S|)$ when $n>0$.
+
+\begin{lemma}\label{lem:criterion}
+The reference matching is rank-maximal exactly when every edge
+applicant's first choice is $h_v$ with $v\notin S$.
+\end{lemma}
+\begin{proof}
+If an edge applicant first chooses $h_v$ with $v\in S$, remove
+$(a_v,h_v)$ from $M$ and assign that previously unmatched applicant
+to $h_v$. This feasible matching gains one rank-one edge and loses
+one rank-two edge, so it improves the rank vector.
+
+Conversely, suppose all edge applicants first choose inactive homes.
+Every first-choice house belongs to
+\[
+ \{k_v:v\in V\}\ \cup\ \{h_v:v\notin S\}.
+\]
+Thus any matching has at most $2n-|S|$ rank-one edges, since assigned
+houses are distinct. The reference attains this bound. A competitor
+attaining it has at most $2n$ assigned edges in total and hence at most
+$|S|$ rank-two edges. All acceptable lists have length at most two,
+so no later coordinate remains to compare.
+\end{proof}
+
+\section*{One exact query counts independent sets}
+By Lemma~\ref{lem:criterion}, a successful profile must have $S$ independent.
+For such an $S$, let $d(S)$ count the graph edges incident to $S$.
+Each of their $t$ copies has exactly one successful order; a copy of
+an edge disjoint from $S$ has two. The variable orders are fixed by $S$.
+The successful-profile count $N_t$ therefore satisfies
+\begin{equation}\label{eq:count}
+ N_t=\sum_{S\in\IS(G)}2^{t(m-d(S))},
+ \qquad \eta_t=\frac{N_t}{2^{n+tm}}.
+\end{equation}
+Here $\IS(G)$ includes the empty independent set.
+
+Choose $t=n+1$ and put $B=2^{n+1}$. If $c_j$ counts the independent
+sets with $d(S)=j$, then
+\[
+ N_t=\sum_{j=0}^{m}c_jB^{m-j},\qquad 0\leq c_j\leq2^n<B.
+\]
+These coefficients are exactly the base-$B$ digits of $N_t$.
+One exact probability query gives $N_t$ after multiplication by
+$2^{n+(n+1)m}$; summing its digits gives $|\IS(G)|$.
+The constructed instance has $2n+(n+1)m$ applicants and $2n$ houses.
+All integers in the extraction have polynomial bit length, so construction
+and digit extraction take polynomial time. Independent-set counting is
+$\sharpP$-complete under polynomial-time Turing reductions
+\cite[\S1, problem 2; \S2, reduction 2]{provan}.
+This proves the exact lower bound for both encodings.
+
+For the threshold lower bound, put $D=2^{n+(n+1)m}$.
+Queries at $q=k/D$ determine whether $N_t\geq k$. Binary search
+recovers $N_t$ in $O(\log(D+1))$ queries, after which digit extraction
+recovers the independent-set count. A $\sharpP$ oracle suffices to decide
+every $\PP$ language, so the threshold problem is $\PP$-hard under
+the stated Turing reductions. This does not assert many-one hardness.
+
+Isolated vertices need no modification: both variable orders contribute
+to the corresponding coefficient. When $m=0$, $N_t=2^n$ and $\eta_t=1$,
+and the single digit counts all subsets. The empty graph gives probability
+one and one independent set.
+
+\section*{Verification and upper bounds}
+For a deterministic profile with $a$ applicants and maximum list length
+$R>0$, assign an edge of rank $r$ the integer weight
+$(a+1)^{R-r}$. The first differing rank coordinate dominates all later
+coordinates: their total possible loss is at most
+\[
+ a\sum_{r=j+1}^{R}(a+1)^{R-r}=(a+1)^{R-j}-1.
+\]
+Maximum-weight bipartite matching, permitting unmatched vertices, therefore
+verifies rank maximality in polynomial bit time. The case $R=0$ is immediate.
+
+For rational independent lotteries, choose a common denominator $D_i$
+for each applicant and represent each listed mass by its integer number
+of tickets. Guess one binary ticket per applicant, reject out-of-range
+tickets, and accept precisely the profiles passing the verifier. The
+accepting-branch count is $N=D\eta(M)$, where $D=\prod_iD_i$ is known
+and has polynomial bit length. For uniform refinements, a ticket indexes
+a permutation in each tie, giving $D=\prod_T|T|!$ and the same argument.
+Consequently exact evaluation belongs to $\FP^{\sharpP}$. For
+$q=u/v\in(0,1]$ with $v>0$, comparison is equivalent to
+$vN>uD-1$. The count $vN$ remains in $\sharpP$: add a bounded ticket
+guess with $v$ choices. A $\sharpP$ count exceeding a polynomial-time
+computable integer is a $\PP$ predicate
+\cite[Definition 2.3]{fenner}; thresholds outside $(0,1]$ are immediate.
+For explicitly listed joint support,
+run the verifier on each profile and add the successful masses.
+This proves all upper bounds and Theorem~\ref{thm:main}.
+
+\paragraph{Attribution and submission scope.}
+The \href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/00ced55ba1223fb48603e1f15028d753997ee515/attacks/open_problems/economics/gpt6_astra_ultra/C78-464.tex}{earlier GPT 6 Astra Ultra catalogue attempt}
+already gives the verifier, counting upper bounds and joint-lottery
+algorithm; its two independent-model lower bounds remain unresolved.
+The new contribution is the gadget, \eqref{eq:count}, and digit extraction.
+This submission contains the complete hand proof. A Lean companion is
+developed separately and is not part of this version. The work was developed
+with Codex AI assistance, without a publication-priority or external-review claim.
+
+\clearpage
+\section*{Completion Estimate}
+100\%
+This is the author's claimed coverage of the complete catalogue question,
+not an independent verification or community acceptance rating.
+
+\section*{Final status}
+\textbf{FULL SOLUTION CLAIMED.} Exact evaluation and rational-threshold
+comparison are classified for all three uncertainty encodings in the
+original catalogue question. Completeness uses polynomial-time Turing
+reductions. No remaining mathematical gap is claimed in this hand proof;
+independent community review is pending. No existing attempt is superseded
+or edited by this contribution.
+
+\begin{thebibliography}{9}
+\bibitem{survey}
+K. Cechl\'arov\'a, \'{A}. Cseh and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences}.
+Bulletin of the EATCS 128 (2019), \S2.1 and \S3.1.2.
+\href{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}{Primary manuscript}.
+\bibitem{provan}
+J. S. Provan and M. O. Ball.
+The complexity of counting cuts and of computing the probability
+that a graph is connected.
+\emph{SIAM Journal on Computing} 12(4) (1983), 777--788.
+\href{https://doi.org/10.1137/0212053}{doi:10.1137/0212053}.
+\bibitem{fenner}
+S. A. Fenner, L. J. Fortnow and S. A. Kurtz.
+Gap-definable counting classes.
+\emph{Journal of Computer and System Sciences} 48(1) (1994), 116--148.
+\href{https://cse.sc.edu/~fenner/papers/gaps.pdf}{Author manuscript}, \S2.
+\end{thebibliography}
+\end{document}

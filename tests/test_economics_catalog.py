@@ -572,8 +572,10 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 attack = attempts[0]
                 claim = 'solved' if problem_id in {'C73-487', 'C73-496'} else 'unresolved'
                 self.assertEqual(attack['status'], claim)
-                self.assertEqual(data[problem_id]['llm_status'], claim)
-                self.assertEqual(data[problem_id]['status'], 'solved' if claim == 'solved' else 'open')
+                # Preserve the frozen Ultra claim while allowing new solved attempts.
+                aggregate = 'solved' if any(a['status'] == 'solved' for a in data[problem_id]['attacks']) else 'unresolved'
+                self.assertEqual(data[problem_id]['llm_status'], aggregate)
+                self.assertEqual(data[problem_id]['status'], 'solved' if aggregate == 'solved' else 'open')
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['date_posted'], '2026-10-09')
                 self.assertEqual(attack['file_path'],
