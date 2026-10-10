@@ -500,7 +500,7 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['status'], expected_claim)
                 # The Pro manuscripts separately claim full solutions for C71-12 and C65-29.
-                aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12', 'C65-29'} else 'unresolved'
+                aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12', 'C65-29', 'C61-73'} else 'unresolved'
                 self.assertEqual(data[problem_id]['llm_status'], aggregate_claim)
                 self.assertEqual(data[problem_id]['status'],
                                  'solved' if aggregate_claim == 'solved' else 'open')
