@@ -324,6 +324,28 @@ class EconomicsCatalogueTests(unittest.TestCase):
             self.assertEqual((self.root / 'docs' / attack['download_url']).read_bytes(),
                              (self.root / attack['file_path']).read_bytes())
 
+    def test_later_solved_claim_preserves_historical_attempt_and_source_status(self):
+        target = self.imported()['problems'][0]
+        historical = self.write_attempt(target)
+        original_bytes = historical.read_bytes()
+        before = build_economics_data(self.root)[target['id']]
+        self.assertEqual(before['status'], 'open')
+        original_attempt = before['attacks'][0]
+        later = historical.parent.parent / 'gpt_6_astra' / historical.name
+        later.parent.mkdir()
+        later.write_text(historical.read_text().replace(
+            '% ATTEMPT_STATUS: unresolved', '% ATTEMPT_STATUS: solved'))
+        after = generate_economics_data(self.root)[target['id']]
+        self.assertEqual(after['source_status'],
+                         before.get('source_status', before['status']))
+        self.assertEqual(after['source_status'], 'open')
+        self.assertEqual(after['status'], 'solved')
+        self.assertEqual(after['llm_status'], 'solved')
+        self.assertEqual(next(a for a in after['attacks']
+                              if a['file_path'] == original_attempt['file_path']),
+                         original_attempt)
+        self.assertEqual(historical.read_bytes(), original_bytes)
+
     def test_attempt_identity_and_explicit_status_are_required(self):
         target = self.imported()['problems'][0]
         path = self.write_attempt(target)
@@ -475,7 +497,15 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['status'], 'unresolved')
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['date_posted'], '2026-10-09')
-                self.assertEqual(data[problem_id]['status'], 'open')
+                # A later model's solved claim may change the aggregate status;
+                # the catalogue source remains open and the historical Opus
+                # attempt remains unresolved.
+                self.assertEqual(data[problem_id].get('source_status',
+                                                     data[problem_id]['status']), 'open')
+                has_solved_claim = any(a['status'] == 'solved'
+                                       for a in data[problem_id]['attacks'])
+                self.assertEqual(data[problem_id]['status'],
+                                 'solved' if has_solved_claim else 'open')
                 source = BASE_DIR / attack['file_path']
                 self.assertEqual(source.parent.name, 'opus_5.5_high')
                 self.assertEqual(source.name, problem_id + '.tex')
