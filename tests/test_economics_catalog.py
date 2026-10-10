@@ -475,7 +475,9 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['status'], 'unresolved')
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['date_posted'], '2026-10-09')
-                self.assertEqual(data[problem_id]['status'], 'open')
+                # Frozen attempt status stays unchanged; later solutions may coexist.
+                aggregate = 'solved' if any(a['status'] == 'solved' for a in data[problem_id]['attacks']) else 'open'
+                self.assertEqual(data[problem_id]['status'], aggregate)
                 source = BASE_DIR / attack['file_path']
                 self.assertEqual(source.parent.name, 'opus_5.5_high')
                 self.assertEqual(source.name, problem_id + '.tex')

@@ -1,0 +1,133 @@
+% ECONOMICS_PROBLEM: {"id": "C78-387", "title": "Popularity probability under uncertain house-allocation preferences", "jel_code": "C78", "source_id": "OP-0546"}
+% FIRST_POSTED: 2026-10-10
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,microtype,titling}
+\setlength{\droptitle}{-12mm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\PP}{\mathrm{PP}}
+\newcommand{\FP}{\mathrm{FP}}
+\newcommand{\sharpP}{\#\mathrm P}
+\newcommand{\Prob}{\mathop{\mathrm{Pr}}}
+\title{Exact popularity probabilities in house allocation}
+\author{Ji Ho Bae}
+\date{10 October 2026}
+\hypersetup{pdftitle={Exact popularity probabilities in house allocation},pdfauthor={Ji Ho Bae}}
+\begin{document}
+\maketitle
+
+\paragraph{Model, authorship and original output.}
+Author: Ji Ho Bae. Prepared with GPT Codex assistance; the precise serving
+revision was not exposed. The final generated mathematical argument is
+retained at the following immutable source link. This catalogue submission
+preserves that argument, adding catalogue metadata and provenance.
+\href{https://github.com/jbaelaw/house-allocation-popularity/blob/5eeef911b3a54337d6739e592ed5d96cb4e64f66/paper/Proof.tex}{Complete original generated TeX}.
+\href{https://github.com/jbaelaw/house-allocation-popularity/blob/5eeef911b3a54337d6739e592ed5d96cb4e64f66/paper/Proof.pdf}{Hand-proof PDF}.
+The preparation included exact target and primary-source checks, adversarial
+mathematical reviews, and finite semantic checks recorded in the public
+package. This is a complete hand-proof claim under polynomial-time Turing
+reductions, submitted for independent expert review. It does not claim
+community acceptance or an end-to-end Lean formalization.
+
+\begin{abstract}
+We classify exact popularity probabilities for a fixed house allocation under three representations of uncertain preferences. Independent lotteries and independent uniform tie refinements give $\FP^{\sharpP}$-complete evaluation and $\PP$-complete threshold comparison under polynomial-time Turing reductions. Explicit joint lotteries admit polynomial-time evaluation. The results allow incomplete acceptable lists and partial matchings.
+\end{abstract}
+
+Applicants have strict preferences over their acceptable houses; every acceptable house is better than being unmatched. Houses have no preferences. A matching is \emph{popular} if no other feasible matching receives strictly more votes in their pairwise comparison. The acceptable pairs are fixed across all realized profiles. For an encoded distribution $I$ and a feasible fixed matching $M$, write
+\[
+ \pi_I(M)=\Prob(M\text{ is popular}).
+\]
+This is the probability-evaluation question in catalogue entry C78-387, motivated by the uncertainty agenda of Cechl\'arov\'a, Cseh and Manlove~\cite[\S3.1.2]{survey}.
+
+\begin{theorem}\label{thm:main}
+For independent explicitly listed rational lotteries over applicants' orders, and for independent uniform refinements of weak orders, exact rational evaluation of $\pi_I(M)$ is $\FP^{\sharpP}$-complete. Deciding $\pi_I(M)\geq\tau$, for a binary rational $\tau\in[0,1]$, is $\PP$-complete. Every completeness statement uses polynomial-time Turing reductions. For an explicitly listed rational lottery over whole profiles, both tasks are in $\mathrm P$.
+\end{theorem}
+
+\paragraph{Verification and upper bounds.}
+For a realized profile, weight an acceptable pair $(a,h)$ by $+1$, $0$ or $-1$ according as $a$ prefers $h$ to $M(a)$, receives the same house, or prefers $M(a)$ to $h$. Give each applicant a private dummy for being unmatched, with weight $0$ if unmatched in $M$ and $-1$ otherwise. A maximum-weight assignment to real or private dummy houses computes the largest vote margin against $M$. Since $M$ has margin zero, it is popular exactly when this maximum is zero. Weighted bipartite matching computes this in polynomial time, including when $M$ is partial.
+
+For an independent lottery, use a common denominator $D_a$ for applicant $a$'s listed probabilities. Integer tickets in $[0,D_a)$ select its order by cumulative intervals. With $D=\prod_aD_a$, let $F$ count successful ticket tuples; then $\pi_I(M)=F/D$. For uniform refinements take $D=\prod_C |C|!$, over all tie blocks $C$, and decode each block ticket as a permutation. In both cases $D$ has polynomial bit length and $F$ is a $\sharpP$ function: guess uniquely encoded tickets, reject invalid encodings, and test popularity. Exact evaluation therefore lies in $\FP^{\sharpP}$.
+
+Number the ticket tuples by $0,\ldots,D-1$ using mixed-radix decoding. Here is an explicit $\PP$ test, including equality. Write $\tau=u/v$, where $0\leq u\leq v$ and $v>0$, and choose $K$ with $2^K>vD$. Guess one bit $b$ and a $K$-bit integer $t$. If $b=0$, accept $t=vD$; for $t<vD$, accept exactly when profile ticket $\lfloor t/v\rfloor$ succeeds; reject the rest. If $b=1$, accept exactly when $t\geq uD$. The number of accepting branches is
+\[
+ (vF+1)+(2^K-uD),
+\]
+which exceeds half of the $2^{K+1}$ branches exactly when $vF\geq uD$. For a listed joint lottery, test every support profile and sum its rational weight; this takes polynomial time.
+
+\paragraph{A vote lemma.}
+In a balanced instance label the assigned houses $h_a$, so that the fixed matching is $M(a)=h_a$. Call $a$ \emph{top} if $h_a$ is its first acceptable house.
+\begin{lemma}\label{lem:vote}
+The perfect matching $M$ is popular if and only if every house preferred to an applicant's assigned house is assigned in $M$ to a top applicant.
+\end{lemma}
+\begin{proof}
+Under the stated condition, a winner against $M$ takes a top applicant's house. Its owner must lose that house, and therefore votes for $M$. Distinct winners take distinct houses, giving an injection from winners to losers.
+
+Conversely, suppose $a$ prefers $h_b$ to $h_a$ and $b$ is not top. Choose $h_c$ preferred by $b$ to $h_b$. If $c=a$, swapping $a$ and $b$ gives two wins and no losses. Otherwise give $a$ house $h_b$, give $b$ house $h_c$, and leave $c$ unmatched. There are two wins and one loss. All newly assigned pairs are acceptable, so either alternative defeats $M$.
+\end{proof}
+
+\paragraph{Independent lotteries.}
+Given a simple graph $G=(V,E)$, create applicant $a_v$ and house $h_v$ for each vertex, with $M(a_v)=h_v$. Every house is acceptable. At each nonisolated vertex choose independently, with equal probabilities, between putting its own house first and putting all neighbors before it. All nonneighbors other than its own house follow it; fix strict orders within the neighbor and nonneighbor groups. Isolated vertices have a deterministic order with their own house first.
+
+Let $S$ consist of the vertices choosing the second order. If $S$ is independent, all improved houses belong to top applicants, so Lemma~\ref{lem:vote} applies. If $u,v\in S$ are adjacent, their house swap gives two wins. Thus popularity is equivalent to independence. If $G$ has $z$ isolates, the number of choices is $2^{|V|-z}$ and the number of independent sets is $2^z i(G-\text{isolates})$. Hence
+\begin{equation}\label{eq:lottery}
+ \pi_I(M)=\frac{i(G)}{2^{|V|}}.
+\end{equation}
+Provan and Ball establish $\sharpP$-completeness for counting bipartite independent sets~\cite[\S1, problem~2; \S2, reduction~2]{pb}. Equation~\eqref{eq:lottery} proves the required counting hardness.
+
+\paragraph{Uniform tie refinements.}
+For each vertex $v$ make an applicant $a_v$ with the sole tie $\{h_v,g_v\}$, and an applicant $z_v$ whose only acceptable house is $g_v$. Match them to $h_v$ and $g_v$, respectively. For each edge $uv$ make applicants $e_{uv,j}$, $1\leq j\leq k$, each with sole tie $\{h_u,h_v,h_{uv,j}\}$ and assigned private house $h_{uv,j}$. All refinements are independent and uniform.
+
+Let $X_v=1$ when $a_v$ ranks $h_v$ above $g_v$. By Lemma~\ref{lem:vote}, popularity holds exactly when every edge applicant puts its own house above each endpoint house $h_v$ with $X_v=0$. Among the six strict edge orders, this has conditional probability
+\[
+ w(0,0)=\tfrac13,\qquad w(0,1)=w(1,0)=\tfrac12,
+ \qquad w(1,1)=1.
+\]
+The resulting probability is
+\begin{equation}\label{eq:spin}
+ \pi_k=2^{-|V|}\sum_{X\in\{0,1\}^V}\prod_{uv\in E}w(X_u,X_v)^k.
+\end{equation}
+Put $m=|E|$. For $S=\{v:X_v=0\}$ let $a$ count edges inside $S$ and $b$ edges inside its complement. If $N_{ab}$ counts such subsets, then
+\begin{equation}\label{eq:interp}
+ 2^{|V|+km}\pi_k
+ =\sum_{\substack{a,b\geq0\\a+b\leq m}}
+ N_{ab}\left(\frac{2^{a+b}}{3^a}\right)^k.
+\end{equation}
+The $t=(m+1)(m+2)/2$ positive rational bases are distinct: their powers of $3$ determine $a$, then their powers of $2$ determine $b$. Values at $k=1,\ldots,t$ form a nonsingular Vandermonde system and recover every $N_{ab}$, hence
+\[
+ i(G)=\sum_{b=0}^m N_{0b}.
+\]
+There are $O(m^2)$ queries, the largest has $O(|V|+m^3)$ applicants, and the matrix entries have $O(m^3)$ bits. Exact rational elimination therefore takes polynomial time. When $m=0$, return $2^{|V|}$ directly. This establishes counting hardness using ties of size at most three.
+
+\paragraph{Completeness.}
+Either evaluation oracle computes the $\sharpP$-complete independent-set count, so it can replace every $\sharpP$ oracle call. This gives $\FP^{\sharpP}$ hardness. Conversely, a threshold oracle recovers the successful-ticket count $F\in[0,D]$ by binary search at thresholds $j/D$, using $O(\log(D+1))$ queries. It therefore simulates either exact-evaluation oracle. Every $\PP$ language is decidable by a $\sharpP$ count followed by comparison with half its computation paths, giving $\PP$ hardness under the stated Turing reductions. The earlier upper bounds finish Theorem~\ref{thm:main}.
+
+\paragraph{Attribution and formal verification.}
+The independent-set construction and tie interpolation are already present in the catalogue's Claude Opus 5.5 High attempt; its GPT 6 Astra Ultra attempt gives the general verification and counting upper bounds. We combine these arguments, repair the isolated-vertex count, supply direct vote proofs and exact bit bounds, and complete the threshold classification under a declared reduction notion. No priority claim or many-one completeness claim is made. The companion Lean development checks the vote criterion and its independent-set consequence for actual partial matchings; complexity classes and the tie interpolation remain hand proofs. The public package records the precise checked declarations, versions and logs. The proof and checks were prepared with AI assistance, under the author's name given above.
+
+\section*{Completion Estimate}
+100\%
+This is the author's claimed coverage of the complete catalogue question,
+not an independent verification or community acceptance rating.
+
+\section*{Final status}
+\textbf{FULL SOLUTION CLAIMED.} Exact evaluation and rational-threshold
+comparison are classified for all three uncertainty encodings in the
+original catalogue question. Completeness uses polynomial-time Turing
+reductions. No remaining mathematical gap is claimed in this hand proof;
+independent community review is pending. No existing attempt is superseded
+or edited by this contribution.
+
+\begin{thebibliography}{9}
+\bibitem{survey} K. Cechl\'arov\'a, \'A. Cseh and D. F. Manlove.
+\emph{Selected open problems in Matching Under Preferences} (2019), \S3.1.2.
+\url{https://hpi.de/friedrich/docs/publications/2019/BEATCS.pdf}.
+\bibitem{pb} J. S. Provan and M. O. Ball.
+The complexity of counting cuts and of computing the probability that a graph is connected.
+\emph{SIAM Journal on Computing} \textbf{12} (1983), 777--788.
+\url{https://doi.org/10.1137/0212053}.
+\end{thebibliography}
+\end{document}
