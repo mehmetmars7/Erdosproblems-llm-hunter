@@ -499,11 +499,15 @@ class CompleteEconomicsImportTests(unittest.TestCase):
                 self.assertEqual(attack['version'], 1)
                 self.assertEqual(attack['entry_kind'], 'research_attempt')
                 self.assertEqual(attack['status'], expected_claim)
-                # The Pro manuscripts separately claim full solutions for C71-12 and C65-29.
-                aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12', 'C65-29'} else 'unresolved'
+                # Preserve the original claims; the later Codex D81-16 attempt separately claims a solution.
+                aggregate_claim = 'solved' if problem_id in {'C65-45', 'C71-12', 'C65-29', 'D81-16'} else 'unresolved'
                 self.assertEqual(data[problem_id]['llm_status'], aggregate_claim)
                 self.assertEqual(data[problem_id]['status'],
                                  'solved' if aggregate_claim == 'solved' else 'open')
+                if problem_id == 'D81-16':
+                    original_pro = [a for a in data[problem_id]['attacks']
+                                    if a['model'] == 'GPT 6 Astra Pro' and a['version'] == 1]
+                    self.assertEqual([a['status'] for a in original_pro], ['unresolved'])
                 if problem_id == 'C71-12':
                     # Preserve the original Pro claim while allowing later
                     # revisions to coexist with this frozen import batch.
