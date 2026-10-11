@@ -1,0 +1,1003 @@
+% ECONOMICS_PROBLEM: {"id":"C73-8","title":"Payoff functionals guaranteeing a value under one-sided information","jel_code":"C73","source_id":"OP-0167"}
+% FIRST_POSTED: 2026-10-11
+% ATTEMPT_STATUS: solved
+% ENTRY_KIND: research_attempt
+% SUBMISSION: {"kind":"research_attempt","category":"economics","problem_id":"C73-8","model":{"provider":"OpenAI","version":"gpt-6-astra","reasoning":"ultra (Codex runtime metadata)","generated_on":"2026-10-11"},"other_models":"gpt-6-astra, high reasoning, for mathematical/citation/exposition reviews. User-supplied ChatGPT Pro response supplied the payoff-family construction; underlying model and reasoning not exposed. Original v1 Codex model version not exposed.","tools":"Primary-source browsing; GitHub CLI; desktop LaTeX compiler; Tectonic; Poppler PDF rendering. No Lean build or verification of added theorems.","target":"For arbitrary fixed finite nonempty K,I,J, intrinsically characterize all bounded Borel payoffs admitting a value at every prior in the exact one-sided-information simultaneous-action game.","scope":"Theorems 2.3 and 2.4 give the certificate iff and exact gap; Theorem 4.3 gives an upper-value majorant; Theorem 5.1 gives the exact payoff-family cover, greatest selector, common root value and mixing closure. All original priors, Borel payoffs and boundary paths are retained.","human_contributions":"Ji Ho Bae (LawAll): documented research direction, problem selection, revision requests and publication authorization. Existing published author attribution retained. No additional human mathematical derivation or independent human proof checking is asserted.","verification":"Root and separate Astra model-assisted full mathematical, primary-source and exposition audits; desktop compile and Tectonic pass; all 11 manuscript PDF pages inspected. No independent human checking documented.","reproducibility":"Published standalone manuscript/source archive at v2.0.0 commit 31c8af23d55dc93e3f1839b2b16d34978375c4c0. Repository Prompt A applied to this new submission preparation after the original research; this chronology is disclosed. Prompt B audit before filing; public process record and scope in submission appendix. Private transcripts are not published."}
+% FULL_SOLUTION_SCOPE: {"target":"For arbitrary fixed finite nonempty K,I,J, intrinsically characterize all bounded Borel payoffs admitting a value at every prior in the exact one-sided-information simultaneous-action game.","result":"Theorems 2.3, 2.4, 4.3 and 5.1; exact certificate characterization and gap, upper-value regularization and payoff-family structure.","coverage":"All finite nonempty state/action sets, all bounded Borel payoffs, every prior including boundary priors, null histories and all infinite paths; neither special-case restriction nor effective-algorithm claim.","dependencies":"TJoens-De Bock PMLR147 (2021) Eq3/Thms2,13 Borel superhedging; Durrett (2019) Thm4.6.8; elementary Fatou, compactness and conditional-expectation facts. Assumptions checked in the paper.","human_verification":"No independent human proof checking documented; model-assisted review only.","unverified":"No identified remaining proof gap in the stated mathematical results. Added results are not Lean-verified; independent human review and maintainer acceptance remain outstanding. The qualitative intrinsicness assessment is supported by the structure theorems, not an algorithmic claim.","novelty":"Primary sources and the fixed catalogue statement were checked. No exhaustive historical-priority search for the added theorems; no first-proof claim."}
+% SCOPE: arbitrary fixed finite nonempty K,I,J; bounded Borel payoffs; all priors
+% BASE_REVISION: 4ea46a1e7f4c898860201c820a34a34cd5a465df
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype,enumitem,xurl,hyperref}
+\hypersetup{hidelinks,hypertexnames=false,
+ pdftitle={Payoff families and value in games with one-sided information},
+ pdfauthor={OpenAI gpt-6-astra; Ji Ho Bae (LawAll), historical attribution and submitter}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\N}{\mathbb N}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Pp}{\mathbb P}
+\newcommand{\HH}{\mathcal H}
+\newcommand{\co}{\operatorname{conv}}
+\newcommand{\lv}{\underline v}
+\newcommand{\uv}{\overline v}
+\newcommand{\UU}{\mathcal U}
+\newcommand{\DD}{\mathcal D}
+\newcommand{\VV}{\mathcal V}
+\newcommand{\ind}{\mathbf 1}
+\setlength{\emergencystretch}{2em}
+\allowdisplaybreaks[1]
+\title{Payoff families and value in games\\with one-sided information}
+\author{OpenAI \texttt{gpt-6-astra}\\
+\small Mathematical generation and revision\\[4pt]
+Ji Ho Bae (LawAll)\\
+\small Historical author attribution and submission}
+\date{11 October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We study bounded Borel payoffs in repeated zero-sum games with a finite
+hidden state known to one player. For fixed finite action sets, value
+existence at every prior is equivalent to a condition on posterior and
+capital arrays over the public history tree. The infimum of the initial capital
+excess equals the minimax gap. These certificates yield an exact cover
+of the value-admitting payoffs by Borel selections of pathwise closed
+convex regions. Each family has a greatest payoff of Baire class at most
+three, a common value at every prior, and closure under public-path
+Borel mixing. Independently of value existence, every bounded Borel
+payoff has a majorant of Baire class at most three with the same upper
+value at every prior. The proofs use Borel superhedging duality on finite-alphabet trees
+and an explicit posterior reduction. All pathwise conditions include
+plays of probability zero.
+\end{abstract}
+
+\section{Model and question}\label{sec:model}
+
+Let $K,I,J$ be nonempty finite sets with the discrete topology.
+Write $\N=\{0,1,\ldots\}$ and
+\[
+ X=I\times J,\qquad \HH=\bigcup_{t\geq0}X^t,
+ \qquad \Omega=X^{\N}.
+\]
+The space $\Omega$ has the product topology of the discrete topology on
+$X$. A history $h\in\HH$ is public; $\varnothing$ denotes the empty
+history, $hij$ appends $(i,j)$ to $h$, and $\omega|t$ is the prefix of
+length $t$.
+
+Nature draws $k\in K$ with prior $p\in\Delta(K)$ and reveals it only to
+the maximizing player. At every date the players choose actions
+simultaneously and then both observe the pair. Their behavioral
+strategies are
+\[
+ \sigma:K\times\HH\longrightarrow\Delta(I),\qquad
+ \tau:\HH\longrightarrow\Delta(J).
+\]
+The two current actions are drawn independently conditional on the
+state and history. For a bounded Borel payoff $f:K\times\Omega\to\R$,
+let $\gamma_{p,f}(\sigma,\tau)=\E_{p,\sigma,\tau}f(k,\omega)$ and
+\[
+ \lv_f(p)=\sup_\sigma\inf_\tau\gamma_{p,f}(\sigma,\tau),\qquad
+ \uv_f(p)=\inf_\tau\sup_\sigma\gamma_{p,f}(\sigma,\tau).
+\]
+The game has a value at $p$ when these two quantities are equal;
+their common value is then denoted by $v_f(p)$.
+
+Castellon Koltun, Lehrer and Solan~\cite[Section~5]{KLS} ask for properties of
+the payoff that guarantee value existence in this model. The
+prior-uniform formulation in problem C73-8 of~\cite{Catalogue} asks
+for a characterization of
+\[
+ \VV_{K,I,J}
+ =\{f:K\times\Omega\to\R\text{ bounded Borel}:
+           \lv_f(p)=\uv_f(p)\text{ for every }p\in\Delta(K)\}.
+\]
+It requires conditions on the payoff and the information structure,
+beyond the equality of the defining optimizations. We give local
+convex conditions and pointwise boundary inequalities, then describe
+the payoff families they determine. The same arrays describe families of path-dependent payoff changes
+that preserve the value at every prior.
+The characterization is infinitary; no effective recognition
+procedure for an arbitrary Borel payoff is asserted.
+
+Choose $a<b$ with $a\leq f\leq b$ and put $F=(f-a)/(b-a)$. Thus
+$0\leq F\leq1$. Both values transform by this positive affine map.
+We write $\VV^{[0,1]}_{K,I,J}$ for the normalized class and
+$\Delta_{\mathbb Q}(K)$ for the rational-coordinate priors. The
+strategy spaces do not depend on $p$, including at its boundary.
+Consequently,
+\begin{equation}\label{eq:lipschitz}
+ |\lv_F(p)-\lv_F(p')|\leq\|p-p'\|_1,\qquad
+ |\uv_F(p)-\uv_F(p')|\leq\|p-p'\|_1.
+\end{equation}
+These bounds hold for every fixed strategy pair and survive either
+order of infimum and supremum. Both values are also monotone in $F$.
+
+\section{Local capital certificates}\label{sec:certificates}
+
+
+\begin{definition}[Capital arrays at prior $p$]
+At each $h\in\HH$, assign
+\[
+ q(h)\in\Delta(K),\quad
+ A_k(h),B(h)\in[0,1]\ (k\in K).
+\]
+Require $q(\varnothing)=p$ and the following conditions.
+
+\emph{Posterior children:}
+\begin{equation}
+ q(hij)\text{ is independent of }j;
+ \quad\text{denote it by }\bar q_i(h).
+ \tag{BF}\label{bf}
+\end{equation}
+In particular, a posterior child depends on the current informed action
+but is independent of the current uninformed action, including branches
+that will receive zero convex weight.
+
+\emph{Common-column capital geometry:} define
+\[
+ V_j(h)=\bigl(A_k(hij)-A_k(h)\bigr)_{(k,i)\in K\times I}
+ \in\R^{K\times I}.
+\]
+Require
+\begin{equation}
+ \co\{V_j(h):j\in J\}\cap\R_{-}^{K\times I}\ne\varnothing,
+ \tag{UC}\label{uc}
+\end{equation}
+where $\R_{-}^{K\times I}$ is the coordinatewise nonpositive orthant.
+
+\emph{Posterior and lower-capital geometry:} define
+\[
+ Z_i(h)=\bigl(\bar q_i(h),
+        (B(hij)-B(h))_{j\in J}\bigr)\in\R^K\times\R^J.
+\]
+Require
+\begin{equation}
+ \co\{Z_i(h):i\in I\}\cap
+        \bigl(\{q(h)\}\times\R_-^J\bigr)\ne\varnothing.
+ \tag{LC}\label{lc}
+\end{equation}
+
+Define the bounded Borel function on \emph{every} path
+\begin{equation}
+ G_q(\omega)=\liminf_{t\to\infty}
+       \sum_{k\in K}q_k(\omega|t)F(k,\omega).
+ \tag{G}\label{g}
+\end{equation}
+Require the pointwise boundary conditions
+\begin{align}
+ \liminf_{t\to\infty}A_k(\omega|t)&\geq F(k,\omega)
+       &&(k\in K,\omega\in\Omega),\tag{UB}\label{ub}\\
+ \liminf_{t\to\infty}B(\omega|t)&\geq1-G_q(\omega)
+       &&(\omega\in\Omega).\tag{LB}\label{lb}
+\end{align}
+These include paths of probability zero.
+\end{definition}
+
+\begin{definition}[Payoff certificate condition]
+The payoff $F$ satisfies condition \textup{(C)} if for every
+$p\in\Delta_{\mathbb Q}(K)$ and every integer $n\geq1$, there are capital
+arrays as above with
+\begin{equation}
+ \sum_{k\in K}p_k A_k(\varnothing)+B(\varnothing)\leq1+\frac1n.
+ \tag{RC}\label{rc}
+\end{equation}
+\end{definition}
+
+The local conditions are finite convex-hull intersections at each
+history. Their boundary inequalities compare the arrays with the payoff
+on every path. We call arrays satisfying these requirements a capital
+certificate; the root bound is imposed separately in (C).
+
+\begin{theorem}[Certificate characterization]\label{main}
+For arbitrary fixed nonempty finite $K,I,J$ and every bounded Borel $f$,
+\[
+ f\in\mathcal V_{K,I,J}\quad\Longleftrightarrow\quad
+ F\text{ satisfies \textup{(C)}}.
+\]
+The equivalence is independent of the normalization bounds $a,b$.
+\end{theorem}
+
+We will also establish the exact local representation of the value gap.
+Let $D_F(p)$ be the infimum of
+$\sum_k p_k A_k(\varnothing)+B(\varnothing)-1$ over capital arrays at prior $p$
+satisfying \eqref{bf}--\eqref{lb}, without \eqref{rc}. Such arrays always
+exist: take $q(h)=p$ and $A_k(h)=B(h)=1$.
+
+\begin{theorem}[Exact gap representation]\label{rep}
+For every bounded Borel $F:K\times\Omega\to[0,1]$ and every prior $p$,
+\[
+ D_F(p)=\uv_F(p)-\lv_F(p).
+\]
+\end{theorem}
+
+\section{Proof of the capital representation}\label{sec:capitalproof}
+\subsection{Borel superhedging on a finite-alphabet tree}
+
+
+We use equation~(3) and Theorems~2 and~13 of T'Joens and De Bock
+\cite{TDB}. Equation~(3) defines the game-theoretic upper expectation
+by pointwise superhedging. Theorem~2 identifies it with the axiomatic
+upper expectation, and Theorem~13 identifies the latter with the
+measure-theoretic upper expectation for bounded Borel payoffs.
+Together they give the following form:
+
+\begin{lemma}[Borel superhedging]\label{duality}
+On a finite alphabet tree, assign each history $h$ a nonempty closed
+convex set $P_h$ of next-step probability vectors. For a bounded
+nonnegative Borel $W$, let $c$ be the supremum of $\E_P W$ over all laws
+whose one-step kernels lie in $P_h$. For every $\delta>0$ there is a
+real-valued, globally bounded-below supermartingale $M$ with $M(\varnothing)<c+\delta$,
+\[
+ \sup_{\pi\in P_h}\sum_{z\in X}\pi_z M(hz)\leq M(h),
+ \qquad
+ \liminf_t M(\omega|t)\geq W(\omega)\quad(\omega\in\Omega).
+\]
+\end{lemma}
+
+The local upper expectation is $Q_h(Z)=\sup_{\pi\in P_h}\pi\cdot Z$,
+so the probability sets and upper expectations agree in the terminology
+of~\cite{TDB}. Both applications below use bounded Borel payoffs and
+nonempty closed convex local models on the finite alphabet $X$.
+
+\begin{lemma}[Capital can be bounded by one]\label{clip}
+If $0\leq W\leq1$, the process in Lemma~\ref{duality} may be chosen in
+$[0,1]$, with the same bound on its initial capital.
+\end{lemma}
+\begin{proof}
+Any process furnished by the lemma is nonnegative at every node. Its
+local inequality implies $\min_z M(hz)\leq M(h)$. If $M(h)<0$ at some
+node, successively choose a child whose value is no larger than its
+parent's. The resulting infinite path extending $h$ has
+$\liminf M\leq M(h)<0$, contradicting its nonnegative boundary lower
+bound. A finite prefix does not affect this liminf.
+
+Now put $\widetilde M(h)=\min\{M(h),1\}$. For each $\pi\in P_h$,
+concavity and monotonicity of $z\mapsto\min\{z,1\}$ give
+\[
+ \sum_z\pi_z\min\{M(hz),1\}
+ \leq\min\left\{\sum_z\pi_zM(hz),1\right\}
+ \leq\min\{M(h),1\}.
+\]
+Thus $\widetilde M$ satisfies the local inequality. Also
+$\liminf\widetilde M=\min\{\liminf M,1\}\geq W$ on every path.
+Clipping decreases initial capital, and $\widetilde M\in[0,1]$.
+\end{proof}
+
+\subsection{Posterior flow}
+
+\begin{lemma}[Bayes-flow correspondence]\label{bayes}
+Fix $p\in\Delta(K)$. Let $q:\HH\to\Delta(K)$ satisfy
+$q(\varnothing)=p$ and \eqref{bf}, and let $w_i(h)\geq0$ be coefficients summing
+to one with $q(h)=\sum_i w_i(h)\bar q_i(h)$. Define
+\[
+ x_k(i\mid h)=\frac{w_i(h)\bar q_{i,k}(h)}{q_k(h)}
+ \quad\text{when }q_k(h)>0,
+\]
+and use any fixed action distribution when $q_k(h)=0$. This is an
+informed behavioral strategy. Against every uninformed strategy $\tau$,
+the public posterior at every positive-probability history is $q(h)$,
+the informed action has public distribution $w(h)$, and
+\begin{equation}
+ \E_{p,x,\tau}F(k,\omega)=\E_{p,x,\tau}G_q(\omega).
+ \tag{PI}\label{pi}
+\end{equation}
+Conversely every informed strategy $x$ at prior $p$ gives such arrays
+with these public laws.
+\end{lemma}
+\begin{proof}
+At a positive-$q_k(h)$ row, the barycentric identity gives
+$\sum_i x_k(i\mid h)=1$. If $q_k(h)=0$, nonnegativity and that same
+identity imply $w_i(h)\bar q_{i,k}(h)=0$ for every $i$. Hence
+\[
+ \sum_k q_k(h)x_k(i\mid h)
+ =\sum_k w_i(h)\bar q_{i,k}(h)=w_i(h).
+\]
+
+Induct on the length of a positive-probability public history $h$.
+At the root the posterior is $p=q(\varnothing)$. If the posterior at $h$
+is $q(h)$, the next pair $(i,j)$ has conditional probability
+$w_i(h)\tau_j(h)$. When this is positive, Bayes' rule gives the next
+posterior
+\[
+ \frac{q_k(h)x_k(i\mid h)}{w_i(h)}
+ =\bar q_{i,k}(h)=q_k(hij).
+\]
+The current factor $\tau_j(h)$ cancels because the uninformed player's
+randomization does not depend on the hidden state. A zero-probability
+child's assigned posterior does not affect the induction or law.
+Zero-prior states are covered by the same argument.
+
+The vector $q(\omega|t)$ is consequently the bounded posterior
+martingale under every $\tau$. Its coordinates converge almost surely
+to the conditional probabilities of the hidden state given the entire
+public play. This is the upward conditional-expectation martingale
+convergence theorem \cite[Theorem~4.6.8]{Durrett}, because the finite public-history sigma fields
+generate the sigma field of the full public play. On that event,
+\[
+ G_q(\omega)=\sum_k q_{\infty,k}(\omega)F(k,\omega).
+\]
+Condition each $\mathbf1_{\{k=\ell\}}F(\ell,\omega)$ on the entire
+public play, then sum over $\ell$, to obtain \eqref{pi}.
+
+There is no exceptional-path measurability convention: at each $t$,
+$\sum_k q_k(\omega|t)F(k,\omega)$ is bounded Borel, so its pointwise
+liminf is bounded Borel on every path, including paths where the
+posterior does not converge.
+
+Conversely start with any informed strategy $x$ and $q(\varnothing)=p$.
+At each history put
+\[
+ w_i(h)=\sum_k q_k(h)x_k(i\mid h).
+\]
+For $w_i(h)>0$ put
+$\bar q_{i,k}(h)=q_k(h)x_k(i\mid h)/w_i(h)$, and for $w_i(h)=0$ put
+$\bar q_i(h)=p$. Set $q(hij)=\bar q_i(h)$ for every $j$. These arrays
+satisfy \eqref{bf} and the barycentric identity. At a zero-weight branch all terms
+$q_k(h)x_k(i\mid h)$ are zero, so the chosen vector contributes nothing
+to the barycentric identity. The preceding induction proves the claimed
+public laws and \eqref{pi}.
+\end{proof}
+
+\subsection{The guarantees}
+
+Fix capital arrays at prior $p$. Condition \eqref{uc} provides at every
+$h$ coefficients $y_j(h)\geq0$, summing to one, such that
+\[
+ \sum_j y_j(h)A_k(hij)\leq A_k(h)
+ \quad\text{for every }(k,i)\in K\times I.
+\]
+These coefficients define an uninformed behavioral strategy $y$; the
+same distribution works for all states and all current informed
+actions, as required by its information restriction.
+
+In each state $k$, against every informed strategy $\sigma_k$, the
+bounded nonnegative process $A_k(\omega|t)$ is a supermartingale.
+Indeed, condition on $h$ and a pure informed action $i$, apply the
+displayed inequality, and then average over that informed action.
+Fatou's lemma and \eqref{ub} imply
+\[
+ \E_{k,\sigma_k,y}F(k,\omega)
+ \leq\E\liminf_t A_k(\omega|t)
+ \leq\liminf_t\E A_k(\omega|t)
+ \leq A_k(\varnothing).
+\]
+After weighting by $p$ this proves
+\begin{equation}
+ \uv_F(p)\leq\sum_k p_k A_k(\varnothing).
+ \label{upper}
+\end{equation}
+
+Condition \eqref{lc} supplies convex coefficients $w_i(h)\geq0$ summing
+to one, simultaneously satisfying
+\[
+ q(h)=\sum_i w_i(h)\bar q_i(h),\qquad
+ \sum_i w_i(h)B(hij)\leq B(h)\quad(j\in J).
+\]
+Reconstruct $x$ using these coefficients and Lemma~\ref{bayes}. Against every
+$\tau$, the public next-action kernel is
+$w_i(h)\tau_j(h)$. Condition \eqref{lc} makes $B(\omega|t)$ a bounded
+nonnegative supermartingale: apply its inequality for each pure $j$
+and average over $\tau(h)$. Fatou, \eqref{lb}, and \eqref{pi} give
+\[
+ \E_{p,x,\tau}(1-F)=\E(1-G_q)
+ \leq\E\liminf_t B(\omega|t)\leq B(\varnothing).
+\]
+Consequently
+\begin{equation}
+ \lv_F(p)\geq1-B(\varnothing).
+ \label{lower}
+\end{equation}
+The elementary minimax inequality, \eqref{upper}, and \eqref{lower}
+yield
+\begin{equation}
+ 0\leq\uv_F(p)-\lv_F(p)
+ \leq\sum_k p_k A_k(\varnothing)+B(\varnothing)-1.
+ \label{gapbound}
+\end{equation}
+Thus (C) gives equality at every rational prior by letting $n$ tend to
+infinity.
+
+The Lipschitz bounds~\eqref{eq:lipschitz} extend equality from the
+rational priors to the entire simplex. Positive affine normalization
+gives sufficiency for the original payoff.
+
+\subsection{Sharpness of the bounds}
+
+For arbitrary $F$ and $p$ write $L=\lv_F(p)$ and $U=\uv_F(p)$. Given
+$\delta>0$, the definitions of the extrema provide behavioral strategies
+$x,y$ such that
+\begin{equation}
+ \inf_\tau\E_{p,x,\tau}F\geq L-\delta,
+ \qquad \sup_\sigma\E_{p,\sigma,y}F\leq U+\delta.
+ \label{approx}
+\end{equation}
+No optimal strategy is assumed to exist. Obtain $q,w,\bar q$ from $x$
+using Lemma~\ref{bayes}.
+
+For each state $k$ use the local credal sets
+\[
+ P_h^y=\{(a_i y_j(h))_{ij}:a\in\Delta(I)\}.
+\]
+These are nonempty closed convex sets, being linear images of the
+finite simplex. Their local upper expectation of a next-step array
+$Z_{ij}$ is
+\[
+ \max_{i\in I}\sum_j y_j(h)Z_{ij}.
+\]
+Compatible precise kernels are exactly the kernels of arbitrary
+state-$k$ informed behavioral responses to the fixed $y$: the marginal
+on $I$ recovers $a(h)$. Therefore the compatible laws are exactly those
+response laws. Let $c_k$ be their upper expectation of $F(k,\cdot)$.
+Lemma~\ref{duality}, with the finite alphabet $X$ and this bounded Borel
+payoff, followed by Lemma~\ref{clip}, gives $A_k\in[0,1]$ with
+\[
+ A_k(\varnothing)<c_k+\delta,\qquad
+ \sum_j y_j(h)A_k(hij)\leq A_k(h)\quad(h\in\HH,i\in I),
+\]
+and with \eqref{ub} on every path. The same $y$ supplies convex
+coefficients for all $k$, proving \eqref{uc} for the combined arrays.
+
+The finitely many state components can be chosen independently, so
+\begin{equation}
+ \sum_k p_k c_k=\sup_\sigma\E_{p,\sigma,y}F.
+ \label{statewise}
+\end{equation}
+For every $\sigma$, $\E_{p,\sigma,y}F\leq\sum_k p_k c_k$, so its
+supremum is also at most that sum. Conversely, choose
+$\varepsilon$-optimal responses separately in each positive-prior state,
+combine them into one informed behavioral strategy, and let
+$\varepsilon\downarrow0$. Zero-prior states have no effect. Hence
+\eqref{approx} gives
+\begin{equation}
+ \sum_k p_k A_k(\varnothing)<U+2\delta.
+ \label{acost}
+\end{equation}
+
+For the other capital process, use the public-law credal sets
+\[
+ P_h^w=\{(w_i(h)b_j)_{ij}:b\in\Delta(J)\}.
+\]
+They are again nonempty closed convex linear images of a finite
+simplex. Their local upper expectation is
+$\max_j\sum_i w_i(h)Z_{ij}$. Compatible precise trees correspond exactly
+to uninformed strategies against $x$, because their $J$ marginal is
+$b$ and their public $I$ marginal is $w$. This statement is also valid
+at histories of probability zero, whose specified kernels do not
+affect the root law.
+
+The boundary payoff $W=1-G_q$ is bounded, nonnegative, and Borel.
+Lemma~\ref{bayes} shows that its upper expectation over these compatible
+trees equals
+\[
+ \sup_\tau\E(1-G_q)=1-\inf_\tau\E_{p,x,\tau}F.
+\]
+Apply Lemmas~\ref{duality} and \ref{clip}. They give $B\in[0,1]$ with
+$\sum_i w_i(h)B(hij)\leq B(h)$ for every $j$, and satisfying
+\eqref{lb}. Together with the barycentric identity, these inequalities
+show that $\sum_i w_i(h)Z_i(h)$ belongs to
+$\{q(h)\}\times\R_-^J$, proving \eqref{lc}. The root bound is
+\begin{equation}
+ B(\varnothing)<1-\inf_\tau\E_{p,x,\tau}F+\delta
+ \leq1-L+2\delta.
+ \label{bcost}
+\end{equation}
+All hypotheses of the Borel duality have thus been checked for both
+applications.
+
+Combining \eqref{acost} and \eqref{bcost} yields capital arrays with
+\[
+ \sum_k p_k A_k(\varnothing)+B(\varnothing)-1
+ <U-L+4\delta.
+\]
+Taking the infimum of these costs and letting $\delta\downarrow0$, then
+using \eqref{gapbound}, proves
+$D_F(p)=U-L$. This establishes Theorem~\ref{rep} for every bounded
+Borel payoff and every prior, without a value-existence assumption.
+When the game has a value, $U=L$; choosing $4\delta<1/n$ gives
+\eqref{rc} for every $n$. This proves necessity of (C), and completes
+Theorem~\ref{main}. Its equivalence with value existence also proves
+independence of the normalization bounds.
+
+
+\section{Upper-value regularization}\label{sec:regularization}
+
+The upper part of the proof gives a separate representation that does
+not use posterior arrays. Let
+\[
+ \UU(F)=\{A:\HH\to[0,1]^K:\text{\eqref{uc} and \eqref{ub} hold}\}.
+\]
+This set has no designated prior.
+
+\begin{proposition}\label{prop:upperdual}
+For every normalized Borel payoff $F$ and every prior $p$,
+\begin{equation}\label{eq:upperdual}
+ \uv_F(p)=\inf_{A\in\UU(F)}p\cdot A(\varnothing).
+\end{equation}
+\end{proposition}
+\begin{proof}
+The argument for~\eqref{upper} uses only \eqref{uc} and \eqref{ub},
+so it gives one inequality. The construction leading to~\eqref{acost}
+provides $A\in\UU(F)$ with $p\cdot A(\varnothing)<\uv_F(p)+2\delta$
+for every $\delta>0$, proving the other.
+\end{proof}
+
+We use the convention that Baire class zero consists of continuous
+real-valued functions, and class at most $m+1$ consists of pointwise
+limits of sequences of functions of class at most $m$.
+
+\begin{lemma}\label{lem:baire}
+For a nonempty countable family of arrays $A^d:\HH\to[0,1]^K$, the
+function on $K\times\Omega$ defined by
+\[
+ c(k,\omega)=\inf_d\liminf_t A^d_k(\omega|t)
+\]
+has Baire class at most three.
+\end{lemma}
+\begin{proof}
+For fixed $d,k,t$, the prefix function $A^d_k(\omega|t)$ is continuous.
+For each $N$, its tail infimum is the pointwise limit, as $M\to\infty$,
+of the continuous functions $\min_{N\leq t\leq M}A^d_k(\omega|t)$.
+It has class at most one. The increasing limit over $N$ is
+$\liminf_t A^d_k(\omega|t)$, of class at most two. Enumerate the
+indices $d$, repeating terms if the family is finite. The infimum
+over $d$ is the decreasing limit of finite minima of these class-two
+functions, hence has class at most three. Finite minima preserve
+each class, by applying the continuous minimum operation to the
+defining sequences. The finitely many state coordinates can be
+combined without raising the class.
+\end{proof}
+
+\begin{theorem}[Upper-value majorant]\label{thm:majorant}
+For every Borel $F:K\times\Omega\to[0,1]$ there is a function
+$C:K\times\Omega\to[0,1]$ of Baire class at most three such that
+\[
+ F\leq C,\qquad \uv_C(p)=\uv_F(p)\quad(p\in\Delta(K)).
+\]
+Every Borel $G$ with $F\leq G\leq C$ has the same upper value as $F$
+at every prior.
+\end{theorem}
+\begin{proof}
+For every $d=(r,n)$ in the countable set
+\[
+ \DD=\Delta_{\mathbb Q}(K)\times\N_{\geq1},
+\]
+choose $A^d\in\UU(F)$ with
+$r\cdot A^d(\varnothing)\leq\uv_F(r)+1/n$, using~\eqref{eq:upperdual}.
+Set $C(k,\omega)=\inf_d\liminf_tA^d_k(\omega|t)$. Then $F\leq C$,
+Lemma~\ref{lem:baire} applies, and every $A^d$ also belongs to $\UU(C)$.
+For rational $r$ and every $n$,
+\[
+ \uv_F(r)\leq\uv_C(r)
+ \leq r\cdot A^{(r,n)}(\varnothing)\leq\uv_F(r)+1/n.
+\]
+Let $n\to\infty$, then use~\eqref{eq:lipschitz} to extend equality
+to all priors. The assertion for $G$ follows by monotonicity.
+\end{proof}
+
+For an arbitrary bounded Borel $f$, apply the theorem to
+$F=(f-a)/(b-a)$ and set $\widehat f=a+(b-a)C$. Then
+$f\leq\widehat f$ and $\uv_{\widehat f}(p)=\uv_f(p)$ for every prior,
+whether or not the game has a value.
+
+\begin{corollary}\label{cor:interval}
+Every $f\in\VV_{K,I,J}$ has a bounded majorant $\widehat f$ of Baire
+class at most three such that every bounded Borel $g$ with
+$f\leq g\leq\widehat f$ belongs to $\VV_{K,I,J}$ and satisfies
+$v_g(p)=v_f(p)$ for every prior.
+\end{corollary}
+\begin{proof}
+Normalize $f$ and apply Theorem~\ref{thm:majorant}. For $F\leq G\leq C$,
+\[
+ v_F(p)=\lv_F(p)\leq\lv_G(p)\leq\uv_G(p)=\uv_F(p)=v_F(p).
+\]
+Undo the affine normalization, setting $\widehat f=a+(b-a)C$.
+\end{proof}
+
+The majorant theorem preserves the upper value even for games without
+a value. It is not a value-existence criterion. No optimality of the
+bound on the Baire class is asserted.
+
+\section{An exact cover by payoff families}\label{sec:families}
+
+We now keep full certificates rather than only their upper arrays.
+This yields families of payoffs with the same value at every prior.
+Their definition uses the information and action structure, without
+first choosing a payoff.
+
+\subsection{Boundary regions}
+
+An array family $\Theta$ assigns $(q^d,A^d,B^d)$ to every
+$d=(p,n)\in\DD$. Require $q^d(\varnothing)=p$,
+\eqref{bf}--\eqref{lc}, and~\eqref{rc} for each $d$.
+The payoff-dependent boundary conditions have not yet been imposed.
+Define
+\begin{align*}
+ u^d_k(\omega)&=\liminf_t A^d_k(\omega|t),&
+ c_{\Theta,k}(\omega)&=\inf_{d\in\DD}u^d_k(\omega),\\
+ \ell^d(\omega)&=1-\liminf_tB^d(\omega|t),&
+ Q^d(\omega)&=\bigcap_{N\geq0}
+       \overline{\{q^d(\omega|t):t\geq N\}}.
+\end{align*}
+The set $Q^d(\omega)$ is the nonempty compact cluster set in
+$\Delta(K)$, defined even when the posterior sequence does not converge.
+Impose the boundary compatibility condition
+\begin{equation}\label{eq:bc}\tag{BC}
+ \min_{r\in Q^d(\omega)}r\cdot c_\Theta(\omega)
+                  \geq\ell^d(\omega)\qquad(d\in\DD,\ \omega\in\Omega).
+\end{equation}
+Let $\mathfrak T_{K,I,J}$ be the class of families satisfying these
+requirements. All arrays take values in the same simplexes and
+intervals as the capital arrays in Section~\ref{sec:certificates}.
+We identify $c_\Theta$ with the payoff $(k,\omega)\mapsto c_{\Theta,k}(\omega)$.
+
+For $\Theta\in\mathfrak T_{K,I,J}$ define
+\begin{equation}\label{eq:region}
+ \mathcal P_\Theta(\omega)=
+ \left\{z\in[0,1]^K:
+ \begin{array}{l}
+ z_k\leq c_{\Theta,k}(\omega)\quad(k\in K),\\
+ r\cdot z\geq\ell^d(\omega)\quad(d\in\DD,\ r\in Q^d(\omega))
+ \end{array}\right\},
+\end{equation}
+and let $\mathcal S_\Theta$ consist of the Borel payoffs $F$ with
+$F(\cdot,\omega)\in\mathcal P_\Theta(\omega)$ at every path.
+The regions are intersections of closed half-spaces and the cube;
+they need not be polyhedra with finitely many defining inequalities.
+
+\begin{theorem}[Payoff-family representation]\label{thm:families}
+For arbitrary fixed nonempty finite $K,I,J$,
+\begin{equation}\label{eq:cover}
+ \VV^{[0,1]}_{K,I,J}
+       =\bigcup_{\Theta\in\mathfrak T_{K,I,J}}\mathcal S_\Theta.
+\end{equation}
+For each $\Theta\in\mathfrak T_{K,I,J}$ the following hold.
+\begin{enumerate}[label=\textup{(\roman*)},leftmargin=*,itemsep=3pt]
+\item Each $\mathcal P_\Theta(\omega)$ is nonempty, closed and convex,
+and the correspondence $\omega\mapsto\mathcal P_\Theta(\omega)$
+has a Borel graph. The greatest element of $\mathcal S_\Theta$
+in the pointwise order is $c_\Theta$, of Baire class at most three.
+\item Every $F\in\mathcal S_\Theta$ has the same value function
+\begin{equation}\label{eq:familyvalue}
+ v_\Theta(p)=\inf_{d\in\DD}p\cdot A^d(\varnothing)
+                    \qquad(p\in\Delta(K)).
+\end{equation}
+In particular, $v_\Theta$ is concave and $1$-Lipschitz in the
+$\ell^1$ norm.
+\item If $F^1,\ldots,F^m\in\mathcal S_\Theta$ and
+$\lambda:\Omega\to\Delta(\{1,\ldots,m\})$ is Borel, then
+\[
+ F^\lambda(k,\omega)=\sum_{a=1}^m\lambda_a(\omega)F^a(k,\omega)
+             \quad\text{belongs to }\mathcal S_\Theta.
+\]
+Also, if $F\in\mathcal S_\Theta$ and $G$ is Borel with
+$F\leq G\leq c_\Theta$, then $G\in\mathcal S_\Theta$.
+\end{enumerate}
+The cover in~\eqref{eq:cover} is not asserted to be disjoint.
+\end{theorem}
+
+\subsection{Proof of the representation}
+
+For a sequence $q_t\in\Delta(K)$ with cluster set $Q$ and any fixed
+$z\in\R^K$, compactness gives
+\begin{equation}\label{eq:cluster}
+ \liminf_t q_t\cdot z=\min_{r\in Q}r\cdot z.
+\end{equation}
+Every cluster point is the limit of a subsequence, so its scalar
+product is at least the liminf. Conversely, a subsequence realizing
+the scalar liminf has a further convergent subsequence in $\Delta(K)$,
+which attains equality. Apply this identity at each path, with
+$z=F(\cdot,\omega)$. The lower boundary inequalities in
+\eqref{eq:region} are exactly~\eqref{lb} for all $d$, while
+$F\leq c_\Theta$ is exactly~\eqref{ub} for all $d$. Thus, for Borel $F:K\times\Omega\to[0,1]$,
+\begin{equation}\label{eq:selectionequiv}
+ F\in\mathcal S_\Theta
+ \quad\Longleftrightarrow\quad
+ (q^d,A^d,B^d)\text{ certifies }F\text{ at its prior for every }d.
+\end{equation}
+
+Condition~\eqref{eq:bc} says that $c_\Theta(\omega)$ itself belongs
+to $\mathcal P_\Theta(\omega)$. Conversely, any point $z$ of that
+region implies~\eqref{eq:bc}, since $z\leq c_\Theta$ and every
+$r\in\Delta(K)$ has nonnegative coordinates. This proves
+nonemptiness; closedness and convexity follow from~\eqref{eq:region}.
+Lemma~\ref{lem:baire} shows that $c_\Theta$ is Borel and has the
+claimed Baire class. It is therefore the greatest member of
+$\mathcal S_\Theta$.
+
+The graph is Borel as well. By~\eqref{eq:cluster}, its defining
+conditions are the coordinate upper bounds and the countably many
+inequalities
+\[
+ \liminf_t q^d(\omega|t)\cdot z\geq\ell^d(\omega).
+\]
+For each $d,t$, the function $(\omega,z)\mapsto q^d(\omega|t)\cdot z$
+is continuous. The displayed comparisons are consequently Borel;
+no measurable-selection theorem is needed.
+
+If $F\in\mathcal S_\Theta$, equivalence~\eqref{eq:selectionequiv}
+and the root bounds give (C), hence value existence by
+Theorem~\ref{main}. Conversely, if $F\in\VV^{[0,1]}_{K,I,J}$,
+choose a certificate satisfying the root bound for each $d=(p,n)$.
+The upper boundaries imply $F\leq c_\Theta$. For every cluster point
+$r\in Q^d(\omega)$, the lower boundaries and~\eqref{eq:cluster} give
+\[
+ r\cdot c_\Theta(\omega)\geq r\cdot F(\cdot,\omega)
+                                      \geq\ell^d(\omega).
+\]
+Hence (BC) holds, $\Theta\in\mathfrak T_{K,I,J}$, and
+$F\in\mathcal S_\Theta$. This proves~\eqref{eq:cover}.
+
+To identify the value, fix $F\in\mathcal S_\Theta$. Each $A^d$
+belongs to $\UU(F)$, and so gives the upper bound
+$v_F(p)\leq p\cdot A^d(\varnothing)$ at \emph{every} prior, regardless
+of the prior assigned to $q^d$. For rational $p$, use $d=(p,n)$,
+\eqref{rc} and~\eqref{lower} to obtain
+\[
+ p\cdot A^{(p,n)}(\varnothing)
+ \leq1-B^{(p,n)}(\varnothing)+1/n\leq v_F(p)+1/n.
+\]
+This proves~\eqref{eq:familyvalue} at rational priors. The right-hand
+side is concave and $1$-Lipschitz, being the infimum of linear
+functions whose coefficient vectors lie in $[0,1]^K$.
+Equation~\eqref{eq:lipschitz} and density extend equality to all priors.
+The expression is independent of $F$, proving the common-value claim.
+
+Finally, pathwise convexity proves the mixing assertion. The weights
+depend on the public path, with the same weights for all states.
+If $F\leq G\leq c_\Theta$, nonnegativity of $r$ preserves every
+lower inequality in~\eqref{eq:region}; the upper inequalities are
+already assumed. This proves the last assertion and completes the
+proof of Theorem~\ref{thm:families}.
+
+\section{Strategies and payoff compatibility}\label{sec:examples}
+
+The local arrays retain the game's strategic constraints. Their
+weights reconstruct behavioral strategies as in Section~\ref{sec:capitalproof}.
+It is useful to make this relation explicit before distinguishing
+the payoff families from ordinary value level sets.
+
+\subsection{Fixed-strategy costs}
+
+Fix $p,F$ and an uninformed strategy $y$. Let $\mathcal A_y(F)$ be
+the upper arrays satisfying \eqref{ub} and
+\[
+ \sum_jy_j(h)A_k(hij)\leq A_k(h)\quad(h\in\HH,\ k\in K,\ i\in I).
+\]
+For an informed strategy $x$, take the recursive posterior extension
+$(q^x,w^x)$ in Lemma~\ref{bayes}, and let $\mathcal B_x(F)$ be
+the $[0,1]$-valued arrays satisfying~\eqref{lb} for $q^x$ and
+$\sum_iw_i^x(h)B(hij)\leq B(h)$ for every $h,j$.
+The two applications of superhedging in Section~\ref{sec:capitalproof},
+now with these strategies fixed, give
+\begin{align}
+ \inf_{A\in\mathcal A_y(F)}p\cdot A(\varnothing)
+       &=\sup_\sigma\gamma_{p,F}(\sigma,y),\label{eq:fixedupper}\\
+ \inf_{B\in\mathcal B_x(F)}B(\varnothing)
+       &=1-\inf_\tau\gamma_{p,F}(x,\tau).\label{eq:fixedlower}
+\end{align}
+The lower bounds follow from the corresponding supermartingale
+guarantees; Lemma~\ref{duality} gives arbitrarily close upper
+bounds. Thus eliminating the capital variables recovers
+\[
+ D_F(p)=\inf_{x,y}\left\{
+       \sup_\sigma\gamma_{p,F}(\sigma,y)
+       -\inf_\tau\gamma_{p,F}(x,\tau)\right\}.
+\]
+This is an identity of infima, with no claim of attainment. The
+representation does not remove strategy search. Its further content
+is the description of the whole payoff family allowed by common
+pathwise bounds, including its greatest member and value-preserving
+changes.
+
+\subsection{Common optimal strategies do not determine a family}
+
+\begin{example}\label{ex:matching}
+Let $K$ be a singleton, $I=J=\{0,1\}$, and
+\[
+ F(\omega)=\ind_{\{i_0=j_0\}},\qquad G(\omega)=1-F(\omega).
+\]
+Both games have value $1/2$, and their optimal strategies are exactly
+those with a uniform first action; later actions are immaterial.
+Nevertheless, no $\mathcal S_\Theta$ contains both payoffs.
+\end{example}
+
+\begin{proof}
+If both belonged to one family, every array in that family would
+satisfy the boundaries for both. Since $q\equiv1$, they would imply
+\[
+ \liminf_tA(\omega|t)\geq\max(F,G)=1,\qquad
+ \liminf_tB(\omega|t)\geq\max(1-F,1-G)=1.
+\]
+The supermartingale guarantees force $A(\varnothing)=B(\varnothing)=1$.
+The certificate cost is then $1$, contradicting the root bound for
+$n=2$.
+
+Individually, each payoff has a certificate of cost zero. For $F$,
+put $A(\varnothing)=B(\varnothing)=1/2$, and after the first pair
+keep $A=F$ and $B=1-F$. Uniform local weights satisfy the two convex
+conditions at the root; at later histories the arrays are constant.
+Interchanging $F$ and $G$ gives the other certificate.
+\end{proof}
+
+The same distinction appears in the path-dependent mixture with
+weights $\lambda_1=F$ and $\lambda_2=1-F$: it equals $1$ everywhere.
+Its value is $1$, whereas mixing within one $\mathcal S_\Theta$
+would preserve $1/2$. The families therefore record compatibility
+of pathwise payoff bounds beyond equality of values and optimal
+strategies.
+
+\subsection{A fixed-strategy infimum need not be attained}
+
+\begin{example}\label{ex:nonattainment}
+Let $K,I$ be singletons, let $J=\{0,1\}$, and fix the uninformed
+strategy $y$ to choose each action with probability $1/2$ at every
+history. Let $F$ indicate the path consisting entirely of zeros.
+The infimum in~\eqref{eq:fixedupper} is zero and is not attained.
+\end{example}
+
+\begin{proof}
+Identify $I\times J$ with $J$ and write $hj$ for the child reached
+by action $j$. The payoff has expectation zero under the fixed
+fair-coin law. If a
+nonnegative upper array had root zero, the inequalities
+$(A(h0)+A(h1))/2\leq A(h)$ would force every node to have value zero.
+This violates the boundary on the all-zero path.
+
+For each $N\geq1$, start instead with $A(\varnothing)=2^{-N}$.
+Before time $N$, double the capital after a zero and set it to zero
+after a one. After time $N$, keep it constant. This $[0,1]$-valued
+array has the required boundary and satisfies the local fair-coin
+inequality with equality. Its root values tend to zero.
+\end{proof}
+
+The nonattainment in this example concerns the \emph{fixed} strategy
+$y$. In the unrestricted certificate problem, cost zero is attained:
+take $A(\varnothing)=0$, put $A(h)=1$ at nonempty all-zero histories
+and $A(h)=0$ elsewhere, and set $B\equiv1$. The upper weights always
+choose action $1$. This satisfies every certificate condition.
+
+Theorem~\ref{thm:families} concerns the greatest payoff within a
+\emph{specified} family, not a greatest payoff among all games with
+the same value. It also supplies neither an optimal strategy nor a
+zero-cost certificate. The approximation index is retained in the
+definition of $\Theta$. Within those limits, the local geometry and
+boundary compatibility give an exact description of the full
+prior-uniform class and of the payoff changes preserved by each
+family.
+
+\begin{thebibliography}{9}
+\bibitem{KLS}
+Gil Bar Castellon Koltun, Ehud Lehrer and Eilon Solan.
+\emph{The Maxmin Value of Repeated Games with Incomplete Information
+on One Side and Tail-Measurable Payoffs}.
+\href{https://arxiv.org/pdf/2512.01581v1}{arXiv:2512.01581v1} (2025).
+Definition~2.1, pp.~6--7; Section~5, p.~18.
+
+\bibitem{Catalogue}
+\emph{Payoff functionals guaranteeing a value under one-sided
+information}, problem C73-8, Economics catalogue in
+\texttt{mehmetmars7/Erdosproblems-llm-hunter}.
+\href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/b1f633121074e16579fa7fd05314e5f504d29bae/attacks/open_problems/economics/statements/C73-8.tex}{Fixed statement at commit \texttt{b1f633121074}}.
+
+\bibitem{TDB}
+Natan T'Joens and Jasper De Bock.
+\emph{Global Upper Expectations for Discrete-Time Stochastic
+Processes: In Practice, They Are All The Same!}
+\href{https://proceedings.mlr.press/v147/t-joens21a/t-joens21a.pdf}{Proceedings of Machine Learning Research \textbf{147}, 310--319 (2021)}.
+Equation~(3), p.~314; Theorems~2 and~13, pp.~315 and~318.
+Extended version:
+\href{https://arxiv.org/pdf/2102.13075v2}{arXiv:2102.13075v2},
+Appendix~A.2, p.~14 (proof of Theorem~13).
+
+\bibitem{Durrett}
+Rick Durrett. \emph{Probability: Theory and Examples}, fifth edition
+(2019). \href{https://sites.math.duke.edu/~rtd/PTE/PTE5_011119.pdf}{Author's version of 11 January 2019},
+Theorem~4.6.8, p.~247.
+\end{thebibliography}
+
+\section*{Submission history, scope and verification}
+
+\paragraph{Original target and result.}
+This is a substantive revision of the hand-proof attempt in
+\href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/pull/134}{PR~134}.
+Theorem~\ref{main} retains every finite nonempty state and action set,
+every bounded Borel payoff and every prior in C73-8. Theorem~\ref{rep}
+identifies the exact gap. Theorem~\ref{thm:families} adds the payoff-family
+cover, greatest payoff, common value and path-dependent mixing;
+Theorem~\ref{thm:majorant} adds upper-value regularization without a
+value-existence assumption. These structural conclusions support the
+claim that the characterization supplies payoff information beyond
+restating the two optimization problems. No effective decision procedure
+or removal of all strategy search is claimed. The original manuscript,
+source statement and historical submissions are preserved.
+
+\paragraph{External dependencies and context.}
+The exact dependencies are stated and applied in Section~\ref{sec:capitalproof}:
+T'Joens--De Bock's Borel superhedging duality and Durrett's upward
+conditional-expectation theorem, together with the elementary probability
+and compactness arguments given in the proofs. The cited primary sources
+and fixed catalogue statement were consulted directly. Their roles and
+hypotheses are identified in the paper. This revision makes no exhaustive
+literature-priority or first-proof claim.
+
+\paragraph{Models and contributions.}
+The revision and submission preparation used OpenAI
+\texttt{gpt-6-astra}, reasoning setting \texttt{ultra}, in Codex;
+separate review tasks used \texttt{gpt-6-astra} with \texttt{high}
+reasoning. These settings are recorded in the local runtime metadata.
+A user-supplied ChatGPT Pro response provided the payoff-family
+construction; its underlying model version and reasoning setting were
+not exposed. The exact model version behind the original Codex v1
+manuscript was not exposed. The original author attribution to
+Ji Ho Bae (LawAll) is retained. The documented human role in this
+workflow comprises research direction, problem selection, revision
+requests and publication authorization. No further human mathematical
+derivation or independent human proof checking is asserted.
+
+\paragraph{Checks and remaining verification.}
+The complete mathematical text underwent separate model-assisted
+mathematical, citation and exposition reviews. The reviews checked the
+original quantifiers, zero-prior states, null paths, the cluster-set
+identity, Baire bounds, the root-value formula and both examples.
+They identified no remaining proof gap in the stated results. The
+Bayes-flow root assumption, fixed-strategy nonattainment scope,
+normalization argument and theorem hierarchy were made explicit.
+The desktop compiler and Tectonic passed, and all eleven pages of the
+published manuscript were visually inspected. These checks are not
+independent human proof verification or maintainer acceptance.
+\href{https://github.com/mehmetmars7/Erdosproblems-llm-hunter/pull/155}{PR~155}
+is the separate earlier Lean submission. No Lean verification of this
+expanded manuscript or its additional theorems is claimed.
+
+\paragraph{Process and reproducibility.}
+The mathematical research and revision preceded this repository-prompt
+application. Prompt~A from the repository's contribution prompts was
+applied prospectively on 11 October 2026 to preparation of this new
+catalogue submission, using the original statement, completed manuscript,
+contribution policy and actual provenance. This does not retroactively
+establish that Prompt~A preceded the original research. Prompt~B was
+applied to the completed submission before filing. It found no new
+mathematical gap and required the contribution-label clarification
+reflected in this submission. The original Prompt~A timing difference
+is disclosed for maintainer assessment; no retrospective compliance
+with the original A-before-research sequence is claimed. Private conversations and credentials are not
+included in the public artifacts.
+
+The published mathematical text is reproduced here without changing its
+proofs; this appendix supplies the catalogue's declarations.
+The pinned \href{https://github.com/jbaelaw/borel-game-value-characterization/tree/31c8af23d55dc93e3f1839b2b16d34978375c4c0}{source commit}
+contains the standalone \href{https://github.com/jbaelaw/borel-game-value-characterization/blob/31c8af23d55dc93e3f1839b2b16d34978375c4c0/paper/Proof.tex}{TeX},
+\href{https://github.com/jbaelaw/borel-game-value-characterization/blob/31c8af23d55dc93e3f1839b2b16d34978375c4c0/paper/Proof.pdf}{PDF}
+and review records. The
+\href{https://github.com/jbaelaw/borel-game-value-characterization/releases/tag/v2.0.0}{v2.0.0 release}
+and \href{https://doi.org/10.5281/zenodo.23290245}{Zenodo version DOI}
+archive this revision. The
+\href{https://doi.org/10.5281/zenodo.23286393}{previous Zenodo version}
+retains the earlier materials. The v1 tag, assets and both prior PRs
+are not replaced or automatically closed.
+
+\section{Completion Estimate}
+\noindent\textbf{COMPLETION: 100\%}
+Full-solution claim for the original C73-8 scope: the certificate iff
+and payoff-family structure cover all of its stated parameters and
+quantifiers. No unresolved mathematical step is identified in the
+present proof. This estimate concerns claimed coverage, not proof
+confidence, independent human verification or catalogue acceptance.
+
+\section*{Final status}
+\textbf{SOLVED (LLM claim).} Submitted for review as a new substantive
+version. Source-catalogue status and community-review verdicts are
+unchanged.
+
+\end{document}
