@@ -1,0 +1,473 @@
+\section{FORMAL RESTATEMENT}
+\textbf{Erd\H{o}s \#58; Lean 4 formalization of the reduction to Gy\'arf\'as's structural theorem.}
+For a simple graph $G$ (on an arbitrary, possibly infinite, vertex type) let $L_o(G)$ be the set of lengths of odd cycles of $G$. The formal-conjectures statement \texttt{Erdos58.erdos\_58} reads: for every $k\in\mathbb{N}$, if $L_o(G)$ is finite and $|L_o(G)|\le k$, then
+\[
+ \chi(G)\le 2k+2,\qquad\text{and}\qquad \chi(G)=2k+2 \iff K_{2k+2}\subseteq G .
+\]
+Here $\chi(G)\in\mathbb{N}\cup\{\infty\}$ and ``$\subseteq$'' means a (not necessarily induced) copy.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Conjectured by Bollob\'as and Erd\H{o}s; proved by A.~Gy\'arf\'as, \emph{Graphs with $k$ odd cycle lengths}, Discrete Math.\ 103 (1992), 41--48, \url{https://users.renyi.hu/~gyarfas/Cikkek/57_Gyarfas_GraphsWithKOddCycleLengths.pdf}. A strengthening is due to Gao, Huo and Ma, SIAM J.\ Discrete Math.\ (2021). See \url{https://www.erdosproblems.com/58} and the formal statement \url{https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/58.lean}. No novelty is claimed.
+
+The external input is Theorem~1 of Gy\'arf\'as, used in the following form (\texttt{GyarfasTheorem} in the Lean file): if $H$ is a finite 2-connected graph containing an odd cycle, $|L_o(H)|\le k$ for some $k\ge1$, and $\delta(H)\ge 2k+1$, then $H=K_{2k+2}$. As a sanity check (not a proof), this implication was verified by brute force for all 523 biconnected non-bipartite graphs on at most 7 vertices (networkx graph atlas).
+
+\section{ATTACK PLAN}
+Reduce the problem, for arbitrary graphs, to one application of the structural theorem to a minimal non-colourable finite subgraph.
+\begin{enumerate}
+\item Odd closed walks contain odd cycles, so $L_o(G)=\emptyset$ gives $\chi(G)\le2$. This settles $k=0$ unconditionally.
+\item $L_o$ is monotone under copies, so every subgraph inherits the hypothesis.
+\item If $G$ is not $m$-colourable, compactness (de Bruijn--Erd\H{o}s, Mathlib's \texttt{nonempty\_hom\_of\_forall\_finite\_subgraph\_hom}) gives a finite non-$m$-colourable subgraph. Take one with the fewest vertices.
+\item Such a minimal $H$ has $\delta(H)\ge m$ (otherwise extend a colouring of $H-v$) and is 2-connected (otherwise glue colourings of two proper pieces meeting in at most one vertex, after permuting colours).
+\item With $m=2k+2$ (bound) or $m=2k+1$ (equality), the structural theorem forces $H=K_{2k+2}$.
+\end{enumerate}
+
+\section{WORK}
+Full Lean 4 source (\texttt{Erdos58Attempt.lean}):
+\begin{verbatim}
+import Mathlib.Combinatorics.SimpleGraph.Coloring.Constructions
+import Mathlib.Combinatorics.SimpleGraph.Copy
+import Mathlib.Combinatorics.SimpleGraph.Finsubgraph
+import FormalConjecturesForMathlib.Combinatorics.SimpleGraph.Circumference
+
+/-!
+# Erdős problem 58: reduction to Gyárfás's structural theorem
+
+STATUS: PARTIAL. The statement `erdos_58` of formal-conjectures is proved from an explicit
+hypothesis `GyarfasTheorem` (Theorem 1 of A. Gyárfás, *Graphs with k odd cycle lengths*,
+Discrete Math. 103 (1992) 41–48). Everything else is proved here, with no `sorry`
+and no custom axioms:
+
+* odd closed walks contain odd cycles, hence graphs without odd cycles are 2-colourable;
+* odd cycle lengths are monotone under graph copies;
+* compactness (de Bruijn–Erdős, via Mathlib) and a minimal finite non-colourable subgraph;
+* the minimal subgraph has minimum degree at least the number of colours and is 2-connected;
+* the case `k = 0` (unconditional) and the lower bound from a copy of `K_{2k+2}`.
+-/
+
+open SimpleGraph
+
+namespace Erdos58Attempt
+
+universe u
+
+variable {V : Type u} {G : SimpleGraph V}
+
+/-! ### Odd closed walks contain odd cycles -/
+
+/-- Every walk can be shortened to a path of the same length parity, unless the graph
+contains an odd cycle. -/
+theorem exists_path_or_oddCycle [DecidableEq V] :
+    ∀ {u v : V} (p : G.Walk u v),
+      (∃ q : G.Walk u v, q.IsPath ∧ (Even q.length ↔ Even p.length)) ∨
+      (∃ (x : V) (c : G.Walk x x), c.IsCycle ∧ Odd c.length)
+  | _, _, .nil => Or.inl ⟨.nil, by simp, Iff.rfl⟩
+  | u, _, .cons h p' => by
+    rcases exists_path_or_oddCycle p' with ⟨q', hq', hpar⟩ | hc
+    · by_cases hu : u ∈ q'.support
+      · have hspec := q'.take_spec hu
+        have hlen : (q'.takeUntil u hu).length + (q'.dropUntil u hu).length = q'.length := by
+          conv_rhs => rw [← hspec]
+          rw [Walk.length_append]
+        by_cases he : Even (q'.takeUntil u hu).length
+        · right
+          refine ⟨u, .cons h (q'.takeUntil u hu), ?_, ?_⟩
+          · rw [Walk.isCycle_iff_isPath_tail_and_le_length]
+            refine ⟨by simpa using hq'.takeUntil hu, ?_⟩
+            have hne : (q'.takeUntil u hu).length ≠ 0 := by
+              intro h0
+              exact h.ne (Walk.eq_of_length_eq_zero h0).symm
+            rcases he with ⟨t, ht⟩
+            simp only [Walk.length_cons]
+            omega
+          · simp only [Walk.length_cons]
+            exact he.add_one
+        · left
+          refine ⟨q'.dropUntil u hu, hq'.dropUntil hu, ?_⟩
+          rw [Nat.not_even_iff_odd] at he
+          rw [← hlen] at hpar
+          simp only [Walk.length_cons]
+          rcases he with ⟨t, ht⟩
+          rw [ht] at hpar
+          simp only [Nat.even_iff] at hpar ⊢
+          constructor
+          · intro hb
+            have : (2 * t + 1 + (q'.dropUntil u hu).length) % 2 ≠ 0 := by omega
+            have : p'.length % 2 ≠ 0 := fun h0 => this (hpar.2 h0)
+            omega
+          · intro hP
+            by_contra hb
+            have : (2 * t + 1 + (q'.dropUntil u hu).length) % 2 = 0 := by omega
+            have := hpar.1 this
+            omega
+      · left
+        refine ⟨.cons h q', (Walk.cons_isPath_iff h q').2 ⟨hq', hu⟩, ?_⟩
+        simp only [Walk.length_cons, Nat.even_add_one, hpar]
+    · exact Or.inr hc
+
+/-- A closed walk of odd length yields an odd cycle length. -/
+theorem exists_mem_oddCycleLengths_of_odd {u : V} (w : G.Walk u u) (hw : Odd w.length) :
+    ∃ m, m ∈ G.oddCycleLengths := by
+  classical
+  rcases exists_path_or_oddCycle w with ⟨q, hq, hpar⟩ | ⟨x, c, hc, hodd⟩
+  · rw [Walk.isPath_iff_nil, ← Walk.length_eq_zero_iff] at hq
+    rw [hq] at hpar
+    exact ((Nat.not_even_iff_odd.2 hw) (by simpa using hpar)).elim
+  · exact ⟨c.length, ⟨x, c, hc, rfl⟩, hodd⟩
+
+theorem colorable_two_of_oddCycleLengths_eq_empty (h : G.oddCycleLengths = ∅) :
+    G.Colorable 2 := by
+  rw [two_colorable_iff_forall_loop_even]
+  intro u w
+  by_contra hw
+  rw [Nat.not_even_iff_odd] at hw
+  obtain ⟨m, hm⟩ := exists_mem_oddCycleLengths_of_odd w hw
+  rw [h] at hm
+  exact hm
+
+theorem oddCycleLengths_nonempty_of_not_colorable_two (h : ¬ G.Colorable 2) :
+    G.oddCycleLengths.Nonempty := by
+  rw [Set.nonempty_iff_ne_empty]
+  intro he
+  exact h (colorable_two_of_oddCycleLengths_eq_empty he)
+
+/-- Odd cycle lengths are monotone under copies. -/
+theorem oddCycleLengths_subset_of_copy {W : Type*} {H : SimpleGraph W} (f : H.Copy G) :
+    H.oddCycleLengths ⊆ G.oddCycleLengths := by
+  rintro m ⟨⟨a, w, hw, rfl⟩, hodd⟩
+  exact ⟨⟨f.toHom a, w.map f.toHom,
+    (Walk.isCycle_map_iff_of_injective f.injective).2 hw, by simp⟩, hodd⟩
+
+/-! ### Gluing colourings along at most one common vertex -/
+
+theorem colorable_of_glue {W : Type*} (H : SimpleGraph W) (m : ℕ)
+    (A B : Set W) (hAB : ∀ x, x ∈ A ∨ x ∈ B) (v : W)
+    (hinter : ∀ x, x ∈ A → x ∈ B → x = v)
+    (hedge : ∀ x y, H.Adj x y → x ∈ A → y ∉ A → x ∈ B)
+    (hcA : (H.induce A).Colorable m) (hcB : (H.induce B).Colorable m) : H.Colorable m := by
+  classical
+  obtain ⟨cA⟩ := hcA
+  obtain ⟨cB⟩ := hcB
+  obtain ⟨σ, hσ⟩ : ∃ σ : Equiv.Perm (Fin m),
+      ∀ x (hx : x ∈ A) (hxB : x ∈ B), σ (cB ⟨x, hxB⟩) = cA ⟨x, hx⟩ := by
+    by_cases hv : v ∈ A ∧ v ∈ B
+    · refine ⟨Equiv.swap (cB ⟨v, hv.2⟩) (cA ⟨v, hv.1⟩), ?_⟩
+      intro x hx hxB
+      obtain rfl := hinter x hx hxB
+      simp [Equiv.swap_apply_left]
+    · refine ⟨Equiv.refl _, ?_⟩
+      intro x hx hxB
+      exact absurd ⟨hinter x hx hxB ▸ hx, hinter x hx hxB ▸ hxB⟩ hv
+  let c : W → Fin m := fun x =>
+    if hx : x ∈ A then cA ⟨x, hx⟩ else σ (cB ⟨x, (hAB x).resolve_left hx⟩)
+  have cross : ∀ x y, H.Adj x y → x ∈ A → y ∉ A → c x ≠ c y := by
+    intro x y hxy hx hy
+    have hxB := hedge x y hxy hx hy
+    have hyB := (hAB y).resolve_left hy
+    simp only [c, dif_pos hx, dif_neg hy]
+    rw [← hσ x hx hxB]
+    intro heq
+    exact cB.valid (show (H.induce B).Adj ⟨x, hxB⟩ ⟨y, hyB⟩ by simpa using hxy)
+      (σ.injective heq)
+  refine ⟨Coloring.mk c ?_⟩
+  intro x y hxy
+  by_cases hx : x ∈ A <;> by_cases hy : y ∈ A
+  · simp only [c, dif_pos hx, dif_pos hy]
+    exact cA.valid (show (H.induce A).Adj ⟨x, hx⟩ ⟨y, hy⟩ by simpa using hxy)
+  · exact cross x y hxy hx hy
+  · exact (cross y x hxy.symm hy hx).symm
+  · simp only [c, dif_neg hx, dif_neg hy]
+    intro heq
+    exact cB.valid (show (H.induce B).Adj ⟨x, (hAB x).resolve_left hx⟩
+      ⟨y, (hAB y).resolve_left hy⟩ by simpa using hxy) (σ.injective heq)
+
+/-! ### Two-connectivity of minimal non-colourable graphs -/
+
+/-- `H` is 2-connected: connected, and still connected after deleting any one vertex. -/
+def TwoConnected {W : Type*} (H : SimpleGraph W) : Prop :=
+  H.Connected ∧ ∀ v : W, (H.induce ({v}ᶜ : Set W)).Connected
+
+theorem twoConnected_of_critical {W : Type*} (H : SimpleGraph W) (m : ℕ) (hm : 1 ≤ m)
+    (hnc : ¬ H.Colorable m)
+    (hproper : ∀ A : Set W, A ≠ Set.univ → (H.induce A).Colorable m) : TwoConnected H := by
+  classical
+  have hne : Nonempty W := by
+    by_contra hW
+    exact hnc ⟨Coloring.mk (fun x => (hW ⟨x⟩).elim) (fun {x} _ => (hW ⟨x⟩).elim)⟩
+  refine ⟨(connected_iff H).2 ⟨?_, hne⟩, ?_⟩
+  · intro u w
+    by_contra hr
+    let A : Set W := {x | H.Reachable u x}
+    apply hnc
+    refine colorable_of_glue H m A Aᶜ (fun x => em (x ∈ A)) u
+      (fun x hx hxc => absurd hx hxc) ?_ (hproper A ?_) (hproper Aᶜ ?_)
+    · intro x y hxy hx hy
+      exact absurd (show H.Reachable u y from hx.trans hxy.reachable) hy
+    · intro hA
+      exact hr (show w ∈ A from hA ▸ Set.mem_univ w)
+    · intro hA
+      exact (show u ∈ Aᶜ from hA ▸ Set.mem_univ u) (Reachable.refl u)
+  · intro v
+    have hne' : Nonempty ({v}ᶜ : Set W) := by
+      by_contra hW
+      apply hnc
+      refine ⟨Coloring.mk (fun _ => ⟨0, hm⟩) ?_⟩
+      intro x y hxy
+      have hx : x = v := by
+        by_contra hx; exact hW ⟨⟨x, hx⟩⟩
+      have hy : y = v := by
+        by_contra hy; exact hW ⟨⟨y, hy⟩⟩
+      exact absurd (hx ▸ hy ▸ hxy) H.irrefl
+    refine (connected_iff _).2 ⟨?_, hne'⟩
+    rintro ⟨u, hu⟩ ⟨w, hw⟩
+    by_contra hr
+    let A : Set W := {x | x = v ∨ ∃ hx : x ≠ v, (H.induce ({v}ᶜ : Set W)).Reachable ⟨u, hu⟩ ⟨x, hx⟩}
+    let B : Set W := {x | x = v ∨ x ∉ A}
+    apply hnc
+    refine colorable_of_glue H m A B (fun x => ?_) v ?_ ?_ (hproper A ?_) (hproper B ?_)
+    · by_cases hx : x ∈ A
+      · exact Or.inl hx
+      · exact Or.inr (Or.inr hx)
+    · intro x hx hxB
+      rcases hxB with hxv | hxA
+      · exact hxv
+      · exact absurd hx hxA
+    · intro x y hxy hx hy
+      by_cases hxv : x = v
+      · exact Or.inl hxv
+      · exfalso
+        apply hy
+        have hyv : y ≠ v := by
+          intro hyv; exact hy (Or.inl hyv)
+        rcases hx with hxv' | ⟨hx', hreach⟩
+        · exact absurd hxv' hxv
+        · refine Or.inr ⟨hyv, hreach.trans ?_⟩
+          apply Adj.reachable
+          simpa using hxy
+    · intro hA
+      have hwA : w ∈ A := hA ▸ Set.mem_univ w
+      rcases hwA with hwv | ⟨hw', hreach⟩
+      · exact hw hwv
+      · exact hr hreach
+    · intro hB
+      have huB : u ∈ B := hB ▸ Set.mem_univ u
+      rcases huB with huv | huA
+      · exact hu huv
+      · exact huA (Or.inr ⟨hu, Reachable.refl _⟩)
+
+/-! ### Minimum degree of minimal non-colourable graphs -/
+
+theorem le_ncard_neighborSet {W : Type*} [Finite W] (H : SimpleGraph W) (m : ℕ)
+    (hnc : ¬ H.Colorable m) (hdel : ∀ v : W, (H.induce ({v}ᶜ : Set W)).Colorable m) (v : W) :
+    m ≤ (H.neighborSet v).ncard := by
+  classical
+  by_contra hlt
+  push Not at hlt
+  obtain ⟨c⟩ := hdel v
+  let S : Set (Fin m) := (fun x : ({v}ᶜ : Set W) => c x) '' {x | H.Adj v x}
+  have hT : (Subtype.val '' {x : ({v}ᶜ : Set W) | H.Adj v x}) = H.neighborSet v := by
+    ext y
+    constructor
+    · rintro ⟨⟨y, hy⟩, hadj, rfl⟩
+      exact hadj
+    · intro hadj
+      exact ⟨⟨y, hadj.ne.symm⟩, hadj, rfl⟩
+  have hS : S.ncard < m := by
+    calc S.ncard ≤ ({x : ({v}ᶜ : Set W) | H.Adj v x}).ncard := Set.ncard_image_le (Set.toFinite _)
+      _ = (H.neighborSet v).ncard := by
+          rw [← hT, Set.ncard_image_of_injective _ Subtype.val_injective]
+      _ < m := hlt
+  obtain ⟨a, ha⟩ : ∃ a, a ∉ S := by
+    by_contra hcon
+    push Not at hcon
+    have : S = Set.univ := Set.eq_univ_of_forall hcon
+    rw [this, Set.ncard_univ, Nat.card_eq_fintype_card, Fintype.card_fin] at hS
+    exact lt_irrefl _ hS
+  apply hnc
+  refine ⟨Coloring.mk (fun x => if hx : x = v then a else c ⟨x, hx⟩) ?_⟩
+  intro x y hxy
+  by_cases hx : x = v <;> by_cases hy : y = v
+  · exact absurd (hx ▸ hy ▸ hxy) H.irrefl
+  · rw [dif_pos hx, dif_neg hy]
+    intro heq
+    rw [hx] at hxy
+    exact ha ⟨⟨y, hy⟩, hxy, heq.symm⟩
+  · rw [dif_neg hx, dif_pos hy]
+    intro heq
+    rw [hy] at hxy
+    exact ha ⟨⟨x, hx⟩, hxy.symm, heq⟩
+  · rw [dif_neg hx, dif_neg hy]
+    exact c.valid (show (H.induce ({v}ᶜ : Set W)).Adj ⟨x, hx⟩ ⟨y, hy⟩ by simpa using hxy)
+
+/-! ### Compactness and a minimal finite witness -/
+
+/-- A graph on `Fin n`, contained in `G`, that is not `m`-colourable. -/
+def Witness (G : SimpleGraph V) (m n : ℕ) : Prop :=
+  ∃ H : SimpleGraph (Fin n), H ⊑ G ∧ ¬ H.Colorable m
+
+theorem witness_of_finite {m : ℕ} {W : Type*} [Fintype W] {H : SimpleGraph W}
+    (hH : H ⊑ G) (hnc : ¬ H.Colorable m) : Witness G m (Fintype.card W) := by
+  classical
+  let e := Fintype.equivFin W
+  let φ : H ≃g H.map e.toEmbedding := SimpleGraph.Iso.map e H
+  refine ⟨H.map e.toEmbedding, IsContained.trans ⟨φ.symm.toCopy⟩ hH, ?_⟩
+  intro hc
+  exact hnc (hc.of_hom φ.toHom)
+
+theorem exists_witness {m : ℕ} (h : ¬ G.Colorable m) : ∃ n, Witness G m n := by
+  classical
+  by_contra hno
+  push Not at hno
+  apply h
+  have : Nonempty (G →g (⊤ : SimpleGraph (Fin m))) := by
+    apply nonempty_hom_of_forall_finite_subgraph_hom
+    intro G' hfin
+    haveI : Fintype G'.verts := hfin.fintype
+    have hcol : G'.coe.Colorable m := by
+      by_contra hc
+      exact hno _ (witness_of_finite (H := G'.coe) ⟨⟨G'.hom, Subgraph.hom_injective⟩⟩ hc)
+    exact hcol.some
+  exact this
+
+theorem minimal_witness {m : ℕ} (h : ¬ G.Colorable m) :
+    ∃ n, ∃ H : SimpleGraph (Fin n), H ⊑ G ∧ ¬ H.Colorable m ∧
+      ∀ (W : Type) [Fintype W] (H' : SimpleGraph W),
+        Fintype.card W < n → H' ⊑ G → H'.Colorable m := by
+  classical
+  have hex := exists_witness h
+  refine ⟨Nat.find hex, ?_⟩
+  obtain ⟨H, hH, hnc⟩ := Nat.find_spec hex
+  refine ⟨H, hH, hnc, ?_⟩
+  intro W _ H' hcard hH'
+  by_contra hc
+  exact Nat.find_min hex hcard (witness_of_finite hH' hc)
+
+theorem induce_colorable_of_ne_univ {m n : ℕ} {H : SimpleGraph (Fin n)} (hH : H ⊑ G)
+    (hmin : ∀ (W : Type) [Fintype W] (H' : SimpleGraph W),
+      Fintype.card W < n → H' ⊑ G → H'.Colorable m)
+    (A : Set (Fin n)) (hA : A ≠ Set.univ) : (H.induce A).Colorable m := by
+  classical
+  obtain ⟨x, hx⟩ : ∃ x, x ∉ A := by
+    by_contra hcon
+    push Not at hcon
+    exact hA (Set.eq_univ_of_forall hcon)
+  apply hmin (↥A) (H.induce A)
+  · calc Fintype.card A < Fintype.card (Fin n) := Fintype.card_subtype_lt hx
+      _ = n := Fintype.card_fin n
+  · exact IsContained.trans ⟨(Embedding.induce A).toCopy⟩ hH
+
+theorem compl_singleton_ne_univ {W : Type*} (v : W) : ({v}ᶜ : Set W) ≠ Set.univ := by
+  intro h
+  have : v ∈ ({v}ᶜ : Set W) := h ▸ Set.mem_univ v
+  exact this rfl
+
+/-! ### The external input -/
+
+/-- Theorem 1 of Gyárfás (1992), stated for graphs on `Fin n`: a 2-connected non-bipartite
+graph with odd cycles of at most `k ≥ 1` lengths and minimum degree at least `2k+1`
+is the complete graph `K_{2k+2}`. This is a HYPOTHESIS here, not a proved theorem. -/
+def GyarfasTheorem : Prop :=
+  ∀ (n k : ℕ) (H : SimpleGraph (Fin n)), 1 ≤ k → TwoConnected H →
+    H.oddCycleLengths.Nonempty → H.oddCycleLengths.ncard ≤ k →
+    (∀ v, 2 * k + 1 ≤ (H.neighborSet v).ncard) → H = ⊤ ∧ n = 2 * k + 2
+
+/-! ### The reduction -/
+
+theorem core (hG : GyarfasTheorem) {k m : ℕ} (hk : 1 ≤ k) (hm : 2 * k + 1 ≤ m)
+    (hfin : G.oddCycleLengths.Finite) (hcard : G.oddCycleLengths.ncard ≤ k)
+    (hnc : ¬ G.Colorable m) :
+    (completeGraph (Fin (2 * k + 2))).IsContained G ∧ m = 2 * k + 1 := by
+  classical
+  obtain ⟨n, H, hH, hHnc, hmin⟩ := minimal_witness hnc
+  have hproper : ∀ A : Set (Fin n), A ≠ Set.univ → (H.induce A).Colorable m :=
+    fun A hA => induce_colorable_of_ne_univ hH hmin A hA
+  have h2c : TwoConnected H := twoConnected_of_critical H m (by omega) hHnc hproper
+  have hdeg : ∀ v, 2 * k + 1 ≤ (H.neighborSet v).ncard := fun v =>
+    le_trans hm (le_ncard_neighborSet H m hHnc
+      (fun v => hproper _ (compl_singleton_ne_univ v)) v)
+  obtain ⟨f⟩ := hH
+  have hsub := oddCycleLengths_subset_of_copy f
+  have hne : H.oddCycleLengths.Nonempty :=
+    oddCycleLengths_nonempty_of_not_colorable_two (fun h2 => hHnc (h2.mono (by omega)))
+  have hle : H.oddCycleLengths.ncard ≤ k := (Set.ncard_le_ncard hsub hfin).trans hcard
+  obtain ⟨rfl, rfl⟩ := hG n k H hk h2c hne hle hdeg
+  refine ⟨⟨f⟩, ?_⟩
+  by_contra hne'
+  apply hHnc
+  exact (colorable_of_fintype _).mono (by simp; omega)
+
+/-- The complete graph `K_{2k+2}` forces chromatic number at least `2k+2`. -/
+theorem le_chromaticNumber_of_isContained {k : ℕ}
+    (h : (completeGraph (Fin (2 * k + 2))).IsContained G) :
+    (2 * k + 2 : ℕ∞) ≤ G.chromaticNumber := by
+  obtain ⟨f⟩ := h
+  have := chromaticNumber_mono_of_hom f.toHom
+  rw [chromaticNumber_top, Fintype.card_fin] at this
+  exact_mod_cast this
+
+/-- The case `k = 0`, proved unconditionally. -/
+theorem isContained_K2_of_not_colorable_one (h : ¬ G.Colorable 1) :
+    (completeGraph (Fin 2)).IsContained G := by
+  classical
+  obtain ⟨u, v, huv⟩ : ∃ u v, G.Adj u v := by
+    by_contra hno
+    push Not at hno
+    exact h ⟨Coloring.mk (fun _ => 0) (fun h' => (hno _ _ h').elim)⟩
+  refine ⟨⟨⟨![u, v], ?_⟩, ?_⟩⟩
+  · intro a b hab
+    fin_cases a <;> fin_cases b <;> simp_all [huv.symm]
+  · intro a b hab
+    fin_cases a <;> fin_cases b <;> simp_all [huv.ne, huv.ne.symm]
+
+/-- CONDITIONAL result: Erdős problem 58, in the formal-conjectures formulation,
+follows from Gyárfás's structural theorem. -/
+theorem erdos_58_of_gyarfas (hG : GyarfasTheorem) :
+    ∀ {V : Type*} (G : SimpleGraph V) (k : ℕ),
+      G.oddCycleLengths.Finite →
+      G.oddCycleLengths.ncard ≤ k →
+        G.chromaticNumber ≤ (2 * k + 2 : ℕ∞) ∧
+        (G.chromaticNumber = (2 * k + 2 : ℕ∞) ↔
+          (SimpleGraph.completeGraph (Fin (2 * k + 2))).IsContained G) := by
+  intro V G k hfin hcard
+  have hup : G.Colorable (2 * k + 2) := by
+    rcases Nat.eq_zero_or_pos k with rfl | hk
+    · have : G.oddCycleLengths = ∅ := (Set.ncard_eq_zero hfin).1 (by omega)
+      simpa using colorable_two_of_oddCycleLengths_eq_empty this
+    · by_contra hnc
+      have := (core hG hk (by omega) hfin hcard hnc).2
+      omega
+  have hle : G.chromaticNumber ≤ (2 * k + 2 : ℕ∞) := by
+    have := chromaticNumber_le_iff_colorable.2 hup
+    exact_mod_cast this
+  refine ⟨hle, ⟨fun heq => ?_, fun h => le_antisymm hle (le_chromaticNumber_of_isContained h)⟩⟩
+  have hnc : ¬ G.Colorable (2 * k + 1) := by
+    intro hc
+    have := chromaticNumber_le_iff_colorable.2 hc
+    rw [heq] at this
+    have : ((2 * k + 2 : ℕ) : ℕ∞) ≤ ((2 * k + 1 : ℕ) : ℕ∞) := by exact_mod_cast this
+    have := ENat.natCast_le_natCast.1 this
+    omega
+  rcases Nat.eq_zero_or_pos k with rfl | hk
+  · exact isContained_K2_of_not_colorable_one (by simpa using hnc)
+  · exact (core hG hk le_rfl hfin hcard hnc).1
+
+#print axioms erdos_58_of_gyarfas
+
+end Erdos58Attempt
+\end{verbatim}
+
+Main results:
+\begin{itemize}
+\item \texttt{exists\_path\_or\_oddCycle}: every walk either shortens to a path of the same length parity or the graph has an odd cycle.
+\item \texttt{colorable\_two\_of\_oddCycleLengths\_eq\_empty}: no odd cycles implies 2-colourable.
+\item \texttt{oddCycleLengths\_subset\_of\_copy}: $L_o(H)\subseteq L_o(G)$ whenever $H\subseteq G$.
+\item \texttt{colorable\_of\_glue}, \texttt{twoConnected\_of\_critical}: minimal non-$m$-colourable graphs are 2-connected.
+\item \texttt{le\_ncard\_neighborSet}: they have minimum degree at least $m$.
+\item \texttt{exists\_witness}, \texttt{minimal\_witness}: compactness and a minimal finite witness on \texttt{Fin n}.
+\item \texttt{erdos\_58\_of\_gyarfas}: \texttt{GyarfasTheorem} implies the formal-conjectures statement, verbatim.
+\end{itemize}
+
+\section{VERIFICATION}
+Checked with \texttt{lake env lean Erdos58Attempt.lean} using Lean v4.33.1 and Mathlib revision \texttt{0df444a360eaa60ab8c11dca51a86af692955474} (the revision pinned by formal-conjectures), importing \texttt{FormalConjecturesForMathlib.Combinatorics.SimpleGraph.Circumference} for the definition of \texttt{oddCycleLengths}. No errors, no warnings, no \texttt{sorry}. \texttt{\#print axioms erdos\_58\_of\_gyarfas} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. \texttt{GyarfasTheorem} is a \texttt{def} used as a hypothesis, never an axiom. The conclusion of \texttt{erdos\_58\_of\_gyarfas} is copied character for character from \texttt{Erdos58.erdos\_58}.
+
+\section{FINAL STATUS}
+\textbf{PARTIAL.} Proved in Lean: the case $k=0$ unconditionally; the implication ``$K_{2k+2}\subseteq G\Rightarrow\chi(G)\ge2k+2$''; and, for all $k$, the full statement from Gy\'arf\'as's structural theorem, including compactness for infinite graphs and the critical-subgraph reduction. Not formalized: Gy\'arf\'as's structural theorem itself (a 2-connected non-bipartite graph with at most $k\ge1$ odd cycle lengths and minimum degree at least $2k+1$ is $K_{2k+2}$). That is the first remaining gap. Subject to expert review.
