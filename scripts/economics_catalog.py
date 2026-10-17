@@ -375,6 +375,12 @@ def generate_economics_data(base_dir=BASE_DIR, data_dir=None):
     base_dir = Path(base_dir)
     data_dir = Path(data_dir) if data_dir is not None else base_dir / 'docs/data'
     data = build_economics_data(base_dir)
+    # Support both the root build and this module's standalone command.
+    if __package__:
+        from .we_solve_links import attach_we_solve_links
+    else:
+        from we_solve_links import attach_we_solve_links
+    attach_we_solve_links(data, 'economics', base_dir)
     classification = json.loads((base_dir / JEL_CODES_PATH).read_text(encoding='utf-8'))
     if classification.get('schema_version') != 1 or not isinstance(classification.get('labels'), dict):
         raise ValueError('Unsupported JEL classification format')

@@ -225,6 +225,7 @@
         }
         const problem = data[id];
         const shared = window.ProblemHunting;
+        const contributeUrl = shared.getWeSolveContributeUrl(problem);
         const completion = shared.getMathematicalAttempts(problem.attacks).length
             ? shared.formatCompletion(problem.completion) : '';
         const completionSource = completion ? shared.getCompletionSourceLabel(problem) : '';
@@ -233,7 +234,9 @@
         const currentIndex = ordered.findIndex(record => record.id === id);
         title.textContent = problem.title;
         document.title = problem.title + ' (' + problem.id + ') - Economics';
-        metadata.innerHTML = '<p><a href="economics.html">&larr; Economics</a></p>' +
+        metadata.innerHTML = '<p><a href="' + contributeUrl + '" target="_blank" rel="noopener">Contribute</a></p>' +
+            shared.renderWeSolveIdentity(problem) +
+            '<p><a href="economics.html">&larr; Economics</a></p>' +
             '<p><strong>JEL code:</strong> <a href="economics.html?jel=' + encodeURIComponent(problem.jel_code) + '">' + escapeHtml(problem.jel_code) + '</a>' +
                 (jelDescription ? ' (' + escapeHtml(jelDescription) + ')' : '') + '</p>' +
             '<p><strong>Rank:</strong> ' + escapeHtml(problem.rank) + '</p>' +
@@ -273,8 +276,9 @@
                 const filename = problem.id + (version > 1 ? '_v' + version : '') + '.tex';
                 const download = attack.download_url || '';
                 const safeDownload = /^data\/economics\/attempts\/[a-zA-Z0-9_-]+\/[A-Z]\d{2}-[1-9]\d*(?:_v[1-9]\d*)?\.tex$/.test(download);
-                const source = attack.file_path && /^attacks\/open_problems\/economics\/[a-zA-Z0-9_-]+\/[A-Z]\d{2}-[1-9]\d*(?:_v[1-9]\d*)?\.tex$/.test(attack.file_path)
-                    ? 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/' + attack.file_path : '';
+                const source = shared.getWeSolveSourceUrl(attack,
+                    attack.file_path && /^attacks\/open_problems\/economics\/[a-zA-Z0-9_-]+\/[A-Z]\d{2}-[1-9]\d*(?:_v[1-9]\d*)?\.tex$/.test(attack.file_path)
+                        ? 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/' + attack.file_path : '');
                 // Repeated equation and source labels belong to their own version.
                 const content = formatTeX(normalizedStatement(attack.raw), false, false)
                     .replace(/data-tex-scope="0"/g, 'data-tex-scope="attempt-' + (index + 1) + '"');
@@ -282,8 +286,10 @@
                     escapeHtml((attack.model || '').replace(/_/g, ' ')) + ' (v' + version + ')</h3>' +
                     '<span class="status-text">' + escapeHtml(attack.entry_kind === 'human_contribution'
                         ? 'submitted' : shared.getAttemptClaim(attack)) + '</span>' +
-                    ' <a href="#comments">comments</a>' +
+                    ' <a href="' + contributeUrl + '" target="_blank" rel="noopener">contribute</a>' +
                     (source ? ' <a href="' + escapeHtml(source) + '" target="_blank" rel="noopener">source</a>' : '') +
+                    ' <a href="#comments">comments</a>' +
+                    ' <a href="' + shared.getWeSolveReviewUrl(attack) + '" target="_blank" rel="noopener">review</a>' +
                     (safeDownload ? ' <a href="' + escapeHtml(download) + '" download="' + escapeHtml(filename) + '">Download attack TeX</a>' : '') +
                     '</div>' + (attack.date_posted ? '<div class="attack-date">Posted: ' + escapeHtml(attack.date_posted) + '</div>' : '') +
                     '<div class="attempt-content tex-content">' + content + '</div></div>';

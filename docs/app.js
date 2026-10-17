@@ -892,11 +892,51 @@ function showMessage(message, duration = 3000) {
     setTimeout(() => div.remove(), duration);
 }
 
+// We-Solve identities travel with each record; display ranks and attempt order
+// can differ between sites and must never be used to construct these links.
+function getWeSolveProblemUrl(problem) {
+    const url = problem?.we_solve?.url;
+    return typeof url === 'string' && /^https:\/\/we-solve\.github\.io\/problems\/[a-z0-9-]+\/$/.test(url)
+        ? url : '';
+}
+
+function getWeSolveContributeUrl(problem) {
+    const url = getWeSolveProblemUrl(problem);
+    return url ? `${url}#contribute` : 'https://we-solve.github.io/contribute/';
+}
+
+function renderWeSolveIdentity(problem) {
+    const url = getWeSolveProblemUrl(problem);
+    const canonicalCode = problem?.we_solve?.code;
+    const recordCode = problem?.we_solve?.record_code ?? canonicalCode;
+    const validCode = code => typeof code === 'string' && /^WS-[1-9]\d*$/.test(code);
+    if (!url || !validCode(recordCode) || !validCode(canonicalCode)) return '';
+    const link = code => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(code)}</a>`;
+    const sharedPage = recordCode !== canonicalCode ? ` (shared page: ${link(canonicalCode)})` : '';
+    return `<p class="we-solve-id"><strong>We-Solve ID:</strong> ${link(recordCode)}${sharedPage}</p>`;
+}
+
+function getWeSolveReviewUrl(attack) {
+    const url = attack?.we_solve?.url;
+    return typeof url === 'string' && /^https:\/\/we-solve\.github\.io\/contributions\/[a-z0-9-]+\/attempt-[1-9]\d*\/r[1-9]\d*\/$/.test(url)
+        ? url : 'https://we-solve.github.io/contribute/review/';
+}
+
+function getWeSolveSourceUrl(record, fallback = '') {
+    const url = record?.we_solve?.source_url;
+    return typeof url === 'string' && /^https:\/\/github\.com\/we-solve\/research\/blob\/main\/[^\s?#]+$/.test(url)
+        ? url : fallback;
+}
+
 // Export for use in other scripts
 window.ProblemHunting = {
     getUrlParams,
     updateUrl,
     escapeHtml,
+    renderWeSolveIdentity,
+    getWeSolveContributeUrl,
+    getWeSolveReviewUrl,
+    getWeSolveSourceUrl,
     formatTeXContent,
     renderMath,
     debounce,

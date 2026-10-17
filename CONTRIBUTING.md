@@ -1,7 +1,39 @@
 # Contributing to Problem Hunting with LLMs
 
-This is the authoritative contribution policy for research attempts and catalogue
-statements. Partial progress and honest unresolved attempts are welcome. Formatting,
+**New research contributions:** use [We-Solve](https://we-solve.github.io/contribute/)
+for [attempts](https://we-solve.github.io/contribute/attempt/),
+[reviews](https://we-solve.github.io/contribute/review/), and
+[problem proposals](https://we-solve.github.io/contribute/problem/).
+The We-Solve website provides current requirements and submission availability.
+For an existing problem, start from its corresponding We-Solve problem page.
+
+The instructions below are retained for the existing collection and repository
+maintenance, including its historical formats and review records.
+
+## Existing collection and maintenance
+
+The website's We-Solve destinations are stored in `lists/we_solve_links.json`.
+They use permanent problem identities and original source paths; ranks and
+attempt display numbers are independent on the two sites. Normal builds use
+this file offline. Each entry binds the old category and permanent ID to its
+We-Solve `record_code` and `problem_id`. Its `code`, `canonical_alias`,
+`canonical_problem_id`, and `url` identify the canonical destination. For example,
+`open_problems:3395` retains `WS-100007` even though its shared page is
+`WS-100001` (`TOP-1`). Rank changes never alter these identities.
+
+To refresh the mapping from published We-Solve exports, run:
+
+```bash
+python scripts/import_we_solve_links.py --site /path/to/we-solve --research /path/to/research
+python build_site.py
+```
+
+Inspect the mapping's `audit` entries before publishing. Unmapped or changed
+manuscripts keep their original source links. We-Solve's attribution links back
+to this repository and links inside mathematical documents remain intact.
+
+This policy documents research attempts and catalogue
+statements in the existing collection. Partial progress and honest unresolved attempts are welcome. Formatting,
 a successful build, an LLM self-review, and a community submission record do not
 establish mathematical correctness or novelty.
 
@@ -538,8 +570,8 @@ python3 build_site.py
 
 Inspect the final diff and rendered statements, references, attempts, downloads and
 review links. Do not commit generated site data unless the contribution needs it.
-Report exact results; a successful build is not proof checking. Review issue forms
-remain available independently of mathematical submission PRs.
+Report exact results; a successful build is not proof checking. For new reviews,
+use [We-Solve's review guide](https://we-solve.github.io/contribute/review/).
 
 ## Automated validation and limitations
 
@@ -593,11 +625,13 @@ satisfy prospective checks.
 
 ## Community Reviews
 
-Use the repository's **Review an LLM claim** issue form. Select **Open Problems**
-for a ranked record and copy its canonical UnsolvedMath ID (such as `6`) from the
-detail page. Select **MO** and its numeric question ID for the MathOverflow subset,
-or **Erdos** and its numeric problem number. An accepted review requires a citation
-and an explanation. Review changes pass through a pull request before publication.
+For new reviews, use [We-Solve's review guide](https://we-solve.github.io/contribute/review/)
+and check its current submission availability.
+
+Existing review records identify **Open Problems** by canonical UnsolvedMath ID
+(such as `6`), **MO** by numeric question ID, and **Erdos** by numeric problem number.
+An accepted review requires a citation and an explanation. Maintenance of these
+records passes through a pull request before publication.
 Use `submitted` to record a contribution awaiting independent review. Submission
 records attribute `submitted_by`, rather than crediting the submitter as a reviewer.
 For a contribution by its authors, retain `submission_role: authors`; the page displays
@@ -610,7 +644,6 @@ to run** banner, a maintainer must review and approve the workflow run first.
 ## Conduct and questions
 
 Credit sources and contributions accurately, respect source licences, and describe
-uncertainty plainly. For contribution questions use
-[GitHub Discussions](https://github.com/mehmetmars7/Erdosproblems-llm-hunter/discussions).
-The review issue form is reserved for reviews of specific attempts; Economics reviews
-currently need a manual maintainer workflow because that form has no Economics option.
+uncertainty plainly. Consult [We-Solve's contribution guides](https://we-solve.github.io/contribute/)
+for new research contributions. Existing Economics review records use a manual
+maintainer workflow.

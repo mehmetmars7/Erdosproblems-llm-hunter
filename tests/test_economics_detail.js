@@ -82,6 +82,7 @@ async function main() {
     let page = await render('?type=economics&id=C73-1');
     assert.equal(page.element('page-title').textContent, 'Game <one>');
     assert.doesNotMatch(page.element('problem-meta').innerHTML, /Field:/);
+    assert.doesNotMatch(page.element('problem-meta').innerHTML, /We-Solve ID:|we-solve-id/);
     assert.match(page.element('problem-meta').innerHTML, /Problem Status:<\/strong> open/);
     assert.match(page.element('problem-meta').innerHTML, /LLM Claim:<\/strong> no attempt/);
     assert.match(page.element('problem-meta').innerHTML, /Community Review:<\/strong> unreviewed/);
@@ -183,6 +184,31 @@ async function main() {
     assert.equal(page.element('problem-links').references[0].href, '#economics-tex-label-1');
     assert.equal(page.element('comments').hidden, false);
     assert.match(attackHtml, /href="#comments">comments<\/a>/);
+    assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-1');
+
+    const mappedEconomics = { ...withAttacks, 'C73-1': { ...withAttacks['C73-1'], rank: 999,
+        we_solve: { record_code: 'WS-300001', code: 'WS-300001', alias: 'ECON-C73-1', url: 'https://we-solve.github.io/problems/economics-game/' },
+        attacks: withAttacks['C73-1'].attacks.map(attack => ({ ...attack, we_solve: {
+            alias: 'ECON-C73-1-A7', revision: 'r' + attack.version,
+            url: 'https://we-solve.github.io/contributions/economics-game/attempt-7/r' + attack.version + '/',
+            source_url: 'https://github.com/we-solve/research/blob/main/contributions/ECON-C73-1-A7/r' + attack.version + '/files/C73-1.tex'
+        } })) } };
+    page = await render('?type=economics&id=C73-1', mappedEconomics);
+    assert.match(page.element('problem-meta').innerHTML,
+        /^<p><a href="https:\/\/we-solve\.github\.io\/problems\/economics-game\/#contribute"[^>]*>Contribute<\/a><\/p>/);
+    assert.match(page.element('problem-meta').innerHTML,
+        /Contribute<\/a><\/p><p class="we-solve-id"><strong>We-Solve ID:<\/strong> <a href="https:\/\/we-solve\.github\.io\/problems\/economics-game\/"[^>]*>WS-300001<\/a><\/p>/);
+    assert.ok(page.element('problem-meta').innerHTML.indexOf('We-Solve ID:') < page.element('problem-meta').innerHTML.indexOf('JEL code:'));
+    const mappedHeaders = [...page.element('attempts-container').innerHTML.matchAll(/<div class="attempt-header">([\s\S]*?)<\/div>/g)]
+        .map(match => match[1]);
+    for (const [index, version] of [[0, 2], [1, 1]]) {
+        assert.ok(mappedHeaders[index].includes(`/attempt-7/r${version}/`));
+        assert.ok(mappedHeaders[index].includes(`/ECON-C73-1-A7/r${version}/files/C73-1.tex`));
+        assert.match(mappedHeaders[index], />contribute<\/a> <a [^>]+>source<\/a> <a href="#comments">comments<\/a>/);
+        assert.ok(mappedHeaders[index].includes('https://we-solve.github.io/problems/economics-game/#contribute'));
+    }
+    assert.match(mappedHeaders[0], /href="data\/economics\/attempts\/gpt_6_astra_pro\/C73-1_v2\.tex" download="C73-1_v2\.tex"/);
+    assert.match(page.element('problem-statement-source').innerHTML, /href="data\/economics\/statements\/C73-1\.tex" download="C73-1\.tex"/);
     assert.equal(page.element('.giscus').children[0].dataset.term, 'Economics-C73-1');
 
     for (const [completion, label] of [[45.5, '45.5%'], [0, '0%'], [100, '100%']]) {

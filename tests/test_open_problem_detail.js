@@ -32,7 +32,8 @@ const erdosRecords = {
     '1': { number: '1', status: 'open', llm_status: 'unresolved', problem_url: 'https://www.erdosproblems.com/1', attacks: [] }
 };
 
-async function render(query, open = records, fetchRecord = async () => ({ ok: false, status: 404 }), erdos = erdosRecords) {
+async function render(query, open = records, fetchRecord = async () => ({ ok: false, status: 404 }), erdos = erdosRecords,
+        mo = { '42': { id: '42', title: 'Legacy question', score: 5, link: 'https://mathoverflow.net/questions/42', attacks: [] } }) {
     const elements = new Map();
     function element(id) {
         if (!elements.has(id)) elements.set(id, {
@@ -60,7 +61,7 @@ async function render(query, open = records, fetchRecord = async () => ({ ok: fa
         window: { location: new URL(`https://example.org/problem.html${query}`),
             history: { replaceState(state, title, url) { this.lastURL = url; } }, OPEN_PROBLEMS_DATA: open,
             OPEN_PROBLEMS_CATALOG: { edition_date: '2026-09-22' } },
-        moProblems: { '42': { id: '42', title: 'Legacy question', score: 5, link: 'https://mathoverflow.net/questions/42', attacks: [] } },
+        moProblems: mo,
         erdosProblems: erdos
     });
     vm.runInContext(fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8'), context);
@@ -95,9 +96,81 @@ assert.equal(page.requests.length, 1);
 assert.equal(page.requests[0].url, 'data/top_problems/20000601.json');
 assert.equal(page.requests[0].options.cache, 'no-store');
 assert.doesNotMatch(page.element('problem-meta').innerHTML, /UnsolvedMath #/);
-const reviewURL = new URL(page.context.getReviewIssueUrl('open_problems', '20000601'));
-assert.equal(reviewURL.searchParams.get('problem_type'), 'Open Problems');
-assert.equal(reviewURL.searchParams.get('problem_id'), '20000601');
+assert.match(page.element('problem-meta').innerHTML,
+    /^<p><a href="https:\/\/we-solve\.github\.io\/contribute\/"[^>]*>Contribute<\/a><\/p>/);
+assert.doesNotMatch(page.element('problem-meta').innerHTML, /We-Solve ID:|we-solve-id/);
+
+// Match permanent records and file paths even when ranks, attempt order and
+// We-Solve attempt numbers differ. Embedded citations and provenance stay put.
+const originalSource = 'https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex';
+const mappedProblem = { ...ranked(1, 999), we_solve: {
+    record_code: 'WS-100001', code: 'WS-100001', alias: 'TOP-1', url: 'https://we-solve.github.io/problems/p-versus-np-problem/',
+    source_url: 'https://github.com/we-solve/research/blob/main/problems/WS-100001/statement.tex'
+}, definition_tex: `\\url{${originalSource}}`, attacks: [
+    { model: 'older_model', status: 'unresolved', date_posted: '2026-09-01',
+        file_path: 'attacks/open_problems/top_problems/older_model/1.tex', raw: 'Older attempt.',
+        we_solve: { alias: 'TOP-1-A7', revision: 'r2',
+            url: 'https://we-solve.github.io/contributions/p-versus-np-problem/attempt-7/r2/',
+            source_url: 'https://github.com/we-solve/research/blob/main/contributions/TOP-1-A7/r2/files/1.tex' } },
+    { model: 'gpt_6_astra_ultra', status: 'unresolved', date_posted: '2026-10-01',
+        file_path: 'attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex', raw: `\\url{${originalSource}}`,
+        we_solve: { alias: 'TOP-1-A2', revision: 'r1',
+            url: 'https://we-solve.github.io/contributions/p-versus-np-problem/attempt-2/r1/',
+            source_url: 'https://github.com/we-solve/research/blob/main/contributions/TOP-1-A2/r1/files/1.tex' } },
+    { model: 'collection', status: 'unresolved', entry_kind: 'reused_writeup',
+        file_path: 'attacks/open_problems/top_problems/collection/1.tex', raw: 'Reused attempt.',
+        provenance: { source_model: 'gpt_6_astra_ultra', primary_source: 'attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex' } }
+] };
+page = await render('?type=open_problems&id=1', { '1': mappedProblem });
+const mappedMeta = page.element('problem-meta').innerHTML;
+assert.match(mappedMeta, /^<p><a href="https:\/\/we-solve\.github\.io\/problems\/p-versus-np-problem\/#contribute"[^>]*>Contribute<\/a><\/p>/);
+assert.ok(mappedMeta.indexOf('>Contribute</a>') < mappedMeta.indexOf('Field:'));
+assert.match(mappedMeta, /Contribute<\/a><\/p><p class="we-solve-id"><strong>We-Solve ID:<\/strong> <a href="https:\/\/we-solve\.github\.io\/problems\/p-versus-np-problem\/"[^>]*>WS-100001<\/a><\/p>/);
+assert.ok(mappedMeta.indexOf('We-Solve ID:') < mappedMeta.indexOf('Field:'));
+assert.doesNotMatch(mappedMeta, /shared page:/);
+assert.ok(page.element('problem-statement-source').innerHTML.includes(mappedProblem.we_solve.source_url));
+assert.ok(page.element('problem-links').innerHTML.includes(originalSource));
+const mappedAttempts = page.element('attempts-container').innerHTML;
+const mappedHeaders = [...mappedAttempts.matchAll(/<div class="attempt-header">([\s\S]*?)<\/div>/g)].map(match => match[1]);
+for (const [header, attack] of [[mappedHeaders[0], mappedProblem.attacks[1]], [mappedHeaders[1], mappedProblem.attacks[0]]]) {
+    assert.ok(header.includes(attack.we_solve.source_url));
+    assert.ok(header.includes(attack.we_solve.url));
+    assert.match(header, />contribute<\/a> <a [^>]+>source<\/a> <a href="#comments">comments<\/a>/);
+    assert.ok(header.includes(mappedProblem.we_solve.url + '#contribute'));
+}
+assert.match(mappedHeaders[0], /Attempt 1: gpt 6 astra ultra/);
+assert.ok(mappedAttempts.includes(`href="${originalSource}" target="_blank" rel="noopener">Original writeup</a>`));
+assert.ok(mappedAttempts.includes(`href="${originalSource}" target="_blank" rel="noopener noreferrer">`));
+assert.match(mappedHeaders[2], /https:\/\/we-solve\.github\.io\/contribute\/review\//);
+assert.match(mappedHeaders[2], /Erdosproblems-llm-hunter\/blob\/main\/attacks\/open_problems\/top_problems\/collection\/1\.tex/);
+assert.doesNotMatch(mappedAttempts, /issues\/new/);
+assert.equal(page.element('.giscus').children[0].dataset.repo, 'mehmetmars7/Erdosproblems-llm-hunter');
+assert.equal(page.element('.giscus').children[0].dataset.term, 'OpenProblem-1');
+
+for (const [query, erdos, mo] of [
+    ['?type=erdos&id=1', { '1': { ...erdosRecords['1'], we_solve: mappedProblem.we_solve } }, undefined],
+    ['?type=open_problems&id=mo%3A42', undefined,
+        { '42': { id: '42', title: 'Legacy question', score: 5, attacks: [], we_solve: mappedProblem.we_solve } }]
+]) {
+    page = await render(query, records, undefined, erdos, mo);
+    assert.ok(page.element('problem-meta').innerHTML.startsWith(`<p><a href="${mappedProblem.we_solve.url}#contribute"`));
+    assert.match(page.element('problem-meta').innerHTML, /Contribute<\/a><\/p><p class="we-solve-id">/);
+}
+
+const mergedProblem = { ...ranked(7, 1234), we_solve: { ...mappedProblem.we_solve,
+    record_code: 'WS-100007', alias: 'TOP-7', code: 'WS-100001', canonical_alias: 'TOP-1' } };
+page = await render('?type=open_problems&id=7', { '7': mergedProblem });
+const mergedIdentity = page.element('problem-meta').innerHTML.match(/<p class="we-solve-id">([\s\S]*?)<\/p>/)[1];
+assert.equal(mergedIdentity.replace(/<[^>]+>/g, ''), 'We-Solve ID: WS-100007 (shared page: WS-100001)');
+assert.deepEqual([...mergedIdentity.matchAll(/href="([^"]+)"/g)].map(match => match[1]),
+    [mappedProblem.we_solve.url, mappedProblem.we_solve.url]);
+assert.equal(page.element('.giscus').children[0].dataset.term, 'OpenProblem-7');
+for (const invalid of [undefined, {}, { code: 'WS-1', url: 'https://example.org/problems/example/' },
+    { ...mappedProblem.we_solve, code: 'WS-0' },
+    { ...mappedProblem.we_solve, record_code: 'WS-100007<script>' },
+    { ...mappedProblem.we_solve, url: 'https://we-solve.github.io/problems/p-versus-np-problem/" onclick="bad' }]) {
+    assert.equal(page.context.window.ProblemHunting.renderWeSolveIdentity({ we_solve: invalid }), '');
+}
 
 const authorSubmission = JSON.parse(fs.readFileSync(path.join(root,
     'reviews/open_problems/30007169.json'), 'utf8'));
@@ -255,6 +328,7 @@ assert.match(hodgeCards, /Archived manuscript/);
 
 page = await render('?type=open_problems&id=mo%3A42');
 assert.match(page.element('problem-meta').innerHTML, /MathOverflow subset/);
+assert.doesNotMatch(page.element('problem-meta').innerHTML, /We-Solve ID:|we-solve-id/);
 assert.equal(page.element('.giscus').children[0].dataset.term, 'MO-42');
 assert.equal(page.requests.length, 0);
 page = await render('?type=erdos&id=1');
@@ -425,7 +499,8 @@ assert.match(pnpStatement, /claymath\.org\/library\/monographs\/MPPc\.pdf/);
 assert.doesNotMatch(pnpStatement, /cataloguescope|hypertarget|\\[se]ref|Research attempt|When a yes-or-no problem/);
 const notebook = page.element('attempts-container').innerHTML;
 assert.match(notebook, /Attempt [0-9]+: gpt 6 astra ultra/);
-assert.match(notebook, /top_problems\/gpt_6_astra_ultra\/1\.tex/);
+assert.ok(notebook.includes(pnp.attacks.find(attack => attack.file_path === 'attacks/open_problems/top_problems/gpt_6_astra_ultra/1.tex').we_solve?.source_url ||
+    'top_problems/gpt_6_astra_ultra/1.tex'));
 assert.equal((notebook.match(/class="attempt"/g) || []).length, pnp.attacks.length);
 assert.match(notebook, /Current frontier and source audit/);
 assert.match(notebook, /unresolved gap/);
@@ -443,9 +518,9 @@ for (const [legacy, record] of [['problem.p-versus-np', pnp], ['problem.hodge-co
     assert.equal(page.context.window.history.lastURL.hash, '#llm-attempts-section');
     assert.equal(page.element('.giscus').children[0].dataset.term, `OpenProblem-${record.id}`);
     assert.doesNotMatch(page.element('problem-statement-source').innerHTML, /unsolvedmath\.com|UnsolvedMath/);
-    assert.ok(page.element('problem-statement-source').innerHTML.includes(`/top_problems/definitions/${record.id}.tex`));
+    assert.ok(page.element('problem-statement-source').innerHTML.includes(record.we_solve?.source_url || `/top_problems/definitions/${record.id}.tex`));
     assert.equal((page.element('attempts-container').innerHTML.match(/class="attempt"/g) || []).length, record.attacks.length);
-    assert.equal(new URL(page.context.getReviewIssueUrl('open_problems', String(record.id))).searchParams.get('problem_id'), String(record.id));
+    assert.doesNotMatch(page.element('attempts-container').innerHTML, /issues\/new\?/);
 }
 console.log('Ranked TeX definitions, fresh data recovery, model attempts, citations and legacy detail routes passed.');
 }

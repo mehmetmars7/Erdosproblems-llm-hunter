@@ -132,10 +132,9 @@
         <section class="contribute-cta" id="contribute-cta" hidden>
             <h3>Contribute</h3>
             <p>
-                Have an LLM attempt or Lean formalization to share for this open problem?
-                Lean contributions use a short TeX summary with a link to the externally hosted code.
-                See our <a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guidelines</a>
-                for the submission format and Lean code safety guidance.
+                Continue this problem on We-Solve. See the
+                <a href="https://we-solve.github.io/contribute/" target="_blank" rel="noopener noreferrer">contribution guide</a>
+                for available contribution types, formats and submission status.
             </p>
         </section>
 
@@ -169,15 +168,15 @@
         </p>
     </footer>
 
-    <script src="data/erdos_data.js"></script>
-    <script src="data/mo_data.js"></script>
-    <script src="data/open_problems_data.js?v=83e1581555176fbf"></script>
-    <script src="app.js?v=c608223712e188cb"></script>
+    <script src="data/erdos_data.js?v=eae4900f9b19aa43"></script>
+    <script src="data/mo_data.js?v=8a507e29f4b9457c"></script>
+    <script src="data/open_problems_data.js?v=40f8bdaad451f589"></script>
+    <script src="app.js?v=f3c41b6c4f25f17a"></script>
     <script src="attempt-previews.js"></script>
     <script src="tex-references.js?v=3"></script>
     <script src="tex-bare-math.js"></script>
     <script src="catalog-math.js"></script>
-    <script id="economics-detail-script" src="economics-detail.js?v=f1dfc91867788496" data-economics-src="data/economics_data.js?v=aee824dab727e866"></script>
+    <script id="economics-detail-script" src="economics-detail.js?v=75b78c303af6e015" data-economics-src="data/economics_data.js?v=56ee41a7f94eaafa"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
             const params = new URLSearchParams(window.location.search);
@@ -293,7 +292,7 @@
                     (problemStatus === 'partial' && (problem.attacks || []).some(window.ProblemHunting.isPartialOpenAIClaim)));
             document.getElementById('contribute-cta').hidden = !isOpenProblem;
 
-            const reviewIssueUrl = getReviewIssueUrl(type, id);
+            const contributeUrl = window.ProblemHunting.getWeSolveContributeUrl(problem);
             initGiscus(type, id);
 
             // Update page title
@@ -383,6 +382,9 @@
                 `;
             }
 
+            metaDiv.innerHTML = `<p><a href="${contributeUrl}" target="_blank" rel="noopener">Contribute</a></p>` +
+                window.ProblemHunting.renderWeSolveIdentity(problem) + metaDiv.innerHTML;
+
             // Ranked definitions and their source qualifications travel with the catalog.
             const linksDiv = document.getElementById('problem-links');
             if (type === 'erdos') {
@@ -400,8 +402,10 @@
                 const definitionFile = problem.definition_file ||
                     (Number.isSafeInteger(problem.id) && problem.id > 0
                         ? `attacks/open_problems/top_problems/definitions/${problem.id}.tex` : '');
+                const definitionUrl = window.ProblemHunting.getWeSolveSourceUrl(problem,
+                    `https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/${definitionFile}`);
                 const definitionLink = /^attacks\/open_problems\/top_problems\/definitions\/[1-9]\d*\.tex$/.test(definitionFile)
-                    ? `<a href="https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/${definitionFile}" target="_blank" rel="noopener" aria-label="View TeX definition (${definitionFile.split('/').pop()})">source</a>`
+                    ? `<a href="${window.ProblemHunting.escapeHtml(definitionUrl)}" target="_blank" rel="noopener" aria-label="View TeX definition (${definitionFile.split('/').pop()})">source</a>`
                     : '';
                 document.getElementById('problem-statement-source').innerHTML = definitionLink;
                 if (problem.definition_tex) {
@@ -481,10 +485,12 @@
                     } else if (isOpenAI && !isWithdrawal) {
                         provenanceNote = window.ProblemHunting.renderOpenAIProvenance(attack);
                     }
-                    const sourceUrl = attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '';
+                    const sourceUrl = window.ProblemHunting.getWeSolveSourceUrl(attack,
+                        attack.file_path ? encodeURI(`${repoBaseUrl}${attack.file_path}`) : '');
+                    const contributeLink = ` <a href="${contributeUrl}" target="_blank" rel="noopener">contribute</a>`;
                     const sourceLink = sourceUrl ? ` <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener">source</a>` : '';
                     const commentsLink = ` <a href="#comments">comments</a>`;
-                    const reviewLink = reviewIssueUrl ? ` <a href="${reviewIssueUrl}" target="_blank" rel="noopener">review</a>` : '';
+                    const reviewLink = ` <a href="${window.ProblemHunting.getWeSolveReviewUrl(attack)}" target="_blank" rel="noopener">review</a>`;
                     
                     // Format date if available
                     const datePosted = attack.date_posted ? 
@@ -496,7 +502,7 @@
                         <div class="attempt" data-statement-only="${isStatement}">
                             <div class="attempt-header">
                                 <h3>${title}</h3>
-                                <span class="status-text">${escapeHtml(statusLabel)}</span>${sourceLink}${commentsLink}${reviewLink}
+                                <span class="status-text">${escapeHtml(statusLabel)}</span>${contributeLink}${sourceLink}${commentsLink}${reviewLink}
                             </div>
                             ${datePosted}
                             ${scopeNote}
@@ -1418,18 +1424,6 @@
             container.appendChild(script);
         }
 
-        function getReviewIssueUrl(type, id) {
-            if (!type || !id) return '';
-            const prefix = type === 'mo' ? 'MO' : type === 'open_problems' ? 'OpenProblem' : 'Erdos';
-            const title = `Review: ${prefix}-${id}`;
-            const params = new URLSearchParams({
-                template: 'review.yml',
-                title: title,
-                problem_type: type === 'mo' ? 'MO' : type === 'open_problems' ? 'Open Problems' : 'Erdos',
-                problem_id: id
-            });
-            return `https://github.com/mehmetmars7/Erdosproblems-llm-hunter/issues/new?${params.toString()}`;
-        }
     </script>
     <script>
         window.addEventListener('message', function(event) {

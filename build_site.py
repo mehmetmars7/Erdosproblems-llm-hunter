@@ -17,6 +17,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from scripts.economics_catalog import generate_economics_data
+from scripts.we_solve_links import attach_we_solve_links
 
 # Directories
 BASE_DIR = Path(__file__).parent
@@ -1355,6 +1356,10 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
     if open_problems is None:
         open_problems = build_open_problems_data(mo_problems, open_catalog)
 
+    attach_we_solve_links(erdos_problems, 'erdos', BASE_DIR)
+    attach_we_solve_links(mo_problems, 'mo', BASE_DIR)
+    attach_we_solve_links(open_problems, 'open_problems', BASE_DIR)
+
     # Generate erdos_data.js
     with open(DATA_DIR / "erdos_data.js", 'w', encoding='utf-8') as f:
         # Sort by problem number
@@ -1395,7 +1400,8 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
 
     # Changing the generated content changes the URL, so a new page cannot
     # accidentally pair with a pre-TeX copy of the index in the browser cache.
-    assets = ['data/open_problems_data.js', 'app.js', 'data/economics_data.js',
+    assets = ['data/open_problems_data.js', 'data/erdos_data.js', 'data/mo_data.js',
+              'app.js', 'data/economics_data.js',
               'economics.js', 'economics-detail.js', 'economics.css']
     versions = {asset: hashlib.sha256((DATA_DIR.parent / asset).read_bytes()).hexdigest()[:16]
                 for asset in assets if (DATA_DIR.parent / asset).exists()}

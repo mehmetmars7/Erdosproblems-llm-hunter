@@ -1,3 +1,8 @@
+New research attempts, reviews, and problem proposals use
+[We-Solve's contribution guides](https://we-solve.github.io/contribute/), which provide
+current requirements and submission availability. The template below is retained
+for maintenance of this repository and its existing records.
+
 ## Contribution type and identity
 
 - Type: research attempt / new statement / human contribution / external claim / maintenance

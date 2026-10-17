@@ -1,5 +1,9 @@
 # Contributor LLM prompts
 
+For new research contributions, use [We-Solve's contribution guides](https://we-solve.github.io/contribute/)
+for current requirements and submission availability. The prompts below are retained
+for the existing collection and repository maintenance.
+
 These prompts implement [CONTRIBUTING.md](../CONTRIBUTING.md). Use A then B for
 research; C then D for statements. Replace every bracketed input with actual facts.
 Provide the original source text and repository format, not merely a problem title.
