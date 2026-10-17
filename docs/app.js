@@ -471,12 +471,15 @@ function renderOpenProblemRows(problems) {
         const sourceLink = source
             ? `<a href="${escapeHtml(source.url)}" target="_blank" rel="noopener" title="${escapeHtml(source.citation || 'Original source')}">Source</a>` : '—';
         const externalLink = getUnsolvedMathLink(problem);
+        const localHref = getOpenProblemHref(problem);
+        const problemHref = getWeSolveProblemUrl(problem) || localHref;
+        const rankLink = rank === '—' ? rank : `<a href="${escapeHtml(localHref)}">${rank}</a>`;
         return `<tr>
-            <td>${rank}</td>
-            <td class="catalogue-problem"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
+            <td>${rankLink}</td>
+            <td class="catalogue-problem"><a href="${escapeHtml(problemHref)}">${escapeHtml(problem.title || problem.id)}</a><span class="catalogue-meta">${escapeHtml(metadata)}</span></td>
             <td${qualification}>${escapeHtml(getOpenProblemStatusLabel(problem))}${sourceStatus}${reviewed}</td>
             <td class="${escapeHtml(getReviewClass(problem.review))}"${reviewTitle}>${escapeHtml(getReviewLabel(problem.review))}</td>
-            <td class="claim-status"><a href="${escapeHtml(getOpenProblemHref(problem))}">${escapeHtml(claimLabel)}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td class="claim-status"><a href="${escapeHtml(problemHref)}">${escapeHtml(claimLabel)}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td>${attempts.length ? escapeHtml(formatCompletion(problem.completion)) || '—' : '—'}</td>
             <td>${labels.length ? labels.map(escapeHtml).join(', ') : '—'}</td>
             <td>${sourceLink}</td>
@@ -933,6 +936,7 @@ window.ProblemHunting = {
     getUrlParams,
     updateUrl,
     escapeHtml,
+    getWeSolveProblemUrl,
     renderWeSolveIdentity,
     getWeSolveContributeUrl,
     getWeSolveReviewUrl,

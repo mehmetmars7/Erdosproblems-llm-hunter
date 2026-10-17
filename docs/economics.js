@@ -57,12 +57,13 @@
         return records.map(record => {
             const attempts = shared.getMathematicalAttempts(record.attacks);
             const models = shared.getModelLabels(record.attacks, { fullNames: true });
+            const problemHref = shared.getWeSolveProblemUrl(record) || href(record);
             return `<tr>
-            <td>${escape(record.rank)}</td>
-            <td class="catalogue-problem"><a href="${href(record)}">${escape(record.title)}</a></td>
+            <td><a href="${href(record)}">${escape(record.rank)}</a></td>
+            <td class="catalogue-problem"><a href="${escape(problemHref)}">${escape(record.title)}</a></td>
             <td>${escape(columnValue(record, 'status'))}</td>
             <td>${attempts.length ? escape(shared.formatCompletion(record.completion)) || '—' : '—'}</td>
-            <td class="claim-status"><a href="${href(record)}">${escape(columnValue(record, 'claim'))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
+            <td class="claim-status"><a href="${escape(problemHref)}">${escape(columnValue(record, 'claim'))}</a><span class="catalogue-meta">${attempts.length} attempt${attempts.length === 1 ? '' : 's'}</span></td>
             <td class="${escape(shared.getReviewClass(record.review))}">${escape(columnValue(record, 'review'))}</td>
             <td><span title="${escape(familyLabel(record.jel_code))}">${escape(record.jel_code)}</span></td>
             <td>${models.length ? models.map(escape).join(', ') : '—'}</td>

@@ -237,7 +237,7 @@ assert.equal(api.escapeHtml('a"<&\''), 'a&quot;&lt;&amp;&#39;');
 const rendered = api.renderOpenProblemRows([records['6'], records['mo:23'], records['20000601']]);
 assert.match(rendered, /Beta &amp; &quot;target&quot;/);
 assert.match(rendered, /href="https:\/\/www\.unsolvedmath\.com\/problems\/MPP-006" target="_blank" rel="noopener noreferrer"[^>]*>MPP-006<\/a>/);
-assert.match(rendered, /<td>2<\/td>/);
+assert.match(rendered, /<td><a href="problem\.html\?type=open_problems&amp;id=6">2<\/a><\/td>/);
 assert.match(rendered, />Source<\/a><\/td>\s*<td><a[^>]*>MPP-006<\/a><\/td>/);
 assert.deepEqual(ids(api.filterOpenProblems(records, { search: 'mpp-006' })), ['6']);
 const duplicateCode = { id: 1479, problem_number: 'TOP-001', external_url: 'https://www.unsolvedmath.com/problems/1479' };

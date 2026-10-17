@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const docs = path.join(root, 'docs');
 const registry = JSON.parse(fs.readFileSync(path.join(root, 'lists/unsolvedmath/problems.json'), 'utf8'));
+const wsMapping = JSON.parse(fs.readFileSync(path.join(root, 'lists/we_solve_links.json'), 'utf8')).problems;
 let server;
 let base = process.env.SITE_BASE_URL;
 if (!base) {
@@ -246,7 +247,9 @@ try {
     const catalogue = await evaluate(`({
         headings: [...document.querySelectorAll('th')].map(th => th.textContent),
         links: [...document.querySelectorAll('#open-problems-tbody tr')].map(row => ({
-            href: row.querySelector('.catalogue-problem a').getAttribute('href'),
+            href: row.querySelector('td:first-child a')?.getAttribute('href'),
+            problem: row.querySelector('.catalogue-problem a').href,
+            claim: row.querySelector('.claim-status a').href,
             external: [...row.querySelectorAll('td:last-child a')].map(a => [a.href, a.textContent, a.target, a.rel])
         }))
     })`);
@@ -254,6 +257,8 @@ try {
     for (const record of registry) {
         const row = catalogue.links.find(row => row.href === `problem.html?type=open_problems&id=${record.id}`);
         assert.ok(row, `Missing numeric link for ${record.id}`);
+        assert.equal(row.problem, wsMapping[`open_problems:${record.id}`].url);
+        assert.equal(row.claim, row.problem);
         assert.deepEqual(row.external, record.external_url ? [[record.external_url, record.problem_number, '_blank', 'noopener noreferrer']] : []);
     }
     for (const key of ['title', 'rank', 'status', 'review', 'claim', 'completion', 'models', 'source', 'unsolvedmath']) {
@@ -276,8 +281,35 @@ try {
     await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' });
     await call('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
     assert.equal(await evaluate(`document.querySelector('[data-sort="title"]').closest('th').getAttribute('aria-sort')`), 'ascending');
+    for (const [category, declaration] of [['economics', 'window.ECONOMICS_DATA = '], ['erdos', 'var erdosProblems = ']]) {
+        const records = readDataExport(`data/${category}_data.js`, declaration);
+        await visit(`${category}.html`, `document.querySelector('#${category}-tbody .claim-status a')`);
+        if (category === 'erdos') {
+            await evaluate(`(() => {
+                const filter = document.querySelector('input[type="checkbox"]');
+                filter.checked = false;
+                filter.dispatchEvent(new Event('change'));
+            })()`);
+        }
+        const rows = await evaluate(`Array.from(document.querySelectorAll('#${category}-tbody tr'), row => ({
+            local: row.querySelector('td:first-child a').getAttribute('href'),
+            number: row.querySelector('td:first-child a').textContent,
+            problem: row.querySelector('.catalogue-problem a')?.href,
+            claim: row.querySelector('.claim-status a').href
+        }))`);
+        assert.equal(rows.length, Object.keys(records).length, category);
+        for (const row of rows) {
+            const id = new URL(row.local, base).searchParams.get('id');
+            const record = records[id];
+            assert.ok(record, `${category}: unknown local problem ${id}`);
+            assert.equal(row.local, `problem.html?type=${category}&id=${id}`);
+            assert.equal(row.number, category === 'erdos' ? `#${record.number}` : String(record.rank));
+            assert.equal(row.claim, wsMapping[`${category}:${id}`].url);
+            if (category === 'economics') assert.equal(row.problem, row.claim);
+        }
+    }
     assert.deepEqual(errors, []);
-    console.log(`Browser verified desktop/mobile contribution controls for P versus NP, Economics and Erdos, detail routes, ${registry.length} catalogue links, external links, all nine sortable columns and keyboard activation.`);
+    console.log(`Browser verified desktop/mobile contribution controls, detail routes, all Top/Economics/Erdos list destinations, external links, all nine sortable columns and keyboard activation.`);
 } finally {
     socket.close();
     await fetch(`${debug}/json/close/${target.id}`);
