@@ -1,0 +1,215 @@
+\section{FORMAL RESTATEMENT}
+\textbf{Erd\H{o}s \#4; Lean 4 formalization of the final reduction step.}
+Write $\log_j x$ for the $j$-fold iterated natural logarithm and let $p_n$ be the $n$-th prime (zero-indexed in Lean: $p_0=2$). The question asks: is it true that for every $C>0$ there are infinitely many $n$ with
+\[
+ p_{n+1}-p_n > C\,\frac{\log n\,\log_2 n\,\log_4 n}{(\log_3 n)^2}\ ?
+\]
+The Lean file below states this as \texttt{Erdos4} and as \texttt{standard\_statement\_of\_stronger\_bound}, in the notation of the formal-conjectures statement.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+The problem is resolved in the literature (Maynard; Ford--Green--Konyagin--Tao; and jointly Ford, Green, Konyagin, Maynard, Tao, \emph{Long gaps between primes}, J.\ Amer.\ Math.\ Soc.\ 31 (2018), 65--105, \url{https://arxiv.org/abs/1412.5029}). See \url{https://www.erdosproblems.com/4}. No novelty is claimed. The contribution here is a machine-checked formalization of the last implication: the stronger prime-index bound implies the arbitrary-constant statement.
+
+\section{ATTACK PLAN}
+Take the stronger bound
+\[
+ \exists c>0:\quad p_{n+1}-p_n \ge c\,\frac{\log n\,\log_2 n\,\log_4 n}{\log_3 n}\ \text{for infinitely many } n
+\]
+as an explicit hypothesis (\texttt{StrongerPrimeIndexBound}). The stronger scale equals $\log_3 n$ times the Rankin scale. Since $\log_3 n\to\infty$, a single constant $c$ can be amplified to beat any $C$. Separately, prove the elementary interval lemmas used in the covering-to-gap step of the CRT construction.
+
+\section{WORK}
+Full Lean 4 source (\texttt{Erdos4Partial.lean}), unedited:
+\begin{verbatim}
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Nat.Nth
+import Mathlib.Data.Nat.Prime.Basic
+import Mathlib.Order.Interval.Finset.Basic
+import Mathlib.Tactic
+
+/-!
+# Erdős problem 4: statement and conditional reduction
+
+STATUS: PARTIAL. This is not an unconditional proof of Erdős problem 4.
+
+Validation: compiled with Lean v4.35.0-rc3 and Mathlib revision
+5e0c4e5239cb0a2d86d68a884bf52cfd963fce22.
+Run in that Mathlib checkout: lake env lean Erdos4Partial.lean
+The printed axiom dependencies are only Lean standard foundations:
+propext, Classical.choice, Quot.sound; there are no custom axioms.
+
+Source: the supplied ProblemNumber4(1).pdf, especially equation (6).
+References:
+* https://www.erdosproblems.com/4
+* Ford, Green, Konyagin, Maynard, Tao, Long gaps between primes,
+  J. Amer. Math. Soc. 31 (2018), 65–105; https://arxiv.org/abs/1412.5029
+* https://github.com/mehmetmars7/Erdosproblems-llm-hunter/blob/main/CONTRIBUTING.md
+
+We prove the last implication in the PDF: its stronger prime-index bound
+implies the arbitrary-constant bound in the question. The stronger bound is
+an EXPLICIT HYPOTHESIS, not an axiom or an established Lean theorem here.
+The covering theorem, CRT construction, and asymptotic passage to equation
+(6) are not formalized here. Two elementary interval lemmas are also proved.
+
+Conventions: Nat.nth Nat.Prime is zero-indexed (p 0 = 2), as in the
+formal-conjectures statement. The gap uses natural subtraction followed by
+coercion to the reals. Real.log is total; eventual positivity is proved,
+so the finitely many small indices cause no problem.
+-/
+
+noncomputable section
+open Filter
+
+namespace Erdos4Partial
+
+def iterLog : ℕ → ℝ → ℝ
+  | 0, x => x
+  | k + 1, x => Real.log (iterLog k x)
+
+def prime (n : ℕ) : ℕ := Nat.nth Nat.Prime n
+
+def gap (n : ℕ) : ℝ := ((prime (n + 1) - prime n : ℕ) : ℝ)
+
+def rankinScale (n : ℕ) : ℝ :=
+  iterLog 1 n * iterLog 2 n * iterLog 4 n / (iterLog 3 n) ^ 2
+
+def strongerScale (n : ℕ) : ℝ :=
+  iterLog 1 n * iterLog 2 n * iterLog 4 n / iterLog 3 n
+
+/-- Full target statement; defining a proposition does not prove it. -/
+def Erdos4 : Prop :=
+  ∀ C : ℝ, 0 < C → {n : ℕ | C * rankinScale n < gap n}.Infinite
+
+/-- The substantive external dependency: equation (6) of the PDF. -/
+def StrongerPrimeIndexBound : Prop :=
+  ∃ c : ℝ, 0 < c ∧ {n : ℕ | c * strongerScale n ≤ gap n}.Infinite
+
+/-- Every fixed iterated logarithm tends to infinity. -/
+theorem iterLog_tendsto (k : ℕ) :
+    Tendsto (fun n : ℕ => iterLog k (n : ℝ)) atTop atTop := by
+  induction k with
+  | zero => simpa [iterLog] using
+      (tendsto_natCast_atTop_atTop : Tendsto (fun n : ℕ => (n : ℝ)) atTop atTop)
+  | succ k ih => exact Real.tendsto_log_atTop.comp ih
+
+theorem rankinScale_eventually_pos :
+    ∀ᶠ n : ℕ in atTop, 0 < rankinScale n := by
+  have h1 := (iterLog_tendsto 1).eventually (eventually_gt_atTop (0 : ℝ))
+  have h2 := (iterLog_tendsto 2).eventually (eventually_gt_atTop (0 : ℝ))
+  have h3 := (iterLog_tendsto 3).eventually (eventually_gt_atTop (0 : ℝ))
+  have h4 := (iterLog_tendsto 4).eventually (eventually_gt_atTop (0 : ℝ))
+  filter_upwards [h1, h2, h3, h4] with n h1 h2 h3 h4
+  exact div_pos (mul_pos (mul_pos h1 h2) h4) (sq_pos_of_pos h3)
+
+/-- Exact algebra behind the extra log-log-log factor. -/
+theorem strongerScale_eq (n : ℕ) (h : iterLog 3 (n : ℝ) ≠ 0) :
+    strongerScale n = iterLog 3 n * rankinScale n := by
+  unfold strongerScale rankinScale
+  field_simp [h]
+
+/-- Generic amplification: an unbounded factor turns one constant into any constant. -/
+theorem amplify {g s L : ℕ → ℝ} {c : ℝ}
+    (hc : 0 < c)
+    (hs : ∀ᶠ n in atTop, 0 < s n)
+    (hL : Tendsto L atTop atTop)
+    (hbig : {n : ℕ | c * (L n * s n) ≤ g n}.Infinite) :
+    ∀ C : ℝ, 0 < C → {n : ℕ | C * s n < g n}.Infinite := by
+  intro C _hC
+  have hthreshold : ∀ᶠ n in atTop, C / c < L n :=
+    hL.eventually (eventually_gt_atTop (C / c))
+  obtain ⟨N, hN⟩ := eventually_atTop.1 (hs.and hthreshold)
+  apply Set.infinite_iff_exists_gt.2
+  intro M
+  obtain ⟨n, hn, hlarge⟩ := hbig.exists_gt (max M N)
+  have hMn : M < n := lt_of_le_of_lt (le_max_left M N) hlarge
+  have hNn : N ≤ n := le_of_lt (lt_of_le_of_lt (le_max_right M N) hlarge)
+  obtain ⟨hsn, hLn⟩ := hN n hNn
+  have hCL : C < c * L n := by
+    have := (div_lt_iff₀ hc).1 hLn
+    nlinarith
+  refine ⟨n, ?_, hMn⟩
+  change C * s n < g n
+  calc
+    C * s n < (c * L n) * s n := mul_lt_mul_of_pos_right hCL hsn
+    _ = c * (L n * s n) := mul_assoc _ _ _
+    _ ≤ g n := hn
+
+/-- CONDITIONAL result. The stronger prime-index theorem remains a hypothesis. -/
+theorem erdos4_of_stronger_bound (hstrong : StrongerPrimeIndexBound) : Erdos4 := by
+  obtain ⟨c, hc, hbig⟩ := hstrong
+  have hidentity (n : ℕ) : strongerScale n = iterLog 3 n * rankinScale n := by
+    by_cases hn : iterLog 3 (n : ℝ) = 0
+    · simp [strongerScale, rankinScale, hn]
+    · exact strongerScale_eq n hn
+  have hbig' : {n : ℕ | c * (iterLog 3 n * rankinScale n) ≤ gap n}.Infinite := by
+    simpa only [hidentity] using hbig
+  exact amplify hc rankinScale_eventually_pos (iterLog_tendsto 3) hbig'
+
+/-- The normalization agrees with the displayed formula, including multiplication order. -/
+theorem rankin_formula (C : ℝ) (n : ℕ) :
+    C * rankinScale n =
+      C * Real.log (Real.log (n : ℝ)) *
+        Real.log (Real.log (Real.log (Real.log (n : ℝ)))) /
+        (Real.log (Real.log (Real.log (n : ℝ)))) ^ 2 * Real.log (n : ℝ) := by
+  simp only [rankinScale, iterLog]
+  ring
+
+/-- The conditional theorem in the notation used by formal-conjectures. -/
+theorem standard_statement_of_stronger_bound (hstrong : StrongerPrimeIndexBound) :
+    ∀ C : ℝ, 0 < C →
+      {n : ℕ | (↑(Nat.nth Nat.Prime (n + 1) - Nat.nth Nat.Prime n) : ℝ) >
+        C * Real.log (Real.log (n : ℝ)) *
+          Real.log (Real.log (Real.log (Real.log (n : ℝ)))) /
+          (Real.log (Real.log (Real.log (n : ℝ)))) ^ 2 * Real.log (n : ℝ)}.Infinite := by
+  intro C hC
+  have h := erdos4_of_stronger_bound hstrong C hC
+  simpa only [rankin_formula, gap, prime] using h
+
+/-- A proper divisor at least two rules out primality, including q = a+t. -/
+theorem translated_not_prime {a t q : ℕ}
+    (hq : 2 ≤ q) (hqa : q ≤ a) (ht : 0 < t) (hdiv : q ∣ a + t) :
+    ¬ Nat.Prime (a + t) := by
+  intro hp
+  exact (Nat.prime_def_lt'.1 hp).2 q hq (by omega) hdiv
+
+/-- Once translated divisibility is established, a covered interval is prime-free. -/
+theorem covered_interval_prime_free {a y : ℕ}
+    (hcover : ∀ t : ℕ, 1 ≤ t → t ≤ y →
+      ∃ q : ℕ, 2 ≤ q ∧ q ≤ a ∧ q ∣ a + t) :
+    ∀ t : ℕ, 1 ≤ t → t ≤ y → ¬ Nat.Prime (a + t) := by
+  intro t ht hty
+  obtain ⟨q, hq, hqa, hdiv⟩ := hcover t ht hty
+  exact translated_not_prime hq hqa (by omega) hdiv
+
+/-- A prime to the right of a prime-free interval gives the required gap. -/
+theorem gap_of_prime_free_interval {a y p p' : ℕ}
+    (hp : p ≤ a) (hp' : a < p') (hprime : Nat.Prime p')
+    (hfree : ∀ t : ℕ, 1 ≤ t → t ≤ y → ¬ Nat.Prime (a + t)) :
+    y < p' - p := by
+  have hout : a + y < p' := by
+    by_contra h
+    have ht : 1 ≤ p' - a := by omega
+    have hty : p' - a ≤ y := by omega
+    have heq : a + (p' - a) = p' := by omega
+    exact (hfree (p' - a) ht hty) (heq.symm ▸ hprime)
+  omega
+
+#print axioms erdos4_of_stronger_bound
+#print axioms covered_interval_prime_free
+#print axioms gap_of_prime_free_interval
+
+end Erdos4Partial
+\end{verbatim}
+
+Main results:
+\begin{itemize}
+\item \texttt{iterLog\_tendsto}: every fixed iterated logarithm tends to infinity.
+\item \texttt{amplify}: if $c\,L(n)s(n)\le g(n)$ infinitely often, $s>0$ eventually and $L\to\infty$, then $C\,s(n)<g(n)$ infinitely often for every $C>0$.
+\item \texttt{erdos4\_of\_stronger\_bound}: \texttt{StrongerPrimeIndexBound} $\Rightarrow$ \texttt{Erdos4}.
+\item \texttt{standard\_statement\_of\_stronger\_bound}: the same conclusion in the displayed formula, with \texttt{rankin\_formula} checking the normalization.
+\item \texttt{translated\_not\_prime}, \texttt{covered\_interval\_prime\_free}, \texttt{gap\_of\_prime\_free\_interval}: a covered interval $(a,a+y]$ has no primes, which gives a gap $>y$.
+\end{itemize}
+
+\section{VERIFICATION}
+Compiled with Lean v4.35.0-rc3 and Mathlib revision \texttt{5e0c4e5239cb0a2d86d68a884bf52cfd963fce22} via \texttt{lake env lean Erdos4Partial.lean}. \texttt{\#print axioms} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. There is no \texttt{sorry} and there are no custom axioms. \texttt{StrongerPrimeIndexBound} appears only as a hypothesis of the theorem, never as an axiom.
+
+\section{FINAL STATUS}
+\textbf{PARTIAL.} Proved in Lean: the implication from the stronger prime-index bound to the problem's statement, plus the elementary prime-free-interval lemmas. Not formalized: the Ford--Green--Konyagin--Maynard--Tao covering theorem, the CRT construction, and the asymptotic passage from the covering bound to the stronger prime-index bound (equation (6) of the source notes). The first remaining gap is to prove \texttt{StrongerPrimeIndexBound} in Lean. Subject to expert review.
