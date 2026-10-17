@@ -1,0 +1,162 @@
+\section{FORMAL RESTATEMENT}
+\textbf{Erd\H{o}s \#67 (the Erd\H{o}s discrepancy problem); partial Lean 4 formalization.}
+For $f:\mathbb{N}\to\{-1,+1\}$ and every real $C>0$, there exist $d,m\ge1$ with
+\[
+ \Bigl|\sum_{k=1}^{m} f(kd)\Bigr| > C .
+\]
+This is \texttt{Erdos67.erdos\_67} in formal-conjectures, with $f$ valued in the finset $\{-1,1\}\subset\mathbb{R}$. The complex variant \texttt{Erdos67.erdos\_67.variants.complex} takes $f:\mathbb{N}\to S^1\subset\mathbb{C}$ and the complex norm.
+
+\section{QUICK LITERATURE/CONTEXT CHECK}
+Both statements were proved by T.~Tao, \emph{The Erd\H{o}s discrepancy problem}, Discrete Analysis 2016:1, \url{https://arxiv.org/abs/1509.05363}. See \url{https://www.erdosproblems.com/67} and the formal statement \url{https://github.com/google-deepmind/formal-conjectures/blob/main/FormalConjectures/ErdosProblems/67.lean}. (The reference list of that file links to \texttt{erdosproblems.com/66}; the intended page is \texttt{/67}.) Tao's proof relies on logarithmically averaged correlation estimates for multiplicative functions. It is not formalized here, and no novelty is claimed.
+
+The unconditional part below is the classical fact that every $\pm1$ sequence has discrepancy at least $2$: a sequence with all homogeneous partial sums in $\{-1,0,1\}$ has length at most $11$.
+
+\section{ATTACK PLAN}
+\begin{enumerate}
+\item Prove the real statement for every $C<2$ by showing that $|\sum_{k\le m}f(kd)|\le C<2$ for all $d,m$ is contradictory. Only the values $f(1),\dots,f(12)$ are needed.
+\item Prove that the complex variant implies the real statement, since $\pm1\in S^1$ and the complex norm of a real number is its absolute value.
+\end{enumerate}
+
+\section{WORK}
+Write $x_n=f(n)$. If two signs satisfy $|a+b|<2$ then $b=-a$. Assume every homogeneous partial sum has absolute value at most $C<2$.
+\begin{itemize}
+\item $d=1$, $m=2,4,6,10$: successively $x_2=-x_1$, $x_4=-x_3$, $x_6=-x_5$, $x_8=-x_7$, $x_{10}=-x_9$ (each even partial sum reduces to its last two terms).
+\item $d=2$, $m=2,4,6$: $x_4=-x_2$, $x_8=-x_6$, $x_{12}=-x_{10}$.
+\item $d=3$, $m=2,4$: $x_6=-x_3$, $x_{12}=-x_9$.
+\item $d=5$, $m=2$: $x_{10}=-x_5$.
+\end{itemize}
+Then $x_{12}=-x_{10}=x_5=-x_6=x_3$, while $x_{12}=-x_9=x_{10}=-x_5=x_6=-x_3$. So $x_3=-x_3$, impossible for $x_3=\pm1$.
+
+Full Lean 4 source (\texttt{Erdos67Attempt.lean}):
+\begin{verbatim}
+import Mathlib.Analysis.Complex.Norm
+import Mathlib.Data.Complex.BigOperators
+import Mathlib.Order.Interval.Finset.Nat
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+
+/-!
+# Erdős problem 67 (the Erdős discrepancy problem): partial formalization
+
+STATUS: PARTIAL. Tao's theorem [Ta16] is NOT formalized here. We prove, with no `sorry`
+and no custom axioms:
+
+* `erdos_67_of_lt_two`: the formal-conjectures statement `Erdos67.erdos_67` holds
+  unconditionally for every `0 < C < 2`, i.e. every `±1` sequence has discrepancy at least `2`.
+  Only the values `f 1, …, f 12` and the differences `d = 1, 2, 3, 5` are used.
+* `erdos_67_of_complex`: the complex variant `Erdos67.erdos_67.variants.complex` implies
+  the real statement `Erdos67.erdos_67`, since `{-1, 1} ⊆ S¹`.
+-/
+
+namespace Erdos67Attempt
+
+/-- The two admissible values. -/
+theorem val_cases {x : ℝ} (hx : x ∈ ({-1, 1} : Finset ℝ)) : x = -1 ∨ x = 1 := by
+  simpa using hx
+
+/-- Two signs whose sum has absolute value below `2` are opposite. -/
+theorem neg_of_abs_add_lt_two {a b : ℝ} (ha : a = -1 ∨ a = 1) (hb : b = -1 ∨ b = 1)
+    (h : |a + b| < 2) : b = -a := by
+  rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
+  · rw [show (-1 : ℝ) + -1 = -2 by norm_num, abs_neg, abs_two] at h
+    exact absurd h (lt_irrefl _)
+  · norm_num
+  · norm_num
+  · rw [show (1 : ℝ) + 1 = 2 by norm_num, abs_two] at h
+    exact absurd h (lt_irrefl _)
+
+/-- **Discrepancy at least 2.** For every `C < 2` the formal-conjectures statement holds. -/
+theorem erdos_67_of_lt_two (f : ℕ → ({-1, 1} : Finset ℝ)) (C : ℝ) (hC : C < 2) :
+    ∃ᵉ (d ≥ 1) (m ≥ 1), C < |∑ k ∈ Finset.Icc 1 m, (f (k * d)).1| := by
+  by_contra hno
+  push Not at hno
+  set x : ℕ → ℝ := fun n => (f n).1 with hx
+  have hv : ∀ n, x n = -1 ∨ x n = 1 := fun n => val_cases (f n).2
+  have key : ∀ d m, 1 ≤ d → 1 ≤ m → |∑ k ∈ Finset.Icc 1 m, x (k * d)| < 2 :=
+    fun d m hd hm => lt_of_le_of_lt (hno d hd m hm) hC
+  -- the partial sums we need, written out
+  have s12 : |x 1 + x 2| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 1 2 le_rfl (by norm_num)
+  have s14 : |x 1 + x 2 + x 3 + x 4| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 1 4 le_rfl (by norm_num)
+  have s16 : |x 1 + x 2 + x 3 + x 4 + x 5 + x 6| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 1 6 le_rfl (by norm_num)
+  have s110 : |x 1 + x 2 + x 3 + x 4 + x 5 + x 6 + x 7 + x 8 + x 9 + x 10| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 1 10 le_rfl (by norm_num)
+  have s18 : |x 1 + x 2 + x 3 + x 4 + x 5 + x 6 + x 7 + x 8| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 1 8 le_rfl (by norm_num)
+  have s22 : |x 2 + x 4| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 2 2 (by norm_num) (by norm_num)
+  have s26 : |x 2 + x 4 + x 6 + x 8 + x 10 + x 12| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 2 6 (by norm_num) (by norm_num)
+  have s24 : |x 2 + x 4 + x 6 + x 8| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 2 4 (by norm_num) (by norm_num)
+  have s32 : |x 3 + x 6| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 3 2 (by norm_num) (by norm_num)
+  have s34 : |x 3 + x 6 + x 9 + x 12| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 3 4 (by norm_num) (by norm_num)
+  have s52 : |x 5 + x 10| < 2 := by
+    simpa [Finset.sum_Icc_succ_top] using key 5 2 (by norm_num) (by norm_num)
+  -- propagate the forced signs
+  have e2 : x 2 = -x 1 := neg_of_abs_add_lt_two (hv 1) (hv 2) s12
+  have e4 : x 4 = -x 3 := neg_of_abs_add_lt_two (hv 3) (hv 4)
+    (by have h : x 3 + x 4 = x 1 + x 2 + x 3 + x 4 := by rw [e2]; ring
+        rw [h]; exact s14)
+  have e6 : x 6 = -x 5 := neg_of_abs_add_lt_two (hv 5) (hv 6)
+    (by have h : x 5 + x 6 = x 1 + x 2 + x 3 + x 4 + x 5 + x 6 := by rw [e2, e4]; ring
+        rw [h]; exact s16)
+  have e8 : x 8 = -x 7 := neg_of_abs_add_lt_two (hv 7) (hv 8)
+    (by have h : x 7 + x 8 = x 1 + x 2 + x 3 + x 4 + x 5 + x 6 + x 7 + x 8 := by
+          rw [e2, e4, e6]; ring
+        rw [h]; exact s18)
+  have e10 : x 10 = -x 9 := neg_of_abs_add_lt_two (hv 9) (hv 10)
+    (by have h : x 9 + x 10 =
+            x 1 + x 2 + x 3 + x 4 + x 5 + x 6 + x 7 + x 8 + x 9 + x 10 := by
+          rw [e2, e4, e6, e8]; ring
+        rw [h]; exact s110)
+  have f4 : x 4 = -x 2 := neg_of_abs_add_lt_two (hv 2) (hv 4) s22
+  have f8 : x 8 = -x 6 := neg_of_abs_add_lt_two (hv 6) (hv 8)
+    (by have h : x 6 + x 8 = x 2 + x 4 + x 6 + x 8 := by rw [f4]; ring
+        rw [h]; exact s24)
+  have f12 : x 12 = -x 10 := neg_of_abs_add_lt_two (hv 10) (hv 12)
+    (by have h : x 10 + x 12 = x 2 + x 4 + x 6 + x 8 + x 10 + x 12 := by
+          rw [f4, f8]; ring
+        rw [h]; exact s26)
+  have g6 : x 6 = -x 3 := neg_of_abs_add_lt_two (hv 3) (hv 6) s32
+  have g12 : x 12 = -x 9 := neg_of_abs_add_lt_two (hv 9) (hv 12)
+    (by have h : x 9 + x 12 = x 3 + x 6 + x 9 + x 12 := by rw [g6]; ring
+        rw [h]; exact s34)
+  have h10 : x 10 = -x 5 := neg_of_abs_add_lt_two (hv 5) (hv 10) s52
+  -- x 12 = -x 10 = x 5 = -x 6 = x 3 and x 12 = -x 9 = x 10 = -x 5 = x 6 = -x 3
+  have hA : x 12 = x 3 := by linarith
+  have hB : x 12 = -x 3 := by linarith
+  rcases hv 3 with h3 | h3 <;> linarith
+
+/-- The complex variant implies the real statement. -/
+theorem erdos_67_of_complex
+    (hcx : ∀ (g : ℕ → Metric.sphere (0 : ℂ) 1) (C : ℝ), 0 < C →
+      ∃ᵉ (d ≥ 1) (m ≥ 1), C < ‖∑ k ∈ Finset.Icc 1 m, (g (k * d)).1‖)
+    (f : ℕ → ({-1, 1} : Finset ℝ)) (C : ℝ) (hC : 0 < C) :
+    ∃ᵉ (d ≥ 1) (m ≥ 1), C < |∑ k ∈ Finset.Icc 1 m, (f (k * d)).1| := by
+  let g : ℕ → Metric.sphere (0 : ℂ) 1 := fun n =>
+    ⟨((f n).1 : ℂ), by
+      rw [mem_sphere_zero_iff_norm, Complex.norm_real, Real.norm_eq_abs]
+      rcases val_cases (f n).2 with h | h <;> rw [h] <;> norm_num⟩
+  obtain ⟨d, hd, m, hm, hlt⟩ := hcx g C hC
+  refine ⟨d, hd, m, hm, ?_⟩
+  have : (∑ k ∈ Finset.Icc 1 m, (g (k * d)).1) =
+      ((∑ k ∈ Finset.Icc 1 m, (f (k * d)).1 : ℝ) : ℂ) := by
+    rw [Complex.ofReal_sum]
+  rw [this, Complex.norm_real, Real.norm_eq_abs] at hlt
+  exact hlt
+
+#print axioms erdos_67_of_lt_two
+#print axioms erdos_67_of_complex
+
+end Erdos67Attempt
+\end{verbatim}
+
+\section{VERIFICATION}
+Checked with \texttt{lake env lean Erdos67Attempt.lean} using Lean v4.33.1 and Mathlib revision \texttt{0df444a360eaa60ab8c11dca51a86af692955474} (the revision pinned by formal-conjectures). No errors, no warnings, no \texttt{sorry}. \texttt{\#print axioms} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} for both theorems. The conclusions use exactly the expressions of the formal-conjectures statements. \texttt{erdos\_67\_of\_lt\_two} does not even need $C>0$.
+
+\section{FINAL STATUS}
+\textbf{PARTIAL.} Proved in Lean: \texttt{erdos\_67} for all $C<2$, unconditionally; and \texttt{erdos\_67.variants.complex} $\Rightarrow$ \texttt{erdos\_67}. Not formalized: Tao's theorem for $C\ge2$. The first remaining gap is $C=2$, where the known elementary route is a large computer search. The general case needs Tao's analytic argument. Subject to expert review.
