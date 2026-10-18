@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Erdos Problems - Problem Hunting with LLMs (beta)</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2c980d2a5d027c3d">
     <script>
         window.MathJax = {
             loader: { load: ['ui/safe'] },
@@ -81,6 +81,20 @@
             </label>
         </section>
 
+        <p id="results-count" class="status-note" role="status" aria-live="polite">Loading catalogue…</p>
+        <nav id="pagination-top" class="pagination" aria-label="Problem pages above the table">
+            <label for="page-size-top">Problems per page:
+                <select id="page-size-top" data-page-size aria-controls="erdos-table">
+                    <option value="100">100</option><option value="200">200</option>
+                    <option value="400">400</option><option value="500">500</option>
+                    <option value="1000">1,000</option>
+                </select>
+            </label>
+            <button type="button" data-page-previous aria-controls="erdos-table" disabled>Previous</button>
+            <span data-page-status role="status" aria-live="polite"></span>
+            <button type="button" data-page-next aria-controls="erdos-table" disabled>Next</button>
+        </nav>
+
         <section class="problems-list">
             <table id="erdos-table">
                 <thead>
@@ -99,6 +113,19 @@
                 </tbody>
             </table>
         </section>
+        <nav id="pagination-bottom" class="pagination" aria-label="Problem pages below the table">
+            <label for="page-size-bottom">Problems per page:
+                <select id="page-size-bottom" data-page-size aria-controls="erdos-table">
+                    <option value="100">100</option><option value="200">200</option>
+                    <option value="400">400</option><option value="500">500</option>
+                    <option value="1000">1,000</option>
+                </select>
+            </label>
+            <button type="button" data-page-previous aria-controls="erdos-table" disabled>Previous</button>
+            <span data-page-status></span>
+            <button type="button" data-page-next aria-controls="erdos-table" disabled>Next</button>
+        </nav>
+
 
         <section class="contribute-cta">
             <h3>Contribute</h3>
@@ -118,8 +145,8 @@
         </p>
     </footer>
 
-    <script src="data/erdos_data.js?v=eae4900f9b19aa43"></script>
-    <script src="app.js?v=32761ee274ca3ff3"></script>
+    <script src="data/erdos_catalogue.js?v=984c7351dd4db433"></script>
+    <script src="app.js?v=12e97ab45e51ffbc"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tbody = document.getElementById('erdos-tbody');
@@ -128,14 +155,19 @@
             const claimHeader = document.getElementById('claim-header');
             const reviewHeader = document.getElementById('review-header');
             const completionHeader = document.getElementById('completion-header');
-            let sortByStatus = 0; // 0 = by number, 1 = status A-Z, -1 = status Z-A
-            let sortByReview = 0; // 0 = by number, 1 = review A-Z, -1 = review Z-A
-            let sortByCompletion = 0; // 0 = by number, 1 = completion asc, -1 = completion desc
+            const params = window.ProblemHunting.getUrlParams();
+            const order = params.get('dir') === 'desc' ? -1 : 1;
+            let sortByStatus = params.get('sort') === 'claim' ? order : 0;
+            let sortByReview = params.get('sort') === 'review' ? order : 0;
+            let sortByCompletion = params.get('sort') === 'completion' ? order : 0;
+            searchInput.value = params.get('q') || '';
+            filterCheckbox.checked = params.get('attempts') === '1';
+            const pagination = window.ProblemHunting.createPagination(() => renderTable());
 
             
             const getOverallStatus = window.ProblemHunting.getOverallClaim;
 
-            function renderTable() {
+            function renderTable(syncUrl = true) {
                 if (typeof erdosProblems === 'undefined') {
                     tbody.innerHTML = '<tr><td colspan="7">Error loading data</td></tr>';
                     return;
@@ -177,12 +209,20 @@
                     problems = problems.filter(p => p.number.includes(searchTerm));
                 }
 
+                document.getElementById('results-count').textContent = `${problems.length} of ${Object.keys(erdosProblems).length} entries`;
+                const visible = pagination.select(problems);
+                if (syncUrl) window.ProblemHunting.updateUrl({
+                    q: searchTerm, attempts: filterAttacks ? '1' : null,
+                    sort: sortByCompletion ? 'completion' : sortByReview ? 'review' : sortByStatus ? 'claim' : null,
+                    dir: (sortByCompletion || sortByReview || sortByStatus) === -1 ? 'desc' : null,
+                    ...pagination.urlParams()
+                });
                 if (problems.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7">No problems found</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = problems.map(p => {
+                tbody.innerHTML = visible.map(p => {
                     const uniqueModels = window.ProblemHunting.getModelLabels(p.attacks);
                     const models = uniqueModels.join(', ') ||
                         (p.attacks.some(a => a.entry_kind === 'statement_only') ? 'awaiting attempt' : '-');
@@ -225,9 +265,10 @@
             }
 
             // Use debounce from app.js for search input
-            const debouncedRender = window.ProblemHunting.debounce(renderTable, 200);
+            function resetPage() { pagination.reset(); renderTable(); }
+            const debouncedRender = window.ProblemHunting.debounce(resetPage, 200);
 
-            filterCheckbox.addEventListener('change', renderTable);
+            filterCheckbox.addEventListener('change', resetPage);
             searchInput.addEventListener('input', debouncedRender);
             claimHeader.addEventListener('click', () => {
                 // Cycle: default (0) -> A-Z (1) -> Z-A (-1) -> default (0)
@@ -240,7 +281,7 @@
                 }
                 sortByCompletion = 0;
                 sortByReview = 0;
-                renderTable();
+                resetPage();
             });
             reviewHeader.addEventListener('click', () => {
                 // Cycle: default (0) -> A-Z (1) -> Z-A (-1) -> default (0)
@@ -253,7 +294,7 @@
                 }
                 sortByStatus = 0;
                 sortByCompletion = 0;
-                renderTable();
+                resetPage();
             });
             completionHeader.addEventListener('click', () => {
                 // Cycle: default (0) -> asc (1) -> desc (-1) -> default (0)
@@ -266,9 +307,9 @@
                 }
                 sortByStatus = 0;
                 sortByReview = 0;
-                renderTable();
+                resetPage();
             });
-            renderTable();
+            renderTable(false);
         });
     </script>
 </body>

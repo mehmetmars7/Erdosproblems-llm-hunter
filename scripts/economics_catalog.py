@@ -378,8 +378,10 @@ def generate_economics_data(base_dir=BASE_DIR, data_dir=None):
     # Support both the root build and this module's standalone command.
     if __package__:
         from .we_solve_links import attach_we_solve_links
+        from .catalogue_data import write_catalogue_data
     else:
         from we_solve_links import attach_we_solve_links
+        from catalogue_data import write_catalogue_data
     attach_we_solve_links(data, 'economics', base_dir)
     classification = json.loads((base_dir / JEL_CODES_PATH).read_text(encoding='utf-8'))
     if classification.get('schema_version') != 1 or not isinstance(classification.get('labels'), dict):
@@ -394,6 +396,7 @@ def generate_economics_data(base_dir=BASE_DIR, data_dir=None):
                             indent=2).replace('</', '<\\/')
     serialized = json.dumps(data, ensure_ascii=False, indent=2).replace('</', '<\\/')
     data_dir.mkdir(parents=True, exist_ok=True)
+    write_catalogue_data(data_dir / 'economics_catalogue.js', data, 'window.ECONOMICS_DATA')
     (data_dir / 'economics_data.js').write_text(
         '// Generated from fixed Economics identities and mutable rankings.\n'
         'window.ECONOMICS_JEL_LABELS = ' + jel_labels + ';\n'

@@ -77,6 +77,122 @@ function readDataExport(file, declaration) {
     return JSON.parse(source.slice(start + declaration.length).split(/;\r?\n/, 1)[0]);
 }
 
+async function collectPages(expression) {
+    return evaluate(`(() => {
+        const size = document.querySelector('#page-size-top');
+        size.value = '1000';
+        size.dispatchEvent(new Event('change'));
+        const rows = [];
+        for (let page = 0; page < 100; page++) {
+            rows.push(...(${expression}));
+            const next = document.querySelector('#pagination-top [data-page-next]');
+            if (next.disabled) return rows;
+            next.click();
+        }
+        throw new Error('Pagination did not reach its last page');
+    })()`);
+}
+
+async function checkPagination(category, tbody) {
+    const result = await evaluate(`(() => {
+        const body = document.getElementById(${JSON.stringify(tbody)});
+        const size = document.querySelector('#page-size-top');
+        const bottomSize = document.querySelector('#page-size-bottom');
+        const next = document.querySelector('#pagination-top [data-page-next]');
+        const previous = document.querySelector('#pagination-top [data-page-previous]');
+        const links = () => [...body.querySelectorAll('tr')].flatMap(row => {
+            const link = row.querySelector('td:first-child a') || row.querySelector('.catalogue-problem a');
+            return link ? [link.getAttribute('href')] : [];
+        });
+        const initial = { count: links().length, size: size.value, previous: previous.disabled,
+            choices: [...size.options].map(option => Number(option.value)),
+            dataFiles: performance.getEntriesByType('resource').map(entry => new URL(entry.name).pathname)
+                .filter(path => path.includes('/data/') && path.endsWith('.js')) };
+        const first = links(); next.click(); const second = links(); previous.click();
+        const returned = links();
+        const sizes = [];
+        for (const value of [200, 400, 500, 1000]) {
+            size.value = String(value); size.dispatchEvent(new Event('change'));
+            sizes.push({ value, count: links().length, bottom: bottomSize.value,
+                page: new URL(location.href).searchParams.get('page') });
+        }
+        size.value = '200'; size.dispatchEvent(new Event('change')); next.click();
+        let all, compare, href;
+        if (${JSON.stringify(category)} === 'erdos') {
+            document.getElementById('completion-header').click();
+            document.getElementById('completion-header').click();
+            all = Object.values(erdosProblems);
+            compare = (a, b) => (b.completion ?? -1) - (a.completion ?? -1);
+            href = record => 'problem.html?type=erdos&id=' + record.number;
+        } else if (${JSON.stringify(category)} === 'economics') {
+            document.querySelector('[data-sort="rank"]').click();
+            all = Object.values(window.ECONOMICS_DATA);
+            compare = (a, b) => window.EconomicsCatalogue.compare(a, b, 'rank', 'desc');
+            href = record => 'problem.html?type=economics&id=' + record.id;
+        } else {
+            document.querySelector('[data-sort="rank"]').click();
+            all = Object.values(window.OPEN_PROBLEMS_DATA);
+            compare = (a, b) => window.ProblemHunting.compareOpenProblems(a, b, 'rank', 'desc');
+            href = window.ProblemHunting.getOpenProblemHref;
+        }
+        const expected = all.sort(compare).map(href);
+        const sortedFirst = links(), sortedPage = new URL(location.href).searchParams.get('page');
+        next.click();
+        return { initial, first, second, returned, sizes, total: all.length,
+            sortedFirst, sortedPage, sortedSecond: links(),
+            expectedFirst: expected.slice(0, 200), expectedSecond: expected.slice(200, 400),
+            search: ${JSON.stringify(category)} === 'open_problems' ? all[300].title : String(all[300].id || all[300].number),
+            searchHref: href(all[300]),
+            saved: location.href };
+    })()`);
+    assert.equal(result.initial.count, 100, category);
+    assert.equal(result.initial.size, '100', category);
+    assert.equal(result.initial.previous, true, category);
+    assert.deepEqual(result.initial.choices, [100, 200, 400, 500, 1000], category);
+    assert.ok(result.initial.dataFiles.some(path => path.endsWith(`/data/${category}_catalogue.js`)), category);
+    assert.ok(result.initial.dataFiles.every(path => !path.endsWith('_data.js')), `${category}: no full detail dataset downloaded`);
+    assert.equal(result.second.length, 100, category);
+    assert.ok(result.second.every(href => !result.first.includes(href)), category);
+    assert.deepEqual(result.returned, result.first, category);
+    for (const row of result.sizes) {
+        assert.equal(row.count, Math.min(row.value, result.total), category);
+        assert.equal(row.bottom, String(row.value), category);
+        assert.equal(row.page, null, category);
+    }
+    assert.equal(result.sortedPage, null, `${category}: sorting resets to page 1`);
+    assert.deepEqual(result.sortedFirst, result.expectedFirst, `${category}: sort full collection before page 1`);
+    assert.deepEqual(result.sortedSecond, result.expectedSecond, `${category}: page 2 continues global sort`);
+    await visit(result.saved, `document.querySelector('#${tbody} .claim-status a')`);
+    assert.equal(await evaluate("document.querySelector('#page-size-top').value"), '200');
+    assert.match(await evaluate("document.querySelector('#pagination-top [data-page-status]').textContent"), /^201–400 /);
+    await evaluate(`document.getElementById('search').value = ${JSON.stringify(result.search)};
+        document.getElementById('search').dispatchEvent(new Event('input'));`);
+    await evaluate(`new Promise(resolve => setTimeout(resolve, 300))`);
+    assert.equal(await evaluate("new URL(location.href).searchParams.get('page')"), null);
+    assert.ok(await evaluate(`[...document.querySelectorAll('#${tbody} td:first-child a')].some(link => link.getAttribute('href') === ${JSON.stringify(result.searchHref)})`),
+        `${category}: search reaches records beyond the current page`);
+    await evaluate(`document.getElementById('search').value = 'zzzz-no-matching-problem-zzzz';
+        document.getElementById('search').dispatchEvent(new Event('input'));`);
+    await evaluate(`new Promise(resolve => setTimeout(resolve, 300))`);
+    assert.equal(await evaluate(`document.querySelectorAll('#${tbody} .claim-status a').length`), 0);
+    assert.equal(await evaluate("document.querySelector('#pagination-top [data-page-previous]').disabled && document.querySelector('#pagination-top [data-page-next]').disabled"), true);
+    await visit(`${category}.html`, `document.querySelector('#${tbody} .claim-status a')`);
+    await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, mobile: true, deviceScaleFactor: 1 });
+    const mobile = await evaluate(`(() => {
+        const top = document.getElementById('pagination-top');
+        document.querySelector('#pagination-bottom [data-page-next]').click();
+        return { top: top.getBoundingClientRect().top, width: innerWidth,
+            controls: [...document.querySelectorAll('.pagination > *')].map(element => {
+                const rect = element.getBoundingClientRect();
+                return { left: rect.left, right: rect.right, width: rect.width };
+            }) };
+    })()`);
+    assert.ok(mobile.top >= 0 && mobile.top < 100, `${category}: bottom navigation returns to controls`);
+    assert.ok(mobile.controls.every(rect => rect.width > 0 && rect.left >= 0 && rect.right <= mobile.width + 1),
+        `${category}: pagination controls fit mobile viewport`);
+    await call('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, mobile: false, deviceScaleFactor: 1 });
+}
+
 async function checkResponsiveActions(type, id, record, viewport) {
     const label = `${type}:${id} at ${viewport.width}px`;
     await visit(`problem.html?type=${type}&id=${encodeURIComponent(id)}`,
@@ -244,15 +360,14 @@ try {
     assert.equal(erdosLink.hidden, false);
     assert.equal(erdosLink.beforeStatement, true);
     await visit('open_problems.html', "document.querySelector('#open-problems-tbody .catalogue-problem')");
-    const catalogue = await evaluate(`({
-        headings: [...document.querySelectorAll('th')].map(th => th.textContent),
-        links: [...document.querySelectorAll('#open-problems-tbody tr')].map(row => ({
+    await checkPagination('open_problems', 'open-problems-tbody');
+    const catalogue = { headings: await evaluate("[...document.querySelectorAll('th')].map(th => th.textContent)"),
+        links: await collectPages(`[...document.querySelectorAll('#open-problems-tbody tr')].map(row => ({
             href: row.querySelector('td:first-child a')?.getAttribute('href'),
             problem: row.querySelector('.catalogue-problem a').href,
             claim: row.querySelector('.claim-status a').href,
             external: [...row.querySelectorAll('td:last-child a')].map(a => [a.href, a.textContent, a.target, a.rel])
-        }))
-    })`);
+        }))`) };
     assert.ok(catalogue.headings.some(label => label.trim().startsWith('UnsolvedMath #')));
     for (const record of registry) {
         const row = catalogue.links.find(row => row.href === `problem.html?type=open_problems&id=${record.id}`);
@@ -274,7 +389,7 @@ try {
         })()`);
         assert.deepEqual(states.states, ['ascending', 'descending']);
         assert.equal(states.selected, key);
-        assert.equal(states.rows, catalogue.links.length);
+        assert.equal(states.rows, Math.min(1000, catalogue.links.length));
     }
     await call('Page.bringToFront');
     await evaluate(`document.querySelector('[data-sort="title"]').focus()`);
@@ -284,6 +399,7 @@ try {
     for (const [category, declaration] of [['economics', 'window.ECONOMICS_DATA = '], ['erdos', 'var erdosProblems = ']]) {
         const records = readDataExport(`data/${category}_data.js`, declaration);
         await visit(`${category}.html`, `document.querySelector('#${category}-tbody .claim-status a')`);
+        await checkPagination(category, `${category}-tbody`);
         if (category === 'erdos') {
             await evaluate(`(() => {
                 const filter = document.querySelector('input[type="checkbox"]');
@@ -291,7 +407,7 @@ try {
                 filter.dispatchEvent(new Event('change'));
             })()`);
         }
-        const rows = await evaluate(`Array.from(document.querySelectorAll('#${category}-tbody tr'), row => ({
+        const rows = await collectPages(`Array.from(document.querySelectorAll('#${category}-tbody tr'), row => ({
             local: row.querySelector('td:first-child a').getAttribute('href'),
             number: row.querySelector('td:first-child a').textContent,
             problem: row.querySelector('.catalogue-problem a')?.href,
@@ -309,7 +425,7 @@ try {
         }
     }
     assert.deepEqual(errors, []);
-    console.log(`Browser verified desktop/mobile contribution controls, detail routes, all Top/Economics/Erdos list destinations, external links, all nine sortable columns and keyboard activation.`);
+    console.log(`Browser verified pagination sizes, global sorting, navigation, saved pages, empty results, all list destinations, detail controls and keyboard activation.`);
 } finally {
     socket.close();
     await fetch(`${debug}/json/close/${target.id}`);

@@ -18,6 +18,7 @@ from pathlib import Path
 
 from scripts.economics_catalog import generate_economics_data
 from scripts.we_solve_links import attach_we_solve_links
+from scripts.catalogue_data import write_catalogue_data
 
 # Directories
 BASE_DIR = Path(__file__).parent
@@ -1360,6 +1361,10 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
     attach_we_solve_links(mo_problems, 'mo', BASE_DIR)
     attach_we_solve_links(open_problems, 'open_problems', BASE_DIR)
 
+    write_catalogue_data(DATA_DIR / 'erdos_catalogue.js', erdos_problems, 'var erdosProblems')
+    write_catalogue_data(DATA_DIR / 'open_problems_catalogue.js', open_problems, 'var openProblems',
+                         'window.OPEN_PROBLEMS_DATA = openProblems;')
+
     # Generate erdos_data.js
     with open(DATA_DIR / "erdos_data.js", 'w', encoding='utf-8') as f:
         # Sort by problem number
@@ -1402,7 +1407,8 @@ def generate_js_data(erdos_problems, mo_problems, open_problems=None, open_catal
     # accidentally pair with a pre-TeX copy of the index in the browser cache.
     assets = ['data/open_problems_data.js', 'data/erdos_data.js', 'data/mo_data.js',
               'app.js', 'data/economics_data.js',
-              'economics.js', 'economics-detail.js', 'economics.css']
+              'economics.js', 'economics-detail.js', 'economics.css', 'styles.css',
+              'data/erdos_catalogue.js', 'data/open_problems_catalogue.js', 'data/economics_catalogue.js']
     versions = {asset: hashlib.sha256((DATA_DIR.parent / asset).read_bytes()).hexdigest()[:16]
                 for asset in assets if (DATA_DIR.parent / asset).exists()}
     for page in DATA_DIR.parent.glob('*.html'):

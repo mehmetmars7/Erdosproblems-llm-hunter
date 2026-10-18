@@ -102,10 +102,11 @@
         search.value = params.get('q') || '';
         sort.value = validSorts.includes(params.get('sort')) ? params.get('sort') : 'rank';
         direction.value = params.get('dir') === 'desc' ? 'desc' : 'asc';
+        const pagination = window.ProblemHunting.createPagination(() => render());
         function render(sync = true) {
             const selected = filter(records, { search: search.value, family: family.value, jel: jel.value })
                 .sort((a, b) => compare(a, b, sort.value, direction.value));
-            body.innerHTML = rows(selected);
+            body.innerHTML = rows(pagination.select(selected));
             const attemptCount = selected.reduce((total, record) => total +
                 window.ProblemHunting.getMathematicalAttempts(record.attacks).length, 0);
             count.textContent = `${selected.length} of ${records.length} entries · ${attemptCount} research attempt${attemptCount === 1 ? '' : 's'}`;
@@ -120,19 +121,20 @@
                 // Some browsers restrict replaceState on file:// previews; filtering still works.
                 try { window.ProblemHunting.updateUrl({ q: search.value.trim(), family: family.value,
                     jel: jel.value, sort: sort.value === 'rank' ? null : sort.value,
-                    dir: direction.value === 'asc' ? null : direction.value }); } catch (_) {}
+                    dir: direction.value === 'asc' ? null : direction.value, ...pagination.urlParams() }); } catch (_) {}
             }
         }
-        search.addEventListener('input', window.ProblemHunting.debounce(() => render(), 200));
-        family.addEventListener('change', () => { codeOptions(jel.value); render(); });
-        [jel, sort, direction].forEach(control => control.addEventListener('change', () => render()));
+        function resetPage() { pagination.reset(); render(); }
+        search.addEventListener('input', window.ProblemHunting.debounce(resetPage, 200));
+        family.addEventListener('change', () => { codeOptions(jel.value); resetPage(); });
+        [jel, sort, direction].forEach(control => control.addEventListener('change', resetPage));
         headers.forEach(button => button.addEventListener('click', () => {
             direction.value = sort.value === button.dataset.sort && direction.value === 'asc' ? 'desc' : 'asc';
             sort.value = button.dataset.sort;
-            render();
+            resetPage();
         }));
         document.getElementById('reset-filters').addEventListener('click', () => {
-            search.value = ''; family.value = ''; codeOptions(''); sort.value = 'rank'; direction.value = 'asc'; render();
+            search.value = ''; family.value = ''; codeOptions(''); sort.value = 'rank'; direction.value = 'asc'; resetPage();
         });
         render(false);
     }

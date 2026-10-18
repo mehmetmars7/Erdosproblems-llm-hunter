@@ -399,7 +399,8 @@ for (const filename of ['index.html', 'open_problems.html', 'mo.html', 'erdos.ht
     assert.ok(mathContext.window.MathJax.loader.load.includes('ui/safe'), filename);
     assert.equal(mathContext.window.MathJax.options.safeOptions.allow.URLs, 'none', filename);
     if (filename !== 'erdos.html') {
-        assert.match(html, /src="data\/open_problems_data\.js(?:\?v=[0-9a-f]{16})?"/);
+        const dataName = filename === 'open_problems.html' ? 'catalogue' : 'data';
+        assert.match(html, new RegExp(`src="data/open_problems_${dataName}\\.js(?:\\?v=[0-9a-f]{16})?"`));
         assert.doesNotMatch(html, /src="data\/mo_data.js"/);
     }
 }

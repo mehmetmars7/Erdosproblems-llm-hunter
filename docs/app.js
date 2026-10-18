@@ -26,6 +26,57 @@ function updateUrl(params) {
     window.history.replaceState({}, '', url);
 }
 
+// Pagination is applied after filtering and sorting the complete catalogue.
+function createPagination(onChange) {
+    const hosts = ['pagination-top', 'pagination-bottom'].map(id => document.getElementById(id)).filter(Boolean);
+    const sizes = [100, 200, 400, 500, 1000];
+    const params = getUrlParams();
+    let size = sizes.includes(Number(params.get('size'))) ? Number(params.get('size')) : 100;
+    const requestedPage = Number(params.get('page'));
+    let page = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+    let pages = 1;
+    const controls = hosts.map(host => ({ host,
+        size: host.querySelector('[data-page-size]'),
+        previous: host.querySelector('[data-page-previous]'),
+        next: host.querySelector('[data-page-next]'),
+        status: host.querySelector('[data-page-status]')
+    }));
+    function change(control, action, focus) {
+        action();
+        onChange();
+        if (control.host === hosts[1]) {
+            const target = controls[0][focus];
+            (target.disabled ? controls[0].size : target).focus({ preventScroll: true });
+            hosts[0].scrollIntoView({ block: 'start' });
+        }
+    }
+    for (const control of controls) {
+        control.size.addEventListener('change', () => change(control, () => {
+            size = sizes.includes(Number(control.size.value)) ? Number(control.size.value) : 100;
+            page = 1;
+        }, 'size'));
+        control.previous.addEventListener('click', () => change(control, () => { page = Math.max(1, page - 1); }, 'previous'));
+        control.next.addEventListener('click', () => change(control, () => { page = Math.min(pages, page + 1); }, 'next'));
+    }
+    return {
+        reset() { page = 1; },
+        urlParams() { return hosts.length ? { page: page > 1 ? page : null, size: size !== 100 ? size : null } : {}; },
+        select(records) {
+            if (!hosts.length) return records;
+            pages = Math.max(1, Math.ceil(records.length / size));
+            page = Math.min(page, pages);
+            const start = (page - 1) * size;
+            for (const control of controls) {
+                control.size.value = String(size);
+                control.previous.disabled = page === 1;
+                control.next.disabled = page === pages;
+                control.status.textContent = `${records.length ? start + 1 : 0}–${Math.min(start + size, records.length)} of ${records.length} · Page ${page} of ${pages}`;
+            }
+            return records.slice(start, start + size);
+        }
+    };
+}
+
 /**
  * Escape HTML to prevent XSS
  */
@@ -543,6 +594,7 @@ function initOpenProblemsPage() {
     sort.value = validSorts.includes(params.get('sort')) ? params.get('sort') : subset ? 'score' : 'rank';
     let direction = ['asc', 'desc'].includes(params.get('dir')) ? params.get('dir') : defaultOpenSortDirection(sort.value);
     const sortButtons = Array.from(document.querySelectorAll('[data-sort]'));
+    const pagination = createPagination(() => renderTable());
 
     function renderTable(syncUrl = true) {
         const filtered = filterOpenProblems(records, {
@@ -556,24 +608,25 @@ function initOpenProblemsPage() {
             button.querySelector('.sort-indicator').textContent = active ? (direction === 'asc' ? '↑' : '↓') : '⇅';
         });
         if (typeof MathJax !== 'undefined' && MathJax.typesetClear) MathJax.typesetClear([tbody]);
-        tbody.innerHTML = renderOpenProblemRows(filtered);
+        tbody.innerHTML = renderOpenProblemRows(pagination.select(filtered));
         count.textContent = `${filtered.length} of ${records.length} entries · ${countWithAttacks(filtered)} with LLM attempts`;
         if (syncUrl) updateUrl({ q: search.value.trim(), domain: domains.value, tag: tags?.value || null,
             source: subset ? null : sources.value,
             attempts: attempts.checked ? '1' : null, sort: sort.value === (subset ? 'score' : 'rank') ? null : sort.value,
-            dir: direction === defaultOpenSortDirection(sort.value) ? null : direction });
+            dir: direction === defaultOpenSortDirection(sort.value) ? null : direction, ...pagination.urlParams() });
         renderMath();
     }
-    search.addEventListener('input', debounce(() => renderTable(), 200));
-    [domains, tags, sources, attempts].filter(Boolean).forEach(input => input.addEventListener('change', () => renderTable()));
+    function resetPage() { pagination.reset(); renderTable(); }
+    search.addEventListener('input', debounce(resetPage, 200));
+    [domains, tags, sources, attempts].filter(Boolean).forEach(input => input.addEventListener('change', resetPage));
     sort.addEventListener('change', () => {
         direction = defaultOpenSortDirection(sort.value);
-        renderTable();
+        resetPage();
     });
     sortButtons.forEach(button => button.addEventListener('click', () => {
         direction = sort.value === button.dataset.sort && direction === 'asc' ? 'desc' : 'asc';
         sort.value = button.dataset.sort;
-        renderTable();
+        resetPage();
     }));
     document.getElementById('reset-filters').addEventListener('click', () => {
         search.value = '';
@@ -583,7 +636,7 @@ function initOpenProblemsPage() {
         attempts.checked = false;
         sort.value = subset ? 'score' : 'rank';
         direction = defaultOpenSortDirection(sort.value);
-        renderTable();
+        resetPage();
     });
     renderTable(false);
 }
@@ -933,6 +986,7 @@ function getWeSolveSourceUrl(record, fallback = '') {
 
 // Export for use in other scripts
 window.ProblemHunting = {
+    createPagination,
     getUrlParams,
     updateUrl,
     escapeHtml,
