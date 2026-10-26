@@ -28,7 +28,6 @@ var siteStats = {
     "ranked_with_attacks": 2709,
     "models": [
       "OpenAI",
-      "gpt 6",
       "gpt 6 astra pro",
       "gpt 6 astra ultra",
       "gpt pro 5.2",

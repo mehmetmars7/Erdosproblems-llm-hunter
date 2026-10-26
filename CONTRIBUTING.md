@@ -61,6 +61,11 @@ and external computation or theorem-proving tools. Generic “GPT”, “ChatGPT
 the underlying version: explicitly record that uncertainty, never invent a version.
 The model folder and GitHub submitter are not sufficient attribution.
 
+For a confirmed attribution correction, retain the published source path and add
+a single `% MODEL_NAME: exact display label` header before the document. Update
+the readable attribution and `SUBMISSION.model` consistently. This display override
+does not apply to specialized OpenAI external-claim records.
+
 ## Mathematical research manuscripts
 
 Submit the complete mathematical output as repository-compatible LaTeX. A standalone

@@ -550,6 +550,15 @@ def parse_attack(content, model_name, date_posted=None, *, metadata_content=None
     """Parse an attack TeX file and extract structured data."""
     original = content if metadata_content is None else metadata_content
     openai, body = parse_openai_claim(original, openai_manifest)
+    # Preserve published source paths when a submitter corrects model attribution.
+    preamble = original.split(r'\begin{document}', 1)[0]
+    model_headers = re.findall(r'^% MODEL_NAME: ([^\r\n]+)$', preamble, re.MULTILINE)
+    if len(model_headers) > 1 or (model_headers and not model_headers[0].strip()):
+        raise ValueError('Require at most one nonempty MODEL_NAME header')
+    if model_headers:
+        if openai:
+            raise ValueError('External OpenAI claims cannot override their model attribution')
+        model_name = model_headers[0].strip()
     if openai and original == content:
         content = body
     provenance, content = parse_collection_metadata(content)

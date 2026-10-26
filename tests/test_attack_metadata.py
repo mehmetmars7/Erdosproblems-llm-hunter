@@ -6,6 +6,17 @@ from build_site import extract_completion, parse_attack
 
 
 class AttackMetadataTests(unittest.TestCase):
+    def test_confirmed_model_override_preserves_source_content(self):
+        source = '% MODEL_NAME: gpt 6 astra pro\n\\begin{document}\nReport\n\\end{document}'
+        attack = parse_attack(source, 'gpt 6')
+        self.assertEqual(attack['model'], 'gpt 6 astra pro')
+        self.assertEqual(attack['raw'], source)
+        self.assertEqual(parse_attack('Report', 'gpt 6')['model'], 'gpt 6')
+        quoted = r'\begin{document}' + '\n% MODEL_NAME: incorrect\nReport'
+        self.assertEqual(parse_attack(quoted, 'gpt 6')['model'], 'gpt 6')
+        with self.assertRaises(ValueError):
+            parse_attack('% MODEL_NAME: one\n% MODEL_NAME: two\nReport', 'gpt 6')
+
     def test_correction_review_is_unresolved_without_a_completion_claim(self):
         content = r'''
 \section{Review and correction of the claimed ``disproof''}
