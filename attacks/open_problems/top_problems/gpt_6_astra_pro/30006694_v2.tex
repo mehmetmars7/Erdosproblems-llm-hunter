@@ -1,0 +1,1487 @@
+% TOP_PROBLEM: {"id": 30006694, "title": "The Exponential Time Hypothesis for 3-SAT", "category_id": 15, "category": {"id": 15, "name": "computer_science", "display_name": "Computer Science", "description": "Computational complexity, algorithms, and theoretical CS.", "slug": "computer-science", "order_index": 15, "created_at": "2026-07-31T15:26:25.671Z"}, "status": "open"}
+% FIRST_POSTED: 2026-10-26
+% ATTEMPT_STATUS: unresolved
+% SUBMISSION: {"kind": "research_attempt", "category": "top_problems", "problem_id": "30006694", "model": {"provider": "OpenAI", "version": "GPT 6 Astra Pro (exact release/build unknown)", "reasoning": "Unknown", "generated_on": "2026-10-26"}, "other_models": "No second model reported for exposition. Codex used for repository formatting; exact underlying release/build not recorded.", "tools": "Source inspection and TeX preparation reported in supplied manuscript; repository validation, LuaLaTeX and browser rendering during integration. No Lean execution.", "target": "Canonical ETH assertion: positive deterministic exponential-time rate for deciding every 3-CNF, allowing polynomial input-reading factors.", "scope": "Literature report only. Detailed exposition of externally produced OpenAI results and formalization scope; no new discovery or independent proof certification.", "human_contributions": "Submitter prompted preparation and expansion; no human mathematical authorship or independent proof verification reported.", "verification": "Source checks attributed to supplied report. Integration checks formatting and target identity, not all analytic/algorithmic proofs or Lean dependencies.", "reproducibility": "Supplied manuscript dated2026-10-26, pinned openai/math commit 7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a. Original prompts and browsing logs unavailable; initial/final research-prompt use not documented. Integration expands presentation/link macros and adds metadata without changing mathematical exposition."}
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=25mm,headheight=14pt]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{microtype,booktabs,array,longtable,enumitem}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily WE-SOLVE \; / \; EXTENDED PROOF EXPOSITION}
+\fancyhead[R]{\small\sffamily\reportcode}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\emergencystretch}{3em}
+\setlength{\parskip}{3pt}
+\setlist{itemsep=3pt,topsep=5pt}
+\allowdisplaybreaks[2]
+\numberwithin{equation}{section}
+\setcounter{tocdepth}{1}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\N}{\mathbb N}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\F}{\mathbb F}
+\newcommand{\HH}{\mathbb H}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\,\mathrm d}
+\newcommand{\poly}{\operatorname{poly}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\diver}{\operatorname{div}}
+\newcommand{\pc}{p_{\mathrm c}}
+\newcommand{\one}{\mathbf 1}
+\newcommand{\sourcecommit}{7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a}
+\newcommand{\pin}{\texttt{\sourcecommit}}
+\newcommand{\repolink}[2]{\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/#1}{#2}}
+\newcommand{\mathsource}[2]{\repolink{preprints/Local-smoothing-for-the-Euclidean-wave-equation-October-25-2026/build/sections/#1.tex}{#2}}
+\newcommand{\cssource}[2]{\repolink{preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/#1.tex}{#2}}
+\newcommand{\statusbox}[1]{\begin{quote}\small\noindent\textbf{Attribution and verification boundary.} #1\end{quote}}
+\hypersetup{pdfauthor={Source-based exposition prepared with GPT-6 Astra Pro},pdfsubject={We-Solve contribution draft; original research attributed to OpenAI}}
+\newcommand{\reportcode}{CS-20}
+\title{A reported refutation of ETH:\\interpolation, exact counting, and recursive tensor contraction\\[4pt]
+\large An extended source-pinned proof exposition for CS-20}
+\author{Prepared for \texttt{we-solve} from OpenAI's public research artifacts}
+\date{26 October 2026 \quad / \quad Expanded edition}
+\begin{document}
+\section*{A reported refutation of ETH: interpolation, exact counting, and recursive tensor contraction}
+\noindent OpenAI GPT 6 Astra Pro; extended literature report, 26 October 2026.
+\section*{Abstract}
+This report reconstructs the main proof mechanisms in OpenAI's October 25,
+2026 manuscript reporting deterministic subexponential exact counting for every
+fixed clause width. It develops the bounded-occurrence interpolation algorithm,
+the low-rank replacement construction, balanced incidence schedules, the
+Taylor-recovery identity, and the full running-time calculation. It then explains
+disjoint sparsification, counting-preserving reductions, the modular parity
+lift, deterministic sparse parity tests, exact arithmetic, and polynomial space.
+A separate part covers the sharper tensor-contraction route: the Cauchy
+deformation, tapered Hermite recovery, valuation-weighted modes, recursive
+factorization, and the incidence encoding for arbitrary density. The manuscript's
+three quantitative levels are distinguished from the published formal scope.
+The final sections derive the precise contradiction to CS-20's ETH formulation,
+check the canonical-encoding issue, and delimit the consequences. This is a
+detailed literature report about an externally produced proof, not a new
+algorithm-discovery claim or an independently completed verification.
+
+\begin{quote}\textbf{Attribution and verification boundary.} OpenAI is credited with the original algorithms, constructions, and
+proofs. This report explains the pinned TeX source and formalization documents.
+Its displayed source lemmas remain imports from that research. Algebraic
+identities and parameter deductions are expanded here, but neither the full
+paper nor the entire Lean dependency closure has been independently certified
+in this preparation. No Lean execution, practical benchmark, or independent
+review is claimed.\end{quote}
+\paragraph{Reading route.}
+Sections~\ref{sec:encoding}--\ref{sec:simple} give the simplest complete
+subexponential route. Sections~\ref{sec:paritylift}--\ref{sec:arithmetic}
+explain the improved rational counting bound. Sections~\ref{sec:tensorinterface}--\ref{sec:tensordense}
+cover the sharper tensor argument. The concluding sections establish the
+exact catalogue implication and its verification boundary.
+
+
+
+
+\section{The exact catalogue claim and the three quantitative levels}
+\label{sec:target}
+The primary entry is \emph{The Exponential Time Hypothesis for 3-SAT}, CS-20,
+with stable handle
+\texttt{prb\_a1b2b1f67d0e489da50d97b732d8291d} \cite{catalogue}.
+Its formulation asserts a positive deterministic exponential-time rate in the
+number $n$ of variables, allowing a polynomial input-reading factor:
+\begin{equation}\label{eq:eth}
+ \exists c>0:\quad\text{no algorithm decides every $3$-CNF formula in}
+ \quad O(2^{cn}\poly(|F|))\text{ time}.
+\end{equation}
+The source snapshot is the \texttt{openai/math} commit
+\begin{center}\texttt{7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a}.\end{center}
+The manuscript is dated October 17 and revised October 25, 2026. Source links
+below use this commit throughout.
+
+\begin{theorem}[OpenAI's reported main counting theorem]\label{thm:main}
+For every fixed $k\ge2$, there is a deterministic algorithm that computes the
+number $\#F$ of satisfying assignments of any $k$-CNF with $n\ge20$ declared
+variables and $m$ clauses using polynomial space and time
+\begin{equation}\label{eq:sharp}
+ (n+m)^{O_k(1)}
+ 2^{O_k(n\log\log n/\sqrt{\log n})}.
+\end{equation}
+For each fixed $D>0$, inputs with $m\le Dn$ satisfy the sharper bound
+\begin{equation}\label{eq:density}
+ (n+m)^{O_{k,D}(1)}2^{O_{k,D}(n/\sqrt{\log n})}.
+\end{equation}
+\end{theorem}
+These are the manuscript's main theorem bounds \cite{paper,quant-reduction}.
+The documented formal scope instead gives the sufficient but weaker exponent
+\begin{equation}\label{eq:rho}
+ \rho(n)=\frac{n(\log\log n)^2}{\sqrt{\log n}},\qquad
+ (L+1)^{O_k(1)}2^{O_k(\rho(n))},
+\end{equation}
+where $L$ is the canonical input length \cite{scope}. Small inputs can be
+handled separately, or logarithms can be shifted as in the formal target.
+
+There are three useful proof layers, which should not be conflated. The
+bounded-occurrence algorithm plus a simple copying reduction already gives
+$2^{o(n)}$ time for general fixed-width formulas, although with a weaker
+explicit exponent. The sparse-polynomial and parity-test machinery improves
+this to \eqref{eq:rho}. The recursive tensor method improves it further to
+\eqref{eq:sharp} and \eqref{eq:density}. The first layer already contradicts
+ETH. The later layers are quantitative improvements, not missing ingredients
+that must be smuggled into the simpler disproof.
+
+Throughout, $k$ is fixed before the input is given. Constants and polynomial
+exponents may depend on $k$. Nothing here asserts the same guarantee when the
+clause width grows with $n$.
+
+\section{Counting as a polynomial sum, and why this alone is not an algorithm}
+\label{sec:encoding}
+For each literal on variable $x_v$, write $L_{e,v}(X_v)=X_v$ for a positive
+literal and $L_{e,v}(X_v)=1-X_v$ for a negative literal. The satisfaction
+polynomial of clause $e$ is
+\[
+ \Phi_e((X_v)_{v\in I_e})
+       =1-\prod_{v\in I_e}(1-L_{e,v}(X_v)).
+\]
+On Boolean input it is exactly the clause's zero--one indicator. Thus
+\begin{equation}\label{eq:count}
+ \#F=\sum_{x\in\{0,1\}^n}\prod_e\Phi_e(x|_{I_e}).
+\end{equation}
+For example,
+\[
+ F=(x_1\vee x_2\vee x_3)\wedge(\neg x_1\vee\neg x_2\vee x_3)
+\]
+has factors $1-(1-X_1)(1-X_2)(1-X_3)$ and
+$1-X_1X_2(1-X_3)$. Precisely two assignments fail, namely $(0,0,0)$ and
+$(1,1,0)$, so the sum is six. This example illustrates the encoding, not a
+speedup: evaluating all its summands would still be brute force.
+
+Initially restrict attention to width at most three and at most three
+occurrences per variable. Remove tautologies and repeated literals; an empty
+clause makes the answer zero. Retain every declared variable. For an unused
+variable, add a factor equal to one with that variable as its formal scope.
+Then the total number of incidences satisfies
+\[
+ n\le M:=\sum_e|I_e|\le3n,
+\]
+and the product in \eqref{eq:count} has degree at most $M$.
+The degree bound, rather than a claim that the constraint graph has small
+separators, is the starting structural advantage \cite{paper}.
+
+If all clauses lay inside small disjoint variable groups, their counts would
+multiply. General instances need not have this property. The source does
+something subtler: it replaces clause inputs by polynomially varying linear
+forms. At selected interpolation nodes, the modified clauses communicate
+through only a few bounded integer measurements. At zero, the original
+inputs are restored. Interpolation then recovers the desired count from the
+structured evaluations.
+
+\section{Low-degree deformation and the measurement-separation lemma}
+\label{sec:design}
+For every incidence $(e,v)$ introduce a row of rational polynomials
+$P_{e,v}(T)\in\Q[T]^n$ with
+\[
+ P_{e,v}(0)=\delta_v,\qquad \deg P_{e,v}\le R.
+\]
+Define
+\begin{equation}\label{eq:H}
+ H(T)=\sum_{x\in\{0,1\}^n}
+       \prod_e\Phi_e\bigl((\langle P_{e,v}(T),x\rangle)_{v\in I_e}\bigr).
+\end{equation}
+Then $H(0)=\#F$ and $\deg H\le MR\le3nR$. At nonzero values of $T$, the
+new clause factors are not necessarily zero or one, or even positive. They
+are auxiliary algebraic quantities; correctness is based on interpolation,
+not on treating each transformed sum as a satisfiability count.
+
+At a node $t\in\{1,\ldots,Q\}$, a design consists of a partition
+$[n]=S_1\sqcup\cdots\sqcup S_r$, with $|S_g|\le2n/r$, an assigned group
+$\sigma_e(t)$ for each factor, and integer measurement matrices $C_g$.
+The total number of rows is at most $2\tau n$ and every row has absolute
+coefficient sum at most $D$. The structural condition is that, for a factor
+assigned to $g$, each replacement form can be written
+\begin{equation}\label{eq:rowspace}
+ \langle P_{e,v}(t),x\rangle
+ =\langle P_{e,v}(t)|_{S_g},x_g\rangle+
+       \sum_{h\ne g}\langle\lambda_{e,v,h},C_hx_h\rangle.
+\end{equation}
+All inputs of the same factor must have the same assigned group. Merely
+assigning a separate group to each literal would not separate the factor.
+
+Fix $y_g=C_gx_g$ for all groups. Since $x_g$ is Boolean, each coordinate of
+$y_g$ lies in $[-D,D]$. Let $A_g(u;y)$ denote the product of the transformed
+factors assigned to group $g$, evaluated using local assignment $u$ and the
+fixed measurements. Distributivity gives the exact identity
+\begin{equation}\label{eq:separate}
+ H(t)=\sum_y\prod_{g=1}^r
+   \left(\sum_{\substack{u\in\{0,1\}^{S_g}\\C_gu=y_g}}A_g(u;y)\right).
+\end{equation}
+Every original Boolean assignment occurs once: it has one measurement tuple
+and one choice of local assignment in every group. Empty measurement fibers
+contribute zero. This establishes correctness without assuming independence
+of the original clauses.
+
+Enumerating the tuples and local assignments takes, up to polynomial factors,
+\begin{equation}\label{eq:sep-cost}
+ (2D+1)^{2\tau n}2^{2n/r}.
+\end{equation}
+The procedure can keep one tuple and one local sum at a time. It need not
+store a table indexed by all measurement tuples.
+
+Both the number of measurements and their coefficient size matter. A single
+row $(1,2,4,\ldots,2^{n-1})$ has rank one but records the entire Boolean
+assignment. Thus low rank alone would not imply a small enumeration domain.
+The explicit row-$\ell^1$ bound is an indispensable part of the design.
+
+\section{Recovering Taylor coefficients without destroying separation}
+\label{sec:taylor}
+The $Q$ values $H(t)$ do not determine a polynomial whose degree can be
+$3nR$. The source uses Hermite interpolation, with
+\[
+ q=\left\lfloor\frac{3nR}{Q}\right\rfloor,\qquad J=q+1.
+\]
+Since $QJ>3nR$, the first $J$ Taylor coefficients at each node suffice.
+Indeed, two polynomials with the same data have a difference divisible by
+$\prod_{t=1}^Q(T-t)^J$, of degree exceeding the allowed degree.
+The issue is how to compute these coefficients using designs that hold only
+at the nodes themselves.
+
+Fix $t$, put $\Delta P(z)=P(t+z)-P(t)$, and introduce a second formal vector
+$X$, distinct from the Boolean summation variable $x$. Set
+\[
+ G_x(X,z)=\prod_e\Phi_e\Bigl(
+ \bigl(\langle P_{e,v}(t),x\rangle+
+ \langle\Delta P_{e,v}(z),X\rangle\bigr)_{v\in I_e}\Bigr).
+\]
+Setting $X=x$ recovers the shifted product, so
+$H(t+z)=\sum_xG_x(x,z)$. Each occurrence of $X$ in this expression carries
+at least one factor of $z$. Consequently
+\begin{equation}\label{eq:taylor-degree}
+ \deg_X[z^j]G_x(X,z)\le j.
+\end{equation}
+
+Work modulo $z^J$ and multilinearize in $X$, replacing positive powers of
+$X_i$ by $X_i$. This does not change values on the Boolean cube. The result
+can be written
+\[
+ G_x(X,z)\equiv\sum_{|E|\le q}a_E(x,z)\prod_{i\in E}X_i\pmod{z^J}.
+\]
+Evaluating at the Boolean vector $\one_U$ sums the coefficients whose supports
+are contained in $U$. Subset inversion gives
+\[
+ a_E(x,z)=\sum_{U\subseteq E}(-1)^{|E|-|U|}G_x(\one_U,z)
+                 \pmod{z^J}.
+\]
+On the diagonal $X=x$, the monomial for $E$ is one exactly when all bits in
+$E$ are one. Therefore
+\begin{equation}\label{eq:jetidentity}
+ H(t+z)\equiv
+ \sum_{|E|\le q}\sum_{U\subseteq E}(-1)^{|E|-|U|}
+ \sum_{\substack{x\in\{0,1\}^n\\x_i=1\ (i\in E)}}
+                         G_x(\one_U,z)\pmod{z^J}.
+\end{equation}
+This is a full algebraic identity, not a heuristic approximation to the
+Taylor series.
+
+For fixed $U$, the correction $\langle\Delta P(z),\one_U\rangle$ no longer
+depends on $x$. Thus the original design still separates the dependence on
+$x$. The restrictions $x_i=1$ are local to the groups. Formula
+\eqref{eq:separate} applies over the truncated ring $\Q[z]/(z^J)$, because
+its proof uses only distributivity. The algorithm evaluates the nested sums
+without ever constructing a multivariate expansion in all $X_i$.
+
+The number of pairs $(E,U)$ is
+\begin{equation}\label{eq:taylorcount}
+ C_q=\sum_{j=0}^{\min(q,n)}2^j\binom nj.
+\end{equation}
+For $1\le q\le n/2$,
+$C_q\le(q+1)(2en/q)^q$, so its logarithm is
+$O(n(R/Q)\log(2Q/R))$. Multiplying by \eqref{eq:sep-cost} shows that the
+exponent is controlled by
+\begin{equation}\label{eq:threecosts}
+ n\left[\frac RQ\log\frac{2Q}{R}
+             +\tau\log(2D+1)+\frac1r\right].
+\end{equation}
+The construction must make \emph{all three} terms small simultaneously.
+
+\section{The auxiliary matrix: spectral concentration and sparse mismatches}
+\label{sec:matrix}
+The source constructs the replacement rows in an auxiliary coordinate space
+\[
+ \mathcal B=([r]\times[r])^Q,
+ \qquad D=|\mathcal B|=r^{2Q}.
+\]
+Write a coordinate as $u=((a_u(s),d_u(s)))_{s=1}^Q$. At node $t$, coordinate
+$w$ belongs to group $a_w(t)$, while row $u$ is assigned to group $d_u(t)$.
+The mismatch set is
+\[
+ E_{u,w}=\{t:a_w(t)\ne d_u(t)\}.
+\]
+The aim is to find a matrix $M_0$ that is the identity on a large subspace,
+but whose nonzero entries have small mismatch sets.
+
+\subsection{Commuting swaps make the two requirements compatible}
+Let $\Pi_s$ swap the two symbols in coordinate $s$. These matrices commute
+and satisfy $\Pi_s^2=I$. Define
+\[
+ V_0=\prod_{s=1}^Q\Pi_s,\qquad
+ W_0=\frac12\sum_{s=1}^Q(I-\Pi_s),\qquad M_0=V_0f(W_0).
+\]
+If $f$ has degree at most $R-1$, expanding it gives products of at most
+$R-1$ swaps. Multiplication by $V_0$ means that all coordinates are swapped
+except perhaps those $R-1$ positions. A complete swap sends row $u$ to a
+column with $a_w(t)=d_u(t)$ everywhere. Thus
+\begin{equation}\label{eq:supportmatrix}
+ M_0[u,w]\ne0\quad\Longrightarrow\quad |E_{u,w}|\le R-1.
+\end{equation}
+
+For one pair of symbols, the swap has an orthogonal basis consisting of
+$e_{aa}$ and $e_{ab}+e_{ba}$ with eigenvalue $+1$, and $e_{ab}-e_{ba}$ with
+eigenvalue $-1$. Tensoring these bases across the $Q$ positions diagonalizes
+all swaps. If a basis vector has $j$ negative factors, its eigenvalues under
+$W_0,V_0,M_0$ are respectively
+\[
+ j,\qquad(-1)^j,\qquad(-1)^jf(j).
+\]
+Under uniform choice of a tensor basis vector, $j$ has distribution
+$\operatorname{Bin}(Q,p)$, with $p=(r-1)/(2r)$.
+
+Choose an interval $\mathcal I$ of $R$ consecutive integers near $Qp$ and
+interpolate $f(j)=(-1)^j$ for $j\in\mathcal I$. This gives degree at most
+$R-1$ and makes $M_0$ fix every central basis vector. A concrete formula when
+$\mathcal I=\{A_0,\ldots,A_0+R-1\}$ is
+\[
+ f(z)=(-1)^{A_0}\sum_{j=0}^{R-1}(-2)^j\binom{z-A_0}{j}.
+\]
+The degree stays small because it is the width of the central interval, not
+the total number of nodes, that matters.
+
+Let $C$ have as its rows the exceptional tensor basis vectors. Its entries
+are $0,1,-1$, and its kernel is spanned by the central basis. A binomial tail
+bound gives
+\begin{equation}\label{eq:exceptional}
+ \#\operatorname{rows}(C)
+ \le2D e^{-R^2/(8Q)}.
+\end{equation}
+Since $I-M_0$ vanishes on $\ker C$, every row of $I-M_0$ belongs to the row
+space of $C$. Its output is therefore determined by the few measurements
+$C\zeta$.
+
+\subsection{A polynomial kills only the mismatched dependencies}
+For each nonzero $M_0[u,w]$, set
+\[
+ \varphi_{u,w}(T)=\prod_{s\in E_{u,w}}(1-T/s).
+\]
+Then define the replacement form by
+\begin{equation}\label{eq:auxrow}
+ \langle P_u(T),\zeta\rangle
+ =((I-M_0)\zeta)_u+
+   \sum_wM_0[u,w]\varphi_{u,w}(T)\zeta_w.
+\end{equation}
+At zero, all multipliers equal one and the expression is $\zeta_u$.
+By \eqref{eq:supportmatrix}, its degree is at most $R-1$.
+At $T=t$, every term with $a_w(t)\ne d_u(t)$ vanishes. The surviving part
+uses only the assigned group, while the first term is determined by $C\zeta$.
+This proves the desired auxiliary measurement property.
+
+The construction explains the unusual conjunction of requirements. Spectral
+concentration makes the correction low rank; low degree in the swap matrices
+bounds the mismatches; and a product of roots at those mismatches turns the
+matrix into a low-degree interpolation family. None of these three facts
+alone would give the algorithm \cite{paper}.
+
+\section{Placing arbitrary incidences into the auxiliary coordinates}
+\label{sec:balance}
+The auxiliary rows must now accommodate the actual formula, including repeated
+uses of the same variable. Give each variable a schedule $a_v\in[r]^Q$ and
+each factor a schedule $d_e\in[r]^Q$. Its incidence $(e,v)$ receives label
+$u(e,v)=(a_v,d_e)\in\mathcal B$.
+
+For the more general construction, assume factor scopes have size at most $w$
+and each variable occurs in at most $b$ scopes. Let $M$ be total incidences,
+with $n\le M\le bn$. The source chooses schedules deterministically so that
+\begin{equation}\label{eq:balance}
+ |S_{t,g}|\le2n/r,\qquad
+ \max_u\#\{(e,v):u(e,v)=u\}\le2M/D,
+\end{equation}
+provided $2(b+w)D^2\le M$ and $2Qr^2\le n$.
+
+Here is the conditional-expectation argument. Under independent uniform
+schedules, let $c_u$ be label loads and $n_{t,g}$ group sizes. Expanding squared
+deviations gives
+\[
+ \mathbb E\sum_u(c_u-M/D)^2\le M(b+w),\qquad
+ \mathbb E\sum_{t,g}(n_{t,g}-n/r)^2\le Qn.
+\]
+Pairs of incidences with disjoint variables and factors have zero covariance;
+only shared incidences contribute to the first bound. Fix schedules one by
+one while not increasing the normalized sum of these two potentials. Each
+conditional expectation concerns at most four schedules per pair of
+indicators and is computable by explicit finite enumeration in polynomial
+size. The final potentials are at most twice their respective scales, giving
+\[
+ c_u\le M/D+\sqrt{2M(b+w)},\qquad
+ n_{t,g}\le n/r+\sqrt{2Qn}.
+\]
+The displayed numerical assumptions imply \eqref{eq:balance}.
+
+Use $h_0=\max_uc_u$ copies of $\mathcal B$ to place incidences with the same
+label into different copies. Put the original variable $X_v$ at its incidence
+position, and zero in unused positions. Repeated appearances of $X_v$ still
+have the same value: these copies are not additional independent Boolean
+variables. Since $h_0D\le2M$, the total coordinate budget remains polynomial.
+
+Apply \eqref{eq:auxrow} in the appropriate copy. Measurements can involve
+several actual variable groups, so split each measurement into its restrictions
+to those groups. This step is essential: conditioning only on a sum of two
+groups could continue to couple them. If the exceptional fraction in
+\eqref{eq:exceptional} is at most $\tau/(rb)$, the total number of split rows
+is at most
+\[
+ rh_0D\frac{\tau}{rb}\le2\tau n.
+\]
+Each row still has integer coefficients with absolute sum at most $D$.
+Combining repeated occurrences cannot increase that bound. Thus the transferred
+rows satisfy the design of Section~\ref{sec:design}.
+
+\section{Parameter choices and the bounded-occurrence running time}
+\label{sec:parameters}
+Put $\lambda=\lceil\log_2n\rceil$ and
+$\nu=\lceil\log_2\lambda\rceil$. For sufficiently large $n$, the source uses
+parameters of the following orders:
+\begin{align*}
+ r&=\left\lfloor\frac{\sqrt\lambda}{\nu^2}\right\rfloor,
+ &Q&=\left\lfloor\frac{\lambda}{128\nu}\right\rfloor,\\
+ R&=(\beta+3)\lceil\sqrt\lambda\rceil,
+ &\tau&=\frac1{r\lambda},\qquad D=r^{2Q}.
+\end{align*}
+Here $\beta$ is a fixed bound such that $b,w\le\lambda^\beta$; the
+width-three, occurrence-three case needs only a fixed choice.
+One obtains $\log_2D\le\lambda/128$, so $D\le(2n)^{1/128}$.
+This ensures the balancing inequalities because their left sides have a
+strictly smaller power of $n$ than their right sides.
+
+The ratio $R/Q$ is $O(\nu/\sqrt\lambda)$ and tends to zero. The interval of
+$R$ central binomial levels therefore fits inside $\{0,\ldots,Q\}$ for large
+$n$. Its tail is exponentially small in $R^2/Q$, which is a sufficiently large
+fixed multiple of $\nu$; this is enough to make the exceptional fraction at
+most $\tau/(rb)$. All these requirements can be checked directly from the
+integer parameters. The finitely many sizes failing the requirements can be
+handled by exhaustive enumeration.
+
+Substitution into \eqref{eq:threecosts} gives
+\[
+ \frac RQ\log\frac{2Q}{R}=O\left(\frac{\nu^2}{\sqrt\lambda}\right),
+ \qquad \tau\log(2D+1)=O(1/r),
+ \qquad \frac1r=O\left(\frac{\nu^2}{\sqrt\lambda}\right).
+\]
+Hence bounded-occurrence counting takes
+\begin{equation}\label{eq:bounded}
+ n^{O(1)}2^{O(n(\log\log n)^2/\sqrt{\log n})}
+\end{equation}
+bit operations, once the arithmetic bounds below are included.
+The matrices, schedules, polynomial rows, and Hermite systems are only
+polynomially large. The subexponential factor comes from the three explicit
+enumerations, not from an uncounted construction of enormous matrices.
+
+\section{Disjoint sparsification: reducing density without double counting}
+\label{sec:sparsification}
+To pass from a special class to all fixed-width formulas, a decision-only
+sparsification statement is insufficient for exact counting: overlapping
+solution sets would be counted repeatedly. The source proves a disjoint
+branching version with explicit dependence on its sparsity parameter
+\cite{paper}.
+
+Normalize the formula into an antichain of literal sets by deleting tautologies,
+duplicates, and any clause containing a smaller clause. Retain the declared
+variable set rather than silently deleting unused variables. Fix an integer
+$K\ge2$ and thresholds $\theta_j=K^j$. If a nonempty proper literal set $H$
+is contained in too many clauses of a width $c$, branch on whether $H$ is
+satisfied. Choose the smallest eligible width and, within it, a core $H$ of
+largest size, with deterministic tie-breaking.
+
+For selected clauses $H\cup P_1,\ldots,H\cup P_t$, and conjunction $G$ of
+other clauses, the two children are
+\begin{align}
+ F_A&=G\wedge H,\label{eq:branchA}\\
+ F_B&=G\wedge\bigwedge_{j=1}^tP_j
+                   \wedge\bigwedge_{\ell\in H}\{\neg\ell\}.
+                                                        \label{eq:branchB}
+\end{align}
+In the first child at least one literal of $H$ is true, so all selected clauses
+are automatically satisfied. In the second, every literal of $H$ is false,
+so each selected clause reduces to its petal $P_j$. These cases are exhaustive
+and disjoint. Petals need not be pairwise disjoint: this is a branching identity,
+not an unsupported sunflower assumption.
+
+The antichain condition and choice of core ensure that newly introduced
+smaller clauses genuinely survive normalization. Mark such clauses to track
+the recursion. The source bounds the number of marked width-$j$ clauses
+containing a fixed smaller literal set by a multiple of $K^{j-i}$.
+If $T_j$ counts relevant insertions, the resulting recurrence has the form
+\[
+ T_1\le2n,\qquad
+ T_j\le4nK^{j-1}+2\sum_{i<j}K^{j-i}T_i
+       \le4(3K)^{j-1}n.
+\]
+Thus the branch depth is at most $C_kn$, where $C_k$ is a fixed polynomial
+in $K$, and the number of more expensive B-choices on a path is at most
+$\Gamma_kn/K$.
+
+Encoding a path by its length and the positions of its B-choices bounds the
+tree by a polynomial factor times
+\[
+ 2^{(\Gamma_kn/K)\log_2(4C_kK)}.
+\]
+Choose $K=O_k(\sigma^{-1}\log(2/\sigma))$ so this exponent is at most
+$\sigma n$. Every leaf then has variable-occurrence bound
+\begin{equation}\label{eq:sparseB}
+ B=O_k\left((\sigma^{-1}\log(2/\sigma))^{k-1}\right)
+\end{equation}
+and at most $Bn$ nonempty clauses. The tree can be traversed depth first in
+polynomial space, and its solution sets partition those of the original
+formula. The explicit parameter dependence permits $\sigma$ to vary slowly
+with $n$; it is not merely a theorem with an opaque constant for each fixed
+$\sigma$.
+
+\section{The simpler complete route to a subexponential algorithm}
+\label{sec:simple}
+Before introducing the sharper machinery, it is useful to close a complete
+logical route from \eqref{eq:bounded} to an ETH refutation.
+For a sparse fixed-width leaf $G$, compute the disjunction in each long clause
+using binary OR gates. A gate $z=u\vee v$ is enforced by
+\[
+ (\neg u\vee z)\wedge(\neg v\vee z)\wedge(u\vee v\vee\neg z).
+\]
+Every assignment to the gate inputs determines exactly one valid output.
+Requiring the final gate output to be one therefore gives a width-three
+encoding with a unique extension of every satisfying original assignment.
+This is count preserving, not merely satisfiability preserving.
+
+If a variable has $s\ge2$ occurrences, replace them by copies
+$x_1,\ldots,x_s$ and add the cycle
+\[
+ (\neg x_1\vee x_2)\wedge\cdots\wedge
+ (\neg x_s\vee x_1).
+\]
+A cyclic sequence of Boolean implications forces all copies to agree. Each
+copy appears in one inherited clause and two cycle clauses, so at most three
+times. Variables with zero or one occurrence remain, preserving their counting
+contribution. The resulting instance has $N=O_k(Bn)$ variables.
+
+Applying \eqref{eq:bounded} to every leaf gives exponent
+\[
+ O_k\left(\sigma n+
+       Bn\frac{(\log\log n)^2}{\sqrt{\log n}}\right)
+\]
+when $B$ is polylogarithmic. For example, taking
+$\sigma\asymp(\log n)^{-1/(2k)}$ and using \eqref{eq:sparseB} gives
+\begin{equation}\label{eq:simple-general}
+ (n+m)^{O_k(1)}
+ 2^{O_k(n(\log\log n)^{k+1}/(\log n)^{1/(2k)})}
+ =(n+m)^{O_k(1)}2^{o(n)}.
+\end{equation}
+This already solves arbitrary fixed-width SAT in subexponential time, by
+checking whether the exact count is positive. No parity-test lemma or tensor
+contraction is needed for this qualitative conclusion.
+
+It would, however, be incorrect to claim the stronger exponent $O(\rho(n))$
+from this copying route alone. The factor $B$ multiplies the number of variables.
+The next construction avoids that blowup by staying on the original Boolean
+variables.
+
+\section{A modular parity lift with a global degree bound}
+\label{sec:paritylift}
+Consider $a=O(n)$ equations over $\F_2$, each represented by a sparse polynomial
+of fixed degree at most $k$. Lift equation $i$ to the ordinary integer sum
+$L_i(X)$ of its listed monomials. For Boolean $x$, the equation holds exactly
+when $L_i(x)$ is even.
+
+Set $\ell=n+1$. The source uses the integer polynomial
+\begin{equation}\label{eq:paritypoly}
+ p_\ell(Y)=(1-Y)^\ell
+        \sum_{j=0}^{\ell-1}\binom{\ell+j-1}{j}Y^j.
+\end{equation}
+The truncated binomial series gives $p_\ell(Y)\equiv1\pmod{Y^\ell}$, while
+the prefactor gives $p_\ell(Y)\equiv0\pmod{(1-Y)^\ell}$. Therefore
+\[
+ p_\ell(y)\equiv
+ \begin{cases}1&y\text{ even},\\0&y\text{ odd},\end{cases}
+ \pmod{2^\ell}.
+\]
+The precision is large enough because a count is between zero and $2^n$, so
+its least nonnegative residue modulo $2^{n+1}$ determines it exactly.
+
+A direct product of these parity polynomials would have degree potentially
+quadratic in $n$. The key is to truncate the product globally. Put
+$h(Y)=Y(Y-1)$, which is even on every integer. Repeated division by this monic
+quadratic gives
+\begin{equation}\label{eq:paritybasis}
+ p_\ell(Y)=\sum_{j=0}^{\ell-1}e_j(Y)h(Y)^j,
+ \qquad e_j\in\Z[Y],\quad\deg e_j\le1.
+\end{equation}
+Introduce one common marker $V$ and work in $\Q[V]/(V^\ell)$ with factors
+\[
+ B_i(X,V)=\sum_{j=0}^{\ell-1}e_j(L_i(X))h(L_i(X))^jV^j.
+\]
+After multiplying, only terms with total marker degree below $\ell$ remain.
+Every discarded term has at least $\ell$ copies of an even integer when
+$X=x$ is Boolean, so vanishes modulo $2^\ell$. The retained incidence-degree
+bound is
+\begin{equation}\label{eq:totaldegree}
+ k\bigl(a+2(\ell-1)\bigr)=O(n).
+\end{equation}
+The word ``total'' is essential: truncating each factor separately would not
+impose this linear bound on their product.
+
+Let $\mathcal S_\ell$ sum the retained coefficients of $V$. Then the number of
+common zeros is the least residue of
+\[
+ \mathcal S_\ell\left(\sum_{x\in\{0,1\}^n}\prod_iB_i(x,V)\right)
+ \pmod{2^\ell}.
+\]
+The coefficient-sum map is applied \emph{after} multiplication in the
+truncated ring. It is not a ring homomorphism, and it cannot be treated as
+substitution $V=1$ in the quotient: the relation $V^\ell=0$ would then be
+violated. This distinction is important for exactness \cite{paper}.
+
+At deformed rational inputs the modular parity interpretation need not hold.
+The interpolation algorithm therefore computes over the rationals, recovers
+the value at $T=0$, and only then takes the integer residue. It does not divide
+by arbitrary even denominators modulo a power of two.
+
+\section{Counting sparse polynomial systems on the original variables}
+\label{sec:sparsecounter}
+Suppose the number of equations is at most $cn$ and each has at most
+$(\log n)^c$ monomials of degree at most $k$, for fixed $k,c$.
+Its scope is therefore polylogarithmic, although a few variables might occur
+in many scopes. Let $M$ be total incidences, adding neutral factors for unused
+variables as needed. Choose a threshold comparable to
+$(M/n)\sqrt{\log n}$. Fewer than $n/\sqrt{\log n}$ variables exceed it.
+Enumerate their values, paying only $2^{O(n/\sqrt{\log n})}$ branches.
+
+On each branch, both scope size and occurrence count are bounded by fixed
+powers of $\log n$. The design construction of Sections~\ref{sec:matrix}--
+\ref{sec:parameters} therefore applies with a suitable fixed $\beta$.
+Use one replacement form per variable in a test and reuse it throughout that
+test. The bound \eqref{eq:totaldegree} implies that the deformed polynomial
+has degree $O(nR)$ in $T$, despite the polylogarithmic number of variables
+read by a factor.
+
+The same Taylor identity applies over the coefficient algebra
+$\Q[V,z]/(V^\ell,z^J)$. It tracks only the two bounded degrees, not all
+monomials in the original variables. A factor is evaluated directly from its
+listed sparse polynomial; no truth table over its full scope is required.
+The branch count is recovered by rational Hermite interpolation, followed by
+$\mathcal S_\ell$ and reduction modulo $2^\ell$. The original precision
+$\ell=n+1$ remains valid after branching.
+
+The source thereby obtains a deterministic counter for \emph{arbitrary}
+supplied sparse polynomial systems in
+\begin{equation}\label{eq:sparsecounter}
+ 2^{O_{k,c}(\rho(n))}\text{ time and }n^{O_{k,c}(1)}\text{ space}.
+\end{equation}
+This generality is what makes the next derandomization noncircular. The
+counter is already valid for systems which accept unwanted assignments; it
+does not require a promise that the system represents exactly the solutions
+of a CNF formula.
+
+\section{Sparse parity tests: first exclude low-weight violation patterns}
+\label{sec:expander}
+For a sparse CNF with $m\le Bn$ clauses, let
+$v_e(x)$ be one when clause $e$ is violated and zero otherwise. A parity test
+is a linear equation in this violation vector over $\F_2$.
+Every satisfying assignment passes all such tests. The task is to choose only
+$O(n)$ short tests so that no nonsatisfying assignment passes them all.
+
+A random short test is unlikely to see a violation vector supported on just
+one clause. The source first constructs a parity-check system whose nonzero
+kernel vectors have large support. Write
+$\mu_0=\lfloor\log_2m\rfloor+1$ and use, for example, the source's scales
+\[
+ P=20000B^2\mu_0^2,\qquad D_0=320000B^2\mu_0^3.
+\]
+It constructs at most $3n$ initial rows, each supported on at most $D_0$
+clauses, such that every surviving nonzero violation vector has weight at
+least $m/P$ \cite{paper}.
+
+\subsection{The graph and the local code}
+The construction is an edge-based code on a bipartite expander multigraph.
+Both sides are copies of a binary vector group. An edge at port $j$ joins
+$u$ on the left to $u\oplus s_j$ on the right. Parallel edges are distinct
+ports. Choose shifts $s_j$ so that every nonconstant binary character has
+small average on them. The character basis diagonalizes the adjacency
+operator, giving the mixing bound
+\begin{equation}\label{eq:mixing}
+ e(U,V)\le \frac{d_G|U||V|}{q_G}
+              +\eps d_G\sqrt{|U||V|}.
+\end{equation}
+The number of vertices $q_G$ and degree $d_G$ are chosen so the graph has
+between $m$ and a constant multiple of $m$ edges.
+
+At every vertex impose a small binary linear code with relative distance
+$\delta$, where $\delta=2\eps$ and both are inverse-polylogarithmic in the
+application. A nonzero global codeword determines sets $U,V$ of vertices
+incident to its nonzero edges. Local distance gives at least $\delta d_G$
+nonzero edges at each active vertex, while \eqref{eq:mixing} bounds how many
+edges can lie between $U$ and $V$. Combining the two implies
+\[
+ \sqrt{|U||V|}\ge(\delta-\eps)q_G,
+ \qquad
+ \text{weight}\ge\delta(\delta-\eps)q_Gd_G.
+\]
+This is the asserted lower support threshold after the parameter choices.
+Shorten the code to exactly $m$ coordinates by fixing extra edge bits to zero;
+shortening preserves the minimum-distance lower bound on nonzero words.
+
+\subsection{Why this construction is deterministic and affordable}
+The source establishes existence of the shifts by a concentration estimate
+for every nontrivial character, and existence of the local code by a union
+bound over its low-weight words. It then searches deterministically for
+objects satisfying the finite stated tests. The searched descriptions have
+size polynomial in $B$ and $\log m$, so the work is
+$2^{\poly(B,\log m)}$ and can be performed sequentially in polynomial space
+in the main input size.
+
+When $B$ is a fixed power of $\log n$, this is
+$2^{(\log n)^{O_k(1)}}$, negligible beside $2^{O_k(\rho(n))}$ for sufficiently
+large $n$. It is not necessarily polynomial-time construction, and describing
+it that way would undercount the work. Its subexponential construction cost
+is explicitly absorbed in the final bound.
+
+\section{Greedy deterministic tests: eliminating every remaining false positive}
+\label{sec:greedy}
+After the initial code checks, any nonsatisfying assignment still passing has
+at least $m/P$ violated clauses. Consider a candidate test obtained from $P$
+independent clause indices, each with an independent coefficient bit. Repeated
+indices are allowed, with repeated selected occurrences cancelling modulo two.
+The chance of hitting the violation support is at least $1-e^{-1}>1/2$.
+Conditional on a hit, one coefficient bit makes the parity odd with probability
+$1/2$, irrespective of the other coefficient bits. Thus the rejection
+probability is at least $1/4$.
+
+For a current test matrix $A$, write
+\[
+ N(A)=\#F+D(A),
+\]
+where $D(A)$ is the number of nonsatisfying assignments still accepted.
+Averaging over candidates gives a candidate $h$ with
+$D(A;h)\le(3/4)D(A)$. The algorithm does not know $\#F$ or $D(A)$.
+Instead, it computes $N(A;h)$ for every candidate using the already established
+sparse-polynomial counter and selects one with minimum count.
+Because every genuine solution passes every candidate, $\#F$ is the same
+additive baseline for all comparisons; minimizing $N$ also minimizes $D$.
+
+After $3n$ such choices,
+\[
+ D\le2^n(3/4)^{3n}=(27/32)^n<1.
+\]
+Since $D$ is a nonnegative integer, it is zero. There are at most $6n$ rows
+in total, combining the initial and added tests. Each test becomes a degree
+at most $k$ polynomial equation with at most
+$2^k\max\{P,D_0\}$ listed monomials, because each clause violation polynomial
+has at most $2^k$ monomials.
+
+The candidate family has at most $(2m)^P$ members per round. Consequently the
+number of counter calls is at most $3n(2m)^P+1$, again
+$2^{(\log n)^{O_k(1)}}$ for polylogarithmic $B$. Calls are processed one at a
+time. This proves a deterministic count-preserving reduction on the original
+$n$ variables. There is no circular appeal to a SAT oracle: each comparison
+is a concrete call to \eqref{eq:sparsecounter}, which is valid even for the
+rejected candidates' larger solution sets.
+
+\section{Assembling the rational route and accounting for bits and space}
+\label{sec:arithmetic}
+Choose the disjoint sparsification parameter on the order of
+$(\log\log n)^2/\sqrt{\log n}$. Then $B$ is polylogarithmic, the number of
+leaves is $2^{O(\rho(n))}$, and the parity-query cost at each leaf is also
+$2^{O_k(\rho(n))}$. Multiplication of these counts adds their exponents, so
+the overall bound is \eqref{eq:rho}, up to a polynomial input-size factor.
+This conclusion still needs exact arithmetic and space bounds; arithmetic
+operations on arbitrarily large rational numbers cannot be charged unit cost.
+
+\subsection{Controlled denominators, not an exponential denominator product}
+The interpolation rows admit a common denominator built from factorials,
+for example $(R-1)!Q!$ before the fixed-degree substitutions. Its bit length
+is polynomial. Coefficient growth in the swap-polynomial construction is
+bounded by $2^{O(Q\log Q)}$, also polynomial in bit length.
+
+For the sparse-polynomial lift, choose a common denominator for every
+substituted factor, then a common denominator for the entire product.
+The crucial implementation invariant is that the \emph{same} denominator is
+used for all summands at a given stage. Exponentially many additions then
+increase numerator bit length by the logarithm of their number; they do not
+multiply the denominator afresh at every addition.
+
+The rings $\Q[V]/(V^\ell)$ and
+$\Q[V,z]/(V^\ell,z^J)$ have polynomially many stored coordinates.
+The coefficients $e_j$ in \eqref{eq:paritybasis} have polynomial bit size,
+as follows by repeated division by a fixed monic quadratic. Products and
+truncations therefore have polynomial coordinate bit bounds under the
+explicit common-denominator invariant.
+
+\subsection{Hermite reconstruction is an exact polynomial-size linear system}
+If the coefficients of $H$ are unknowns, the equation for Taylor coefficient
+$j$ at node $t$ has coefficient $\binom uj t^{u-j}$ in column $u\ge j$.
+The system is an integer confluent Vandermonde system of polynomial dimension,
+with entries of polynomial bit length. Its nonsingularity is the divisibility
+argument of Section~\ref{sec:taylor}.
+
+After clearing the common denominator of the data, fraction-free elimination
+or a determinant-ratio computation gives the desired constant coefficient.
+Bounds on minors give polynomial bit lengths; one does not expand a determinant
+by enumerating all permutations. At $T=0$ the recovered quantity is integral.
+Only then is the marker-coefficient sum reduced modulo $2^{n+1}$ to obtain
+the exact count.
+
+\subsection{Streaming every large enumeration}
+The algorithm processes sparsification branches, heavy-variable assignments,
+parity candidates, interpolation nodes, subset pairs $(E,U)$, measurement
+tuples, and local Boolean assignments sequentially. The data retained at any
+time are polynomially many counters, matrices, polynomial coefficients, and
+running sums. The disjoint leaf counts add to at most $2^n$, so the final
+accumulator needs only $n+1$ bits.
+
+Polynomial space is thus a concrete storage assertion, not a consequence of
+subexponential time. The source's formal statement strengthens this further
+by bounding all visited tape cells at every prefix of a primitive-machine
+execution \cite{scope,challenge}.
+
+\section{The sharper route: Boolean tensor contraction and fixed density}
+\label{sec:tensorinterface}
+The sharper manuscript bounds use a second algorithmic engine, not simply a
+better estimate of \eqref{eq:taylorcount}. A Boolean tensor network is a
+bipartite multigraph with one bit on each edge. A vertex tensor assigns a
+coefficient-ring element to every assignment of its incident port bits. Its
+contraction is
+\[
+ Z=\sum_{x\in\{0,1\}^{E(G)}}\prod_{v\in V(G)}T_v(x|_{\delta(v)}).
+\]
+Parallel edges have distinct ports. Size is measured by the number of edges,
+not by a potentially exponential explicit truth table for every tensor.
+
+The source proves a contraction theorem for $O(s)$ edges, maximum degree
+at most $\lceil s^{9/10}\rceil$, and entries in
+\[
+ \mathcal B_{P_0,\ell}=(\Z/2^{P_0}\Z)[V]/(V^\ell),
+ \qquad P_0,\ell=O(s).
+\]
+There are polynomially many vertices. Each entry is specified by a procedure
+using polynomial space and at most a polynomial factor times
+$2^{O(s^{9/10})}$ time. Under these hypotheses the contraction is computed
+in polynomial space and
+\begin{equation}\label{eq:tensorbound}
+ (s+\mathcal L)^{O(1)}2^{O(s/\sqrt{\log s})}
+\end{equation}
+bit operations, where $\mathcal L$ is the description length
+\cite{quant-reduction,quant-contraction}.
+The entry-access assumption is part of the theorem; arbitrary tensors given
+only by unspecified oracles are not covered.
+
+For a fixed-width CNF, make a clause tensor for each clause and equality
+tensors to identify the ports representing the same variable. High-degree
+equality constraints can be replaced by trees of trivalent equality tensors.
+Every consistent setting of the external ports extends uniquely through such
+a tree. Subdivide every edge once by a binary equality tensor to obtain a
+bipartite network. The resulting graph has $O_k(n+m)$ edges and bounded
+maximum degree.
+
+Apply the contraction theorem with $s=n+m$, $P_0=n+1$, and $\ell=1$.
+Unused declared variables contribute a factor $2$ each; multiply by their
+combined factor before taking the least residue. The count is at most $2^n$,
+so reduction modulo $2^{n+1}$ is exact. If $m\le Dn$, then $s=O_D(n)$,
+and \eqref{eq:tensorbound} gives \eqref{eq:density}. This reduction has no
+variable blowup depending on a polylogarithmic sparsity parameter.
+
+The remaining sections explain why the contraction theorem has this strong
+bound, and how sparse parity systems can be encoded with only
+$O(n\log\log n)$ wires for the arbitrary-density result.
+
+\section{Exact coefficient arithmetic and balanced packets}
+\label{sec:tensorpackets}
+\subsection{A finite extension supplies enough interpolation points}
+Let $\lambda=\lceil\log_2s\rceil$, $e=4\lambda$, and choose a monic integer
+polynomial $f$ of degree $e$ whose reduction modulo two is irreducible. The
+source finds one by finite deterministic enumeration, polynomial in $s$.
+Work in
+\[
+ \mathcal O=\Z_{(2)}[U]/(f),\quad
+ \mathcal K=\Q[U]/(f),\quad
+ \mathcal A=\mathcal O[V]/(V^\ell),\quad
+ \mathcal A_p=\mathcal A/(2^p).
+\]
+Here $\Z_{(2)}$ allows odd denominators. Nonzero residues modulo two are units,
+because the residue ring is the field $\F_{2^e}$. The valuation of a nonzero
+scalar in $\mathcal K$ is the minimum two-adic valuation of its coordinates
+in the basis $1,U,\ldots,U^{e-1}$; reduction to the residue field shows it is
+multiplicative.
+
+Binary-coordinate lifts of distinct residue-field elements have unit
+differences. Thus there are sufficiently many points for ordinary Lagrange
+interpolation modulo $2^p$ without dividing by nonunits. Arithmetic stores
+$e\ell$ coordinates, each with $p$ bits. Unit inverses are computed by exact
+linear algebra or lifting from characteristic two. These operations have
+polynomial bit complexity at the precisions used by the algorithm.
+
+When precision increases recursively, each tensor uses its original
+creation-time coordinate representatives. This convention is important:
+canonical lifting of residues is not a ring homomorphism. The proof does
+not treat it as one. Instead it fixes entrywise lifts once for a call's
+deformation, and all its evaluations refer to those same lifted tensors.
+
+\subsection{Recursive scales and collision control}
+The root size parameter $s$ remains fixed. A call with $M$ wires is a leaf
+when $M\le H$, where $H\asymp s/\sqrt\lambda$. At active depth $d$, use a
+fixed number of groups $r=64$ and parameters
+\[
+ u_d=\left\lfloor\frac{\eps_0\lambda}{2^d}\right\rfloor,
+ \qquad a_d=2\sum_{j=0}^du_j,
+ \qquad L=2^{a_d},\qquad D_{\rm arr}=r^{2a_d},
+\]
+with a sufficiently small absolute constant $\eps_0$.
+The source arranges $M\le Cs8^{-d}$ and
+$L,D_{\rm arr}\le s^{1/1000}$. At active calls, $u_d$ is still a large power
+of $\lambda$, while the maximum vertex degree remains at most
+$\Delta=\lceil s^{9/10}\rceil$.
+
+Assign vertices on each side labels in $[r]^{a_d}$. The second-moment
+calculation for pair-label loads has expected squared deviation at most
+$2M\Delta$: only pairs of edges sharing a vertex can contribute covariance.
+Conditional expectation yields a deterministic assignment with the same
+bound. Padding each pair-label class to a common multiple of $L$ then gives
+at most $3M/L$ packets of $L$ positions.
+
+Each packet fixes the unordered pair of group symbols in every coordinate.
+When the pair has distinct symbols, the corresponding bit of the position
+index specifies its orientation. In any coordinate, each group has at most
+$3M/r$ real ports on either side. The packing is possible because
+$M\ge2D_{\rm arr}^2\Delta$ and $M\ge LD_{\rm arr}$ at active scales.
+The unused padded positions carry no real ports. This combinatorial step
+supplies both the bit structure used below and the eventual factor-eight
+shrinkage of recursive networks \cite{quant-contraction}.
+
+\section{The Cauchy deformation and tapered Hermite recovery}
+\label{sec:cauchy}
+\subsection{Deforming wire identifications instead of clause variables}
+Within a packet, let $x,y\in\{0,\ldots,L-1\}$ be row and column positions.
+Use the integer grid $S=\{-L,\ldots,L-1\}$ and set
+\[
+ \mathcal C(T)=\prod_{t\in S}(T-t),\qquad \alpha=2^{a+1},\qquad
+ W_{xy}(T)=\frac{\mathcal C(T)}{\mathcal C'(0)(T-(y-x))}.
+\]
+The apparent pole cancels a numerator factor, so $W_{xy}$ is a polynomial
+of degree $2L-1$. Between packets, set entries to zero; unused slots are
+omitted. At zero, $W(0)=I$ on the real ports.
+
+Let $A(Y)$ and $B(X)$ be the products of the row-side and column-side tensors,
+respectively. With $l_0(z)=1-z$ and $l_1(z)=z$, define
+\begin{equation}\label{eq:tensorF}
+ F(T)=\sum_{X,Y\in\{0,1\}^M}A(Y)B(X)
+       \prod_{\text{row ports }x}l_{Y_x}((W(T)X)_x).
+\end{equation}
+At $T=0$, the affine factors require the row and column bits to agree on
+each original wire, so $F(0)$ is the original contraction. Its degree is at
+most $M(2L-1)$. Formula \eqref{eq:tensorF} defines the polynomial; the
+algorithm does not evaluate its double Boolean sum by brute force.
+
+The grid is a complete residue system modulo $2^{a+1}$. For every node $t$,
+the valuation of $\mathcal C'(t)$ equals that of $\mathcal C'(0)$.
+Canceling these powers of two shows
+\[
+ W(t+\alpha z)\in\mathcal O[z],\qquad F(t+\alpha z)\in\mathcal A[z].
+\]
+More specifically, factors $t-q+\alpha z$ have known two-adic contents;
+after cancellation only odd denominators need be inverted. This local
+integrality is what makes modular evaluation legitimate, despite the rational
+coefficients of the global Cauchy deformation.
+
+\subsection{Multiplicity must vary with node valuation}
+At nonzero node $t$, put $i=v_2(t)$ and $D_t=L/2^i$. Let
+\[
+ h=\lceil3M/u\rceil,\qquad q_t=h\max(0,u-i).
+\]
+There are $L$ odd nodes, so the total multiplicity exceeds $M(2L-1)$.
+The source recovers $F(0)$ modulo $2^p$ from the first $q_t$ local
+coefficients, using precision
+\begin{equation}\label{eq:precision}
+ p_t=p+8hD_t+8M(a+1).
+\end{equation}
+The taper $q_t$ is the key quantitative feature. Equal multiplicities at all
+retained valuation levels would incur a larger precision loss at the last
+level.
+
+For each node define
+\[
+ E_t(T)=\prod_{q\in S\setminus\{0,t\}}
+            \left(\frac{T-q}{t-q}\right)^{q_q}.
+\]
+Hermite reconstruction gives the identity
+\begin{equation}\label{eq:taperidentity}
+ F(0)=\sum_{t:q_t>0}E_t(0)
+ \left[\frac{F(t+\alpha z)}{E_t(t+\alpha z)}\right]_{<q_t}
+                  \bigg|_{z=-t/\alpha}.
+\end{equation}
+To verify it, replace zero by an indeterminate. Each summand has the desired
+jet at its own node and vanishes to the required multiplicity at all other
+nodes. The difference from $F$ has smaller degree than the product of all
+those multiplicity factors and is divisible by that product, hence is zero.
+
+The local denominator $E_t(t+\alpha z)$ has integral coefficients and constant
+term one, so its formal reciprocal loses no precision. The source counts
+grid points by their valuations and obtains
+\begin{equation}\label{eq:valuationloss}
+ v_2(E_t(0))=
+ D_t\sum_{j=1}^{a-i}\frac{j}{2^j}\bigl(q(i+j)-q(i)\bigr)
+ \ge-6D_th.
+\end{equation}
+Indeed, $q(i+j)-q(i)\ge-hj$ and $\sum_{j\ge1}j^2/2^j=6$.
+Evaluation at $-t/\alpha$ loses at most another $4M(a+1)$ powers of two.
+Thus \eqref{eq:precision} leaves enough precision for the final answer.
+Rational arithmetic in this last combination has polynomial-length
+numerators and denominators because all products and multiplicities are
+polynomially bounded.
+
+The recursive choice $a_d=a_{d-1}+2u_d$ ensures that inherited precision is
+also affordable. At an active node $i<u_d$, one has
+$D_t\ge2^{a_{d-1}+u_d}$. This additional factor dominates inherited
+polylogarithmic overhead, yielding the effective bound
+\begin{equation}\label{eq:effectiveprecision}
+ p_t=O(MD_t/u_d).
+\end{equation}
+All precisions nevertheless remain polynomial in the root size $s$.
+To obtain the local jets, the algorithm evaluates the entire local polynomial
+at polynomially many residue-distinct extension-field lifts and interpolates
+with unit denominators. Its evaluations are performed by the recursive
+factorization described next.
+
+\section{Valuation-weighted modes and the recursive contraction identity}
+\label{sec:modes}
+Fix a node $t$ with $i=v_2(t)<u$ and a local evaluation $T=t+\alpha\zeta$.
+Group the vertices by coordinate $i$ of their labels. At $T=t$, a nonzero
+Cauchy entry has $y-x=t$; adding an integer of valuation $i$ flips bit $i$.
+The packet orientation convention therefore makes this entry join ports in
+the same group. Only the perturbation away from the node creates crossing
+interactions.
+
+Partition a packet's columns into tiles
+$y=y_0+2^{i+1}j$. A tile has a fixed source group. For a row crossing to
+that tile, $v_2(t-y_0+x)\le i$. A geometric expansion gives
+\begin{equation}\label{eq:modeexpansion}
+ W_{xy}(T)\equiv
+ \sum_{b+1<p_t}
+ \frac{\mathcal C(T)}{\mathcal C'(0)(T-y_0+x)}
+ \left(\frac{2^{i+1}}{T-y_0+x}\right)^b j^b
+ \pmod{2^{p_t}}.
+\end{equation}
+After the known powers of two have been factored out, the inverses are unit
+inverses. The coefficient at index $b$ is divisible by $2^{b+1}$.
+
+For each packet, tile, and index $b$, introduce a mode $Z$ of weight
+$w_Z=b+1$, whose eventual value is
+\[
+ L_Z(X)=\sum_{\text{real columns in the tile}}j^bX_y.
+\]
+Each mode has one source group and one target group. The row forms are sums
+of a local part and these modes, with coefficients divisible by their
+weight powers of two. Consequently a mode monomial $Z^\beta$ has coefficient
+divisible by $2^{\sum_Zw_Z\beta_Z}$. It contributes nothing modulo $2^{p_t}$
+if its total weight is at least $p_t$.
+
+\subsection{A partition estimate counts all surviving interactions}
+There are at most $6M/D_t$ modes of any one weight. For $\theta>0$, the number
+of exponent tuples of total weight below $p_t$ is bounded by
+\[
+ \exp\left(\theta p_t+\frac{6M}{D_t}
+                \sum_{j\ge1}-\log(1-e^{-\theta j})\right).
+\]
+Expanding the logarithm gives
+\[
+ \sum_{j\ge1}-\log(1-e^{-\theta j})
+ =\sum_{h\ge1}\frac1{h(e^{\theta h}-1)}
+ \le\frac1\theta\sum_{h\ge1}\frac1{h^2}.
+\]
+Choose $\theta=\sqrt{M/(D_tp_t)}$ and use
+\eqref{eq:effectiveprecision}. The number of tuples is then
+\begin{equation}\label{eq:modenumber}
+ \exp(O(\sqrt{Mp_t/D_t}))=\exp(O(M/\sqrt u)).
+\end{equation}
+The tuples can be enumerated sequentially with polynomial-size counters.
+A partial feasible tuple always has the all-zero continuation, so traversing
+the enumeration tree has only a polynomial overhead per completed tuple.
+
+\subsection{Fixing a tuple separates the groups}
+For a fixed $\beta$, each target group extracts the coefficient of its
+incoming modes from its affine row-factor product. Each source group
+multiplies the corresponding powers $L_Z(X)^{\beta_Z}$. These operations
+involve only bits from that group once $\beta$ is fixed.
+
+To represent the resulting expression as a new bipartite network, put all
+current vertices of one group on one side and new packet tensors on the
+other. A packet tensor carries precisely the coefficient-extraction and
+source-mode factors just described. Distributing the products and then
+summing independent group bits gives the exact modular identity
+\begin{equation}\label{eq:recursion}
+ F(t+\alpha\zeta)
+ =\sum_{\beta:\,\sum w_Z\beta_Z<p_t}
+            \prod_{g=1}^{64}Z_{g,\beta}\pmod{2^{p_t}},
+\end{equation}
+where $Z_{g,\beta}$ is the contraction of that group's child network.
+Terms not listed vanish by divisibility, not by an approximate truncation.
+
+Each child has at most $6M/64=3M/32<M/8$ wires, using the balanced port loads.
+A new packet vertex has at most $2L$ ports, so the degree invariant is
+preserved. Its entry is computed by expanding a product of at most $L$
+affine factors and extracting the specified coefficient, in
+$\exp(O(L\log s))$ time and polynomial space. Since $L\le s^{1/1000}$,
+this fits the allowed entry-access budget.
+
+Descriptions are retained with their creation precision and used directly.
+One does not recursively compose entry routines into an increasingly large
+formula. This implementation detail prevents an uncounted description or
+precision explosion along the recursion.
+
+\section{Why the recursive costs sum to the square-root-logarithmic exponent}
+\label{sec:tensorcost}
+At depth $d$, $M\le Cs8^{-d}$ and
+$u_d\asymp\lambda/2^d$. Thus \eqref{eq:modenumber} gives exponent
+\[
+ O\left(\frac{s}{\sqrt\lambda}
+                 \left(\frac{\sqrt2}{8}\right)^d\right)
+\]
+for the branching work of a call, apart from polynomial factors for nodes,
+evaluations, and groups. There are only $O(\log\lambda)$ active depths.
+Multiplying the branching bounds adds their exponents, and the geometric
+series converges. Polynomial overhead across these depths contributes only
+$O(\lambda\log\lambda)$ to the logarithm of the cost, which is smaller than
+$s/\sqrt\lambda$.
+
+Leaves have at most $H\asymp s/\sqrt\lambda$ wires and are evaluated directly.
+Their entry-access cost is $2^{O(s^{9/10})}$, also absorbed asymptotically by
+$2^{O(s/\sqrt\lambda)}$. Correctness follows inductively from the exact
+recursive identity, local modular evaluations, and tapered reconstruction.
+The total bit-operation bound is therefore \eqref{eq:tensorbound}.
+
+For space, use depth-first recursion. Retain one running sum over tuples,
+one product over groups, the polynomially many local interpolation data,
+and the current packet descriptions. Precision is polynomially bounded, and
+the stack has only $O(\log\log s)$ levels. The computation therefore uses
+polynomial space even though its total recursion tree is subexponentially
+large.
+
+The distinction from the rational clause-interpolation route is now visible.
+There, a single global Taylor order produces a binomial subset-enumeration
+cost. Here, modular divisibility controls a weighted mode count at each
+recursive scale, and the tapered multiplicities reduce the precision enough
+to make those costs sum geometrically. This is why the sharper exponent is
+not obtained simply by deleting a logarithm from the earlier calculation.
+
+\section{The arbitrary-density improvement via incidence-subset encoding}
+\label{sec:tensordense}
+The tensor theorem must next be applied to sparse polynomial parity systems
+without creating one wire per incidence, since there can be
+$n\operatorname{polylog}(n)$ incidences. The source uses the global degree bound
+\eqref{eq:totaldegree} to encode selected incidences more economically
+\cite{quant-reduction}.
+
+After branching on heavy variables as before, introduce a separate variable
+$z_{iv}$ for each test--variable incidence. Multilinearize each lifted test
+factor in its own incidence variables. The factors now use disjoint
+indeterminate sets, and their truncated product is multilinear of total
+incidence degree at most
+\[
+ K=k(a+2n)=O(n).
+\]
+The actual Boolean variable $x_v$ is substituted for all of its incidence
+copies only after this coefficient representation has been established.
+
+Partition the tests and variables separately into
+$J=\lceil n^{1/4}\rceil$ nearly equal groups. Let $N_{gh}$ be the number of
+incidences between test group $g$ and variable group $h$, with total
+$N\le n(\log n)^{O(1)}$. For a monomial, write $d_{gh}$ for its selected
+incidence count in that pair. Enumerate arrays with
+$0\le d_{gh}\le N_{gh}$ and $\sum d_{gh}\le K$. There are at most
+$(K+1)^{J^2}=2^{O(\sqrt n\log n)}$ such arrays.
+
+For a fixed array, the subset in pair $(g,h)$ has
+$\binom{N_{gh}}{d_{gh}}$ possibilities. Encode its lexicographic index with
+$\lceil\log_2\binom{N_{gh}}{d_{gh}}\rceil$ Boolean wires. Invalid bit strings
+receive tensor value zero. Subsets are decoded by binomial-coefficient counts
+of completions, in polynomial time. The total wire count is bounded by
+\begin{align}\label{eq:wirecount}
+ M&\le J^2+\log_2\prod_{g,h}\binom{N_{gh}}{d_{gh}}\\
+  &\le J^2+\log_2\binom{N+K}{K}
+   =O(n\log\log n).\nonumber
+\end{align}
+The last estimate uses $K=\Theta(n)$ and $N/n$ polylogarithmic.
+This entropy bound is the source of the single remaining $\log\log n$
+factor in the sharper arbitrary-density exponent.
+
+At a test-group vertex, the tensor entry is the product of the coefficients
+of the selected incidence monomials in that group's test factors. A selected
+coefficient is computed by subset inversion:
+\[
+ [z_S]\overline B_i(z,V)
+   =\sum_{T\subseteq S}(-1)^{|S|-|T|}B_i(\one_T,V).
+\]
+Each test scope has polylogarithmic size, so this entry procedure costs only
+$2^{(\log n)^{O(1)}}$ time and polynomial space.
+At a variable-group vertex, a variable selected at least once must equal one
+when summing its monomial over the Boolean cube; an unselected variable is
+free. The tensor value is therefore $2$ to the number of unselected variables,
+computed modulo $2^{n+1}$.
+
+Every incidence monomial occurs in exactly one degree array and has one valid
+subset index per group pair. The product of the test-side entries is its
+coefficient, and the product of the variable-side entries is its Boolean
+monomial sum. Summing the resulting contractions therefore gives the required
+truncated polynomial sum exactly. Apply $\mathcal S_\ell$ only at the end.
+
+Each group has at most $n^{3/4}(\log n)^{O(1)}$ incident ports, within the
+contraction theorem's degree allowance for large $n$ when
+$s=n\lceil\log_2\log_2n\rceil$. Its precision and marker truncation are
+$n+1=O(s)$. Equations \eqref{eq:tensorbound} and \eqref{eq:wirecount} thus give
+\[
+ n^{O_{k,c}(1)}2^{O_{k,c}(n\log\log n/\sqrt{\log n})}
+\]
+for the sparse polynomial counter. Heavy-variable branches and the degree-array
+enumeration have smaller exponents and are processed sequentially.
+
+Finally use disjoint sparsification with
+$\sigma\asymp1/\sqrt{\log n}$, and the same deterministic parity-test selection,
+now calling this faster counter. The leaf count and candidate-enumeration
+costs are absorbed in \eqref{eq:sharp}. A single algorithm can achieve both
+claimed regimes: use the direct clause network when
+$m\le n\lceil\log_2\log_2n\rceil$ and the parity-system route otherwise.
+For every fixed density $D$, all sufficiently large inputs with $m\le Dn$
+choose the first branch, giving \eqref{eq:density}.
+
+\section{The explicit ETH contradiction and the canonical-input issue}
+\label{sec:eth-consequence}
+Take $k=3$. The reported algorithm computes $\#F$ exactly; comparing its
+binary output with zero decides satisfiability. Even the weaker exponent
+\eqref{eq:rho} is enough because
+\[
+ \frac{\rho(n)}n=\frac{(\log\log n)^2}{\sqrt{\log n}}\longrightarrow0.
+\]
+For any proposed constant $c>0$ in \eqref{eq:eth}, a fixed exponent constant
+$A$ satisfies $A\rho(n)\le cn/2$ for all sufficiently large $n$.
+The finitely many smaller inputs can be absorbed into the overall constant.
+Thus one obtains an algorithm within the rate that \eqref{eq:eth} forbids.
+The source's stronger uniform statement chooses one machine for fixed $k$
+before all input sizes and formulas; it is not advice selected separately
+for every input.
+
+The published formal theorem uses a canonical encoding. Variables lie in
+$\operatorname{Fin}(n)$, clauses and formulas are finite sets, and literals,
+clauses, and formulas are sorted and framed. Natural-number components use
+unary coding. Therefore the theorem's polynomial factor is measured in this
+canonical length $L$, not in an unspecified compact representation.
+
+For an ordinary explicit 3-CNF decision input, rename its occurring variables
+consecutively. Their number is at most the input length, and each unary index
+then has polynomial length in that input. Sorting, removing duplicate literals
+and clauses, and producing the canonical representation are polynomial-time
+operations. The polynomial factor in $L$ is consequently a polynomial
+input-reading factor in the usual representation. This supplies the needed
+bridge to the catalogue's decision formulation.
+
+For fixed width there are only
+$\sum_{j=0}^k\binom{2n}{j}=O_k(n^k)$ distinct normalized clauses. Thus the
+canonical representation also cannot hide a positive exponential rate solely
+in its duplicate-free clause list. Exact counting must still retain unused
+declared variables or restore a factor $2^u$. A declaration of an astronomically
+large number of unused variables in a compact binary field requires special
+care about output length: writing the count itself needs up to $n+1$ bits.
+The formal encoding and the manuscript's polynomial-in-$n+m$ statement include
+that cost. No stronger succinct-input counting claim is inferred here.
+
+\section{Consequences that follow, and claims that do not}
+\label{sec:consequences}
+\subsection{Witnesses and exact sampling}
+A satisfying assignment can be found by fixing one bit at a time and counting
+the two restrictions. If the current count is positive, at least one branch
+has positive count. This needs only polynomially many calls.
+To sample uniformly, choose each next bit with probability equal to its
+conditional count divided by the current count. For a final satisfying
+assignment the conditional ratios telescope to $1/\#F$. Exact integer
+sampling implements these rational probabilities with polynomial expected
+overhead. This is a randomized exact sampler, not a deterministic procedure
+that somehow produces randomness.
+
+\subsection{Examples of parameter-controlled counting reductions}
+Independent sets of a graph correspond bijectively to satisfying assignments
+of $\bigwedge_{\{u,v\}\in E}(\neg x_u\vee\neg x_v)$, using one variable per
+vertex. For each fixed number of colors $q$, one-hot color variables give a
+count-preserving fixed-width encoding with $q$ variables per vertex. These
+reductions therefore give subexponential counting in the number of vertices,
+up to the relevant polynomial input factors.
+
+For perfect matchings, one Boolean variable per edge and a linear-size
+checking circuit give a unique-extension width-three encoding with
+$O(v+e)$ variables. The resulting subexponential parameter is $v+e$, not
+automatically $v$ for dense graphs. This distinction illustrates why the
+size of a reduction must be tracked rather than suppressed in the phrase
+``NP-complete reduction'' \cite{paper}.
+
+\subsection{What ETH's failure would and would not imply}
+A subexponential algorithm need not be polynomial time. For instance,
+$2^{\sqrt n}$ is subexponential and superpolynomial. Thus the reported theorem
+does not settle $\mathsf P$ versus $\mathsf{NP}$. Its constants can also be
+large, and none of the proofs supplies a practical SAT benchmark or a small
+crossover input size.
+
+The fixed-width theorem contradicts the usual fixed-$k$ strong exponential-time
+hypothesis as well: every fixed width now has vanishing exponential rate.
+It does not assert a uniform subexponential bound for unrestricted-width CNF
+with $k$ growing with $n$. Nor does it automatically give subexponential
+algorithms for every problem in NP. A polynomial reduction can enlarge an
+$n$-parameter instance to $n^c$ SAT variables, and $2^{o(n^c)}$ need not be
+$2^{o(n)}$.
+
+An ETH-conditional lower-bound theorem remains a valid implication if ETH is
+false, but its antecedent can no longer establish an unconditional lower bound.
+To obtain a fast algorithm for its target problem one still needs a suitable
+reduction in the algorithmic direction with a controlled parameter blowup.
+The source contains further applications to approximation, local maps, and
+circuit lower bounds; those are downstream results, not prerequisites for
+the CS-20 resolution, and their full proofs are not reproduced in this report.
+
+\section{Formal scope, source dependencies, and remaining verification}
+\label{sec:formal}
+The inspected comparator target quantifies a fixed deterministic primitive
+machine for each $k\ge2$, then every $n$ and every width-at-most-$k$ formula.
+A basic machine step performs a bounded tape action, rather than an arbitrary
+unit-cost rational calculation. The target supplies a halting trace with the
+correct binary count, the satisfiability bit, the documented runtime, and a
+polynomial bound on total visited tape cells at every execution prefix
+\cite{challenge}.
+
+The runtime scale in that statement uses shifted logarithms,
+\[
+ n\frac{[\log\log(n+16)]^2}{\sqrt{\log(n+16)}},
+\]
+which is asymptotically the same as \eqref{eq:rho} and well-defined for all
+natural-number inputs. The formal scope explicitly distinguishes this bound
+from the sharper manuscript exponents \cite{scope}. This report likewise
+does not label the tensor-contraction runtime as independently machine-checked
+merely because a weaker sufficient SAT theorem is documented.
+
+The reference file under \texttt{ComparatorChallenges} contains the target
+statement and its proof placeholder. It is not the solution proof. Its JSON
+configuration routes to the separate module
+\texttt{OAI.Algorithms.SubexponentialSAT.Main} and names the theorem
+\begin{center}\small
+\texttt{OAI.Algorithms.SubexponentialSAT.SqrtLogSpace.}\par
+\texttt{exact\_count\_and\_sat}.
+\end{center}
+The permitted foundational axioms are \texttt{propext}, \texttt{Quot.sound},
+and \texttt{Classical.choice} \cite{config,solution}.
+Inspecting these files is not the same as successfully executing their
+verification procedure. No complete rebuild, comparator run, or transitive
+axiom audit was performed here.
+
+The mathematical dependencies that most deserve an independent check are the
+balanced-incidence embedding and denominator bounds in the rational route;
+the global marker-degree truncation and noncircular parity-test selection;
+and, in the sharper route, local integrality, the valuation loss in tapered
+Hermite recovery, the child-network identity, and the immutable precision
+convention for implicit tensors. Each is necessary to rule out a hidden
+exponential cost or an invalid algebraic substitution.
+
+The earlier catalogue contribution explored separator-based strategies and
+correctly distinguished them from a uniform algorithm. The source method
+reported here does not assume those separators exist: its separations occur
+at algebraically deformed inputs or within valuation-indexed recursive
+contractions. This is the substantive difference from an unproved graph
+partition hypothesis \cite{catalogue}.
+
+\section{Completion Estimate}
+\noindent\textbf{COMPLETION: 0\%}
+This report claims no new original solution or independently verified proof. The estimate concerns this report's original research contribution, not the extent of the results attributed to OpenAI.
+\section{Final status and preparation}
+Unresolved as an original research attempt: literature exposition only. OpenAI's reported full result remains attributed to the cited source; no source-catalogue or community-review verdict is changed by this report.
+The document is dated 26 October 2026. The underlying GPT 6 Astra Pro release/build and reasoning setting are unknown. The supplied source-inspection statements describe the preparation of the report; repository integration checks identity, formatting, compilation and rendering, rather than certifying the underlying proofs. Original generation prompts and browsing logs are unavailable; use of the repository's initial and final research prompts during original preparation is not documented. No independent human audit, Lean execution or new performance benchmark is asserted.
+
+
+\section{Attribution and provenance}
+\paragraph{Problem handle.} \texttt{prb\_a1b2b1f67d0e489da50d97b732d8291d}
+(CS-20).
+\paragraph{Submission claim.} Literature report.
+\paragraph{Underlying reported result.} Full disproof of ETH, attributed to
+OpenAI, through deterministic exact counting for each fixed clause width.
+\paragraph{Exact scope.} Detailed exposition of the bounded-occurrence
+interpolation core, disjoint general reduction, sparse-polynomial counter,
+deterministic parity tests, arithmetic and space accounting, and the sharper
+recursive tensor method. It derives the ETH contradiction and checks ordinary
+input compatibility. It distinguishes the documented formal runtime from the
+sharper manuscript runtimes. No original discovery, full independent audit,
+Lean execution, or practical performance claim is made.
+\paragraph{Who did the work.} LLM only (people only prompted or submitted).
+\paragraph{Model used in this preparation.} OpenAI GPT 6 Astra Pro; exact version:
+unknown; thinking setting: unknown; actual time or compute budget: unknown.
+Role: source inspection, mathematical exposition, scope comparison, and TeX
+preparation. No second model or independent human proof reviewer was used.
+\paragraph{People and roles.} The submitter prompted preparation and expansion. No human mathematical authorship or independent proof-verification role is asserted.
+\paragraph{External research provenance.} OpenAI is the author named on the
+source manuscript. The original research's internal model identities, settings,
+budgets, and individual roles are not established by this report and are
+recorded as unknown. They are external source provenance, not additional models
+invoked during this preparation.
+Linked third-party artifacts retain their original terms. Source manuscripts, images and Lean code are not bundled.
+
+\begin{thebibliography}{99}
+\bibitem{catalogue} \emph{we-solve}, CS-20,
+\emph{The Exponential Time Hypothesis for 3-SAT}.
+Used: exact ETH quantifiers, input-size convention, stable handle, and the
+scope of the earlier separator exploration.
+\url{https://we-solve.github.io/problems/the-exponential-time-hypothesis-for-3-sat/}.
+\bibitem{paper} OpenAI, \emph{The Exponential Time Hypothesis is False},
+October 17, revised October 25, 2026, pinned commit in Section~\ref{sec:target}.
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/main_full_version.tex}{Main manuscript source}.
+Used: theorem and technique overview; measurement separation; Boolean Taylor
+recovery; swap-matrix construction; incidence balancing; parity lift and its
+total-degree bound; sparse-polynomial counting; deterministic parity tests;
+sparsification appendix; bit complexity and polynomial space; selected
+counting consequences. The source was read for this exposition, not fully
+independently verified.
+\bibitem{quant-reduction} OpenAI, same manuscript,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/quantitative-reduction.tex}{Sharper exact-counting bounds and tensor encodings}.
+Used: contraction interface, fixed-density clause network, incidence-subset
+encoding, dense-case reduction, and the single algorithm attaining both regimes.
+\bibitem{quant-contraction} OpenAI, same manuscript,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/build/quantitative-contraction.tex}{Proof of the Boolean tensor-contraction theorem}.
+Used: coefficient arithmetic, packet packing, Cauchy deformation, local
+integrality, tapered Hermite recovery, weighted modes, child networks,
+precision invariants, and recursive time/space bounds.
+\bibitem{scope} OpenAI,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/lean/docs/378.md}{Formalization scope 378}.
+Used: exact-counting and satisfiability scope, canonical input length,
+documented weaker runtime, and the distinction from the manuscript bounds.
+\bibitem{challenge} OpenAI,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/lean/ComparatorChallenges/SubexponentialSAT.lean}{Subexponential-SAT comparator reference}.
+Used: finite variable set, canonical encoding, primitive-machine semantics,
+quantifier order, binary output, runtime, and all-prefix space statement.
+This is the reference specification, not its solution proof.
+\bibitem{config} OpenAI,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/lean/ComparatorChallenges/SubexponentialSAT.json}{Subexponential-SAT comparator configuration}.
+Used: theorem identification, solution routing, and permitted axioms.
+\bibitem{solution} OpenAI,
+\href{https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/lean/OAI/Algorithms/SubexponentialSAT/Main.lean}{Subexponential-SAT main solution module}.
+Used: imports and identification of the exact-counting polynomial-space result.
+No complete dependency-closure check or successful local execution is claimed.
+\end{thebibliography}
+\end{document}
